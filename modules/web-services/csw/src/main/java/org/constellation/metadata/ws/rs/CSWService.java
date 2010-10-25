@@ -58,7 +58,6 @@ import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.csw.xml.Transaction;
 import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DescribeRecordType;
 import org.geotoolkit.csw.xml.v202.DistributedSearchType;
 import org.geotoolkit.csw.xml.v202.ElementSetNameType;

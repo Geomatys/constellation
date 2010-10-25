@@ -17,10 +17,7 @@
 
 package org.constellation.ws;
 
-import com.sun.jersey.api.core.HttpContext;
 import java.util.logging.Level;
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -38,21 +35,6 @@ public interface Worker {
      * Initialize the {@see #uriContext} information.
      */
     void initUriContext(final UriInfo uriInfo);
-
-    /**
-     * Initialize the {@see #httpContext} value.
-     */
-    void initHTTPContext(final HttpContext httpCtxt);
-
-    /**
-     * Initialize the {@see #servletContext} value.
-     */
-    void initServletContext(final ServletContext servCtxt);
-
-    /**
-     * Initialize the {@see #servletContext} value.
-     */
-    void initSecurityContext(final SecurityContext secCtxt);
 
     /**
      * Set The Logging level for all the info message in the worker

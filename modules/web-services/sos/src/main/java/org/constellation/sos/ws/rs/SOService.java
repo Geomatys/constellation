@@ -38,7 +38,6 @@ import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.geotoolkit.sos.xml.v100.GetObservation;

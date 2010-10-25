@@ -18,8 +18,6 @@
 package org.constellation.sos.ws.soap;
 
 // JDK dependencies
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
@@ -70,11 +68,6 @@ public class SOService {
      * use for debugging purpose
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
-    
-    /**
-     * A map containing the Capabilities Object already load from file.
-     */
-    private Map<String,Object> capabilities = new HashMap<String,Object>();
     
     /**
      * a service worker

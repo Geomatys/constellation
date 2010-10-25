@@ -158,9 +158,6 @@ public class WFSService extends OGCWebService {
 
         ServiceDef version    = null;
 
-        worker.initHTTPContext(getHttpContext());
-        worker.initSecurityContext(null);
-        worker.initServletContext(getServletContext());
         worker.initUriContext(getUriContext());
 
         try {

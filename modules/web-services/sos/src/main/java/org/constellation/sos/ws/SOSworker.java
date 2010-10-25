@@ -40,7 +40,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
@@ -59,7 +58,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationFilterReader;
@@ -323,7 +321,7 @@ public class SOSworker extends AbstractWorker {
     public SOSworker(File configurationDirectory) {
         
         if (configurationDirectory == null) {
-            configurationDirectory = getConfigDirectory();
+            configurationDirectory = getConfigurationDirectory("sos");
         }
 
         final String notWorkingMsg     = "The SOS service is not running!";
@@ -2152,9 +2150,9 @@ public class SOSworker extends AbstractWorker {
         try {
             if (dbId != null && physicalID != null) {
                 map.setProperty(physicalID, dbId);
-                final File configDirectory = getConfigDirectory();
+                final File configDirectory = getConfigurationDirectory("sos");
                 if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
-                    final File mappingFile     = new File(getConfigDirectory(), "mapping.properties");
+                    final File mappingFile     = new File(configDirectory, "mapping.properties");
                     final FileOutputStream out = new FileOutputStream(mappingFile);
                     map.store(out, "");
                     out.close();
@@ -2179,23 +2177,6 @@ public class SOSworker extends AbstractWorker {
         if (!isStarted) {
             throw new CstlServiceException("The service is not running!", NO_APPLICABLE_CODE);
         }
-    }
-
-    /**
-     * Look for the SOS configuration directory.
-     */
-    private File getConfigDirectory() {
-        final File configDir = ConfigDirectory.getConfigDirectory();
-        if (configDir != null && configDir.exists()) {
-            final File sosDir = new File(configDir, "sos_configuration");
-            if (sosDir != null && sosDir.exists()) {
-                LOGGER.log(Level.INFO, "taking configuration from constellation directory: {0}", configDir.getPath());
-            } else {
-                LOGGER.warning("Unable to find a SOS configuration directory");
-            }
-            return sosDir;
-        }
-        return null;
     }
 
     /**

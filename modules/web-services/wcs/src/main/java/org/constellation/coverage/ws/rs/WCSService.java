@@ -131,9 +131,6 @@ public class WCSService extends GridWebService {
 
         ServiceDef serviceDef = null;
 
-        worker.initHTTPContext(getHttpContext());
-        worker.initSecurityContext(null);
-        worker.initServletContext(getServletContext());
         worker.initUriContext(getUriContext());
         try {
             // Handle an empty request by sending a basic web page.

@@ -73,7 +73,6 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     public static void setUpClass() throws Exception {
         WORKER = new WCSWorker();
         // Default instanciation of the worker' servlet context and uri context.
-        WORKER.initServletContext(new ServletContextImpl());
         WORKER.initUriContext(new WebApplicationContext(
                 new WebApplicationImpl(),
                 new ContainerRequest(new WebApplicationImpl(), "GET", new URI("http://localhost:9090/"),

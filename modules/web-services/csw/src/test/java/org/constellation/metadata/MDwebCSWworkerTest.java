@@ -31,7 +31,6 @@ import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.util.Util;
 
 import org.geotoolkit.csw.xml.CSWClassesContext;
-import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;

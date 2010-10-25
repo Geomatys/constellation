@@ -18,8 +18,6 @@
 package org.constellation.metadata.ws.soap;
 
 // J2SE dependencies 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 // JAX-WS dependencies
@@ -60,11 +58,6 @@ public class CSWService {
      * use for debugging purpose
      */
     private static final Logger LOGGER = Logger.getLogger("org.costellation.metadata");
-    
-    /**
-     * A map containing the Capabilities Object already load from file.
-     */
-    private Map<String,Object> capabilities = new HashMap<String,Object>();
     
     /**
      * a service worker

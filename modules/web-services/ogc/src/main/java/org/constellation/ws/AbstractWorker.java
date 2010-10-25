@@ -17,7 +17,6 @@
 package org.constellation.ws;
 
 //J2SE dependencies
-import com.sun.jersey.api.core.HttpContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,12 +24,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.SecurityContext;
+
 import javax.ws.rs.core.UriInfo;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.provider.configuration.ConfigDirectory;
+
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -52,20 +53,6 @@ public abstract class AbstractWorker implements Worker {
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws");
 
     /**
-     * Contains information about the HTTP exchange of the request, for instance, 
-     * the HTTP headers.
-     */
-    private HttpContext httpContext = null;
-    /**
-     * Contains authentication information related to the requesting principal.
-     */
-    private SecurityContext securityContext = null;
-    /**
-     * Defines a set of methods that a servlet uses to communicate with its servlet container,
-     * for example, to get the MIME type of a file, dispatch requests, or write to a log file.
-     */
-    private ServletContext servletContext = null;
-    /**
      * Contains the request URI and therefore any  KVP parameters it may contain.
      */
     private UriInfo uriContext = null;
@@ -86,42 +73,6 @@ public abstract class AbstractWorker implements Worker {
     @Override
     public synchronized void initUriContext(final UriInfo uriInfo){
         uriContext = uriInfo;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public synchronized void initHTTPContext(final HttpContext httpCtxt){
-        httpContext = httpCtxt;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public synchronized void initServletContext(final ServletContext servCtxt){
-        servletContext = servCtxt;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public synchronized void initSecurityContext(final SecurityContext secCtxt){
-        securityContext = secCtxt;
-    }
-
-    protected synchronized HttpContext getHttpContext(){
-        return httpContext;
-    }
-
-    protected synchronized SecurityContext getSecurityContext(){
-        return securityContext;
-    }
-
-    protected synchronized ServletContext getServletContext(){
-        return servletContext;
     }
 
     protected synchronized UriInfo getUriContext(){
@@ -157,12 +108,8 @@ public abstract class AbstractWorker implements Worker {
         } else {
             fileName = service + "Capabilities" + version + '-' + language + ".xml";
         }
-        final String home;
-        if (getServletContext() != null) {
-            home     = getServletContext().getRealPath("WEB-INF");
-        } else {
-            home = null;
-        }
+        final String home = null;
+       
         final boolean update  = WebServiceUtilities.getUpdateCapabilitiesFlag(home);
 
         //Look if the template capabilities is already in cache.
@@ -204,4 +151,22 @@ public abstract class AbstractWorker implements Worker {
     }
 
     protected abstract MarshallerPool getMarshallerPool();
+
+
+    /**
+     * Look for the service configuration directory.
+     */
+    protected File getConfigurationDirectory(String service) {
+        final File configDir = ConfigDirectory.getConfigDirectory();
+        if (configDir != null && configDir.exists()) {
+            final File sosDir = new File(configDir, service);
+            if (sosDir != null && sosDir.exists()) {
+                LOGGER.log(Level.INFO, "taking configuration for service {0} from directory: {1}", new Object[]{service, configDir.getPath()});
+            } else {
+                LOGGER.log(Level.WARNING, "Unable to find a {0} configuration directory", service);
+            }
+            return sosDir;
+        }
+        return null;
+    }
 }

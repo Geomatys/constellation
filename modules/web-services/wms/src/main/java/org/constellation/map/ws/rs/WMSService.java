@@ -200,7 +200,6 @@ public class WMSService extends GridWebService {
                 if (version == null) {
                     version = getVersionFromNumber(requestCapab.getVersion());
                 }
-                worker.initServletContext(getServletContext());
                 worker.initUriContext(uriContext);
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
                 

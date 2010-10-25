@@ -37,7 +37,6 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
@@ -62,7 +61,6 @@ import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -256,11 +254,6 @@ public class CSWworker extends AbstractWorker {
     private ServiceDef actingVersion = ServiceDef.CSW_2_0_2;
 
     /**
-     * The log level off al the informations log.
-     */
-    private Level logLevel = Level.INFO;
-    
-    /**
      * Build a new CSW worker with the specified configuration directory
      *
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
@@ -270,7 +263,7 @@ public class CSWworker extends AbstractWorker {
 
         final String notWorkingMsg = "The CSW service is not working!";
         if (configDir == null) {
-            configDir    = getConfigDirectory();
+            configDir    = getConfigurationDirectory("csw");
             if (configDir == null) {
                 LOGGER.log(Level.WARNING, "{0}\nCause: The configuration directory has not been found", notWorkingMsg);
                 isStarted = false;
@@ -1720,24 +1713,6 @@ public class CSWworker extends AbstractWorker {
         } catch (SecurityException ex) {
             LOGGER.log(Level.SEVERE, "Security exception while trying to separate CSW Logs{0}", ex.getMessage());
         }
-    }
-
-    /**
-     * Look for the CSW configuration directory.
-     */
-    public static File getConfigDirectory() {
-
-        final File configDir = ConfigDirectory.getConfigDirectory();
-        if (configDir != null && configDir.exists()) {
-            final File sosDir = new File(configDir, "csw_configuration");
-            if (sosDir != null && sosDir.exists()) {
-                LOGGER.log(Level.INFO, "taking configuration from constellation directory: {0}", configDir.getPath());
-            } else {
-                LOGGER.warning("Unable to find a CSW configuration directory");
-            }
-            return sosDir;
-        }
-        return null;
     }
 
     /**
