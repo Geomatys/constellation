@@ -170,7 +170,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     @Override
     public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws CstlServiceException {
         final OnlineResourceType or = new OnlineResourceType();
-        or.setHref(getUriContext().getBaseUri().toString() + "wcs?");
+        or.setHref(getServiceUrl() + "wcs?");
 
         final List<LayerDescriptionType> layerDescriptions = new ArrayList<LayerDescriptionType>();
         final List<String> layers = descLayer.getLayers();
@@ -233,7 +233,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
-        final String url = getUriContext().getBaseUri().toString();
+        final String url = getServiceUrl();
         //inCapabilities.getService().getOnlineResource().setHref(url + "wms");
         //No, this is to "refer to the web site of the service provider."
         final AbstractRequest request = inCapabilities.getCapability().getRequest();

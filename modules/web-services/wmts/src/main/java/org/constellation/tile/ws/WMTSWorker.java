@@ -66,6 +66,4 @@ public interface WMTSWorker extends Worker {
      */
     File getTile(final GetTile getTile) throws CstlServiceException;
 
-    void setServiceURL(String serviceURL);
-
 }

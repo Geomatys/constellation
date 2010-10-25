@@ -70,7 +70,7 @@ public class CSWService {
     public CSWService() {
        worker = new CSWworker("", null);
        //TODO find real url
-       worker.setServiceURL("http://localhost:8080/CSWServer/CSWService");
+       worker.setServiceUrl("http://localhost:8080/CSWServer/CSWService");
     }
     
     /**

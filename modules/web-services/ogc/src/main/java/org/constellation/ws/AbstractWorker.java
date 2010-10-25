@@ -25,11 +25,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.UriInfo;
-
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import org.constellation.provider.configuration.ConfigDirectory;
 
 import org.geotoolkit.util.logging.Logging;
@@ -55,7 +54,7 @@ public abstract class AbstractWorker implements Worker {
     /**
      * Contains the request URI and therefore any  KVP parameters it may contain.
      */
-    private UriInfo uriContext = null;
+    private String serviceUrl = null;
 
     /**
      * The log level off al the informations log.
@@ -71,12 +70,16 @@ public abstract class AbstractWorker implements Worker {
      * {@inheritDoc }
      */
     @Override
-    public synchronized void initUriContext(final UriInfo uriInfo){
-        uriContext = uriInfo;
+    public void setServiceUrl(String serviceUrl) {
+        this.serviceUrl = serviceUrl;
     }
 
-    protected synchronized UriInfo getUriContext(){
-        return uriContext;
+    /**
+     * return the current service URL.
+     * @return
+     */
+    protected synchronized String getServiceUrl(){
+        return serviceUrl;
     }
 
     /**

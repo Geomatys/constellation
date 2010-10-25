@@ -97,7 +97,7 @@ public class WMTSService extends GridWebService {
                                               NO_APPLICABLE_CODE);
             }
             logParameters();
-            worker.setServiceURL(getServiceURL());
+            worker.setServiceUrl(getServiceURL());
 
             // if the request is not an xml request we fill the request parameter.
             final RequestBase request;

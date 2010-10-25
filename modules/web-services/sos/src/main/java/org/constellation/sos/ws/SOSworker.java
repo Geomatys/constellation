@@ -200,13 +200,8 @@ public class SOSworker extends AbstractWorker {
      * The valid time for a getObservation template (in ms).
      */
     private long templateValidTime;
-    
+
     /**
-     * The service url.
-     */
-    private String serviceURL;
-    
-     /**
      * The current MIME type of return
      */
     private String outputFormat;
@@ -666,7 +661,7 @@ public class SOSworker extends AbstractWorker {
             }
 
             //we update the URL
-            om.updateURL(serviceURL, SOS);
+            om.updateURL(getServiceUrl(), SOS);
 
            if (!keepCapabilities) {
 
@@ -1355,7 +1350,7 @@ public class SOSworker extends AbstractWorker {
             }
             values = datablock.toString();
         }
-        final GetResultResponse.Result r = new GetResultResponse.Result(values, serviceURL + '/' + requestResult.getObservationTemplateId());
+        final GetResultResponse.Result r = new GetResultResponse.Result(values, getServiceUrl() + '/' + requestResult.getObservationTemplateId());
         final GetResultResponse response = new GetResultResponse(r);
         LOGGER.log(logLevel, "GetResult processed in " + (System.currentTimeMillis() - start) + "ms");
         return response;
@@ -2131,13 +2126,6 @@ public class SOSworker extends AbstractWorker {
             return MimeType.APPLICATION_XML;
         }
         return outputFormat;
-    }
-    
-    /**
-     * Set the current service URL
-     */
-    public void setServiceURL(String serviceURL){
-        this.serviceURL = serviceURL;
     }
     
     /**

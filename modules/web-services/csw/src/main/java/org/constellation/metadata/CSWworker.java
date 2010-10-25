@@ -148,11 +148,6 @@ import org.opengis.util.CodeList;
 public class CSWworker extends AbstractWorker {
 
     /**
-     * The service url.
-     */
-    private String serviceURL;
-    
-    /**
      * A Database reader.
      */
     private CSWMetadataReader mdReader;
@@ -611,7 +606,7 @@ public class CSWworker extends AbstractWorker {
                 }
             
                 // we update the URL
-                om.updateURL(serviceURL, CSW);
+                om.updateURL(getServiceUrl(), CSW);
 
                 // we add the cascaded services (if there is some)
                 final DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");
@@ -1609,13 +1604,6 @@ public class CSWworker extends AbstractWorker {
      */
     private boolean isSupportedFormat(final String format) {
         return ACCEPTED_OUTPUT_FORMATS.contains(format);
-    }
-    
-    /**
-     * Set the current service URL
-     */
-    public void setServiceURL(final String serviceURL){
-        this.serviceURL = serviceURL;
     }
     
     /**

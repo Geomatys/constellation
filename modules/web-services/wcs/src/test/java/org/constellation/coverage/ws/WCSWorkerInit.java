@@ -16,18 +16,11 @@
  */
 package org.constellation.coverage.ws;
 
-import com.sun.grizzly.http.servlet.ServletContextImpl;
-import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.server.impl.application.WebApplicationContext;
-import com.sun.jersey.server.impl.application.WebApplicationImpl;
-import com.sun.jersey.spi.container.ContainerRequest;
 import java.io.File;
-import java.net.URI;
 import java.util.List;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.data.CoverageSQLTestCase;
-import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
@@ -36,7 +29,6 @@ import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.coveragesql.CoverageSQLProvider;
 import org.constellation.provider.coveragesql.CoverageSQLProviderService;
 import org.constellation.register.RegisterException;
-import org.geotoolkit.xml.MarshallerPool;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -73,12 +65,8 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     public static void setUpClass() throws Exception {
         WORKER = new WCSWorker();
         // Default instanciation of the worker' servlet context and uri context.
-        WORKER.initUriContext(new WebApplicationContext(
-                new WebApplicationImpl(),
-                new ContainerRequest(new WebApplicationImpl(), "GET", new URI("http://localhost:9090/"),
-                                     new URI("http://localhost:9090/wcs?request=GetCapabilities&service=WCS&version=1.0.0"),
-                                     new InBoundHeaders(), null),
-                null));
+        WORKER.setServiceUrl("http://localhost:9090");
+        
 
         // Defines a PostGrid data provider
         final ProviderSource source = new ProviderSource();

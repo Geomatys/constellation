@@ -81,7 +81,7 @@ public class SOService {
        worker                      = new SOSworker(null);
 
        //TODO find real url
-       worker.setServiceURL("http://localhost:8080/SOServer/SOService");
+       worker.setServiceUrl("http://localhost:8080/SOServer/SOService");
     }
     
     /**

@@ -77,7 +77,7 @@ public class SOService extends OGCWebService {
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         ServiceDef serviceDef = null;
         try {
-            worker.setServiceURL(getServiceURL());
+            worker.setServiceUrl(getServiceURL());
             logParameters();
 
             final RequestBase request;

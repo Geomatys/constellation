@@ -726,7 +726,7 @@ public final class WCSWorker extends AbstractWorker {
         if (requestedSections.contains("OperationsMetadata") || requestedSections.contains(all)) {
             om = staticCapabilities.getOperationsMetadata();
             //we update the url in the static part.
-            om.updateURL(getUriContext().getBaseUri().toString(), ServiceDef.Specification.WCS.toString());
+            om.updateURL(getServiceUrl(), ServiceDef.Specification.WCS.toString());
         }
         final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), null, null);
 
@@ -1103,10 +1103,10 @@ public final class WCSWorker extends AbstractWorker {
            for (Object obj: dcp.getHTTP().getGetOrPost()){
                if (obj instanceof Get){
                    final Get getMethod = (Get)obj;
-                   getMethod.getOnlineResource().setHref(getUriContext().getBaseUri().toString() + "wcs?SERVICE=WCS&");
+                   getMethod.getOnlineResource().setHref(getServiceUrl() + "wcs?SERVICE=WCS&");
                } else if (obj instanceof Post){
                    final Post postMethod = (Post)obj;
-                   postMethod.getOnlineResource().setHref(getUriContext().getBaseUri().toString() + "wcs?SERVICE=WCS&");
+                   postMethod.getOnlineResource().setHref(getServiceUrl() + "wcs?SERVICE=WCS&");
                }
            }
         }

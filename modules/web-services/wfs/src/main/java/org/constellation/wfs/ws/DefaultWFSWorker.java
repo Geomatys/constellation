@@ -192,8 +192,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
-        if (getUriContext() != null) {
-            final String url = getUriContext().getBaseUri().toString();
+        final String url = getServiceUrl();
+        if (url != null) {
             inCapabilities.getOperationsMetadata().updateURL(url, "WFS");
         }
 
@@ -517,9 +517,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     LOGGER.severe("TODO multiple typeName schemaLocation");
 
                 } else {
-                    final String prefix          = typeName.getPrefix();
-                    if (getUriContext() != null) {
-                        String describeRequest = getUriContext().getBaseUri().toString() + "wfs?request=DescribeFeatureType&version=1.1.0&service=WFS";
+                    final String prefix = typeName.getPrefix();
+                    final String url    = getServiceUrl();
+                    if (getServiceUrl() != null) {
+                        String describeRequest = url + "wfs?request=DescribeFeatureType&version=1.1.0&service=WFS";
                         describeRequest        = describeRequest + "&namespace=xmlns(" + prefix + "=" + namespace + ")";
                         describeRequest        = describeRequest + "&Typename=" + prefix + ':' + typeName.getLocalPart();
                         schemaLocations.put(namespace, describeRequest);

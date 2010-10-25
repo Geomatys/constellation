@@ -158,7 +158,7 @@ public class WFSService extends OGCWebService {
 
         ServiceDef version    = null;
 
-        worker.initUriContext(getUriContext());
+        worker.setServiceUrl(getServiceURL());
 
         try {
             logParameters();

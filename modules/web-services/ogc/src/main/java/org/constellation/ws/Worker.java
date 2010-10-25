@@ -18,7 +18,6 @@
 package org.constellation.ws;
 
 import java.util.logging.Level;
-import javax.ws.rs.core.UriInfo;
 
 /**
  * Generic definition of a worker.
@@ -32,9 +31,9 @@ public interface Worker {
     void destroy();
 
     /**
-     * Initialize the {@see #uriContext} information.
+     * Initialize the serviceUrl of the service.
      */
-    void initUriContext(final UriInfo uriInfo);
+    void setServiceUrl(final String serviceUrl);
 
     /**
      * Set The Logging level for all the info message in the worker

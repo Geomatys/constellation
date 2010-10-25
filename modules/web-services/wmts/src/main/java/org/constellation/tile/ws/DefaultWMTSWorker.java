@@ -119,11 +119,6 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
     private String outputFormat;
 
     /**
-     * The service url.
-     */
-    private String serviceURL;
-    
-    /**
      * A list of supported MIME type
      */
     private static final List<String> ACCEPTED_OUTPUT_FORMATS;
@@ -243,7 +238,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
            om = skeletonCapabilities.getOperationsMetadata();
 
            //we update the URL
-           om.updateURL(serviceURL, "WMTS");
+           om.updateURL(getServiceUrl(), "WMTS");
 
         }
 
@@ -732,14 +727,6 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
             return buffer.toString();
         }
         return null;
-    }
-
-    /**
-     * Set the current service URL
-     */
-    @Override
-    public void setServiceURL(final String serviceURL){
-        this.serviceURL = serviceURL;
     }
 
     private static MutableStyle getStyle(final String styleName) throws CstlServiceException {
