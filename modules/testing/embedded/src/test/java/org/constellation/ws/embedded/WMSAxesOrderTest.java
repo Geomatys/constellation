@@ -58,37 +58,37 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      * URLs which will be tested on the server.
      */
     private static final String WMS_GETMAP_111_PROJ =
-            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.1.1&" +
+            "http://localhost:9090/default/wms?request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:3395&bbox=-19000000,-19000000,19000000,19000000&" +
                                       "layers="+ LAYER_TEST +"&styles=";
     private static final String WMS_GETMAP_130_PROJ =
-            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.3.0&" +
+            "http://localhost:9090/default/wms?request=GetMap&service=WMS&version=1.3.0&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=EPSG:3395&bbox=-19000000,-19000000,19000000,19000000&" +
                                       "layers="+ LAYER_TEST +"&styles=";
     private static final String WMS_GETMAP_111_GEO =
-            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.1.1&" +
+            "http://localhost:9090/default/wms?request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4022&bbox=-90,-180,90,180&" +
                                       "layers="+ LAYER_TEST +"&styles=";
     private static final String WMS_GETMAP_111_EPSG_4326 =
-            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.1.1&" +
+            "http://localhost:9090/default/wms?request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
     private static final String WMS_GETMAP_130_EPSG_4326 =
-            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.3.0&" +
+            "http://localhost:9090/default/wms?request=GetMap&service=WMS&version=1.3.0&" +
                                       "format=image/png&width=512&height=1024&" +
                                       "crs=EPSG:4326&bbox=-90,-180,90,180&" +
                                       "layers="+ LAYER_TEST +"&styles=";
     private static final String WMS_GETMAP_111_CRS_84 =
-            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.1.1&" +
+            "http://localhost:9090/default/wms?request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=CRS:84&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
     private static final String WMS_GETMAP_130_CRS_84 =
-            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.3.0&" +
+            "http://localhost:9090/default/wms?request=GetMap&service=WMS&version=1.3.0&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=CRS:84&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";

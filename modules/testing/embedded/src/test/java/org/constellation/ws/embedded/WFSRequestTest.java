@@ -49,9 +49,9 @@ import static org.junit.Assert.*;
  */
 public class WFSRequestTest extends AbstractTestRequest {
 
-    private static final String WFS_POST_URL = "http://localhost:9090/wfs?";
+    private static final String WFS_POST_URL = "http://localhost:9090/default/wfs?";
 
-    private static final String WFS_GETFEATURE_URL = "http://localhost:9090/wfs?request=getFeature&service=WFS&version=1.1.0&"
+    private static final String WFS_GETFEATURE_URL = "http://localhost:9090/default/wfs?request=getFeature&service=WFS&version=1.1.0&"
             + "typename=sa:SamplingPoint&namespace=xmlns(sa=http://www.opengis.net/sampling/1.0)&"
             + "filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%20xmlns:gml=%22http://www.opengis.net/gml%22%3E"
             + "%3Cogc:PropertyIsEqualTo%3E"

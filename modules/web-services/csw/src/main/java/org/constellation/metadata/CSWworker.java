@@ -255,7 +255,7 @@ public class CSWworker extends AbstractWorker {
      * 
      */
     public CSWworker(final String serviceID, File configDir) {
-
+        super(serviceID);
         final String notWorkingMsg = "The CSW service is not working!";
         if (configDir == null) {
             configDir    = getConfigurationDirectory("csw");
@@ -271,7 +271,7 @@ public class CSWworker extends AbstractWorker {
             // we initialize the filterParsers
             final JAXBContext jb                  = JAXBContext.newInstance("org.constellation.generic.database");
             final Unmarshaller configUnmarshaller = jb.createUnmarshaller();
-            final File configFile                 = new File(configDir, serviceID + "config.xml");
+            final File configFile                 = new File(configDir, "config.xml");
             if (!configFile.exists()) {
                  LOGGER.log(Level.WARNING, "{0}\nCause: The configuration file has not been found", notWorkingMsg);
                  isStarted = false;
@@ -320,6 +320,7 @@ public class CSWworker extends AbstractWorker {
      *
      */
     public CSWworker(final String serviceID, File configDir, Automatic configuration) {
+        super(serviceID);
         final String notWorkingMsg = "The CSW service is not working!";
         isStarted = true;
         try {

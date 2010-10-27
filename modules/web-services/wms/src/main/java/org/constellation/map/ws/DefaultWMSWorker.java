@@ -152,6 +152,10 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         SUPPORTED_LANGUAGES.put("fre", language);
     }
 
+    public DefaultWMSWorker(String id) {
+        super(id);
+    }
+
     @Override
     protected MarshallerPool getMarshallerPool() {
         return WMSMarshallerPool.getInstance();

@@ -152,7 +152,7 @@ public abstract class WebService {
     private volatile HttpContext httpContext;
 
     /**
-     * If this flag is set the method logParameters() will path the entire request in the logs
+     * If this flag is set the method logParameters() will write the entire request in the logs
      * instead of the parameters map.
      */
     private boolean fullRequestLog = false;
@@ -512,7 +512,7 @@ public abstract class WebService {
 
     /**
      * Return the service url obtain by the first request made.
-     * something like : http://localhost:8080/constellation/WS
+     * something like : http://localhost:8080/constellation/WS/
      *
      * @return the service url.
      */
@@ -534,6 +534,13 @@ public abstract class WebService {
         this.fullRequestLog = fullRequestLog;
     }
 
+    /**
+     * Enable the request validation.
+     * When a request will arrive, the service will try to validate it against the specified
+     * XSD specified in mainXsdPath.
+     * 
+     * @param mainXsdPath The url to the xsd.
+     */
     public void activateRequestValidation(String mainXsdPath) {
         this.mainXsdPath                = mainXsdPath;
         this.requestValidationActivated = true;

@@ -78,7 +78,7 @@ public class SOService {
      * Initialize the database connection.
      */
     public SOService() throws CstlServiceException {
-       worker                      = new SOSworker(null);
+       worker = new SOSworker("", null);
 
        //TODO find real url
        worker.setServiceUrl("http://localhost:8080/SOServer/SOService");

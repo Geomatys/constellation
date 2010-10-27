@@ -313,7 +313,8 @@ public class SOSworker extends AbstractWorker {
     /**
      * Initialize the database connection.
      */
-    public SOSworker(File configurationDirectory) {
+    public SOSworker(String id, File configurationDirectory) {
+        super(id);
         
         if (configurationDirectory == null) {
             configurationDirectory = getConfigurationDirectory("sos");

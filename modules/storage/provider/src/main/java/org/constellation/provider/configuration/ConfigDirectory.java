@@ -58,18 +58,19 @@ public final class ConfigDirectory {
      * TODO: How does this relate to the directories used in deployment? This is
      *       in the home directory of the user running the container?
      */
-    public static final String UNIX_DIRECTORY = ".constellation";
+    private static final String UNIX_DIRECTORY = ".constellation";
 
     /**
      * The user directory where configuration files are stored on Windows platforms.
      */
-    public static final String WINDOWS_DIRECTORY = "Application Data\\Constellation";
+    private static final String WINDOWS_DIRECTORY = "Application Data\\Constellation";
 
     /**
      * The user directory where configuration files are stored.
      * this variable is fill by the user in the jsf interface.
      */
     public static String USER_DIRECTORY = null;
+
     //we try to load this variable at the start by reading a properties file
     static {
         File propertiesFile = FileUtilities.getFileFromResource("constellation.properties");

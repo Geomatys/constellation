@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 // Constellation dependencies
+import javax.ws.rs.core.MediaType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
@@ -110,7 +111,7 @@ public interface WFSWorker extends Worker {
      *
      * @return the current outputFormat.
      */
-    String getOutputFormat();
+    MediaType getOutputFormat();
 
     /**
      * Return a map with namespace - xsd location.

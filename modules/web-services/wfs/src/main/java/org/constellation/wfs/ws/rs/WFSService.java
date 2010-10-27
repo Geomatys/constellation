@@ -18,6 +18,7 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
+import java.io.File;
 import org.constellation.ws.WebServiceUtilities;
 import org.geotoolkit.ows.xml.RequestBase;
 import java.io.StringWriter;
@@ -49,7 +50,6 @@ import java.util.logging.Level;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 // constellation dependencies
@@ -100,11 +100,9 @@ import static org.constellation.wfs.ws.WFSConstants.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@Path("wfs")
+@Path("{serviceId}/wfs")
 @Singleton
-public class WFSService extends OGCWebService {
-
-    private final WFSWorker worker;
+public class WFSService extends OGCWebService<WFSWorker> {
 
     private static Map<String, String> schemaLocations;
     static {
@@ -119,7 +117,6 @@ public class WFSService extends OGCWebService {
     public WFSService() {
         super(ServiceDef.WFS_1_1_0);
 
-        WFSWorker candidate              = null;
         try {
             final MarshallerPool pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
@@ -128,27 +125,28 @@ public class WFSService extends OGCWebService {
                           ":org.geotoolkit.sampling.xml.v100" +
                          ":org.geotoolkit.internal.jaxb.geometry");
             setXMLContext(pool);
-            candidate       = new DefaultWFSWorker();
 
         } catch (JAXBException ex){
-            LOGGER.warning("The WFS service is not running."       + '\n' +
-                           " cause  : Error creating XML context." + '\n' +
-                           " error  : " + ex.getMessage()          + '\n' +
-                           " details: " + ex.toString());
+            LOGGER.warning("The WFS service is not running.\ncause  : Error creating XML context.\n" +
+                           " error  : " + ex.getMessage()  + 
+                           "\n details: " + ex.toString());
         } 
-        this.worker        = candidate;
 
         //activateRequestValidation("http://schemas.opengis.net/wfs/1.1.0/wfs.xsd");
-        if (worker != null) {
-            LOGGER.info("WFS Service running");
-        }
+        LOGGER.info("WFS Service running");
     }
+
+    @Override
+    protected WFSWorker createWorker(File instanceDirectory) {
+        return new DefaultWFSWorker(instanceDirectory.getName());
+    }
+
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest, WFSWorker worker) throws JAXBException {
 
         ServiceDef version    = null;
 
@@ -171,30 +169,30 @@ public class WFSService extends OGCWebService {
 
             if (request instanceof GetCapabilitiesType) {
                 final GetCapabilitiesType model = (GetCapabilitiesType) request;
-                return Response.ok(worker.getCapabilities(model), getOutputFormat()).build();
+                return Response.ok(worker.getCapabilities(model), worker.getOutputFormat()).build();
 
             } else if (request instanceof DescribeFeatureTypeType) {
                 final DescribeFeatureTypeType model = (DescribeFeatureTypeType) request;
-                return Response.ok(worker.describeFeatureType(model), getOutputFormat()).build();
+                return Response.ok(worker.describeFeatureType(model), worker.getOutputFormat()).build();
 
             } else if (request instanceof GetFeatureType) {
                 final GetFeatureType model = (GetFeatureType) request;
                 final Object response = worker.getFeature(model);
                 schemaLocations = worker.getSchemaLocations();
-                return Response.ok(response, getOutputFormat()).build();
+                return Response.ok(response, worker.getOutputFormat()).build();
                 
             } else if (request instanceof GetGmlObjectType) {
                 final GetGmlObjectType model = (GetGmlObjectType) request;
                 final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model));
-                return Response.ok(response, getOutputFormat()).build();
+                return Response.ok(response, worker.getOutputFormat()).build();
 
             } else if (request instanceof LockFeatureType) {
                 final LockFeatureType model = (LockFeatureType) request;
-                return Response.ok(worker.lockFeature(model), getOutputFormat()).build();
+                return Response.ok(worker.lockFeature(model), worker.getOutputFormat()).build();
 
             } else if (request instanceof TransactionType) {
                 final TransactionType model = (TransactionType) request;
-                return Response.ok(worker.transaction(model), getOutputFormat()).build();
+                return Response.ok(worker.transaction(model), worker.getOutputFormat()).build();
             }
 
             throw new CstlServiceException("The operation " + request.getClass().getName() + " is not supported by the service",
@@ -224,6 +222,10 @@ public class WFSService extends OGCWebService {
     /**
      * Treat the incoming POST request encoded in xml.
      *
+     * We have to redefine this method because we can't read the feature with JAXB.
+     * we have to use JAXP.
+     * TODO we must do somethin to treat this case in the super class.
+     * 
      * @return an image or xml response.
      * @throw JAXBException
      */
@@ -239,6 +241,22 @@ public class WFSService extends OGCWebService {
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
                 unmarshaller.setEventHandler(handler);
+                
+                // with the new changes we have to choose a worker right now
+                final WFSWorker worker;
+                try {
+                    final String serviceID = getParameter("serviceId", false);
+                    if (serviceID != null && workersMap.containsKey(serviceID)) {
+                        worker = workersMap.get(serviceID);
+                    } else {
+                        LOGGER.log(Level.WARNING, "unknow service id:{0}", serviceID);
+                        //TODO return 404
+                        return Response.serverError().build();
+                    }
+                } catch (CstlServiceException ex) {
+                    return processExceptionResponse(ex, ServiceDef.WFS_1_1_0);
+                }
+
                 // we made a pre-reading to extract the feature to insert in transaction request.
                 // we also extract the namespace mapping
                 final BufferedReader in;
@@ -362,7 +380,8 @@ public class WFSService extends OGCWebService {
      */
     @Override
     public void destroy() {
-        // do something
+        super.destroy();
+        LOGGER.log(Level.INFO, "Shutting down the REST WFS service facade.");
     }
 
     private DescribeFeatureTypeType createNewDescribeFeatureTypeRequest() throws CstlServiceException {
@@ -675,14 +694,5 @@ public class WFSService extends OGCWebService {
 
     public static Map<String, String> getSchemaLocations() {
         return schemaLocations;
-    }
-
-    public MediaType getOutputFormat() {
-        final String format = worker.getOutputFormat();
-        if (format.equals("text/xml; subtype=gml/3.1.1")) {
-            return new MediaType("text", "xml; subtype=gml/3.1.1");
-        } else {
-            return MediaType.valueOf(format);
-        }
     }
 }

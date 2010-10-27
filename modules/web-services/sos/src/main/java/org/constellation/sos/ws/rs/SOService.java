@@ -18,6 +18,7 @@
 package org.constellation.sos.ws.rs;
 
 // Jersey dependencies
+import java.io.File;
 import org.geotoolkit.ows.xml.RequestBase;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -58,18 +59,15 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  *
  * @author Guilhem Legal
  */
-@Path("sos")
+@Path("{serviceId}/sos")
 @Singleton
-public class SOService extends OGCWebService {
-
-    private SOSworker worker;
+public class SOService extends OGCWebService<SOSworker> {
 
     /**
      * Build a new Restfull SOS service.
      */
     public SOService() throws JAXBException, CstlServiceException {
         super(ServiceDef.SOS_1_0_0);
-        worker = new SOSworker(null);
         setXMLContext(SOSMarshallerPool.getInstance());
     }
 
@@ -77,7 +75,16 @@ public class SOService extends OGCWebService {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+    protected SOSworker createWorker(File instanceDirectory) {
+        return new SOSworker(instanceDirectory.getName(), instanceDirectory);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Response treatIncomingRequest(Object objectRequest, SOSworker worker) throws JAXBException {
         ServiceDef serviceDef = null;
         try {
             worker.setServiceUrl(getServiceURL());
@@ -284,9 +291,7 @@ public class SOService extends OGCWebService {
     @PreDestroy
     @Override
     public void destroy() {
+        super.destroy();
         LOGGER.info("Shutting down the REST SOS service facade");
-        if (worker != null) {
-            worker.destroy();
-        }
     }
 }

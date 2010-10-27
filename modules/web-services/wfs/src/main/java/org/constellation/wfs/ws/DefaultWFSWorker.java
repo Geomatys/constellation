@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -147,8 +148,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     private String outputFormat = "text/xml";
 
-    public DefaultWFSWorker() {
-
+    public DefaultWFSWorker(String id) {
+        super(id);
+        
         //todo wait for martin fix
         standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
         standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
@@ -846,8 +848,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public String getOutputFormat() {
-        return outputFormat;
+    public MediaType getOutputFormat() {
+        if (outputFormat.equals("text/xml; subtype=gml/3.1.1")) {
+            return new MediaType("text", "xml; subtype=gml/3.1.1");
+        } else {
+            return MediaType.valueOf(outputFormat);
+        }
     }
 
     /**

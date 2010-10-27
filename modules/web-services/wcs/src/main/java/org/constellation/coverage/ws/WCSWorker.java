@@ -178,6 +178,10 @@ public final class WCSWorker extends AbstractWorker {
     private static final Map<String,GetCapabilitiesResponse> CAPS_RESPONSE =
             new HashMap<String,GetCapabilitiesResponse>();
 
+    public WCSWorker(String id) {
+        super(id);
+    }
+
     @Override
     protected MarshallerPool getMarshallerPool() {
         return WCSMarshallerPool.getInstance();

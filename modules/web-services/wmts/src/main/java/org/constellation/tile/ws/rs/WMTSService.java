@@ -17,6 +17,7 @@
 package org.constellation.tile.ws.rs;
 
 import com.sun.jersey.spi.resource.Singleton;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -58,13 +59,10 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-@Path("wmts")
+@Path("{serviceId}/wmts")
 @Singleton
-public class WMTSService extends GridWebService {
-    /**
-     * A worker to use in order to do WMTS operations.
-     */
-    protected WMTSWorker worker;
+public class WMTSService extends GridWebService<WMTSWorker> {
+    
 
     private static final String NOT_WORKING = "The WMTS service is not running";
     /**
@@ -74,7 +72,6 @@ public class WMTSService extends GridWebService {
     public WMTSService() {
         super(ServiceDef.WMTS_1_0_0);
         setXMLContext(WMTSMarshallerPool.getInstance());
-        worker = new DefaultWMTSWorker();
         setFullRequestLog(true);
     }
 
@@ -82,7 +79,16 @@ public class WMTSService extends GridWebService {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(final Object objectRequest) throws JAXBException {
+    protected WMTSWorker createWorker(File instanceDirectory) {
+        return new DefaultWMTSWorker(instanceDirectory.getName());
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Response treatIncomingRequest(final Object objectRequest, WMTSWorker worker) throws JAXBException {
         ServiceDef serviceDef = null;
         try {
             if (worker == null) {
@@ -316,6 +322,8 @@ public class WMTSService extends GridWebService {
     {
         ServiceDef serviceDef = null;
         try {
+            final String serviceId = getParameter("serviceId", false);
+            WMTSWorker worker = workersMap.get(serviceId);
             if (worker == null) {
                 throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
@@ -352,6 +360,8 @@ public class WMTSService extends GridWebService {
                                           @PathParam("format") String format)
     {
         try {
+            final String serviceId = getParameter("serviceId", false);
+            WMTSWorker worker = workersMap.get(serviceId);
             if (worker == null) {
                 throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
@@ -404,6 +414,7 @@ public class WMTSService extends GridWebService {
      */
     @Override
     public void destroy() {
+        super.destroy();
         LOGGER.info("Shutting down the REST WMTS service facade.");
     }
 

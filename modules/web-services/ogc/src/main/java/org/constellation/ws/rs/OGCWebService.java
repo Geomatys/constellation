@@ -18,17 +18,20 @@
 package org.constellation.ws.rs;
 
 // J2SE dependencies
-import java.util.StringTokenizer;
-import java.util.logging.Level;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.ws.rs.core.Response;
 
 // Constellation dependencies
+import javax.xml.bind.JAXBException;
 import org.constellation.ServiceDef;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies
+import org.constellation.ws.Worker;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.StringUtilities;
@@ -63,18 +66,24 @@ import org.opengis.util.CodeList;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public abstract class OGCWebService extends WebService {
+public abstract class OGCWebService<W extends Worker> extends WebService {
 	
     /**
      * The supported supportedVersions supported by this web serviceType.
      * avoid modification after instanciation.
      */
     private final UnmodifiableArrayList<ServiceDef> supportedVersions;
+
+    /**
+     * A map of service worker.
+     * TODO this attribute must be set to private when will fix the WFS service
+     */
+    protected final Map<String, W> workersMap;
+    
     
     /**
      * Initialize the basic attributes of a web serviceType.
      *
-     * @param serviceType The initials of the web serviceType (CSW, WMS, WCS, SOS, ...)
      * @param supportedVersions A list of the supported version of this serviceType.
      *                          The first version specified <strong>MUST</strong> be the highest
      *                          one, the best one.
@@ -82,7 +91,7 @@ public abstract class OGCWebService extends WebService {
     public OGCWebService(final ServiceDef... supportedVersions) {
         super();
 
-        if(supportedVersions == null || supportedVersions.length == 0 || 
+        if (supportedVersions == null || supportedVersions.length == 0 ||
                 (supportedVersions.length == 1 && supportedVersions[0] == null)){
             throw new IllegalArgumentException("It is compulsory for a web service to have " +
                     "at least one version specified.");
@@ -90,7 +99,96 @@ public abstract class OGCWebService extends WebService {
         
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
+
+        /*
+         * build the map of Workers, by scanning the sub-directories of its service directory.
+         */
+        workersMap = new HashMap<String, W>();
+        final File configDirectory = ConfigDirectory.getConfigDirectory();
+        if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
+            final File serviceDirectory = new File(configDirectory, supportedVersions[0].specification.name());
+            if (serviceDirectory.exists() && serviceDirectory.isDirectory()) {
+                for (File instanceDirectory : serviceDirectory.listFiles()) {
+                    /*
+                     * For each sub-directory we build a new Worker.
+                     */
+                    if (instanceDirectory.isDirectory() && !instanceDirectory.getName().startsWith(".")) {
+                        final W newWorker = createWorker(instanceDirectory);
+                        workersMap.put(instanceDirectory.getName(), newWorker);
+                    }
+                }
+            } else {
+                LOGGER.log(Level.SEVERE, "The service configuration directory: {0} does not exist or is not a directory.", serviceDirectory.getPath());
+            }
+        } else {
+            if (configDirectory == null) {
+                LOGGER.severe("The service was unable to find a config directory.");
+            } else {
+                LOGGER.log(Level.SEVERE, "The configuration directory: {0} does not exist or is not a directory.", configDirectory.getPath());
+            }
+        }
     }
+
+    /**
+     * Initialize the basic attributes of a web serviceType.
+     * the worker Map here is fill by the subClasse, this is not the best behavior.
+     * This constructor is here to keep compatibility with old version.
+     *
+     * @param supportedVersions A list of the supported version of this serviceType.
+     *                          The first version specified <strong>MUST</strong> be the highest
+     *                          one, the best one.
+     * @param workers A map of worker id / worker.
+     */
+    public OGCWebService(Map<String, W> workers, final ServiceDef... supportedVersions) {
+        super();
+
+        if (supportedVersions == null || supportedVersions.length == 0 ||
+                (supportedVersions.length == 1 && supportedVersions[0] == null)){
+            throw new IllegalArgumentException("It is compulsory for a web service to have " +
+                    "at least one version specified.");
+        }
+
+        //guarantee it will not be modified
+        this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
+        this.workersMap        = workers;
+    }
+
+    protected abstract W createWorker(File instanceDirectory);
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        try {
+        final String serviceID = getParameter("serviceId", false);
+        if (serviceID != null && workersMap.containsKey(serviceID)) {
+            final W worker = workersMap.get(serviceID);
+            return treatIncomingRequest(objectRequest, worker);
+        } else {
+            LOGGER.log(Level.WARNING, "unknow service id:{0}", serviceID);
+            //TODO return 404
+            return Response.serverError().build();
+        }
+        } catch (CstlServiceException ex) {
+            return processExceptionResponse(ex, supportedVersions.get(0));
+        }
+    }
+
+    /**
+     * Treat the incomming request and call the right function.
+     *
+     * @param objectRequest if the server receive a POST request in XML,
+     *        this object contain the request. Else for a GET or a POST kvp
+     *        request this param is {@code null}
+     * 
+     * @param worker the selected worker on whitch apply the request.
+     * 
+     * @return an xml response.
+     * @throw JAXBException
+     */
+    protected abstract Response treatIncomingRequest(final Object objectRequest, W worker) throws JAXBException;
 
     /**
      * Verify if the version is supported by this serviceType.
@@ -240,6 +338,14 @@ public abstract class OGCWebService extends WebService {
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
+    }
+
+    @Override
+    public void destroy() {
+        for (final Worker worker : workersMap.values()) {
+            worker.destroy();
+        }
+        workersMap.clear();
     }
 
 }

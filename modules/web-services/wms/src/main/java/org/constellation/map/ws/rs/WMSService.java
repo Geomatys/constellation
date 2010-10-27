@@ -35,7 +35,6 @@ import java.util.List;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
@@ -91,14 +90,10 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.1
  */
-@Path("wms")
+@Path("{serviceId}/wms")
 @Singleton
-public class WMSService extends GridWebService {
-    /**
-     * The worker which will perform the core logic for this service.
-     */
-    private final WMSWorker worker;
-
+public class WMSService extends GridWebService<WMSWorker> {
+    
     /**
      * Build a new instance of the webService and initialize the JAXB context.
      */
@@ -108,7 +103,6 @@ public class WMSService extends GridWebService {
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WMSMarshallerPool.getInstance());
 
-        worker = new DefaultWMSWorker();
         setFullRequestLog(true);
         LOGGER.info("WMS service running");
     }
@@ -117,8 +111,16 @@ public class WMSService extends GridWebService {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) {
-        final UriInfo uriContext = getUriContext();
+    protected WMSWorker createWorker(File instanceDirectory) {
+        return new DefaultWMSWorker(instanceDirectory.getName());
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Response treatIncomingRequest(Object objectRequest, WMSWorker worker) {
         final QueryContext queryContext = new QueryContext();
 
         ServiceDef version = null;
@@ -624,8 +626,8 @@ public class WMSService extends GridWebService {
     @PreDestroy
     @Override
     public void destroy() {
+        super.destroy();
         LOGGER.info("Shutting down the REST WMS service facade.");
-        worker.destroy();
     }
 }
 

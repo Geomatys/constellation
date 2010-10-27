@@ -108,7 +108,7 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        SOSworker worker = new SOSworker(configurationDirectory);
+        SOSworker worker = new SOSworker("", configurationDirectory);
 
         boolean exceptionLaunched = false;
         GetCapabilities request = new GetCapabilities();
@@ -130,7 +130,7 @@ public class SOSWorkerInitialisationTest {
         File configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
 
-        worker = new SOSworker(configurationDirectory);
+        worker = new SOSworker("", configurationDirectory);
 
         exceptionLaunched = false;
         try {
@@ -154,7 +154,7 @@ public class SOSWorkerInitialisationTest {
         Marshaller marshaller = JAXBContext.newInstance("org.geotoolkit.sos.xml.v100:org.geotoolkit.internal.jaxb.geometry").createMarshaller();
         marshaller.marshal(request, configFile);
 
-        worker = new SOSworker(configurationDirectory);
+        worker = new SOSworker("", configurationDirectory);
 
         exceptionLaunched = false;
         try {
@@ -178,7 +178,7 @@ public class SOSWorkerInitialisationTest {
 
         marshaller.marshal(new BDD(), configFile);
 
-        worker = new SOSworker(configurationDirectory);
+        worker = new SOSworker("", configurationDirectory);
 
         exceptionLaunched = false;
         try {
@@ -200,7 +200,7 @@ public class SOSWorkerInitialisationTest {
         SOSConfiguration configuration = new SOSConfiguration();
         marshaller.marshal(configuration, configFile);
 
-        worker = new SOSworker(configurationDirectory);
+        worker = new SOSworker("", configurationDirectory);
 
         exceptionLaunched = false;
         try {
@@ -224,7 +224,7 @@ public class SOSWorkerInitialisationTest {
         configuration = new SOSConfiguration(new Automatic(), null);
         marshaller.marshal(configuration, configFile);
 
-        worker = new SOSworker(configurationDirectory);
+        worker = new SOSworker("", configurationDirectory);
 
         exceptionLaunched = false;
         try {
@@ -248,7 +248,7 @@ public class SOSWorkerInitialisationTest {
         configuration = new SOSConfiguration(new Automatic(), new Automatic());
         marshaller.marshal(configuration, configFile);
 
-        worker = new SOSworker(configurationDirectory);
+        worker = new SOSworker("", configurationDirectory);
 
         exceptionLaunched = false;
         try {
@@ -274,7 +274,7 @@ public class SOSWorkerInitialisationTest {
         configuration.setTemplateValidTime("ff:oo");
         marshaller.marshal(configuration, configFile);
 
-        worker = new SOSworker(configurationDirectory);
+        worker = new SOSworker("", configurationDirectory);
 
 
         exceptionLaunched = false;

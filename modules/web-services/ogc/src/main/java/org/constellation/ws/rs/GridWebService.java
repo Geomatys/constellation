@@ -20,6 +20,7 @@ package org.constellation.ws.rs;
 import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import org.constellation.ServiceDef;
+import org.constellation.ws.Worker;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.internal.io.Installation;
 
@@ -32,7 +33,7 @@ import org.geotoolkit.internal.io.Installation;
  * @author Cédric Briançon (Geomatys)
  * @since 0.5
  */
-public abstract class GridWebService extends OGCWebService {
+public abstract class GridWebService<W extends Worker> extends OGCWebService<W> {
     static {
         Installation.allowSystemPreferences = false;
         ImageIO.scanForPlugins();

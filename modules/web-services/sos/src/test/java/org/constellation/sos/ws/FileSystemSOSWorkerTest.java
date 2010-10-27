@@ -118,7 +118,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         }
         pool.release(marshaller);
         init();
-        worker = new SOSworker(configDir);
+        worker = new SOSworker("", configDir);
         worker.setServiceUrl(URL);
         worker.setLogLevel(Level.FINER);
     }

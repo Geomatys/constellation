@@ -41,4 +41,10 @@ public interface Worker {
      * @param logLevel
      */
     void setLogLevel(Level logLevel);
+
+    /**
+     * Return the identifier of the worker.
+     * @return
+     */
+    String getId();
 }

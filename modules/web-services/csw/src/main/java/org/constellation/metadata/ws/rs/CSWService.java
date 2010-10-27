@@ -21,7 +21,6 @@ package org.constellation.metadata.ws.rs;
 import org.constellation.ws.WebServiceUtilities;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -89,12 +88,10 @@ import static org.constellation.metadata.CSWConstants.*;
  * 
  * @author Guilhem Legal
  */
-@Path("csw")
+@Path("{serviceId}/csw")
 @Singleton
-public class CSWService extends OGCWebService {
+public class CSWService extends OGCWebService<CSWworker> {
     
-    protected Map<String, CSWworker> workers;
-
     private final String serviceID;
 
     private final XMLSerializer serializer;
@@ -107,39 +104,35 @@ public class CSWService extends OGCWebService {
     }
 
     /**
-     * Build a new Restfull CSW service.
-     * used by subClasses.
-     */
-    protected CSWService(final String serviceID) {
-        this(null, serviceID);
-    }
-
-    /**
      * Build a new Restfull CSW service with multiple workers.
      * used by subClasses.
      */
     protected CSWService(final String serviceID, final Map<String, CSWworker> workers) {
-        super(ServiceDef.CSW_2_0_2);
+        super(workers, ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());
         this.serviceID  = serviceID;
-        this.workers    = workers;
         this.serializer = getXMLSerializer();
     }
 
     /**
-     * Build a new Restfull CSW service with a single worker.
+     * Build a new Restfull CSW service.
      * used by subClasses.
      */
-    protected CSWService(final File configDirectory, String serviceID) {
+    protected CSWService(String serviceID) {
         super(ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());
         this.serviceID         = serviceID;
-        final CSWworker worker = new CSWworker(serviceID, configDirectory);
-        this.workers           = new HashMap<String, CSWworker>();
         this.serializer        = getXMLSerializer();
-        workers.put(serviceID, worker);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected CSWworker createWorker(File instanceDirectory) {
+        return new CSWworker(instanceDirectory.getName(), instanceDirectory);
+    }
+    
     /**
      * This method has to be overriden by child classes.
      * 
@@ -149,25 +142,10 @@ public class CSWService extends OGCWebService {
         return null;
     }
 
-     /**
-     * Treat the incomming request and call the right function.
-     * 
-     * @param objectRequest if the server receive a POST request in XML,
-     *        this object contain the request. Else for a GET or a POST kvp
-     *        request this param is {@code null}
-     * 
-     * @return an xml response.
-     * @throw JAXBException
-     */
-    @Override
-    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
-        final CSWworker worker = workers.get(serviceID);
-        return treatIncomingRequest(objectRequest, worker);
-    }
-
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Response treatIncomingRequest(final Object objectRequest, CSWworker worker) throws JAXBException {
         ServiceDef serviceDef = null;
         
@@ -299,15 +277,12 @@ public class CSWService extends OGCWebService {
     @PreDestroy
     @Override
     public void destroy() {
+        super.destroy();
         String id = "";
         if (serviceID != null && !serviceID.isEmpty())
             id = '(' + serviceID + ')';
 
         LOGGER.log(Level.INFO, "Shutting down the REST CSW service facade {0}.", id);
-        for (final CSWworker worker : workers.values()) {
-            worker.destroy();
-        }
-        workers.clear();
     }
     
     /**

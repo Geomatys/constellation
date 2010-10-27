@@ -67,11 +67,20 @@ public abstract class AbstractWorker implements Worker {
     private final Map<String,Object> capabilities = new HashMap<String,Object>();
 
     /**
+     * The identifier of the worker.
+     */
+    private final String id;
+
+    public AbstractWorker(String id) {
+        this.id = id;
+    }
+    
+    /**
      * {@inheritDoc }
      */
     @Override
     public void setServiceUrl(String serviceUrl) {
-        this.serviceUrl = serviceUrl;
+        this.serviceUrl = serviceUrl + id + '/';
     }
 
     /**
@@ -80,6 +89,11 @@ public abstract class AbstractWorker implements Worker {
      */
     protected synchronized String getServiceUrl(){
         return serviceUrl;
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     /**

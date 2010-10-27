@@ -18,6 +18,7 @@
 package org.constellation.coverage.ws.rs;
 
 // Jersey dependencies
+import java.io.File;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.ExceptionResponse;
 import com.sun.jersey.spi.resource.Singleton;
@@ -93,13 +94,9 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * @author Cédric Briançon
  * @since 0.3
  */
-@Path("wcs")
+@Path("{serviceId}/wcs")
 @Singleton
-public class WCSService extends GridWebService {
-    /**
-     * The worker which will perform the core logic for this service.
-     */
-    private final WCSWorker worker;
+public class WCSService extends GridWebService<WCSWorker> {
 
     /**
      * Build a new instance of the webService and initialize the JAXB context.
@@ -111,7 +108,6 @@ public class WCSService extends GridWebService {
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WCSMarshallerPool.getInstance());
 
-        worker = new WCSWorker();
         LOGGER.info("WCS service running");
     }
 
@@ -119,7 +115,16 @@ public class WCSService extends GridWebService {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+    protected WCSWorker createWorker(File instanceDirectory) {
+        return new WCSWorker(instanceDirectory.getName());
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Response treatIncomingRequest(Object objectRequest, WCSWorker worker) throws JAXBException {
         final UriInfo uriContext = getUriContext();
 
         ServiceDef serviceDef = null;
@@ -696,7 +701,7 @@ public class WCSService extends GridWebService {
     @PreDestroy
     @Override
     public void destroy() {
+        super.destroy();
         LOGGER.info("Shutting down the REST WCS service facade");
-        worker.destroy();
     }
 }

@@ -64,19 +64,19 @@ public class WMSRequestsTest extends AbstractTestRequest {
      * URLs which will be tested on the server.
      */
     private static final String WMS_GETCAPABILITIES =
-            "http://localhost:9090/wms?request=GetCapabilities&service=WMS&version=1.1.1";
+            "http://localhost:9090/default/wms?request=GetCapabilities&service=WMS&version=1.1.1";
 
     private static final String WMS_FALSE_REQUEST =
-            "http://localhost:9090/wms?request=SomethingElse";
+            "http://localhost:9090/default/wms?request=SomethingElse";
 
     private static final String WMS_GETMAP =
-            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.1.1&" +
+            "http://localhost:9090/default/wms?request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
 
     private static final String WMS_GETFEATUREINFO =
-            "http://localhost:9090/wms?request=GetFeatureInfo&service=WMS&version=1.1.1&" +
+            "http://localhost:9090/default/wms?request=GetFeatureInfo&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=&" +
@@ -84,11 +84,11 @@ public class WMSRequestsTest extends AbstractTestRequest {
                                       "X=300&Y=200";
 
     private static final String WMS_GETLEGENDGRAPHIC =
-            "http://localhost:9090/wms?request=GetLegendGraphic&service=wms&" +
+            "http://localhost:9090/default/wms?request=GetLegendGraphic&service=wms&" +
             "width=200&height=40&layer="+ LAYER_TEST +"&format=image/png&version=1.1.0";
 
     private static final String WMS_DESCRIBELAYER =
-            "http://localhost:9090/wms?request=DescribeLayer&service=WMS&" +
+            "http://localhost:9090/default/wms?request=DescribeLayer&service=WMS&" +
             "version=1.1.1&layers="+ LAYER_TEST;
 
     /**

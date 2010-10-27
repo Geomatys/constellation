@@ -108,7 +108,7 @@ public class WFSWorkerTest {
         try {
             pool = WFSMarshallerPool.getInstance();
 
-            worker = new DefaultWFSWorker();
+            worker = new DefaultWFSWorker("");
             worker.setLogLevel(Level.FINER);
         } catch (Exception ex) {
             ex.printStackTrace();
