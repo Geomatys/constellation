@@ -60,7 +60,7 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
         final File configDir = ConfigDirectory.getConfigDirectory();
 
         if (configDir != null && configDir.exists()) {
-            final File cswDir = new File(configDir, "csw_configuration");
+            final File cswDir = new File(configDir, "CSW");
             if (cswDir != null && configDir.exists()) {
                 return cswDir;
             }

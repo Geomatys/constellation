@@ -152,7 +152,7 @@ public final class ConfigurationService extends WebService  {
             LOGGER.warning("Factory not found for CSWConfigurer, specific CSW operation will not be available.");
             cswFunctionEnabled = false;
         }
-        LOGGER.info("Configuration service runing");
+        LOGGER.info("\nConfiguration service runing\n");
     }
     
     /**

@@ -320,7 +320,6 @@ public class SOSworker extends AbstractWorker {
             configurationDirectory = getConfigurationDirectory("sos");
         }
 
-        final String notWorkingMsg     = "The SOS service is not running!";
         isStarted                      = true;
         SOSConfiguration configuration = null;
 
@@ -334,12 +333,12 @@ public class SOSworker extends AbstractWorker {
                 if (object instanceof SOSConfiguration) {
                     configuration = (SOSConfiguration) object;
                 } else {
-                    LOGGER.warning(notWorkingMsg + "\ncause: The generic configuration file is malformed\n");
+                    LOGGER.warning("\nThe SOS worker is not running!\ncause: The generic configuration file is malformed\n");
                     isStarted = false;
                     return;
                 }
             } else {
-                LOGGER.warning(notWorkingMsg + "\ncause: The configuration file can't be found\n");
+                LOGGER.warning("\nThe SOS worker is not running!\ncause: The configuration file can't be found\n");
                 isStarted = false;
                 return;
             }
@@ -373,7 +372,7 @@ public class SOSworker extends AbstractWorker {
 
             final Automatic smlConfiguration = configuration.getSMLConfiguration();
             if (smlConfiguration == null) {
-                LOGGER.warning(notWorkingMsg + "\ncause: The configuration file does not contains a SML configuration");
+                LOGGER.warning("\nThe SOS worker is not running!\ncause: The configuration file does not contains a SML configuration");
                 isStarted = false;
                 return;
             }
@@ -381,7 +380,7 @@ public class SOSworker extends AbstractWorker {
 
             final Automatic omConfiguration = configuration.getOMConfiguration();
             if (omConfiguration == null) {
-                LOGGER.warning(notWorkingMsg + "\ncause: The configuration file does not contains a O&M configuration");
+                LOGGER.warning("\nThe SOS worker is not running!\ncause: The configuration file does not contains a O&M configuration");
                 isStarted = false;
                 return;
             }
@@ -453,16 +452,16 @@ public class SOSworker extends AbstractWorker {
                     msg = "no message";
                 }
             }
-            LOGGER.warning(notWorkingMsg + "\ncause: JAXBException:" + msg);
+            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\n\ncause: JAXBException:{0}", msg);
             isStarted = false;
         } catch (FactoryNotFoundException ex) {
-            LOGGER.warning(notWorkingMsg + "\ncause: Unable to find a SOS Factory");
+            LOGGER.warning("\nThe SOS worker is not running!\ncause: Unable to find a SOS Factory");
             isStarted = false;
         } catch (MetadataIoException ex) {
-            LOGGER.warning(notWorkingMsg + "\ncause: MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage());
+            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: MetadataIOException while initializing the sensor reader/writer:\n{0}", ex.getMessage());
             isStarted = false;
         } catch (CstlServiceException ex) {
-            LOGGER.warning(notWorkingMsg + "\ncause:" + ex.getMessage());
+            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause:{0}", ex.getMessage());
             isStarted = false;
         }
     }
@@ -470,7 +469,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * Log some informations about the implementations classes for reader / writer / filter object.
      */
-    private final void logInfos() {
+    private void logInfos() {
         final String loaded =  " loaded.\n";
         final StringBuilder infos = new StringBuilder();
 
@@ -508,7 +507,7 @@ public class SOSworker extends AbstractWorker {
                 infos.append("No O&M writer loaded.\n");
             }
         }
-        infos.append("SOS service running").append('\n');
+        infos.append("SOS worker \"").append(getId()).append("\" running\n");
         LOGGER.info(infos.toString());
     }
 

@@ -22,7 +22,6 @@ import java.io.File;
 import org.geotoolkit.ows.xml.RequestBase;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import javax.annotation.PreDestroy;
 import com.sun.jersey.spi.resource.Singleton;
 
 //JAXB dependencies
@@ -283,15 +282,5 @@ public class SOService extends OGCWebService<SOSworker> {
                                   getParameter("OUTPUTFORMAT", true));
 
 
-    }
-
-    /**
-     * Shutodown the SOS service.
-     */
-    @PreDestroy
-    @Override
-    public void destroy() {
-        super.destroy();
-        LOGGER.info("Shutting down the REST SOS service facade");
     }
 }

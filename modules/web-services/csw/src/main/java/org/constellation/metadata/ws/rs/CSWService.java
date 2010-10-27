@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
@@ -92,8 +91,6 @@ import static org.constellation.metadata.CSWConstants.*;
 @Singleton
 public class CSWService extends OGCWebService<CSWworker> {
     
-    private final String serviceID;
-
     private final XMLSerializer serializer;
     
     /**
@@ -110,7 +107,6 @@ public class CSWService extends OGCWebService<CSWworker> {
     protected CSWService(final String serviceID, final Map<String, CSWworker> workers) {
         super(workers, ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());
-        this.serviceID  = serviceID;
         this.serializer = getXMLSerializer();
     }
 
@@ -121,8 +117,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     protected CSWService(String serviceID) {
         super(ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());
-        this.serviceID         = serviceID;
-        this.serializer        = getXMLSerializer();
+        this.serializer = getXMLSerializer();
     }
 
     /**
@@ -271,20 +266,6 @@ public class CSWService extends OGCWebService<CSWworker> {
                         INVALID_PARAMETER_VALUE, "request");
     }
 
-    /**
-     * Destroy all the resource and close the connection when the web application is undeployed.
-     */
-    @PreDestroy
-    @Override
-    public void destroy() {
-        super.destroy();
-        String id = "";
-        if (serviceID != null && !serviceID.isEmpty())
-            id = '(' + serviceID + ')';
-
-        LOGGER.log(Level.INFO, "Shutting down the REST CSW service facade {0}.", id);
-    }
-    
     /**
      * Build a new GetCapabilities request object with the url parameters 
      */

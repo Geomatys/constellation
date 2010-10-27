@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import javax.annotation.PreDestroy;
 import javax.ws.rs.core.Response;
 
 // Constellation dependencies
@@ -96,6 +97,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             throw new IllegalArgumentException("It is compulsory for a web service to have " +
                     "at least one version specified.");
         }
+        LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", supportedVersions[0].specification.name());
         
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
@@ -340,8 +342,10 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
     }
 
+    @PreDestroy
     @Override
     public void destroy() {
+        LOGGER.log(Level.INFO, "Shutting down the REST {0} service facade.", supportedVersions.get(0).specification.name());
         for (final Worker worker : workersMap.values()) {
             worker.destroy();
         }

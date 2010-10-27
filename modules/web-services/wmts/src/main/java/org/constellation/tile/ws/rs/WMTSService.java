@@ -63,8 +63,8 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
 @Singleton
 public class WMTSService extends GridWebService<WMTSWorker> {
     
-
     private static final String NOT_WORKING = "The WMTS service is not running";
+    
     /**
      * Builds a new WMTS service REST (both REST Kvp and RESTFUL). This service only
      * provides the version 1.0.0 of OGC WMTS standard, for the moment.
@@ -408,14 +408,4 @@ public class WMTSService extends GridWebService<WMTSWorker> {
         return Response.ok(report, MimeType.TEXT_XML).build();
         
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() {
-        super.destroy();
-        LOGGER.info("Shutting down the REST WMTS service facade.");
-    }
-
 }

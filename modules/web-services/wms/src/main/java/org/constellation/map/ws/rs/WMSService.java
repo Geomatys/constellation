@@ -32,7 +32,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
@@ -618,16 +617,4 @@ public class WMSService extends GridWebService<WMSWorker> {
         return new GetMap(env, new Version(version), format, namedLayers, styles, sld, elevation,
                     date, size, background, transparent, azimuth, strExceptions, getParameters());
     }
-
-    
-    /**
-     * Logs the destruction of the service
-     */
-    @PreDestroy
-    @Override
-    public void destroy() {
-        super.destroy();
-        LOGGER.info("Shutting down the REST WMS service facade.");
-    }
 }
-

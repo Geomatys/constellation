@@ -375,15 +375,6 @@ public class WFSService extends OGCWebService<WFSWorker> {
                         INVALID_PARAMETER_VALUE, "request");
     }
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void destroy() {
-        super.destroy();
-        LOGGER.log(Level.INFO, "Shutting down the REST WFS service facade.");
-    }
-
     private DescribeFeatureTypeType createNewDescribeFeatureTypeRequest() throws CstlServiceException {
         String outputFormat   = getParameter("outputFormat", false);
         final String handle   = getParameter(HANDLE, false);

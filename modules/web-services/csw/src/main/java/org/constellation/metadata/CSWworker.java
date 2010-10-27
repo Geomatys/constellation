@@ -256,11 +256,10 @@ public class CSWworker extends AbstractWorker {
      */
     public CSWworker(final String serviceID, File configDir) {
         super(serviceID);
-        final String notWorkingMsg = "The CSW service is not working!";
         if (configDir == null) {
             configDir    = getConfigurationDirectory("csw");
             if (configDir == null) {
-                LOGGER.log(Level.WARNING, "{0}\nCause: The configuration directory has not been found", notWorkingMsg);
+                LOGGER.log(Level.WARNING, "The CSW worker is not working!\nCause: The configuration directory has not been found");
                 isStarted = false;
                 return;
             }
@@ -273,11 +272,11 @@ public class CSWworker extends AbstractWorker {
             final Unmarshaller configUnmarshaller = jb.createUnmarshaller();
             final File configFile                 = new File(configDir, "config.xml");
             if (!configFile.exists()) {
-                 LOGGER.log(Level.WARNING, "{0}\nCause: The configuration file has not been found", notWorkingMsg);
+                 LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: The configuration file has not been found");
                  isStarted = false;
             } else {
                 final Automatic configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
-                init(configuration, serviceID, configDir);
+                init(configuration, "", configDir);
                 initializeSupportedTypeNames();
                 initializeSupportedSchemaLanguage();
                 initializeAcceptedResourceType();
@@ -288,26 +287,26 @@ public class CSWworker extends AbstractWorker {
                 if (profile == TRANSACTIONAL) {
                     suffix = "-T";
                 }
-                LOGGER.info("CSW" + suffix + " service (" + configuration.getFormat() + ") running");
+                LOGGER.info("\nCSW" + suffix + " worker (" + configuration.getFormat() + ") \"" + serviceID + "\" running\n");
             }
         } catch (FactoryNotFoundException ex) {
-            LOGGER.warning(notWorkingMsg + "\nCause: Unable to find a CSW Factory");
+            LOGGER.warning("\nThe CSW worker is not working!\nCause: Unable to find a CSW Factory\n");
             isStarted = false;
         } catch (JAXBException ex) {
-            LOGGER.warning(notWorkingMsg + "\nCause: JAXBException while getting configuration:" + ex.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: JAXBException while getting configuration:{0}\n", ex.getLocalizedMessage());
             isStarted = false;
         } catch (MetadataIoException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", e.getMessage());
             isStarted = false;
         } catch (IndexingException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", e.getMessage());
             isStarted = false;
         } catch (IllegalArgumentException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: IllegalArgumentException: {0}\n", e.getLocalizedMessage());
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
         } catch (CstlServiceException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause: CstlServiceException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: CstlServiceException: {0}\n", e.getLocalizedMessage());
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
         }
@@ -321,7 +320,6 @@ public class CSWworker extends AbstractWorker {
      */
     public CSWworker(final String serviceID, File configDir, Automatic configuration) {
         super(serviceID);
-        final String notWorkingMsg = "The CSW service is not working!";
         isStarted = true;
         try {
             // we initialize the filterParsers
@@ -336,27 +334,27 @@ public class CSWworker extends AbstractWorker {
             if (profile == TRANSACTIONAL) {
                 suffix = "-T";
             }
-            LOGGER.info("CSW" + suffix + " service (" + configuration.getFormat() + ") running");
+            LOGGER.info("CSW" + suffix + " worker (" + configuration.getFormat() + ") \"" + serviceID + "\" running\n");
             
         } catch (FactoryNotFoundException ex) {
-            LOGGER.warning(notWorkingMsg + "\nCause: Unable to find a CSW Factory");
+            LOGGER.warning("\nThe CSW worker is not working!\nCause: Unable to find a CSW Factory\n");
             isStarted = false;
         } catch (MetadataIoException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", e.getMessage());
             isStarted = false;
         } catch (IndexingException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", e.getMessage());
             isStarted = false;
         } catch (IllegalArgumentException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: IllegalArgumentException: {0}\n", e.getLocalizedMessage());
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
         } catch (CstlServiceException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause: CstlServiceException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: CstlServiceException: {0}\n", e.getLocalizedMessage());
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
         }  catch (JAXBException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause: JAXBException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: JAXBException: {0}\n", e.getLocalizedMessage());
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
         }

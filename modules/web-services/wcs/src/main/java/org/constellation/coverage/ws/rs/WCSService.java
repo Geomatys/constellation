@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
-import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -695,13 +694,5 @@ public class WCSService extends GridWebService<WCSWorker> {
     		"    </p>\n" +
     		"  </body>\n" +
     		"</html>\n";
-    }
-
-
-    @PreDestroy
-    @Override
-    public void destroy() {
-        super.destroy();
-        LOGGER.info("Shutting down the REST WCS service facade");
     }
 }
