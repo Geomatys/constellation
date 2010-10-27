@@ -30,10 +30,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map.Entry;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.naming.RefAddr;
-import javax.naming.Reference;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -55,7 +51,6 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
 // Geotoolkit dependencies
-import org.geotoolkit.factory.Hints;
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
@@ -127,16 +122,6 @@ public abstract class WebService {
     protected static final Logger LOGGER = Logging.getLogger(WebService.class);
 
     /**
-     * Specifies if the process is running on a Glassfish application server.
-     */
-    private static final boolean RUNNING_ON_GLASSFISH;
-
-    static {
-        RUNNING_ON_GLASSFISH = (System.getProperty("domain.name") != null) ? true : false;
-        Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-    }
-
-    /**
      * Automaticly set by Jersey.
      *
      * Provides access to the URI used in the method call, for instance, to
@@ -182,14 +167,37 @@ public abstract class WebService {
      */
     private String mainXsdPath = null;
 
+    /**
+     * A pool of JAXB unmarshaller used to create Java objects from XML files.
+     */
+    private MarshallerPool marshallerPool;
+
+    /**
+     * Provides access to the URI used in the method call, for instance, to
+     * obtain the Key-Value Pairs in the request. 
+     * 
+     * @return
+     */
     protected final UriInfo getUriContext(){
         return uriContext;
     }
 
+    /**
+     * Used to communicate with the servlet container, for example, to obtain
+     * the MIME type of a file, to dispatch requests or to write to a log file.
+     *
+     * @return
+     */
     protected final ServletContext getServletContext(){
         return servletContext;
     }
 
+    /**
+     * The HTTP context used to get information about the client which sent the
+     * request.
+     * 
+     * @return
+     */
     protected final HttpContext getHttpContext(){
         return httpContext;
     }
@@ -231,9 +239,17 @@ public abstract class WebService {
      * Provide the marshaller pool.
      * Live it's instanciation to implementations.
      */
-    protected abstract MarshallerPool getMarshallerPool();
+    protected synchronized MarshallerPool getMarshallerPool() {
+        return marshallerPool;
+    }
 
-    
+    /**
+     * Initialize the JAXB context.
+     */
+    protected synchronized void setXMLContext(final MarshallerPool pool) {
+        LOGGER.finer("SETTING XML CONTEXT: marshaller Pool version");
+        marshallerPool = pool;
+    }
 
     /**
      * Treat the incoming GET request.
@@ -279,7 +295,6 @@ public abstract class WebService {
     @POST
     @Consumes("*/xml")
     public Response doPOSTXml(InputStream is) throws JAXBException  {
-        final MarshallerPool marshallerPool = getMarshallerPool();
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
@@ -463,8 +478,6 @@ public abstract class WebService {
     protected Object getComplexParameter(final String parameterName, final boolean mandatory)
                                                                   throws CstlServiceException
     {
-
-        final MarshallerPool marshallerPool = getMarshallerPool();
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = marshallerPool.acquireUnmarshaller();
@@ -505,55 +518,6 @@ public abstract class WebService {
      */
     protected String getServiceURL() {
         return getUriContext().getBaseUri().toString();
-    }
-
-    /**
-     * Get the value for a property defined in the JNDI context chosen.
-     *
-     * @param propGroup If you use Glassfish, you have to specify the name of the resource that
-     *                  owns the property you wish to get. Otherwise you should specify {@code null}
-     * @param propName  The name of the property to get.
-     * @return The property value defines in the context, or {@code null} if no property of this name
-     *         is defined in the resource given in parameter.
-     * @throws NamingException if an error occurs while initializing the context, or if an empty value
-     *                         for propGroup has been passed while using a Glassfish application server.
-     */
-    public static String getPropertyValue(final String propGroup, final String propName) throws NamingException {
-        final InitialContext ctx = new InitialContext();
-        
-        if (RUNNING_ON_GLASSFISH) {
-            if (propGroup == null) {
-                throw new NamingException("The coverage property group is not specified.");
-            }
-            final Reference props = (Reference) getContextProperty(propGroup, ctx);
-            if (props == null) {
-                throw new NamingException("The coverage property group specified does not exist.");
-            }
-            final RefAddr permissionAddr = (RefAddr) props.get(propName);
-            if (permissionAddr != null) {
-                return (String) permissionAddr.getContent();
-            }
-            return null;
-        } else {
-            final javax.naming.Context envContext = (javax.naming.Context) ctx.lookup("java:/comp/env");
-            return (String) getContextProperty(propName, envContext);
-        }
-    }
-
-    /**
-     * Returns the context value for the key specified, or {@code null} if not found
-     * in this context.
-     *
-     * @param key The key to search in the context.
-     * @param context The context which to consider.
-     */
-    private static Object getContextProperty(final String key, final javax.naming.Context context) {
-        try {
-            return context.lookup(key);
-        } catch (NamingException n) {
-            // Do nothing, the key is not found in the context and the value is still null.
-        }
-        return null;
     }
 
     /**

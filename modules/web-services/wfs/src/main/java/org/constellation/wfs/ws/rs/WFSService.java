@@ -18,6 +18,7 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
+import org.constellation.ws.WebServiceUtilities;
 import org.geotoolkit.ows.xml.RequestBase;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -374,7 +375,7 @@ public class WFSService extends OGCWebService {
             outputFormat = "text/xml; subtype=gml/3.1.1";
         }
         final String namespace = getParameter(NAMESPACE, false);
-        final Map<String, String> mapping = extractNamespace(namespace);
+        final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 
         final String typeName = getParameter("typeName", false);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
@@ -447,7 +448,7 @@ public class WFSService extends OGCWebService {
             outputFormat = "text/xml; subtype=gml/3.1.1";
         }
         final String namespace = getParameter(NAMESPACE, false);
-        final Map<String, String> mapping = extractNamespace(namespace);
+        final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 
         final String result = getParameter("resultType", false);
         ResultTypeType resultType = null;
@@ -586,7 +587,7 @@ public class WFSService extends OGCWebService {
         }
 
         final String namespace            = getParameter(NAMESPACE, false);
-        final Map<String, String> mapping = extractNamespace(namespace);
+        final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 
         final String typeName       = getParameter("typeName", true);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
@@ -617,7 +618,7 @@ public class WFSService extends OGCWebService {
         }
 
         final String namespace            = getParameter(NAMESPACE, false);
-        final Map<String, String> mapping = extractNamespace(namespace);
+        final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 
         final String typeName       = getParameter("typeName", true);
         final List<QName> typeNames = extractTypeName(typeName, mapping);

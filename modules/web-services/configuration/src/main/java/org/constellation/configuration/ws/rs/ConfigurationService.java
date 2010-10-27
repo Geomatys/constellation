@@ -17,6 +17,7 @@
 package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
+import org.constellation.ws.rs.WebService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -57,7 +58,6 @@ import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.AbstractWebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
 
@@ -88,28 +88,46 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 @Path("configuration")
 @Singleton
-public final class ConfigurationService extends AbstractWebService  {
+public final class ConfigurationService extends WebService  {
 
     /**
      * A container notifier allowing to dynamically reload all the active service.
      */
     @Context
     private ContainerNotifierImpl cn;
-    
+
+    /**
+     * The implementation specific CSW configurer.
+     */
     private AbstractCSWConfigurer cswConfigurer;
-    
+
+    /**
+     * The factory registry allowing to load the correct implementation specific CSW configurer.
+     */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractConfigurerFactory.class);
-    
+
+    /**
+     * A flag indicating if a CSW configuration have been found.
+     */
     private boolean cswFunctionEnabled;
 
+    /**
+     * A flag indicatng if an indexation is going on.
+     */
     private static boolean indexing;
 
+    /**
+     * The list of service currently indexing.
+     */
     private static final List<String> SERVICE_INDEXING = new ArrayList<String>();
-    
+
+    /**
+     * A map of service / configuration location.
+     */
     public static final Map<String, File> SERVCE_DIRECTORY = new HashMap<String, File>();
     static {
-        SERVCE_DIRECTORY.put("CSW",      new File(ConfigDirectory.getConfigDirectory(), "csw_configuration"));
-        SERVCE_DIRECTORY.put("SOS",      new File(ConfigDirectory.getConfigDirectory(), "sos_configuration"));
+        SERVCE_DIRECTORY.put("CSW",      new File(ConfigDirectory.getConfigDirectory(), "csw"));
+        SERVCE_DIRECTORY.put("SOS",      new File(ConfigDirectory.getConfigDirectory(), "sos"));
     }
     
     /**
@@ -296,10 +314,19 @@ public final class ConfigurationService extends AbstractWebService  {
         
     }
 
+    /**
+     * Return true if the select service (identified by his ID) is currently indexing (CSW).
+     * @param id
+     * @return
+     */
     private boolean isIndexing(String id) {
         return indexing & SERVICE_INDEXING.contains(id);
     }
 
+    /**
+     * Add the specified service to the indexing service list.
+     * @param id
+     */
     private void startIndexation(String id) {
         indexing  = true;
         if (id != null) {
@@ -307,6 +334,10 @@ public final class ConfigurationService extends AbstractWebService  {
         }
     }
 
+    /**
+     * remove the selected service from the indexing service list.
+     * @param id
+     */
     private void endIndexation(String id) {
         indexing = false;
         if (id != null) {
@@ -331,7 +362,9 @@ public final class ConfigurationService extends AbstractWebService  {
     }
 
     /**
-     * Restart all the web-services.
+     * Restart all the web-services, reload the providers.
+     * If some services are currently indexing, the service will not restart
+     * unless you specified the flag "forced".
      * 
      * @return an Acknowlegement if the restart succeed.
      */
@@ -379,6 +412,15 @@ public final class ConfigurationService extends AbstractWebService  {
         }
     }
 
+    /**
+     * Verify that the request contains good parameters :
+     * - A existing service
+     * - A file name.
+     * 
+     * @param service
+     * @param fileName
+     * @throws CstlServiceException
+     */
     private void verifyBaseAttribute(final String service, final String fileName) throws CstlServiceException {
          if ( service == null) {
             throw new CstlServiceException("You must specify the service parameter.",

@@ -40,7 +40,7 @@ public class ContainerNotifierImpl implements ContainerNotifier {
     }
     
     public void reload() {
-        for ( ContainerListener cl : containerListeners) {
+        for (ContainerListener cl : containerListeners) {
             cl.onReload();
         }
     }

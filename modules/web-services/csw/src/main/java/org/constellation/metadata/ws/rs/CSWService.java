@@ -18,6 +18,7 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
+import org.constellation.ws.WebServiceUtilities;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,7 +115,7 @@ public class CSWService extends OGCWebService {
     }
 
     /**
-     * Build a new Restfull CSW service.
+     * Build a new Restfull CSW service with multiple workers.
      * used by subClasses.
      */
     protected CSWService(final String serviceID, final Map<String, CSWworker> workers) {
@@ -126,7 +127,7 @@ public class CSWService extends OGCWebService {
     }
 
     /**
-     * Build a new Restfull CSW service.
+     * Build a new Restfull CSW service with a single worker.
      * used by subClasses.
      */
     protected CSWService(final File configDirectory, String serviceID) {
@@ -191,8 +192,7 @@ public class CSWService extends OGCWebService {
 
                 if (request instanceof GetCapabilities) {
 
-                    final GetCapabilities gc = (GetCapabilities)request;
-                    return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
+                    return Response.ok(worker.getCapabilities((GetCapabilities)request), worker.getOutputFormat()).build();
                 }
 
                 if (request instanceof GetRecordsRequest) {
@@ -217,26 +217,22 @@ public class CSWService extends OGCWebService {
 
                 if (request instanceof DescribeRecord) {
 
-                    final DescribeRecord dr = (DescribeRecord)request;
-                    return Response.ok(worker.describeRecord(dr), worker.getOutputFormat()).build();
+                    return Response.ok(worker.describeRecord((DescribeRecord)request), worker.getOutputFormat()).build();
                 }
 
                 if (request instanceof GetDomain) {
 
-                    final GetDomain gd = (GetDomain)request;
-                    return Response.ok(worker.getDomain(gd), worker.getOutputFormat()).build();
+                    return Response.ok(worker.getDomain((GetDomain)request), worker.getOutputFormat()).build();
                 }
 
                 if (request instanceof Transaction) {
 
-                    final Transaction t = (Transaction)request;
-                    return Response.ok(worker.transaction(t), worker.getOutputFormat()).build();
+                    return Response.ok(worker.transaction( (Transaction)request), worker.getOutputFormat()).build();
                 }
 
                 if (request instanceof HarvestType) {
 
-                    final HarvestType h = (HarvestType)request;
-                    return Response.ok(worker.harvest(h), worker.getOutputFormat()).build();
+                    return Response.ok(worker.harvest((HarvestType)request), worker.getOutputFormat()).build();
                 }
 
                 throw new CstlServiceException("The operation " +  request.getClass().getName() + " is not supported by the service",
@@ -423,7 +419,7 @@ public class CSWService extends OGCWebService {
         
         // we get the namespaces.
         final String namespace               = getParameter("NAMESPACE", false);
-        final Map<String, String> namespaces = extractNamespace(namespace);
+        final Map<String, String> namespaces = WebServiceUtilities.extractNamespace(namespace);
         
         //if there is not namespace specified, using the default namespace
         if (namespaces.isEmpty()) {
@@ -630,7 +626,7 @@ public class CSWService extends OGCWebService {
         
          // we get the namespaces.
         final String namespace               = getParameter("NAMESPACE", false);
-        final Map<String, String> namespaces = extractNamespace(namespace);
+        final Map<String, String> namespaces = WebServiceUtilities.extractNamespace(namespace);
         
         //if there is not namespace specified, using the default namespace
         // TODO add gmd...
