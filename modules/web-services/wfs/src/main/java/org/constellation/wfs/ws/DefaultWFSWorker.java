@@ -194,11 +194,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
-        final String url = getServiceUrl();
-        if (url != null) {
-            inCapabilities.getOperationsMetadata().updateURL(url, "WFS");
-        }
-
         final WFSCapabilitiesType result = new WFSCapabilitiesType("1.1.0");
 
 
@@ -265,7 +260,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         if (request.getSections() != null && !request.containsSection("operationsMetadata")) {
             result.setOperationsMetadata(null);
         } else {
-            result.setOperationsMetadata(inCapabilities.getOperationsMetadata());
+            final String url = getServiceUrl();
+            if (url != null) {
+                OPERATIONS_METADATA.updateURL(url, "WFS");
+            }
+            result.setOperationsMetadata(OPERATIONS_METADATA);
         }
         if (request.getSections() != null && !request.containsSection("serviceProvider")) {
             result.setServiceProvider(null);
@@ -280,7 +279,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         result.setServesGMLObjectTypeList(null);
         result.setSupportsGMLObjectTypeList(null);
 
-        result.setFilterCapabilities(inCapabilities.getFilterCapabilities());
+        result.setFilterCapabilities(WFSConstants.FILTER_CAPABILITIES);
 
         LOGGER.log(logLevel, "GetCapabilities treated in " + (System.currentTimeMillis() - start) + "ms");
         return result;

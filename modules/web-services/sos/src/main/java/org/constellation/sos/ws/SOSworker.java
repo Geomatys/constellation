@@ -316,10 +316,6 @@ public class SOSworker extends AbstractWorker {
     public SOSworker(String id, File configurationDirectory) {
         super(id);
         
-        if (configurationDirectory == null) {
-            configurationDirectory = getConfigurationDirectory("sos");
-        }
-
         isStarted                      = true;
         SOSConfiguration configuration = null;
 
@@ -2138,7 +2134,7 @@ public class SOSworker extends AbstractWorker {
         try {
             if (dbId != null && physicalID != null) {
                 map.setProperty(physicalID, dbId);
-                final File configDirectory = getConfigurationDirectory("sos");
+                final File configDirectory = getConfigurationDirectory("SOS");
                 if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
                     final File mappingFile     = new File(configDirectory, "mapping.properties");
                     final FileOutputStream out = new FileOutputStream(mappingFile);

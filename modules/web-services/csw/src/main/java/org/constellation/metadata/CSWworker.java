@@ -39,7 +39,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -56,6 +55,7 @@ import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
@@ -255,61 +255,7 @@ public class CSWworker extends AbstractWorker {
      * 
      */
     public CSWworker(final String serviceID, File configDir) {
-        super(serviceID);
-        if (configDir == null) {
-            configDir    = getConfigurationDirectory("csw");
-            if (configDir == null) {
-                LOGGER.log(Level.WARNING, "The CSW worker is not working!\nCause: The configuration directory has not been found");
-                isStarted = false;
-                return;
-            }
-        }
-        LOGGER.log(Level.FINER, "Path to config directory: {0}", configDir);
-        isStarted = true;
-        try {
-            // we initialize the filterParsers
-            final JAXBContext jb                  = JAXBContext.newInstance("org.constellation.generic.database");
-            final Unmarshaller configUnmarshaller = jb.createUnmarshaller();
-            final File configFile                 = new File(configDir, "config.xml");
-            if (!configFile.exists()) {
-                 LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: The configuration file has not been found");
-                 isStarted = false;
-            } else {
-                final Automatic configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
-                init(configuration, "", configDir);
-                initializeSupportedTypeNames();
-                initializeSupportedSchemaLanguage();
-                initializeAcceptedResourceType();
-                initializeRecordSchema();
-                initializeAnchorsMap();
-                loadCascadedService(configDir);
-                String suffix = "";
-                if (profile == TRANSACTIONAL) {
-                    suffix = "-T";
-                }
-                LOGGER.info("\nCSW" + suffix + " worker (" + configuration.getFormat() + ") \"" + serviceID + "\" running\n");
-            }
-        } catch (FactoryNotFoundException ex) {
-            LOGGER.warning("\nThe CSW worker is not working!\nCause: Unable to find a CSW Factory\n");
-            isStarted = false;
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: JAXBException while getting configuration:{0}\n", ex.getLocalizedMessage());
-            isStarted = false;
-        } catch (MetadataIoException e) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", e.getMessage());
-            isStarted = false;
-        } catch (IndexingException e) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", e.getMessage());
-            isStarted = false;
-        } catch (IllegalArgumentException e) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: IllegalArgumentException: {0}\n", e.getLocalizedMessage());
-            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            isStarted = false;
-        } catch (CstlServiceException e) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: CstlServiceException: {0}\n", e.getLocalizedMessage());
-            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-            isStarted = false;
-        }
+        this(serviceID, configDir, null);
     }
 
     /**
@@ -322,14 +268,23 @@ public class CSWworker extends AbstractWorker {
         super(serviceID);
         isStarted = true;
         try {
+            //we look if the configuration have been specified
+            if (configuration == null) {
+                final MarshallerPool pool             = GenericDatabaseMarshallerPool.getInstance();
+                final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
+                final File configFile                 = new File(configDir, "config.xml");
+                if (!configFile.exists()) {
+                     LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: The configuration file has not been found");
+                     isStarted = false;
+                     return;
+                } else {
+                    configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
+                }
+                pool.release(configUnmarshaller);
+            }
+
             // we initialize the filterParsers
-            init(configuration, serviceID, configDir);
-            initializeSupportedTypeNames();
-            initializeSupportedSchemaLanguage();
-            initializeAcceptedResourceType();
-            initializeRecordSchema();
-            initializeAnchorsMap();
-            loadCascadedService(configDir);
+            init(configuration, "", configDir);
             String suffix = "";
             if (profile == TRANSACTIONAL) {
                 suffix = "-T";
@@ -371,7 +326,7 @@ public class CSWworker extends AbstractWorker {
      * @throws MetadataIoException If an error occurs while querying the datasource.
      * @throws IndexingException If an error occurs while initialiazing the indexation.
      */
-    private void init(final Automatic configuration, String serviceID, File configDir) throws MetadataIoException, IndexingException {
+    private void init(final Automatic configuration, String serviceID, File configDir) throws MetadataIoException, IndexingException, JAXBException, CstlServiceException {
 
         // we assign the configuration directory
         configuration.setConfigurationDirectory(configDir);
@@ -393,6 +348,12 @@ public class CSWworker extends AbstractWorker {
         } else {
             indexer.destroy();
         }
+        initializeSupportedTypeNames();
+        initializeSupportedSchemaLanguage();
+        initializeAcceptedResourceType();
+        initializeRecordSchema();
+        initializeAnchorsMap();
+        loadCascadedService(configDir);
     }
     
     /**

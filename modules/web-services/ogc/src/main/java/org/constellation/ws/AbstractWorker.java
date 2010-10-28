@@ -205,13 +205,18 @@ public abstract class AbstractWorker implements Worker {
     protected File getConfigurationDirectory(String service) {
         final File configDir = ConfigDirectory.getConfigDirectory();
         if (configDir != null && configDir.exists()) {
-            final File sosDir = new File(configDir, service);
-            if (sosDir != null && sosDir.exists()) {
-                LOGGER.log(Level.INFO, "taking configuration for service {0} from directory: {1}", new Object[]{service, configDir.getPath()});
+            final File serviceDir = new File(configDir, service);
+            if (serviceDir.isDirectory() && serviceDir.exists()) {
+                File instanceDir = new File(serviceDir, id);
+                if (instanceDir.isDirectory() && instanceDir.exists()) {
+                    LOGGER.log(Level.INFO, "taking configuration for service {0} from directory: {1}", new Object[]{service, instanceDir.getPath()});
+                    return instanceDir;
+                } else {
+                    LOGGER.log(Level.WARNING, "Unable to find a {0} configuration directory for instance: {1} ",  new Object[]{service, id});
+                }
             } else {
                 LOGGER.log(Level.WARNING, "Unable to find a {0} configuration directory", service);
             }
-            return sosDir;
         }
         return null;
     }

@@ -18,6 +18,8 @@
 package org.constellation.metadata.ws.soap;
 
 // J2SE dependencies 
+import java.io.File;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JAX-WS dependencies
@@ -32,6 +34,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 
 //geotoolkit dependencies
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordType;
@@ -68,9 +71,21 @@ public class CSWService {
      * Initialize the database connection.
      */
     public CSWService() {
-       worker = new CSWworker("", null);
-       //TODO find real url
-       worker.setServiceUrl("http://localhost:8080/CSWServer/CSWService");
+       File configDirectory = ConfigDirectory.getConfigDirectory();
+       if (configDirectory != null && configDirectory.exists()) {
+            File serviceDirectory = new File(configDirectory, "CSW");
+            if (serviceDirectory.exists()) {
+                File instanceDirectory = new File(serviceDirectory, "default");
+                if (instanceDirectory.exists()) {
+                    worker = new CSWworker("default", instanceDirectory);
+                    //TODO find real url
+                    worker.setServiceUrl("http://localhost:8080/CSWServer/CSWService");
+                } else {
+                    LOGGER.log(Level.SEVERE, "The CSW service is not working!\nCause: The configuration directory has not been found");
+                }
+            }
+       }
+       
     }
     
     /**

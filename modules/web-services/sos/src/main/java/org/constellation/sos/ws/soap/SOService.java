@@ -18,6 +18,8 @@
 package org.constellation.sos.ws.soap;
 
 // JDK dependencies
+import java.io.File;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
@@ -30,6 +32,7 @@ import javax.jws.soap.SOAPBinding.ParameterStyle;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.sos.ws.SOSworker;
 
@@ -78,10 +81,20 @@ public class SOService {
      * Initialize the database connection.
      */
     public SOService() throws CstlServiceException {
-       worker = new SOSworker("", null);
-
-       //TODO find real url
-       worker.setServiceUrl("http://localhost:8080/SOServer/SOService");
+       File configDirectory = ConfigDirectory.getConfigDirectory();
+       if (configDirectory != null && configDirectory.exists()) {
+            File serviceDirectory = new File(configDirectory, "SOS");
+            if (serviceDirectory.exists()) {
+                File instanceDirectory = new File(serviceDirectory, "default");
+                if (instanceDirectory.exists()) {
+                    worker = new SOSworker("default", instanceDirectory);
+                   //TODO find real url
+                    worker.setServiceUrl("http://localhost:8080/SOServer/SOService");
+                } else {
+                    LOGGER.log(Level.SEVERE, "The SOS service is not working!\nCause: The configuration directory has not been found");
+                }
+            }
+       }
     }
     
     /**
