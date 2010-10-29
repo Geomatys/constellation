@@ -34,7 +34,7 @@ import org.geotoolkit.wms.xml.v130.Post;
 import org.geotoolkit.wms.xml.v130.Request;
 
 /**
- *  WFS Constants
+ *  WMS Constants
  *
  * @author Guilhem Legal (Geomatys)
  */

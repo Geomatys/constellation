@@ -86,9 +86,6 @@ import org.geotoolkit.wcs.xml.v100.ContentMetadata;
 import org.geotoolkit.wcs.xml.v100.CoverageDescription;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
-import org.geotoolkit.wcs.xml.v100.DCPTypeType;
-import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
-import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Post;
 import org.geotoolkit.wcs.xml.v100.DomainSetType;
 import org.geotoolkit.wcs.xml.v100.GetCoverageType;
 import org.geotoolkit.wcs.xml.v100.Keywords;
@@ -591,10 +588,10 @@ public final class WCSWorker extends AbstractWorker {
                                         requestedSection.equals("/"))
         {
             //we update the url in the static part.
-            final Request req = staticCapabilities.getCapability().getRequest();
-            updateURL(req.getGetCapabilities().getDCPType());
-            updateURL(req.getDescribeCoverage().getDCPType());
-            updateURL(req.getGetCoverage().getDCPType());
+            final Request req = WCSConstant.REQUEST_100;
+            final String url  = getServiceUrl() + "wcs?SERVICE=WCS&";
+            req.updateURL(url);
+            staticCapabilities.getCapability().setRequest(req);
         }
 
         final WCSCapabilitiesType responsev100;
@@ -728,7 +725,7 @@ public final class WCSWorker extends AbstractWorker {
             si = staticCapabilities.getServiceIdentification();
         }
         if (requestedSections.contains("OperationsMetadata") || requestedSections.contains(all)) {
-            om = staticCapabilities.getOperationsMetadata();
+            om = WCSConstant.OPERATIONS_METADATA_111;
             //we update the url in the static part.
             om.updateURL(getServiceUrl(), ServiceDef.Specification.WCS.toString());
         }
@@ -1097,23 +1094,6 @@ public final class WCSWorker extends AbstractWorker {
         	throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
         }
         return layerRef;
-    }
-
-    /**
-     * update The URL in capabilities document with the service actual URL.
-     */
-    private void updateURL(List<DCPTypeType> dcpList) {
-        for(DCPTypeType dcp: dcpList) {
-           for (Object obj: dcp.getHTTP().getGetOrPost()){
-               if (obj instanceof Get){
-                   final Get getMethod = (Get)obj;
-                   getMethod.getOnlineResource().setHref(getServiceUrl() + "wcs?SERVICE=WCS&");
-               } else if (obj instanceof Post){
-                   final Post postMethod = (Post)obj;
-                   postMethod.getOnlineResource().setHref(getServiceUrl() + "wcs?SERVICE=WCS&");
-               }
-           }
-        }
     }
 
     /**
