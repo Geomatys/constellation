@@ -236,7 +236,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         //we enter the operation Metadata
         if (sections.containsSection("OperationsMetadata") || sections.containsSection("All")) {
 
-           om = skeletonCapabilities.getOperationsMetadata();
+           om = WMTSConstant.OPERATIONS_METADATA;
 
            //we update the URL
            om.updateURL(getServiceUrl(), "WMTS");
