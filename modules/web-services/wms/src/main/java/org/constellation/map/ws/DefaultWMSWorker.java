@@ -42,7 +42,6 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 //Constellation dependencies
@@ -93,20 +92,14 @@ import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.Version;
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.wms.xml.AbstractDCP;
 import org.geotoolkit.wms.xml.AbstractDimension;
-import org.geotoolkit.wms.xml.AbstractHTTP;
 import org.geotoolkit.wms.xml.AbstractLayer;
-import org.geotoolkit.wms.xml.AbstractOperation;
-import org.geotoolkit.wms.xml.AbstractProtocol;
 import org.geotoolkit.wms.xml.AbstractRequest;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
-import org.geotoolkit.wms.xml.v130.OperationType;
 
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
@@ -237,16 +230,16 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
-        final String url = getServiceUrl();
-        //inCapabilities.getService().getOnlineResource().setHref(url + "wms");
-        //No, this is to "refer to the web site of the service provider."
-        final AbstractRequest request = inCapabilities.getCapability().getRequest();
-
-        updateURL(request.getGetCapabilities().getDCPType(), url);
-        updateURL(request.getGetFeatureInfo().getDCPType(), url);
-        updateURL(request.getGetMap().getDCPType(), url);
-        updateExtendedOperationURL(request, getCapab.getVersion(), url);
-
+        final String url = getServiceUrl() + "wms";
+        
+        final AbstractRequest request;
+        if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
+            request = WMSConstant.REQUEST_111;
+        } else {
+            request = WMSConstant.REQUEST_130;
+        }
+        request.updateURL(url);
+        inCapabilities.getCapability().setRequest(request);
 
 
 //        /* ****************************************************************** *
@@ -576,54 +569,6 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         } 
         CAPS_RESPONSE.put(keyCache, inCapabilities);
         return inCapabilities;
-    }
-
-    /**
-     * update The URL in capabilities document with the service actual URL.
-     */
-    private void updateURL(final List<? extends AbstractDCP> dcpList, final String url) {
-        for(AbstractDCP dcp: dcpList) {
-            final AbstractHTTP http = dcp.getHTTP();
-            final AbstractProtocol getMethod = http.getGet();
-            if (getMethod != null) {
-                getMethod.getOnlineResource().setHref(url + "wms?");
-            }
-            final AbstractProtocol postMethod = http.getPost();
-            if (postMethod != null) {
-                postMethod.getOnlineResource().setHref(url + "wms?");
-            }
-        }
-    }
-
-    /**
-     * update The URL in capabilities document for the extended operation.
-     */
-    private void updateExtendedOperationURL(final AbstractRequest request, final Version version,
-                                                                           final String url){
-
-        if (version.toString().equals(ServiceDef.WMS_1_3_0_SLD.version.toString())) {
-            final org.geotoolkit.wms.xml.v130.Request r = (org.geotoolkit.wms.xml.v130.Request) request;
-            final List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
-            for(JAXBElement<OperationType> extOp: extendedOperations) {
-                updateURL(extOp.getValue().getDCPType(), url);
-            }
-
-        // version 1.1.1
-        } else {
-           final org.geotoolkit.wms.xml.v111.Request r = (org.geotoolkit.wms.xml.v111.Request) request;
-           AbstractOperation op = r.getDescribeLayer();
-           if (op != null)
-                updateURL(op.getDCPType(), url);
-           op = r.getGetLegendGraphic();
-           if (op != null)
-                updateURL(op.getDCPType(), url);
-           op = r.getGetStyles();
-           if (op != null)
-                updateURL(op.getDCPType(), url);
-           op = r.getPutStyles();
-           if (op != null)
-                updateURL(op.getDCPType(), url);
-        }
     }
 
     /**
