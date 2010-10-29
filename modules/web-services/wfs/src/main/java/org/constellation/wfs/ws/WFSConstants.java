@@ -120,17 +120,17 @@ public final class WFSConstants {
         operations.add(getCapabilities);
 
         final List<DomainType> dfParameters = new ArrayList<DomainType>();
-        dfParameters.add(new DomainType("Version", Arrays.asList("1.1.0")));
         dfParameters.add(new DomainType("outputFormat", Arrays.asList("text/xml; subtype=gml/3.1.1")));
         dfParameters.add(new DomainType("Service", Arrays.asList("WFS")));
+        dfParameters.add(new DomainType("Version", Arrays.asList("1.1.0")));
         Operation describeFeatureType = new Operation(dcps, dfParameters, null, null, "DescribeFeatureType");
         operations.add(describeFeatureType);
 
         final List<DomainType> gfParameters = new ArrayList<DomainType>();
-        gfParameters.add(new DomainType("Version", Arrays.asList("1.1.0")));
+        gfParameters.add(new DomainType("resultType", Arrays.asList("results","hits")));
         gfParameters.add(new DomainType("outputFormat", Arrays.asList("text/xml; subtype=gml/3.1.1")));
         gfParameters.add(new DomainType("Service", Arrays.asList("WFS")));
-        gfParameters.add(new DomainType("resultType", Arrays.asList("results","hits")));
+        gfParameters.add(new DomainType("Version", Arrays.asList("1.1.0")));
 
         final List<DomainType> gfConstraints = new ArrayList<DomainType>();
         gfConstraints.add(new DomainType("LocalTraverseXLinkScope", Arrays.asList("2"))); // ???
@@ -138,12 +138,12 @@ public final class WFSConstants {
         operations.add(getFeature);
 
         final List<DomainType> tParameters = new ArrayList<DomainType>();
-        tParameters.add(new DomainType("Version", Arrays.asList("1.1.0")));
         tParameters.add(new DomainType("inputFormat", Arrays.asList("text/xml; subtype=gml/3.1.1")));
-        tParameters.add(new DomainType("Service", Arrays.asList("WFS")));
         tParameters.add(new DomainType("idgen", Arrays.asList("GenerateNew","UseExisting","ReplaceDuplicate")));
         tParameters.add(new DomainType("releaseAction", Arrays.asList("ALL", "SOME")));
-        Operation Transaction = new Operation(dcps2, dfParameters, null, null, "Transaction");
+        tParameters.add(new DomainType("Service", Arrays.asList("WFS")));
+        tParameters.add(new DomainType("Version", Arrays.asList("1.1.0")));
+        Operation Transaction = new Operation(dcps2, tParameters, null, null, "Transaction");
         operations.add(Transaction);
 
 

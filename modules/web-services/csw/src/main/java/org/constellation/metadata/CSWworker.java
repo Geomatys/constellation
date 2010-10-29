@@ -265,7 +265,7 @@ public class CSWworker extends AbstractWorker {
      *
      */
     public CSWworker(final String serviceID, File configDir, Automatic configuration) {
-        super(serviceID);
+        super(serviceID, configDir);
         isStarted = true;
         try {
             //we look if the configuration have been specified

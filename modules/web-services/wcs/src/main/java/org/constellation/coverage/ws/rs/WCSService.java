@@ -115,7 +115,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      */
     @Override
     protected WCSWorker createWorker(File instanceDirectory) {
-        return new WCSWorker(instanceDirectory.getName());
+        return new WCSWorker(instanceDirectory.getName() , instanceDirectory);
     }
 
 

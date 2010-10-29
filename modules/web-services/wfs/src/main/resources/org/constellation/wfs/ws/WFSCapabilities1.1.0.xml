@@ -6,7 +6,6 @@ xmlns:ogc="http://www.opengis.net/ogc"
 xmlns:gml="http://www.opengis.net/gml"
 xmlns:xlink="http://www.w3.org/1999/xlink"
 xmlns:ins="http://www.inspire.org">
-
     <ows:ServiceIdentification>
         <ows:Title>Web Feature Service (Constellation)</ows:Title>
         <ows:Abstract>Features provided by constellation SDI server.</ows:Abstract>
@@ -19,7 +18,6 @@ xmlns:ins="http://www.inspire.org">
         <ows:Fees>NONE</ows:Fees>
         <ows:AccessConstraints>NONE</ows:AccessConstraints>
     </ows:ServiceIdentification>
-
     <ows:ServiceProvider>
         <ows:ProviderName>Constellation</ows:ProviderName>
         <ows:ProviderSite xlink:href="http://constellation.codehaus.org"/>
@@ -46,130 +44,4 @@ xmlns:ins="http://www.inspire.org">
             <ows:Role></ows:Role>
         </ows:ServiceContact>
     </ows:ServiceProvider>
-
-    <ows:OperationsMetadata>
-        <ows:Operation name="GetCapabilities">
-            <ows:DCP>
-                <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS//wfs?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
-                </ows:HTTP>
-            </ows:DCP>
-            <ows:Parameter name="AcceptVersions">
-                <ows:Value>1.1.0</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="AcceptFormats">
-                <ows:Value>text/xml</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Service">
-                <ows:Value>WFS</ows:Value>
-            </ows:Parameter>
-        </ows:Operation>
-        <ows:Operation name="DescribeFeatureType">
-            <ows:DCP>
-                <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
-                </ows:HTTP>
-            </ows:DCP>
-            <ows:Parameter name="outputFormat">
-                <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Service">
-                <ows:Value>WFS</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Version">
-                <ows:Value>1.1.0</ows:Value>
-            </ows:Parameter>
-        </ows:Operation>
-        <ows:Operation name="GetFeature">
-            <ows:DCP>
-                <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
-                </ows:HTTP>
-            </ows:DCP>
-            <ows:Parameter name="resultType">
-                <ows:Value>results</ows:Value>
-                <ows:Value>hits</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="outputFormat">
-                <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Service">
-                <ows:Value>WFS</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Version">
-                <ows:Value>1.1.0</ows:Value>
-            </ows:Parameter>
-            <ows:Constraint name="LocalTraverseXLinkScope">
-                <ows:Value>2</ows:Value>
-            </ows:Constraint>
-        </ows:Operation>
-        <ows:Operation name="Transaction">
-            <ows:DCP>
-                <ows:HTTP>
-                    <ows:Post xlink:href="http://www.BlueOx.org/wfs"/>
-                </ows:HTTP>
-            </ows:DCP>
-            <ows:Parameter name="inputFormat">
-                <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="idgen">
-                <ows:Value>GenerateNew</ows:Value>
-                <ows:Value>UseExisting</ows:Value>
-                <ows:Value>ReplaceDuplicate</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="releaseAction">
-                <ows:Value>ALL</ows:Value>
-                <ows:Value>SOME</ows:Value>
-            </ows:Parameter>
-        </ows:Operation>
-    </ows:OperationsMetadata>
-    <ogc:Filter_Capabilities>
-        <ogc:Spatial_Capabilities>
-            <ogc:GeometryOperands>
-                <ogc:GeometryOperand>gml:Envelope</ogc:GeometryOperand>
-                <ogc:GeometryOperand>gml:Point</ogc:GeometryOperand>
-                <ogc:GeometryOperand>gml:LineString</ogc:GeometryOperand>
-                <ogc:GeometryOperand>gml:Polygon</ogc:GeometryOperand>
-            </ogc:GeometryOperands>
-            <ogc:SpatialOperators>
-                <ogc:SpatialOperator name="Disjoint"/>
-                <ogc:SpatialOperator name="Equals"/>
-                <ogc:SpatialOperator name="DWithin"/>
-                <ogc:SpatialOperator name="Beyond"/>
-                <ogc:SpatialOperator name="Intersects"/>
-                <ogc:SpatialOperator name="Touches"/>
-                <ogc:SpatialOperator name="Crosses"/>
-                <ogc:SpatialOperator name="Contains"/>
-                <ogc:SpatialOperator name="Overlaps"/>
-                <ogc:SpatialOperator name="BBOX"/>
-            </ogc:SpatialOperators>
-        </ogc:Spatial_Capabilities>
-        <ogc:Scalar_Capabilities>
-            <ogc:LogicalOperators/>
-            <ogc:ComparisonOperators>
-                <ogc:ComparisonOperator>LessThan</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>GreaterThan</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>LessThanEqualTo</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>GreaterThanEqualTo</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>EqualTo</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>NotEqualTo</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>Like</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>Between</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>NullCheck</ogc:ComparisonOperator>
-            </ogc:ComparisonOperators>
-            <ogc:ArithmeticOperators>
-                <ogc:SimpleArithmetic/>
-            </ogc:ArithmeticOperators>
-        </ogc:Scalar_Capabilities>
-        <ogc:Id_Capabilities>
-            <ogc:FID/>
-            <ogc:EID/>
-        </ogc:Id_Capabilities>
-    </ogc:Filter_Capabilities>
-
-
-
 </WFS_Capabilities>

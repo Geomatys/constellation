@@ -49,8 +49,8 @@
         <ows:Operation name="GetCapabilities">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS//wfs?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
+                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
+                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="AcceptVersions">
@@ -66,8 +66,8 @@
         <ows:Operation name="DescribeFeatureType">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
+                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
+                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="outputFormat">
@@ -83,8 +83,8 @@
         <ows:Operation name="GetFeature">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs?"/>
+                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
+                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="resultType">
@@ -107,7 +107,7 @@
         <ows:Operation name="Transaction">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Post xlink:href="http://www.BlueOx.org/wfs"/>
+                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="inputFormat">
@@ -121,6 +121,12 @@
             <ows:Parameter name="releaseAction">
                 <ows:Value>ALL</ows:Value>
                 <ows:Value>SOME</ows:Value>
+            </ows:Parameter>
+            <ows:Parameter name="Service">
+                <ows:Value>WFS</ows:Value>
+            </ows:Parameter>
+            <ows:Parameter name="Version">
+                <ows:Value>1.1.0</ows:Value>
             </ows:Parameter>
         </ows:Operation>
     </ows:OperationsMetadata>
@@ -345,17 +351,16 @@
                 <ogc:SpatialOperator name="BBOX"/>
             </ogc:SpatialOperators>
         </ogc:Spatial_Capabilities>
-        <ogc:Scalar_Capabilities>
-            <ogc:LogicalOperators/>
+       <ogc:Scalar_Capabilities>
             <ogc:ComparisonOperators>
-                <ogc:ComparisonOperator>LessThan</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>GreaterThan</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>LessThanEqualTo</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>GreaterThanEqualTo</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>EqualTo</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>NotEqualTo</ogc:ComparisonOperator>
-                <ogc:ComparisonOperator>Like</ogc:ComparisonOperator>
                 <ogc:ComparisonOperator>Between</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>EqualTo</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>GreaterThan</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>GreaterThanEqualTo</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>LessThan</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>LessThanEqualTo</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>Like</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>NotEqualTo</ogc:ComparisonOperator>
                 <ogc:ComparisonOperator>NullCheck</ogc:ComparisonOperator>
             </ogc:ComparisonOperators>
             <ogc:ArithmeticOperators>

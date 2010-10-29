@@ -15,56 +15,6 @@
     <accessConstraints>NONE</accessConstraints>
   </Service>
   <Capability>
-    <Request>
-      <GetCapabilities>
-        <DCPType>
-          <HTTP>
-            <Get>
-              <OnlineResource xlink:href=""/>
-            </Get>
-          </HTTP>
-        </DCPType>
-        <DCPType>
-          <HTTP>
-            <Post>
-              <OnlineResource xlink:href=""/>
-            </Post>
-          </HTTP>
-        </DCPType>
-      </GetCapabilities>
-      <DescribeCoverage>
-        <DCPType>
-          <HTTP>
-            <Get>
-              <OnlineResource xlink:href=""/>
-            </Get>
-          </HTTP>
-        </DCPType>
-        <DCPType>
-          <HTTP>
-            <Post>
-              <OnlineResource xlink:href=""/>
-            </Post>
-          </HTTP>
-        </DCPType>
-      </DescribeCoverage>
-      <GetCoverage>
-        <DCPType>
-          <HTTP>
-            <Get>
-              <OnlineResource xlink:href=""/>
-            </Get>
-          </HTTP>
-        </DCPType>
-        <DCPType>
-          <HTTP>
-            <Post>
-              <OnlineResource xlink:href=""/>
-            </Post>
-          </HTTP>
-        </DCPType>
-      </GetCoverage>
-    </Request>
     <Exception>
       <Format>application/vnd.ogc.se_xml</Format>
       <Format>text/xml</Format>

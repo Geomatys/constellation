@@ -103,16 +103,17 @@ import org.xml.sax.SAXException;
 public class WFSWorkerTest {
 
     private static MarshallerPool pool;
-    private static WFSWorker worker ;
+    private static final WFSWorker worker ;
     static {
         try {
             pool = WFSMarshallerPool.getInstance();
 
-            worker = new DefaultWFSWorker("");
-            worker.setLogLevel(Level.FINER);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        worker = new DefaultWFSWorker("default", null);
+        worker.setLogLevel(Level.FINER);
+        worker.setServiceUrl("http://geomatys.com/constellation/WS/");
     }
 
     

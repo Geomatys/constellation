@@ -17,6 +17,7 @@
 
 package org.constellation.wfs.ws;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -148,8 +149,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     private String outputFormat = "text/xml";
 
-    public DefaultWFSWorker(String id) {
-        super(id);
+    public DefaultWFSWorker(String id, File configurationDirectory) {
+        super(id, configurationDirectory);
         
         //todo wait for martin fix
         standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");

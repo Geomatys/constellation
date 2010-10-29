@@ -138,7 +138,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
 
     @Override
     protected WFSWorker createWorker(File instanceDirectory) {
-        return new DefaultWFSWorker(instanceDirectory.getName());
+        return new DefaultWFSWorker(instanceDirectory.getName(), instanceDirectory);
     }
 
 

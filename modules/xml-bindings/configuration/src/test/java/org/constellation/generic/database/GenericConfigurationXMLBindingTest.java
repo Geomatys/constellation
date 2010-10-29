@@ -93,11 +93,11 @@ public class GenericConfigurationXMLBindingTest {
         StringWriter sw = new StringWriter();
         marshaller.marshal(config, sw);
 
-        String result = sw.toString();
+        String result =  removeXmlns(sw.toString());
         //System.out.println(result);
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                + '\n' +
-        "<automatic format=\"MDWEB\" xmlns:ns2=\"http://www.constellation.org/config\" xmlns:ns3=\"http://constellation.generic.filter.org\">" + '\n' +
+        "<automatic format=\"MDWEB\" >" + '\n' +
         "    <bdd>"                                                                    + '\n' +
         "        <className>org.driver.test</className>"                               + '\n' +
         "        <connectURL>http://somehost/blablabla</connectURL>"                   + '\n' +
@@ -166,11 +166,11 @@ public class GenericConfigurationXMLBindingTest {
         StringWriter sw = new StringWriter();
         marshaller.marshal(sosConfig, sw);
 
-        String result = sw.toString();
+        String result =  removeXmlns(sw.toString());
         //System.out.println("result:" + result);
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
-        "<ns2:SOSConfiguration xmlns:ns2=\"http://www.constellation.org/config\" xmlns:ns3=\"http://constellation.generic.filter.org\">" + '\n' +
+        "<ns2:SOSConfiguration >" + '\n' +
         "    <ns2:SMLConfiguration format=\"MDWEB\">"                              + '\n' +
         "        <bdd>"                                                            + '\n' +
         "            <className>org.driver.test</className>"                       + '\n' +
@@ -396,7 +396,7 @@ public class GenericConfigurationXMLBindingTest {
 
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                                                            + '\n' +
-        "<ns3:query name=\"ObservationAffinage\" xmlns:ns2=\"http://www.constellation.org/config\" xmlns:ns3=\"http://constellation.generic.filter.org\">"  + '\n' +
+        "<ns4:query name=\"ObservationAffinage\" >"  + '\n' +
         "    <parameters>"                                                                                         + '\n' +
         "        <entry>"                                                                                          + '\n' +
         "            <key>st1</key>"                                                                                 + '\n' +
@@ -419,7 +419,7 @@ public class GenericConfigurationXMLBindingTest {
         "    <from group=\"observations\">location loc, physical_parameter pp</from>"                               + '\n' +
         "    <where group=\"observations\">loc.location_id = lm.location_id</where>"                                + '\n' +
         "    <orderby group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderby>"         + '\n' +
-        "</ns3:query>" + '\n';
+        "</ns4:query>" + '\n';
 
         FilterSelect select = new FilterSelect();
         select.setGroup("filterObservation");
@@ -463,8 +463,17 @@ public class GenericConfigurationXMLBindingTest {
 
         marshaller.marshal(query, sw);
 
-        String result = sw.toString();
+        String result =  removeXmlns(sw.toString());
         
         assertEquals(expResult, result);
+    }
+
+    public static String removeXmlns(String xml) {
+        String s = xml;
+        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
+        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
+        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
+        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
+        return s;
     }
 }

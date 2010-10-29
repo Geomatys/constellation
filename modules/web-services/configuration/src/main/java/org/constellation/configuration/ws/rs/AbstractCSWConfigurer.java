@@ -20,12 +20,11 @@ package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -34,7 +33,6 @@ import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.filter.ConfigurationFileFilter;
 import org.constellation.generic.database.Automatic;
@@ -52,7 +50,6 @@ import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.AbstractIndexer.IndexDirectoryFilter;
-import org.geotoolkit.util.FileUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -218,42 +215,6 @@ public abstract class AbstractCSWConfigurer {
     }
     
     /**
-     * Refresh the properties file used by the CSW service to store federated catalogues.
-     * 
-     * @param request
-     * @return
-     * @throws org.constellation.coverage.web.CstlServiceException
-     */
-    public AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws CstlServiceException {
-        LOGGER.info("refresh cascaded servers requested");
-        
-        final File cascadingFile = new File(getConfigurationDirectory(), "CSWCascading.properties");
-        Properties prop;
-        try {
-            prop = FileUtilities.getPropertiesFromFile(cascadingFile);
-        } catch (IOException ex) {
-            throw new CstlServiceException("IO exception while loading the cascading properties file",
-                            NO_APPLICABLE_CODE);
-        }
-        
-        if (!request.isAppend()) {
-            prop.clear();
-        }
-        
-        for (String servName : request.getCascadedServices().keySet()) {
-            prop.put(servName, request.getCascadedServices().get(servName));
-        }
-        try {
-            FileUtilities.storeProperties(prop, cascadingFile);
-        } catch (IOException ex) {
-            throw new CstlServiceException("unable to store the cascading properties file",
-                        NO_APPLICABLE_CODE);
-        }
-        
-        return new AcknowlegementType("success", "CSW cascaded servers list refreshed");
-    }
-    
-    /**
      * Destroy the CSW index directory in order that it will be recreated.
      * 
      * @param asynchrone a flag for indexation mode.
@@ -270,7 +231,7 @@ public abstract class AbstractCSWConfigurer {
         if (id != null && !id.isEmpty()) {
             suffix = suffix + " id:" + id;
         }
-        LOGGER.info("refresh index requested" + suffix);
+        LOGGER.log(Level.INFO, "refresh index requested{0}", suffix);
         try {
             refreshServiceConfiguration();
         } catch (ConfigurationException ex) {
@@ -318,7 +279,7 @@ public abstract class AbstractCSWConfigurer {
         if (deleted) {
             restart();
         } else {
-            LOGGER.info("there is no index correspounding to " + id + " to delete");
+            LOGGER.log(Level.INFO, "there is no index correspounding to {0} to delete", id);
         }
     }
 
@@ -354,7 +315,7 @@ public abstract class AbstractCSWConfigurer {
                     throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
                 }
             } catch (IllegalArgumentException ex) {
-                LOGGER.severe("unable to create an indexer for configuration file:" + configFile.getName());
+                LOGGER.log(Level.SEVERE, "unable to create an indexer for configuration file:{0}", configFile.getName());
             } catch (IndexingException ex) {
                 throw new CstlServiceException("An eception occurs while creating the index!" + '\n' +
                         "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);

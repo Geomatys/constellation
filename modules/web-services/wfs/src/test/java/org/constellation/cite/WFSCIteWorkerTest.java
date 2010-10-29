@@ -57,7 +57,7 @@ public class WFSCIteWorkerTest {
 
     private static final WFSWorker worker;
     static {
-        worker = new DefaultWFSWorker("");
+        worker = new DefaultWFSWorker("default", null);
         worker.setLogLevel(Level.FINER);
     }
 

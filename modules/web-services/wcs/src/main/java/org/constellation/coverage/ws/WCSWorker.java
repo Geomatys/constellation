@@ -17,6 +17,7 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
+import java.io.File;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -175,8 +176,8 @@ public final class WCSWorker extends AbstractWorker {
     private static final Map<String,GetCapabilitiesResponse> CAPS_RESPONSE =
             new HashMap<String,GetCapabilitiesResponse>();
 
-    public WCSWorker(String id) {
-        super(id);
+    public WCSWorker(String id, File configurationDirectory) {
+        super(id, configurationDirectory);
     }
 
     @Override

@@ -111,7 +111,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      */
     @Override
     protected WMSWorker createWorker(File instanceDirectory) {
-        return new DefaultWMSWorker(instanceDirectory.getName());
+        return new DefaultWMSWorker(instanceDirectory.getName(), instanceDirectory);
     }
 
 

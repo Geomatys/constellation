@@ -27,9 +27,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Arrays;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 
 // Jersey dependencies
@@ -48,9 +46,6 @@ import javax.xml.bind.Marshaller;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.CSWCascadingType;
-import org.constellation.configuration.UpdatePropertiesFileType;
-import org.constellation.configuration.UpdateXMLFileType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.provider.LayerProviderProxy;
@@ -65,7 +60,6 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
@@ -180,18 +174,6 @@ public final class ConfigurationService extends WebService  {
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             
-            if ("UpdatePropertiesFile".equalsIgnoreCase(request) || objectRequest instanceof UpdatePropertiesFileType) {
-                final UpdatePropertiesFileType updateProp = (UpdatePropertiesFileType) objectRequest;
-                marshaller.marshal(updatePropertiesFile(updateProp), sw);
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
-            }
-
-            if ("UpdateXMLFile".equalsIgnoreCase(request) || objectRequest instanceof UpdateXMLFileType) {
-                final UpdateXMLFileType updateProp = (UpdateXMLFileType) objectRequest;
-                marshaller.marshal(updateXmlFile(updateProp), sw);
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
-            }
-            
             if ("Download".equalsIgnoreCase(request)) {    
                 final File f = downloadFile();
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
@@ -262,12 +244,6 @@ public final class ConfigurationService extends WebService  {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, "Request");
                 }
-            }
-            
-            if ("RefreshCascadedServers".equalsIgnoreCase(request) || objectRequest instanceof CSWCascadingType) {
-                final CSWCascadingType refreshCS = (CSWCascadingType) objectRequest;
-                marshaller.marshal(cswConfigurer.refreshCascadedServers(refreshCS), sw);
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             
             if ("UpdateVocabularies".equalsIgnoreCase(request)) {    
@@ -439,89 +415,6 @@ public final class ConfigurationService extends WebService  {
         }
     }
     
-    /**
-     * Update a properties file on the server file system.
-     * 
-     * @param request
-     * @return
-     * @throws org.constellation.coverage.web.CstlServiceException
-     */
-    private AcknowlegementType updatePropertiesFile(UpdatePropertiesFileType request) throws CstlServiceException {
-        LOGGER.info("update properties file requested");
-        
-        final String service  = request.getService();
-        final String fileName = request.getFileName();
-        final Map<String, String> newProperties = request.getProperties();
-        
-        verifyBaseAttribute(service, fileName);
-        
-        if (newProperties == null || newProperties.isEmpty()) {
-             throw new CstlServiceException("You must specify a non empty properties parameter.", MISSING_PARAMETER_VALUE, 
-                     "properties");
-        }
-        
-        final File configDir   = SERVCE_DIRECTORY.get(service);
-        final File propertiesFile = new File(configDir, fileName);
-        
-        final Properties prop     = new Properties();
-        if (propertiesFile.exists()) {
-            for (Entry<String, String> entry : newProperties.entrySet()) {
-                prop.put(entry.getKey(), entry.getValue());
-            }
-        } else {
-            throw new CstlServiceException("The file does not exist: " + propertiesFile.getPath(),
-                                          NO_APPLICABLE_CODE);
-        }
-        try {
-            FileUtilities.storeProperties(prop, propertiesFile);
-        } catch (IOException ex) {
-            throw new CstlServiceException("IOException xhile trying to store the properties files.",
-                                          NO_APPLICABLE_CODE);
-        }
-        
-        return new AcknowlegementType(Parameters.SUCCESS, "properties file sucessfully updated");
-    }
-
-    /**
-     * Update a properties file on the server file system.
-     *
-     * @param request
-     * @return
-     * @throws org.constellation.coverage.web.CstlServiceException
-     */
-    private AcknowlegementType updateXmlFile(UpdateXMLFileType request) throws CstlServiceException {
-        LOGGER.info("update properties file requested");
-
-        final String service    = request.getService();
-        final String fileName   = request.getFileName();
-        final Object newContent = request.getXmlContent();
-
-        verifyBaseAttribute(service, fileName);
-
-        if (newContent == null) {
-             throw new CstlServiceException("You must specify a non empty xml content parameter.", MISSING_PARAMETER_VALUE,
-                     "xmlContent");
-        }
-
-        final File configDir  = SERVCE_DIRECTORY.get(service);
-        final File configFile = new File(configDir, fileName);
-
-        Marshaller marshaller = null;
-        try {
-            marshaller = getMarshallerPool().acquireMarshaller();
-            marshaller.marshal(newContent, configFile);
-        } catch (JAXBException ex) {
-            throw new CstlServiceException("JAXBException while trying to store the properties files.",
-                                          NO_APPLICABLE_CODE);
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
-        }
-
-        return new AcknowlegementType(Parameters.SUCCESS, "xml file sucessfully updated");
-    }
-
     /**
      * Receive a file and write it into the static file path.
      * 

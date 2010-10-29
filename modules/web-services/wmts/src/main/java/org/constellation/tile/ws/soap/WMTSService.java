@@ -21,11 +21,13 @@ import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.tile.ws.DefaultWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;
@@ -65,7 +67,20 @@ public class WMTSService {
      * Creates a WMTS SOAP service.
      */
     public WMTSService() {
-        worker = new DefaultWMTSWorker("");
+       File configDirectory = ConfigDirectory.getConfigDirectory();
+       if (configDirectory != null && configDirectory.exists()) {
+            File serviceDirectory = new File(configDirectory, "WMTS");
+            if (serviceDirectory.exists()) {
+                File instanceDirectory = new File(serviceDirectory, "default");
+                if (instanceDirectory.exists()) {
+                    worker = new DefaultWMTSWorker("default", instanceDirectory);
+                    //TODO find real url
+                    worker.setServiceUrl("http://localhost:8080/WMTSServer/WMTSService");
+                } else {
+                    LOGGER.log(Level.SEVERE, "The WMTS service is not working!\nCause: The configuration directory has not been found");
+                }
+            }
+       }
     }
 
     /**

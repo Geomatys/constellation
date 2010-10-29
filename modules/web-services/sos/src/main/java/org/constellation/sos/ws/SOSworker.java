@@ -314,7 +314,7 @@ public class SOSworker extends AbstractWorker {
      * Initialize the database connection.
      */
     public SOSworker(String id, File configurationDirectory) {
-        super(id);
+        super(id, configurationDirectory);
         
         isStarted                      = true;
         SOSConfiguration configuration = null;
@@ -2134,7 +2134,7 @@ public class SOSworker extends AbstractWorker {
         try {
             if (dbId != null && physicalID != null) {
                 map.setProperty(physicalID, dbId);
-                final File configDirectory = getConfigurationDirectory("SOS");
+                final File configDirectory = configurationDirectory;
                 if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
                     final File mappingFile     = new File(configDirectory, "mapping.properties");
                     final FileOutputStream out = new FileOutputStream(mappingFile);

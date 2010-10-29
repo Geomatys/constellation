@@ -80,7 +80,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      */
     @Override
     protected WMTSWorker createWorker(File instanceDirectory) {
-        return new DefaultWMTSWorker(instanceDirectory.getName());
+        return new DefaultWMTSWorker(instanceDirectory.getName(), instanceDirectory);
     }
 
 

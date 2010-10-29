@@ -40,22 +40,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CSWCascadingType }
-     * 
-     */
-    public CSWCascadingType createCSWCascadingType() {
-        return new CSWCascadingType();
-    }
-
-    /**
-     * Create an instance of {@link UpdateCapabilitiesType }
-     * 
-     */
-    public UpdateCapabilitiesType createUpdateCapabilitiesType() {
-        return new UpdateCapabilitiesType();
-    }
-    
-    /**
      * Create an instance of {@link AcknowlegementType }
      * 
      */
@@ -63,14 +47,6 @@ public class ObjectFactory {
         return new AcknowlegementType();
     }
     
-    /**
-     * Create an instance of {@link UpdatePropertiesFileType }
-     * 
-     */
-    public UpdatePropertiesFileType createUpdatePropertiesFileType() {
-        return new UpdatePropertiesFileType();
-    }
-
     /**
      * Create an instance of {@link SOSConfiguration }
      *
@@ -95,12 +71,24 @@ public class ObjectFactory {
         return new HarvestTask();
     }
 
-    /**
-     * Create an instance of {@link UpdateXMLFileType }
-     *
-     */
-    public UpdateXMLFileType createUpdateXMLFileType() {
-        return new UpdateXMLFileType();
+    public LayerContext createLayerContext() {
+        return new LayerContext();
+    }
+
+    public LayerList createLayerList() {
+        return new LayerList();
+    }
+
+    public Layers createLayers() {
+        return new Layers();
+    }
+
+    public Layer createLayer() {
+        return new Layer();
+    }
+
+    public Source createSource() {
+        return new Source();
     }
 
 }

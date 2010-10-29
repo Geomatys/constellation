@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -144,8 +144,8 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
     /**
      * Instanciates the working class for a SOAP client, that do request on a SOAP PEP service.
      */
-    public DefaultWMTSWorker(String id) {
-        super(id);
+    public DefaultWMTSWorker(String id, File configurationDirectory) {
+        super(id, configurationDirectory);
         LOGGER.info("WMTS Service running");
     }
 

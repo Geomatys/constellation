@@ -17,6 +17,7 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import java.io.File;
 import org.geotoolkit.wms.xml.v130.Capability;
 import java.net.URL;
 import org.geotoolkit.sld.MutableLayer;
@@ -145,8 +146,8 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         SUPPORTED_LANGUAGES.put("fre", language);
     }
 
-    public DefaultWMSWorker(String id) {
-        super(id);
+    public DefaultWMSWorker(String id, File configurationDirectory) {
+        super(id, configurationDirectory);
     }
 
     @Override

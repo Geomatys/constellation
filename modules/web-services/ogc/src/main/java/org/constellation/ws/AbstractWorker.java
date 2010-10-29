@@ -29,8 +29,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.constellation.provider.configuration.ConfigDirectory;
-
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -57,6 +55,11 @@ public abstract class AbstractWorker implements Worker {
     private String serviceUrl = null;
 
     /**
+     * The direcory containing the configuration for this service. TODO make it private => SOSWorker.recordMapping
+     */
+    protected final File configurationDirectory;
+
+    /**
      * The log level off al the informations log.
      */
     protected Level logLevel = Level.INFO;
@@ -71,8 +74,9 @@ public abstract class AbstractWorker implements Worker {
      */
     private final String id;
 
-    public AbstractWorker(String id) {
+    public AbstractWorker(String id, File configurationDirectory) {
         this.id = id;
+        this.configurationDirectory = configurationDirectory;
     }
     
     /**
@@ -149,10 +153,9 @@ public abstract class AbstractWorker implements Worker {
                 LOGGER.log(logLevel, "updating metadata");
             }
 
-            final File configDirectory = getConfigurationDirectory(service);
             final File f;
-            if (configDirectory != null && configDirectory.exists()) {
-                f = new File(configDirectory, fileName);
+            if (configurationDirectory != null && configurationDirectory.exists()) {
+                f = new File(configurationDirectory, fileName);
             } else {
                 f = null;
             }
@@ -193,31 +196,4 @@ public abstract class AbstractWorker implements Worker {
      */
     protected abstract MarshallerPool getMarshallerPool();
 
-
-   /**
-    * Look for the service configuration directory.
-    *
-    * @param service The service type identifier. example "WMS"
-    *
-    * @return The configuration directory of the service or {@code null}
-    * if there is no configuration directory for this service.
-    */
-    protected File getConfigurationDirectory(String service) {
-        final File configDir = ConfigDirectory.getConfigDirectory();
-        if (configDir != null && configDir.exists()) {
-            final File serviceDir = new File(configDir, service);
-            if (serviceDir.isDirectory() && serviceDir.exists()) {
-                File instanceDir = new File(serviceDir, id);
-                if (instanceDir.isDirectory() && instanceDir.exists()) {
-                    LOGGER.log(Level.INFO, "taking configuration for service {0} from directory: {1}", new Object[]{service, instanceDir.getPath()});
-                    return instanceDir;
-                } else {
-                    LOGGER.log(Level.WARNING, "Unable to find a {0} configuration directory for instance: {1} ",  new Object[]{service, id});
-                }
-            } else {
-                LOGGER.log(Level.WARNING, "Unable to find a {0} configuration directory", service);
-            }
-        }
-        return null;
-    }
 }
