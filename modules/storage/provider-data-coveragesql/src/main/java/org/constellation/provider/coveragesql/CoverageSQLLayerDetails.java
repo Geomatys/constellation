@@ -18,6 +18,7 @@ package org.constellation.provider.coveragesql;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -270,12 +271,19 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
                                           throws PortrayalException
     {
         final Map<String,?> properties = Collections.singletonMap("size", dimension);
+        RenderedImage legend = null;
         try {
-            return (BufferedImage) reader.getInput().getColorRamp(0, null, properties);
+            legend = reader.getInput().getColorRamp(0, null, properties);
         } catch (CoverageStoreException ex) {
             LOGGER.log(Level.INFO, ex.getMessage(), ex);
-            return super.getLegendGraphic(dimension, template, style, rule, scale);
         }
+        if (legend != null) {
+            // Always an instance of BufferedImage in Geotk implementation.
+            // We don't check because we want a ClassCastException if this
+            // assumption does not hold anymore, so we know we have to fix.
+            return (BufferedImage) legend;
+        }
+        return super.getLegendGraphic(dimension, template, style, rule, scale);
     }
 
     /**
