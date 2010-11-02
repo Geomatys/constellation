@@ -34,12 +34,4 @@ public abstract class AbstractStyleProvider implements StyleProvider{
     public MutableStyle getByIdentifier(String key) {
         return get(key);
     }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public MutableStyle getByIdentifier(String key, String service) {
-        return get(key, service);
-    }
 }

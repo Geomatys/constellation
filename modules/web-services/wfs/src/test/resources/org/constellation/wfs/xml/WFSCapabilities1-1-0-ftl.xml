@@ -97,8 +97,8 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
-            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:Component</wfs:Name>
-            <wfs:Title>Component</wfs:Title>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:DataSourceType</wfs:Name>
+            <wfs:Title>DataSourceType</wfs:Title>
             <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
@@ -108,8 +108,8 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
-            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:DataSourceType</wfs:Name>
-            <wfs:Title>DataSourceType</wfs:Title>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:Component</wfs:Name>
+            <wfs:Title>Component</wfs:Title>
             <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>

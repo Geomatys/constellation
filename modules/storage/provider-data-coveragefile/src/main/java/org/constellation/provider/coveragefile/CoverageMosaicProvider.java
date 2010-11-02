@@ -102,8 +102,8 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
     }
 
     @Override
-    public Set<Name> getKeys(String service) {
-        if (source.services.contains(service) || source.services.isEmpty()) {
+    public Set<Name> getKeys(String sourceName) {
+       if (source.id.equals(sourceName)) {
             return index.keySet();
         }
         return new HashSet();
@@ -139,14 +139,6 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         return null;
     }
 
-    @Override
-    public LayerDetails get(Name key, String service) {
-       if (source.services.contains(service) || source.services.isEmpty()) {
-           return get(key);
-       }
-       return null;
-    }
-    
     /**
      * {@inheritDoc }
      */

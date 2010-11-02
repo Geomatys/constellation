@@ -17,6 +17,7 @@
 
 package org.constellation.configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -115,6 +116,9 @@ public class Layer {
     }
 
     public List<String> getKeywords() {
+        if (keywords == null) {
+            keywords = new ArrayList<String>();
+        }
         return keywords;
     }
 

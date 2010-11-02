@@ -154,8 +154,8 @@ public class SMLProvider extends AbstractLayerProvider {
      * {@inheritDoc }
      */
     @Override
-    public Set<Name> getKeys(String service) {
-        if (source.services.contains(service) || source.services.isEmpty()) {
+    public Set<Name> getKeys(String sourceName) {
+        if (source.id.equals(sourceName)) {
             return Collections.unmodifiableSet(index);
         }
         return Collections.emptySet();
@@ -199,14 +199,6 @@ public class SMLProvider extends AbstractLayerProvider {
         }
         return new SMLLayerDetails(key, store, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
         
-    }
-
-    @Override
-    public LayerDetails get(Name key, String service) {
-       if (source.services.contains(service) || source.services.isEmpty()) {
-           return get(key);
-       }
-       return null;
     }
 
     /**

@@ -34,6 +34,10 @@ import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
@@ -103,18 +107,8 @@ import org.xml.sax.SAXException;
 public class WFSWorkerTest {
 
     private static MarshallerPool pool;
-    private static final WFSWorker worker ;
-    static {
-        try {
-            pool = WFSMarshallerPool.getInstance();
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        worker = new DefaultWFSWorker("default", null);
-        worker.setLogLevel(Level.FINER);
-        worker.setServiceUrl("http://geomatys.com/constellation/WS/");
-    }
+    private static WFSWorker worker ;
+    
 
     
     private static DefaultDataSource ds = null;
@@ -126,6 +120,34 @@ public class WFSWorkerTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         initFeatureSource();
+        File configDir = new File("WFSWorkerTest");
+        if (configDir.exists()) {
+            FileUtilities.deleteDirectory(new File("WFSWorkerTest"));
+        }
+
+        try {
+            pool = WFSMarshallerPool.getInstance();
+
+            if (!configDir.exists()) {
+                configDir.mkdir();
+                Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
+                Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
+                Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
+                LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
+
+                //we write the configuration file
+                File configFile = new File(configDir, "layerContext.xml");
+                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                marshaller.marshal(lc, configFile);
+                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        worker = new DefaultWFSWorker("default", configDir);
+        worker.setLogLevel(Level.FINER);
+        worker.setServiceUrl("http://geomatys.com/constellation/WS/");
     }
 
     @AfterClass
@@ -136,6 +158,11 @@ public class WFSWorkerTest {
         if (ds2 != null) {
             ds2.shutdown();
         }
+
+        if (worker != null) {
+            worker.destroy();
+        }
+        FileUtilities.deleteDirectory(new File("WFSWorkerTest"));
 
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
@@ -896,6 +923,7 @@ public class WFSWorkerTest {
          *                                      *
          ****************************************/
         final ProviderSource sourceShape = new ProviderSource();
+        sourceShape.id = "shapeSrc";
         sourceShape.loadAll = true;
         sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
                 "/org/constellation/ws/embedded/wms111/shapefiles");
@@ -960,6 +988,7 @@ public class WFSWorkerTest {
         con.close();
         
         final ProviderSource sourceOM = new ProviderSource();
+        sourceOM.id      = "omSrc";
         sourceOM.loadAll = true;
         sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
         sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
@@ -1002,6 +1031,7 @@ public class WFSWorkerTest {
         con.close();
 
         final ProviderSource sourceSML = new ProviderSource();
+        sourceSML.id      = "smlSrc";
         sourceSML.loadAll = true;
         sourceSML.parameters.put(SMLProvider.KEY_SGBDTYPE, "derby");
         sourceSML.parameters.put(SMLProvider.KEY_DERBYURL, url2);

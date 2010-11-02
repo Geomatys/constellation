@@ -124,21 +124,6 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
         return null;
     }
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public MutableStyle get(String key, String serv) {
-        for(StyleProviderService service : SERVICES){
-            for(StyleProvider provider : service.getProviders()){
-                final MutableStyle style = provider.get(key, serv);
-                if(style != null) return style;
-            }
-        }
-
-        return null;
-    }
-
     public Collection<StyleProviderService> getServices() {
         return Collections.unmodifiableCollection(SERVICES);
     }

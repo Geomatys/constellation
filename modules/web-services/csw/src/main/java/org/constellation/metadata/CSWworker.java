@@ -178,11 +178,6 @@ public class CSWworker extends AbstractWorker {
     private final FilterParser sqlFilterParser = new SQLFilterParser();
     
     /**
-     * A flag indicating if the worker is correctly started.
-     */
-    private boolean isStarted;
-    
-    /**
      * A catalogue Harvester comunicating with other CSW 
      */
     private CatalogueHarvester catalogueHarvester;
@@ -274,7 +269,7 @@ public class CSWworker extends AbstractWorker {
                 final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
                 final File configFile                 = new File(configDir, "config.xml");
                 if (!configFile.exists()) {
-                     LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: The configuration file has not been found");
+                     LOGGER.log(Level.WARNING, "\nThe CSW worker( {0}) is not working!\nCause: The configuration file has not been found", serviceID);
                      isStarted = false;
                      return;
                 } else {
@@ -675,7 +670,7 @@ public class CSWworker extends AbstractWorker {
             
         c = new Capabilities(si, sp, om, CSW_202_VERSION, null, fc);
 
-        LOGGER.log(logLevel, "GetCapabilities request processed in " + (System.currentTimeMillis() - startTime) + MS);
+        LOGGER.log(logLevel, "GetCapabilities request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return c;
     }
     
@@ -952,7 +947,7 @@ public class CSWworker extends AbstractWorker {
         }
         
         response = new GetRecordsResponseType(id, System.currentTimeMillis(), request.getVersion().toString(), searchResults);
-        LOGGER.log(logLevel, "GetRecords request processed in " + (System.currentTimeMillis() - startTime) + MS);
+        LOGGER.log(logLevel, "GetRecords request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
     
@@ -1095,7 +1090,7 @@ public class CSWworker extends AbstractWorker {
         }
 
         response = new GetRecordByIdResponseType(records, otherRecords);
-        LOGGER.log(logLevel, "GetRecordById request processed in " + (System.currentTimeMillis() - startTime) + MS);
+        LOGGER.log(logLevel, "GetRecordById request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
     
@@ -1186,7 +1181,7 @@ public class CSWworker extends AbstractWorker {
             components.add(component);
         }
 
-        LOGGER.log(logLevel, "DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + MS);
+        LOGGER.log(logLevel, "DescribeRecords request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return new DescribeRecordResponseType(components);
     }
     
@@ -1279,7 +1274,7 @@ public class CSWworker extends AbstractWorker {
             throw new CstlServiceException("One of propertyName or parameterName must be filled",
                                           MISSING_PARAMETER_VALUE, "parameterName, propertyName");
         }
-        LOGGER.log(logLevel, "GetDomain request processed in " + (System.currentTimeMillis() - startTime) + MS);
+        LOGGER.log(logLevel, "GetDomain request processed in {0} ms", (System.currentTimeMillis() - startTime));
 
         return CswXmlFactory.getDomainResponse(actingVersion.version.toString(), responseList);
     }
@@ -1437,7 +1432,7 @@ public class CSWworker extends AbstractWorker {
                                                                           totalDeleted,
                                                                           requestID);
         final TransactionResponseType response = new TransactionResponseType(summary, null, request.getVersion().toString());
-        LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + MS);
+        LOGGER.log(logLevel, "Transaction request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
     }
     
@@ -1663,17 +1658,6 @@ public class CSWworker extends AbstractWorker {
         }
     }
 
-    /**
-     * Throw and exception if the service is not working
-     * 
-     * @throws org.constellation.ws.CstlServiceException
-     */
-    private void isWorking() throws CstlServiceException {
-        if (!isStarted) {
-            throw new CstlServiceException("The service is not running!", NO_APPLICABLE_CODE);
-        }
-    }
-    
     /**
      * {@inheritDoc }
      */

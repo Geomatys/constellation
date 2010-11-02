@@ -68,20 +68,6 @@ public abstract class AbstractLayerProvider implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails getByIdentifier(Name key, String service) {
-        for(final Name n : getKeys(service)){
-            if( (key.getNamespaceURI() == null && key.getLocalPart().equals(n.getLocalPart()))
-                || key.equals(n) ){
-                return get(n);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
     public ElevationModel getElevationModel(Name name) {
         return null;
     }

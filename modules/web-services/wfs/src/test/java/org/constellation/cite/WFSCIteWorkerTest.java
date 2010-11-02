@@ -16,6 +16,13 @@
  */
 package org.constellation.cite;
 
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import javax.xml.bind.Marshaller;
+import org.constellation.configuration.Source;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.LayerContext;
+import org.geotoolkit.util.FileUtilities;
+import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,23 +62,45 @@ import static org.junit.Assert.*;
  */
 public class WFSCIteWorkerTest {
 
-    private static final WFSWorker worker;
-    static {
-        worker = new DefaultWFSWorker("default", null);
-        worker.setLogLevel(Level.FINER);
-    }
+    private static WFSWorker worker;
 
     private XmlFeatureWriter featureWriter;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         initFeatureSource();
+        File configDir = new File("WFSCiteWorkerTest");
+        if (configDir.exists()) {
+            FileUtilities.deleteDirectory(new File("WFSCiteWorkerTest"));
+        }
+
+        try {
+
+
+            if (!configDir.exists()) {
+                configDir.mkdir();
+                Source s1 = new Source("src", Boolean.TRUE, null, null);
+                LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
+
+                //we write the configuration file
+                File configFile = new File(configDir, "layerContext.xml");
+                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                marshaller.marshal(lc, configFile);
+                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        worker = new DefaultWFSWorker("default", configDir);
+        worker.setLogLevel(Level.FINER);
     }
 
 
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+          FileUtilities.deleteDirectory(new File("WFSCiteWorkerTest"));
     }
 
     @Before
@@ -171,6 +200,7 @@ public class WFSCIteWorkerTest {
         final ProviderConfig configPostGis = new ProviderConfig();
         configPostGis.sources.add(sourcePostGis);
         sourcePostGis.loadAll = true;
+        sourcePostGis.id      = "src";
 
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the postgis data provider defined previously

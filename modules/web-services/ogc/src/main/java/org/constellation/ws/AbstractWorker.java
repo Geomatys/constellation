@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
@@ -48,6 +49,11 @@ public abstract class AbstractWorker implements Worker {
      * The default logger.
      */
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws");
+
+    /**
+     * A flag indicating if the worker is correctly started.
+     */
+    protected boolean isStarted;
 
     /**
      * Contains the service url used in capabilities document.
@@ -196,4 +202,15 @@ public abstract class AbstractWorker implements Worker {
      */
     protected abstract MarshallerPool getMarshallerPool();
 
+    /**
+     * Throw and exception if the service is not working
+     *
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    protected void isWorking() throws CstlServiceException {
+        if (!isStarted) {
+            throw new CstlServiceException("The service is not running!", OWSExceptionCode.NO_APPLICABLE_CODE);
+        }
+    }
+    
 }

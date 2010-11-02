@@ -168,8 +168,8 @@ public class OMProvider extends AbstractLayerProvider {
      * {@inheritDoc }
      */
     @Override
-    public Set<Name> getKeys(String service) {
-        if (source.services.contains(service) || source.services.isEmpty()) {
+    public Set<Name> getKeys(String sourceName) {
+        if (source.id.equals(sourceName)) {
             return Collections.unmodifiableSet(index);
         }
         return Collections.emptySet();
@@ -215,14 +215,6 @@ public class OMProvider extends AbstractLayerProvider {
         
     }
 
-    @Override
-    public LayerDetails get(Name key, String service) {
-       if (source.services.contains(service) || source.services.isEmpty()) {
-           return get(key);
-       }
-       return null;
-    }
-    
     /**
      * {@inheritDoc }
      */

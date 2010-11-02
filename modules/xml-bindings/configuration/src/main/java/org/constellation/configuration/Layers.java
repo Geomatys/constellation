@@ -17,6 +17,7 @@
 
 package org.constellation.configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -44,6 +45,9 @@ public class Layers {
      * @return the source
      */
     public List<Source> getSource() {
+        if (source == null) {
+            source = new ArrayList<Source>();
+        }
         return source;
     }
 

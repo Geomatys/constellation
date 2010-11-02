@@ -85,7 +85,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
             List<Name> layerNames) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
-            return getLayerRefs(serviceDef, layerNames);
+            return getLayerRefs(layerNames);
         }
 
         /* SHOULD NOT REACH HERE */
@@ -97,7 +97,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     public LayerDetails getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
-            return getLayerRef(serviceDef, layerName);
+            return getLayerRef(layerName);
         }
 
         /* SHOULD NOT REACH HERE */
@@ -123,12 +123,11 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     }
 
-    private List<LayerDetails> getLayerRefs(ServiceDef serviceDef, List<Name> layerNames) throws RegisterException {
+    private List<LayerDetails> getLayerRefs(List<Name> layerNames) throws RegisterException {
 
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
         for (Name layerName : layerNames) {
-            final LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
-                    serviceDef.specification.name());
+            final LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName);
 
             if (null == layerRef) {
                 throw new RegisterException("Unknown layer " + layerName);
@@ -139,10 +138,9 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
         return layerRefs;
     }
 
-    private LayerDetails getLayerRef(ServiceDef serviceDef, Name layerName) throws RegisterException {
+    private LayerDetails getLayerRef(Name layerName) throws RegisterException {
 
-        final LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
-                serviceDef.specification.name());
+        final LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName);
 
         if (null == layerRef) {
             throw new RegisterException("Unknown layer " + layerName);

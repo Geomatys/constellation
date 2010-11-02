@@ -164,8 +164,8 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public Set<Name> getKeys(String service) {
-        if (source.services.contains(service) || source.services.isEmpty()) {
+    public Set<Name> getKeys(String sourceName) {
+        if (source.id.equals(sourceName)) {
             return getKeys();
         }
         return new HashSet();
@@ -213,17 +213,6 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         return null;
     }
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public LayerDetails get(Name key, String service) {
-       if (source.services.contains(service) || source.services.isEmpty()) {
-           return get(key);
-       }
-       return null;
-    }
-    
     /**
      * {@inheritDoc }
      */

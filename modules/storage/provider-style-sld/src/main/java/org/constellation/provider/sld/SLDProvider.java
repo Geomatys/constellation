@@ -117,8 +117,8 @@ public class SLDProvider extends AbstractStyleProvider{
      * {@inheritDoc }
      */
     @Override
-    public Set<String> getKeys(String service) {
-        if (source.services.contains(service) || source.services.isEmpty()) {
+    public Set<String> getKeys(String sourceName) {
+        if (source.id.equals(sourceName)) {
             return index.keySet();
         }
         return new HashSet();
@@ -222,14 +222,6 @@ public class SLDProvider extends AbstractStyleProvider{
         }
 
         return value;
-    }
-
-    @Override
-    public MutableStyle get(String key, String service) {
-       if (source.services.contains(service) || source.services.isEmpty()) {
-           return get(key);
-       }
-       return null;
     }
 
     /**

@@ -117,6 +117,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         source.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
         source.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
         source.loadAll = true;
+        source.id      = "coverageTestSrc";
 
         final ProviderConfig config = new ProviderConfig();
         config.sources.add(source);
@@ -154,6 +155,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             sourceOM.loadAll = true;
             sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
             sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
+            sourceOM.id = "omSrc";
 
             final ProviderConfig configOM = new ProviderConfig();
             configOM.sources.add(sourceOM);
@@ -194,6 +196,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
             sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
                                    null, null, null, null, false, null));
+            sourceShape.id = "shapeSrc";
 
 
             final ProviderConfig configShape = new ProviderConfig();

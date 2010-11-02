@@ -35,14 +35,16 @@ import javax.xml.namespace.QName;
 // Constellation dependencies
 import org.apache.xerces.dom.ElementNSImpl;
 import org.constellation.ServiceDef;
+import org.constellation.configuration.FormatURL;
+import org.constellation.configuration.Layer;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.wfs.ws.WFSConstants.*;
 
 // Geotoolkit dependencies
+import org.constellation.ws.LayerWorker;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.data.DataUtilities;
@@ -83,6 +85,8 @@ import org.geotoolkit.filter.visitor.IsValidSpatialFilterVisitor;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
+import org.geotoolkit.ows.xml.v100.KeywordsType;
+import org.geotoolkit.ows.xml.v100.OperationsMetadata;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
@@ -95,9 +99,12 @@ import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
+import org.geotoolkit.wfs.xml.v110.MetadataURLType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
+import org.geotoolkit.ows.xml.v100.ServiceIdentification;
+import org.geotoolkit.ows.xml.v100.ServiceProvider;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
@@ -122,7 +129,7 @@ import org.w3c.dom.NodeList;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
+public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     /**
      * Base known CRS.
@@ -151,12 +158,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
     public DefaultWFSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory);
-        
+
         //todo wait for martin fix
         standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
         standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
 
-//        try{
+        //        try{
 //            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("CRS:84"), true));
 //            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("EPSG:4326"), true));
 //            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("EPSG:3395"), true));
@@ -181,6 +188,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final long start = System.currentTimeMillis();
 
         // we verify the base attribute
+        isWorking();
         verifyBaseRequest(request, false, true);
 
         outputFormat = request.getFirstAcceptFormat();
@@ -195,9 +203,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
-        final WFSCapabilitiesType result = new WFSCapabilitiesType("1.1.0");
-
-
+        FeatureTypeListType ftl  = null;
+        OperationsMetadata om    = null;
+        ServiceProvider sp       = null;
+        ServiceIdentification si = null;
+        
         if (request.getSections() == null || request.containsSection("featureTypeList")) {
             final List<FeatureTypeType> types = new ArrayList<FeatureTypeType>();
 
@@ -205,8 +215,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
              *  layer providers
              */
             final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
-            for (final Name layerName : namedProxy.getKeys(ServiceDef.Specification.WFS.name())) {
+            for (final Name layerName : layers.keySet()) {
                 final LayerDetails layer = namedProxy.get(layerName);
+                final Layer configLayer  = layers.get(layerName);
+
                 if (layer instanceof FeatureLayerDetails) {
                     final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
                     final FeatureType type;
@@ -239,50 +251,67 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         } else {
                             defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
                         }
+                        final String title;
+                        if (configLayer.getTitle() != null) {
+                            title = configLayer.getTitle();
+                        } else {
+                            title = fld.getName().getLocalPart();
+                        }
                         ftt = new FeatureTypeType(
                                 Utils.getQnameFromName(layerName),
-                                fld.getName().getLocalPart(),
+                                title,
                                 defaultCRS,
                                 standardCRS,
                                 UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getStore(), fld.getName())}));
+
+                        /*
+                         * we apply the layer customization
+                         */
+                        ftt.setAbstract(configLayer.getAbstrac());
+                        if (!configLayer.getKeywords().isEmpty()) {
+                            ftt.getKeywords().add(new KeywordsType(configLayer.getKeywords(), null));
+                        }
+                        FormatURL metadataURL = configLayer.getMetadataURL();
+                        if (metadataURL != null) {
+                            ftt.getMetadataURL().add(new MetadataURLType(metadataURL.getOnlineResource().getValue(),
+                                                                         metadataURL.getType(),
+                                                                         metadataURL.getFormat()));
+                        }
+
+                        // we add the feature type description to the list
                         types.add(ftt);
                     } catch (FactoryException ex) {
                         Logging.unexpectedException(LOGGER, ex);
                     }
 
+                } else {
+                    LOGGER.log(Level.WARNING, "The layer:{0} is not a feature layer", layerName);
                 }
             }
 
-            result.setFeatureTypeList(new FeatureTypeListType(null, types));
-        } else {
-            result.setFeatureTypeList(null);
+            ftl = new FeatureTypeListType(null, types);
         }
         //todo ...etc...--------------------------------------------------------
-        if (request.getSections() != null && !request.containsSection("operationsMetadata")) {
-            result.setOperationsMetadata(null);
-        } else {
+
+        if (request.getSections() == null || request.containsSection("operationsMetadata")) {
             final String url = getServiceUrl();
             if (url != null) {
                 OPERATIONS_METADATA.updateURL(url, "WFS");
             }
-            result.setOperationsMetadata(OPERATIONS_METADATA);
+            om = OPERATIONS_METADATA;
         }
-        if (request.getSections() != null && !request.containsSection("serviceProvider")) {
-            result.setServiceProvider(null);
-        } else {
-            result.setServiceProvider(inCapabilities.getServiceProvider());
+        if (request.getSections() == null || request.containsSection("serviceProvider")) {
+            sp = inCapabilities.getServiceProvider();
         }
-        if (request.getSections() != null && !request.containsSection("serviceIdentification")) {
-            result.setServiceIdentification(null);
-        } else {
-            result.setServiceIdentification(inCapabilities.getServiceIdentification());
+        if (request.getSections() == null || request.containsSection("serviceIdentification")) {
+            si = inCapabilities.getServiceIdentification();
         }
+
+        final WFSCapabilitiesType result = new WFSCapabilitiesType("1.1.0", si, sp, om, ftl, WFSConstants.FILTER_CAPABILITIES);
         result.setServesGMLObjectTypeList(null);
         result.setSupportsGMLObjectTypeList(null);
 
-        result.setFilterCapabilities(WFSConstants.FILTER_CAPABILITIES);
-
-        LOGGER.log(logLevel, "GetCapabilities treated in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "GetCapabilities treated in {0}ms", (System.currentTimeMillis() - start));
         return result;
     }
 
@@ -295,6 +324,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final long start = System.currentTimeMillis();
 
         // we verify the base attribute
+        isWorking();
         verifyBaseRequest(request, false, false);
 
         String requestOutputFormat                = request.getOutputFormat();
@@ -313,11 +343,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final List<QName> names             = request.getTypeName();
         final List<FeatureType> types       = new ArrayList<FeatureType>();
 
-        final Set<Name> wfsNames = namedProxy.getKeys(ServiceDef.Specification.WFS.name());
-
         if (names.isEmpty()) {
             //search all types
-            for (final Name name : wfsNames) {
+            for (final Name name : layers.keySet()) {
                 final LayerDetails layer = namedProxy.get(name);
                 if (!(layer instanceof FeatureLayerDetails)) continue;
 
@@ -332,7 +360,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             //search only the given list
             for (final QName name : names) {
                 final Name n = Utils.getNameFromQname(name);
-                if (!wfsNames.contains(n)) {
+                if (!layers.containsKey(n)) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + name);
                 }
 
@@ -358,7 +386,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 LOGGER.log(Level.SEVERE, "error while excluding primary keys", ex);
             }
         }
-        LOGGER.log(logLevel, "DescribeFeatureType treated in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "DescribeFeatureType treated in {0}ms", (System.currentTimeMillis() - start));
         return writer.getSchemaFromFeatureType(types);
     }
 
@@ -382,6 +410,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final long start = System.currentTimeMillis();
 
         // we verify the base attribute
+        isWorking();
         verifyBaseRequest(request, false, false);
 
         // we verify the outputFormat requested (default text/xml; subtype=gml/3.1.1)
@@ -410,7 +439,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
             final List<QName> typeNames;
             if (featureId != null && query.getTypeName().isEmpty()) {
-                typeNames = Utils.getQNameListFromNameSet(namedProxy.getKeys(ServiceDef.Specification.WFS.name()));
+                typeNames = Utils.getQNameListFromNameSet(layers.keySet());
             } else {
                 typeNames = query.getTypeName();
             }
@@ -463,10 +492,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
             for (QName typeName : typeNames) {
 
-                final LayerDetails layerD = namedProxy.get(Utils.getNameFromQname(typeName), ServiceDef.Specification.WFS.name());
-                if (layerD == null) {
+
+                if (!layers.containsKey(Utils.getNameFromQname(typeName))) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
+                final LayerDetails layerD = namedProxy.get(Utils.getNameFromQname(typeName));
 
                 if (!(layerD instanceof FeatureLayerDetails)) continue;
 
@@ -554,7 +584,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             return collection;
 
         }
-        LOGGER.log(logLevel, "GetFeature treated in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
         return response;
     }
 
@@ -581,6 +611,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     public TransactionResponseType transaction(TransactionType request) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
         final long startTime = System.currentTimeMillis();
+        isWorking();
         verifyBaseRequest(request, true, false);
 
         // we prepare the report
@@ -633,11 +664,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         }
                         throw new CstlServiceException("Unexpected Object to insert:" + featureType);
                     }
-                    
-                    final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName, ServiceDef.Specification.WFS.name());
-                    if (layer == null) {
+
+                    if (!layers.containsKey(typeName)) {
                         throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                     }
+                    final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName);
                     try {
                         final List<FeatureId> features = layer.getStore().addFeatures(typeName, featureCollection);
 
@@ -668,11 +699,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
                 final Filter filter = extractJAXBFilter(deleteRequest.getFilter(), Filter.EXCLUDE);
 
-                final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(deleteRequest.getTypeName()), ServiceDef.Specification.WFS.name());
-                if (layer == null) {
-                    throw new CstlServiceException(UNKNOW_TYPENAME + deleteRequest.getTypeName());
+                final Name typeName = Utils.getNameFromQname(deleteRequest.getTypeName());
+                if (!layers.containsKey(typeName)) {
+                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
-
+                final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName);
                 try {
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
 
@@ -711,13 +742,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 //decode crs--------------------------------------------------------
                 final CoordinateReferenceSystem crs = extractCRS(updateRequest.getSrsName());
 
-
-                final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(
-                        Utils.getNameFromQname(updateRequest.getTypeName()), ServiceDef.Specification.WFS.name());
-
-                if (layer == null) {
-                    throw new CstlServiceException(UNKNOW_TYPENAME + updateRequest.getTypeName());
+                final Name typeName = Utils.getNameFromQname(updateRequest.getTypeName());
+                if (!layers.containsKey(typeName)) {
+                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
+                final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName);
                 try {
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
                     if (ft == null) {
@@ -792,7 +821,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                                                           totalDeleted);
 
         final TransactionResponseType response = new TransactionResponseType(summary, null, insertResults, actingVersion.version.toString());
-        LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "Transaction request processed in {0} ms", (System.currentTimeMillis() - startTime));
         
         return response;
     }
@@ -1027,7 +1056,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
 
         //search all types
-        for (final Name name : namedProxy.getKeys(ServiceDef.Specification.WFS.name())) {
+        for (final Name name : layers.keySet()) {
             final LayerDetails layer = namedProxy.get(name);
             if (!(layer instanceof FeatureLayerDetails)) continue;
 

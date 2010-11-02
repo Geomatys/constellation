@@ -92,10 +92,6 @@ public class GO2StyleProvider extends AbstractStyleProvider{
         return index.get(key);
     }
 
-    @Override
-    public MutableStyle get(String key, String service) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
     /**
      * {@inheritDoc }
      */

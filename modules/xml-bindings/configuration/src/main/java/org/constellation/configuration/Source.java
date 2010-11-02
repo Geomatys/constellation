@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.namespace.QName;
 
 /**
  *
@@ -115,6 +116,36 @@ public class Source {
         } else {
             return exclude.getLayer();
         }
+    }
+
+    /**
+     * Return true idf the specified layer is excluded from the source.
+     * @param name
+     * @return
+     */
+    public boolean isExcludedLayer(QName name) {
+        for (Layer layer : getExclude()) {
+            if (layer.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Return the layer object if the specified layer is included from the source.
+     * or {@code null} else;
+     *
+     * @param name
+     * @return
+     */
+    public Layer isIncludedLayer(QName name) {
+        for (Layer layer : getInclude()) {
+            if (layer.getName().equals(name)) {
+                return layer;
+            }
+        }
+        return null;
     }
 
     /**

@@ -280,11 +280,6 @@ public class SOSworker extends AbstractWorker {
     private AbstractSOSFactory sosFactory;
 
     /**
-     * A flag indicating if the worker is correctly started.
-     */
-    private boolean isStarted;
-    
-    /**
      * The supported Response Mode for GetObservation request (depends on reader capabilities)
      */
     private List<ResponseModeType> acceptedResponseMode;
@@ -749,7 +744,7 @@ public class SOSworker extends AbstractWorker {
         // we normalize the document
         c = normalizeDocument(c);
 
-        LOGGER.log(logLevel, "getCapabilities processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        LOGGER.log(logLevel, "getCapabilities processed in {0} ms.\n", (System.currentTimeMillis() - start));
         return c;
     }
     
@@ -796,7 +791,7 @@ public class SOSworker extends AbstractWorker {
             result = SmlFactory.convertTo101((SensorML)result);
         }
         
-        LOGGER.log(logLevel, "describeSensor processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        LOGGER.log(logLevel, "describeSensor processed in {0} ms.\n", (System.currentTimeMillis() - start));
         return result;
     }
     
@@ -1033,7 +1028,7 @@ public class SOSworker extends AbstractWorker {
                                         matchingFeatureOfInterest.add(sp.getId());
                                         add = true;
                                     } else {
-                                        LOGGER.finer(" the feature of interest " + sp.getId() + " is not in the BBOX");
+                                        LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", sp.getId());
                                     }
                                     
                                 } else if (station instanceof SamplingCurveType) {
@@ -1058,13 +1053,13 @@ public class SOSworker extends AbstractWorker {
                                             matchingFeatureOfInterest.add(sc.getId());
                                             add = true;
                                         } else {
-                                            LOGGER.finer(" the feature of interest " + sc.getId() + " is not in the BBOX");
+                                            LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", sc.getId());
                                         }
                                     } else {
-                                        LOGGER.warning(" the feature of interest (samplingCurve)" + sc.getId() + " does not have proper bounds");
+                                        LOGGER.log(Level.WARNING, " the feature of interest (samplingCurve){0} does not have proper bounds", sc.getId());
                                     }
                                 } else {
-                                    LOGGER.warning("unknow implementation:" + station.getClass().getName());
+                                    LOGGER.log(Level.WARNING, "unknow implementation:{0}", station.getClass().getName());
                                 }
                             }
                             if (add) {
@@ -1219,7 +1214,7 @@ public class SOSworker extends AbstractWorker {
             }
             response = sReponse;
         }
-        LOGGER.log(logLevel, "getObservation processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        LOGGER.log(logLevel, "getObservation processed in {0}ms.\n", (System.currentTimeMillis() - start));
         return response;
     }
 
@@ -1348,7 +1343,7 @@ public class SOSworker extends AbstractWorker {
         }
         final GetResultResponse.Result r = new GetResultResponse.Result(values, getServiceUrl() + '/' + requestResult.getObservationTemplateId());
         final GetResultResponse response = new GetResultResponse(r);
-        LOGGER.log(logLevel, "GetResult processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "GetResult processed in {0} ms", (System.currentTimeMillis() - start));
         return response;
     }
     
@@ -1560,8 +1555,8 @@ public class SOSworker extends AbstractWorker {
                 throw new CstlServiceException("Only the filter BBOX is upported for now", OPERATION_NOT_SUPPORTED);
             }
         }
-        // TODO never readh
-        LOGGER.log(logLevel, "GetFeatureOfInterest processed in " + (System.currentTimeMillis() - start) + "ms");
+        // TODO never reach
+        LOGGER.log(logLevel, "GetFeatureOfInterest processed in {0}ms", (System.currentTimeMillis() - start));
         return null;
     }
 
@@ -1583,7 +1578,7 @@ public class SOSworker extends AbstractWorker {
         } else {
             throw new CstlServiceException("there is not such samplingFeature on the server", INVALID_PARAMETER_VALUE);
         }
-        LOGGER.log(logLevel, "GetFeatureOfInterestTime processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "GetFeatureOfInterestTime processed in {0} ms", (System.currentTimeMillis() - start));
         return result;
     }
 
@@ -1741,7 +1736,7 @@ public class SOSworker extends AbstractWorker {
             }
         }
         
-        LOGGER.log(logLevel, "registerSensor processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "registerSensor processed in {0}ms", (System.currentTimeMillis() - start));
         return new RegisterSensorResponse(id);
     }
     
@@ -1823,7 +1818,7 @@ public class SOSworker extends AbstractWorker {
             }
         }
 
-        LOGGER.log(logLevel, "insertObservation processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "insertObservation processed in {0} ms", (System.currentTimeMillis() - start));
         omFilter.refresh();
         return new InsertObservationResponse(id);
     }
@@ -2153,17 +2148,6 @@ public class SOSworker extends AbstractWorker {
     }
 
     /**
-     * Throw and exception if the service is not working
-     *
-     * @throws org.constellation.ws.CstlServiceException
-     */
-    private void isWorking() throws CstlServiceException {
-        if (!isStarted) {
-            throw new CstlServiceException("The service is not running!", NO_APPLICABLE_CODE);
-        }
-    }
-
-    /**
      * Redirect the logs into the specified folder.
      * if the parameter ID is null or empty it create a file named "cstl-sos.log"
      * else the file is named "ID-cstl-sos.log"
@@ -2204,6 +2188,7 @@ public class SOSworker extends AbstractWorker {
         isStarted = false;
     }
 
+    @Override
     public void setLogLevel(Level logLevel) {
         this.logLevel = logLevel;
         if (omFilter != null) {

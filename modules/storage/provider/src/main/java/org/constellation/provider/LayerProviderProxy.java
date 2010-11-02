@@ -25,6 +25,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.feature.type.Name;
 
@@ -38,15 +39,9 @@ import org.opengis.feature.type.Name;
  */
 public class LayerProviderProxy extends AbstractLayerProvider{
 
-    /**
-     * Default logger.
-     
-    private static final Logger LOGGER = Logger.getLogger(LayerProviderProxy.class.getName());*/
-
     private static final Collection<LayerProviderService> SERVICES = new ArrayList<LayerProviderService>();
 
     private static LayerProviderProxy instance = null;
-
 
     private LayerProviderProxy(){}
     
@@ -71,13 +66,16 @@ public class LayerProviderProxy extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public Set<Name> getKeys(String serviceRestrictions) {
+    public Set<Name> getKeys(String sourceName) {
 
         final Set<Name> keys = new HashSet<Name>();
 
         for(LayerProviderService service : SERVICES) {
             for(LayerProvider provider : service.getProviders()){
-                keys.addAll( provider.getKeys(serviceRestrictions) );
+                ProviderSource ps = provider.getSource();
+                if (sourceName.equals(ps.id)) {
+                    keys.addAll(provider.getKeys(sourceName) );
+                }
             }
         }
 
@@ -118,19 +116,6 @@ public class LayerProviderProxy extends AbstractLayerProvider{
     /**
      * {@inheritDoc }
      */
-    @Override
-    public LayerDetails get(Name key, String webService) {
-
-        for(LayerProviderService service : SERVICES){
-            for(LayerProvider provider : service.getProviders()){
-                final LayerDetails layer = provider.get(key, webService);
-                if(layer != null) return layer;
-            }
-        }
-
-        return null;
-    }
-
     @Override
     public ElevationModel getElevationModel(Name name) {
 
