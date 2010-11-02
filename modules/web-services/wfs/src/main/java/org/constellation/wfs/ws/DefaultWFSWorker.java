@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
@@ -782,7 +781,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                             }
                             LOGGER.finer(">> updating : "+ updatePropertyValue +"   => " + value);
                             if (value != null) {
-                                LOGGER.finer("type : " + value.getClass());
+                                LOGGER.log(Level.FINER, "type : {0}", value.getClass());
                             }
                         }
                         values.put(ft.getDescriptor(updatePropertyValue), value);

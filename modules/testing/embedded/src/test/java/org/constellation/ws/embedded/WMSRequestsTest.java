@@ -28,9 +28,6 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
-import org.constellation.Cstl;
-import org.constellation.ServiceDef;
-import org.constellation.register.RegisterException;
 import org.constellation.test.ImageTesting;
 
 // Geotoolkit dependencies
@@ -96,13 +93,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
-        // Get the list of layers
-        try {
-            layers = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD);
-        } catch (RegisterException ex) {
-            layers = null;
-            assumeNoException(ex);
-        }
         pool = WMSMarshallerPool.getInstance();
     }
 
@@ -132,10 +122,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSGetMap() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
-
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -161,10 +147,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSGetCapabilities() throws JAXBException, IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
-
         // Creates a valid GetMap url.
         final URL getCapsUrl;
         try {
@@ -197,10 +179,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSGetFeatureInfo() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
-
         // Creates a valid GetFeatureInfo url.
         final URL gfi;
         try {
@@ -240,10 +218,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
     @Test
     @Ignore
     public void testWMSGetLegendGraphic() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
-
         // Creates a valid GetLegendGraphic url.
         final URL getLegendUrl;
         try {
@@ -267,10 +241,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSDescribeLayer() throws JAXBException, IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
-
         // Creates a valid DescribeLayer url.
         final URL describeUrl;
         try {

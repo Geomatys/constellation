@@ -59,21 +59,15 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
 
     private int index = 0;
 
-    public HTMLGraphicVisitor(final GetFeatureInfo gfi) {
+    public HTMLGraphicVisitor(final GetFeatureInfo gfi, List<LayerDetails> layerDetails) {
         super(gfi);
 
-        for (Name key : gfi.getQueryLayers()) {
-            final LayerDetails layerDetails;
-            try {
-                layerDetails = DefaultWMSWorker.getLayerReference(key, gfi.getVersion().toString());
-            } catch (CstlServiceException ex) {
-                // Should not occur since it has already been gotten previously.
-                throw new AssertionError(ex);
-            }
-            if (layerDetails.getType().equals(TYPE.COVERAGE)) {
-                coverages.put(key.getLocalPart(), new ArrayList<String>());
+        for (LayerDetails layerDetail : layerDetails) {
+            final String name = layerDetail.getName().getLocalPart();
+            if (layerDetail.getType().equals(TYPE.COVERAGE)) {
+                coverages.put(name, new ArrayList<String>());
             } else {
-                features.put(key.getLocalPart(), new ArrayList<Feature>());
+                features.put(name, new ArrayList<Feature>());
             }
         }
     }

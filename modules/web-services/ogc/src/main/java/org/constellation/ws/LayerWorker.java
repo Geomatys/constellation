@@ -69,11 +69,11 @@ public abstract class LayerWorker extends AbstractWorker {
                 }
             } else {
                 isStarted = false;
-                LOGGER.log(Level.WARNING, "\nThe WFS worker ({0}) is not working!\nCause: The configuration file layerContext.xml has not been found", id);
+                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: The configuration file layerContext.xml has not been found", id);
             }
         } else {
             isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe WFS worker ({0}) is not working!\nCause: The configuration directory has not been found", id);
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: The configuration directory has not been found", id);
         }
     }
 
