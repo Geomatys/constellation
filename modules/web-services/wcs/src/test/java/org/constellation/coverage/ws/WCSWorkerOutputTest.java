@@ -77,13 +77,13 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         assertTrue(response instanceof WCSCapabilitiesType);
         final WCSCapabilitiesType getCaps = (WCSCapabilitiesType) response;
 
-        // Ensures that the test layer is really present.
-        assumeTrue(containsTestLayer());
+        
         // Verifies that the test layer is present into the GetCapabilities response.
         final List<CoverageOfferingBriefType> offerings = getCaps.getContentMetadata().getCoverageOfferingBrief();
         assertFalse(offerings.isEmpty());
         for (CoverageOfferingBriefType offering : offerings) {
             for (JAXBElement<String> string : offering.getRest()) {
+                System.out.println("value:" + string.getValue());
                 if (string.getName().getLocalPart().equalsIgnoreCase("name") &&
                     string.getValue().equals(LAYER_TEST))
                 {
@@ -104,8 +104,6 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testDescribeCoverage() throws JAXBException, CstlServiceException {
-        // Ensures that the test layer is really present.
-        assumeTrue(containsTestLayer());
 
         final DescribeCoverage request = new DescribeCoverageType(LAYER_TEST);
         final DescribeCoverageResponse response = WORKER.describeCoverage(request);
@@ -154,8 +152,6 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCoverage() throws JAXBException, CstlServiceException {
-        // Ensures that the test layer is really present.
-        assumeTrue(containsTestLayer());
 
         // Builds the GetCoverage request
         final List<String> axis = new ArrayList<String>();

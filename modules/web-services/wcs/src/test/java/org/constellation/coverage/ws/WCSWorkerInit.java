@@ -16,19 +16,21 @@
  */
 package org.constellation.coverage.ws;
 
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import javax.xml.bind.Marshaller;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.LayerContext;
+import java.util.Arrays;
+import org.constellation.configuration.Source;
+import org.geotoolkit.util.FileUtilities;
 import java.io.File;
-import java.util.List;
-import org.constellation.Cstl;
-import org.constellation.ServiceDef;
 import org.constellation.data.CoverageSQLTestCase;
-import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.coveragesql.CoverageSQLProvider;
 import org.constellation.provider.coveragesql.CoverageSQLProviderService;
-import org.constellation.register.RegisterException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -45,10 +47,6 @@ import static org.junit.Assume.*;
  * @since 0.5
  */
 public class WCSWorkerInit extends CoverageSQLTestCase {
-    /**
-     * A list of available layers to be requested in WMS.
-     */
-    protected static List<LayerDetails> LAYERS;
 
     /**
      * The layer to test.
@@ -63,10 +61,6 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
      */
     @BeforeClass
     public static void setUpClass() throws Exception {
-        WORKER = new WCSWorker("default", null);
-        // Default instanciation of the worker' servlet context and uri context.
-        WORKER.setServiceUrl("http://localhost:9090");
-        
 
         // Defines a PostGrid data provider
         final ProviderSource source = new ProviderSource();
@@ -78,7 +72,9 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
         source.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
         source.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
         source.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
+        source.parameters.put(CoverageSQLProvider.KEY_NAMESPACE,   "no namespace");
         source.loadAll = true;
+        source.id = "src";
 
         final ProviderConfig config = new ProviderConfig();
         config.sources.add(source);
@@ -95,34 +91,40 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
             }
         }
 
-        try {
-            LAYERS = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_0_0);
-        } catch (RegisterException ex) {
-            LAYERS = null;
-            assumeNoException(ex);
+        File configDir = new File("WCSWorkerTest");
+        if (configDir.exists()) {
+            FileUtilities.deleteDirectory(new File("WCSWorkerTest"));
         }
+
+        try {
+            if (!configDir.exists()) {
+                configDir.mkdir();
+                Source s1 = new Source("src", Boolean.TRUE, null, null);
+                
+                LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
+
+                //we write the configuration file
+                File configFile = new File(configDir, "layerContext.xml");
+                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                marshaller.marshal(lc, configFile);
+                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        WORKER = new WCSWorker("default", configDir);
+        // Default instanciation of the worker' servlet context and uri context.
+        WORKER.setServiceUrl("http://localhost:9090");
+        
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        FileUtilities.deleteDirectory(new File("WCSWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();
         }
-    }
-
-    /**
-     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
-     * available layers. It means the postgrid database, pointed by the postgrid.xml
-     * file in the configuration directory, contains this layer and can then be requested
-     * in WMS.
-     */
-    protected static boolean containsTestLayer() {
-        for (LayerDetails layer : LAYERS) {
-            if (layer.getName().equals(LAYER_TEST)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

@@ -27,9 +27,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
-import org.constellation.Cstl;
-import org.constellation.ServiceDef;
-import org.constellation.register.RegisterException;
 import org.constellation.test.ImageTesting;
 
 // Geotoolkit dependencies
@@ -98,13 +95,6 @@ public class WCSRequestsTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
-        // Get the list of layers
-        try {
-            layers = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_0_0);
-        } catch (RegisterException ex) {
-            layers = null;
-            assumeNoException(ex);
-        }
         pool = WCSMarshallerPool.getInstance();
     }
 
@@ -158,9 +148,6 @@ public class WCSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWCSGetCoverage() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
 
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
@@ -192,9 +179,6 @@ public class WCSRequestsTest extends AbstractTestRequest {
      */
     @Ignore
     public void testWCSGetCoverageMatrixFormat() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
 
         // Creates a valid GetCoverage url.
         final URL getCovMatrixUrl;
@@ -215,9 +199,6 @@ public class WCSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWCSGetCapabilities() throws JAXBException, IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
 
         // Creates a valid GetCapabilities url.
         final URL getCapsUrl;
@@ -261,9 +242,6 @@ public class WCSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWCSDescribeCoverage() throws JAXBException, IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
 
         // Creates a valid DescribeCoverage url.
         final URL getCapsUrl;

@@ -17,6 +17,10 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
+import java.util.Arrays;
+import org.constellation.configuration.Layer;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.ws.LayerWorker;
 import java.io.File;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -43,9 +47,7 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.StyleProviderProxy;
-import org.constellation.register.RegisterException;
 import org.constellation.util.StyleUtils;
-import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
@@ -115,6 +117,8 @@ import org.geotoolkit.feature.DefaultName;
 
 
 // GeoAPI dependencies
+import org.geotoolkit.ows.xml.v110.MetadataType;
+import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
 import org.opengis.geometry.Envelope;
 import org.opengis.feature.type.Name;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -142,7 +146,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public final class WCSWorker extends AbstractWorker {
+public final class WCSWorker extends LayerWorker {
     /**
      * The date format to match.
      */
@@ -198,9 +202,8 @@ public final class WCSWorker extends AbstractWorker {
      * @return An XML document giving the full description of the requested coverages.
      * @throws CstlServiceException
      */
-    public DescribeCoverageResponse describeCoverage(final DescribeCoverage request)
-                                          throws CstlServiceException
-    {
+    public DescribeCoverageResponse describeCoverage(final DescribeCoverage request) throws CstlServiceException {
+        isWorking();
         final String version = request.getVersion().toString();
         if (version.isEmpty()) {
             throw new CstlServiceException("The parameter VERSION must be specified.",
@@ -230,10 +233,9 @@ public final class WCSWorker extends AbstractWorker {
      *
      * @throws CstlServiceException
      */
-    private DescribeCoverageResponse describeCoverage100(
-            final org.geotoolkit.wcs.xml.v100.DescribeCoverageType request)
-                            throws CstlServiceException
-    {
+    private DescribeCoverageResponse describeCoverage100(final org.geotoolkit.wcs.xml.v100.DescribeCoverageType request)
+            throws CstlServiceException {
+        
         if (request.getCoverage().isEmpty()) {
             throw new CstlServiceException("The parameter COVERAGE must be specified.",
                     MISSING_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
@@ -241,7 +243,7 @@ public final class WCSWorker extends AbstractWorker {
 
         final List<CoverageOfferingType> coverageOfferings = new ArrayList<CoverageOfferingType>();
         for (String coverage : request.getCoverage()) {
-            final LayerDetails layerRef = getLayerReference(coverage, ServiceDef.WCS_1_0_0.version.toString());
+            final LayerDetails layerRef = getLayerReference(coverage);
             if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
@@ -382,7 +384,7 @@ public final class WCSWorker extends AbstractWorker {
 
         final List<CoverageDescriptionType> coverageDescriptions = new ArrayList<CoverageDescriptionType>();
         for (String coverage : request.getIdentifier()) {
-            final LayerDetails layerRef = getLayerReference(coverage, ServiceDef.WCS_1_1_1.version.toString());
+            final LayerDetails layerRef = getLayerReference(coverage);
             if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
@@ -504,8 +506,8 @@ public final class WCSWorker extends AbstractWorker {
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
     public GetCapabilitiesResponse getCapabilities(GetCapabilities request)
-                                  throws JAXBException, CstlServiceException
-    {
+                                  throws JAXBException, CstlServiceException {
+        isWorking();
         //we begin by extract the base attribute
         String version = request.getVersion().toString();
         if (version.isEmpty()) {
@@ -560,10 +562,8 @@ public final class WCSWorker extends AbstractWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private GetCapabilitiesResponse getCapabilities100(
-            final org.geotoolkit.wcs.xml.v100.GetCapabilitiesType request)
-                           throws CstlServiceException, JAXBException
-    {
+    private GetCapabilitiesResponse getCapabilities100(final org.geotoolkit.wcs.xml.v100.GetCapabilitiesType request)
+            throws CstlServiceException, JAXBException {
         /*
          * In WCS 1.0.0 the user can request only one section
          * ( or all by omitting the parameter section)
@@ -615,13 +615,13 @@ public final class WCSWorker extends AbstractWorker {
 
         final ContentMetadata contentMetadata;
         final List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
-        final org.geotoolkit.wcs.xml.v100.ObjectFactory wcs100Factory =
-                new org.geotoolkit.wcs.xml.v100.ObjectFactory();
-
-        //NOTE: ADRIAN HACKED HERE
-        final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_0_0.version.toString());
+        final org.geotoolkit.wcs.xml.v100.ObjectFactory wcs100Factory = new org.geotoolkit.wcs.xml.v100.ObjectFactory();
+        final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
         try {
-            for (LayerDetails layer : layerRefs) {
+            for (Name name : layers.keySet()) {
+                final LayerDetails layer = namedProxy.get(name);
+                final Layer configLayer  = layers.get(name);
+                
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
                     continue;
                 }
@@ -666,6 +666,21 @@ public final class WCSWorker extends AbstractWorker {
                 }
                 co.setLonLatEnvelope(outputBBox);
 
+                /*
+                 * coverage brief customisation
+                 */
+                 if (configLayer.getTitle() != null) {
+                    co.setLabel(configLayer.getTitle());
+                 }
+                 if (configLayer.getAbstrac() != null) {
+                    co.setDescription(configLayer.getAbstrac());
+                 }
+                 if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
+                    co.setKeywords(new Keywords(configLayer.getKeywords()));
+                 }
+                 if (configLayer.getMetadataURL() != null && configLayer.getMetadataURL().getOnlineResource() != null) {
+                     co.setMetadataLink(Arrays.asList(new MetadataLinkType(configLayer.getMetadataURL().getOnlineResource().getValue())));
+                 }
                 offBrief.add(co);
             }
             contentMetadata = new ContentMetadata(offBrief);
@@ -693,10 +708,8 @@ public final class WCSWorker extends AbstractWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private Capabilities getCapabilities111(
-            final org.geotoolkit.wcs.xml.v111.GetCapabilitiesType request)
-                                throws CstlServiceException, JAXBException
-    {
+    private Capabilities getCapabilities111(final org.geotoolkit.wcs.xml.v111.GetCapabilitiesType request)
+                                throws CstlServiceException, JAXBException {
         // First we try to extract only the requested section.
         List<String> requestedSections =
                 SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
@@ -743,10 +756,12 @@ public final class WCSWorker extends AbstractWorker {
         final org.geotoolkit.wcs.xml.v111.ObjectFactory wcs111Factory = new org.geotoolkit.wcs.xml.v111.ObjectFactory();
         final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory    = new org.geotoolkit.ows.xml.v110.ObjectFactory();
 
-        //NOTE: ADRIAN HACKED HERE
-        final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_1_1.version.toString());
+        final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
         try {
-            for (LayerDetails layer : layerRefs) {
+            for (Name name : layers.keySet()) {
+                final LayerDetails layer = namedProxy.get(name);
+                final Layer configLayer  = layers.get(name);
+                
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
                     continue;
                 }
@@ -775,6 +790,22 @@ public final class WCSWorker extends AbstractWorker {
                         inputGeoBox.getNorthBoundLatitude());
                 cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
                 cs.addRest(wcs111Factory.createIdentifier(coverageLayer.getName().getLocalPart()));
+
+                /*
+                 * coverage brief customisation
+                 */
+                 if (configLayer.getTitle() != null) {
+                    cs.setTitle(configLayer.getTitle());
+                 }
+                 if (configLayer.getAbstrac() != null) {
+                    cs.setAbstract(configLayer.getAbstrac());
+                 }
+                 if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
+                    cs.setKeywords(Arrays.asList(new KeywordsType(configLayer.getKeywords())));
+                 }
+                 if (configLayer.getMetadataURL() != null && configLayer.getMetadataURL().getOnlineResource() != null) {
+                    cs.setMetadata(new MetadataType(configLayer.getMetadataURL().getOnlineResource().getValue()));
+                 }
                 summary.add(cs);
             }
 
@@ -799,9 +830,8 @@ public final class WCSWorker extends AbstractWorker {
      *
      * @throws CstlServiceException
      */
-    public RenderedImage getCoverage(final GetCoverage request)
-                     throws CstlServiceException
-    {
+    public RenderedImage getCoverage(final GetCoverage request) throws CstlServiceException {
+        isWorking();
         final String inputVersion = request.getVersion().toString();
         if (inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
@@ -822,7 +852,7 @@ public final class WCSWorker extends AbstractWorker {
             throw new CstlServiceException("You must specify the parameter: COVERAGE" , INVALID_PARAMETER_VALUE,
                     KEY_COVERAGE.toLowerCase());
         }
-        final LayerDetails layerRef = getLayerReference(request.getCoverage(), inputVersion);
+        final LayerDetails layerRef = getLayerReference(request.getCoverage());
         if (!layerRef.isQueryable(ServiceDef.Query.WCS_ALL) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
                     layerRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
@@ -1041,37 +1071,26 @@ public final class WCSWorker extends AbstractWorker {
     }
 
     //TODO: handle the null value in the exception.
-    //TODO: harmonize with the method getLayerReference().
-    private List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
-
-    	List<LayerDetails> layerRefs;
-    	try { // WE catch the exception from either service version
-	        if ( version.equals("1.0.0") ) {
-	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_0_0 );
-	        } else if ( version.equals("1.1.0") ) {
-	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_0 );
-	        } else if ( version.equals("1.1.1") ) {
-	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_1 );
-	        } else if ( version.equals("1.1.2") ) {
-	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_2 );
-	        } else {
-	        	throw new CstlServiceException("WCS acting according to no known version.",
-                        VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
-	        }
-        } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
-        }
-        return layerRefs;
-    }
-
-    //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getAllLayerReferences().
     //TODO: distinguish exceptions: layer doesn't exist and layer could not be obtained.
-    private LayerDetails getLayerReference(final String layerName, final String version)
-                                                             throws CstlServiceException
-    {
+    private LayerDetails getLayerReference(final String layerName) throws CstlServiceException {
+        final Name namedLayerName = parseCoverageName(layerName);
+    	final LayerDetails layerRef;
+        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+        if (layers.containsKey(namedLayerName)) {
+            layerRef = namedProxy.get(namedLayerName);
+        } else {
+            throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
+        }
+        return layerRef;
+    }
 
-    	LayerDetails layerRef;
+    /**
+     * Parse a Name from a string.
+     * @param layerName
+     * @return
+     */
+    private Name parseCoverageName(String layerName) {
         final Name namedLayerName;
         if (layerName != null && layerName.lastIndexOf(':') != -1) {
             final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));
@@ -1080,21 +1099,7 @@ public final class WCSWorker extends AbstractWorker {
         } else {
             namedLayerName = new DefaultName(layerName);
         }
-    	try { // WE catch the exception from either service version
-        	if ( version.equals("1.0.0") ){
-        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_0_0, namedLayerName);
-        	} else if ( version.equals("1.1.1") ) {
-        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_1, namedLayerName);
-        	} else if ( version.equals("1.1.2") ) {
-        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_2, namedLayerName);
-        	} else {
-        		throw new CstlServiceException("WCS acting according to no known version.",
-                        VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
-        	}
-        } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
-        }
-        return layerRef;
+        return namedLayerName;
     }
 
     /**
