@@ -18,6 +18,8 @@ package org.constellation.provider.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -96,13 +98,29 @@ public final class ConfigDirectory {
     public static File getConfigDirectory() {
         File constellationDirectory;
 
-        // 1) WAR packaged config
-        constellationDirectory = FileUtilities.getDirectoryFromResource("configuration");
+        /*
+         * 1) WAR packaged config located in WEB-INF
+         */
+         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+         URL url = classloader.getResource("org/constellation/provider/Provider.class");
+         String path = url.toString();
+         path = path.substring(path.lastIndexOf(':') + 1); // we remove the file type
+         final int  separator = path.indexOf('!'); // we remove the path inside the jar
+         if (separator != -1) {
+            path = path.substring(0, separator);
+         }
+         File f = new File(path);
+         f = f.getParentFile(); // lib
+         f = f.getParentFile(); // WEB-INF
+
+        constellationDirectory = new File(f, "configuration");
         if (constellationDirectory != null && constellationDirectory.isDirectory()) {
             return constellationDirectory;
         }
 
-        // 2) user defined config
+        /*
+         * 2) user defined config
+         */
         if (USER_DIRECTORY != null) {
             constellationDirectory = new File(USER_DIRECTORY);
             if (!constellationDirectory.exists()) {
@@ -113,7 +131,9 @@ public final class ConfigDirectory {
             return constellationDirectory;
         }
 
-        // 3) .constellation in home directory
+        /*
+         * 3) .constellation in home directory
+         */
         final String home = System.getProperty("user.home");
 
         if (System.getProperty("os.name", "").startsWith("Windows")) {
