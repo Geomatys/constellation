@@ -728,9 +728,9 @@ public final class WCSWorker extends LayerWorker {
         final Capabilities staticCapabilities = (Capabilities) getStaticCapabilitiesObject(ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
         
         ServiceIdentification si = null;
-        ServiceProvider sp = null;
-        OperationsMetadata om = null;
-        final String all = "All";
+        ServiceProvider sp       = null;
+        OperationsMetadata om    = null;
+        final String all         = "All";
         //we add the static sections if the are included in the requested sections
         if (requestedSections.contains("ServiceProvider") || requestedSections.contains(all)) {
             sp = staticCapabilities.getServiceProvider();

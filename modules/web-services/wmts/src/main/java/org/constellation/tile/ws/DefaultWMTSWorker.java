@@ -50,10 +50,13 @@ import org.constellation.provider.StyleProviderProxy;
 import org.constellation.register.RegisterException;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
+import org.constellation.configuration.FormatURL;
+import org.constellation.configuration.Layer;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerProviderProxy;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.LayerWorker;
 
 import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
@@ -95,6 +98,9 @@ import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.v110.KeywordsType;
+import org.geotoolkit.ows.xml.v110.MetadataType;
+import org.geotoolkit.wmts.xml.v100.URLTemplateType;
 
 import org.opengis.coverage.Coverage;
 import org.opengis.feature.type.Name;
@@ -111,7 +117,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
+public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
     /**
      * The current MIME type of return
@@ -146,7 +152,9 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
      */
     public DefaultWMTSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory);
-        LOGGER.info("WMTS Service running");
+        if (isStarted) {
+            LOGGER.log(Level.INFO, "WMTS worker{0} running", id);
+        }
     }
 
     @Override
@@ -245,14 +253,17 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
         if (sections.containsSection("Contents") || sections.containsSection("All")) {
             
-            final List<LayerDetails> layerRefs = getAllLayerReferences();
-
             // Build the list of layers
-            final List<LayerType> layers = new ArrayList<LayerType>();
+            final List<LayerType> outputLayers = new ArrayList<LayerType>();
             // and the list of matrix set
             final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
 
-            for (LayerDetails layer : layerRefs){
+            final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+            for (Name name : layers.keySet()){
+
+                LayerDetails layer = namedProxy.get(name);
+                Layer configLayer  = layers.get(name);
+                
                 if (!layer.isQueryable(ServiceDef.Query.WMTS_ALL) || !(layer instanceof CoverageLayerDetails)) {
                     continue;
                 }
@@ -278,7 +289,9 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                 // List of elevations, times and dim_range values.
                 final List<Dimension> dimensions = new ArrayList<Dimension>();
 
-                //the available date
+                /*
+                 * Dimension : the available date
+                 */
                 String defaut = null;
                 Dimension dim;
                 SortedSet<Date> dates = null;
@@ -299,7 +312,9 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                     dimensions.add(dim);
                 }
 
-                //the available elevation
+                /*
+                 * Dimension : the available elevation
+                 */
                 defaut = null;
                 SortedSet<Number> elevations = null;
                 try {
@@ -323,7 +338,9 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                     dimensions.add(dim);
                 }
 
-                //the dimension range
+                /*
+                 * Dimension : the dimension range
+                 */
                 defaut = null;
                 final MeasurementRange<?>[] ranges = layer.getSampleValueRanges();
                 /* If the layer has only one sample dimension, then we can apply the dim_range
@@ -395,21 +412,43 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
                 final LayerType outputLayer = new LayerType(layerName, coverageLayer.getRemarks(), outputBBox, styles, dimensions);
 
-            /**
-             * Hard coded part
-             */
-            final TileMatrixSet outputMatrixSet = DefaultTileExample.getTileMatrixSet(layerName);
-            if (outputMatrixSet != null) {
-                final TileMatrixSetLink tmsl = new TileMatrixSetLink();
-                tmsl.setTileMatrixSet(layerName);
-                outputLayer.getTileMatrixSetLink().add(tmsl);
-                tileSets.add(outputMatrixSet);
-            }
-            layers.add(outputLayer);
+                /*
+                 * layer customisation
+                 */
+                 if (configLayer.getTitle() != null) {
+                    outputLayer.setTitle(configLayer.getTitle());
+                }
+                if (configLayer.getAbstrac() != null) {
+                    outputLayer.setAbstract(configLayer.getAbstrac());
+                }
+                if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
+                    outputLayer.setKeywords(Arrays.asList(new KeywordsType(configLayer.getKeywords())));
+                }
+                if (configLayer.getMetadataURL() != null) {
+                    final FormatURL metadataURL = configLayer.getMetadataURL();
+                    outputLayer.getMetadata().add(new MetadataType(metadataURL.getOnlineResource().getHref()));
+                }
+                if (configLayer.getDataURL() != null) {
+                    final FormatURL dataURL = configLayer.getDataURL();
+                    outputLayer.getResourceURL().add(new URLTemplateType(dataURL.getFormat(),
+                                                                         dataURL.getType(),
+                                                                         dataURL.getOnlineResource().getHref()));
+                }
+                /*
+                 * Hard coded part
+                 */
+                final TileMatrixSet outputMatrixSet = DefaultTileExample.getTileMatrixSet(layerName);
+                if (outputMatrixSet != null) {
+                    final TileMatrixSetLink tmsl = new TileMatrixSetLink();
+                    tmsl.setTileMatrixSet(layerName);
+                    outputLayer.getTileMatrixSetLink().add(tmsl);
+                    tileSets.add(outputMatrixSet);
+                }
+                outputLayers.add(outputLayer);
             }
             
             cont = new ContentsType();
-            cont.setLayers(layers);
+            cont.setLayers(outputLayers);
             cont.setTileMatrixSet(tileSets);
             
         }
@@ -422,22 +461,10 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
         c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
 
-        LOGGER.log(logLevel, "getCapabilities processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        LOGGER.log(logLevel, "getCapabilities processed in {0}ms.\n", (System.currentTimeMillis() - start));
         return c;
 
         
-    }
-
-    private static List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
-
-        List<LayerDetails> layerRefs;
-        try { // WE catch the exception from either service version
-            layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMTS_1_0_0);
-
-        } catch (RegisterException regex) {
-            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
-        }
-        return layerRefs;
     }
 
     private static List<String> getRootDirectories() throws CstlServiceException {
@@ -453,14 +480,14 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
     }
 
 
-    public static LayerDetails getLayerReference(Name name) throws CstlServiceException {
+    public LayerDetails getLayerReference(Name name) throws CstlServiceException {
 
-        LayerDetails layerRef;
-        try { // WE catch the exception from either service version
-            layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMTS_1_0_0, name);
-
-        } catch (RegisterException regex) {
-            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
+        final LayerDetails layerRef;
+        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+        if (layers.containsKey(name)) {
+            layerRef = namedProxy.get(name);
+        } else {
+            throw new CstlServiceException("Unknow Layer name:" + name, LAYER_NOT_DEFINED);
         }
         return layerRef;
     }
@@ -554,7 +581,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
             visitor = new CSVGraphicVisitor(request);
         } else if (infoFormat.equalsIgnoreCase(MimeType.TEXT_HTML)) {
             // TEXT / HTML
-            visitor = new HTMLGraphicVisitor(request);
+            visitor = new HTMLGraphicVisitor(request, layerRef);
         } else if (infoFormat.equalsIgnoreCase(MimeType.APP_GML) || infoFormat.equalsIgnoreCase(MimeType.TEXT_XML) ||
                    infoFormat.equalsIgnoreCase(MimeType.APP_XML) || infoFormat.equalsIgnoreCase("xml") ||
                    infoFormat.equalsIgnoreCase("gml"))
@@ -660,9 +687,9 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
         final File f = new File(fileName);
         if (f.exists()) {
-            LOGGER.info("returning existing file:" + f.getPath());
+            LOGGER.log(Level.INFO, "returning existing file:{0}", f.getPath());
         } else {
-            LOGGER.info("file does not exist:" + f.getPath());
+            LOGGER.log(Level.INFO, "file does not exist:{0}", f.getPath());
             return new File(rootDir + "blank.png");
             //throw new CstlServiceException("The correspounding file has not been found", NO_APPLICABLE_CODE);
         }
