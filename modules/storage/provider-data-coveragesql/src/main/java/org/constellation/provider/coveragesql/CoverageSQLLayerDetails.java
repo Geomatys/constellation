@@ -52,6 +52,7 @@ import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.MeasurementRange;
 
 import org.opengis.feature.type.Name;
@@ -92,6 +93,14 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
 
         this.reader = reader;
         this.elevationModel = elevationModel;
+    }
+
+    /**
+     * Returns the time range of this layer.
+     */
+    @Override
+    public DateRange getDateRange() throws DataStoreException {
+        return reader.getInput().getEnvelope(null, null).getTimeRange();
     }
 
     /**
