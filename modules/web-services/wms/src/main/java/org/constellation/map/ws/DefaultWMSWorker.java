@@ -158,8 +158,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         SUPPORTED_LANGUAGES.put("fre", language);
     }
 
+    private final WMSMapDecoration mapDecoration;
+
     public DefaultWMSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory);
+        mapDecoration = new WMSMapDecoration(configurationDirectory);
+        if (isStarted) {
+            LOGGER.log(Level.INFO, "WMS worker {0} running", id);
+        }
     }
 
     @Override
@@ -428,7 +434,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                     for (String styleName : stylesName) {
                         final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
-                        final LegendTemplate lt = WMSMapDecoration.getDefaultLegendTemplate();
+                        final LegendTemplate lt = mapDecoration.getDefaultLegendTemplate();
                         final Dimension dimLegend;
                         try {
                             dimLegend = layer.getPreferredLegendSize(lt, ms);
@@ -543,7 +549,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                     for (String styleName : stylesName) {
                         final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
-                        final LegendTemplate lt = WMSMapDecoration.getDefaultLegendTemplate();
+                        final LegendTemplate lt = mapDecoration.getDefaultLegendTemplate();
                         final Dimension dimLegend;
                         try {
                             dimLegend = layer.getPreferredLegendSize(lt, ms);
@@ -877,7 +883,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     ms = StyleProviderProxy.getInstance().get(style);
                 }
             }
-            image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), ms, rule, scale);
+            image = layer.getLegendGraphic(dims, mapDecoration.getDefaultLegendTemplate(), ms, rule, scale);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex);
         }
@@ -936,8 +942,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final Map<String, Object> params       = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
         final SceneDef sdef = new SceneDef();
-        sdef.extensions().add(WMSMapDecoration.getExtension());
-        final Hints hints = WMSMapDecoration.getHints();
+        sdef.extensions().add(mapDecoration.getExtension());
+        final Hints hints = mapDecoration.getHints();
         if (hints != null) {
             sdef.getHints().putAll(hints);
         }

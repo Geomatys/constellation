@@ -51,6 +51,7 @@ import org.constellation.provider.configuration.ConfigDirectory;
  */
 public final class MailSendingUtilities {
 
+    private static final Logger LOGGER = Logger.getLogger(MailSendingUtilities.class.getName());
     private static final String FROM;
     private static final String MAILHOST;
     private static final String MAILER;
@@ -70,7 +71,7 @@ public final class MailSendingUtilities {
             final File f = new File(ConfigDirectory.getConfigDirectory(), "mailing.properties");
             configProps.load(new FileInputStream(f));
         } catch (IOException ex) {
-            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
 
         FROM        = configProps.getProperty("from");
@@ -111,15 +112,15 @@ public final class MailSendingUtilities {
             mailingProps.put("javax.net.ssl.trustStorePassword", store);
 
         } catch (NoSuchProviderException ex) {
-            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         } catch (CertificateException ex) {
-            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         } catch (KeyStoreException ex) {
-            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
         }
 
         SESSION = Session.getInstance(mailingProps, null);

@@ -162,6 +162,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
         standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
 
+        if (isStarted) {
+            LOGGER.log(Level.INFO, "WFS worker {0} running", id);
+        }
+
         //        try{
 //            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("CRS:84"), true));
 //            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("EPSG:4326"), true));

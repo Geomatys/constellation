@@ -32,6 +32,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
@@ -103,7 +104,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         setXMLContext(WMSMarshallerPool.getInstance());
 
         setFullRequestLog(true);
-        LOGGER.info("WMS service running");
+        LOGGER.log(Level.INFO, "WMS REST service running ({0} instances)", workersMap.size());
     }
 
     /**

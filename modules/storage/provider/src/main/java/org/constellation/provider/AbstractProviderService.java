@@ -71,10 +71,6 @@ public abstract class AbstractProviderService<K, V> implements ProviderService<K
      */
     @Override
     public final void setConfiguration(File file) {
-        if (file == null) {
-            throw new NullPointerException("Configuration file can not be null");
-        }
-
         //unload previous providers
         final Collection<Provider> providers = new ArrayList<Provider>(getProviders());
         for(Provider p : providers){

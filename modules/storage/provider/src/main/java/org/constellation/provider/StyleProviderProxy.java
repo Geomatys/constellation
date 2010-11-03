@@ -29,7 +29,6 @@ import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
-import org.geotoolkit.util.FileUtilities;
 
 
 /**
@@ -47,8 +46,6 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
     public static final RandomStyleFactory STYLE_RANDOM_FACTORY = new RandomStyleFactory();
 
     private static final Collection<StyleProviderService> SERVICES = new ArrayList<StyleProviderService>();
-
-    private static String configPath = null;
 
     private static StyleProviderProxy instance = null;
 
@@ -152,16 +149,7 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
 
     }
 
-    public static synchronized void init(final String confPath){
-        if(confPath == null){
-            throw new NullPointerException("Configuration path can not be null.");
-        }
-
-        if(configPath != null){
-            throw new IllegalStateException("The style provider proxy has already been initialize");
-        }
-
-        configPath = confPath;
+    public static synchronized void init() {
         loadServices();
     }
 
@@ -169,19 +157,10 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
         SERVICES.clear();
         final ServiceLoader<StyleProviderService> loader = ServiceLoader.load(StyleProviderService.class);
         for(final StyleProviderService service : loader){
-            final String name = service.getName();
+            final String name     = service.getName();
             final String fileName = name + ".xml";
-            /*
-             * First check that there are config files in the WEB-INF/classes directory
-             */
-            File configFile = FileUtilities.getFileFromResource(fileName);
-            /*
-             * No config file in the resources, then we try with the default config directory.
-             */
-            if (configFile == null || !configFile.exists()) {
-                final String path = configPath + fileName;
-                configFile = new File(path);
-            }
+            final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+
             service.setConfiguration(configFile);
 
             SERVICES.add(service);
@@ -207,7 +186,7 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
      */
     public static synchronized StyleProviderProxy getInstance(final boolean createIfNotExists){
         if(instance == null && createIfNotExists){
-            init(ConfigDirectory.getConfigDirectory().getPath() + File.separator);
+            init();
             instance = new StyleProviderProxy();
         }
 

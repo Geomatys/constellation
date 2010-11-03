@@ -43,8 +43,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.constellation.provider.configuration.ConfigDirectory;
-
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.GO2Hints;
 import org.geotoolkit.display2d.canvas.J2DCanvas;
@@ -167,27 +165,28 @@ public final class WMSMapDecoration {
     /**
      * Decoration extension and hints for map queries.
      */
-    private static PortrayalExtension extension = null;
-    private static final Hints hints = new Hints();
-    private static final Map<String,Float> compressions = new HashMap<String, Float>();
+    private PortrayalExtension extension = null;
+    private final Hints hints = new Hints();
+    private final Map<String,Float> compressions = new HashMap<String, Float>();
 
-    private static LegendTemplate legendTemplate = null;
+    private LegendTemplate legendTemplate = null;
 
-    private WMSMapDecoration(){}
+    private final File instanceDirectory;
+
+    public WMSMapDecoration(File instanceDirectory) {
+        this.instanceDirectory = instanceDirectory;
+    }
 
     /**
      * First call to this method will parse the configuration file if there is one.
      * 
      * @return PortrayalExtension
      */
-    public static synchronized PortrayalExtension getExtension() {
+    public PortrayalExtension getExtension() {
 
         if(extension != null) return extension;
 
-        //load the portrayal extension
-        final String path = ConfigDirectory.getConfigDirectory().getPath() + File.separator + "WMSPortrayal.xml";
-
-        final File f = new File(path);
+        final File f = new File(instanceDirectory, "WMSPortrayal.xml");
         if(f.exists()){
             try {
                 extension = read(f);
@@ -201,7 +200,7 @@ public final class WMSMapDecoration {
         }
 
         //no configuration available, make an empty
-        if(extension == null){
+        if (extension == null) {
             LOGGER.log(Level.FINE, "No WMS portrayal extension found, will create an empty extension");
             extension = new DecorationExtension();
         }
@@ -212,7 +211,7 @@ public final class WMSMapDecoration {
     /**
      * @return a copy of the hints defined in the wms portrayal configuration file.
      */
-    public static synchronized Hints getHints() {
+    public Hints getHints() {
         getExtension();
         //return a copy to avoid modifications
         return new Hints(hints);
@@ -221,7 +220,7 @@ public final class WMSMapDecoration {
     /**
      * @return Float or null if no compression has been set for the given mime type.
      */
-    public static synchronized Float getCompression(String mime){
+    public Float getCompression(String mime){
         getExtension();
         if(compressions != null){
             return compressions.get(mime.toLowerCase());
@@ -230,8 +229,7 @@ public final class WMSMapDecoration {
         }
     }
 
-    private static PortrayalExtension read(File configFile)
-            throws ParserConfigurationException, SAXException, IOException{
+    private PortrayalExtension read(File configFile) throws ParserConfigurationException, SAXException, IOException{
 
         if(!configFile.exists()){
             return null;
@@ -315,12 +313,12 @@ public final class WMSMapDecoration {
                     try{
                         final Float comp = Float.valueOf(types[1]);
                         if(comp <0 || comp >1){
-                            LOGGER.log(Level.WARNING, "Invalid compression : "+comp+" for type : "+mime);
+                            LOGGER.log(Level.WARNING, "Invalid compression : " + comp + " for type : " + mime);
                         }else{
                             compressions.put(mime, comp);
                         }
                     }catch(NumberFormatException ex){
-                        LOGGER.log(Level.WARNING, "Invalid compression : "+types[1]+" for type : "+mime);
+                        LOGGER.log(Level.WARNING, "Invalid compression : " + types[1] + " for type : " + mime);
                     }
 
                 }
@@ -348,7 +346,7 @@ public final class WMSMapDecoration {
     /**
      * Returns the default legend template.
      */
-    public static LegendTemplate getDefaultLegendTemplate(){
+    public LegendTemplate getDefaultLegendTemplate(){
         getExtension(); //will force parsing the file
         return legendTemplate;
     }
@@ -767,16 +765,9 @@ public final class WMSMapDecoration {
     }
 
     /**
-     * This method clear the portrayal extension value.
-     */
-    public static void reload(){
-        extension = null;
-    }
-
-    /**
      * @return a copy of all compressions defined in the configuration file.
      */
-    public static Map<String,Float> getCompressions(){
+    public Map<String,Float> getCompressions(){
         getHints();
         return new HashMap(compressions);
     }

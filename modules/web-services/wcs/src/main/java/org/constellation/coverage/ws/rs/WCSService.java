@@ -18,6 +18,7 @@
 package org.constellation.coverage.ws.rs;
 
 // Jersey dependencies
+import java.util.logging.Level;
 import java.io.File;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.ExceptionResponse;
@@ -107,7 +108,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WCSMarshallerPool.getInstance());
 
-        LOGGER.info("WCS service running");
+        LOGGER.log(Level.INFO, "WCS REST service running ({0} instances)", workersMap.size());
     }
 
     /**

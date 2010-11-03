@@ -39,59 +39,6 @@ public class WebServiceUtilities {
 
     private WebServiceUtilities(){}
 
-    @Deprecated
-    public static boolean getUpdateCapabilitiesFlag() {
-        final Properties p = new Properties();
-
-        // if the flag file is present we load the properties
-        final File changeFile = getChangeFile();
-        if (changeFile != null && changeFile.exists()) {
-            try {
-                final FileInputStream in = new FileInputStream(changeFile);
-                p.load(in);
-                in.close();
-            } catch (IOException ex) {
-                LOGGER.warning("Unable to read the change.properties file");
-                return false;
-            }
-            
-        } else {
-            p.put("update", "false");
-        }
-        return  p.getProperty("update").equals("true");
-    }
-
-    @Deprecated
-    public static void storeUpdateCapabilitiesFlag() {
-        final Properties p = new Properties();
-        final File changeFile = getChangeFile();
-        p.put("update", "false");
-
-        // if the flag file is present we store the properties
-        if (changeFile != null && changeFile.exists()) {
-            try {
-                final FileOutputStream out = new FileOutputStream(changeFile);
-                p.store(out, "updated from WebService");
-                out.close();
-            } catch (IOException ex) {
-                LOGGER.warning("Unable to write the change.properties file");
-            }
-        }
-    }
-
-    /**
-     * Return a the change file named "change.properties" located in the constellation directory.
-     *
-     * @return The specified file.
-     */
-    private static File getChangeFile() {
-         File path = ConfigDirectory.getConfigDirectory();
-         if (path != null && path.exists() && path.isDirectory()) {
-            return new File(path, "change.properties");
-         }
-         return null;
-    }
-
     /**
      * Extract The mapping between namespace and prefix in a namespace parameter of a GET request.
      *

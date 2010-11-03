@@ -44,7 +44,6 @@ import javax.servlet.ServletContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.map.ws.WMSMapDecoration;
 
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
@@ -1439,15 +1438,24 @@ public final class ServicesBean {
      * This method is called from services page via a commandbutton action event
      */
     public void reloadPortrayal(){
+        LOGGER.warning("map decoration has been de-activated since there is multi-instance");
+        /*
         WMSMapDecoration.reload();
+         */
     }
 
     public List<Entry> getHints() {
+        LOGGER.warning("map decoration has been de-activated since there is multi-instance");
+        return new ArrayList<Entry>();
+        /*
         return new ArrayList<Entry>(WMSMapDecoration.getHints().entrySet());
+         */
     }
 
     public List<Entry> getCompressions(){
-        return new ArrayList<Entry>(WMSMapDecoration.getCompressions().entrySet());
+        LOGGER.warning("map decoration has been de-activated since there is multi-instance");
+        return new ArrayList<Entry>();
+        /*return new ArrayList<Entry>(WMSMapDecoration.getCompressions().entrySet());*/
     }
 
 

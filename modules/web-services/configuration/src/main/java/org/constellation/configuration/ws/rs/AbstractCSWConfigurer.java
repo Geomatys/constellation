@@ -34,13 +34,13 @@ import javax.xml.bind.Unmarshaller;
 // constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
-import org.constellation.configuration.filter.ConfigurationFileFilter;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
@@ -91,32 +91,15 @@ public abstract class AbstractCSWConfigurer {
     public AbstractCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         this.containerNotifier = cn;
 
-        final File cswConfigDir = getConfigurationDirectory();
-        if (cswConfigDir == null || !cswConfigDir.isDirectory()) {
-            throw new ConfigurationException("No configuration directory have been found");
-        }
-        
         try {
-            final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             cswfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
 
-            for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
-                //we get the csw ID (if single mode return "")
-                final String id = getConfigID(configFile);
-                // we get the CSW configuration file
-                final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
-                config.setConfigurationDirectory(cswConfigDir);
-                serviceConfiguration.put(id, config);
-            }
-            GenericDatabaseMarshallerPool.getInstance().release(configUnmarshaller);
-            
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());
         } catch (FactoryNotFoundException ex) {
             throw new ConfigurationException("Unable to find a CSW factory for CSW in configuration service", ex.getMessage());
         } catch (IllegalArgumentException ex) {
             throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
         }
+        refreshServiceConfiguration();
     }
 
 
@@ -187,23 +170,39 @@ public abstract class AbstractCSWConfigurer {
         return result;
     }
 
+    /**
+     * Refresh the map of configuration object.
+     * 
+     * @throws ConfigurationException
+     */
     private void refreshServiceConfiguration() throws ConfigurationException {
         serviceConfiguration = new HashMap<String, Automatic>();
 
-        final File cswConfigDir = getConfigurationDirectory();
-        if (cswConfigDir == null || !cswConfigDir.isDirectory()) {
+        final File configDir = ConfigDirectory.getConfigDirectory();
+        final File cswConfigDir;
+        if (configDir == null || !configDir.isDirectory()) {
             throw new ConfigurationException("No configuration directory have been found");
+        } else {
+            cswConfigDir = new File(configDir, "CSW");
+            if (cswConfigDir == null || !cswConfigDir.isDirectory()) {
+                throw new ConfigurationException("No CSW configuration directory have been found");
+            }
         }
         try {
             final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
 
-            for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
-                //we get the csw ID (if single mode return "")
-                final String id = getConfigID(configFile);
-                // we get the CSW configuration file
-                final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
-                config.setConfigurationDirectory(cswConfigDir);
-                serviceConfiguration.put(id, config);
+            for (File instanceDirectory : cswConfigDir.listFiles()) {
+                if (instanceDirectory.isDirectory()) {
+                    //we get the csw ID
+                    final String id = instanceDirectory.getName();
+                    final File configFile = new File(instanceDirectory, "config.xml");
+                    if (configFile.exists()) {
+                        // we get the CSW configuration file
+                        final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
+                        config.setConfigurationDirectory(cswConfigDir);
+                        serviceConfiguration.put(id, config);
+                    }
+                }
             }
             GenericDatabaseMarshallerPool.getInstance().release(configUnmarshaller);
 
@@ -238,7 +237,7 @@ public abstract class AbstractCSWConfigurer {
             throw new CstlServiceException(ex);
         }
         String msg;
-        final File cswConfigDir = getConfigurationDirectory();
+        final File cswConfigDir = getConfigurationDirectory(id);
         if (!asynchrone) {
             synchroneIndexRefresh(cswConfigDir, id);
         } else {
@@ -293,36 +292,29 @@ public abstract class AbstractCSWConfigurer {
      * @throws org.constellation.ws.CstlServiceException
      */
     private void asynchroneIndexRefresh(File configurationDirectory, String id) throws CstlServiceException {
-        /*
-         * then we create all the nextIndex directory and create the indexes
-         * if there is a specific id in parameter we only index the specified profile
-         */
-        for (File configFile : configurationDirectory.listFiles(new ConfigurationFileFilter(id))) {
-            final String currentId        = getConfigID(configFile);
-            final File nexIndexDir        = new File(configurationDirectory, currentId + "index-" + System.currentTimeMillis());
-            AbstractIndexer indexer = null;
-            try {
-                indexer = initIndexer(currentId, null);
-                if (indexer != null) {
-                    final boolean success = nexIndexDir.mkdir();
-                    if (!success) {
-                        throw new CstlServiceException("Unable to create a directory nextIndex for  the id:" + id, NO_APPLICABLE_CODE);
-                    }
-                    indexer.setFileDirectory(nexIndexDir);
-                    indexer.createIndex();
+        final File nexIndexDir        = new File(configurationDirectory, "index-" + System.currentTimeMillis());
+        AbstractIndexer indexer = null;
+        try {
+            indexer = initIndexer(id, null);
+            if (indexer != null) {
+                final boolean success = nexIndexDir.mkdir();
+                if (!success) {
+                    throw new CstlServiceException("Unable to create a directory nextIndex for  the id:" + id, NO_APPLICABLE_CODE);
+                }
+                indexer.setFileDirectory(nexIndexDir);
+                indexer.createIndex();
 
-                } else {
-                    throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
-                }
-            } catch (IllegalArgumentException ex) {
-                LOGGER.log(Level.SEVERE, "unable to create an indexer for configuration file:{0}", configFile.getName());
-            } catch (IndexingException ex) {
-                throw new CstlServiceException("An eception occurs while creating the index!" + '\n' +
-                        "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
-            } finally {
-                if (indexer != null) {
-                    indexer.destroy();
-                }
+            } else {
+                throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+            }
+        } catch (IllegalArgumentException ex) {
+            LOGGER.log(Level.SEVERE, "unable to create an indexer for id:{0}", id);
+        } catch (IndexingException ex) {
+            throw new CstlServiceException("An eception occurs while creating the index!" + '\n' +
+                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } finally {
+            if (indexer != null) {
+                indexer.destroy();
             }
         }
     }
@@ -337,46 +329,38 @@ public abstract class AbstractCSWConfigurer {
     public AcknowlegementType addToIndex(String service, String id, List<String> identifiers) throws CstlServiceException {
         LOGGER.info("Add to index requested");
 
-        // CSW indexation
-        final File cswConfigDir = getConfigurationDirectory();
-        /*
-         * then we create all the nextIndex directory and create the indexes
-         * if there is a specific id in parameter we only index the specified profile
-         */
-        for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(id))) {
-            final String currentId   = getConfigID(configFile);
-            AbstractIndexer indexer  = null;
-            CSWMetadataReader reader = null;
-            try {
-                reader  = initReader(currentId);
-                final List<Object> objectToIndex = new ArrayList<Object>();
-                if (reader != null) {
-                    try {
-                        for (String identifier : identifiers) {
-                            objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115, null));
-                        }
-                    } catch (MetadataIoException ex) {
-                        throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        AbstractIndexer indexer  = null;
+        CSWMetadataReader reader = null;
+        try {
+            reader  = initReader(id);
+            final List<Object> objectToIndex = new ArrayList<Object>();
+            if (reader != null) {
+                try {
+                    for (String identifier : identifiers) {
+                        objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115, null));
                     }
-                } else {
-                    throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
+                } catch (MetadataIoException ex) {
+                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                 }
+            } else {
+                throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
+            }
 
-                indexer = initIndexer(currentId, reader);
-                if (indexer != null) {
-                    for (Object obj : objectToIndex) {
-                        indexer.indexDocument(obj);
-                    }
-                } else {
-                    throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+            indexer = initIndexer(id, reader);
+            if (indexer != null) {
+                for (Object obj : objectToIndex) {
+                    indexer.indexDocument(obj);
                 }
+            } else {
+                throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+            }
 
-            } finally {
-                if (indexer != null) {
-                    indexer.destroy();
-                }
+        } finally {
+            if (indexer != null) {
+                indexer.destroy();
             }
         }
+        
         final String msg = "The specified record have been added to the CSW index";
         return new AcknowlegementType("success", msg);
     }
@@ -394,21 +378,6 @@ public abstract class AbstractCSWConfigurer {
     }
 
     /**
-     * Return the ID of the CSW given by the configuration file Name.
-     */
-    private String getConfigID(File configFile) {
-        if (configFile == null || !configFile.exists()) {
-            return "";
-        }
-        String id = configFile.getName();
-        if (id.indexOf("config.xml") != -1) {
-            id = id.substring(0, id.indexOf("config.xml"));
-            return id;
-        }
-        return "";
-    }
-
-    /**
      * Because the injectable fields are null at initialization time
      * @param containerNotifier
      */
@@ -420,7 +389,7 @@ public abstract class AbstractCSWConfigurer {
     
     public abstract AcknowlegementType updateVocabularies() throws CstlServiceException;
 
-    protected abstract File getConfigurationDirectory();
+    protected abstract File getConfigurationDirectory(String instanceId);
 
     /**
      * destroy all the resource and close the connection.

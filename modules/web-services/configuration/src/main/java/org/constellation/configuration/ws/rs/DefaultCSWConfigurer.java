@@ -56,13 +56,16 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     }
     
     @Override
-    protected File getConfigurationDirectory() {
+    protected File getConfigurationDirectory(String instanceId) {
         final File configDir = ConfigDirectory.getConfigDirectory();
 
         if (configDir != null && configDir.exists()) {
             final File cswDir = new File(configDir, "CSW");
-            if (cswDir != null && configDir.exists()) {
-                return cswDir;
+            if (configDir.exists() && configDir.isDirectory()) {
+                File  instanceDir = new File(cswDir, instanceId);
+                if (instanceDir.exists() && instanceDir.isDirectory()) {
+                    return instanceDir;
+                }
             }
         }
         return null;

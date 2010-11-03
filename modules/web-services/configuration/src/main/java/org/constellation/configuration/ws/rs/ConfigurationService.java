@@ -25,8 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Arrays;
 import java.util.logging.Level;
 
@@ -50,7 +48,6 @@ import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.ContainerNotifierImpl;
@@ -116,15 +113,6 @@ public final class ConfigurationService extends WebService  {
     private static final List<String> SERVICE_INDEXING = new ArrayList<String>();
 
     /**
-     * A map of service / configuration location.
-     */
-    public static final Map<String, File> SERVCE_DIRECTORY = new HashMap<String, File>();
-    static {
-        SERVCE_DIRECTORY.put("CSW",      new File(ConfigDirectory.getConfigDirectory(), "csw"));
-        SERVCE_DIRECTORY.put("SOS",      new File(ConfigDirectory.getConfigDirectory(), "sos"));
-    }
-    
-    /**
      * Construct the ConfigurationService and configure its context.
      */
     public ConfigurationService() {
@@ -185,7 +173,7 @@ public final class ConfigurationService extends WebService  {
             if ("RefreshIndex".equalsIgnoreCase(request)) {
                 if (cswFunctionEnabled) {
                     final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
-                    final String id          = getParameter("ID", false);
+                    final String id          = getParameter("ID", true);
                     final boolean forced     = Boolean.parseBoolean((String) getParameter("FORCED", false));
 
                     if (isIndexing(id) && !forced) {
@@ -215,7 +203,7 @@ public final class ConfigurationService extends WebService  {
             if ("AddToIndex".equalsIgnoreCase(request)) {
                 if (cswFunctionEnabled) {
                     final String service           = getParameter("SERVICE", false);
-                    final String id                = getParameter("ID", false);
+                    final String id                = getParameter("ID", true);
                     final List<String> identifiers = new ArrayList<String>();
                     final String identifierList    = getParameter("IDENTIFIERS", true);
                     final StringTokenizer tokens   = new StringTokenizer(identifierList, ",;");
@@ -388,33 +376,6 @@ public final class ConfigurationService extends WebService  {
         }
     }
 
-    /**
-     * Verify that the request contains good parameters :
-     * - A existing service
-     * - A file name.
-     * 
-     * @param service
-     * @param fileName
-     * @throws CstlServiceException
-     */
-    private void verifyBaseAttribute(final String service, final String fileName) throws CstlServiceException {
-         if ( service == null) {
-            throw new CstlServiceException("You must specify the service parameter.",
-                                              MISSING_PARAMETER_VALUE, Parameters.SERVICE);
-        } else if (!SERVCE_DIRECTORY.keySet().contains(service)) {
-            final StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
-            msg.append("accepted values are:");
-            for (String s: SERVCE_DIRECTORY.keySet()) {
-                msg .append(s).append(',');
-            }
-            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, Parameters.SERVICE);
-        }
-
-        if (fileName == null) {
-             throw new CstlServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, "fileName");
-        }
-    }
-    
     /**
      * Receive a file and write it into the static file path.
      * 

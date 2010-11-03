@@ -153,7 +153,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     public DefaultWMTSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory);
         if (isStarted) {
-            LOGGER.log(Level.INFO, "WMTS worker{0} running", id);
+            LOGGER.log(Level.INFO, "WMTS worker {0} running", id);
         }
     }
 

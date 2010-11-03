@@ -17,6 +17,7 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
+import java.util.logging.Level;
 import java.util.Arrays;
 import org.constellation.configuration.Layer;
 import org.constellation.provider.LayerProviderProxy;
@@ -182,6 +183,9 @@ public final class WCSWorker extends LayerWorker {
 
     public WCSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory);
+        if (isStarted) {
+            LOGGER.log(Level.INFO, "WCS worker {0} running", id);
+        }
     }
 
     @Override

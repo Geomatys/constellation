@@ -165,12 +165,9 @@ public class LayerProviderProxy extends AbstractLayerProvider{
         SERVICES.clear();
         final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
         for(final LayerProviderService service : loader){
-            final String name = service.getName();
+            final String name     = service.getName();
             final String fileName = name + ".xml";
-            /*
-             * First check that there are config files in the WEB-INF/classes directory
-             */
-            File configFile = ConfigDirectory.getConfigFile(fileName);
+            final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
 
             service.setConfiguration(configFile);
 

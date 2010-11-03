@@ -127,9 +127,19 @@ public final class ConfigDirectory {
     /**
      * Return a file at the root in the configuration directory.
      */
-    public static File getConfigFile(String fileName) {
-        File constellationDirectory = getConfigDirectory();
-        return new File(constellationDirectory, fileName);
+    public static File getProviderConfigFile(String fileName) {
+        final File constellationDirectory = getConfigDirectory();
+        if (constellationDirectory != null && constellationDirectory.exists()) {
+            final File providerDirectory = new File(constellationDirectory, "provider");
+            if (providerDirectory.exists() && providerDirectory.isDirectory()) {
+                return new File(providerDirectory, fileName);
+            } else {
+                LOGGER.warning("Unable to find a provider directory");
+            }
+        } else {
+            LOGGER.warning("Unable to find a configuration directory");
+        }
+        return null;
     }
 
     /**

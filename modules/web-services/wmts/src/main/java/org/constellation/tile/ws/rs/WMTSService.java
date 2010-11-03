@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import javax.imageio.IIOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -73,6 +74,8 @@ public class WMTSService extends GridWebService<WMTSWorker> {
         super(ServiceDef.WMTS_1_0_0);
         setXMLContext(WMTSMarshallerPool.getInstance());
         setFullRequestLog(true);
+        
+        LOGGER.log(Level.INFO, "WMTS REST service running ({0} instances)", workersMap.size());
     }
 
     /**

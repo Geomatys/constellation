@@ -150,15 +150,10 @@ public abstract class AbstractWorker implements Worker {
         } else {
             fileName = service + "Capabilities" + version + '-' + language + ".xml";
         }
-        final boolean update  = WebServiceUtilities.getUpdateCapabilitiesFlag();
 
         //Look if the template capabilities is already in cache.
         Object response = capabilities.get(fileName);
-        if (response == null || update) {
-            if (update) {
-                LOGGER.log(logLevel, "updating metadata");
-            }
-
+        if (response == null) {
             final File f;
             if (configurationDirectory != null && configurationDirectory.exists()) {
                 f = new File(configurationDirectory, fileName);
@@ -189,8 +184,6 @@ public abstract class AbstractWorker implements Worker {
                     getMarshallerPool().release(unmarshaller);
                 }
             }
-
-            WebServiceUtilities.storeUpdateCapabilitiesFlag();
         }
         return response;
     }

@@ -104,7 +104,7 @@ public final class GrizzlyServer {
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
         sourcePostGrid.loadAll = true;
-        sourcePostGrid.services.add("WCS");
+        sourcePostGrid.id = "postgridSrc";
         final ProviderConfig configPostGrid = new ProviderConfig();
         configPostGrid.sources.add(sourcePostGrid);
 
@@ -173,7 +173,7 @@ public final class GrizzlyServer {
                                null, null, null, null, false, null));
         sourceShape.layers.add(new ProviderLayer("Streams", Collections.singletonList("cite_style_Streams"),
                                null, null, null, null, false, null));
-
+        sourceShape.id = "shapeSrc";
 
 
         final ProviderConfig configShape = new ProviderConfig();
@@ -202,7 +202,7 @@ public final class GrizzlyServer {
         final ProviderConfig configPostGis = new ProviderConfig();
         configPostGis.sources.add(sourcePostGis);
         sourcePostGis.loadAll = true;
-        sourcePostGis.services.add("WFS");
+        sourcePostGis.id = "postgisSrc";
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the postgis data provider defined previously
             if (service instanceof PostGisProviderService) {

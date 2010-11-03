@@ -60,7 +60,7 @@ public class ProviderConfig {
     public static final synchronized ProviderConfig read(final File configFile) 
             throws ParserConfigurationException, SAXException, IOException{
 
-        if(!configFile.exists()){
+        if(configFile == null || !configFile.exists()){
             return new ProviderConfig();
         }
 
