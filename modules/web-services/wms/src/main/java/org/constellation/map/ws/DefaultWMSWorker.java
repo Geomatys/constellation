@@ -248,7 +248,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
-        final String url = getServiceUrl() + "wms";
+        final String url = getServiceUrl() + "wms?";
         
         final AbstractRequest request;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
@@ -405,7 +405,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             } else {
                 layerName = fullLayerName.getLocalPart();
             }
-            final String beginLegendUrl = url + "wms?REQUEST=GetLegendGraphic&" +
+            final String beginLegendUrl = url + "REQUEST=GetLegendGraphic&" +
                                                     "VERSION=1.1.1&" +
                                                     "FORMAT=";
             final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
