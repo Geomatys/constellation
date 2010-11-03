@@ -125,10 +125,10 @@ public class WFSService extends OGCWebService<WFSWorker> {
                           ":org.geotoolkit.sampling.xml.v100" +
                          ":org.geotoolkit.internal.jaxb.geometry");
             setXMLContext(pool);
-            LOGGER.log(Level.INFO, "WFS REST service running ({0} instances)", workersMap.size());
+            LOGGER.log(Level.INFO, "WFS REST service running ({0} instances)\n", workersMap.size());
 
         } catch (JAXBException ex){
-            LOGGER.warning("The WFS service is not running.\ncause  : Error creating XML context.\n" +
+            LOGGER.warning("The WFS REST service is not running.\ncause  : Error creating XML context.\n" +
                            " error  : " + ex.getMessage()  + 
                            "\n details: " + ex.toString());
         } 

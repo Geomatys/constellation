@@ -104,7 +104,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         setXMLContext(WMSMarshallerPool.getInstance());
 
         setFullRequestLog(true);
-        LOGGER.log(Level.INFO, "WMS REST service running ({0} instances)", workersMap.size());
+        LOGGER.log(Level.INFO, "WMS REST service running ({0} instances)\n", workersMap.size());
     }
 
     /**

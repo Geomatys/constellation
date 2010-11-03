@@ -18,7 +18,6 @@ package org.constellation.provider.configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -119,7 +118,15 @@ public final class ConfigDirectory {
         }
 
         /*
-         * 2) user defined config
+         * 2) resource packaged config
+         */
+         constellationDirectory = FileUtilities.getDirectoryFromResource("configuration");
+         if (constellationDirectory != null && constellationDirectory.isDirectory()) {
+            return constellationDirectory;
+         }
+
+        /*
+         * 3) user defined config
          */
         if (USER_DIRECTORY != null) {
             constellationDirectory = new File(USER_DIRECTORY);
@@ -132,7 +139,7 @@ public final class ConfigDirectory {
         }
 
         /*
-         * 3) .constellation in home directory
+         * 4) .constellation in home directory
          */
         final String home = System.getProperty("user.home");
 

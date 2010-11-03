@@ -18,6 +18,7 @@
 package org.constellation.sos.ws.rs;
 
 // Jersey dependencies
+import java.util.logging.Level;
 import java.io.File;
 import org.geotoolkit.ows.xml.RequestBase;
 import javax.ws.rs.Path;
@@ -68,6 +69,7 @@ public class SOService extends OGCWebService<SOSworker> {
     public SOService() throws JAXBException, CstlServiceException {
         super(ServiceDef.SOS_1_0_0);
         setXMLContext(SOSMarshallerPool.getInstance());
+        LOGGER.log(Level.INFO, "SOS REST service running ({0} instances)\n", workersMap.size());
     }
 
     /**

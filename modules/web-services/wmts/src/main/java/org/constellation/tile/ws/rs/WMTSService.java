@@ -75,7 +75,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
         setXMLContext(WMTSMarshallerPool.getInstance());
         setFullRequestLog(true);
         
-        LOGGER.log(Level.INFO, "WMTS REST service running ({0} instances)", workersMap.size());
+        LOGGER.log(Level.INFO, "WMTS REST service running ({0} instances)\n", workersMap.size());
     }
 
     /**

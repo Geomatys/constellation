@@ -18,6 +18,7 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
+import java.util.logging.Level;
 import org.constellation.ws.WebServiceUtilities;
 import java.io.File;
 import java.util.ArrayList;
@@ -97,27 +98,21 @@ public class CSWService extends OGCWebService<CSWworker> {
      * Build a new Restfull CSW service.
      */
     public CSWService() {
-        this("");
+        super(ServiceDef.CSW_2_0_2);
+        setXMLContext(EBRIMMarshallerPool.getInstance());
+        this.serializer = getXMLSerializer();
+        LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", workersMap.size());
     }
 
     /**
      * Build a new Restfull CSW service with multiple workers.
      * used by subClasses.
      */
-    protected CSWService(final String serviceID, final Map<String, CSWworker> workers) {
+    protected CSWService(final Map<String, CSWworker> workers) {
         super(workers, ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());
         this.serializer = getXMLSerializer();
-    }
-
-    /**
-     * Build a new Restfull CSW service.
-     * used by subClasses.
-     */
-    protected CSWService(String serviceID) {
-        super(ServiceDef.CSW_2_0_2);
-        setXMLContext(EBRIMMarshallerPool.getInstance());
-        this.serializer = getXMLSerializer();
+        LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", workersMap.size());
     }
 
     /**

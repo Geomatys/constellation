@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LayerContext xmlns="http://www.constellation.org/config">
     <layers>
-        <Source id="coverageTestSrc" load-all="true"/>
+        <Source id="shapeSrc" load-all="true"/>
     </layers>
 </LayerContext>
 
