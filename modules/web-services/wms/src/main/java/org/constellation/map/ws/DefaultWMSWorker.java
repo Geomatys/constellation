@@ -996,36 +996,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         return image;
     }
 
-    //TODO: handle the null value in the exception.
-    //TODO: harmonize with the method getLayerReference().
-    private List<LayerDetails> getLayerReferences(final List<Name> layerNames) throws CstlServiceException {
-        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-        for (Name layerName : layerNames) {
-            if (layers.containsKey(layerName)) {
-                layerRefs.add(namedProxy.get(layerName));
-            } else {
-                throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
-            }
-        }
-        return layerRefs;
-    }
-
-    //TODO: handle the null value in the exception.
-    //TODO: harmonize with the method getLayerReference().
-    private LayerDetails getLayerReference(final Name layerName) throws CstlServiceException {
-        final LayerDetails layerRef;
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-        if (layers.containsKey(layerName)) {
-            layerRef = namedProxy.get(layerName);
-        } else {
-            throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
-        }
-        return layerRef;
-    }
-
-
-
     private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld){
         if(sld == null){
             throw new NullPointerException("SLD should not be null");

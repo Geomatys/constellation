@@ -480,18 +480,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     }
 
 
-    public LayerDetails getLayerReference(Name name) throws CstlServiceException {
-
-        final LayerDetails layerRef;
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-        if (layers.containsKey(name)) {
-            layerRef = namedProxy.get(name);
-        } else {
-            throw new CstlServiceException("Unknow Layer name:" + name, LAYER_NOT_DEFINED);
-        }
-        return layerRef;
-    }
-
     /**
      * {@inheritDoc}
      */

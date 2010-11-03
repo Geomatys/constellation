@@ -243,7 +243,8 @@ public final class WCSWorker extends LayerWorker {
 
         final List<CoverageOfferingType> coverageOfferings = new ArrayList<CoverageOfferingType>();
         for (String coverage : request.getCoverage()) {
-            final LayerDetails layerRef = getLayerReference(coverage);
+            final Name tmpName = parseCoverageName(coverage);
+            final LayerDetails layerRef = getLayerReference(tmpName);
             if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
@@ -384,7 +385,8 @@ public final class WCSWorker extends LayerWorker {
 
         final List<CoverageDescriptionType> coverageDescriptions = new ArrayList<CoverageDescriptionType>();
         for (String coverage : request.getIdentifier()) {
-            final LayerDetails layerRef = getLayerReference(coverage);
+            final Name tmpName = parseCoverageName(coverage);
+            final LayerDetails layerRef = getLayerReference(tmpName);
             if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
@@ -852,7 +854,8 @@ public final class WCSWorker extends LayerWorker {
             throw new CstlServiceException("You must specify the parameter: COVERAGE" , INVALID_PARAMETER_VALUE,
                     KEY_COVERAGE.toLowerCase());
         }
-        final LayerDetails layerRef = getLayerReference(request.getCoverage());
+        final Name tmpName = parseCoverageName(request.getCoverage());
+        final LayerDetails layerRef = getLayerReference(tmpName);
         if (!layerRef.isQueryable(ServiceDef.Query.WCS_ALL) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
                     layerRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
@@ -1068,21 +1071,6 @@ public final class WCSWorker extends LayerWorker {
 
             return img;
         }
-    }
-
-    //TODO: handle the null value in the exception.
-    //TODO: harmonize with the method getAllLayerReferences().
-    //TODO: distinguish exceptions: layer doesn't exist and layer could not be obtained.
-    private LayerDetails getLayerReference(final String layerName) throws CstlServiceException {
-        final Name namedLayerName = parseCoverageName(layerName);
-    	final LayerDetails layerRef;
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-        if (layers.containsKey(namedLayerName)) {
-            layerRef = namedProxy.get(namedLayerName);
-        } else {
-            throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
-        }
-        return layerRef;
     }
 
     /**

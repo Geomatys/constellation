@@ -16,6 +16,8 @@
  */
 package org.constellation.ws;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +30,10 @@ import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.opengis.feature.type.Name;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * A super class for all the web service worker dealing with layers (WMS, WCS, WMTS, WFS, ...)
@@ -118,5 +122,25 @@ public abstract class LayerWorker extends AbstractWorker {
             }
         }
     }
+
+    protected List<LayerDetails> getLayerReferences(final List<Name> layerNames) throws CstlServiceException {
+        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+        for (Name layerName : layerNames) {
+            layerRefs.add(getLayerReference(layerName));
+        }
+        return layerRefs;
+    }
+
+    protected LayerDetails getLayerReference(final Name layerName) throws CstlServiceException {
+        final LayerDetails layerRef;
+        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+        if (layers.containsKey(layerName)) {
+            layerRef = namedProxy.get(layerName);
+        } else {
+            throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
+        }
+        return layerRef;
+    }
+
 
 }
