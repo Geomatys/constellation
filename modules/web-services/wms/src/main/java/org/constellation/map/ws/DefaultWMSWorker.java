@@ -17,6 +17,8 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import org.geotoolkit.display2d.service.OutputDef;
+import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.configuration.Reference;
 import org.geotoolkit.wms.xml.v130.DataURL;
 import org.constellation.configuration.FormatURL;
@@ -823,7 +825,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @throws CstlServiceException if the layer does not support GetLegendGraphic requests.
      */
     @Override
-    public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
+    public PortrayalResponse getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         isWorking();
         final LayerDetails layer = getLayerReference(getLegend.getLayer());
         final String layerName = layer.getName().toString();
@@ -901,7 +903,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             throw new CstlServiceException("The requested layer \""+ layerName +"\" does not support "
                     + "GetLegendGraphic request", NO_APPLICABLE_CODE, KEY_LAYER.toLowerCase());
         }
-        return image;
+        return new PortrayalResponse(image);
     }
 
     /**
@@ -913,7 +915,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @throws CstlServiceException
      */
     @Override
-    public BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
+    public PortrayalResponse getMap(final GetMap getMap) throws CstlServiceException {
         isWorking();
     	//
     	// Note this is almost the same logic as in getFeatureInfo
@@ -1000,10 +1002,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 4. IMAGE
         final String mime = getMap.getFormat();
         final OutputDef odef = new OutputDef(mime, new Object());
-        odef.setCompression(WMSMapDecoration.getCompression(mime));
+        odef.setCompression(mapDecoration.getCompression(mime));
 
         final PortrayalResponse response = new PortrayalResponse(cdef, sdef, vdef, odef);
-        if(!WMSMapDecoration.writeInStream()){
+        if(!mapDecoration.writeInStream()){
             try {
                 response.prepareNow();
             } catch (PortrayalException ex) {
@@ -1014,31 +1016,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             }
         }
-
-        return response;
-    }
-
-
-
-    //TODO: handle the null value in the exception.
-    //TODO: harmonize with the method getLayerReference().
-    private static List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
-
-        List<LayerDetails> layerRefs;
-        try { // WE catch the exception from either service version
-            if (version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
-                layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD);
-            } else if (version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString())) {
-                layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0_SLD);
-            } else {
-                throw new CstlServiceException("WMS acting according to no known version.",
-                        VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
-            }
-        } catch (RegisterException regex) {
-            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
-        }
-        return layerRefs;
-    }
 
         return response;
     }

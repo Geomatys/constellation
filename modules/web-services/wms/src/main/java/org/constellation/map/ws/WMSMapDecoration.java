@@ -45,8 +45,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.constellation.provider.configuration.ConfigDirectory;
-
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.GO2Hints;
 import org.geotoolkit.display2d.canvas.J2DCanvas;
@@ -401,7 +399,7 @@ public final class WMSMapDecoration {
      * @return true if the coverage writer is enable, which implies writing
      * directly in the output stream.
      */
-    public static boolean writeInStream(){
+    public boolean writeInStream(){
         final Hints hints = getHints();
         final Object val = hints.get(GO2Hints.KEY_COVERAGE_WRITER);
         return GO2Hints.COVERAGE_WRITER_ON.equals(val);

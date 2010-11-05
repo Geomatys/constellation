@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map.Entry;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -56,6 +57,8 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
 import static org.constellation.ws.ExceptionCode.*;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.image.jai.Registry;
 import org.xml.sax.SAXException;
 
 
