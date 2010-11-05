@@ -27,13 +27,13 @@ import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
 import org.geotoolkit.sld.MutableNamedStyle;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.style.MutableStyle;
+
 import org.opengis.feature.type.Name;
 
 /**
@@ -63,7 +63,7 @@ public final class PortrayalUtil {
             Map<String,Object> renderingParameters ) throws PortrayalException {
 
     	assert ( layerRefs.size() == styleRefs.size() );
-        final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
+        final MapContext context = MapBuilder.createContext();
 
         for (int i = 0; i < layerRefs.size(); i++) {
             final LayerDetails layerRef = layerRefs.get(i);

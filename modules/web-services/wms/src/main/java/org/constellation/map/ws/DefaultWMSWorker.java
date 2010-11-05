@@ -672,8 +672,14 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         }
 
         // 2. VIEW
-        final JTSEnvelope2D refEnv             = new JTSEnvelope2D(getFI.getEnvelope());
-        final double azimuth                   = getFI.getAzimuth();
+        Envelope refEnv = getFI.getEnvelope();
+        try {
+            refEnv = GO2Utilities.combine(
+                    refEnv, new Date[]{time, time}, new Double[]{elevation, elevation});
+        } catch (TransformException ex) {
+            throw new CstlServiceException(ex);
+        }
+        final double azimuth = getFI.getAzimuth();
         final ViewDef vdef = new ViewDef(refEnv,azimuth);
 
 
