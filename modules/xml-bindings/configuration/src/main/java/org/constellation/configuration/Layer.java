@@ -63,6 +63,9 @@ public class Layer {
     @XmlElement(name="Opaque")
     private Boolean opaque;
 
+    @XmlElement(name="CRS")
+    private List<String> crs;
+    
     public Layer() {
 
     }
@@ -177,5 +180,22 @@ public class Layer {
 
     public void setOpaque(Boolean opaque) {
         this.opaque = opaque;
+    }
+
+    /**
+     * @return the crs
+     */
+    public List<String> getCrs() {
+        if (crs == null) {
+            crs = new ArrayList<String>();
+        }
+        return crs;
+    }
+
+    /**
+     * @param crs the crs to set
+     */
+    public void setCrs(List<String> crs) {
+        this.crs = crs;
     }
 }

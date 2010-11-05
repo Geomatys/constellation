@@ -74,7 +74,8 @@ public final class ConfigDirectory {
 
     //we try to load this variable at the start by reading a properties file
     static {
-        File propertiesFile = FileUtilities.getFileFromResource("constellation.properties");
+        final File webInfDirectory = getWebInfDiretory();
+        File propertiesFile = new File(webInfDirectory, "constellation.properties");
         if (propertiesFile != null && propertiesFile.exists()) {
             try {
                 Properties prop = FileUtilities.getPropertiesFromFile(propertiesFile);
@@ -84,7 +85,21 @@ public final class ConfigDirectory {
             }
         } 
     }
-    
+
+    private static File getWebInfDiretory() {
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        URL url = classloader.getResource("org/constellation/provider/Provider.class");
+        String path = url.toString();
+        path = path.substring(path.lastIndexOf(':') + 1); // we remove the file type
+        final int separator = path.indexOf('!'); // we remove the path inside the jar
+        if (separator != -1) {
+            path = path.substring(0, separator);
+        }
+        File f = new File(path);
+        f = f.getParentFile(); // lib
+        f = f.getParentFile(); // WEB-INF
+        return f;
+    }
 
     /**
      * Return the configuration directory.
@@ -100,19 +115,9 @@ public final class ConfigDirectory {
         /*
          * 1) WAR packaged config located in WEB-INF
          */
-         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-         URL url = classloader.getResource("org/constellation/provider/Provider.class");
-         String path = url.toString();
-         path = path.substring(path.lastIndexOf(':') + 1); // we remove the file type
-         final int  separator = path.indexOf('!'); // we remove the path inside the jar
-         if (separator != -1) {
-            path = path.substring(0, separator);
-         }
-         File f = new File(path);
-         f = f.getParentFile(); // lib
-         f = f.getParentFile(); // WEB-INF
+         final File webInfDirectory = getWebInfDiretory();
 
-        constellationDirectory = new File(f, "configuration");
+        constellationDirectory = new File(webInfDirectory, "configuration");
         if (constellationDirectory != null && constellationDirectory.isDirectory()) {
             return constellationDirectory;
         }

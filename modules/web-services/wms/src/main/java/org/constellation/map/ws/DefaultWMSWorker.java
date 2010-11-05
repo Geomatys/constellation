@@ -144,6 +144,21 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @since 0.3
  */
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
+
+    /*
+     * Default declareded CRS codes for each layer in the getCapabilities
+     */
+    private static final List<String> DEFAULT_CRS = new ArrayList<String>();
+    static {
+        DEFAULT_CRS.add("EPSG:4326");
+        DEFAULT_CRS.add("CRS:84");
+        DEFAULT_CRS.add("EPSG:3395");
+        DEFAULT_CRS.add("EPSG:3857");
+        DEFAULT_CRS.add("EPSG:27571");
+        DEFAULT_CRS.add("EPSG:27572");
+        DEFAULT_CRS.add("EPSG:27573");
+        DEFAULT_CRS.add("EPSG:27574");
+    }
     /**
      * Output responses of a GetCapabilities request.
      */
@@ -229,17 +244,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (CAPS_RESPONSE.containsKey(keyCache)) {
             return CAPS_RESPONSE.get(keyCache);
         }
-
-        //Add accepted CRS codes
-        final List<String> crs = new ArrayList<String>();
-        crs.add("EPSG:4326");
-        crs.add("CRS:84");
-        crs.add("EPSG:3395");
-        crs.add("EPSG:27571");
-        crs.add("EPSG:27572");
-        crs.add("EPSG:27573");
-        crs.add("EPSG:27574");
-
 
         //Generate the correct URL in the static part. ?TODO: clarify this.
         final AbstractWMSCapabilities inCapabilities;
@@ -462,11 +466,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
                     outputLayer111 = new org.geotoolkit.wms.xml.v111.Layer(layerName,
                             StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks()),
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), crs,
+                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), DEFAULT_CRS,
                             bbox, outputBBox, queryable, dimensions, styles);
                 } else {
                     outputLayer111 = new org.geotoolkit.wms.xml.v111.Layer(layerName,
-                            "Vector data", "Vector data", crs, bbox,
+                            "Vector data", "Vector data", DEFAULT_CRS, bbox,
                             outputBBox, queryable, dimensions, styles);
                 }
                 /*
@@ -525,6 +529,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     }
                     outputLayer111.setOpaque(opaque);
                 }
+                if (!configLayer.getCrs().isEmpty()) {
+                    outputLayer111.setSrs(configLayer.getCrs());
+                }
                 outputLayer = outputLayer111;
             } else {
                 /*
@@ -576,11 +583,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
                     outputLayer130 = new org.geotoolkit.wms.xml.v130.Layer(layerName,
                             StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks()),
-                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), crs,
+                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), DEFAULT_CRS,
                             bbox, outputBBox, queryable, dimensions, styles);
                 } else {
                     outputLayer130 = new org.geotoolkit.wms.xml.v130.Layer(layerName,
-                            "Vector data", "Vector data", crs, bbox,
+                            "Vector data", "Vector data", DEFAULT_CRS, bbox,
                             outputBBox, queryable, dimensions, styles);
                 }
                 /*
@@ -639,6 +646,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     }
                     outputLayer130.setOpaque(opaque);
                 }
+                if (!configLayer.getCrs().isEmpty()) {
+                    outputLayer130.setCrs(configLayer.getCrs());
+                }
                 outputLayer = outputLayer130;
             }
             outputLayers.add(outputLayer);
@@ -647,10 +657,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         //we build the general layer and add it to the document
         final AbstractLayer mainLayer = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
             new org.geotoolkit.wms.xml.v111.Layer("Constellation Web Map Layer",
-                    "description of the service(need to be fill)", crs,
+                    "description of the service(need to be fill)", DEFAULT_CRS,
                     new LatLonBoundingBox(-180.0, -90.0, 180.0, 90.0), outputLayers) :
             new org.geotoolkit.wms.xml.v130.Layer("Constellation Web Map Layer",
-                    "description of the service(need to be fill)", crs,
+                    "description of the service(need to be fill)", DEFAULT_CRS,
                     new EXGeographicBoundingBox(-180.0, -90.0, 180.0, 90.0), outputLayers);
 
         inCapabilities.getCapability().setLayer(mainLayer);

@@ -133,8 +133,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     /**
      * Base known CRS.
      */
-    private final List<String> standardCRS = new ArrayList<String>();
-
+    private final static List<String> DEFAULT_CRS = new ArrayList<String>();
+    static {
+        DEFAULT_CRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
+        DEFAULT_CRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
+    }
     /**
      * The current version of the service.
      */
@@ -157,24 +160,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     public DefaultWFSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory);
-
-        //todo wait for martin fix
-        standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
-        standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
-
         if (isStarted) {
             LOGGER.log(Level.INFO, "WFS worker {0} running", id);
         }
-
-        //        try{
-//            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("CRS:84"), true));
-//            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("EPSG:4326"), true));
-//            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("EPSG:3395"), true));
-//        }catch(FactoryException ex){
-//            LOGGER.log(Level.SEVERE, "Could not find urn identifiers : " + ex.getLocalizedMessage(),ex);
-//        }
-
-
     }
 
     @Override
@@ -264,7 +252,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                 Utils.getQnameFromName(layerName),
                                 title,
                                 defaultCRS,
-                                standardCRS,
+                                DEFAULT_CRS,
                                 UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getStore(), fld.getName())}));
 
                         /*
@@ -279,6 +267,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                             ftt.getMetadataURL().add(new MetadataURLType(metadataURL.getOnlineResource().getValue(),
                                                                          metadataURL.getType(),
                                                                          metadataURL.getFormat()));
+                        }
+                        if (!configLayer.getCrs().isEmpty()) {
+                            ftt.setOtherSRS(configLayer.getCrs());
                         }
 
                         // we add the feature type description to the list
