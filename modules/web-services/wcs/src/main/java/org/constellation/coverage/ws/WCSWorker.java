@@ -842,9 +842,9 @@ public final class WCSWorker extends LayerWorker {
         if (inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
-        } else if (!inputVersion.equals("1.0.0") || !inputVersion.equals("1.1.1")) {
-            throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+        } else if (!inputVersion.equals("1.0.0") && !inputVersion.equals("1.1.1")) {
+            throw new CstlServiceException("The version number specified for this request " + inputVersion +
+                    " is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
 
         Date date = null;
