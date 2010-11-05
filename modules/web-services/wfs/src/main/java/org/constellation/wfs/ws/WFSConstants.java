@@ -95,10 +95,11 @@ public final class WFSConstants {
         compaOperatorList[8] = ComparisonOperatorType.NULL_CHECK;
 
         final ComparisonOperatorsType comparisons = new ComparisonOperatorsType(compaOperatorList);
-        final ScalarCapabilitiesType sclalarCapabilities = new ScalarCapabilitiesType(comparisons, arithmetic, false);
+        final ScalarCapabilitiesType scalarCapabilities = new ScalarCapabilitiesType(comparisons, arithmetic, true);
+
 
         final IdCapabilitiesType idCapabilities = new IdCapabilitiesType(true, true);
-        FILTER_CAPABILITIES = new FilterCapabilities(sclalarCapabilities, spatialCapabilties, idCapabilities);
+        FILTER_CAPABILITIES = new FilterCapabilities(scalarCapabilities, spatialCapabilties, idCapabilities);
         
     }
 
