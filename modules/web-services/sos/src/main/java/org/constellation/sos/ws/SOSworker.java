@@ -2173,6 +2173,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * Destroy and free the resource used by the worker.
      */
+    @Override
     public void destroy() {
         if (smlReader != null)
             smlReader.destroy();

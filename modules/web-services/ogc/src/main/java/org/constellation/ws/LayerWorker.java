@@ -134,12 +134,31 @@ public abstract class LayerWorker extends AbstractWorker {
     protected LayerDetails getLayerReference(final Name layerName) throws CstlServiceException {
         final LayerDetails layerRef;
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-        if (layers.containsKey(layerName)) {
+        if (layersContainsKey(layerName)) {
             layerRef = namedProxy.get(layerName);
         } else {
             throw new CstlServiceException("Unknow Layer name:" + layerName, LAYER_NOT_DEFINED);
         }
         return layerRef;
+    }
+
+    /**
+     * We can use directly layers.containsKey because it may miss the namespace
+     * @param name
+     */
+    protected boolean layersContainsKey(Name name) {
+        if (name == null) {
+            return false;
+        }
+        if (!layers.containsKey(name)) {
+            for (Name layerName: layers.keySet()) {
+                if (layerName.getLocalPart().equals(name.getLocalPart())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
 

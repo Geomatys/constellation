@@ -117,7 +117,7 @@ public final class ConfigDirectory {
          */
          final File webInfDirectory = getWebInfDiretory();
 
-        constellationDirectory = new File(webInfDirectory, "configuration");
+        constellationDirectory = new File(webInfDirectory, "constellation");
         if (constellationDirectory != null && constellationDirectory.isDirectory()) {
             return constellationDirectory;
         }
@@ -125,7 +125,7 @@ public final class ConfigDirectory {
         /*
          * 2) resource packaged config
          */
-         constellationDirectory = FileUtilities.getDirectoryFromResource("configuration");
+         constellationDirectory = FileUtilities.getDirectoryFromResource("constellation");
          if (constellationDirectory != null && constellationDirectory.isDirectory()) {
             return constellationDirectory;
          }
