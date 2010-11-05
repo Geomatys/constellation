@@ -17,16 +17,17 @@
 package org.constellation.portrayal.internal;
 
 import java.awt.Dimension;
-import java.awt.Shape;
 import java.awt.image.BufferedImage;
 
 import org.constellation.portrayal.PortrayalServiceIF;
 
+import org.geotoolkit.display.canvas.control.CanvasMonitor;
+import org.geotoolkit.display.canvas.control.NeverFailMonitor;
 import org.geotoolkit.display.canvas.control.StopOnErrorMonitor;
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.display2d.canvas.AbstractGraphicVisitor;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
+import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
@@ -59,15 +60,7 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
     private CstlPortrayalService(){}
 
     /**
-     * Portray a set of Layers over a given geographic extent with a given 
-     * resolution yielding a {@code BufferedImage} of the scene.
-     * @param sdef A structure which defines the scene.
-     * @param vdef A structure which defines the view.
-     * @param cdef A structure which defines the canvas.
-     * 
-     * @return A rendered image of the scene, in the chosen view and for the 
-     *           given canvas.
-     * @throws PortrayalException For errors during portrayal, TODO: common examples?
+     *{@inheritDoc}
      */
     @Override
     public BufferedImage portray( final SceneDef sdef,
@@ -101,17 +94,7 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
     }
     
     /**
-     * Apply the Visitor to all the 
-     * {@link org..opengis.display.primitive.Graphic} objects which lie within 
-     * the {@link java.awt.Shape} in the given scene.
-     * <p>
-     * The visitor could be an extension of the AbstractGraphicVisitor class in
-     * this same package.
-     * </p>
-     * 
-     * TODO: why are the last two arguments not final?
-     * 
-     * @see AbstractGraphicVisitor
+     *{@inheritDoc}
      */
     @Override
     public void visit( final SceneDef sdef,
@@ -141,6 +124,27 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
     @Override
     public BufferedImage writeInImage(Exception e, Dimension dim){
         return DefaultPortrayalService.writeException(e, dim);
+    }
+
+    /**
+     *{@inheritDoc}
+     */
+    @Override
+    public void portray(SceneDef sdef, ViewDef vdef, CanvasDef cdef, OutputDef odef) throws PortrayalException {
+
+        //never stop rendering, we write in the output, we must never.
+        final CanvasMonitor monitor = new NeverFailMonitor();
+        vdef.setMonitor(monitor);
+
+        try {
+            DefaultPortrayalService.portray(cdef,sdef,vdef,odef);
+        }catch(PortrayalException ex){
+            throw ex;
+        } catch(Exception ex) {
+            throw new PortrayalException(ex);
+        } finally {
+            sdef.getContext().layers().clear();
+        }
     }
         
 }

@@ -164,6 +164,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-coverageio-netcdf</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.geotoolkit.project</groupId>
       <artifactId>geotk-test</artifactId>
       <scope>test</scope>

@@ -37,11 +37,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.measure.unit.Unit;
 import javax.swing.SwingConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.constellation.provider.configuration.ConfigDirectory;
 
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.GO2Hints;
@@ -69,6 +73,8 @@ import org.geotoolkit.display2d.ext.text.GraphicTextJ2D;
 import org.geotoolkit.display2d.ext.text.TextTemplate;
 import org.geotoolkit.display2d.service.PortrayalExtension;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.image.io.XImageIO;
+import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.lang.ThreadSafe;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.Converters;
@@ -89,6 +95,8 @@ import org.xml.sax.SAXException;
  */
 @ThreadSafe(concurrent=false)
 public final class WMSMapDecoration {
+
+    public static final PortrayalExtension EMPTY_EXTENSION = new DecorationExtension();
 
     private static final Logger LOGGER = Logging.getLogger(WMSMapDecoration.class);
 
@@ -158,6 +166,10 @@ public final class WMSMapDecoration {
     private static final String HINT_RENDERING_ORDER        = "rendering-order";
     private static final String FEATURE_ORDER               = "feature";
     private static final String SYMBOLIZER_ORDER            = "symbolizer";
+    private static final String HINT_COVERAGE_WRITER        = "coverage-writer"; //boolean value
+    private static final String HINT_PARALLAL_BUFFER        = "parallal-buffer"; //boolean value
+    private static final String HINT_NATIVE_READER          = "jai-native-reader";
+    private static final String HINT_NATIVE_WRITER          = "jai-native-writer";
 
     //compression hint, value should look like : image/png:0.1,image/jpeg:0.4
     private static final String HINT_COMPRESSION            = "compression";
@@ -272,11 +284,7 @@ public final class WMSMapDecoration {
                 }
             }else if(HINT_GENERALIZE.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
-                if (Boolean.parseBoolean(value)) {
-                    hints.put(GO2Hints.KEY_GENERALIZE, Boolean.TRUE);
-                } else {
-                    hints.put(GO2Hints.KEY_GENERALIZE, Boolean.FALSE);
-                }
+                hints.put(GO2Hints.KEY_GENERALIZE, Boolean.parseBoolean(value));
             }else if(HINT_GENERALIZE_FACTOR.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
                 try{
@@ -287,11 +295,7 @@ public final class WMSMapDecoration {
                 }
             }else if(HINT_MULTITHREAD.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
-                if (Boolean.parseBoolean(value)) {
-                    hints.put(GO2Hints.KEY_MULTI_THREAD, Boolean.TRUE);
-                } else {
-                    hints.put(GO2Hints.KEY_MULTI_THREAD, Boolean.FALSE);
-                }
+                hints.put(GO2Hints.KEY_MULTI_THREAD, Boolean.parseBoolean(value));
             }else if(HINT_RENDERING_ORDER.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
                 if (SYMBOLIZER_ORDER.equalsIgnoreCase(value)) {
@@ -322,6 +326,44 @@ public final class WMSMapDecoration {
                     }
 
                 }
+            }else if(HINT_COVERAGE_WRITER.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                hints.put(GO2Hints.KEY_COVERAGE_WRITER, Boolean.parseBoolean(value));
+            }else if(HINT_PARALLAL_BUFFER.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                hints.put(GO2Hints.KEY_PARALLAL_BUFFER, Boolean.parseBoolean(value));
+            }else if(HINT_NATIVE_READER.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                final String[] parts = value.split(",");
+
+                //reset values, only allow pure java readers
+                for(String jn : ImageIO.getReaderFormatNames()){
+                    Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+                }
+
+                //allow natives readers only on thoses requested
+                for(String part : parts){
+                    final String[] javaNames = XImageIO.getFormatNamesByMimeType(part, true, false);
+                    for(String jn : javaNames){
+                        Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, true);
+                    }
+                }
+            }else if(HINT_NATIVE_WRITER.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                final String[] parts = value.split(",");
+
+                //reset values, only allow pure java writers
+                for(String jn : ImageIO.getWriterFormatNames()){
+                    Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+                }
+
+                //allow natives writers only on thoses requested
+                for(String part : parts){
+                    final String[] javaNames = XImageIO.getFormatNamesByMimeType(part, false, true);
+                    for(String jn : javaNames){
+                        Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, true);
+                    }
+                }
             }
         }
 
@@ -340,7 +382,11 @@ public final class WMSMapDecoration {
             parseDecoration(ext, decoNode);
         }
 
-        return ext;
+        if(ext.decorations.isEmpty()){
+            return EMPTY_EXTENSION;
+        }else{
+            return ext;
+        }
     }
 
     /**
@@ -349,6 +395,16 @@ public final class WMSMapDecoration {
     public LegendTemplate getDefaultLegendTemplate(){
         getExtension(); //will force parsing the file
         return legendTemplate;
+    }
+
+    /**
+     * @return true if the coverage writer is enable, which implies writing
+     * directly in the output stream.
+     */
+    public static boolean writeInStream(){
+        final Hints hints = getHints();
+        final Object val = hints.get(GO2Hints.KEY_COVERAGE_WRITER);
+        return GO2Hints.COVERAGE_WRITER_ON.equals(val);
     }
 
     private static void parseDecoration(final DecorationExtension deco, final Element decoNode){

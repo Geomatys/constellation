@@ -42,6 +42,7 @@ import org.constellation.ServiceDef;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.map.ws.QueryContext;
 import org.constellation.map.ws.WMSWorker;
+import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.query.QueryAdapter;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetMap;
@@ -142,7 +143,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetMap requestMap = adaptGetMap(versionSt, true, queryContext);
                 version = getVersionFromNumber(requestMap.getVersion());
-                final BufferedImage map = worker.getMap(requestMap);
+                final PortrayalResponse map = worker.getMap(requestMap);
                 return Response.ok(map, requestMap.getFormat()).build();
             }
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
@@ -197,7 +198,7 @@ public class WMSService extends GridWebService<WMSWorker> {
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
                 version = getVersionFromNumber(requestLegend.getVersion());
-                final BufferedImage legend = worker.getLegendGraphic(requestLegend);
+                final PortrayalResponse legend = worker.getLegendGraphic(requestLegend);
                 return Response.ok(legend, requestLegend.getFormat()).build();
             }
             if (DESCRIBELAYER.equalsIgnoreCase(request)) {

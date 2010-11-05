@@ -20,6 +20,7 @@ package org.constellation.map.ws;
 import java.awt.image.BufferedImage;
 
 //Constellation dependencies
+import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -73,7 +74,7 @@ public interface WMSWorker extends Worker{
      * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request done on this service.
      * @throws CstlServiceException
      */
-    BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException;
+    PortrayalResponse getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException;
 
     /**
      * Returns a {@link BufferedImage}, which is the result of a {@code GetMap} request.
@@ -81,5 +82,5 @@ public interface WMSWorker extends Worker{
      * @param getMap The {@linkplain GetMap get map} request done on this service.
      * @throws CstlServiceException
      */
-    BufferedImage getMap(final GetMap getMap) throws CstlServiceException;
+    PortrayalResponse getMap(final GetMap getMap) throws CstlServiceException;
 }

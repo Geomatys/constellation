@@ -121,6 +121,15 @@ public abstract class WebService {
      */
     protected static final Logger LOGGER = Logging.getLogger(WebService.class);
 
+    static {
+        //loading JAI codecs
+        Registry.setDefaultCodecPreferences();
+        Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, true);
+        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, true);
+
+        Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+    }
+
     /**
      * Automaticly set by Jersey.
      *

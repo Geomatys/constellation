@@ -17,7 +17,10 @@
 package org.constellation.provider.coveragesql;
 
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +42,9 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.sql.Layer;
 import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.geotoolkit.storage.DataStoreException;
+import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
+import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.ElevationModel;
@@ -47,6 +52,7 @@ import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.MeasurementRange;
 
 import org.opengis.feature.type.Name;
@@ -57,6 +63,7 @@ import org.opengis.style.FeatureTypeStyle;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Rule;
 import org.opengis.style.ShadedRelief;
+import org.opengis.style.Style;
 import org.opengis.style.Symbolizer;
 
 
@@ -86,6 +93,14 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
 
         this.reader = reader;
         this.elevationModel = elevationModel;
+    }
+
+    /**
+     * Returns the time range of this layer.
+     */
+    @Override
+    public DateRange getDateRange() throws DataStoreException {
+        return reader.getInput().getEnvelope(null, null).getTimeRange();
     }
 
     /**
@@ -239,7 +254,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
             return sampleValueRanges.toArray(new MeasurementRange<?>[0]);
         } catch (CoverageStoreException ex) {
             LOGGER.log(Level.INFO, ex.getMessage(), ex);
-            return new MeasurementRange[0];
+            return new MeasurementRange<?>[0];
         }
     }
 
@@ -254,6 +269,30 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
             LOGGER.log(Level.INFO, ex.getMessage(), ex);
             return "unknown";
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BufferedImage getLegendGraphic(Dimension dimension, final LegendTemplate template,
+                                          final Style style, final String rule, final Double scale)
+                                          throws PortrayalException
+    {
+        final Map<String,?> properties = Collections.singletonMap("size", dimension);
+        RenderedImage legend = null;
+        try {
+            legend = reader.getInput().getColorRamp(0, null, properties);
+        } catch (CoverageStoreException ex) {
+            LOGGER.log(Level.INFO, ex.getMessage(), ex);
+        }
+        if (legend != null) {
+            // Always an instance of BufferedImage in Geotk implementation.
+            // We don't check because we want a ClassCastException if this
+            // assumption does not hold anymore, so we know we have to fix.
+            return (BufferedImage) legend;
+        }
+        return super.getLegendGraphic(dimension, template, style, rule, scale);
     }
 
     /**

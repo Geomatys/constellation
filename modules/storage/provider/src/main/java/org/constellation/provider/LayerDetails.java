@@ -35,6 +35,7 @@ import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.util.DateRange;
 import org.opengis.feature.type.Name;
 
 import org.opengis.filter.FilterFactory2;
@@ -65,14 +66,29 @@ public interface LayerDetails {
     FilterFactory2 FILTER_FACTORY = (FilterFactory2)FactoryFinder.getFilterFactory(
                             new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
     RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
-    
+
     /**
      * Default legend size, if not specified in the {@code GetLegend} request.
      */
     Dimension LEGEND_SIZE = new Dimension(200, 40);
 
     /**
-     * @see Layer#getAvailableTimes
+     * Returns the time range of this layer. This method is typically much faster than
+     * {@link #getAvailableTimes()} when only the first date and/or the last date are
+     * needed, rather than the set of all available dates.
+     *
+     * @return The time range of this layer, or {@code null} if this information is not available.
+     * @throws DataStoreException If an error occurred while fetching the time range.
+     */
+    DateRange getDateRange() throws DataStoreException;
+
+    /**
+     * Returns the set of dates when a coverage is available. Note that this method may
+     * be slow and should be invoked only when the set of all dates is really needed.
+     * If only the first or last date is needed, consider using {@link #getDateRange()}
+     * instead.
+     *
+     * @see Layer#getAvailableTimes()
      */
     SortedSet<Date> getAvailableTimes() throws DataStoreException;
 
@@ -133,7 +149,7 @@ public interface LayerDetails {
     /**
      * Create a MapLayer with the given style and parameters.
      * if style is null, the favorite style of this layer will be used.
-     * 
+     *
      * @param style : can be null. reconized types are String/GraphicBuilder/MutableStyle.
      * @param params : can be null.
      */
@@ -152,7 +168,7 @@ public interface LayerDetails {
     /**
      * Returns {@code true} if the layer is queryable by the specified service.
      *
-     * @see Layer#isQueryable 
+     * @see Layer#isQueryable
      */
     boolean isQueryable(ServiceDef.Query query);
 

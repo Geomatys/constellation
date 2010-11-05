@@ -51,6 +51,7 @@ import org.geotoolkit.internal.jaxb.ObjectFactory;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.storage.DataStoreException;
+import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
@@ -298,17 +299,22 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             builder.append("\t\t\t<time>").append(time).append("</time>")
                    .append("\n");
         } else {
-            SortedSet<Date> dates = null;
+            /*
+             * Get the date of the last slice in this layer. Don't invoke
+             * layerPostgrid.getAvailableTimes().last() because getAvailableTimes() is very
+             * costly. The layerPostgrid.getEnvelope() method is much cheaper, since it can
+             * leverage the database index.
+             */
+            DateRange dates = null;;
             try {
-                dates = layerPostgrid.getAvailableTimes();
+                dates = layerPostgrid.getDateRange();
             } catch (DataStoreException ex) {
                 LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-                dates = null;
             }
             if (dates != null && !(dates.isEmpty())) {
                 final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                builder.append("\t\t\t<time>").append(df.format(dates.last()))
+                builder.append("\t\t\t<time>").append(df.format(dates.getMaxValue()))
                        .append("</time>").append("\n");
             }
         }

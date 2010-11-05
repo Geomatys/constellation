@@ -19,7 +19,9 @@ package org.constellation.provider;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,9 +32,11 @@ import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
@@ -76,6 +80,20 @@ public abstract class AbstractLayerDetails implements LayerDetails{
     @Override
     public Name getName() {
         return name;
+    }
+
+    /**
+     * Returns the time range of this layer. The default implementation invoked
+     * {@link #getAvailableTimes()} and extract the first and last date from it.
+     * Subclasses are encouraged to provide more efficient implementation.
+     */
+    @Override
+    public DateRange getDateRange() throws DataStoreException {
+        final SortedSet<Date> dates = getAvailableTimes();
+        if (dates != null && !dates.isEmpty()) {
+            return new DateRange(dates.first(), dates.last());
+        }
+        return null;
     }
 
     /**

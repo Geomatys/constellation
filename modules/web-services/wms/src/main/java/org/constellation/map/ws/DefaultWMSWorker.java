@@ -931,7 +931,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         } catch (CstlServiceException ex) {
         	//TODO: distinguish
             if (errorInImage) {
-                return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize());
+                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
             } else {
                 throw new CstlServiceException(ex, LAYER_NOT_DEFINED, KEY_LAYERS.toLowerCase());
             }
@@ -963,7 +963,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             sdef.setContext(context);
         } catch (PortrayalException ex) {
             if (errorInImage) {
-                return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize() );
+                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
             } else {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
@@ -998,18 +998,49 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final CanvasDef cdef = new CanvasDef(canvasDimension,background);
 
         // 4. IMAGE
-        BufferedImage image;
-        try {
-            image = Cstl.getPortrayalService().portray(sdef, vdef, cdef);
-        } catch (PortrayalException ex) {
-            if (errorInImage) {
-                return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize() );
-            } else {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        final String mime = getMap.getFormat();
+        final OutputDef odef = new OutputDef(mime, new Object());
+        odef.setCompression(WMSMapDecoration.getCompression(mime));
+
+        final PortrayalResponse response = new PortrayalResponse(cdef, sdef, vdef, odef);
+        if(!WMSMapDecoration.writeInStream()){
+            try {
+                response.prepareNow();
+            } catch (PortrayalException ex) {
+                if (errorInImage) {
+                    return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
+                } else {
+                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                }
             }
         }
 
-        return image;
+        return response;
+    }
+
+
+
+    //TODO: handle the null value in the exception.
+    //TODO: harmonize with the method getLayerReference().
+    private static List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
+
+        List<LayerDetails> layerRefs;
+        try { // WE catch the exception from either service version
+            if (version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
+                layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD);
+            } else if (version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString())) {
+                layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0_SLD);
+            } else {
+                throw new CstlServiceException("WMS acting according to no known version.",
+                        VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+            }
+        } catch (RegisterException regex) {
+            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
+        }
+        return layerRefs;
+    }
+
+        return response;
     }
 
     private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld){

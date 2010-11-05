@@ -57,7 +57,6 @@ public class CoverageFileProviderService extends AbstractProviderService<Name,La
 
     static {
         //load additional readers.
-        Registry.setDefaultCodecPreferences();
         WorldFileImageReader.Spi.registerDefaults(null);
         WorldFileImageWriter.Spi.registerDefaults(null);
         GeoTiffImageReader.Spi.registerDefaults(null);
