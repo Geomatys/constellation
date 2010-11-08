@@ -113,6 +113,7 @@
             </ogc:SpatialOperators>
         </ogc:Spatial_Capabilities>
         <ogc:Scalar_Capabilities>
+            <ogc:LogicalOperators/>
             <ogc:ComparisonOperators>
                 <ogc:ComparisonOperator>Between</ogc:ComparisonOperator>
                 <ogc:ComparisonOperator>EqualTo</ogc:ComparisonOperator>
