@@ -81,6 +81,7 @@ import org.geotoolkit.filter.visitor.IsValidSpatialFilterVisitor;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
@@ -726,7 +727,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     // we verify that the update property are contained in the feature type
                     for (final PropertyType updateProperty : updateRequest.getProperty()) {
                         final String updatePropertyValue = updateProperty.getName().getLocalPart();
-                        final PropertyAccessor pa        = Accessors.getAccessor(FeatureType.class, updatePropertyValue, null);
+                        final PropertyAccessor pa        = Accessors.getAccessor(Feature.class, updatePropertyValue, null);
                         if (pa == null || pa.get(ft, updatePropertyValue, null) == null) {
                             throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyValue, INVALID_PARAMETER_VALUE);
                         }
@@ -915,7 +916,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     //but it always exist on the features
                     continue;
                 }
-                final PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
+                final PropertyAccessor pa = Accessors.getAccessor(Feature.class, filterProperty, null);
                 if (pa == null || pa.get(ft, filterProperty, null) == null) {
                     throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
                 }
