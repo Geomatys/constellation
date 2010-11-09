@@ -738,9 +738,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         // 2. VIEW
-        final JTSEnvelope2D refEnv             = new JTSEnvelope2D(getFI.getEnvelope());
-        final double azimuth                   = getFI.getAzimuth();
-        final ViewDef vdef = new ViewDef(refEnv,azimuth);
+        final Envelope refEnv = getFI.getEnvelope();
+        try {
+            refEnv = GO2Utitlities.combine(
+                    refEnv, new Date[] {time, time}, new Double[] {elevation, elevation});
+        } catch (TransformationException ex) {
+            throw new CstlServiceException(ex);
+        }
+        final double azimuth = getFI.getAzimuth();
+        final ViewDef vdef   = new ViewDef(refEnv,azimuth);
 
 
         // 3. CANVAS
