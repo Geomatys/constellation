@@ -59,6 +59,7 @@ import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
+import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
@@ -67,6 +68,7 @@ import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
+import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.FileUtilities;
@@ -390,7 +392,62 @@ public class WFSWorkerTest {
                 writer.toString());
 
         /**
-         * Test 5 : query on typeName samplingPoint with sort on gml:name
+         * Test 5 : query on typeName samplingPoint whith a filter xpath //gml:name = 10972X0137-PONT
+         */
+        queries = new ArrayList<QueryType>();
+        pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("//{http://www.opengis.net/gml}name"), Boolean.TRUE);
+        filter = new FilterType(pe);
+        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"),
+                writer.toString());
+
+        /**
+         * Test 6 : query on typeName samplingPoint whith a spatial filter BBOX
+         */
+        queries = new ArrayList<QueryType>();
+        SpatialOpsType bbox = new BBOXType("{http://www.opengis.net/sampling/1.0}position", 65300.0, 1731360.0, 65500.0, 1731400.0, "urn:ogc:def:crs:epsg:7.5.0.1:27582");
+        filter = new FilterType(bbox);
+        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+       result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"),
+                writer.toString());
+
+        /**
+         * Test 7 : query on typeName samplingPoint whith a spatial filter BBOX () with no namespace
+         */
+        queries = new ArrayList<QueryType>();
+        bbox = new BBOXType("position", 65300.0, 1731360.0, 65500.0, 1731400.0, "urn:ogc:def:crs:epsg:7.5.0.1:27582");
+        filter = new FilterType(bbox);
+        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"),
+                writer.toString());
+
+
+        /**
+         * Test 8 : query on typeName samplingPoint with sort on gml:name
          */
 
         queries = new ArrayList<QueryType>();
@@ -409,7 +466,7 @@ public class WFSWorkerTest {
                 writer.toString());
 
         /**
-         * Test 6 : query on typeName samplingPoint with sort on gml:name
+         * Test 9 : query on typeName samplingPoint with sort on gml:name
          */
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
@@ -427,7 +484,7 @@ public class WFSWorkerTest {
                 writer.toString());
 
         /**
-         * Test 7 : query on typeName samplingPoint whith HITS result type
+         * Test 10 : query on typeName samplingPoint whith HITS result type
          */
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
@@ -440,7 +497,7 @@ public class WFSWorkerTest {
 
 
         /**
-         * Test 8 : query on typeName samplingPoint whith a filter with unexpected property
+         * Test 11 : query on typeName samplingPoint whith a filter with unexpected property
          */
 
         queries = new ArrayList<QueryType>();
@@ -457,7 +514,7 @@ public class WFSWorkerTest {
         }
 
         /**
-         * Test 9 : query on typeName samplingPoint whith a an unexpected property in propertyNames
+         * Test 12 : query on typeName samplingPoint whith a an unexpected property in propertyNames
          */
 
         queries = new ArrayList<QueryType>();

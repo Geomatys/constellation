@@ -738,11 +738,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         // 2. VIEW
-        final Envelope refEnv = getFI.getEnvelope();
+        Envelope refEnv = getFI.getEnvelope();
         try {
-            refEnv = GO2Utitlities.combine(
+            refEnv = GO2Utilities.combine(
                     refEnv, new Date[] {time, time}, new Double[] {elevation, elevation});
-        } catch (TransformationException ex) {
+        } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
         final double azimuth = getFI.getAzimuth();
