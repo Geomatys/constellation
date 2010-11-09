@@ -24,6 +24,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -39,6 +40,7 @@ import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.util.ImageIOUtilities;
 import org.geotoolkit.util.logging.Logging;
 
@@ -63,6 +65,7 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
 
         BufferedImage img = r.getImage();
         if(img != null){
+            Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, false);
             ImageIOUtilities.writeImage(img, mt.toString(), out);
         }else{
             final CanvasDef cdef = r.getCanvasDef();
