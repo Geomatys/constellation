@@ -223,6 +223,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         crs.add("EPSG:4326");
         crs.add("CRS:84");
         crs.add("EPSG:3395");
+        crs.add("EPSG:3857");
         crs.add("EPSG:27571");
         crs.add("EPSG:27572");
         crs.add("EPSG:27573");
