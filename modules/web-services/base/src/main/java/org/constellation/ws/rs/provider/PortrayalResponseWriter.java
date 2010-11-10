@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -65,7 +67,9 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
 
         BufferedImage img = r.getImage();
         if(img != null){
-            Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, false);
+            //Hack
+            Registry.setNativeCodecAllowed("PNG", ImageWriterSpi.class, false);
+            Registry.setNativeCodecAllowed("BMP", ImageWriterSpi.class, false);
             ImageIOUtilities.writeImage(img, mt.toString(), out);
         }else{
             final CanvasDef cdef = r.getCanvasDef();
