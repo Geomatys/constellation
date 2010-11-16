@@ -952,12 +952,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
         //       -- build an equivalent style List
         //TODO: clean up the SLD vs. style logic
-        final List<String> styleNames          = getMap.getStyles();
+        final List<String> styleNames = getMap.getStyles();
         final StyledLayerDescriptor sld = getMap.getSld();
 
         final List<MutableStyle> styles = getStyles(layerRefs, sld, styleNames);
         //       -- create the rendering parameter Map
-        final Map<String, Object> params       = new HashMap<String, Object>();
+        final Map<String, Object> params = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
         final SceneDef sdef = new SceneDef();
         sdef.extensions().add(mapDecoration.getExtension());
@@ -979,12 +979,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
 
         // 2. VIEW
-        final Double elevation = getMap.getElevation();
-        final Date time        = getMap.getTime();
-        Envelope refEnv  = getMap.getEnvelope();
+        final Envelope refEnv;
         try {
-            refEnv = GO2Utilities.combine(
-                    refEnv, new Date[]{time, time}, new Double[]{elevation, elevation});
+            refEnv = getMap.getEnvelope();
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
@@ -995,7 +992,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
 
         // 3. CANVAS
-        final Dimension canvasDimension        = getMap.getSize();
+        final Dimension canvasDimension = getMap.getSize();
         final Color background;
         if (getMap.getTransparent() && !MimeType.IMAGE_JPEG.equalsIgnoreCase(getMap.getFormat())) {
             background = null;
