@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ import org.constellation.query.QueryRequest;
 import org.constellation.ws.MimeType;
 
 import org.geotoolkit.client.util.RequestsUtilities;
+import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.geometry.ImmutableEnvelope;
 import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.util.StringUtilities;
@@ -36,6 +37,8 @@ import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
 
 
@@ -281,8 +284,17 @@ public class GetMap extends WMSQuery {
 
     /**
      * Returns the envelope which contains the bounds and the crs for the request.
+     * The ND envelope from the query BBOX + CRS + TIME + ELEVATION
      */
-    public Envelope getEnvelope() {
+    public Envelope getEnvelope() throws TransformException {
+        return GO2Utilities.combine(getEnvelope2D(), new Date[]{time, time}, new Double[]{elevation, elevation});
+    }
+
+    /**
+     * Returns the envelope which contains the bounds and the crs for the request.
+     * Only the 2D envelope from the query BBOX + CRS
+     */
+    public Envelope getEnvelope2D(){
         return envelope;
     }
 

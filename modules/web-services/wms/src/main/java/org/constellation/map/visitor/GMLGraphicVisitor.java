@@ -273,7 +273,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
                .append("\t\t<").append(layerNameCorrected).append("_feature").append(endMark);
 
         final LayerDetails layerPostgrid = dp.getByIdentifier(fullLayerName);
-        final Envelope objEnv = gfi.getEnvelope();
+        final Envelope objEnv = gfi.getEnvelope2D();
         final Date time = gfi.getTime();
         final Double elevation = gfi.getElevation();
         final CoordinateReferenceSystem crs = objEnv.getCoordinateReferenceSystem();
@@ -413,7 +413,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      * {@linkplain CoordinateReferenceSystem crs} defined in the request.
      */
     public GeneralDirectPosition getPixelCoordinates(final GetFeatureInfo gfi) {
-        final JTSEnvelope2D objEnv = new JTSEnvelope2D(gfi.getEnvelope());
+        final JTSEnvelope2D objEnv = new JTSEnvelope2D(gfi.getEnvelope2D());
         final int width = gfi.getSize().width;
         final int height = gfi.getSize().height;
         final int pixelX = gfi.getX();
