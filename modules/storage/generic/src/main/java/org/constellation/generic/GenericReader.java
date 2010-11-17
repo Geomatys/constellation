@@ -154,7 +154,7 @@ public abstract class GenericReader  {
      * @throws java.sql.SQLException
      */
     private void initStatement() throws SQLException {
-        
+        statements.clear();
         final Queries queries = configuration.getQueries();
         if (queries != null) {
 
@@ -342,11 +342,13 @@ public abstract class GenericReader  {
                 fillValues(stmt, statements.get(stmt), values);
             } catch (SQLException ex) {
                 /*
-                 * If we get the error code 17008,
+                 * If we get the error code 17008 (oracle),
+                 * or SQL state 08006 (psotgresql)
                  * this mean that we have lost the connection
                  * So we try to reconnect.
                  */
-                if (ex.getErrorCode() == 17008) {
+                if (ex.getErrorCode() == 17008 || "08006".equals(ex.getSQLState())) {
+                    LOGGER.warning("detected a conenction lost:" + ex.getMessage());
                     reloadConnection();
                 }
                 logError(statements.get(stmt), ex, stmt.getSql());
@@ -453,22 +455,37 @@ public abstract class GenericReader  {
      */
     private void logError(List<String> varList, Exception ex, String sql) {
         final StringBuilder varlist = new StringBuilder();
-        String value;
+        final String value;
+        final int code;
+        final String state;
+        // we build the String list of variables
         if (varList != null) {
             for (String s : varList) {
                 varlist.append(s).append(',');
             }
-            value = varlist.toString();
-            if (varlist.length() > 1)
+            if (varlist.length() > 1) {
                 value = varlist.substring(0, varlist.length() - 1);
+            } else {
+                value = "no variables";
+            }
         } else {
             value = "no variables";
         }
+        // we get the exception code if there is one
+        if (ex instanceof SQLException) {
+            code   = ((SQLException)ex).getErrorCode() ;
+            state = ((SQLException)ex).getSQLState() ;
+        } else {
+            code = -1;
+            state = "undefined";
+        }
         LOGGER.severe( ex.getClass().getSimpleName()             + " " +
                       "occurs while executing query: "           + '\n' +
-                      "query: " + sql                            + '\n' +
-                      "cause: " + ex.getMessage()                + '\n' +
-                      "for variable: " + value                   + '\n');
+                      "Query: " + sql                            + '\n' +
+                      "Cause: " + ex.getMessage()                + '\n' +
+                      "Code: "  + code                           + '\n' +
+                      "SQLState : "  + state                     + '\n' +
+                      "For variable: " + value                   + '\n');
     }
 
     /**
@@ -479,9 +496,10 @@ public abstract class GenericReader  {
     public void reloadConnection() throws MetadataIoException {
         if (!isReconnecting) {
             try {
+               isReconnecting = true;
                LOGGER.info("refreshing the connection");
                final BDD db    = configuration.getBdd();
-               this.connection = db.getConnection();
+               this.connection = db.getFreshConnection();
                initStatement();
                isReconnecting  = false;
 
