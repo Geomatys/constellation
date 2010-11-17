@@ -104,8 +104,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     public GenericIndexer(CSWMetadataReader reader, Automatic configuration, String serviceID) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory(), reader.getAdditionalQueryablePathMap());
         this.reader = reader;
-        if (create)
+        if (create) {
             createIndex();
+        }
     }
 
     /**
@@ -117,8 +118,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         super(serviceID, configDirectory, analyzer, additionalQueryable);
         this.logLevel            = logLevel;
         this.reader              = null;
-        if (create)
+        if (create) {
             createIndex(toIndex);
+        }
     }
 
     /**
@@ -129,8 +131,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     public GenericIndexer(List<Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID) throws IndexingException {
         super(serviceID, configDirectory, additionalQueryable);
         this.reader = null;
-        if (create)
+        if (create) {
             createIndex(toIndex);
+        }
     }
     
     /**
@@ -164,10 +167,10 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             writer.close();
 
         } catch (IOException ex) {
-            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "IOException while indexing document: {0}", ex.getMessage());
             throw new IndexingException("IOException while indexing documents.", ex);
         } catch (MetadataIoException ex) {
-            LOGGER.severe("CstlServiceException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "CstlServiceException while indexing document: {0}", ex.getMessage());
             throw new IndexingException("CstlServiceException while indexing documents.", ex);
         }
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\n" +
@@ -683,6 +686,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     @Override
     public void destroy() {
         LOGGER.info("shutting down generic indexer");
+        super.destroy();
         pool.shutdown();
     }
 
