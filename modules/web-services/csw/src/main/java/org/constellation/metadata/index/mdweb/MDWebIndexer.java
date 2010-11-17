@@ -459,6 +459,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
     @Override
     public void destroy() {
+        super.destroy();
         try {
             mdWebReader.close();
         } catch (MD_IOException ex) {
