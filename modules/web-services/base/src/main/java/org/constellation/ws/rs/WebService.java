@@ -44,10 +44,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
-
-// Constellation dependencies
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+
+
+// Constellation dependencies
+import org.constellation.management.ConstellationsMBeans;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
@@ -131,6 +133,9 @@ public abstract class WebService {
         Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, true);*/
 
         Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+
+        //register managed bean
+        ConstellationsMBeans.register();
     }
 
     /**

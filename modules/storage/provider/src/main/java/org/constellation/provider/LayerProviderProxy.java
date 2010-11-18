@@ -138,6 +138,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
      */
     @Override
     public void reload() {
+        dispose();
         loadServices();
     }
     
@@ -154,7 +155,6 @@ public class LayerProviderProxy extends AbstractLayerProvider{
         }
 
         SERVICES.clear();
-
     }
 
     private static synchronized void init(){
