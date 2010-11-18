@@ -738,10 +738,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         // 2. VIEW
-        Envelope refEnv = getFI.getEnvelope();
+        Envelope refEnv;
         try {
-            refEnv = GO2Utilities.combine(
-                    refEnv, new Date[] {time, time}, new Double[] {elevation, elevation});
+            refEnv = getFI.getEnvelope();
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
