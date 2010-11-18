@@ -25,7 +25,6 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.type.Name;
@@ -157,6 +156,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
      */
     @Override
     public void reload() {
+        dispose();
         loadServices();
     }
     
@@ -173,7 +173,6 @@ public class LayerProviderProxy extends AbstractLayerProvider{
         }
 
         SERVICES.clear();
-
     }
 
     private static synchronized void init(final String confPath){

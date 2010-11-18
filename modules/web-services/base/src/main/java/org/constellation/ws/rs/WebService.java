@@ -48,21 +48,22 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
-
-// Constellation dependencies
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+
+// Constellation dependencies
+import org.constellation.management.ConstellationsMBeans;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
 // Geotoolkit dependencies
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
 import static org.constellation.ws.ExceptionCode.*;
-import org.geotoolkit.image.jai.Registry;
 import org.xml.sax.SAXException;
 
 
@@ -141,6 +142,9 @@ public abstract class WebService {
 
         RUNNING_ON_GLASSFISH = (System.getProperty("domain.name") != null) ? true : false;
         Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+
+        //register managed bean
+        ConstellationsMBeans.register();
     }
 
     /**
