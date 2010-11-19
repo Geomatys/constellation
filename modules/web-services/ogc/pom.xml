@@ -80,11 +80,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation.engine</groupId>
-      <artifactId>cstl-engine-server</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-ows</artifactId>
     </dependency>
