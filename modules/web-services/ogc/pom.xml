@@ -80,11 +80,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation.engine</groupId>
-      <artifactId>cstl-engine-server</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-base</artifactId>
       <version>${project.version}</version>
