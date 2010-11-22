@@ -354,7 +354,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             //search only the given list
             for (final QName name : names) {
                 final Name n = Utils.getNameFromQname(name);
-                if (!layersContainsKey(n)) {
+                if (layersContainsKey(n) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + name);
                 }
 
@@ -486,11 +486,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             for (QName typeName : typeNames) {
 
-
-                if (!layersContainsKey(Utils.getNameFromQname(typeName))) {
+                final Name fullTypeName = Utils.getNameFromQname(typeName);
+                if (layersContainsKey(fullTypeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
-                final LayerDetails layerD = namedProxy.get(Utils.getNameFromQname(typeName));
+                final LayerDetails layerD = namedProxy.get(fullTypeName);
 
                 if (!(layerD instanceof FeatureLayerDetails)) continue;
 
@@ -659,7 +659,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         throw new CstlServiceException("Unexpected Object to insert:" + featureType);
                     }
 
-                    if (!layersContainsKey(typeName)) {
+                    if (layersContainsKey(typeName) == null) {
                         throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                     }
                     final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName);
@@ -694,7 +694,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 final Filter filter = extractJAXBFilter(deleteRequest.getFilter(), Filter.EXCLUDE);
 
                 final Name typeName = Utils.getNameFromQname(deleteRequest.getTypeName());
-                if (!layersContainsKey(typeName)) {
+                if (layersContainsKey(typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
                 final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName);
@@ -737,7 +737,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 final CoordinateReferenceSystem crs = extractCRS(updateRequest.getSrsName());
 
                 final Name typeName = Utils.getNameFromQname(updateRequest.getTypeName());
-                if (!layersContainsKey(typeName)) {
+                if (layersContainsKey(typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
                 final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName);
