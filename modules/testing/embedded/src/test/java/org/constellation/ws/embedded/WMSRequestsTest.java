@@ -155,9 +155,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSGetMapLakePng() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
 
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -183,9 +180,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSGetMapLakeBmp() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
 
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -211,9 +205,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSGetMapLakePpm() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
 
         // Creates a valid GetMap url.
         final URL getMapUrl;
