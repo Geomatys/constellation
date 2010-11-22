@@ -30,7 +30,6 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.test.ImageTesting;
 
