@@ -30,6 +30,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import javax.imageio.spi.ImageWriterSpi;
+import org.geotoolkit.image.jai.Registry;
+
 import org.constellation.portrayal.internal.CstlPortrayalService;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.ws.CstlServiceException;
@@ -63,6 +66,11 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
 
         BufferedImage img = r.getImage();
         if(img != null){
+            /**
+             * Hack
+             */
+            Registry.setNativeCodecAllowed("PNG", ImageWriterSpi.class, false);
+            Registry.setNativeCodecAllowed("BMP", ImageWriterSpi.class, false);
             ImageIOUtilities.writeImage(img, mt.toString(), out);
         }else{
             final CanvasDef cdef = r.getCanvasDef();

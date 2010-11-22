@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.data.CoverageSQLTestCase;
+import org.constellation.map.ws.WMSMapDecoration;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.StyleProviderProxy;
@@ -91,6 +92,8 @@ public final class GrizzlyServer {
 
         // Initialises the postgrid testing raster.
         CoverageSQLTestCase.init();
+
+        WMSMapDecoration.setEmptyExtension();
 
         // Defines a PostGrid data provider
         final ProviderSource sourcePostGrid = new ProviderSource();

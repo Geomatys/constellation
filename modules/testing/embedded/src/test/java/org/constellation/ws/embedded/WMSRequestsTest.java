@@ -189,7 +189,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertTrue  (!(ImageTesting.isImageEmpty(image)));
         assertEquals(100, image.getWidth());
         assertEquals(100,  image.getHeight());
-        assertTrue  (ImageTesting.getNumColors(image) > 8);
+        assertTrue  (ImageTesting.getNumColors(image) > 2);
     }
 
     /**
@@ -217,7 +217,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertTrue  (!(ImageTesting.isImageEmpty(image)));
         assertEquals(100, image.getWidth());
         assertEquals(100,  image.getHeight());
-        assertTrue  (ImageTesting.getNumColors(image) > 8);
+        assertTrue  (ImageTesting.getNumColors(image) > 2);
     }
 
     /**
@@ -245,7 +245,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertTrue  (!(ImageTesting.isImageEmpty(image)));
         assertEquals(100, image.getWidth());
         assertEquals(100,  image.getHeight());
-        assertTrue  (ImageTesting.getNumColors(image) > 8);
+        assertTrue  (ImageTesting.getNumColors(image) > 2);
     }
 
     /**

@@ -137,8 +137,6 @@ public abstract class WebService {
     static {
         //loading JAI codecs
         Registry.setDefaultCodecPreferences();
-        Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, true);
-        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, true);
 
         RUNNING_ON_GLASSFISH = (System.getProperty("domain.name") != null) ? true : false;
         Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
