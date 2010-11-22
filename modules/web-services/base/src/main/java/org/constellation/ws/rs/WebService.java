@@ -129,8 +129,8 @@ public abstract class WebService {
     static {
         //loading JAI codecs
         Registry.setDefaultCodecPreferences();
-        /*Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, true);
-        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, true);*/
+        Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, true);
+        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, true);
 
         Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 
