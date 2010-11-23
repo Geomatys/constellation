@@ -166,11 +166,18 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * @return
      */
     private File getFileFromIdentifier(String identifier, File directory) {
-        // try to find the file in the current directory
+        // 1) try to find the file in the current directory
         File metadataFile = new File (directory,  identifier + XML_EXT);
+        // 2) trying without the extension
         if (!metadataFile.exists()) {
             metadataFile = new File (directory,  identifier);
         }
+        // 3) trying by replacing ':' by '-' (for windows platform who don't accept ':' in file name)
+        if (!metadataFile.exists()) {
+            final String windowsIdentifier = identifier.replace(':', '-');
+            metadataFile = new File (directory,  windowsIdentifier + XML_EXT);
+        }
+
         if (metadataFile.exists()) {
             return metadataFile;
         } else {

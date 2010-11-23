@@ -219,6 +219,15 @@ public final class WMSMapDecoration {
     }
 
     /**
+     * Disable any read extension (test purpose).
+     *
+     * @return PortrayalExtension
+     */
+    public static synchronized void setEmptyExtension() {
+        extension = EMPTY_EXTENSION;
+    }
+
+    /**
      * @return a copy of the hints defined in the wms portrayal configuration file.
      */
     public Hints getHints() {

@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.data.CoverageSQLTestCase;
+import org.constellation.map.ws.WMSMapDecoration;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.StyleProviderProxy;
@@ -42,6 +43,7 @@ import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.provider.sld.SLDProvider;
 import org.constellation.provider.sld.SLDProviderService;
+import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
@@ -91,6 +93,9 @@ public final class GrizzlyServer {
 
         // Initialises the postgrid testing raster.
         CoverageSQLTestCase.init();
+
+        WorldFileImageReader.Spi.registerDefaults(null);
+        WMSMapDecoration.setEmptyExtension();
 
         // Defines a PostGrid data provider
         final ProviderSource sourcePostGrid = new ProviderSource();

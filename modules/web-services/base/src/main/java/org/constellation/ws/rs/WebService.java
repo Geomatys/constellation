@@ -30,7 +30,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map.Entry;
-import javax.imageio.spi.ImageWriterSpi;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -46,7 +45,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
 
 // Constellation dependencies
 import org.constellation.management.ConstellationsMBeans;
@@ -129,9 +127,7 @@ public abstract class WebService {
     static {
         //loading JAI codecs
         Registry.setDefaultCodecPreferences();
-        Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, true);
-        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, true);
-
+        
         Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 
         //register managed bean

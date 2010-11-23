@@ -97,6 +97,9 @@ public class WMSRequestsTest extends AbstractTestRequest {
     private static final String WMS_GETMAP_PPM = "http://localhost:9090/default/wms?" +
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/x-portable-pixmap&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
+    private static final String WMS_GETMAP_GIF = "http://localhost:9090/wms?" +
+    "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/gif&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -154,8 +157,31 @@ public class WMSRequestsTest extends AbstractTestRequest {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
-    public void testWMSGetMapLakePng() throws IOException {
+    public void testWMSGetMapLakeGif() throws IOException {
+                // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            getMapUrl = new URL(WMS_GETMAP_GIF);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
 
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/gif");
+
+        // Test on the returned image.
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(100, image.getWidth());
+        assertEquals(100,  image.getHeight());
+        assertTrue  (ImageTesting.getNumColors(image) > 2);
+    }
+    
+    /**
+     * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
+     */
+    @Test
+    public void testWMSGetMapLakePng() throws IOException {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -172,7 +198,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertTrue  (!(ImageTesting.isImageEmpty(image)));
         assertEquals(100, image.getWidth());
         assertEquals(100,  image.getHeight());
-        assertTrue  (ImageTesting.getNumColors(image) > 8);
+        assertTrue  (ImageTesting.getNumColors(image) > 2);
     }
 
     /**
@@ -180,7 +206,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSGetMapLakeBmp() throws IOException {
-
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -197,7 +222,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertTrue  (!(ImageTesting.isImageEmpty(image)));
         assertEquals(100, image.getWidth());
         assertEquals(100,  image.getHeight());
-        assertTrue  (ImageTesting.getNumColors(image) > 8);
+        assertTrue  (ImageTesting.getNumColors(image) > 2);
     }
 
     /**
@@ -205,7 +230,6 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSGetMapLakePpm() throws IOException {
-
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
@@ -222,7 +246,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertTrue  (!(ImageTesting.isImageEmpty(image)));
         assertEquals(100, image.getWidth());
         assertEquals(100,  image.getHeight());
-        assertTrue  (ImageTesting.getNumColors(image) > 8);
+        assertTrue  (ImageTesting.getNumColors(image) > 2);
     }
 
     /**

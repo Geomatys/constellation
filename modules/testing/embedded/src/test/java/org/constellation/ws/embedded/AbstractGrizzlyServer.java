@@ -34,6 +34,7 @@ import javax.imageio.ImageReader;
 
 // Constellation dependencies
 import org.constellation.data.CoverageSQLTestCase;
+import org.constellation.map.ws.WMSMapDecoration;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
@@ -105,6 +106,8 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         grizzly = new GrizzlyThread();
 
         WorldFileImageReader.Spi.registerDefaults(null);
+        WMSMapDecoration.setEmptyExtension();
+        
         // Defines a PostGrid data provider
         final ProviderSource source = new ProviderSource();
         source.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");

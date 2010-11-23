@@ -33,6 +33,7 @@ import org.geotoolkit.sld.MutableNamedLayer;
 import org.geotoolkit.sld.MutableNamedStyle;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.style.MutableStyle;
+
 import org.opengis.feature.type.Name;
 
 /**
