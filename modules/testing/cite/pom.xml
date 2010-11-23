@@ -123,7 +123,13 @@
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-coveragesql</artifactId>
       <version>${project.version}</version>
-    </dependency>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.media</groupId> <!-- Exclude JAI while waiting for geotk patch -->
+          <artifactId>jai_imageio</artifactId>
+        </exclusion>
+      </exclusions>
+</dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-shapefile</artifactId>

@@ -35,16 +35,13 @@ import org.geotoolkit.image.jai.Registry;
 
 import org.constellation.portrayal.internal.CstlPortrayalService;
 import org.constellation.portrayal.internal.PortrayalResponse;
-import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.util.ImageIOUtilities;
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -72,7 +69,7 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
              * Hack
              */
             Registry.setNativeCodecAllowed("PNG", ImageWriterSpi.class, false);
-            Registry.setNativeCodecAllowed("BMP", ImageWriterSpi.class, false);
+            Registry.setNativeCodecAllowed("BMP", ImageWriterSpi.class, false); 
             DefaultPortrayalService.writeImage(img, new OutputDef(mt.toString(), out));
         } else {
             final CanvasDef cdef = r.getCanvasDef();
