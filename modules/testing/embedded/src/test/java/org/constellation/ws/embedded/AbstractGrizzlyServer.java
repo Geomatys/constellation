@@ -106,7 +106,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         grizzly = new GrizzlyThread();
 
         WorldFileImageReader.Spi.registerDefaults(null);
-        WMSMapDecoration.setEmptyExtension();
+        WMSMapDecoration.setEmptyExtension(true);
         
         // Defines a PostGrid data provider
         final ProviderSource source = new ProviderSource();

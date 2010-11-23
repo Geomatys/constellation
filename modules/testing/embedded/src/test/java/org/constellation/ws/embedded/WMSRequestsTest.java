@@ -97,7 +97,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
     private static final String WMS_GETMAP_PPM = "http://localhost:9090/default/wms?" +
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/x-portable-pixmap&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
-    private static final String WMS_GETMAP_GIF = "http://localhost:9090/wms?" +
+    private static final String WMS_GETMAP_GIF = "http://localhost:9090/default/wms?" +
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/gif&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
     
     /**

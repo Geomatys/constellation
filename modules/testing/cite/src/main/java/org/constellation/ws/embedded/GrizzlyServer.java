@@ -95,7 +95,7 @@ public final class GrizzlyServer {
         CoverageSQLTestCase.init();
 
         WorldFileImageReader.Spi.registerDefaults(null);
-        WMSMapDecoration.setEmptyExtension();
+        WMSMapDecoration.setEmptyExtension(true);
 
         // Defines a PostGrid data provider
         final ProviderSource sourcePostGrid = new ProviderSource();

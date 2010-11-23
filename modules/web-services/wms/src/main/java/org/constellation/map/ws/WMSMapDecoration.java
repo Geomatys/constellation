@@ -183,6 +183,11 @@ public final class WMSMapDecoration {
 
     private final File instanceDirectory;
 
+    /**
+     * A flag used in test to forbid to read the confiuration file.
+     */
+    private static boolean emptyExtension = false;
+
     public WMSMapDecoration(File instanceDirectory) {
         this.instanceDirectory = instanceDirectory;
     }
@@ -197,7 +202,7 @@ public final class WMSMapDecoration {
         if(extension != null) return extension;
 
         final File f = new File(instanceDirectory, "WMSPortrayal.xml");
-        if(f.exists()){
+        if(f.exists() && !emptyExtension){
             try {
                 extension = read(f);
             } catch (ParserConfigurationException ex) {
@@ -223,8 +228,8 @@ public final class WMSMapDecoration {
      *
      * @return PortrayalExtension
      */
-    public static synchronized void setEmptyExtension() {
-        extension = EMPTY_EXTENSION;
+    public static synchronized void setEmptyExtension(boolean emptyExt) {
+        emptyExtension = emptyExt;
     }
 
     /**
