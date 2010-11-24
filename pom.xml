@@ -27,7 +27,7 @@
     <groupId>org.constellation</groupId>
     <artifactId>constellation-sdi</artifactId>
     <packaging>pom</packaging>
-    <version>0.6-CONF-SNAPSHOT</version>
+    <version>0.6-SNAPSHOT</version>
     <name>Constellation Spatial Data Infrastructure</name>
     <url>http://www.constellation-sdi.org</url>
     <description>

@@ -69,6 +69,7 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
              */
             Registry.setNativeCodecAllowed("PNG", ImageWriterSpi.class, false);
             Registry.setNativeCodecAllowed("BMP", ImageWriterSpi.class, false); 
+            Registry.setNativeCodecAllowed("GIF", ImageWriterSpi.class, false);
             DefaultPortrayalService.writeImage(img, new OutputDef(mt.toString(), out));
         } else {
             final CanvasDef cdef = r.getCanvasDef();

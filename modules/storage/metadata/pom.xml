@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.constellation</groupId>
     <artifactId>storage</artifactId>
-    <version>0.6-CONF-SNAPSHOT</version>
+    <version>0.6-SNAPSHOT</version>
   </parent>
 
 
