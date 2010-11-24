@@ -16,15 +16,17 @@
  */
 package org.constellation.map.visitor;
 
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
 import javax.measure.unit.Unit;
 
 import org.constellation.query.wms.GetFeatureInfo;
 
+import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
+import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
+
 import org.opengis.feature.type.Name;
 
 
@@ -62,8 +64,8 @@ public final class CSVGraphicVisitor extends TextGraphicVisitor {
      * {@inheritDoc }
      */
     @Override
-    public void visit(ProjectedFeature graphic, Shape queryArea) {
-        super.visit(graphic, queryArea);
+    public void visit(ProjectedFeature graphic, RenderingContext2D context, SearchAreaJ2D queryArea) {
+        super.visit(graphic, context, queryArea);
         index++;
     }
 
@@ -71,9 +73,9 @@ public final class CSVGraphicVisitor extends TextGraphicVisitor {
      * {@inheritDoc }
      */
     @Override
-    public void visit(ProjectedCoverage coverage, Shape queryArea) {
+    public void visit(ProjectedCoverage coverage,  RenderingContext2D context, SearchAreaJ2D queryArea) {
         index++;
-        final Object[][] results = getCoverageValues(coverage, queryArea);
+        final Object[][] results = getCoverageValues(coverage, context, queryArea);
 
         if (results == null) {
             return;

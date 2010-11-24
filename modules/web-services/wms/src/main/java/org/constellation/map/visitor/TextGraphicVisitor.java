@@ -17,15 +17,19 @@
 package org.constellation.map.visitor;
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.constellation.query.wms.GetFeatureInfo;
+
 import org.geotoolkit.display2d.canvas.AbstractGraphicVisitor;
+import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
+import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.map.FeatureMapLayer;
+
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;
 import org.opengis.feature.type.Name;
@@ -70,7 +74,7 @@ public abstract class TextGraphicVisitor extends AbstractGraphicVisitor {
      * {@inheritDoc }
      */
     @Override
-    public void visit(ProjectedFeature graphic, Shape queryArea) {
+    public void visit(ProjectedFeature graphic,  RenderingContext2D context, SearchAreaJ2D queryArea) {
         final StringBuilder builder = new StringBuilder();
         final FeatureMapLayer layer = graphic.getFeatureLayer();
         final Feature feature = graphic.getFeature();

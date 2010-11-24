@@ -18,7 +18,6 @@ package org.constellation.map.visitor;
 
 import com.vividsolutions.jts.geom.Geometry;
 import java.awt.Dimension;
-import java.awt.Shape;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -42,8 +41,10 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
+import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.isoonjts.JTSUtils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
@@ -55,12 +56,12 @@ import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
-
 import org.opengis.geometry.Envelope;
 import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -127,9 +128,9 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      * {@inheritDoc }
      */
     @Override
-    public void visit(ProjectedFeature graphic, Shape queryArea) {
+    public void visit(ProjectedFeature graphic,  RenderingContext2D context, SearchAreaJ2D queryArea) {
         if (mode == 0) {
-            super.visit(graphic, queryArea);
+            super.visit(graphic, context, queryArea);
         } else {
 
             //TODO handle features as real GML features here
@@ -238,9 +239,9 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      * {@inheritDoc }
      */
     @Override
-    public void visit(ProjectedCoverage coverage, Shape queryArea) {
+    public void visit(ProjectedCoverage coverage,  RenderingContext2D context, SearchAreaJ2D queryArea) {
         index++;
-        final Object[][] results = getCoverageValues(coverage, queryArea);
+        final Object[][] results = getCoverageValues(coverage, context, queryArea);
 
         if (results == null) {
             return;
