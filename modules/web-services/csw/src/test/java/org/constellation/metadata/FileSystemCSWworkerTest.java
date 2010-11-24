@@ -231,7 +231,13 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
 
     public static void writeDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {
 
-        File dataFile = new File(dataDirectory, identifier + ".xml");
+        final File dataFile;
+        if (System.getProperty("os.name", "").startsWith("Windows")) {
+            final String windowsIdentifier = identifier.replace(':', '-');
+            dataFile = new File(dataDirectory, windowsIdentifier + ".xml");
+        } else {
+            dataFile = new File(dataDirectory, identifier + ".xml");
+        }
         FileWriter fw = new FileWriter(dataFile);
         InputStream in = Util.getResourceAsStream("org/constellation/metadata/" + resourceName);
 

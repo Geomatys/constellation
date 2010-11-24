@@ -111,7 +111,13 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         try {
             marshaller = marshallerPool.acquireMarshaller();
             final String identifier = Utils.findIdentifier(obj);
-            f = new File(dataDirectory, identifier + ".xml");
+            // for windows we avoid to create file with ':'
+            if (System.getProperty("os.name", "").startsWith("Windows")) {
+                final String windowsIdentifier = identifier.replace(':', '-');
+                f = new File(dataDirectory, windowsIdentifier + ".xml");
+            } else {
+                f = new File(dataDirectory, identifier + ".xml");
+            }
             f.createNewFile();
             marshaller.marshal(obj, f);
             indexer.indexDocument(obj);
