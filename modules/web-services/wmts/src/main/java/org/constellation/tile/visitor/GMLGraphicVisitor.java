@@ -33,8 +33,10 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
+import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.metadata.iso.citation.Citations;
@@ -77,8 +79,8 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      * {@inheritDoc }
      */
     @Override
-    public void visit(ProjectedFeature graphic, Shape queryArea) {
-        super.visit(graphic, queryArea);
+    public void visit(ProjectedFeature graphic, RenderingContext2D context, SearchAreaJ2D queryArea) {
+        super.visit(graphic, context, queryArea);
         index++;
         //TODO handle features as real GML features here
     }
@@ -87,9 +89,9 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      * {@inheritDoc }
      */
     @Override
-    public void visit(ProjectedCoverage coverage, Shape queryArea) {
+    public void visit(ProjectedCoverage coverage, RenderingContext2D context, SearchAreaJ2D queryArea) {
         index++;
-        final Object[][] results = getCoverageValues(coverage, queryArea);
+        final Object[][] results = getCoverageValues(coverage, context, queryArea);
 
         if (results == null) {
             return;

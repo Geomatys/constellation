@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.geotoolkit.display2d.canvas.AbstractGraphicVisitor;
+import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
+import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.opengis.feature.Feature;
@@ -70,7 +72,7 @@ public abstract class TextGraphicVisitor extends AbstractGraphicVisitor {
      * {@inheritDoc }
      */
     @Override
-    public void visit(ProjectedFeature graphic, Shape queryArea) {
+    public void visit(ProjectedFeature graphic, RenderingContext2D context, SearchAreaJ2D queryArea) {
         final StringBuilder builder = new StringBuilder();
         final FeatureMapLayer layer = graphic.getFeatureLayer();
         final Feature feature = graphic.getFeature();
