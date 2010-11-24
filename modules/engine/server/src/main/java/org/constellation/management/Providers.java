@@ -38,7 +38,6 @@ import org.opengis.feature.type.Name;
 public final class Providers implements ProvidersMBean{
 
     static final Providers INSTANCE = new Providers();
-    public static final String OBJECT_NAME = Providers.class.getPackage().getName()+":type=Manager,name=Providers";
     private static final Logger LOGGER = Logging.getLogger(Providers.class);
 
     private Providers(){}

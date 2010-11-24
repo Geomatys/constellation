@@ -28,6 +28,8 @@ import java.util.List;
  */
 public interface ProvidersMBean {
 
+    public static final String OBJECT_NAME = "org.constellation:type=Manager,name=Providers";
+
     /**
      * @return list of all layers
      */
