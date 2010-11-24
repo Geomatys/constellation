@@ -159,8 +159,8 @@ public class CstlXMLSerializer extends XMLSerializer {
                     // If the attribute xml:space exists, determine whether
                     // to preserve spaces in this and child nodes based on
                     // its value.
-                    if (name.equals("xml:space")) {
-                        if (value.equals("preserve")) {
+                    if ("xml:space".equals(name)) {
+                        if ("preserve".equals(value)) {
                             preserveSpace = true;
                         } else {
                             preserveSpace = _format.getPreserveSpace();

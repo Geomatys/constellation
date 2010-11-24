@@ -163,5 +163,7 @@ public abstract class LayerWorker extends AbstractWorker {
         return name;
     }
 
-
+    public Layer getMainLayer() {
+        return layerContext.getMainLayer();
+    }
 }

@@ -145,7 +145,8 @@ public class ConfigurationXmlBindingTest {
                        new AttributionType("State College University",
                                            new Reference("http://www.university.edu/"),
                                            new FormatURL(100, 100, "image/gif", "http://www.university.edu/icons/logo.gif")),
-                       true);
+                       true,
+                       Arrays.asList("EPSG:666", "EPSG:999"));
         l2 = new Layer(new QName("layer2"));
         include.add(l1);
         include.add(l2);
@@ -153,13 +154,19 @@ public class ConfigurationXmlBindingTest {
         s2 = new Source("source2", true, null, null);
         sources.add(s1);
         sources.add(s2);
-        context = new LayerContext(new Layers(sources));
+        Layer mainLayer = new Layer(null, "mainTitle", null, null, null, null, null, null, null, null, Arrays.asList("CRS-custo1", "CRS-custo2"));
+        context = new LayerContext(new Layers(mainLayer, sources));
         sw = new StringWriter();
         marshaller.marshal(context, sw);
 
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext >" + '\n'
                 + "    <ns2:layers>" + '\n'
+                + "        <ns2:MainLayer>" + '\n'
+                + "            <ns2:Title>mainTitle</ns2:Title>" + '\n'
+                + "            <ns2:CRS>CRS-custo1</ns2:CRS>" + '\n'
+                + "            <ns2:CRS>CRS-custo2</ns2:CRS>" + '\n'
+                + "        </ns2:MainLayer>" + '\n'
                 + "        <ns2:Source id=\"source1\">" + '\n'
                 + "            <ns2:include>" + '\n'
                 + "                <ns2:Layer name=\"layer1\">" + '\n'
@@ -188,6 +195,8 @@ public class ConfigurationXmlBindingTest {
                 + "                        </ns2:LogoURL>" + '\n'
                 + "                    </ns2:Attribution>" + '\n'
                 + "                    <ns2:Opaque>true</ns2:Opaque>" + '\n'
+                + "                    <ns2:CRS>EPSG:666</ns2:CRS>" + '\n'
+                + "                    <ns2:CRS>EPSG:999</ns2:CRS>" + '\n'
                 + "                </ns2:Layer>" + '\n'
                 + "                <ns2:Layer name=\"layer2\"/>" + '\n'
                 + "            </ns2:include>" + '\n'

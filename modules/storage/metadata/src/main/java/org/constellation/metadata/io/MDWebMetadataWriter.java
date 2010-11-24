@@ -328,28 +328,28 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final Date creationDate = new Date(System.currentTimeMillis());
             final String className  = object.getClass().getSimpleName();
             // ISO 19115 types
-            if (className.equals("DefaultMetadata")      ||
+            if ("DefaultMetadata".equals(className)      ||
             
             // ISO 19110 types        
-                className.equals("FeatureCatalogueImpl") ||
-                className.equals("FeatureOperationImpl") ||
-                className.equals("FeatureAssociationImpl")
+                "FeatureCatalogueImpl".equals(className) ||
+                "FeatureOperationImpl".equals(className) ||
+                "FeatureAssociationImpl".equals(className)
             ) {
                 mainStandard   = Standard.ISO_19115;
             
             // Ebrim Types    
-            } else if (className.equals("IdentifiableType")) {
+            } else if ("IdentifiableType".equals(className)) {
                 mainStandard = Standard.EBRIM_V3;
            
-            } else if (className.equals("RegistryObjectType")) {
+            } else if ("RegistryObjectType".equals(className)) {
                 mainStandard = Standard.EBRIM_V2_5;
             
             // CSW Types    
-            } else if (className.equals("RecordType")) {
+            } else if ("RecordType".equals(className)) {
                 mainStandard = Standard.CSW;
             
             // SML Types
-            } else if (className.equals("SensorML")) {
+            } else if ("SensorML".equals(className)) {
                 mainStandard = Standard.SENSORML;
 
             // unkow types
@@ -362,7 +362,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
 
             if (profile == null) {
-                if  (className.equals("DefaultMetadata")) {
+                if  ("DefaultMetadata".equals(className)) {
                     profile = mdWriter.getProfile("ISO_19115");
                 }
             }
@@ -598,7 +598,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     }
 
                     final Method getter;
-                    if (propName.equals("axis")) {
+                    if ("axis".equals(propName)) {
                         getter = ReflectionUtilities.getMethod("get" + StringUtilities.firstToUpper(propName), object.getClass(), int.class);
                     } else {
                         getter = ReflectionUtilities.getGetterFromName(propName, object.getClass());
@@ -606,7 +606,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     if (getter != null) {
                         try {
                             final Object propertyValue;
-                            if (propName.equals("axis")) {
+                            if ("axis".equals(propName)) {
                                 propertyValue = getter.invoke(object, 0);
                             } else {
                                 propertyValue = getter.invoke(object);
@@ -630,7 +630,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             return result;
                         }
                     // we get directly the field
-                    } else if (!propName.equals("unitOfMeasure") && !propName.equals("verticalDatum")) {
+                    } else if (!"unitOfMeasure".equals(propName) && !"verticalDatum".equals(propName)) {
                         final Class valueClass     = object.getClass();
                         final Object propertyValue = getValueFromField(valueClass, propName, object);
                         if (propertyValue != null) {
@@ -723,17 +723,17 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
 
         //special case TODO delete when geotoolkit/api will be updated.
-        if (className.equals("DefaultMetadata")) {
+        if ("DefaultMetadata".equals(className)) {
             className = "Metadata";
-        } else if (className.equals("DefaultOnlineResource")) {
+        } else if ("DefaultOnlineResource".equals(className)) {
             className = "OnlineResource";
-        } else if (className.equals("CitationDate") || className.equals("DefaultCitationDate")) {
+        } else if ("CitationDate".equals(className) || "DefaultCitationDate".equals(className)) {
             className = "CI_Date";
-        } else if (className.equals("DefaultScope")) {
+        } else if ("DefaultScope".equals(className)) {
             className = "DQ_Scope";
-        } else if (className.equals("ReferenceSystemMetadata")) {
+        } else if ("ReferenceSystemMetadata".equals(className)) {
             className = "ReferenceSystem";
-        } else if (className.equals("DefaultReferenceIdentifier")) {
+        } else if ("DefaultReferenceIdentifier".equals(className)) {
             className = "RS_Identifier";
         }
         
@@ -754,17 +754,17 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
         
         //we remove the Type suffix
-        if (className.endsWith("Type") && !className.equals("CouplingType") 
-                                       && !className.equals("DateType") 
-                                       && !className.equals("KeywordType")
-                                       && !className.equals("FeatureType")
-                                       && !className.equals("GeometricObjectType")
-                                       && !className.equals("SpatialRepresentationType")
-                                       && !className.equals("AssociationType")
-                                       && !className.equals("InitiativeType")
-                                       && !className.equals("DimensionNameType")
-                                       && !className.equals("CoverageContentType")
-                                       && !className.equals("CodeType")) {
+        if (className.endsWith("Type") && !"CouplingType".equals(className)
+                                       && !"DateType".equals(className)
+                                       && !"KeywordType".equals(className)
+                                       && !"FeatureType".equals(className)
+                                       && !"GeometricObjectType".equals(className)
+                                       && !"SpatialRepresentationType".equals(className)
+                                       && !"AssociationType".equals(className)
+                                       && !"InitiativeType".equals(className)
+                                       && !"DimensionNameType".equals(className)
+                                       && !"CoverageContentType".equals(className)
+                                       && !"CodeType".equals(className)) {
             className = className.substring(0, className.length() - 4);
         }
 
@@ -826,13 +826,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             /* to avoid some confusion between to classes with the same name
              * we affect the standard in some special case
              */
-            if (packageName.equals("org.geotoolkit.service")) {
+            if ("org.geotoolkit.service".equals(packageName)) {
                 standard = Standard.ISO_19119;
             } else if (packageName.startsWith("org.geotoolkit.sml.xml")) {
                 standard = Standard.SENSORML;
             } else if (packageName.startsWith("org.geotoolkit.swe.xml")) {
                 standard = mdWriter.getStandard("Sensor Web Enablement");
-            } else if (packageName.equals("org.geotoolkit.gml.xml.v311")) {
+            } else if ("org.geotoolkit.gml.xml.v311".equals(packageName)) {
                 standard = Standard.ISO_19108;
             }
                 
@@ -947,7 +947,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     private Classe getPrimitiveTypeFromName(String className) throws MD_IOException {
         final String mdwclassName;
         final Standard mdwStandard;
-        if (className.equals("String") || className.equals("SimpleInternationalString") || className.equals("BaseUnit")) {
+        if ("String".equals(className) || "SimpleInternationalString".equals(className) || "BaseUnit".equals(className)) {
             mdwclassName = "CharacterString";
             mdwStandard  = Standard.ISO_19103;
         } else if (className.equalsIgnoreCase("DefaultInternationalString")) {
@@ -972,14 +972,14 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             mdwclassName = className;
             mdwStandard  = Standard.ISO_19115;
         //special case for locale codeList.
-        } else if (className.equals("Locale")) {
+        } else if ("Locale".equals(className)) {
             mdwclassName = "LanguageCode";
             mdwStandard = Standard.ISO_19115;
         //special case for Role codeList.
-        } else if (className.equals("Role")) {
+        } else if ("Role".equals(className)) {
             mdwclassName = "CI_RoleCode";
             mdwStandard = Standard.ISO_19115;
-        } else if (className.equals("Double")) {
+        } else if ("Double".equals(className)) {
             mdwclassName = "Real";
             mdwStandard = Standard.ISO_19103;
         } else {
@@ -1159,7 +1159,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         
         Classe type;
         // we look for a know metadata type
-        if (typeName.equals("MD_Metadata")) {
+        if ("MD_Metadata".equals(typeName)) {
             mainStandard = Standard.ISO_19115;
             type = mdWriter.getClasse("MD_Metadata", mainStandard);
         } else if (typeName.equals("Record")) {
@@ -1233,7 +1233,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     private Property getProperty(final Classe type, String propertyName) throws MD_IOException, MetadataIoException {
         // Special case for a bug in MDWeb
-        if (propertyName.equals("geographicElement")) {
+        if ("geographicElement".equals(propertyName)) {
             propertyName = "geographicElement2";
         }
         Property property = type.getPropertyByName(propertyName);

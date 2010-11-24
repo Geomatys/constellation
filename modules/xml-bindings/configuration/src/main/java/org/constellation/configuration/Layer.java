@@ -75,7 +75,7 @@ public class Layer {
     }
 
     public Layer(QName name, String title, String abstrac, List<String> keywords, FormatURL metadataURL, FormatURL dataURL, FormatURL authorityURL,
-            Reference identifier, AttributionType attribution, Boolean opaque) {
+            Reference identifier, AttributionType attribution, Boolean opaque, List<String> crs) {
         this.name         = name;
         this.title        = title;
         this.abstrac      = abstrac;
@@ -86,6 +86,7 @@ public class Layer {
         this.identifier   = identifier;
         this.attribution  = attribution;
         this.opaque       = opaque;
+        this.crs          = crs;
     }
     
     /**

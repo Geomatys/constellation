@@ -31,6 +31,9 @@ import javax.xml.bind.annotation.XmlElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Layers {
 
+    @XmlElement(name="MainLayer")
+    private Layer mainLayer;
+    
     @XmlElement(name="Source")
     private List<Source> source;
 
@@ -41,6 +44,12 @@ public class Layers {
     public Layers(List<Source> source) {
         this.source = source;
     }
+
+    public Layers(Layer mainLayer, List<Source> source) {
+        this.source    = source;
+        this.mainLayer = mainLayer;
+    }
+
     /**
      * @return the source
      */
@@ -56,5 +65,19 @@ public class Layers {
      */
     public void setSource(List<Source> source) {
         this.source = source;
+    }
+
+    /**
+     * @return the mainLayer
+     */
+    public Layer getMainLayer() {
+        return mainLayer;
+    }
+
+    /**
+     * @param mainLayer the mainLayer to set
+     */
+    public void setMainLayer(Layer mainLayer) {
+        this.mainLayer = mainLayer;
     }
 }

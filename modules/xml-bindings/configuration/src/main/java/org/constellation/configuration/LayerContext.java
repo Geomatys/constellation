@@ -53,10 +53,23 @@ public class LayerContext {
         }
     }
 
+
     /**
      * @param layers the layers to set
      */
     public void setLayers(List<Source> layers) {
         this.layers = new Layers(layers);
+    }
+
+    /**
+     * @return the layers
+     */
+    public Layer getMainLayer() {
+        if (layers == null) {
+            layers = new Layers();
+            return layers.getMainLayer();
+        } else {
+            return layers.getMainLayer();
+        }
     }
 }

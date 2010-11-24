@@ -80,14 +80,12 @@ import org.constellation.ws.MimeType;
 
 //Geotoolkit dependencies
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
 import org.geotoolkit.inspire.xml.vs.LanguageType;
 import org.geotoolkit.inspire.xml.vs.LanguagesType;
@@ -475,66 +473,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             "Vector data", "Vector data", DEFAULT_CRS, bbox,
                             outputBBox, queryable, dimensions, styles);
                 }
-                /*
-                 * Layer information customisation
-                 */
-                if (configLayer.getTitle() != null) {
-                    outputLayer111.setTitle(configLayer.getTitle());
-                }
-                if (configLayer.getAbstrac() != null) {
-                    outputLayer111.setAbstract(configLayer.getAbstrac());
-                }
-                if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-                    final List<org.geotoolkit.wms.xml.v111.Keyword> keywords = new ArrayList<org.geotoolkit.wms.xml.v111.Keyword>();
-                    for (String kw : configLayer.getKeywords()) {
-                        keywords.add(new org.geotoolkit.wms.xml.v111.Keyword(kw));
-                    }
-                    outputLayer111.setKeywordList(new org.geotoolkit.wms.xml.v111.KeywordList(keywords));
-                }
-                if (configLayer.getMetadataURL() != null) {
-                    final FormatURL metadataURL = configLayer.getMetadataURL();
-                    outputLayer111.setMetadataURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.MetadataURL(metadataURL.getFormat(),
-                                                                                metadataURL.getOnlineResource().getHref(),
-                                                                                metadataURL.getType())));
-                }
-                if (configLayer.getDataURL() != null) {
-                    final FormatURL dataURL = configLayer.getDataURL();
-                    outputLayer111.setDataURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.DataURL(dataURL.getFormat(),
-                                                                        dataURL.getOnlineResource().getHref())));
-                }
-                if (configLayer.getAuthorityURL() != null) {
-                    final FormatURL authorityURL = configLayer.getAuthorityURL();
-                    outputLayer111.setAuthorityURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.AuthorityURL(authorityURL.getName(),
-                                                                                  authorityURL.getOnlineResource().getHref())));
-                }
-                if (configLayer.getIdentifier() != null) {
-                    final Reference identifier = configLayer.getIdentifier();
-                    outputLayer111.setIdentifier(Arrays.asList(new org.geotoolkit.wms.xml.v111.Identifier(identifier.getValue(), identifier.getAuthority())));
-                }
-                if (configLayer.getAttribution() != null) {
-                    final AttributionType attribution = configLayer.getAttribution();
-                    final FormatURL fUrl = attribution.getLogoURL();
-                    final org.geotoolkit.wms.xml.v111.LogoURL logoUrl;
-                    if (fUrl != null) {
-                        logoUrl = new org.geotoolkit.wms.xml.v111.LogoURL(fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
-                    } else {
-                        logoUrl = null;
-                    }
-                    outputLayer111.setAttribution(new org.geotoolkit.wms.xml.v111.Attribution(attribution.getTitle(),
-                                                                  attribution.getOnlineResource().getHref(),
-                                                                  logoUrl));
-                }
-                if (configLayer.getOpaque() != null) {
-                    int opaque = 0;
-                    if (configLayer.getOpaque()) {
-                        opaque = 1;
-                    }
-                    outputLayer111.setOpaque(opaque);
-                }
-                if (!configLayer.getCrs().isEmpty()) {
-                    outputLayer111.setSrs(configLayer.getCrs());
-                }
-                outputLayer = outputLayer111;
+                
+                outputLayer = customizeLayer111(outputLayer111, configLayer);
             } else {
                 /*
                  * TODO
@@ -592,78 +532,19 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             "Vector data", "Vector data", DEFAULT_CRS, bbox,
                             outputBBox, queryable, dimensions, styles);
                 }
-                /*
-                 * Layer information customisation
-                 */
-                if (configLayer.getTitle() != null) {
-                    outputLayer130.setTitle(configLayer.getTitle());
-                }
-                if (configLayer.getAbstrac() != null) {
-                    outputLayer130.setAbstract(configLayer.getAbstrac());
-                }
-                if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
-                    final List<Keyword> keywords = new ArrayList<Keyword>();
-                    for (String kw : configLayer.getKeywords()) {
-                        keywords.add(new Keyword(kw));
-                    }
-                    outputLayer130.setKeywordList(new KeywordList(keywords));
-                }
-                if (configLayer.getMetadataURL() != null) {
-                    final FormatURL metadataURL = configLayer.getMetadataURL();
-                    outputLayer130.setMetadataURL(Arrays.asList(new MetadataURL(metadataURL.getFormat(),
-                                                                                metadataURL.getOnlineResource().getHref(),
-                                                                                metadataURL.getType())));
-                }
-                if (configLayer.getDataURL() != null) {
-                    final FormatURL dataURL = configLayer.getDataURL();
-                    outputLayer130.setDataURL(Arrays.asList(new DataURL(dataURL.getFormat(),
-                                                                        dataURL.getOnlineResource().getHref())));
-                }
-                if (configLayer.getAuthorityURL() != null) {
-                    final FormatURL authorityURL = configLayer.getAuthorityURL();
-                    outputLayer130.setAuthorityURL(Arrays.asList(new AuthorityURL(authorityURL.getName(),
-                                                                                  authorityURL.getOnlineResource().getHref())));
-                }
-                if (configLayer.getIdentifier() != null) {
-                    final Reference identifier = configLayer.getIdentifier();
-                    outputLayer130.setIdentifier(Arrays.asList(new Identifier(identifier.getValue(), identifier.getAuthority())));
-                }
-                if (configLayer.getAttribution() != null) {
-                    final AttributionType attribution = configLayer.getAttribution();
-                    final FormatURL fUrl = attribution.getLogoURL();
-                    final LogoURL logoUrl;
-                    if (fUrl != null) {
-                        logoUrl = new LogoURL(fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
-                    } else {
-                        logoUrl = null;
-                    }
-                    outputLayer130.setAttribution(new Attribution(attribution.getTitle(), 
-                                                                  attribution.getOnlineResource().getHref(),
-                                                                  logoUrl));
-                }
-                if (configLayer.getOpaque() != null) {
-                    int opaque = 0;
-                    if (configLayer.getOpaque()) {
-                        opaque = 1;
-                    }
-                    outputLayer130.setOpaque(opaque);
-                }
-                if (!configLayer.getCrs().isEmpty()) {
-                    outputLayer130.setCrs(configLayer.getCrs());
-                }
-                outputLayer = outputLayer130;
+                outputLayer = customizeLayer130(outputLayer130, configLayer);
             }
             outputLayers.add(outputLayer);
         }
 
         //we build the general layer and add it to the document
         final AbstractLayer mainLayer = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-            new org.geotoolkit.wms.xml.v111.Layer("Constellation Web Map Layer",
+            customizeLayer111(new org.geotoolkit.wms.xml.v111.Layer("Constellation Web Map Layer",
                     "description of the service(need to be fill)", DEFAULT_CRS,
-                    new LatLonBoundingBox(-180.0, -90.0, 180.0, 90.0), outputLayers) :
-            new org.geotoolkit.wms.xml.v130.Layer("Constellation Web Map Layer",
+                    new LatLonBoundingBox(-180.0, -90.0, 180.0, 90.0), outputLayers), getMainLayer()):
+            customizeLayer130(new org.geotoolkit.wms.xml.v130.Layer("Constellation Web Map Layer",
                     "description of the service(need to be fill)", DEFAULT_CRS,
-                    new EXGeographicBoundingBox(-180.0, -90.0, 180.0, 90.0), outputLayers);
+                    new EXGeographicBoundingBox(-180.0, -90.0, 180.0, 90.0), outputLayers), getMainLayer());
 
         inCapabilities.getCapability().setLayer(mainLayer);
 
@@ -689,6 +570,146 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         } 
         CAPS_RESPONSE.put(keyCache, inCapabilities);
         return inCapabilities;
+    }
+
+    /**
+     * Apply the layer customization extracted from the configuration.
+     *
+     * @param outputLayer111
+     * @param configLayer
+     * @return
+     */
+    private org.geotoolkit.wms.xml.v111.Layer customizeLayer111(org.geotoolkit.wms.xml.v111.Layer outputLayer111, Layer configLayer) {
+        if (configLayer == null) {
+            return outputLayer111;
+        }
+        if (configLayer.getTitle() != null) {
+            outputLayer111.setTitle(configLayer.getTitle());
+        }
+        if (configLayer.getAbstrac() != null) {
+            outputLayer111.setAbstract(configLayer.getAbstrac());
+        }
+        if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
+            final List<org.geotoolkit.wms.xml.v111.Keyword> keywords = new ArrayList<org.geotoolkit.wms.xml.v111.Keyword>();
+            for (String kw : configLayer.getKeywords()) {
+                keywords.add(new org.geotoolkit.wms.xml.v111.Keyword(kw));
+            }
+            outputLayer111.setKeywordList(new org.geotoolkit.wms.xml.v111.KeywordList(keywords));
+        }
+        if (configLayer.getMetadataURL() != null) {
+            final FormatURL metadataURL = configLayer.getMetadataURL();
+            outputLayer111.setMetadataURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.MetadataURL(metadataURL.getFormat(),
+                    metadataURL.getOnlineResource().getHref(),
+                    metadataURL.getType())));
+        }
+        if (configLayer.getDataURL() != null) {
+            final FormatURL dataURL = configLayer.getDataURL();
+            outputLayer111.setDataURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.DataURL(dataURL.getFormat(),
+                    dataURL.getOnlineResource().getHref())));
+        }
+        if (configLayer.getAuthorityURL() != null) {
+            final FormatURL authorityURL = configLayer.getAuthorityURL();
+            outputLayer111.setAuthorityURL(Arrays.asList(new org.geotoolkit.wms.xml.v111.AuthorityURL(authorityURL.getName(),
+                    authorityURL.getOnlineResource().getHref())));
+        }
+        if (configLayer.getIdentifier() != null) {
+            final Reference identifier = configLayer.getIdentifier();
+            outputLayer111.setIdentifier(Arrays.asList(new org.geotoolkit.wms.xml.v111.Identifier(identifier.getValue(), identifier.getAuthority())));
+        }
+        if (configLayer.getAttribution() != null) {
+            final AttributionType attribution = configLayer.getAttribution();
+            final FormatURL fUrl = attribution.getLogoURL();
+            final org.geotoolkit.wms.xml.v111.LogoURL logoUrl;
+            if (fUrl != null) {
+                logoUrl = new org.geotoolkit.wms.xml.v111.LogoURL(fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
+            } else {
+                logoUrl = null;
+            }
+            outputLayer111.setAttribution(new org.geotoolkit.wms.xml.v111.Attribution(attribution.getTitle(),
+                    attribution.getOnlineResource().getHref(),
+                    logoUrl));
+        }
+        if (configLayer.getOpaque() != null) {
+            int opaque = 0;
+            if (configLayer.getOpaque()) {
+                opaque = 1;
+            }
+            outputLayer111.setOpaque(opaque);
+        }
+        if (!configLayer.getCrs().isEmpty()) {
+            outputLayer111.setSrs(configLayer.getCrs());
+        }
+        return outputLayer111;
+    }
+
+    /**
+     * Apply the layer customization extracted from the configuration.
+     * 
+     * @param outputLayer130
+     * @param configLayer
+     * @return
+     */
+    private org.geotoolkit.wms.xml.v130.Layer customizeLayer130(org.geotoolkit.wms.xml.v130.Layer outputLayer130, Layer configLayer) {
+        if (configLayer == null) {
+            return outputLayer130;
+        }
+        if (configLayer.getTitle() != null) {
+            outputLayer130.setTitle(configLayer.getTitle());
+        }
+        if (configLayer.getAbstrac() != null) {
+            outputLayer130.setAbstract(configLayer.getAbstrac());
+        }
+        if (configLayer.getKeywords() != null && !configLayer.getKeywords().isEmpty()) {
+            final List<Keyword> keywords = new ArrayList<Keyword>();
+            for (String kw : configLayer.getKeywords()) {
+                keywords.add(new Keyword(kw));
+            }
+            outputLayer130.setKeywordList(new KeywordList(keywords));
+        }
+        if (configLayer.getMetadataURL() != null) {
+            final FormatURL metadataURL = configLayer.getMetadataURL();
+            outputLayer130.setMetadataURL(Arrays.asList(new MetadataURL(metadataURL.getFormat(),
+                    metadataURL.getOnlineResource().getHref(),
+                    metadataURL.getType())));
+        }
+        if (configLayer.getDataURL() != null) {
+            final FormatURL dataURL = configLayer.getDataURL();
+            outputLayer130.setDataURL(Arrays.asList(new DataURL(dataURL.getFormat(),
+                    dataURL.getOnlineResource().getHref())));
+        }
+        if (configLayer.getAuthorityURL() != null) {
+            final FormatURL authorityURL = configLayer.getAuthorityURL();
+            outputLayer130.setAuthorityURL(Arrays.asList(new AuthorityURL(authorityURL.getName(),
+                    authorityURL.getOnlineResource().getHref())));
+        }
+        if (configLayer.getIdentifier() != null) {
+            final Reference identifier = configLayer.getIdentifier();
+            outputLayer130.setIdentifier(Arrays.asList(new Identifier(identifier.getValue(), identifier.getAuthority())));
+        }
+        if (configLayer.getAttribution() != null) {
+            final AttributionType attribution = configLayer.getAttribution();
+            final FormatURL fUrl = attribution.getLogoURL();
+            final LogoURL logoUrl;
+            if (fUrl != null) {
+                logoUrl = new LogoURL(fUrl.getFormat(), fUrl.getOnlineResource().getHref(), fUrl.getWidth(), fUrl.getHeight());
+            } else {
+                logoUrl = null;
+            }
+            outputLayer130.setAttribution(new Attribution(attribution.getTitle(),
+                    attribution.getOnlineResource().getHref(),
+                    logoUrl));
+        }
+        if (configLayer.getOpaque() != null) {
+            int opaque = 0;
+            if (configLayer.getOpaque()) {
+                opaque = 1;
+            }
+            outputLayer130.setOpaque(opaque);
+        }
+        if (!configLayer.getCrs().isEmpty()) {
+            outputLayer130.setCrs(configLayer.getCrs());
+        }
+        return outputLayer130;
     }
 
     /**
