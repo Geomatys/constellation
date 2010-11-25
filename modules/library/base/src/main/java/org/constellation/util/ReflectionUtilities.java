@@ -380,53 +380,54 @@ public final class ReflectionUtilities {
      */
     public static Method getGetterFromName(String propertyName, final Class<?> rootClass) {
 
-
+        final String rootClassName = rootClass.getName();
         //special case and corrections TODO remove
-        if (propertyName.equals("beginPosition") && !rootClass.getName().equals("org.geotoolkit.gml.xml.v311.TimePeriodType")) {
-            if (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultInstant"))
+        if ("beginPosition".equals(propertyName) && !"org.geotoolkit.gml.xml.v311.TimePeriodType".equals(rootClassName)) {
+            if ("org.geotoolkit.temporal.object.DefaultInstant".equals(rootClassName))
                 return null;
             else
                 propertyName = "beginning";
-        } else if (propertyName.equals("endPosition")  && !rootClass.getName().equals("org.geotoolkit.gml.xml.v311.TimePeriodType")) {
-            if (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultInstant"))
+        } else if ("endPosition".equals(propertyName)  && !"org.geotoolkit.gml.xml.v311.TimePeriodType".equals(rootClassName)) {
+            if ("org.geotoolkit.temporal.object.DefaultInstant".equals(rootClassName))
                 return null;
             else
                 propertyName = "ending";
-        } else if (propertyName.equals("recordType") && rootClass.getSimpleName().equals("DefaultRecordType")) {
+        } else if ("recordType".equals(propertyName) && "DefaultRecordType".equals(rootClass.getSimpleName())) {
             return null;
-        } else if (propertyName.equals("dataSetURI")) {
+        } else if ("dataSetURI".equals(propertyName)) {
             propertyName = "dataSetUri";
-        } else if (propertyName.equals("nameOfMeasure")) {
+        } else if ("nameOfMeasure".equals(propertyName)) {
             propertyName = "namesOfMeasure";
-        } else if (propertyName.equals("dateTime") && rootClass.getName().startsWith("org.geotoolkit.metadata.iso.quality")) {
+        } else if ("dateTime".equals(propertyName) && rootClassName.startsWith("org.geotoolkit.metadata.iso.quality")) {
              propertyName = "dates";
-        } else if (propertyName.equals("extentTypeCode")) {
+        } else if ("extentTypeCode".equals(propertyName)) {
             propertyName = "inclusion";
         // TODO remove when this issue will be fix in MDWeb
         } else if (propertyName.indexOf("geographicElement") != -1) {
             propertyName = "geographicElement";
 
         // avoid unnecesary log flood
-        } else if (rootClass.getName().equals("org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription") &&
-                  (propertyName.equals("westBoundLongitude") || propertyName.equals("eastBoundLongitude") ||
-                   propertyName.equals("northBoundLatitude") || propertyName.equals("southBoundLatitude"))) {
+        } else if ("org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription".equals(rootClassName) &&
+                  ("westBoundLongitude".equals(propertyName) || "eastBoundLongitude".equals(propertyName) ||
+                   "northBoundLatitude".equals(propertyName) || "southBoundLatitude".equals(propertyName))) {
             return null;
         // avoid unnecesary log flood
-        } else if ((propertyName.equals("accessConstraints"))
-                   && rootClass.getName().equals("org.geotoolkit.metadata.iso.constraint.DefaultConstraints")) {
+        } else if (("accessConstraints".equals(propertyName))
+                   && "org.geotoolkit.metadata.iso.constraint.DefaultConstraints".equals(rootClassName)) {
             return null;
         // avoid unnecesary log flood
-        } else if (rootClass.getName().equals("org.geotoolkit.service.ServiceIdentificationImpl") &&
-                  (propertyName.equals("spatialResolution") || propertyName.equals("language") ||
-                   propertyName.equals("topicCategory"))) {
+        } else if ("org.geotoolkit.service.ServiceIdentificationImpl".equals(rootClassName) &&
+                  ("spatialResolution".equals(propertyName) || "language".equals(propertyName) ||
+                   "topicCategory".equals(propertyName))) {
             return null;
-        } else if (propertyName.equals("geographicIdentifier") && rootClass.getName().equals("org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox")) {
+        } else if ("geographicIdentifier".equals(propertyName) && "org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox".equals(rootClassName)) {
             return null;
-        } else if (propertyName.equals("position") && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPeriod"))) {
+        } else if ("position".equals(propertyName) && ("org.geotoolkit.temporal.object.DefaultPeriod".equals(rootClassName))) {
             return null;
-        }  else if ((propertyName.equals("calendarEraName") || propertyName.equals("frame") || propertyName.equals("indeterminatePosition")) && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPosition"))) {
+        }  else if (("calendarEraName".equals(propertyName) || "frame".equals(propertyName) || "indeterminatePosition".equals(propertyName))
+                && ("org.geotoolkit.temporal.object.DefaultPosition".equals(rootClassName))) {
             return null;
-        } else if (propertyName.equals("value") && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPosition"))) {
+        } else if ("value".equals(propertyName) && ("org.geotoolkit.temporal.object.DefaultPosition".equals(rootClassName))) {
             propertyName = "date";
         }
 

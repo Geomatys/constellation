@@ -88,7 +88,7 @@ public final class ConfigDirectory {
 
     private static File getWebInfDiretory() {
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        URL url = classloader.getResource("org/constellation/provider/Provider.class");
+        URL url = classloader.getResource("org/constellation/configuration/ConfigDirectory.class");
         String path = url.toString();
         path = path.substring(path.lastIndexOf(':') + 1); // we remove the file type
         final int separator = path.indexOf('!'); // we remove the path inside the jar

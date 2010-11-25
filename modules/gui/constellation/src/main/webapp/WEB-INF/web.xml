@@ -101,6 +101,7 @@
         <web-resource-collection>
             <web-resource-name>Constellation secured service</web-resource-name>
             <url-pattern>/WS/configuration</url-pattern>
+            <url-pattern>/WS/admin/*</url-pattern>
             <http-method>GET</http-method>
             <http-method>POST</http-method>
         </web-resource-collection>

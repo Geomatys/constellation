@@ -80,6 +80,12 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * TODO this attribute must be set to private when will fix the WFS service
      */
     protected final Map<String, W> workersMap;
+
+    private static final String RESTART_ANCKNOWLEDEGEMENT ="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
+                                                           "<Acknowlegement xmlns=\"http://www.constellation.org/config\">\n" +
+                                                           "    <message>workers succefully restarted</message>\n" +
+                                                           "    <status>Success</status>\n" +
+                                                           "</Acknowlegement>";
     
     
     /**
@@ -106,29 +112,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
          * build the map of Workers, by scanning the sub-directories of its service directory.
          */
         workersMap = new HashMap<String, W>();
-        final File configDirectory = ConfigDirectory.getConfigDirectory();
-        if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
-            final File serviceDirectory = new File(configDirectory, supportedVersions[0].specification.name());
-            if (serviceDirectory.exists() && serviceDirectory.isDirectory()) {
-                for (File instanceDirectory : serviceDirectory.listFiles()) {
-                    /*
-                     * For each sub-directory we build a new Worker.
-                     */
-                    if (instanceDirectory.isDirectory() && !instanceDirectory.getName().startsWith(".")) {
-                        final W newWorker = createWorker(instanceDirectory);
-                        workersMap.put(instanceDirectory.getName(), newWorker);
-                    }
-                }
-            } else {
-                LOGGER.log(Level.SEVERE, "The service configuration directory: {0} does not exist or is not a directory.", serviceDirectory.getPath());
-            }
-        } else {
-            if (configDirectory == null) {
-                LOGGER.severe("The service was unable to find a config directory.");
-            } else {
-                LOGGER.log(Level.SEVERE, "The configuration directory: {0} does not exist or is not a directory.", configDirectory.getPath());
-            }
-        }
+        buildWorkerMap();
     }
 
     /**
@@ -155,6 +139,42 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         this.workersMap        = workers;
     }
 
+    /**
+     * Scan the configuration directory to instanciate Web service workers.
+     */
+    private void buildWorkerMap() {
+        final File configDirectory   = ConfigDirectory.getConfigDirectory();
+        
+        if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
+            final File serviceDirectory = new File(configDirectory, supportedVersions.get(0).specification.name());
+            if (serviceDirectory.exists() && serviceDirectory.isDirectory()) {
+                for (File instanceDirectory : serviceDirectory.listFiles()) {
+                    /*
+                     * For each sub-directory we build a new Worker.
+                     */
+                    if (instanceDirectory.isDirectory() && !instanceDirectory.getName().startsWith(".")) {
+                        final W newWorker = createWorker(instanceDirectory);
+                        workersMap.put(instanceDirectory.getName(), newWorker);
+                    }
+                }
+            } else {
+                LOGGER.log(Level.SEVERE, "The service configuration directory: {0} does not exist or is not a directory.", serviceDirectory.getPath());
+            }
+        } else {
+            if (configDirectory == null) {
+                LOGGER.severe("The service was unable to find a config directory.");
+            } else {
+                LOGGER.log(Level.SEVERE, "The configuration directory: {0} does not exist or is not a directory.", configDirectory.getPath());
+            }
+        }
+    }
+
+    /**
+     * Build a new instance of Web service worker with the specified configuration directory
+     * 
+     * @param instanceDirectory The configuration directory of the instance.
+     * @return
+     */
     protected abstract W createWorker(File instanceDirectory);
 
 
@@ -164,15 +184,27 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         try {
-        final String serviceID = getParameter("serviceId", false);
-        if (serviceID != null && workersMap.containsKey(serviceID)) {
-            final W worker = workersMap.get(serviceID);
-            return treatIncomingRequest(objectRequest, worker);
-        } else {
-            LOGGER.log(Level.WARNING, "unknow service id:{0}", serviceID);
-            //TODO return 404
-            return Response.serverError().build();
-        }
+            final String serviceID = getParameter("serviceId", false);
+            // request is send to the specified worker
+            if (serviceID != null && workersMap.containsKey(serviceID)) {
+                final W worker = workersMap.get(serviceID);
+                return treatIncomingRequest(objectRequest, worker);
+                
+            // administration a the instance
+            } else if ("admin".equals(serviceID)){
+                LOGGER.info("refreshing the workers");
+                for (final Worker worker : workersMap.values()) {
+                    worker.destroy();
+                }
+                workersMap.clear();
+                buildWorkerMap();
+                return Response.ok(RESTART_ANCKNOWLEDEGEMENT, "text/xml").build();
+
+            // unbounded URL
+            } else {
+                LOGGER.log(Level.WARNING, "Received request on undefined instance identifier:{0}", serviceID);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, supportedVersions.get(0));
         }
@@ -333,9 +365,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     protected void logException(CstlServiceException ex) {
         if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE) &&
             !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED) &&
-            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)   && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE) &&
-            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)  && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED) &&
-            !ex.getExceptionCode().equals(LAYER_NOT_DEFINED)         && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED)) {
+            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED) &&
+            !ex.getExceptionCode().equals(LAYER_NOT_DEFINED)          && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED)) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
