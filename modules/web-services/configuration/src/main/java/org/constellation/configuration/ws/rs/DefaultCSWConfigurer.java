@@ -24,7 +24,7 @@ import java.io.File;
 // Constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
-import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 

@@ -105,11 +105,6 @@
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.constellation.engine</groupId>
-      <artifactId>cstl-engine-server</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 
 </project>

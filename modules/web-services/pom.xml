@@ -84,13 +84,14 @@
         <module>wmts</module>
         <module>wcs</module>
         <module>wfs</module>
-        <module>configuration</module>
+        <module>map</module>
       </modules>
     </profile>
     <profile>
       <id>wms</id>
       <modules>
         <module>wms</module>
+        <module>map</module>
       </modules>
     </profile>
     <profile>
@@ -98,18 +99,21 @@
       <modules>
         <module>wms</module>
         <module>wcs</module>
+        <module>map</module>
       </modules>
     </profile>
     <profile>
       <id>wmts</id>
       <modules>
         <module>wmts</module>
+        <module>map</module>
       </modules>
     </profile>
     <profile>
       <id>wcs</id>
       <modules>
         <module>wcs</module>
+        <module>map</module>
       </modules>
     </profile>
     <profile>
@@ -122,6 +126,7 @@
       <id>wfs</id>
       <modules>
         <module>wfs</module>
+        <module>map</module>
       </modules>
     </profile>
     <profile>

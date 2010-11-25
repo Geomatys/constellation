@@ -62,23 +62,8 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-ogc</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.engine</groupId>
-      <artifactId>cstl-engine-server</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-provider</artifactId>
+      <artifactId>cstl-web-map</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

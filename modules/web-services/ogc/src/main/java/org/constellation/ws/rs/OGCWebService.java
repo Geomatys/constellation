@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 // Constellation dependencies
 import javax.xml.bind.JAXBException;
 import org.constellation.ServiceDef;
-import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies

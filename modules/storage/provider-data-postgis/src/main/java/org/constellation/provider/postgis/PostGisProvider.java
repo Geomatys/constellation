@@ -35,7 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;

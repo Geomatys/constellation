@@ -32,7 +32,7 @@ import javax.jws.soap.SOAPBinding.ParameterStyle;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
-import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.sos.ws.SOSworker;
 

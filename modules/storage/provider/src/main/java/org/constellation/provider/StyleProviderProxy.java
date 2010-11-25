@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.style.MutableStyle;

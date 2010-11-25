@@ -20,13 +20,14 @@ package org.constellation.ws.rs;
 import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import org.constellation.ServiceDef;
+import org.constellation.management.ConstellationsMBeans;
 import org.constellation.ws.Worker;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.internal.io.Installation;
 
 
 /**
- * A Super class for WMS and WCS Webservice.
+ * A Super class for WMS, WMTS, WFS and WCS Webservice.
  * The point is to remove the hard-coded dependency to JAI.
  *
  * @author Guilhem Legal (Geomatys)
@@ -35,6 +36,12 @@ import org.geotoolkit.internal.io.Installation;
  */
 public abstract class GridWebService<W extends Worker> extends OGCWebService<W> {
     static {
+        //register managed bean
+        ConstellationsMBeans.register();
+
+        //loading JAI codecs
+        Registry.setDefaultCodecPreferences();
+
         Installation.allowSystemPreferences = false;
         ImageIO.scanForPlugins();
         try {

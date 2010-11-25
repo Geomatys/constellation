@@ -34,7 +34,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 
 //geotoolkit dependencies
-import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordType;

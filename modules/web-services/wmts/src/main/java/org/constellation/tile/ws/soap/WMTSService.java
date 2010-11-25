@@ -27,7 +27,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
-import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.tile.ws.DefaultWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;

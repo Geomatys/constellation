@@ -17,16 +17,10 @@
 
 package org.constellation.ws;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -34,8 +28,6 @@ import org.geotoolkit.util.logging.Logging;
  * @author Guilhem Legal (Geomatys)
  */
 public class WebServiceUtilities {
-
-    private static final Logger LOGGER = Logging.getLogger(WebServiceUtilities.class);
 
     private WebServiceUtilities(){}
 

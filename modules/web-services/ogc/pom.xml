@@ -23,9 +23,8 @@
   <name>Web service base for OGC web services</name>
   <description>
     The geospatial web services standardized by the Open Geospatial Consortium
-    (OGC), including CSW, SOS, WMS, and WCS.
+    (OGC), including CSW, SOS, WMS, WMTS, WFS and WCS.
   </description>
-
 
 
   <!--
@@ -75,11 +74,6 @@
   <dependencies>
     <!-- Constellation modules-->
     <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-base</artifactId>
       <version>${project.version}</version>
@@ -93,15 +87,6 @@
     <dependency>
      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-ows</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-sld</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <!--scope>provided</scope-->   <!-- Uncomment if Tomcat already has jsp / servlet APIs in <TOMCAT_HOME>/lib -->
     </dependency>
   </dependencies>
 
