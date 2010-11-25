@@ -121,7 +121,7 @@ public abstract class AbstractCSWConfigurer {
                 if (currentReader == null) {
                     currentReader = cswfactory.getMetadataReader(config);
                 }
-                return cswfactory.getIndexer(config, currentReader, serviceID);
+                return cswfactory.getIndexer(config, currentReader, "");
 
             } catch (Exception ex) {
                 throw new CstlServiceException("An eception occurs while initializing the indexer!" + '\n' +
@@ -199,7 +199,7 @@ public abstract class AbstractCSWConfigurer {
                     if (configFile.exists()) {
                         // we get the CSW configuration file
                         final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
-                        config.setConfigurationDirectory(cswConfigDir);
+                        config.setConfigurationDirectory(instanceDirectory);
                         serviceConfiguration.put(id, config);
                     }
                 }
@@ -245,7 +245,7 @@ public abstract class AbstractCSWConfigurer {
         if (!asynchrone) {
             synchroneIndexRefresh(cswInstanceDirectories);
         } else {
-            asynchroneIndexRefresh(cswInstanceDirectories, id);
+            asynchroneIndexRefresh(cswInstanceDirectories);
         }
 
         final String msg = "CSW index succefully recreated";
@@ -296,8 +296,9 @@ public abstract class AbstractCSWConfigurer {
      * 
      * @throws org.constellation.ws.CstlServiceException
      */
-    private void asynchroneIndexRefresh(List<File> cswInstanceDirectories, String id) throws CstlServiceException {
+    private void asynchroneIndexRefresh(List<File> cswInstanceDirectories) throws CstlServiceException {
         for (File cswInstanceDirectory : cswInstanceDirectories) {
+            String id = cswInstanceDirectory.getName();
             final File nexIndexDir        = new File(cswInstanceDirectory, "index-" + System.currentTimeMillis());
             AbstractIndexer indexer = null;
             try {

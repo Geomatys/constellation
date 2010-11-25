@@ -206,7 +206,7 @@ public class LuceneFilterParser extends FilterParser {
         }
         
         String query = queryBuilder.toString();
-        if (query.equals("()")) {
+        if ("()".equals(query)) {
             query = "";
         }
 
@@ -227,10 +227,10 @@ public class LuceneFilterParser extends FilterParser {
      */
     @Override
     protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) {
-        if (operator.equals("!=")) {
+        if ("!=".equals(operator)) {
             response.append("metafile:doc NOT ");
         }
-        if (operator.equals("LIKE") || operator.equals("IS NULL ")) {
+        if ("LIKE".equals(operator) || "IS NULL ".equals(operator)) {
             response.append(removePrefix(propertyName.getPropertyName())).append(":").append(literalValue);
         } else {
             response.append(removePrefix(propertyName.getPropertyName())).append(":\"").append(literalValue).append('"');
@@ -247,9 +247,9 @@ public class LuceneFilterParser extends FilterParser {
             response.append(removePrefix(propertyName.getPropertyName())).append(":");
 
             String comparison;
-            if (operator.equals("<=") || operator.equals("<")) {
+            if ("<=".equals(operator) || "<".equals(operator)) {
                 comparison = "00000101 " + dateValue;
-            } else if (operator.equals(">=") || operator.equals(">")){
+            } else if (">=".equals(operator) || ">".equals(operator)){
                 comparison = dateValue + "  30000101";
             } else {
                 // TODO

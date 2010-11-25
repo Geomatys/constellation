@@ -436,7 +436,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
         }
         
         // Special case 1
-        if (serviceName.equals("IAAA CSW")) {
+        if ("IAAA CSW".equals(serviceName)) {
             specialCase1 = true;
             request      = fullGetRecordsRequestv200Special1;
             special      = "Special case 1";
@@ -716,37 +716,37 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
      */
     private String getNamespaceURIFromprefix(String prefix, String distantVersion) {
         if (distantVersion.equals(CSW_202_VERSION)) {
-            if (prefix.equals("csw"))
+            if ("csw".equals(prefix))
                 return Namespaces.CSW_202;
             
-            else if (prefix.equals("ebrim") || prefix.equals("rim"))
+            else if ("ebrim".equals(prefix) || "rim".equals(prefix))
                 return "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
             
-            else if (prefix.equals("rim25"))
+            else if ("rim25".equals(prefix))
                 return "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
             
-            else if (prefix.equals("gmd"))
+            else if ("gmd".equals(prefix))
                 return Namespaces.GMD;
             
-            else if (prefix.equals("wrs"))
+            else if ("wrs".equals(prefix))
                 return "http://www.opengis.net/cat/wrs/1.0";
             
-             else if (prefix.equals("wrs09"))
+             else if ("wrs09".equals(prefix))
                 return "http://www.opengis.net/cat/wrs";
             
             else 
                 throw new IllegalArgumentException("2.0.2 prefix unsupported: " + prefix + ".");
         } else {
-            if (prefix.equals("csw"))
+            if ("csw".equals(prefix))
                 return "http://www.opengis.net/cat/csw";
             
-            else if (prefix.equals("ebrim") || prefix.equals("rim") || prefix.equals("rim25"))
+            else if ("ebrim".equals(prefix) || "rim".equals(prefix) || "rim25".equals(prefix))
                 return "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
             
-            else if (prefix.equals("gmd"))
+            else if ("gmd".equals(prefix))
                 return Namespaces.GMD;
             
-            else if (prefix.equals("wrs") || prefix.equals("wrs09"))
+            else if ("wrs".equals(prefix) || "wrs09".equals(prefix))
                 return "http://www.opengis.net/cat/wrs";
             
             else 
