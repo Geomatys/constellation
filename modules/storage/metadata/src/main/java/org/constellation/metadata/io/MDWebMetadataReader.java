@@ -463,7 +463,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                             method = ReflectionUtilities.getMethod("fromValue", classe, String.class);
                             result = ReflectionUtilities.invokeMethod(method, classe, element.getName());
                         } else {
-                            LOGGER.warning("unknow codelist type:" + value.getType());
+                            LOGGER.log(Level.WARNING, "unknow codelist type:{0}", value.getType());
                             return null;
                         }
                     }
@@ -528,7 +528,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
              * and no setters so we must call the normal constructor.
              */
             final String className = classe.getSimpleName();
-            if (className.equals("DefaultTypeName")) {
+            if ("DefaultTypeName".equals(className)) {
                 TextValue child = null;
 
                 //We search the child of the TypeName
@@ -551,16 +551,16 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
              * Again another special case QNAME does not have a empty constructor.
              * and no setters so we must call the normal constructor.
              */
-            } else if (className.equals("QName")) {
+            } else if ("QName".equals(className)) {
                 String localPart    = null;
                 String namespaceURI = null;
 
                 //We search the children of the QName
                 for (Value childValue : value.getChildren()) {
                     if (childValue instanceof TextValue) {
-                        if (childValue.getPath().getName().equals("localPart"))
+                        if ("localPart".equals(childValue.getPath().getName()))
                             localPart = ((TextValue)childValue).getValue();
-                        else  if (childValue.getPath().getName().equals("namespaceURI"))
+                        else  if ("namespaceURI".equals(childValue.getPath().getName()))
                             namespaceURI = ((TextValue)childValue).getValue();
                     }
                 }
@@ -575,7 +575,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             /**
              * Again another special case PT_FreeText has a special construction.
              */
-            } else if (className.equals("DefaultInternationalString")) {
+            } else if ("DefaultInternationalString".equals(className)) {
 
                 String ptvalue = null;
                 final Map<Locale, String> map = new HashMap<Locale, String>();
@@ -584,13 +584,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     if (childValue instanceof TextValue) {
                         ptvalue = ((TextValue)childValue).getValue();
                     } else {
-                        if (childValue.getType() != null && childValue.getType().getName().equals("LocalisedCharacterString")) {
+                        if (childValue.getType() != null && "LocalisedCharacterString".equals(childValue.getType().getName())) {
                             String lvalue = null;
                             String locale = null;
                             for (Value subchildValue : childValue.getChildren()) {
-                                if (subchildValue instanceof TextValue && subchildValue.getPath().getName().equals("value")) {
+                                if (subchildValue instanceof TextValue && "value".equals(subchildValue.getPath().getName())) {
                                     lvalue = ((TextValue) subchildValue).getValue();
-                                } else if (subchildValue instanceof TextValue && subchildValue.getPath().getName().equals("locale")) {
+                                } else if (subchildValue instanceof TextValue && "locale".equals(subchildValue.getPath().getName())) {
                                     locale = ((TextValue) subchildValue).getValue();
                                 }
                             }
@@ -654,13 +654,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     //special case due to a bug in mdweb
                     if (attribName.startsWith("geographicElement")) {
                         attribName = "geographicElements";
-                    } else if (attribName.equals("transformationParameterAvailability")) {
+                    } else if ("transformationParameterAvailability".equals(attribName)) {
                         attribName = "transformationParameterAvailable";
-                    } else if (attribName.equals("beginPosition")) {
+                    } else if ("beginPosition".equals(attribName)) {
                         attribName = "begining";
-                    } else if (attribName.equals("endPosition")) {
+                    } else if ("endPosition".equals(attribName)) {
                         attribName = "ending";
-                    } else if (attribName.equals("value") && classe.getSimpleName().equals("DefaultPosition")) {
+                    } else if ("value".equals(attribName) && "DefaultPosition".equals(classe.getSimpleName())) {
                         attribName = "position";
                     } else if (attribName.equalsIgnoreCase("verticalCSProperty")) {
                         attribName = "coordinateSystem";
@@ -754,7 +754,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     private void setFieldToValue(Field field, String attribName, Object result, Object param) {
         field.setAccessible(true);
         try {
-            if (attribName.equals("axis")) {
+            if ("axis".equals(attribName)) {
                 final CoordinateSystemAxis[] params = new CoordinateSystemAxis[1];
                 params[0] = (CoordinateSystemAxis) param;
                 field.set(result, params);
@@ -838,30 +838,30 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     private List<String> getPackageFromStandard(String standardName, String className, int mode) {
         final List<String> packagesName;
-        if (standardName.equals("Catalog Web Service") || standardName.equals("DublinCore") ||
-            standardName.equals("OGC Web Service")     || standardName.equals("OGC Filter")) {
+        if ("Catalog Web Service".equals(standardName) || "DublinCore".equals(standardName) ||
+            "OGC Web Service".equals(standardName)     || "OGC Filter".equals(standardName)) {
             packagesName = cswPackage;
 
-        } else if (standardName.equals("Ebrim v3.0") || standardName.equals("Web Registry Service v1.0")) {
+        } else if ("Ebrim v3.0".equals(standardName) || "Web Registry Service v1.0".equals(standardName)) {
             packagesName = ebrimV3Package;
 
-        } else if (standardName.equals("Ebrim v2.5") || standardName.equals("Web Registry Service v0.9")) {
+        } else if ("Ebrim v2.5".equals(standardName) || "Web Registry Service v0.9".equals(standardName)) {
             packagesName = ebrimV25Package;
 
-        } else if (standardName.equals("NATSDI")) {
+        } else if ("NATSDI".equals(standardName)) {
             packagesName = natureSDIPackage;
 
-        } else if (standardName.equals("SensorML")) {
+        } else if ("SensorML".equals(standardName)) {
             packagesName = sensorMLPackage;
 
-        } else if (standardName.equals("Sensor Web Enablement")) {
+        } else if ("Sensor Web Enablement".equals(standardName)) {
             packagesName = swePackage;
 
-        } else if (standardName.equals("ISO 19108") && mode == SENSORML) {
+        } else if ("ISO 19108".equals(standardName) && mode == SENSORML) {
             packagesName = gmlPackage;
 
         } else {
-            if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType") && !className.equals("AxisDirection")) {
+            if (!className.contains("Code") && !"DCPList".equals(className) && !"SV_CouplingType".equals(className) && !"AxisDirection".equals(className)) {
                 packagesName = geotoolkitPackage;
                 packagesName.addAll(gmlPackage);
             } else {
@@ -886,7 +886,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         Class result = classBinding.get(classNameSave);
         if (result == null) {
-            LOGGER.finer("search for class " + classNameSave);
+            LOGGER.log(Level.FINER, "search for class {0}", classNameSave);
         } else {
             return result;
         }
@@ -899,11 +899,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         }
 
         //special case TODO delete when geotoolkit/api will be updated.
-        if (className.equals("CI_Date")) {
+        if ("CI_Date".equals(className)) {
             className = "CitationDate";
-        } else if (className.equals("RS_Identifier")) {
+        } else if ("RS_Identifier".equals(className)) {
             className = "ReferenceIdentifier";
-        } else if (className.equals("MD_ReferenceSystem")) {
+        } else if ("MD_ReferenceSystem".equals(className)) {
             className = "ReferenceSystemMetadata";
         }
 
@@ -912,17 +912,17 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         for (String packageName : packagesName) {
             
             //TODO remove this special case
-            if (className.equals("RS_Identifier"))
+            if ("RS_Identifier".equals(className))
                 packageName = "org.geotoolkit.referencing";
-            else if (className.equals("MD_ScopeCode"))
+            else if ("MD_ScopeCode".equals(className))
                 packageName = "org.opengis.metadata.maintenance";
-            else if (className.equals("SV_ServiceIdentification")) 
+            else if ("SV_ServiceIdentification".equals(className))
                 packageName = "org.geotoolkit.service";
             else if (className.startsWith("FRA_")) 
                 packageName = "org.geotoolkit.metadata.fra";
-            else if (className.equals("ReferenceSystemMetadata"))
+            else if ("ReferenceSystemMetadata".equals(className))
                 packageName = "org.geotoolkit.internal.jaxb.metadata";
-            else if (className.equals("Anchor"))
+            else if ("Anchor".equals(className))
                 packageName = "org.geotoolkit.internal.jaxb.text";
             String name  = className;
             int nameType = 0;
@@ -1045,7 +1045,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             for (Entry<String, Class> entry : classBinding.entrySet()) {
                 prop.put(entry.getKey(), entry.getValue().getName());
             }
-            LOGGER.info("stored " + classBinding.size() + " classes in classMapping.properties");
+            LOGGER.log(Level.INFO, "stored {0} classes in classMapping.properties", classBinding.size());
             prop.store(out, "save at reader destroy");
 
         } catch (IOException ex) {

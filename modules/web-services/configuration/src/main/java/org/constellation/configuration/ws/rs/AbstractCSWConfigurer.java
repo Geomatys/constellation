@@ -236,15 +236,19 @@ public abstract class AbstractCSWConfigurer {
         } catch (ConfigurationException ex) {
             throw new CstlServiceException(ex);
         }
-        String msg;
-        final File cswConfigDir = getConfigurationDirectory(id);
-        if (!asynchrone) {
-            synchroneIndexRefresh(cswConfigDir, id);
+        final List<File> cswInstanceDirectories = new ArrayList<File>();
+        if ("all".equals(id)) {
+            cswInstanceDirectories.addAll(getAllCswInstanceDirectory());
         } else {
-            asynchroneIndexRefresh(cswConfigDir, id);
+            cswInstanceDirectories.add(getCswInstanceDirectory(id));
+        }
+        if (!asynchrone) {
+            synchroneIndexRefresh(cswInstanceDirectories);
+        } else {
+            asynchroneIndexRefresh(cswInstanceDirectories, id);
         }
 
-        msg = "CSW index succefully recreated";
+        final String msg = "CSW index succefully recreated";
         return new AcknowlegementType("success", msg);
     }
 
@@ -254,23 +258,24 @@ public abstract class AbstractCSWConfigurer {
      * TODO maybe we can directly recreate the index here (fusion of synchrone/asynchrone)
      *
      * @param configurationDirectory The CSW configuration directory.
-     * @param id The service identifier.
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    private void synchroneIndexRefresh(File configurationDirectory, String id) throws CstlServiceException {
+    private void synchroneIndexRefresh(List<File> cswInstanceDirectories) throws CstlServiceException {
         boolean deleted = false;
-        //we delete each index directory
-        for (File indexDir : configurationDirectory.listFiles(new IndexDirectoryFilter(id))) {
-            deleted = true;
-            for (File f : indexDir.listFiles()) {
-                final boolean sucess = f.delete();
-                if (!sucess) {
-                    throw new CstlServiceException("The service can't delete the index file:" + f.getPath(), NO_APPLICABLE_CODE);
+        for (File cswInstanceDirectory : cswInstanceDirectories) {
+            //we delete each index directory
+            for (File indexDir : cswInstanceDirectory.listFiles(new IndexDirectoryFilter(null))) {
+                deleted = true;
+                for (File f : indexDir.listFiles()) {
+                    final boolean sucess = f.delete();
+                    if (!sucess) {
+                        throw new CstlServiceException("The service can't delete the index file:" + f.getPath(), NO_APPLICABLE_CODE);
+                    }
                 }
-            }
-            if (!indexDir.delete()) {
-                throw new CstlServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE);
+                if (!indexDir.delete()) {
+                    throw new CstlServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE);
+                }
             }
         }
 
@@ -278,7 +283,7 @@ public abstract class AbstractCSWConfigurer {
         if (deleted) {
             restart();
         } else {
-            LOGGER.log(Level.INFO, "there is no index correspounding to {0} to delete", id);
+            LOGGER.log(Level.INFO, "there is no index to delete");
         }
     }
 
@@ -291,30 +296,32 @@ public abstract class AbstractCSWConfigurer {
      * 
      * @throws org.constellation.ws.CstlServiceException
      */
-    private void asynchroneIndexRefresh(File configurationDirectory, String id) throws CstlServiceException {
-        final File nexIndexDir        = new File(configurationDirectory, "index-" + System.currentTimeMillis());
-        AbstractIndexer indexer = null;
-        try {
-            indexer = initIndexer(id, null);
-            if (indexer != null) {
-                final boolean success = nexIndexDir.mkdir();
-                if (!success) {
-                    throw new CstlServiceException("Unable to create a directory nextIndex for  the id:" + id, NO_APPLICABLE_CODE);
-                }
-                indexer.setFileDirectory(nexIndexDir);
-                indexer.createIndex();
+    private void asynchroneIndexRefresh(List<File> cswInstanceDirectories, String id) throws CstlServiceException {
+        for (File cswInstanceDirectory : cswInstanceDirectories) {
+            final File nexIndexDir        = new File(cswInstanceDirectory, "index-" + System.currentTimeMillis());
+            AbstractIndexer indexer = null;
+            try {
+                indexer = initIndexer(id, null);
+                if (indexer != null) {
+                    final boolean success = nexIndexDir.mkdir();
+                    if (!success) {
+                        throw new CstlServiceException("Unable to create a directory nextIndex for  the id:" + id, NO_APPLICABLE_CODE);
+                    }
+                    indexer.setFileDirectory(nexIndexDir);
+                    indexer.createIndex();
 
-            } else {
-                throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
-            }
-        } catch (IllegalArgumentException ex) {
-            LOGGER.log(Level.SEVERE, "unable to create an indexer for id:{0}", id);
-        } catch (IndexingException ex) {
-            throw new CstlServiceException("An eception occurs while creating the index!" + '\n' +
-                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        } finally {
-            if (indexer != null) {
-                indexer.destroy();
+                } else {
+                    throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+                }
+            } catch (IllegalArgumentException ex) {
+                LOGGER.log(Level.SEVERE, "unable to create an indexer for id:{0}", id);
+            } catch (IndexingException ex) {
+                throw new CstlServiceException("An eception occurs while creating the index!" + '\n' +
+                        "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            } finally {
+                if (indexer != null) {
+                    indexer.destroy();
+                }
             }
         }
     }
@@ -389,7 +396,9 @@ public abstract class AbstractCSWConfigurer {
     
     public abstract AcknowlegementType updateVocabularies() throws CstlServiceException;
 
-    protected abstract File getConfigurationDirectory(String instanceId);
+    protected abstract File getCswInstanceDirectory(String instanceId);
+
+    protected abstract List<File> getAllCswInstanceDirectory();
 
     /**
      * destroy all the resource and close the connection.

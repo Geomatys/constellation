@@ -17,6 +17,8 @@
 
 package org.constellation.configuration.ws.rs;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.io.File;
 
 // Constellation dependencies
@@ -56,7 +58,7 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     }
     
     @Override
-    protected File getConfigurationDirectory(String instanceId) {
+    protected File getCswInstanceDirectory(String instanceId) {
         final File configDir = ConfigDirectory.getConfigDirectory();
 
         if (configDir != null && configDir.exists()) {
@@ -69,5 +71,22 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
             }
         }
         return null;
+    }
+
+    @Override
+    protected List<File> getAllCswInstanceDirectory() {
+        final File configDir     = ConfigDirectory.getConfigDirectory();
+        final List<File> results = new ArrayList<File>();
+        if (configDir != null && configDir.exists()) {
+            final File cswDir = new File(configDir, "CSW");
+            if (cswDir.exists() && cswDir.isDirectory()) {
+                for (File instanceDir : cswDir.listFiles()) {
+                    if (instanceDir.isDirectory()) {
+                        results.add(instanceDir);
+                    }
+                }
+            }
+        }
+        return results;
     }
 }
