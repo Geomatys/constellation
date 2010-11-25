@@ -132,7 +132,7 @@ public final class PortrayalUtil {
             final MutableStyledLayerDescriptor sld) {
 
         if (sld == null) {
-            throw new NullPointerException("SLD should not be null");
+            throw new IllegalArgumentException("SLD should not be null");
         }
 
         for (final MutableLayer layer : sld.layers()) {

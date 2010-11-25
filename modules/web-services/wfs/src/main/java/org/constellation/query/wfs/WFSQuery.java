@@ -81,7 +81,7 @@ public abstract class WFSQuery implements Query {
 
     protected WFSQuery(final Version version) {
         if (version == null) {
-            throw new NullPointerException("Version should not be null !");
+            throw new IllegalArgumentException("Version should not be null !");
         }
         this.version = version;
     }

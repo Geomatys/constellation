@@ -168,7 +168,7 @@ public abstract class WMSQuery implements Query {
 
     protected WMSQuery(final Version version, MultivaluedMap<String,String> parameters) {
         if (version == null) {
-            throw new NullPointerException("Version should not be null !");
+            throw new IllegalArgumentException("Version should not be null !");
         }
         this.version = version;
         this.parameters = parameters;

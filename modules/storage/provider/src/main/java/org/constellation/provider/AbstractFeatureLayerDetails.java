@@ -90,7 +90,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
         super(name,favorites);
         
         if(store == null){
-            throw new NullPointerException("FeatureSource can not be null.");
+            throw new IllegalArgumentException("FeatureSource can not be null.");
         }
         try {
             if (!store.getNames().contains(name)) {

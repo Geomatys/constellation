@@ -1045,7 +1045,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld){
         if(sld == null){
-            throw new NullPointerException("SLD should not be null");
+            throw new IllegalArgumentException("SLD should not be null");
         }
 
         final List<MutableNamedLayer> emptyNameSLDLayers = new ArrayList<MutableNamedLayer>();

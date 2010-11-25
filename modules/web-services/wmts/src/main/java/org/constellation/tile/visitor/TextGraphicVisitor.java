@@ -56,7 +56,7 @@ public abstract class TextGraphicVisitor extends AbstractGraphicVisitor {
      */
     protected TextGraphicVisitor(final GetFeatureInfo gfi) {
         if (gfi == null) {
-            throw new NullPointerException("GetFeatureInfo Object can not be null");
+            throw new IllegalArguementException("GetFeatureInfo Object can not be null");
         }
         this.gfi = gfi;
     }

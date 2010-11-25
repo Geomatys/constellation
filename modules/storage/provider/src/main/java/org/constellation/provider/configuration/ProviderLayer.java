@@ -41,7 +41,7 @@ public class ProviderLayer {
                          final String startElevation, final String endElevation,
                          final boolean isElevationModel, final String elevationModel){
         if(name == null || styles == null){
-            throw new NullPointerException("Name and style list must not be null");
+            throw new IllegalArgumentException("Name and style list must not be null");
         }
         this.name = name;
         this.styles = styles;

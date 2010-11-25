@@ -29,7 +29,7 @@ public final class DefaultQueryRequest implements QueryRequest{
     private final String name;
 
     public DefaultQueryRequest(String name) {
-        if(name == null) throw new NullPointerException("Request name can not be null");
+        if(name == null) throw new IllegalArgumentException("Request name can not be null");
         this.name = name;
     }
 

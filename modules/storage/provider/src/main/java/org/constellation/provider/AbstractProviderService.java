@@ -97,7 +97,7 @@ public abstract class AbstractProviderService<K, V> implements ProviderService<K
     @Override
     public final void setConfiguration(ProviderConfig configuration) {
         if(configuration == null){
-            throw new NullPointerException("Configuration can not be null");
+            throw new IllegalArgumentException("Configuration can not be null");
         }
 
         //unload previous providers
