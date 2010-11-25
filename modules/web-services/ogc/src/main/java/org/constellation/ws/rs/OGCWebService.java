@@ -139,24 +139,12 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         this.workersMap        = workers;
     }
 
-    /**
-     * Scan the configuration directory to instanciate Web service workers.
-     */
-    private void buildWorkerMap() {
+    private File getServiceDirectory() {
         final File configDirectory   = ConfigDirectory.getConfigDirectory();
-        
         if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
             final File serviceDirectory = new File(configDirectory, supportedVersions.get(0).specification.name());
             if (serviceDirectory.exists() && serviceDirectory.isDirectory()) {
-                for (File instanceDirectory : serviceDirectory.listFiles()) {
-                    /*
-                     * For each sub-directory we build a new Worker.
-                     */
-                    if (instanceDirectory.isDirectory() && !instanceDirectory.getName().startsWith(".")) {
-                        final W newWorker = createWorker(instanceDirectory);
-                        workersMap.put(instanceDirectory.getName(), newWorker);
-                    }
-                }
+                return serviceDirectory;
             } else {
                 LOGGER.log(Level.SEVERE, "The service configuration directory: {0} does not exist or is not a directory.", serviceDirectory.getPath());
             }
@@ -165,6 +153,38 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 LOGGER.severe("The service was unable to find a config directory.");
             } else {
                 LOGGER.log(Level.SEVERE, "The configuration directory: {0} does not exist or is not a directory.", configDirectory.getPath());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Scan the configuration directory to instanciate Web service workers.
+     */
+    private void buildWorkerMap() {
+        final File serviceDirectory = getServiceDirectory();
+        if (serviceDirectory != null) {
+            for (File instanceDirectory : serviceDirectory.listFiles()) {
+                /*
+                 * For each sub-directory we build a new Worker.
+                 */
+                if (instanceDirectory.isDirectory() && !instanceDirectory.getName().startsWith(".")) {
+                    final W newWorker = createWorker(instanceDirectory);
+                    workersMap.put(instanceDirectory.getName(), newWorker);
+                }
+            }
+        }
+    }
+
+    private void buildWorker(String identifier) {
+        final File serviceDirectory = getServiceDirectory();
+        if (serviceDirectory != null) {
+            final File instanceDirectory = new File(serviceDirectory, identifier);
+            if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+                final W newWorker = createWorker(instanceDirectory);
+                workersMap.put(instanceDirectory.getName(), newWorker);
+            } else {
+                LOGGER.log(Level.SEVERE, "The instance directory: {0} does not exist or is not a directory.", instanceDirectory.getPath());
             }
         }
     }
@@ -192,13 +212,33 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 
             // administration a the instance
             } else if ("admin".equals(serviceID)){
-                LOGGER.info("refreshing the workers");
-                for (final Worker worker : workersMap.values()) {
-                    worker.destroy();
+                final String request    = getParameter("request", true);
+                final String identifier = getParameter("id", false);
+                
+                // restart operation
+                if ("restart".equals(request)) {
+                    LOGGER.info("\nrefreshing the workers\n");
+                    if (identifier == null) {
+                        for (final Worker worker : workersMap.values()) {
+                            worker.destroy();
+                        }
+                        workersMap.clear();
+                        buildWorkerMap();
+                    } else {
+                        if (workersMap.containsKey(identifier)){
+                            Worker worker = workersMap.get(identifier);
+                            workersMap.remove(identifier);
+                            worker.destroy();
+                            buildWorker(identifier);
+                        } else {
+                            throw new CstlServiceException("There is no worker " +  identifier, INVALID_PARAMETER_VALUE, "id");
+                        }
+                    }
+                    return Response.ok(RESTART_ANCKNOWLEDEGEMENT, "text/xml").build();
+                } else {
+                    throw new CstlServiceException("The operation " +  request + " is not supported by the administration service",
+                        INVALID_PARAMETER_VALUE, "request");
                 }
-                workersMap.clear();
-                buildWorkerMap();
-                return Response.ok(RESTART_ANCKNOWLEDEGEMENT, "text/xml").build();
 
             // unbounded URL
             } else {

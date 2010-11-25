@@ -240,7 +240,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
 
-        final String keyCache    = queryVersion + '-' + currentLanguage;
+        final String keyCache = getId() + queryVersion + '-' + currentLanguage;
         if (CAPS_RESPONSE.containsKey(keyCache)) {
             return CAPS_RESPONSE.get(keyCache);
         }
