@@ -830,6 +830,16 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         visitDef.setVisitor(visitor);
 
 
+        try {
+            //force longitude first
+            vdef.setLongitudeFirst();            
+        } catch (TransformException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        } catch (FactoryException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+
+
         // We now build the response, according to the format chosen.
         try {
         	Cstl.getPortrayalService().visit(sdef,vdef,cdef,visitDef);
@@ -1027,7 +1037,17 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final OutputDef odef = new OutputDef(mime, new Object());
         odef.setCompression(mapDecoration.getCompression(mime));
 
+        try {
+            //force longitude first
+            vdef.setLongitudeFirst();            
+        } catch (TransformException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        } catch (FactoryException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+
         final PortrayalResponse response = new PortrayalResponse(cdef, sdef, vdef, odef);
+        
         if(!mapDecoration.writeInStream()){
             try {
                 response.prepareNow();
