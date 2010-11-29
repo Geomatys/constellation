@@ -133,7 +133,7 @@ public final class ConfigDirectory {
         /*
          * 3) user defined config
          */
-        if (USER_DIRECTORY != null) {
+        if (USER_DIRECTORY != null && !USER_DIRECTORY.isEmpty()) {
             constellationDirectory = new File(USER_DIRECTORY);
             if (!constellationDirectory.exists()) {
                 LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", USER_DIRECTORY);

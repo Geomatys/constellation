@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LayerContext xmlns="http://www.constellation.org/config">
     <layers>
-        <Source id="postgisSrc" load-all="true"/>
+        <Source id="postgisSrc" load_all="true"/>
     </layers>
 </LayerContext>
 

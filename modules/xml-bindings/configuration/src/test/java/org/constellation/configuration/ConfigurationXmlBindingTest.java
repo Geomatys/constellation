@@ -64,8 +64,8 @@ public class ConfigurationXmlBindingTest {
         String expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext >" + '\n'
                 + "    <ns2:layers>" + '\n'
-                + "        <ns2:Source load-all=\"true\" id=\"source1\"/>" + '\n'
-                + "        <ns2:Source load-all=\"true\" id=\"source2\"/>" + '\n'
+                + "        <ns2:Source load_all=\"true\" id=\"source1\"/>" + '\n'
+                + "        <ns2:Source load_all=\"true\" id=\"source2\"/>" + '\n'
                 + "    </ns2:layers>" + '\n'
                 + "</ns2:LayerContext>\n";
 
@@ -89,13 +89,13 @@ public class ConfigurationXmlBindingTest {
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext >" + '\n'
                 + "    <ns2:layers>" + '\n'
-                + "        <ns2:Source load-all=\"true\" id=\"source1\">" + '\n'
+                + "        <ns2:Source load_all=\"true\" id=\"source1\">" + '\n'
                 + "            <ns2:exclude>" + '\n'
                 + "                <ns2:Layer name=\"layer1\"/>" + '\n'
                 + "                <ns2:Layer name=\"layer2\"/>" + '\n'
                 + "            </ns2:exclude>" + '\n'
                 + "        </ns2:Source>" + '\n'
-                + "        <ns2:Source load-all=\"true\" id=\"source2\"/>" + '\n'
+                + "        <ns2:Source load_all=\"true\" id=\"source2\"/>" + '\n'
                 + "    </ns2:layers>" + '\n'
                 + "</ns2:LayerContext>\n";
 
@@ -125,7 +125,7 @@ public class ConfigurationXmlBindingTest {
                 + "                <ns2:Layer name=\"layer2\"/>" + '\n'
                 + "            </ns2:include>" + '\n'
                 + "        </ns2:Source>" + '\n'
-                + "        <ns2:Source load-all=\"true\" id=\"source2\"/>" + '\n'
+                + "        <ns2:Source load_all=\"true\" id=\"source2\"/>" + '\n'
                 + "    </ns2:layers>" + '\n'
                 + "</ns2:LayerContext>\n";
 
@@ -201,7 +201,7 @@ public class ConfigurationXmlBindingTest {
                 + "                <ns2:Layer name=\"layer2\"/>" + '\n'
                 + "            </ns2:include>" + '\n'
                 + "        </ns2:Source>" + '\n'
-                + "        <ns2:Source load-all=\"true\" id=\"source2\"/>" + '\n'
+                + "        <ns2:Source load_all=\"true\" id=\"source2\"/>" + '\n'
                 + "    </ns2:layers>" + '\n'
                 + "</ns2:LayerContext>\n";
 

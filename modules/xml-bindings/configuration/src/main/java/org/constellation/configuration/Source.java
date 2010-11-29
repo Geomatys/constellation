@@ -35,7 +35,7 @@ public class Source {
     @XmlAttribute
     private String id;
 
-    @XmlAttribute(name="load-all")
+    @XmlAttribute(name="load_all")
     private Boolean loadAll;
 
     @XmlElement
@@ -77,6 +77,9 @@ public class Source {
      * @return the loadAll
      */
     public Boolean getLoadAll() {
+        if (loadAll == null) {
+            return false;
+        }
         return loadAll;
     }
 
