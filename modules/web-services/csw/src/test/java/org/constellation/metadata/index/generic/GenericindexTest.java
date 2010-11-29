@@ -88,6 +88,8 @@ public class GenericindexTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
         FileUtilities.deleteDirectory(new File("GenericIndexTest"));
+        indexer.destroy();
+        indexSearcher.destroy();
     }
 
 

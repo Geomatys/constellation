@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // Lucene dependencies
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
@@ -31,8 +30,6 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 // Geotoolkit dependencies
-import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.factory.Hints;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
@@ -43,7 +40,6 @@ import org.geotoolkit.util.FileUtilities;
 //Junit dependencies
 import org.geotoolkit.referencing.CRS;
 import org.junit.*;
-import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.*;
 
@@ -53,13 +49,6 @@ import static org.junit.Assert.*;
  */
 public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
 
-    protected static final FilterFactory2 FF = (FilterFactory2)
-            FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
-
-    private static final Logger logger = Logger.getLogger("org.constellation.metadata");
-
-    private static AbstractIndexSearcher indexSearcher;
-
     private static File configDirectory = new File("WhiteSpaceAnalyzerTest");
 
 
@@ -68,6 +57,8 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new WhitespaceAnalyzer(), Level.FINER);
+        indexer.destroy();
+        
         indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new WhitespaceAnalyzer());
         indexSearcher.setLogLevel(Level.FINER);
     }
@@ -75,6 +66,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
+        indexSearcher.destroy();
     }
 
     public static void deleteIndex() {

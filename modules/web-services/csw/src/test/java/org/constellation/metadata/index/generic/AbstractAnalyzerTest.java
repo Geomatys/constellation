@@ -19,17 +19,28 @@ package org.constellation.metadata.index.generic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.opengis.filter.FilterFactory2;
 
 /**
  *
 * @author Guilhem Legal (Geomatys)
  */
 public abstract class AbstractAnalyzerTest {
+
+    protected static final FilterFactory2 FF = (FilterFactory2) FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
+
+    protected static final Logger logger = Logger.getLogger("org.constellation.metadata.index.generic");
+
+    protected static AbstractIndexSearcher indexSearcher;
 
     public static List<Object> fillTestData() throws JAXBException {
         List<Object> result       = new ArrayList<Object>();
