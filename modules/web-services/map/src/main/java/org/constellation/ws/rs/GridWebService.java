@@ -21,6 +21,8 @@ import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import org.constellation.ServiceDef;
 import org.constellation.management.ConstellationsMBeans;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.Worker;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.internal.io.Installation;
@@ -54,5 +56,19 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
 
     public GridWebService(final ServiceDef... supportedVersions) {
         super(supportedVersions);
+    }
+
+    @Override
+    protected void specificRestart(String identifier) {
+        LOGGER.info("reloading provider");
+        // Reload the style and layer provider proxies if they already exist.
+        final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
+        if (spp != null) {
+            spp.reload();
+        }
+        final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
+        if (lpp != null) {
+            lpp.reload();
+        }
     }
 }

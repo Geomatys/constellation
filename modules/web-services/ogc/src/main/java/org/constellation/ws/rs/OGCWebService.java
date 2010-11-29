@@ -218,6 +218,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 // restart operation
                 if ("restart".equals(request)) {
                     LOGGER.info("\nrefreshing the workers\n");
+                    specificRestart(identifier);
                     if (identifier == null) {
                         for (final Worker worker : workersMap.values()) {
                             worker.destroy();
@@ -248,6 +249,10 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, supportedVersions.get(0));
         }
+    }
+
+    protected void specificRestart(String identifier) {
+        // do nothing in this implementation
     }
 
     /**
