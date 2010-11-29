@@ -112,7 +112,7 @@
                             </gmd:CI_Citation>
                         </gmd:authority>
                         <gmd:code>
-                            <gmx:Anchor xlink:href="SDN:L101:2:4326">World Geodetic System 84</gmx:Anchor>
+                            <gmx:Anchor xlink:href="SDN:L101:2:4326">0UINDITENE</gmx:Anchor>
                         </gmd:code>
                     </gmd:RS_Identifier>
                 </gmd:referenceSystemIdentifier>

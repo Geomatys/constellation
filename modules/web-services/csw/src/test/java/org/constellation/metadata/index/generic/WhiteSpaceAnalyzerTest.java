@@ -157,6 +157,42 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
+
+        /**
+         * Test 4 simple search: ID = World Geodetic System 84
+         */
+        spatialQuery = new SpatialQuery("ID:\"World Geodetic System 84\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "simpleSearch 4:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 5 simple search: ID = 0UINDITENE
+         */
+        spatialQuery = new SpatialQuery("ID:\"0UINDITENE\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "simpleSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("11325_158_19640418141800");
+
+        assertEquals(expectedResult, result);
     }
 
      /**
@@ -285,7 +321,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -320,7 +356,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -345,7 +381,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("CTDF02");
@@ -370,7 +406,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("CTDF02");
@@ -395,7 +431,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 4:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -435,7 +471,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("39727_22_19750113062500");
@@ -461,7 +497,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -487,7 +523,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 1:\n" + result);
+        logger.log(Level.FINER, "identifier query 1:\n{0}", result);
 
         String expectedResult = "39727_22_19750113062500";
 
@@ -500,7 +536,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 2:\n" + result);
+        logger.log(Level.FINER, "identifier query 2:\n{0}", result);
 
         expectedResult = "CTDF02";
 

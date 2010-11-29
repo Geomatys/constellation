@@ -144,6 +144,42 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
+
+        /**
+         * Test 4 simple search: ID = World Geodetic System 84
+         */
+        spatialQuery = new SpatialQuery("ID:\"World Geodetic System 84\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "simpleSearch 4:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 5 simple search: ID = 0UINDITENE
+         */
+        spatialQuery = new SpatialQuery("ID:\"0UINDITENE\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "simpleSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("11325_158_19640418141800");
+
+        assertEquals(expectedResult, result);
     }
 
      /**
