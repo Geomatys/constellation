@@ -634,7 +634,7 @@
                 <gmd:distributionFormat>
                     <gmd:MD_Format>
                         <gmd:name>
-                            <gmx:Anchor xlink:href="SDN:L241:1:MEDATLAS">MEDATLAS ASCII</gmx:Anchor>
+                            <gmx:Anchor xlink:href="SDN:L241:1:MEDATLAS">ASCII MEDATLAS</gmx:Anchor>
                         </gmd:name>
                         <gmd:version>
                             <gco:CharacterString>1.0</gco:CharacterString>

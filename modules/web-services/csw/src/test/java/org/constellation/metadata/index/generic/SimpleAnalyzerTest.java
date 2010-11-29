@@ -94,7 +94,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
         // the result we want are this
         List<String> expectedResult = new ArrayList<String>();
@@ -119,7 +119,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -145,7 +145,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("simpleSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -172,7 +172,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -192,7 +192,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -209,7 +209,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("WilCharSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "WilCharSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("39727_22_19750113062500");
@@ -233,10 +233,31 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 4:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 5 wildCharSearch: Format LIKE *MEDATLAS ASCII*
+         */
+        spatialQuery = new SpatialQuery("Format:(*MEDATLAS ASCII*)", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800"); // >>  ISSUES This one shoudn't be there because it not in the same order => ASCII MEDATLAS
+        expectedResult.add("40510_145_19930221211500");
 
         assertEquals(expectedResult, result);
     }

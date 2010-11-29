@@ -96,7 +96,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
         // the result we want are this
         List<String> expectedResult = new ArrayList<String>();
@@ -117,7 +117,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -138,7 +138,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("simpleSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -165,7 +165,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -183,7 +183,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -203,7 +203,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         assertTrue(result.contains("39727_22_19750113062500"));
@@ -222,7 +222,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 4:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -230,6 +230,30 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         // ERROR it didn't find any result (why???)
         expectedResult = new ArrayList<String>();
         
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 5 wildCharSearch: Format LIKE *MEDATLAS ASCII*
+         */
+        spatialQuery = new SpatialQuery("Format:(*MEDATLAS ASCII*)", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("40510_145_19930221211500");
+
+
+        // ERROR it didn't find any result (why???)
+        expectedResult = new ArrayList<String>();
+
         assertEquals(expectedResult, result);
 
     }
@@ -253,7 +277,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -288,7 +312,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -313,7 +337,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("CTDF02");
@@ -338,7 +362,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("CTDF02");
@@ -363,7 +387,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 4:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -403,7 +427,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("39727_22_19750113062500");
@@ -430,7 +454,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -456,7 +480,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 1:\n" + result);
+        logger.log(Level.FINER, "identifier query 1:\n{0}", result);
 
         String expectedResult = "39727_22_19750113062500";
 
@@ -469,7 +493,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 2:\n" + result);
+        logger.log(Level.FINER, "identifier query 2:\n{0}", result);
 
         expectedResult = "CTDF02";
 

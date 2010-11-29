@@ -95,7 +95,7 @@ public class CQLParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "Title:VM*");
+        assertEquals(spaQuery.getQuery(), "Title:(VM*)");
         
         /**
          *  Test 2: PropertyIsEquals
@@ -1032,7 +1032,7 @@ public class CQLParserTest {
         SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "(Title:*VM*)");
+        assertEquals(spaQuery.getQuery(), "(Title:(*VM*))");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
@@ -1060,7 +1060,7 @@ public class CQLParserTest {
         
         SpatialQuery subQuery = spaQuery.getSubQueries().get(0);
         assertTrue(subQuery.getSpatialFilter() != null);
-        assertEquals(subQuery.getQuery(), "(Title:*VM*)");
+        assertEquals(subQuery.getQuery(), "(Title:(*VM*))");
         assertEquals(subQuery.getSubQueries().size(), 0);
         
         assertTrue(subQuery.getSpatialFilter() instanceof LuceneOGCFilter);
@@ -1116,7 +1116,7 @@ public class CQLParserTest {
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.OR);
         
         subQuery = spaQuery.getSubQueries().get(0);
-        assertEquals(subQuery.getQuery(), "(Title:*VM*)");
+        assertEquals(subQuery.getQuery(), "(Title:(*VM*))");
         assertEquals(subQuery.getSubQueries().size(), 0);
         assertEquals(subQuery.getLogicalOperator(), SerialChainFilter.OR);
         assertTrue(subQuery.getSpatialFilter() instanceof LuceneOGCFilter);
@@ -1211,7 +1211,7 @@ public class CQLParserTest {
         
         subQuery1 = spaQuery.getSubQueries().get(0);
         assertTrue  (subQuery1.getSpatialFilter() != null);
-        assertEquals(subQuery1.getQuery(), "(Title:LO?Li)");
+        assertEquals(subQuery1.getQuery(), "(Title:(LO?Li))");
         assertEquals(subQuery1.getSubQueries().size(), 0);
         assertEquals(subQuery1.getLogicalOperator(), SerialChainFilter.AND);
         
@@ -1300,7 +1300,7 @@ public class CQLParserTest {
         
         SpatialQuery subQuery1_1 = subQuery1.getSubQueries().get(0);
         assertEquals(subQuery1_1.getLogicalOperator(), SerialChainFilter.AND);
-        assertEquals(subQuery1_1.getQuery(), "(Title:*VM*)");
+        assertEquals(subQuery1_1.getQuery(), "(Title:(*VM*))");
         assertTrue  (subQuery1_1.getSpatialFilter() != null);
         assertTrue  (subQuery1_1.getSpatialFilter() instanceof LuceneOGCFilter);
         spaFilter = (LuceneOGCFilter) subQuery1_1.getSpatialFilter();
@@ -1326,7 +1326,7 @@ public class CQLParserTest {
         
         SpatialQuery subQuery2_1 = subQuery2.getSubQueries().get(0);
         assertTrue  (subQuery2_1.getSpatialFilter() != null);
-        assertEquals(subQuery2_1.getQuery(), "(Title:LO?Li)");
+        assertEquals(subQuery2_1.getQuery(), "(Title:(LO?Li))");
         assertEquals(subQuery2_1.getSubQueries().size(), 0);
         assertEquals(subQuery2_1.getLogicalOperator(), SerialChainFilter.AND);
         

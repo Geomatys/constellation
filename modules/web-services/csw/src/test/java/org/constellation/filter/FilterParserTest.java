@@ -110,7 +110,7 @@ public class FilterParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "Title:*VM*");
+        assertEquals(spaQuery.getQuery(), "Title:(*VM*)");
         
         
         /**
@@ -1011,7 +1011,7 @@ public class FilterParserTest {
         SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "(Title:*VM*)");
+        assertEquals(spaQuery.getQuery(), "(Title:(*VM*))");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
@@ -1057,7 +1057,7 @@ public class FilterParserTest {
         spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "(Title:*VM* AND Title:\"VM\")");
+        assertEquals(spaQuery.getQuery(), "(Title:(*VM*) AND Title:\"VM\")");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
         assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
@@ -1160,7 +1160,7 @@ public class FilterParserTest {
         spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "(Title:*VM* OR Title:\"VM\")");
+        assertEquals(spaQuery.getQuery(), "(Title:(*VM*) OR Title:\"VM\")");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.OR);
         
@@ -1336,7 +1336,7 @@ public class FilterParserTest {
         
         subQuery1 = spaQuery.getSubQueries().get(0);
         assertTrue  (subQuery1.getSpatialFilter() != null);
-        assertEquals(subQuery1.getQuery(), "(Title:LO?Li)");
+        assertEquals(subQuery1.getQuery(), "(Title:(LO?Li))");
         assertEquals(subQuery1.getSubQueries().size(), 0);
         assertEquals(subQuery1.getLogicalOperator(), SerialChainFilter.AND);
         
@@ -1412,7 +1412,7 @@ public class FilterParserTest {
         spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
-        assertEquals(spaQuery.getQuery(), "(Title:*VM*)");
+        assertEquals(spaQuery.getQuery(), "(Title:(*VM*))");
         assertEquals(spaQuery.getSubQueries().size(), 2);
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.AND);
         
@@ -1440,7 +1440,7 @@ public class FilterParserTest {
         
         SpatialQuery subQuery2_1 = subQuery2.getSubQueries().get(0);
         assertTrue  (subQuery2_1.getSpatialFilter() != null);
-        assertEquals(subQuery2_1.getQuery(), "(Title:LO?Li)");
+        assertEquals(subQuery2_1.getQuery(), "(Title:(LO?Li))");
         assertEquals(subQuery2_1.getSubQueries().size(), 0);
         assertEquals(subQuery2_1.getLogicalOperator(), SerialChainFilter.AND);
         
@@ -1541,7 +1541,7 @@ public class FilterParserTest {
         // first sub-query
         subQuery1 = spaQuery.getSubQueries().get(0);
         assertTrue  (subQuery1.getSpatialFilter() == null);
-        assertEquals(subQuery1.getQuery(), "Title:*VM*");
+        assertEquals(subQuery1.getQuery(), "Title:(*VM*)");
         assertEquals(subQuery1.getSubQueries().size(), 0);
         assertEquals(subQuery1.getLogicalOperator(), SerialChainFilter.NOT);
         
@@ -1574,7 +1574,7 @@ public class FilterParserTest {
         
         SpatialQuery subQuery3_1 = subQuery3.getSubQueries().get(0);
         assertTrue  (subQuery3_1.getSpatialFilter() != null);
-        assertEquals(subQuery3_1.getQuery(), "(Title:LO?Li)");
+        assertEquals(subQuery3_1.getQuery(), "(Title:(LO?Li))");
         assertEquals(subQuery3_1.getSubQueries().size(), 0);
         assertEquals(subQuery3_1.getLogicalOperator(), SerialChainFilter.AND);
         

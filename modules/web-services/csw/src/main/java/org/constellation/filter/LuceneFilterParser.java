@@ -230,7 +230,9 @@ public class LuceneFilterParser extends FilterParser {
         if ("!=".equals(operator)) {
             response.append("metafile:doc NOT ");
         }
-        if ("LIKE".equals(operator) || "IS NULL ".equals(operator)) {
+        if ("LIKE".equals(operator)) {
+            response.append(removePrefix(propertyName.getPropertyName())).append(":").append('(').append(literalValue).append(')');
+        } else if ("IS NULL ".equals(operator)) {
             response.append(removePrefix(propertyName.getPropertyName())).append(":").append(literalValue);
         } else {
             response.append(removePrefix(propertyName.getPropertyName())).append(":\"").append(literalValue).append('"');
