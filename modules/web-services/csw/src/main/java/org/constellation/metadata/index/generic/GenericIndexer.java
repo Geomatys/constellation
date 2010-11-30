@@ -603,7 +603,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                             metadata = null;
                         }
                         
-                    } else metadata = getAttributeValue(metadata, attributeName);
+                    } else {
+                        metadata = getAttributeValue(metadata, attributeName);
+                    }
                 }
             } 
             result = getStringValue(metadata);
@@ -620,10 +622,19 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     private static boolean matchCondition(Object metadata, String conditionalAttribute, String conditionalValue) {
         final Object conditionalObj = getAttributeValue(metadata, conditionalAttribute);
-        LOGGER.finer("contionalObj: "     + getStringValue(conditionalObj) + '\n' +
-                     "conditionalValue: " + conditionalValue               + '\n' +
-                     "match? "            + conditionalValue.equals(getStringValue(conditionalObj)));
-        return conditionalValue.equalsIgnoreCase(getStringValue(conditionalObj));
+        final String attributValue  = getStringValue(conditionalObj);
+        final boolean result;
+        // if we a have a pattern matching
+        if (conditionalValue.contains("*")) {
+            result = attributValue.matches(conditionalValue);
+        } else {
+            result = conditionalValue.equalsIgnoreCase(attributValue);
+        }
+        LOGGER.info("contionalObj: "       + attributValue +
+                     "\nconditionalValue: " + conditionalValue             +
+                     "\nmatch? "            + result);
+        
+        return result;
     }
     
     /**
@@ -662,7 +673,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                     GETTERS.put(object.getClass().getName() + ':' + attributeName, getter);
                     result = ReflectionUtilities.invokeMethod(object, getter);
                 } else {
-                    LOGGER.finer("No getter have been found for attribute " + attributeName + " in the class " + object.getClass().getName());
+                    LOGGER.info("No getter have been found for attribute " + attributeName + " in the class " + object.getClass().getName());
                 }
             }
         }

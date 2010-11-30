@@ -470,13 +470,13 @@ public class WMSService extends GridWebService<WMSWorker> {
          */
         if ("1.3.0".equals(version)) {
             if (strExceptions != null && 
-                (!"XML".equals(strExceptions) || !"INIMAGE".equals(strExceptions) || !"BLANK".equals(strExceptions))) {
+                (!"XML".equals(strExceptions) && !"INIMAGE".equals(strExceptions) && !"BLANK".equals(strExceptions))) {
                 throw new CstlServiceException("exception format:" + strExceptions + " is not allowed. Use XML, INIMAGE or BLANK", INVALID_PARAMETER_VALUE);
             }
         } else {
             if (strExceptions != null &&
-                (!"application/vnd.ogc.se_xml".equals(strExceptions) || !"application/vnd.ogc.se_inimage".equals(strExceptions)
-              || !"application/vnd.ogc.se_blank".equals(strExceptions))) {
+                (!"application/vnd.ogc.se_xml".equals(strExceptions) && !"application/vnd.ogc.se_inimage".equals(strExceptions)
+              && !"application/vnd.ogc.se_blank".equals(strExceptions))) {
                 throw new CstlServiceException("exception format:" + strExceptions + " is not allowed. Use application/vnd.ogc.se_xml, application/vnd.ogc.se_inimage or application/vnd.ogc.se_blank", INVALID_PARAMETER_VALUE);
             }
         }
