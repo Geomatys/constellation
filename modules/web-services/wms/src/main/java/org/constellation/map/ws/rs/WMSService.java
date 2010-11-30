@@ -465,7 +465,22 @@ public class WMSService extends GridWebService<WMSWorker> {
      */
     private GetMap adaptGetMap(final String version, final boolean fromGetMap, final QueryContext queryContext) throws CstlServiceException {
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
-        if (strExceptions != null && strExceptions.equalsIgnoreCase(MimeType.APP_INIMAGE)) {
+        /*
+         * we verify that the exception format is an allowed value
+         */
+        if ("1.3.0".equals(version)) {
+            if (strExceptions != null && 
+                (!"XML".equals(strExceptions) || !"INIMAGE".equals(strExceptions) || !"BLANK".equals(strExceptions))) {
+                throw new CstlServiceException("exception format:" + strExceptions + " is not allowed. Use XML, INIMAGE or BLANK", INVALID_PARAMETER_VALUE);
+            }
+        } else {
+            if (strExceptions != null &&
+                (!"application/vnd.ogc.se_xml".equals(strExceptions) || !"application/vnd.ogc.se_inimage".equals(strExceptions)
+              || !"application/vnd.ogc.se_blank".equals(strExceptions))) {
+                throw new CstlServiceException("exception format:" + strExceptions + " is not allowed. Use application/vnd.ogc.se_xml, application/vnd.ogc.se_inimage or application/vnd.ogc.se_blank", INVALID_PARAMETER_VALUE);
+            }
+        }
+        if (strExceptions != null && (strExceptions.equalsIgnoreCase(MimeType.APP_INIMAGE) || strExceptions.equalsIgnoreCase("INIMAGE"))) {
             queryContext.setErrorInimage(true);
         }
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);

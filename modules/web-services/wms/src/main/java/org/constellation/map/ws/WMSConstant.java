@@ -17,7 +17,9 @@
 
 package org.constellation.map.ws;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.wms.xml.v111.DescribeLayer;
 import org.geotoolkit.wms.xml.v111.GetCapabilities;
@@ -83,8 +85,19 @@ public class WMSConstant {
         final GetLegendGraphic getLegendGraphic = new GetLegendGraphic(Arrays.asList("image/png","image/jpeg","image/gif","image/tiff"), dcp);
 
         REQUEST_111 = new org.geotoolkit.wms.xml.v111.Request(getCapabilities, getMap, getFeatureInfo, describeLayer, getLegendGraphic, null, null);
+    }
 
-       
+    public static final List<String> EXCEPTION_111 = new ArrayList<String>();
+    static {
+        EXCEPTION_111.add("application/vnd.ogc.se_xml");
+        EXCEPTION_111.add("application/vnd.ogc.se_inimage");
+        EXCEPTION_111.add("application/vnd.ogc.se_blank");
+    }
 
+    public static final List<String> EXCEPTION_130 = new ArrayList<String>();
+    static {
+        EXCEPTION_130.add("XML");
+        EXCEPTION_130.add("INIMAGE");
+        EXCEPTION_130.add("BLANK");
     }
 }

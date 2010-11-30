@@ -263,6 +263,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         request.updateURL(url);
         inCapabilities.getCapability().setRequest(request);
 
+        final List<String> exceptionFormats;
+        if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
+            exceptionFormats = WMSConstant.EXCEPTION_111;
+        } else {
+            exceptionFormats = WMSConstant.EXCEPTION_130;
+        }
+        inCapabilities.getCapability().setExceptionFormats(exceptionFormats);
+
+
         //Build the list of layers
         final List<AbstractLayer> outputLayers = new ArrayList<AbstractLayer>();
         final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
