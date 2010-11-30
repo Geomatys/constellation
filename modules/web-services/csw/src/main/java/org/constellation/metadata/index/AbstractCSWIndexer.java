@@ -17,6 +17,7 @@
 
 package org.constellation.metadata.index;
 
+import java.util.Map.Entry;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,10 +97,11 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
         // For an ISO 19139 object
         if (isISO19139(metadata)) {
-            indexQueryableSet(doc, metadata, ISO_QUERYABLE, anyText);
+            final Map<String, List<String>> isoQueryable = removeOverridenField(ISO_QUERYABLE);
+            indexQueryableSet(doc, metadata, isoQueryable, anyText);
 
             //we add the geometry parts
-            alreadySpatiallyIndexed = indexSpatialPart(doc, metadata, ISO_QUERYABLE);
+            alreadySpatiallyIndexed = indexSpatialPart(doc, metadata, isoQueryable);
 
         } else if (isEbrim30(metadata)) {
            // TODO
@@ -110,11 +112,12 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         }
 
         // All metadata types must be compatible with dublinCore.
-        indexQueryableSet(doc, metadata, DUBLIN_CORE_QUERYABLE, anyText);
+        final Map<String, List<String>> dcQueryable = removeOverridenField(DUBLIN_CORE_QUERYABLE);
+        indexQueryableSet(doc, metadata, dcQueryable, anyText);
 
         //we add the geometry parts if its nor already indexed
         if (!alreadySpatiallyIndexed) {
-            indexSpatialPart(doc, metadata, DUBLIN_CORE_QUERYABLE);
+            indexSpatialPart(doc, metadata, dcQueryable);
         }
 
         // we add to the index the special queryable elements
@@ -129,6 +132,21 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         return doc;
     }
 
+    /**
+     * Remove the mapping of the specified Queryable set if it is overriden by one in the additional Queryable set.
+     * 
+     * @param queryableSet
+     */
+    private Map<String, List<String>> removeOverridenField(Map<String, List<String>> queryableSet) {
+        Map<String, List<String>> result = new HashMap<String, List<String>>();
+        for (Entry<String, List<String>> entry : queryableSet.entrySet()) {
+            if (!additionalQueryable.containsKey(entry.getKey())) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
+    }
+    
     /**
      * Add the specifics implementation field to the document.
      *

@@ -625,12 +625,12 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         final String attributValue  = getStringValue(conditionalObj);
         final boolean result;
         // if we a have a pattern matching
-        if (conditionalValue.contains("*")) {
+        if (conditionalValue.contains("[")) {
             result = attributValue.matches(conditionalValue);
         } else {
             result = conditionalValue.equalsIgnoreCase(attributValue);
         }
-        LOGGER.info("contionalObj: "       + attributValue +
+        LOGGER.finer("contionalObj: "       + attributValue +
                      "\nconditionalValue: " + conditionalValue             +
                      "\nmatch? "            + result);
         
@@ -673,7 +673,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                     GETTERS.put(object.getClass().getName() + ':' + attributeName, getter);
                     result = ReflectionUtilities.invokeMethod(object, getter);
                 } else {
-                    LOGGER.info("No getter have been found for attribute " + attributeName + " in the class " + object.getClass().getName());
+                    LOGGER.finer("No getter have been found for attribute " + attributeName + " in the class " + object.getClass().getName());
                 }
             }
         }

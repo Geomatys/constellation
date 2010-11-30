@@ -301,6 +301,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         final InputStream inGfi = gfi.openStream();
         final InputStreamReader isr = new InputStreamReader(inGfi);
         final BufferedReader reader = new BufferedReader(isr);
+        String fullResponse = "";
         String line;
         while ((line = reader.readLine()) != null) {
             // Verify that the line starts with a number, only the one with the value
@@ -309,11 +310,12 @@ public class WMSRequestsTest extends AbstractTestRequest {
                 // keep the line with the value
                 value = line;
             }
+            fullResponse = fullResponse + line + '\n';
         }
         reader.close();
 
         // Tests on the returned value
-        assertNotNull(value);
+        assertNotNull(fullResponse, value);
         assertTrue   (value.startsWith("28.5"));
     }
 
