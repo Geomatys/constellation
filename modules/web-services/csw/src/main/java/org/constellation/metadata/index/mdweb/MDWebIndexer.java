@@ -106,7 +106,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
             if (version != null && version.startsWith("2.0")) {
                 mdWebReader = new Reader20(dataSource, isPostgres);
-            } else if (version != null && version.startsWith("2.1")) {
+            } else if (version != null && (version.startsWith("2.1") || version.startsWith("2.2"))) {
                 mdWebReader = new Reader21(dataSource, isPostgres);
             } else {
                 throw new IndexingException("unexpected database version:" + version);

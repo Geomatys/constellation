@@ -1,0 +1,1316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmi:MI_Metadata xmlns="http://www.isotc211.org/2005/gmi" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmi Q:/users/mize.jacqueline/ISO/gmi/gmi.xsd">
+    <gmd:fileIdentifier>
+        <gco:CharacterString>gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX</gco:CharacterString>
+    </gmd:fileIdentifier>
+    <gmd:language>
+        <gco:CharacterString>eng; USA</gco:CharacterString>
+    </gmd:language>
+    <gmd:characterSet>
+        <gmd:MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8" codeSpace="004">utf8</gmd:MD_CharacterSetCode>
+    </gmd:characterSet>
+    <gmd:hierarchyLevel>
+        <gmd:MD_ScopeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset" codeSpace="005">dataset</gmd:MD_ScopeCode>
+    </gmd:hierarchyLevel>
+    <gmd:contact>
+        <gmd:CI_ResponsibleParty>
+            <gmd:organisationName>
+                <gco:CharacterString>NOAA/NESDIS/NODC/NCDDC; National Coastal Data Development Center</gco:CharacterString>
+            </gmd:organisationName>
+            <gmd:contactInfo>
+                <gmd:CI_Contact>
+                    <gmd:phone>
+                        <gmd:CI_Telephone>
+                            <gmd:voice>
+                                <gco:CharacterString>866-732-2382</gco:CharacterString>
+                            </gmd:voice>
+                            <gmd:facsimile>
+                                <gco:CharacterString>228-688-2968</gco:CharacterString>
+                            </gmd:facsimile>
+                        </gmd:CI_Telephone>
+                    </gmd:phone>
+                    <gmd:address>
+                        <gmd:CI_Address>
+                            <gmd:city>
+                                <gco:CharacterString>Stennis Space Center</gco:CharacterString>
+                            </gmd:city>
+                            <gmd:administrativeArea>
+                                <gco:CharacterString>MS</gco:CharacterString>
+                            </gmd:administrativeArea>
+                            <gmd:postalCode>
+                                <gco:CharacterString>39529</gco:CharacterString>
+                            </gmd:postalCode>
+                            <gmd:electronicMailAddress>
+                                <gco:CharacterString>ncddcmetadata@noaa.gov</gco:CharacterString>
+                            </gmd:electronicMailAddress>
+                        </gmd:CI_Address>
+                    </gmd:address>
+                    <gmd:hoursOfService>
+                        <gco:CharacterString>8am-5pm, Monday through Friday</gco:CharacterString>
+                    </gmd:hoursOfService>
+                </gmd:CI_Contact>
+            </gmd:contactInfo>
+            <gmd:role>
+                <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact" codeSpace="007">http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode</gmd:CI_RoleCode>
+            </gmd:role>
+        </gmd:CI_ResponsibleParty>
+    </gmd:contact>
+    <gmd:dateStamp>
+        <gco:Date>2008-01-31</gco:Date>
+    </gmd:dateStamp>
+    <gmd:metadataStandardName>
+        <gco:CharacterString>ISO 19115-2</gco:CharacterString>
+    </gmd:metadataStandardName>
+    <gmd:metadataStandardVersion>
+        <gco:CharacterString>2009-02-15</gco:CharacterString>
+    </gmd:metadataStandardVersion>
+    <gmd:spatialRepresentationInfo/>
+    <gmd:referenceSystemInfo>
+        <gmd:MD_ReferenceSystem/>
+    </gmd:referenceSystemInfo>
+    <gmd:metadataExtensionInfo>
+        <gmd:MD_MetadataExtensionInformation>
+            <gmd:extensionOnLineResource>
+                <gmd:CI_OnlineResource>
+                    <gmd:linkage>
+                        <gmd:URL>http://www.fgdc.gov/standards/projects/FGDC-standards-projects/csdgm_rs_ex/MetadataRemoteSensingExtens.pdf</gmd:URL>
+                    </gmd:linkage>
+                    <gmd:name>
+                        <gco:CharacterString>Content Standard for Digital Geospatial Metadata: Extensions for Remote Sensing Metadata</gco:CharacterString>
+                    </gmd:name>
+                </gmd:CI_OnlineResource>
+            </gmd:extensionOnLineResource>
+        </gmd:MD_MetadataExtensionInformation>
+    </gmd:metadataExtensionInfo>
+    <gmd:identificationInfo>
+        <gmd:MD_DataIdentification>
+            <gmd:citation>
+                <gmd:CI_Citation>
+                    <gmd:title>
+                        <gco:CharacterString>Sea surface temperature and history derived from an analysis of MODIS Level 3 data for the Gulf of Mexico</gco:CharacterString>
+                    </gmd:title>
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date gco:nilReason="unpublished material"/>
+                            <gmd:dateType>
+                                <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="002">publication</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                    <gmd:identifier>
+                        <gmd:MD_Identifier>
+                            <gmd:code>
+                                <gco:CharacterString>MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX</gco:CharacterString>
+                            </gmd:code>
+                        </gmd:MD_Identifier>
+                    </gmd:identifier>
+                    <gmd:citedResponsibleParty>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+                                <gco:CharacterString>NRL-Code 7333</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="originator" codeSpace="006">originator</gmd:CI_RoleCode>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:citedResponsibleParty>
+                    <gmd:citedResponsibleParty>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+                                <gco:CharacterString>Naval Research Laboratory, Stennis Space Center</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="originator" codeSpace="006">originator</gmd:CI_RoleCode>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:citedResponsibleParty>
+                    <gmd:presentationForm>
+                        <gmd:CI_PresentationFormCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode" codeListValue="mapDigital" codeSpace="005">mapDigital</gmd:CI_PresentationFormCode>
+                    </gmd:presentationForm>
+                </gmd:CI_Citation>
+            </gmd:citation>
+            <gmd:abstract>
+                <gco:CharacterString>This dataset consists of measurements from ocean color sensors and the blending of products for ocean color sensors for several products derived from the Quasi-Analytical Algorithm including absorption, backward scattering, and absorption due to CDOM and phytoplankton, and the extracted true color images. In addition to these products, sea surface temperature and chlorophyll from NASA algorithms were produced. For further information on how these products were generated, please contact Robert Arnone at the Naval Research Lab ph. (228) 688-5268. E-mail: arnone@nrlssc.navy.mil</gco:CharacterString>
+            </gmd:abstract>
+            <gmd:purpose>
+                <gco:CharacterString>To supply the most recent optical products for the Gulf of Mexico for real-time monitoring.</gco:CharacterString>
+            </gmd:purpose>
+            <gmd:status>
+                <gmd:MD_ProgressCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode" codeListValue="underDevelopment" codeSpace="007">underDevelopment</gmd:MD_ProgressCode>
+            </gmd:status>
+            <gmd:pointOfContact>
+                <gmd:CI_ResponsibleParty>
+                    <gmd:individualName>
+                        <gco:CharacterString>Robert Arnone</gco:CharacterString>
+                    </gmd:individualName>
+                    <gmd:organisationName>
+                        <gco:CharacterString>Naval Research Laboratory</gco:CharacterString>
+                    </gmd:organisationName>
+                    <gmd:positionName>
+                        <gco:CharacterString>Head, Ocean Sciences Branch</gco:CharacterString>
+                    </gmd:positionName>
+                    <gmd:contactInfo>
+                        <gmd:CI_Contact>
+                            <gmd:phone>
+                                <gmd:CI_Telephone>
+                                    <gmd:voice>
+                                        <gco:CharacterString>(228)688-5268</gco:CharacterString>
+                                    </gmd:voice>
+                                </gmd:CI_Telephone>
+                            </gmd:phone>
+                            <gmd:address>
+                                <gmd:CI_Address>
+                                    <gmd:city>
+                                        <gco:CharacterString>Stennis Space Center</gco:CharacterString>
+                                    </gmd:city>
+                                    <gmd:administrativeArea>
+                                        <gco:CharacterString>MS</gco:CharacterString>
+                                    </gmd:administrativeArea>
+                                    <gmd:postalCode>
+                                        <gco:CharacterString>39529</gco:CharacterString>
+                                    </gmd:postalCode>
+                                    <gmd:electronicMailAddress>
+                                        <gco:CharacterString>arnone@nrlssc.navy.mil</gco:CharacterString>
+                                    </gmd:electronicMailAddress>
+                                </gmd:CI_Address>
+                            </gmd:address>
+                        </gmd:CI_Contact>
+                    </gmd:contactInfo>
+                    <gmd:role>
+                        <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact" codeSpace="007">pointOfContact</gmd:CI_RoleCode>
+                    </gmd:role>
+                </gmd:CI_ResponsibleParty>
+            </gmd:pointOfContact>
+            <gmd:resourceMaintenance>
+                <gmd:MD_MaintenanceInformation>
+                    <gmd:maintenanceAndUpdateFrequency>
+                        <gmd:MD_MaintenanceFrequencyCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode" codeListValue="daily" codeSpace="002">daily</gmd:MD_MaintenanceFrequencyCode>
+                    </gmd:maintenanceAndUpdateFrequency>
+                </gmd:MD_MaintenanceInformation>
+            </gmd:resourceMaintenance>
+            <gmd:resourceMaintenance/>
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    <gmd:keyword>
+                        <gco:CharacterString>Ocean Thermal</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Optical Products</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>MODIS</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Terra</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Aqua</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>SST</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Sea Surface Temperature</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:type>
+                        <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme" codeSpace="005">theme</gmd:MD_KeywordTypeCode>
+                    </gmd:type>
+                    <gmd:thesaurusName>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>None</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date gco:nilReason="Unknown"/>
+                        </gmd:CI_Citation>
+                    </gmd:thesaurusName>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    <gmd:keyword>
+                        <gco:CharacterString>Dissolved nutrients</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Ocean Color</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Optical properties</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Salinity</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Temperature</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:type>
+                        <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme" codeSpace="005">theme</gmd:MD_KeywordTypeCode>
+                    </gmd:type>
+                    <gmd:thesaurusName>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>IOOS Core Data Variables</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date gco:nilReason="Unknown"/>
+                        </gmd:CI_Citation>
+                    </gmd:thesaurusName>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    <gmd:keyword>
+                        <gco:CharacterString>Gulf of Mexico</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Mississippi Bight</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>United States</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Texas</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Louisiana</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Mississippi</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Alabama</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Florida</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Mexico</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Tamaulipas</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Veracruz</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Tabasco</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Campeche</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Yucatan</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Coastal</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>Open Ocean</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:type>
+                        <gmd:MD_KeywordTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="place" codeSpace="002">place</gmd:MD_KeywordTypeCode>
+                    </gmd:type>
+                    <gmd:thesaurusName>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>None</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date gco:nilReason="Unknown"/>
+                        </gmd:CI_Citation>
+                    </gmd:thesaurusName>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <gmd:resourceConstraints>
+                <gmd:MD_LegalConstraints>
+                    <gmd:accessConstraints>
+                        <gmd:MD_RestrictionCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions" codeSpace="008">otherRestrictions</gmd:MD_RestrictionCode>
+                    </gmd:accessConstraints>
+                    <gmd:useConstraints>
+                        <gmd:MD_RestrictionCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions" codeSpace="008">otherRestrictions</gmd:MD_RestrictionCode>
+                    </gmd:useConstraints>
+                    <gmd:otherConstraints>
+                        <gco:CharacterString>Access Constraints: This product is the result of ongoing NRL research. Use Constraints: None Distribution Liability: NOAA makes no warranty regarding these data, expressed or implied, nor does the fact of distribution constitute such a warranty. NOAA, NESDIS, NODC and NCDDC cannot assume liability for any damages caused by any errors or omissions in these data, nor as a result of the failure of these data to function on a particular system.</gco:CharacterString>
+                    </gmd:otherConstraints>
+                </gmd:MD_LegalConstraints>
+            </gmd:resourceConstraints>
+            <gmd:resourceConstraints>
+                <gmd:MD_SecurityConstraints>
+                    <gmd:classification>
+                        <gmd:MD_ClassificationCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode" codeListValue="unclassified" codeSpace="001">unclassified</gmd:MD_ClassificationCode>
+                    </gmd:classification>
+                    <gmd:classificationSystem>
+                        <gco:CharacterString>United States Government</gco:CharacterString>
+                    </gmd:classificationSystem>
+                    <gmd:handlingDescription>
+                        <gco:CharacterString>Experimental</gco:CharacterString>
+                    </gmd:handlingDescription>
+                </gmd:MD_SecurityConstraints>
+            </gmd:resourceConstraints>
+            <gmd:spatialRepresentationType>
+                <gmd:MD_SpatialRepresentationTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid" codeSpace="002"/>
+            </gmd:spatialRepresentationType>
+            <gmd:language>
+                <gco:CharacterString>eng; USA</gco:CharacterString>
+            </gmd:language>
+            <gmd:topicCategory>
+                <gmd:MD_TopicCategoryCode>imageryBaseMapsEarthCover</gmd:MD_TopicCategoryCode>
+            </gmd:topicCategory>
+            <gmd:topicCategory>
+                <gmd:MD_TopicCategoryCode>010</gmd:MD_TopicCategoryCode>
+            </gmd:topicCategory>
+            <gmd:topicCategory>
+                <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
+            </gmd:topicCategory>
+            <gmd:topicCategory>
+                <gmd:MD_TopicCategoryCode>014</gmd:MD_TopicCategoryCode>
+            </gmd:topicCategory>
+            <gmd:environmentDescription>
+                <gco:CharacterString>Native Dataset Environment: APS v3.4.3 i686-pc-linux-gnu</gco:CharacterString>
+            </gmd:environmentDescription>
+            <gmd:extent>
+                <gmd:EX_Extent id="boundingExtent">
+                    <gmd:geographicElement>
+                        <gmd:EX_GeographicBoundingBox id="boundingGeographicBoundingBox">
+                            <gmd:westBoundLongitude>
+                                <gco:Decimal>-99</gco:Decimal>
+                            </gmd:westBoundLongitude>
+                            <gmd:eastBoundLongitude>
+                                <gco:Decimal>-79</gco:Decimal>
+                            </gmd:eastBoundLongitude>
+                            <gmd:southBoundLatitude>
+                                <gco:Decimal>14.9844</gco:Decimal>
+                            </gmd:southBoundLatitude>
+                            <gmd:northBoundLatitude>
+                                <gco:Decimal>31</gco:Decimal>
+                            </gmd:northBoundLatitude>
+                        </gmd:EX_GeographicBoundingBox>
+                    </gmd:geographicElement>
+                    <gmd:temporalElement gco:nilReason="unknown">
+                        <gmd:EX_TemporalExtent>
+                            <gmd:extent>
+                                <gml:TimePeriod gml:id="boundingTemporalExtent">
+                                    <gml:description>ground condition</gml:description>
+                                    <gml:beginPosition/>
+                                    <gml:endPosition indeterminatePosition="now">2010-08-27T08:26:10-05:00</gml:endPosition>
+                                </gml:TimePeriod>
+                            </gmd:extent>
+                        </gmd:EX_TemporalExtent>
+                    </gmd:temporalElement>
+                </gmd:EX_Extent>
+            </gmd:extent>
+        </gmd:MD_DataIdentification>
+    </gmd:identificationInfo>
+    <gmd:contentInfo>
+        <gmd:MD_FeatureCatalogueDescription>
+            <gmd:includedWithDataset>
+                <gco:Boolean>true</gco:Boolean>
+            </gmd:includedWithDataset>
+            <gmd:featureTypes>
+                <gco:LocalName codeSpace="sensor data"/>
+            </gmd:featureTypes>
+            <gmd:featureCatalogueCitation gco:nilReason="unknown"/>
+        </gmd:MD_FeatureCatalogueDescription>
+    </gmd:contentInfo>
+    <gmd:contentInfo>
+        <gmi:MI_CoverageDescription>
+            <gmd:attributeDescription>
+                <gco:RecordType>Individual Band Identification</gco:RecordType>
+            </gmd:attributeDescription>
+            <gmd:contentType>
+                <gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode" codeListValue="image" codeSpace="001"/>
+            </gmd:contentType>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>1</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>620-670</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>2</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>841-876</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>3</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>459-479</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>4</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>545-565</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>5</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>1230-1250</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>6</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>1628-1652</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>7</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>2105-2155</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>8</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>405-420</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>9</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>438-448</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>10</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>483-4930</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>11</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>526-536</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>12</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>546-556</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>13</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>662-672</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>14</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>662-672</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>15</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>743-753</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>16</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>862-877</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>17</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>890-920</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>18</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>931-941</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>19</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>931-941</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>20</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>3.660-3.840</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>21</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>3.929-3.989</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>22</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>3.929-3.989</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>23</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>3.929-3.989</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>24</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>3.929-3.989</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>25</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>4.482-4.549</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>26</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>1.360-1.390</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>27</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>6.535-6.895</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>28</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>7.175-7.475</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>29</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>8.400-8.700</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>30</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>9.580-9.880</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>31</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>10.780-11.280</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>32</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>11.770-12.270</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>33</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>13.185-13.485</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>34</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>13.485-13.785</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>35</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>13.787-14.085</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+            <gmd:dimension>
+                <gmd:MD_Band>
+                    <gmd:sequenceIdentifier>
+                        <gco:MemberName>
+                            <gco:aName>
+                                <gco:CharacterString>36</gco:CharacterString>
+                            </gco:aName>
+                            <gco:attributeType gco:nilReason="unknown"/>
+                        </gco:MemberName>
+                    </gmd:sequenceIdentifier>
+                    <gmd:descriptor>
+                        <gco:CharacterString>14.085-14.385</gco:CharacterString>
+                    </gmd:descriptor>
+                </gmd:MD_Band>
+            </gmd:dimension>
+        </gmi:MI_CoverageDescription>
+    </gmd:contentInfo>
+    <gmd:distributionInfo>
+        <gmd:MD_Distribution>
+            <gmd:distributionFormat>
+                <gmd:MD_Format>
+                    <gmd:name>
+                        <gco:CharacterString>HDF</gco:CharacterString>
+                    </gmd:name>
+                    <gmd:version gco:nilReason="unknown"/>
+                </gmd:MD_Format>
+            </gmd:distributionFormat>
+            <gmd:distributor>
+                <gmd:MD_Distributor>
+                    <gmd:distributorContact>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+                                <gco:CharacterString>NOAA's National Coastal Data Development Center (NCDDC)</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:contactInfo>
+                                <gmd:CI_Contact>
+                                    <gmd:phone>
+                                        <gmd:CI_Telephone>
+                                            <gmd:voice>
+                                                <gco:CharacterString>866-732-2382</gco:CharacterString>
+                                            </gmd:voice>
+                                            <gmd:facsimile>
+                                                <gco:CharacterString>228-688-2968</gco:CharacterString>
+                                            </gmd:facsimile>
+                                        </gmd:CI_Telephone>
+                                    </gmd:phone>
+                                    <gmd:address>
+                                        <gmd:CI_Address>
+                                            <gmd:city>
+                                                <gco:CharacterString>Stennis Space Center</gco:CharacterString>
+                                            </gmd:city>
+                                            <gmd:administrativeArea>
+                                                <gco:CharacterString>MS</gco:CharacterString>
+                                            </gmd:administrativeArea>
+                                            <gmd:postalCode>
+                                                <gco:CharacterString>39529</gco:CharacterString>
+                                            </gmd:postalCode>
+                                            <gmd:country>
+                                                <gco:CharacterString>USA</gco:CharacterString>
+                                            </gmd:country>
+                                            <gmd:electronicMailAddress>
+                                                <gco:CharacterString>ncddc@noaa.gov</gco:CharacterString>
+                                            </gmd:electronicMailAddress>
+                                        </gmd:CI_Address>
+                                    </gmd:address>
+                                    <gmd:hoursOfService>
+                                        <gco:CharacterString>8am-5pm</gco:CharacterString>
+                                    </gmd:hoursOfService>
+                                </gmd:CI_Contact>
+                            </gmd:contactInfo>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="distributor" codeSpace="005">distributor</gmd:CI_RoleCode>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:distributorContact>
+                    <gmd:distributionOrderProcess>
+                        <gmd:MD_StandardOrderProcess>
+                            <gmd:fees>
+                                <gco:CharacterString>none</gco:CharacterString>
+                            </gmd:fees>
+                        </gmd:MD_StandardOrderProcess>
+                    </gmd:distributionOrderProcess>
+                </gmd:MD_Distributor>
+            </gmd:distributor>
+        </gmd:MD_Distribution>
+    </gmd:distributionInfo>
+    <gmd:dataQualityInfo>
+        <gmd:DQ_DataQuality>
+            <gmd:scope gco:nilReason="unknown"/>
+            <gmd:report>
+                <gmd:DQ_CompletenessCommission>
+                    <gmd:evaluationMethodDescription>
+                        <gco:CharacterString>The classification scheme comprehensively includes all anticipated land covers, however, not all pixels will contain data due to cloud cover for the past seven days.</gco:CharacterString>
+                    </gmd:evaluationMethodDescription>
+                    <gmd:result gco:nilReason="unknown"/>
+                </gmd:DQ_CompletenessCommission>
+            </gmd:report>
+            <gmd:report>
+                <gmd:DQ_CompletenessOmission>
+                    <gmd:evaluationMethodDescription>
+                        <gco:CharacterString>The classification scheme comprehensively includes all anticipated land covers, however, not all pixels will contain data due to cloud cover for the past seven days.</gco:CharacterString>
+                    </gmd:evaluationMethodDescription>
+                    <gmd:result gco:nilReason="unknown"/>
+                </gmd:DQ_CompletenessOmission>
+            </gmd:report>
+            <gmd:report>
+                <gmd:DQ_ConceptualConsistency>
+                    <gmd:measureDescription>
+                        <gco:CharacterString>None</gco:CharacterString>
+                    </gmd:measureDescription>
+                    <gmd:result gco:nilReason="unknown"/>
+                </gmd:DQ_ConceptualConsistency>
+            </gmd:report>
+            <gmd:lineage>
+                <gmd:LI_Lineage>
+                    <gmd:processStep>
+                        <gmd:LI_ProcessStep>
+                            <gmd:description>
+                                <gco:CharacterString>LPC's (Latest Pixel Composites) are processed through NRL's Automated Processing System in real-time. LPC's are the most recent clear pixel using a time scale of seven days and the multiple ocean color sensors are blended using a weighted average. The optical algorithms used were Quasi-Analytical Algorithms (QAA). The chlorophyll product was derived by using NASA's algorithm.</gco:CharacterString>
+                            </gmd:description>
+                            <gmd:dateTime gco:nilReason="unknown"/>
+                        </gmd:LI_ProcessStep>
+                    </gmd:processStep>
+                    <gmd:source>
+                        <gmd:LI_Source>
+                            <gmd:description>
+                                <gco:CharacterString>Source Contribution: REASON online</gco:CharacterString>
+                            </gmd:description>
+                            <gmd:scaleDenominator>
+                                <gmd:MD_RepresentativeFraction>
+                                    <gmd:denominator/>
+                                </gmd:MD_RepresentativeFraction>
+                            </gmd:scaleDenominator>
+                            <gmd:sourceCitation>
+                                <gmd:CI_Citation>
+                                    <gmd:title>
+                                        <gco:CharacterString>Blended Products from Ocean Color Sensors</gco:CharacterString>
+                                    </gmd:title>
+                                    <gmd:alternateTitle>
+                                        <gco:CharacterString>NRL</gco:CharacterString>
+                                    </gmd:alternateTitle>
+                                    <gmd:date>
+                                        <gmd:CI_Date>
+                                            <gmd:date gco:nilReason="unpublished material"/>
+                                            <gmd:dateType>
+                                                <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="002">publication</gmd:CI_DateTypeCode>
+                                            </gmd:dateType>
+                                        </gmd:CI_Date>
+                                    </gmd:date>
+                                    <gmd:edition/>
+                                    <gmd:citedResponsibleParty>
+                                        <gmd:CI_ResponsibleParty>
+                                            <gmd:organisationName>
+                                                <gco:CharacterString>NRL-Code 7333</gco:CharacterString>
+                                            </gmd:organisationName>
+                                            <gmd:role>
+                                                <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="resourceProvider" codeSpace="001">resourceProvider</gmd:CI_RoleCode>
+                                            </gmd:role>
+                                        </gmd:CI_ResponsibleParty>
+                                    </gmd:citedResponsibleParty>
+                                    <gmd:presentationForm/>
+                                    <gmd:series>
+                                        <gmd:CI_Series>
+                                            <gmd:name/>
+                                            <gmd:issueIdentification/>
+                                        </gmd:CI_Series>
+                                    </gmd:series>
+                                    <gmd:otherCitationDetails/>
+                                </gmd:CI_Citation>
+                            </gmd:sourceCitation>
+                            <gmd:sourceExtent>
+                                <gmd:EX_Extent>
+                                    <gmd:temporalElement>
+                                        <gmd:EX_TemporalExtent>
+                                            <gmd:extent gco:nilReason="unknown">
+                                                <gml:TimePeriod gml:id="sourceTemporalExtent">
+                                                    <gml:description>ground condition
+                                                    </gml:description>
+                                                    <gml:beginPosition/>
+                                                    <gml:endPosition indeterminatePosition="now">2010-08-27T08:26:10-05:00</gml:endPosition>
+                                                </gml:TimePeriod>
+                                            </gmd:extent>
+                                        </gmd:EX_TemporalExtent>
+                                    </gmd:temporalElement>
+                                </gmd:EX_Extent>
+                            </gmd:sourceExtent>
+                        </gmd:LI_Source>
+                    </gmd:source>
+                </gmd:LI_Lineage>
+            </gmd:lineage>
+        </gmd:DQ_DataQuality>
+    </gmd:dataQualityInfo>
+    <gmd:metadataMaintenance>
+        <gmd:MD_MaintenanceInformation>
+            <gmd:maintenanceAndUpdateFrequency gco:nilReason="Unknown"/>
+            <gmd:maintenanceNote>
+                <gco:CharacterString>This metadata was automatically generated from the FGDC Content Standard for Digital Geospatial Metadata standard version FGDC-STD-001-1998 .</gco:CharacterString>
+            </gmd:maintenanceNote>
+            <gmd:contact>
+                <gmd:CI_ResponsibleParty>
+                    <gmd:individualName/>
+                    <gmd:organisationName>
+                        <gco:CharacterString>NOAA/NESDIS/NODC/NCDDC; National Coastal Data Development Center</gco:CharacterString>
+                    </gmd:organisationName>
+                    <gmd:contactInfo>
+                        <gmd:CI_Contact>
+                            <gmd:phone>
+                                <gmd:CI_Telephone>
+                                    <gmd:voice>
+                                        <gco:CharacterString>866-732-2382</gco:CharacterString>
+                                    </gmd:voice>
+                                    <gmd:facsimile>
+                                        <gco:CharacterString>228-688-2968</gco:CharacterString>
+                                    </gmd:facsimile>
+                                </gmd:CI_Telephone>
+                            </gmd:phone>
+                            <gmd:address>
+                                <gmd:CI_Address>
+                                    <gmd:city>
+                                        <gco:CharacterString>Stennis Space Center</gco:CharacterString>
+                                    </gmd:city>
+                                    <gmd:administrativeArea>
+                                        <gco:CharacterString>MS</gco:CharacterString>
+                                    </gmd:administrativeArea>
+                                    <gmd:postalCode>
+                                        <gco:CharacterString>39529</gco:CharacterString>
+                                    </gmd:postalCode>
+                                    <gmd:electronicMailAddress>
+                                        <gco:CharacterString>ncddcmetadata@noaa.gov</gco:CharacterString>
+                                    </gmd:electronicMailAddress>
+                                </gmd:CI_Address>
+                            </gmd:address>
+                            <gmd:hoursOfService>
+                                <gco:CharacterString>8am-5pm, Monday through Friday</gco:CharacterString>
+                            </gmd:hoursOfService>
+                        </gmd:CI_Contact>
+                    </gmd:contactInfo>
+                    <gmd:role>
+                        <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="custodian" codeSpace="002">custodian</gmd:CI_RoleCode>
+                    </gmd:role>
+                </gmd:CI_ResponsibleParty>
+            </gmd:contact>
+        </gmd:MD_MaintenanceInformation>
+    </gmd:metadataMaintenance>
+    <gmi:acquisitionInformation>
+        <gmi:MI_AcquisitionInformation>
+            <gmi:operation>
+                <gmi:MI_Operation>
+                    <gmi:citation>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>Earth Observing System</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date>
+                                <gmd:CI_Date>
+                                    <gmd:date gco:nilReason="unknown"/>
+                                    <gmd:dateType>
+                                        <gmd:CI_DateTypeCode/>
+                                    </gmd:dateType>
+                                </gmd:CI_Date>
+                            </gmd:date>
+                        </gmd:CI_Citation>
+                    </gmi:citation>
+                    <gmi:status gco:nilReason="unknown"/>
+                    <gmi:parentOperation gco:nilReason="unknown"/>
+                </gmi:MI_Operation>
+            </gmi:operation>
+            <gmi:operation>
+                <gmi:MI_Operation>
+                    <gmi:citation>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>Earth Observing System</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:date>
+                                <gmd:CI_Date>
+                                    <gmd:date gco:nilReason="unknown"/>
+                                    <gmd:dateType>
+                                        <gmd:CI_DateTypeCode/>
+                                    </gmd:dateType>
+                                </gmd:CI_Date>
+                            </gmd:date>
+                        </gmd:CI_Citation>
+                    </gmi:citation>
+                    <gmi:status gco:nilReason="unknown"/>
+                    <gmi:parentOperation gco:nilReason="unknown"/>
+                </gmi:MI_Operation>
+            </gmi:operation>
+            <gmi:platform>
+                <gmi:MI_Platform>
+                    <gmi:identifier>
+                        <gmd:MD_Identifier>
+                            <gmd:authority>
+                                <gmd:CI_Citation>
+                                    <gmd:title>
+                                        <gco:CharacterString>Terra</gco:CharacterString>
+                                    </gmd:title>
+                                    <gmd:title>
+                                        <gco:CharacterString>Aqua</gco:CharacterString>
+                                    </gmd:title>
+                                    <gmd:date>
+                                        <gmd:CI_Date>
+                                            <gmd:date>
+                                                <gco:Date>1999-12-18</gco:Date>
+                                            </gmd:date>
+                                            <gmd:dateType>
+                                                <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="creation" codeSpace="001"/>
+                                            </gmd:dateType>
+                                        </gmd:CI_Date>
+                                    </gmd:date>
+                                </gmd:CI_Citation>
+                            </gmd:authority>
+                            <gmd:code gco:nilReason="unknown"/>
+                        </gmd:MD_Identifier>
+                    </gmi:identifier>
+                    <gmi:description gco:nilReason="unknown"/>
+                    <gmi:sponsor>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+                                <gco:CharacterString>National Aeronautics and Space Administration (NASA)</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="owner" codeSpace="003"/>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmi:sponsor>
+                    <gmi:instrument>
+                        <gmi:MI_Instrument>
+                            <gmi:citation>
+                                <gmd:CI_Citation>
+                                    <gmd:title>
+                                        <gco:CharacterString>Moderate Resolution Imaging Spectroradiometer</gco:CharacterString>
+                                    </gmd:title>
+                                    <gmd:title>
+                                        <gco:CharacterString>Moderate Resolution Imaging Spectroradiometer</gco:CharacterString>
+                                    </gmd:title>
+                                    <gmd:alternateTitle>
+                                        <gco:CharacterString>MODIS TERRA</gco:CharacterString>
+                                    </gmd:alternateTitle>
+                                    <gmd:alternateTitle>
+                                        <gco:CharacterString>MODIS AQUA</gco:CharacterString>
+                                    </gmd:alternateTitle>
+                                    <gmd:date>
+                                        <gmd:CI_Date>
+                                            <gmd:date gco:nilReason="unknown"/>
+                                            <gmd:dateType>
+                                                <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="002"/>
+                                            </gmd:dateType>
+                                        </gmd:CI_Date>
+                                    </gmd:date>
+                                    <gmd:citedResponsibleParty>
+                                        <gmd:CI_ResponsibleParty>
+                                            <gmd:organisationName>
+                                                <gco:CharacterString>National Aeronautics and Space Administration (NASA)</gco:CharacterString>
+                                            </gmd:organisationName>
+                                            <gmd:role>
+                                                <gmd:CI_RoleCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="originator" codeSpace="006"/>
+                                            </gmd:role>
+                                        </gmd:CI_ResponsibleParty>
+                                    </gmd:citedResponsibleParty>
+                                </gmd:CI_Citation>
+                            </gmi:citation>
+                            <gmi:type>
+                                <gmi:MI_SensorTypeCode/>
+                            </gmi:type>
+                        </gmi:MI_Instrument>
+                    </gmi:instrument>
+                </gmi:MI_Platform>
+            </gmi:platform>
+        </gmi:MI_AcquisitionInformation>
+    </gmi:acquisitionInformation>
+</gmi:MI_Metadata>
