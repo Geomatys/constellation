@@ -84,6 +84,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115-2.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
@@ -240,7 +241,7 @@ public class MDWebMetadataReaderTest {
     }
 
      /**
-     * Tests the getMetadata method for ISO 19119 data
+     * Tests the getMetadata method for ISO 19110 data
      *
      * @throws java.lang.Exception
      */
@@ -254,6 +255,25 @@ public class MDWebMetadataReaderTest {
 
         assertTrue(result instanceof FeatureCatalogueImpl);
         catalogueEquals(expResult, (FeatureCatalogueImpl)result);
+
+        pool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the getMetadata method for ISO 19115-2 data
+     *
+     * @throws java.lang.Exception
+     */
+    @Ignore
+    public void getMetadataISO191152Test() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("24:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
+
+        assertTrue(result instanceof DefaultMetadata);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
         pool.release(unmarshaller);
     }

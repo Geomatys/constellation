@@ -23,6 +23,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -48,6 +49,8 @@ public class BDD {
     private static final Logger LOGGER = Logger.getLogger("org.constellation.generic.database");
 
     public static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
+
+    public static final String ORACLE_DRIVER_CLASS = "oracle.jdbc.driver.OracleDriver";
 
     private static final Map<BDD, Connection> CONNECTION_MAP = new HashMap<BDD, Connection>();
     
@@ -165,7 +168,7 @@ public class BDD {
                 try {
                     return Integer.parseInt(portName);
                 } catch (NumberFormatException ex) {
-                    LOGGER.severe("unable to parse the port number: " + portName);
+                    LOGGER.log(Level.WARNING, "unable to parse the port number: {0} using default", portName);
                     return 5432;
                 }
             } else {
@@ -252,7 +255,7 @@ public class BDD {
             } else {
                 return null;
             }
-        } else if (className.equals("oracle.jdbc.driver.OracleDriver")) {
+        } else if (className.equals(ORACLE_DRIVER_CLASS)) {
             final OracleDataSource oraSource = new OracleDataSource();
             oraSource.setURL(connectURL);
             oraSource.setUser(user);
@@ -286,7 +289,7 @@ public class BDD {
             } else {
                 return null;
             }
-        } else if (className.equals("oracle.jdbc.driver.OracleDriver")) {
+        } else if (className.equals(ORACLE_DRIVER_CLASS)) {
             final OracleConnectionPoolDataSource oraSource = new OracleConnectionPoolDataSource();
             oraSource.setURL(connectURL);
             oraSource.setUser(user);

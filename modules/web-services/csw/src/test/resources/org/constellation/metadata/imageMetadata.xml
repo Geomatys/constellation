@@ -64,10 +64,6 @@
     <gmd:metadataStandardVersion>
         <gco:CharacterString>2009-02-15</gco:CharacterString>
     </gmd:metadataStandardVersion>
-    <gmd:spatialRepresentationInfo/>
-    <gmd:referenceSystemInfo>
-        <gmd:MD_ReferenceSystem/>
-    </gmd:referenceSystemInfo>
     <gmd:metadataExtensionInfo>
         <gmd:MD_MetadataExtensionInformation>
             <gmd:extensionOnLineResource>
@@ -130,7 +126,7 @@
                 </gmd:CI_Citation>
             </gmd:citation>
             <gmd:abstract>
-                <gco:CharacterString>This dataset consists of measurements from ocean color sensors and the blending of products for ocean color sensors for several products derived from the Quasi-Analytical Algorithm including absorption, backward scattering, and absorption due to CDOM and phytoplankton, and the extracted true color images. In addition to these products, sea surface temperature and chlorophyll from NASA algorithms were produced. For further information on how these products were generated, please contact Robert Arnone at the Naval Research Lab ph. (228) 688-5268. E-mail: arnone@nrlssc.navy.mil</gco:CharacterString>
+                <gco:CharacterString>This dataset consists of measurements from ocean color sensors and the blending of products for ocean color sensors for several products derived from the Quasi-Analytical Algorithm including absorption, backward scattering, and absorption due to CDOM and phytoplankton, and the extracted color images. In addition to these products, sea surface temperature and chlorophyll from NASA algorithms were produced. For further information on how these products were generated, please contact Robert Arnone at the Naval Research Lab ph. (228) 688-5268. E-mail: arnone@nrlssc.navy.mil</gco:CharacterString>
             </gmd:abstract>
             <gmd:purpose>
                 <gco:CharacterString>To supply the most recent optical products for the Gulf of Mexico for real-time monitoring.</gco:CharacterString>
@@ -188,7 +184,6 @@
                     </gmd:maintenanceAndUpdateFrequency>
                 </gmd:MD_MaintenanceInformation>
             </gmd:resourceMaintenance>
-            <gmd:resourceMaintenance/>
             <gmd:descriptiveKeywords>
                 <gmd:MD_Keywords>
                     <gmd:keyword>
@@ -220,7 +215,6 @@
                             <gmd:title>
                                 <gco:CharacterString>None</gco:CharacterString>
                             </gmd:title>
-                            <gmd:date gco:nilReason="Unknown"/>
                         </gmd:CI_Citation>
                     </gmd:thesaurusName>
                 </gmd:MD_Keywords>
@@ -250,7 +244,6 @@
                             <gmd:title>
                                 <gco:CharacterString>IOOS Core Data Variables</gco:CharacterString>
                             </gmd:title>
-                            <gmd:date gco:nilReason="Unknown"/>
                         </gmd:CI_Citation>
                     </gmd:thesaurusName>
                 </gmd:MD_Keywords>
@@ -313,7 +306,6 @@
                             <gmd:title>
                                 <gco:CharacterString>None</gco:CharacterString>
                             </gmd:title>
-                            <gmd:date gco:nilReason="Unknown"/>
                         </gmd:CI_Citation>
                     </gmd:thesaurusName>
                 </gmd:MD_Keywords>
@@ -348,19 +340,13 @@
                 <gmd:MD_SpatialRepresentationTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid" codeSpace="002"/>
             </gmd:spatialRepresentationType>
             <gmd:language>
-                <gco:CharacterString>eng; USA</gco:CharacterString>
+                <gco:CharacterString>eng</gco:CharacterString>
             </gmd:language>
             <gmd:topicCategory>
                 <gmd:MD_TopicCategoryCode>imageryBaseMapsEarthCover</gmd:MD_TopicCategoryCode>
             </gmd:topicCategory>
             <gmd:topicCategory>
-                <gmd:MD_TopicCategoryCode>010</gmd:MD_TopicCategoryCode>
-            </gmd:topicCategory>
-            <gmd:topicCategory>
                 <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
-            </gmd:topicCategory>
-            <gmd:topicCategory>
-                <gmd:MD_TopicCategoryCode>014</gmd:MD_TopicCategoryCode>
             </gmd:topicCategory>
             <gmd:environmentDescription>
                 <gco:CharacterString>Native Dataset Environment: APS v3.4.3 i686-pc-linux-gnu</gco:CharacterString>
@@ -403,17 +389,20 @@
             <gmd:includedWithDataset>
                 <gco:Boolean>true</gco:Boolean>
             </gmd:includedWithDataset>
-            <gmd:featureTypes>
-                <gco:LocalName codeSpace="sensor data"/>
-            </gmd:featureTypes>
-            <gmd:featureCatalogueCitation gco:nilReason="unknown"/>
+            <gmd:featureCatalogueCitation>
+                <gmd:CI_Citation>
+                    <gmd:title>
+                        <gco:CharacterString>Some title</gco:CharacterString>
+                    </gmd:title>
+                </gmd:CI_Citation>
+            </gmd:featureCatalogueCitation>
         </gmd:MD_FeatureCatalogueDescription>
     </gmd:contentInfo>
     <gmd:contentInfo>
         <gmi:MI_CoverageDescription>
-            <gmd:attributeDescription>
+            <!--gmd:attributeDescription>
                 <gco:RecordType>Individual Band Identification</gco:RecordType>
-            </gmd:attributeDescription>
+            </gmd:attributeDescription-->
             <gmd:contentType>
                 <gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode" codeListValue="image" codeSpace="001"/>
             </gmd:contentType>
@@ -1036,7 +1025,6 @@
                     <gmd:evaluationMethodDescription>
                         <gco:CharacterString>The classification scheme comprehensively includes all anticipated land covers, however, not all pixels will contain data due to cloud cover for the past seven days.</gco:CharacterString>
                     </gmd:evaluationMethodDescription>
-                    <gmd:result gco:nilReason="unknown"/>
                 </gmd:DQ_CompletenessCommission>
             </gmd:report>
             <gmd:report>
@@ -1044,7 +1032,6 @@
                     <gmd:evaluationMethodDescription>
                         <gco:CharacterString>The classification scheme comprehensively includes all anticipated land covers, however, not all pixels will contain data due to cloud cover for the past seven days.</gco:CharacterString>
                     </gmd:evaluationMethodDescription>
-                    <gmd:result gco:nilReason="unknown"/>
                 </gmd:DQ_CompletenessOmission>
             </gmd:report>
             <gmd:report>
@@ -1052,7 +1039,6 @@
                     <gmd:measureDescription>
                         <gco:CharacterString>None</gco:CharacterString>
                     </gmd:measureDescription>
-                    <gmd:result gco:nilReason="unknown"/>
                 </gmd:DQ_ConceptualConsistency>
             </gmd:report>
             <gmd:lineage>

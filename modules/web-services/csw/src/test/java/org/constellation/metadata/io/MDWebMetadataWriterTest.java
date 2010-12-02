@@ -547,10 +547,9 @@ public class MDWebMetadataWriterTest {
         assertEquals(expResult.getMember().iterator().next(), result.getMember().iterator().next());
         assertEquals(expResult.getMember(), result.getMember());
 
+        pool.release(unmarshaller);
 
         assertEquals(expResult, result);
-
-        pool.release(unmarshaller);
     }
 
     /**
@@ -631,10 +630,10 @@ public class MDWebMetadataWriterTest {
         result = (DefaultMetadata) absResult;
         expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_16));
 
+        pool.release(unmarshaller);
+
         metadataEquals(expResult,result);
 
-
-        pool.release(unmarshaller);
     }
 
     /**
@@ -655,6 +654,7 @@ public class MDWebMetadataWriterTest {
         FeatureCatalogueImpl result = (FeatureCatalogueImpl) absResult;
         FeatureCatalogueImpl expResult =  (FeatureCatalogueImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/featcatalog1.xml"));
 
+        pool.release(unmarshaller);
         catalogueEquals(expResult,result);
     }
 
@@ -670,12 +670,13 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("12:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("2:CSWCat", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
 
+        pool.release(unmarshaller);
         metadataEquals(expResult,result);
     }
 }

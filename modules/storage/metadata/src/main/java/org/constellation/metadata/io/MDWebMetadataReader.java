@@ -135,6 +135,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     private List<String> gmlPackage;
 
     /**
+     * A list of package containing the ISO 19115-2 implementation
+     */
+    private List<String> geotkAcquisitionPackage;
+
+    /**
      * A list of package containing the Ebrim V3.0 implementation
      */
     private List<String> ebrimV3Package;
@@ -281,6 +286,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
         this.natureSDIPackage   = FileUtilities.searchSubPackage("org.geotoolkit.naturesdi");
+        this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.internal.jaxb", "org.geotoolkit.metadata.iso.acquisition");
     }
 
     /**
@@ -860,6 +866,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else if ("ISO 19108".equals(standardName) && mode == SENSORML) {
             packagesName = gmlPackage;
 
+        } else if ("ISO 19115-2".equals(standardName)) {
+            packagesName = geotkAcquisitionPackage;
+
         } else {
             if (!className.contains("Code") && !"DCPList".equals(className) && !"SV_CouplingType".equals(className) && !"AxisDirection".equals(className)) {
                 packagesName = geotoolkitPackage;
@@ -912,9 +921,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         for (String packageName : packagesName) {
             
             //TODO remove this special case
-            if ("RS_Identifier".equals(className))
+            /*if ("RS_Identifier".equals(className))
                 packageName = "org.geotoolkit.referencing";
-            else if ("MD_ScopeCode".equals(className))
+            else*/ if ("MD_ScopeCode".equals(className))
                 packageName = "org.opengis.metadata.maintenance";
             else if ("SV_ServiceIdentification".equals(className))
                 packageName = "org.geotoolkit.service";

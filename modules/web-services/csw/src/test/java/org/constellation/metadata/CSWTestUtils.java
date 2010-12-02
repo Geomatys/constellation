@@ -5,6 +5,7 @@
 
 package org.constellation.metadata;
 
+import org.opengis.metadata.content.ContentInformation;
 import org.geotoolkit.feature.catalog.PropertyTypeImpl;
 import org.geotoolkit.feature.catalog.FeatureTypeImpl;
 import org.opengis.metadata.citation.Citation;
@@ -16,6 +17,8 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
+import org.opengis.metadata.content.CoverageDescription;
+import org.opengis.metadata.content.FeatureCatalogueDescription;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.VerticalExtent;
@@ -64,6 +67,31 @@ public class CSWTestUtils {
             assertEquals(expResp.getContactInfo(), resResp.getContactInfo());
         }
         assertEquals(expResult.getContacts(), result.getContacts());
+        assertEquals(expResult.getContentInfo().size(), result.getContentInfo().size());
+
+        Iterator<ContentInformation> expContentIt =  expResult.getContentInfo().iterator();
+        Iterator<ContentInformation> resContentIt =  result.getContentInfo().iterator();
+        while (expContentIt.hasNext()) {
+            ContentInformation expContent = expContentIt.next();
+            ContentInformation resContent = resContentIt.next();
+            if (expContent instanceof FeatureCatalogueDescription) {
+                assertTrue(resContent instanceof FeatureCatalogueDescription);
+                FeatureCatalogueDescription expFeatureCatalogue = (FeatureCatalogueDescription) expContent;
+                FeatureCatalogueDescription resFeatureCatalogue = (FeatureCatalogueDescription) resContent;
+                assertEquals(expFeatureCatalogue.getFeatureCatalogueCitations(), resFeatureCatalogue.getFeatureCatalogueCitations());
+                assertEquals(expFeatureCatalogue.getLanguages(), resFeatureCatalogue.getLanguages());
+                assertEquals(expFeatureCatalogue.getFeatureTypes(), resFeatureCatalogue.getFeatureTypes());
+            }
+            if (expContent instanceof CoverageDescription) {
+                assertTrue(resContent instanceof CoverageDescription);
+                CoverageDescription expCovDesc = (CoverageDescription) expContent;
+                CoverageDescription resCovDesc = (CoverageDescription) resContent;
+                assertEquals(expContent.getClass().getName(), resContent.getClass().getName());
+                assertEquals(expCovDesc.getAttributeDescription(), resCovDesc.getAttributeDescription());
+                assertEquals(expCovDesc.getContentType(), resCovDesc.getContentType());
+                assertEquals(expCovDesc.getRangeElementDescriptions(), resCovDesc.getRangeElementDescriptions());
+            }
+        }
         assertEquals(expResult.getContentInfo(), result.getContentInfo());
         assertEquals(expResult.getDataQualityInfo().size(), result.getDataQualityInfo().size());
 
@@ -77,7 +105,18 @@ public class CSWTestUtils {
             Iterator<? extends Element> expDqRep = expDq.getReports().iterator();
             Iterator<? extends Element> resDqRep = resDq.getReports().iterator();
             while (expDqRep.hasNext()) {
-                assertEquals(expDqRep.next(), resDqRep.next());
+                Element expElement = expDqRep.next();
+                Element resElement = resDqRep.next();
+                assertEquals(expElement.getClass().getName(), resElement.getClass().getName());
+                assertEquals(expElement.getDates(), resElement.getDates());
+                assertEquals(expElement.getEvaluationMethodDescription(), resElement.getEvaluationMethodDescription());
+                assertEquals(expElement.getEvaluationMethodType(), resElement.getEvaluationMethodType());
+                assertEquals(expElement.getEvaluationProcedure(), resElement.getEvaluationProcedure());
+                assertEquals(expElement.getMeasureDescription(), resElement.getMeasureDescription());
+                assertEquals(expElement.getMeasureIdentification(), resElement.getMeasureIdentification());
+                assertEquals(expElement.getNamesOfMeasure(), resElement.getNamesOfMeasure());
+                assertEquals(expElement.getResults(), resElement.getResults());
+                assertEquals(expElement, resElement);
             }
             assertEquals(expDq.getReports(), resDq.getReports());
             assertEquals(expDq.getScope(), resDq.getScope());

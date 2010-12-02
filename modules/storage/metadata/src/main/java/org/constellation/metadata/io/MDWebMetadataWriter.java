@@ -722,12 +722,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             return result;
         }
 
-        //special case TODO delete when geotoolkit/api will be updated.
-        if ("DefaultMetadata".equals(className)) {
-            className = "Metadata";
-        } else if ("DefaultOnlineResource".equals(className)) {
-            className = "OnlineResource";
-        } else if ("CitationDate".equals(className) || "DefaultCitationDate".equals(className)) {
+        if ("CitationDate".equals(className) || "DefaultCitationDate".equals(className)) {
             className = "CI_Date";
         } else if ("DefaultScope".equals(className)) {
             className = "DQ_Scope";
@@ -778,6 +773,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (Standard.ISO_19115.equals(mainStandard)) {
             availableStandards.add(Standard.ISO_19115_FRA);
             availableStandards.add(mainStandard);
+            availableStandards.add(Standard.ISO_19115_2);
             availableStandards.add(Standard.ISO_19108);
             availableStandards.add(Standard.ISO_19103);
             availableStandards.add(Standard.ISO_19119);
@@ -831,15 +827,17 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             } else if (packageName.startsWith("org.geotoolkit.sml.xml")) {
                 standard = Standard.SENSORML;
             } else if (packageName.startsWith("org.geotoolkit.swe.xml")) {
-                standard = mdWriter.getStandard("Sensor Web Enablement");
+                standard = Standard.SENSOR_WEB_ENABLEMENT;
             } else if ("org.geotoolkit.gml.xml.v311".equals(packageName)) {
                 standard = Standard.ISO_19108;
+            } else if ("org.geotoolkit.internal.jaxb".equals(packageName)) {
+                standard = Standard.ISO_19115_2;
             }
                 
             String name = className;
             int nameType = 0;
             final String codeSuffix = "Code";
-            while (nameType < 12) {
+            while (nameType < 13) {
                 
                 LOGGER.finer("searching: " + standard.getName() + ':' + name);
                 result = mdWriter.getClasse(name, standard);
@@ -905,28 +903,34 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             name = "LI_" + className;    
                             break;
                         }
-                        //we add the prefix DS_ + the suffix "Code"
+                        //we add the prefix MI_
                         case 9: {
                             nameType = 10;
+                            name = "MI_" + className;
+                            break;
+                        }
+                        //we add the prefix DS_ + the suffix "Code"
+                        case 10: {
+                            nameType = 11;
                             name = "DS_" + className + codeSuffix;
                             break;
                         }
                         //for the temporal element we remove add prefix
-                        case 10: {
+                        case 11: {
                             name = "Time" + className;
-                            nameType = 11;
+                            nameType = 12;
                             break;
                         }
                         //for the code list we add the "code" suffix
-                        case 11: {
+                        case 12: {
                             if (name.indexOf(codeSuffix) != -1) {
                                 name += codeSuffix;
                             }
-                            nameType = 12;
+                            nameType = 13;
                             break;
                         }
                         default:
-                            nameType = 12;
+                            nameType = 13;
                             break;
                     }
 
