@@ -9,7 +9,7 @@
         <gco:CharacterString>MDWeb_FR_SY_couche_vecteur_258</gco:CharacterString>
     </gmd:fileIdentifier>
     <gmd:language>
-        <gco:CharacterString>fra</gco:CharacterString>
+        <gco:CharacterString>fre</gco:CharacterString>
     </gmd:language>
     <gmd:characterSet>
         <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#8859part1" codeListValue="8859part1"/>
@@ -124,7 +124,7 @@
                         </gmd:CI_ResponsibleParty>
                     </gmd:citedResponsibleParty>
                     <gmd:presentationForm>
-                        <gmd:CI_PresentationFormCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#vector theme" codeListValue="vector theme"/>
+                        <gmd:CI_PresentationFormCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#vectorLayer" codeListValue="vectorLayer"/>
                     </gmd:presentationForm>
                 </gmd:CI_Citation>
             </gmd:citation>
@@ -172,7 +172,7 @@
                 </gmd:MD_Resolution>
             </gmd:spatialResolution>
             <gmd:language>
-                <gco:CharacterString>fra</gco:CharacterString>
+                <gco:CharacterString>fre</gco:CharacterString>
             </gmd:language>
             <gmd:characterSet>
                 <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#8859part1" codeListValue="8859part1"/>

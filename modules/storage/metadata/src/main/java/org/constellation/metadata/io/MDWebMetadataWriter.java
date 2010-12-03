@@ -72,6 +72,7 @@ import org.mdweb.io.Writer;
 import org.mdweb.io.sql.v21.Writer21;
 import org.mdweb.model.storage.FormInfo;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
+import org.opengis.annotation.UML;
 
 /**
  *
@@ -702,7 +703,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         String packageName;
         Classe result;
         if (object != null) {
-            
+            // look for previously cached result
             result = classBinding.get(object.getClass().getName());
             if (result != null) {
                 return result;
@@ -722,6 +723,24 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             return result;
         }
 
+        /*
+         * work around :
+         * here we can find the classe by using the annotation from GeoAPI.
+         * This allow to supress some of the special case directly after that comment.
+         * But there is some problem with ISO 19115-2 which is annoted with ISO 19115 value
+         * AND with multiple TimePeriod implementation
+         *
+         * code :
+
+            result = getClasseFromAnnotation(object);
+            if (result != null) {
+                classBinding.put(object.getClass().getName(), result);
+                return result;
+            }
+
+         */
+
+
         if ("CitationDate".equals(className) || "DefaultCitationDate".equals(className)) {
             className = "CI_Date";
         } else if ("DefaultScope".equals(className)) {
@@ -730,7 +749,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             className = "ReferenceSystem";
         } else if ("DefaultReferenceIdentifier".equals(className)) {
             className = "RS_Identifier";
-        }
+        } 
         
         //we remove the Impl suffix
         final int i = className.indexOf("Impl");
@@ -941,6 +960,33 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         LOGGER.warning("class no found: " + className + " in the following standards: " + availableStandardLabel + "\n (" + object.getClass().getName() + ')');
         return null;
     }
+
+    /**
+     * Find an MDWeb Classe by extracting the GeoAPI UML annotation.
+     * 
+     * @param object
+     * @return
+     * @throws MD_IOException
+     */
+    private Classe getClasseFromAnnotation(Object object) throws MD_IOException {
+        Class[] interfaces = object.getClass().getInterfaces();
+        for (Class interf : interfaces) {
+            if (interf.getName().startsWith("org.opengis")) {
+                UML a = (UML) interf.getAnnotation(UML.class);
+                if (a != null) {
+                    Standard stan = Standard.getStandardFromUMLSpecification(a.specification());
+                    if (stan != null) {
+                        final Classe result = mdWriter.getClasse(a.identifier(), stan);
+                        if (result != null) {
+                            LOGGER.finer("found thank to Annotation: " + a.identifier() + "-" + a.specification() + " for classe :" + object.getClass().getName());
+                        }
+                        return result;
+                    }
+                }
+            }
+        }
+        return null;
+    }
     
     /**
      * Return a class (java primitive type) from a class name.
@@ -954,25 +1000,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if ("String".equals(className) || "SimpleInternationalString".equals(className) || "BaseUnit".equals(className)) {
             mdwclassName = "CharacterString";
             mdwStandard  = Standard.ISO_19103;
-        } else if (className.equalsIgnoreCase("DefaultInternationalString")) {
+        } else if ("DefaultInternationalString".equalsIgnoreCase(className)) {
             mdwclassName = "PT_FreeText";
             mdwStandard  = Standard.ISO_19115;
-        } else if (className.equalsIgnoreCase("Date")) {
+        } else if ("Date".equalsIgnoreCase(className) || "URI".equalsIgnoreCase(className) || "Integer".equalsIgnoreCase(className)
+                || "Boolean".equalsIgnoreCase(className)) {
             mdwclassName = className;
             mdwStandard  = Standard.ISO_19103;
-        } else if (className.equalsIgnoreCase("URI")) {
-            mdwclassName = className;
-            mdwStandard = Standard.ISO_19103;
-        }  else if (className.equalsIgnoreCase("Integer")) {
-            mdwclassName = className;
-            mdwStandard = Standard.ISO_19103;
-        }  else if (className.equalsIgnoreCase("Long")) {
+        
+        }  else if ("Long".equalsIgnoreCase(className)) {
             mdwclassName = "Integer";
             mdwStandard = Standard.ISO_19103;
-        } else if (className.equalsIgnoreCase("Boolean")) {
-            mdwclassName = className;
-            mdwStandard  = Standard.ISO_19103;
-        }  else if (className.equalsIgnoreCase("URL")) {
+        }  else if ("URL".equalsIgnoreCase(className)) {
             mdwclassName = className;
             mdwStandard  = Standard.ISO_19115;
         //special case for locale codeList.
