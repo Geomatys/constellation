@@ -219,36 +219,6 @@ public final class Utils {
     }
 
     /**
-     * Return a time description on the form "Xmin Ys Zms" from a millisecond time.
-     *
-     * @param time A time value in millisecond
-     *
-     * @return A string on the form "Xmin Ys Zms".
-     */
-    public static String getPeriodDescription(long time) {
-        long temp = time / 1000;
-        final long ms   = time - (temp * 1000);
-        time      = time - ms;
-
-        // we pass in second
-        time      = time / 1000;
-
-        temp      = time / 60;
-        final long sec  = time - (temp * 60);
-        time      = time - sec;
-
-        if (time == 0) return sec + "s " + ms + "ms";
-
-        //we pass in minute
-        time      = time / 60;
-
-        temp      = time / 60;
-        final long min  = time - (temp * 60);
-
-        return min + "min " + sec + "s " + ms + "ms";
-    }
-
-    /**
      * Return an envelope containing all the Observation member of the collection.
      *
      * @param collection

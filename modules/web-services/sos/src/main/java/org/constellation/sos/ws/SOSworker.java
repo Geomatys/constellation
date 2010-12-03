@@ -18,6 +18,7 @@
 package org.constellation.sos.ws;
 
 // JDK dependencies
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -1788,7 +1789,7 @@ public class SOSworker extends AbstractWorker {
                 try {
                     final Date d = DATE_FORMATS.get(0).parse(timeInstant.getTimePosition().getValue());
                     final long t = System.currentTimeMillis() - d.getTime();
-                    LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + Utils.getPeriodDescription(t) + ')');
+                    LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + TemporalUtilities.durationToString(t) + ')');
                 } catch (ParseException ex) {
                     LOGGER.warning("unable to parse the samplingTime");
                 }

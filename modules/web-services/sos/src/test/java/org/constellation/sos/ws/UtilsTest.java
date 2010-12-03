@@ -17,6 +17,7 @@
 
 package org.constellation.sos.ws;
 
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,9 +83,9 @@ public class UtilsTest {
     @Test
     public void getPeriodDescriptionTest() throws Exception {
 
-        assertEquals("1s 12ms", Utils.getPeriodDescription(1012));
+        assertEquals("1s 12ms", TemporalUtilities.durationToString(1012));
 
-        assertEquals("1min 7s 12ms", Utils.getPeriodDescription(67012));
+        assertEquals("1min 7s 12ms",TemporalUtilities.durationToString(67012));
     }
 
     /**
