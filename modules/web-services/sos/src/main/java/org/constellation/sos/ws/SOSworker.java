@@ -170,7 +170,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * A list of temporary ObservationTemplate
      */
-    private Map<String, ObservationEntry> templates = new HashMap<String, ObservationEntry>();
+    private final Map<String, ObservationEntry> templates = new HashMap<String, ObservationEntry>();
     
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
@@ -210,7 +210,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * A list of schreduled Task (used in close method).
      */
-    private List<Timer> schreduledTask = new ArrayList<Timer>();
+    private final List<Timer> schreduledTask = new ArrayList<Timer>();
     
     /**
      * A list of supported MIME type 
@@ -2090,7 +2090,7 @@ public class SOSworker extends AbstractWorker {
         final List<String> srsName = Arrays.asList("EPSG:4326");
 
         String description = "";
-        if (offeringName.equals("allSensor")) {
+        if ("allSensor".equals(offeringName)) {
             description = "Base offering containing all the sensors.";
         }
         // we create a the new Offering
@@ -2220,7 +2220,7 @@ public class SOSworker extends AbstractWorker {
         /**
          * The identifier of the temporary template.
          */
-        private String templateId;
+        private final String templateId;
         
         /**
          * Build a new Timer which will destroy the temporaryTemplate

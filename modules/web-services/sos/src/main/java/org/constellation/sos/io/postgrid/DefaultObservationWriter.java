@@ -221,7 +221,7 @@ public class DefaultObservationWriter implements ObservationWriter {
                 srsName = srsName.substring(5);
             }
 
-            if (srsName.equals("27582")) {
+            if ("27582".equals(srsName)) {
                 request = request + " \"sos\".\"projected_localisations\" WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {
@@ -230,7 +230,7 @@ public class DefaultObservationWriter implements ObservationWriter {
                     insert = false;
                     LOGGER.log(Level.INFO, "Projected sensor location already registred for {0} keeping old location", physicalID);
                 }
-            } else if (srsName.equals("4326")) {
+            } else if ("4326".equals(srsName)) {
                 request = request + " \"sos\".\"geographic_localisations\" WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {

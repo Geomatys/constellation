@@ -43,6 +43,8 @@ import org.geotoolkit.wms.xml.v130.Request;
 @Immutable
 public class WMSConstant {
 
+    private WMSConstant() {}
+
     public static final Request REQUEST_130;
     static {
         final DCPType dcp = new DCPType(new HTTP(new Get(new OnlineResource("someurl")), new Post(new OnlineResource("someurl"))));

@@ -202,9 +202,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                 }
 
                 // we look for a know metadata type
-                if (typeName.equals("MD_Metadata")) {
+                if ("MD_Metadata".equals(typeName)) {
                     type = DefaultMetadata.class;
-                } else if (typeName.equals("Record")) {
+                } else if ("Record".equals(typeName)) {
                     type = RecordType.class;
                 } else {
                     throw new MetadataIoException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);

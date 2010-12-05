@@ -1233,7 +1233,7 @@ public class CSWworker extends AbstractWorker {
                     if (o != null) {
                         final DomainType param = o.getParameterIgnoreCase(parameter);
                         QName type;
-                        if (operationName.equals("GetCapabilities")) {
+                        if ("GetCapabilities".equals(operationName)) {
                             type = CAPABILITIES_QNAME;
                         } else {
                             type = RECORD_QNAME;

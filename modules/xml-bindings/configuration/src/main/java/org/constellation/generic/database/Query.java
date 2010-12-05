@@ -236,9 +236,10 @@ public class Query {
         for (Column col : select.getCol()) {
             String varName        = col.getVar();
             final String varValue = col.getSql();
-            if (varName != null && !varValue.equals("*")) {
-                if (varName.equals(":$"))
+            if (varName != null && !"*".equals(varValue)) {
+                if (":$".equals(varName)) {
                     varName = "ID";
+                }
                 mainQuery.append(varValue).append(" AS ").append(varName).append(',');
             } else {
                 mainQuery.append(varValue).append(',');

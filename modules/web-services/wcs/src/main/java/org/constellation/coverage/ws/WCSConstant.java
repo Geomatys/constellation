@@ -39,6 +39,8 @@ import org.geotoolkit.wcs.xml.v100.WCSCapabilityType.Request;
  */
 public class WCSConstant {
 
+    private WCSConstant() {}
+    
     public static final Request REQUEST_100;
     static {
         final Get get         = new DCPTypeType.HTTP.Get(new OnlineResourceType("someurl"));

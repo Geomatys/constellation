@@ -28,12 +28,8 @@ import java.util.List;
  */
 public class ContainerNotifierImpl implements ContainerNotifier {
     
-    private List<ContainerListener> containerListeners;
+    private final List<ContainerListener> containerListeners = new ArrayList<ContainerListener>();
 
-    public ContainerNotifierImpl() {
-        containerListeners = new ArrayList<ContainerListener>();
-    }
-    
     @Override
     public void addListener(ContainerListener arg0) {
         containerListeners.add(arg0);

@@ -43,7 +43,7 @@ import org.constellation.xacml.bridge.PolicySetFinderModule;
  */
 public class JBossPolicyLocator implements PolicyLocator, ContextMapOp {
    
-    private Map<String, Object> map = new HashMap<String, Object>();
+    private final Map<String, Object> map = new HashMap<String, Object>();
     
     private PolicyFinderModule policyFinderModule;
 

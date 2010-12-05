@@ -60,6 +60,8 @@ public class Utils {
      */
     private static final String UNKNOW_TITLE = "unknow title";
 
+    private Utils() {}
+    
     /**
      * This method try to find an Identifier for this object.
      *  we try to find a getId(), getIdentifier() or getFileIdentifier() method.

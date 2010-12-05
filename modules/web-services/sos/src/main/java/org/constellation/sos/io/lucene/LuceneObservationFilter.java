@@ -58,7 +58,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
     private static final Logger LOGGER =Logger.getLogger("org.constellation.sos.io.lucene");
     
-    private Properties map;
+    private final Properties map;
 
     private StringBuilder luceneRequest;
 

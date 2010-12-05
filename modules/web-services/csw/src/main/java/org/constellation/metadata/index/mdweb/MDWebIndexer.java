@@ -281,7 +281,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     protected void indexQueryableSet(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
         for (Entry<String,List<String>> entry :queryableSet.entrySet()) {
             final String values = getValues(form, entry.getValue());
-            if (!values.equals("null")) {
+            if (!"null".equals(values)) {
                 anyText.append(values).append(" ");
             }
             doc.add(new Field(entry.getKey(),           values, Field.Store.YES, Field.Index.ANALYZED));

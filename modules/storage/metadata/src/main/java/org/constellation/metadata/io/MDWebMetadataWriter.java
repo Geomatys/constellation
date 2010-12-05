@@ -121,7 +121,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * A flag indicating that we don't want to add the metadata to the index.
      */
-    private boolean noIndexation = false;
+    private final boolean noIndexation;
 
     /**
      * Build a new metadata writer.
@@ -163,9 +163,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             mdRecordSet = getRecordSet(configuration.getDefaultRecordSet());
             defaultUser = mdWriter.getUser("admin");
 
-            if (configuration.getNoIndexation() != null && configuration.getNoIndexation().equalsIgnoreCase("true")) {
+            if ("true".equalsIgnoreCase(configuration.getNoIndexation())) {
                 noIndexation = true;
                 LOGGER.info("indexation is de-activated for Transactionnal part");
+            } else {
+                noIndexation = false;
             }
 
         } catch (MD_IOException ex) {
@@ -194,12 +196,14 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             throw new MetadataIoException("MD_IOException while getting the catalog and user:" +'\n'+
                                            "cause:" + ex.getMessage());
         }
+        this.noIndexation = false;
         this.classBinding = new HashMap<String, Classe>();
         this.alreadyWrite = new HashMap<Object, Value>();
     }
 
     protected MDWebMetadataWriter() throws MetadataIoException {
-        defaultUser = null;
+        this.defaultUser = null;
+        this.noIndexation = false;
     }
     
     // TODO move this to CSW implementation
@@ -322,7 +326,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         
         if (object != null) {
             //we try to find a title for the from
-            if (title.equals("unknow title")) {
+            if ("unknow title".equals(title)) {
                 title = mdWriter.getAvailableTitle();
             }
             
@@ -1205,7 +1209,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if ("MD_Metadata".equals(typeName)) {
             mainStandard = Standard.ISO_19115;
             type = mdWriter.getClasse("MD_Metadata", mainStandard);
-        } else if (typeName.equals("Record")) {
+        } else if ("Record".equals(typeName)) {
             mainStandard = Standard.CSW;
             type = mdWriter.getClasse("Record", mainStandard);
         } else {

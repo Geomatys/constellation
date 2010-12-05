@@ -31,7 +31,7 @@ public class SQLQuery {
     
     public int nbField;
     
-    private Filter spatialFilter;
+    private final Filter spatialFilter;
     
     private List<SQLQuery> subQueries;
     

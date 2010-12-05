@@ -260,7 +260,7 @@ public class SQLFilterParser extends FilterParser {
         }
         
         String query = queryBuilder.toString();
-        if (query.equals("()")) {
+        if ("()".equals(query)) {
             query = "";
         }
 
@@ -278,7 +278,7 @@ public class SQLFilterParser extends FilterParser {
     protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) {
         response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName.getPropertyName())).append("' AND ");
         response.append('v').append(nbField).append(".\"value\" ").append(operator);
-        if (!operator.equals("IS NULL ")) {
+        if (!"IS NULL ".equals(operator)) {
             response.append("'").append(literalValue).append("' ");
         }
         response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");

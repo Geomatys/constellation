@@ -116,13 +116,12 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * A map of label - concept URI loaded from a Thesaurus.
      * They are used to make Anchor mark in the xml export.
      */
-    private Map<String, URI> conceptMap;
+    private final Map<String, URI> conceptMap = new HashMap<String, URI>();
 
     
     public MDWebCSWMetadataReader(Automatic configuration) throws MetadataIoException {
         super(configuration);
 
-        conceptMap = new HashMap<String, URI>();
         final List<BDD> thesaurusDBs = configuration.getThesaurus();
         for (BDD thesaurusDB : thesaurusDBs) {
             try {

@@ -97,7 +97,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * A map containing the mapping beetween the MDWeb className and java typeName
      */
-    private Map<String, Class> classBinding;
+    private final Map<String, Class> classBinding;
     
     /**
      * A list of package containing the ISO 19115 interfaces (and the codelist classes)
@@ -158,7 +158,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * A List of the already logged Missing MDWeb Classe.
      */
-    private List<String> classeNotFound;
+    private final List<String> classeNotFound = new ArrayList<String>();
 
     private boolean storeMapping = false;
 
@@ -235,7 +235,6 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         initPackage();
         this.classBinding       = initClassBinding(configuration.getConfigurationDirectory());
         this.alreadyRead        = new HashMap<Value, Object>();
-        this.classeNotFound     = new ArrayList<String>();
     }
 
     /**
@@ -249,7 +248,6 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         initPackage();
         this.classBinding       = new HashMap<String, Class>();
         this.alreadyRead        = new HashMap<Value, Object>();
-        this.classeNotFound     = new ArrayList<String>();
     }
 
     /**
@@ -263,7 +261,6 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         initPackage();
         this.classBinding       = new HashMap<String, Class>();
         this.alreadyRead        = new HashMap<Value, Object>();
-        this.classeNotFound     = new ArrayList<String>();
     }
 
     /**
@@ -814,7 +811,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             return Double.class;
         } else if (className.equalsIgnoreCase("Integer")) {
             return Integer.class;
-        } else if (className.equalsIgnoreCase("Boolean") && !standardName.equals("Sensor Web Enablement")) {
+        } else if (className.equalsIgnoreCase("Boolean") && !"Sensor Web Enablement".equals(standardName)) {
             return Boolean.class;
         } else if (className.equalsIgnoreCase("Distance")) {
             return Double.class;

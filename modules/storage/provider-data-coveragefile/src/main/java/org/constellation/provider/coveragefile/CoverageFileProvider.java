@@ -65,7 +65,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                 String nmsp = source.parameters.get(KEY_NAMESPACE);
                 if (nmsp == null) {
                     nmsp = DEFAULT_NAMESPACE;
-                } else if (nmsp.equals("no namespace")) {
+                } else if ("no namespace".equals(nmsp)) {
                     nmsp = null;
                 }
 
@@ -85,7 +85,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                 String nmsp = source.parameters.get(KEY_NAMESPACE);
                 if (nmsp == null) {
                     nmsp = DEFAULT_NAMESPACE;
-                } else if (nmsp.equals("no namespace")) {
+                } else if ("no namespace".equals(nmsp)) {
                     nmsp = null;
                 }
 
@@ -255,7 +255,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                     String nmsp = source.parameters.get(KEY_NAMESPACE);
                     if (nmsp == null) {
                         nmsp = DEFAULT_NAMESPACE;
-                    } else if (nmsp.equals("no namespace")) {
+                    } else if ("no namespace".equals(nmsp)) {
                         nmsp = null;
                     }
                     index.put(new DefaultName(nmsp,name), candidate);

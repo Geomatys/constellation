@@ -430,11 +430,11 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 final String definition = fieldDef.get(i);
                 final String uomCode    = uomCodes.get(i);
                 if (typeName != null) {
-                    if (typeName.equals("Quantity")) {
+                    if ("Quantity".equals(typeName)) {
                         component = new QuantityType(definition, uomCode, null);
-                    } else if (typeName.equals("Time")) {
+                    } else if ("Time".equals(typeName)) {
                         component = new TimeType(definition, uomCode, null);
-                    } else if (typeName.equals("Boolean")) {
+                    } else if ("Boolean".equals(typeName)) {
                         component = new BooleanType(definition, null);
                     } else {
                         LOGGER.severe("unexpected field type");

@@ -75,7 +75,7 @@ public class OMProvider extends AbstractLayerProvider {
 
     private final Map<String,Serializable> params = new HashMap<String,Serializable>();
     private final Set<Name> index = new LinkedHashSet<Name>();
-    private DataStore store;
+    private final DataStore store;
     private final ProviderSource source;
 
 

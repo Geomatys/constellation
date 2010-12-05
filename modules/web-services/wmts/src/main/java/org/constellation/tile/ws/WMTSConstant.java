@@ -35,6 +35,8 @@ import org.geotoolkit.ows.xml.v110.RequestMethodType;
  */
 public class WMTSConstant {
 
+    private WMTSConstant() {}
+    
     public static final OperationsMetadata OPERATIONS_METADATA;
     static {
         final List<DCP> dcps = new ArrayList<DCP>();

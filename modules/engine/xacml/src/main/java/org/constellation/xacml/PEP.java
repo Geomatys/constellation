@@ -34,14 +34,15 @@ import org.geotoolkit.xacml.xml.context.SubjectType;
 import org.constellation.xacml.factory.RequestAttributeFactory;
 
 /**
+ * The Policy Enforcement Point.
  *
  * @author Guilhem Legal
  */
 public class PEP {
     
-    private String issuer = "constellation.org";
+    private final String issuer = "constellation.org";
     
-    private PolicyDecisionPoint pdp;
+    private final PolicyDecisionPoint pdp;
     
     /**
      * Build a new Policy Enforcement Point.

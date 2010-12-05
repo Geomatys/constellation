@@ -872,7 +872,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      */
     @Override
     public MediaType getOutputFormat() {
-        if (outputFormat.equals("text/xml; subtype=gml/3.1.1")) {
+        if ("text/xml; subtype=gml/3.1.1".equals(outputFormat)) {
             return new MediaType("text", "xml; subtype=gml/3.1.1");
         } else {
             return MediaType.valueOf(outputFormat);

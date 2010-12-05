@@ -61,7 +61,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
                 String nmsp = source.parameters.get(KEY_NAMESPACE);
                 if (nmsp == null) {
                     nmsp = DEFAULT_NAMESPACE;
-                } else if (nmsp.equals("no namespace")) {
+                } else if ("no namespace".equals(nmsp)) {
                     nmsp = null;
                 }
 
@@ -162,7 +162,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             String nmsp = source.parameters.get(KEY_NAMESPACE);
             if (nmsp == null) {
                 nmsp = DEFAULT_NAMESPACE;
-            } else if (nmsp.equals("no namespace")) {
+            } else if ("no namespace".equals(nmsp)) {
                 nmsp = null;
             }
 

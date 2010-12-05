@@ -85,9 +85,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             this.map        = (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);
              //we build the prepared Statement
             final String version = ((AbstractReader)mdWriter).getVersion();
-            if (version.equals("2.0")) {
+            if ("2.0".equals(version)) {
                 newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Storage\".\"Forms\" WHERE \"title\" LIKE '%" + sensorIdBase + "%' ");
-            } else if (version.equals("2.1")) {
+            } else if (version.startsWith("2.1") || version.startsWith("2.2")) {
                 newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Storage\".\"Records\" WHERE \"title\" LIKE '%" + sensorIdBase + "%' ");
             } else {
                 throw new IllegalArgumentException("unexpected MDWeb database version:" + version);

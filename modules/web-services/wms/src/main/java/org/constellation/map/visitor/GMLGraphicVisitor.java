@@ -85,23 +85,25 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      * a flag indicating the version of GML: 0 for mapserver output
      *                                       1 for GML 3 output
      */
-    private int mode;
+    private final int mode;
 
     /**
      * A Map of namespace / prefix
      */
-    private Map<String, String> prefixMap = new HashMap<String, String>();
+    private final Map<String, String> prefixMap = new HashMap<String, String>();
 
-    private static MarshallerPool pool;
+    private static final MarshallerPool pool;
     static {
+        MarshallerPool candidate = null;
         try {
             final Map<String, String> properties = new HashMap<String, String>();
             properties.put(Marshaller.JAXB_FRAGMENT, "true");
             properties.put(Marshaller.JAXB_FORMATTED_OUTPUT, "false");
-            pool = new MarshallerPool(properties, ObjectFactory.class);
+            candidate = new MarshallerPool(properties, ObjectFactory.class);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB Exception while initalizing the marshaller pool", ex);
         }
+        pool = candidate;
     }
 
 

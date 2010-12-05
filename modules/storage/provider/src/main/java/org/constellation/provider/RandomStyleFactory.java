@@ -67,11 +67,11 @@ import org.opengis.style.Symbolizer;
  */
 public class RandomStyleFactory extends Factory {
 
-    private MutableStyleFactory sf     = (MutableStyleFactory)FactoryFinder.getStyleFactory(null);
-    private FilterFactory ff           = FactoryFinder.getFilterFactory(null);
-    private final String[] pointShapes = {"square", "circle", "triangle", "star", "cross", "x"};
-    private final int[] sizes          = {8, 10, 12, 14, 16};
-    private final int[] widths         = {1, 2};
+    private final MutableStyleFactory sf = (MutableStyleFactory)FactoryFinder.getStyleFactory(null);
+    private final FilterFactory ff       = FactoryFinder.getFilterFactory(null);
+    private final String[] pointShapes   = {"square", "circle", "triangle", "star", "cross", "x"};
+    private final int[] sizes            = {8, 10, 12, 14, 16};
+    private final int[] widths           = {1, 2};
     private final Color[] colors = {
         Color.BLACK, Color.BLUE, Color.CYAN, Color.DARK_GRAY,
         Color.GRAY, Color.GREEN.darker(), Color.LIGHT_GRAY,

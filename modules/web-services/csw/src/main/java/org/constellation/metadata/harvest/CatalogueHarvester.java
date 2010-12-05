@@ -107,9 +107,9 @@ public abstract class CatalogueHarvester {
         try {
             unmarshaller = marshallerPool.acquireUnmarshaller();
 
-            if (resourceType.equals(Namespaces.GMD) ||
-                resourceType.equals(Namespaces.CSW_202) ||
-                resourceType.equals("http://www.isotc211.org/2005/gfc")) {
+            if (Namespaces.GMD.equals(resourceType) ||
+                Namespaces.CSW_202.equals(resourceType) ||
+               "http://www.isotc211.org/2005/gfc".equals(resourceType)) {
 
                 final InputStream in      = getSingleMetadata(sourceURL);
                 final Object harvested    = unmarshaller.unmarshal(in);

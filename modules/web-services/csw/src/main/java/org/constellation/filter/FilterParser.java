@@ -503,9 +503,9 @@ public abstract class FilterParser {
                     geometry = GeometrytoJTS.toJTS(gmlEnvelope);
                 }
 
-                if (operator.equals("DWithin")) {
+                if ("DWithin".equals(operator)) {
                     spatialfilter = wrap(FF.dwithin(GEOMETRY_PROPERTY,FF.literal(geometry),distance, units));
-                } else if (operator.equals("Beyond")) {
+                } else if ("Beyond".equals(operator)) {
                     spatialfilter = wrap(FF.beyond(GEOMETRY_PROPERTY,FF.literal(geometry),distance, units));
                 } else {
                     throw new CstlServiceException("Unknow DistanceBuffer operator.",

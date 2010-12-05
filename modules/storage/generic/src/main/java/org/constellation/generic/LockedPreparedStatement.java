@@ -35,7 +35,7 @@ public final class LockedPreparedStatement extends StatementEntry {
     /**
      * The SQL request contained in the prepared statement.
      */
-    private String sql;
+    private final String sql;
 
     /**
      * Build a ne LockedPreparedStatement.

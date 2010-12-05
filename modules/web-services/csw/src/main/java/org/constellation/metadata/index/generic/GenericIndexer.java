@@ -92,7 +92,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     /**
      * Shared Thread Pool for parralele execution
      */
-    private ExecutorService pool = Executors.newFixedThreadPool(6);
+    private final ExecutorService pool = Executors.newFixedThreadPool(6);
 
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
@@ -228,7 +228,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     @Override
     protected void indexSpecialField(final Object metadata, final Document doc) throws IndexingException {
         final String identifier = getIdentifier(metadata);
-        if (identifier.equals("unknow")) {
+        if ("unknow".equals(identifier)) {
             throw new IndexingException("unexpected metadata type.");
         }
         doc.add(new Field("id", identifier,  Field.Store.YES, Field.Index.NOT_ANALYZED));
@@ -314,7 +314,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @return
      */
     private TermValue formatStringValue(TermValue values) {
-         if (values.term.equals("date")) {
+         if ("date".equals(values.term)) {
              String value = values.value;
              if (value.endsWith("z") || value.endsWith("Z")) {
                  value = value.substring(0, value.length() - 1);

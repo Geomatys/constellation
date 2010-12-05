@@ -57,7 +57,7 @@ public class HarvestTaskSchreduler {
     /**
      * The name of the harvest task file
      */
-    private String harvestTaskFileName =  "HarvestTask.xml";
+    private static final String HARVEST_TASK_FILE_NAME =  "HarvestTask.xml";
 
      /**
      * A unMarshaller to get object from harvested resource.
@@ -69,7 +69,7 @@ public class HarvestTaskSchreduler {
     /**
      * A list of schreduled Task (used in close method).
      */
-    private List<Timer> schreduledTask = new ArrayList<Timer>();
+    private final List<Timer> schreduledTask = new ArrayList<Timer>();
 
     private final CatalogueHarvester catalogueHarvester;
 
@@ -95,7 +95,7 @@ public class HarvestTaskSchreduler {
         Unmarshaller unmarshaller = null;
         try {
             // we get the saved harvest task file
-            final File f = new File(configDir, harvestTaskFileName);
+            final File f = new File(configDir, HARVEST_TASK_FILE_NAME);
             if (f.exists()) {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
                 final Object obj = unmarshaller.unmarshal(f);
@@ -150,7 +150,7 @@ public class HarvestTaskSchreduler {
      */
     private void saveSchreduledHarvestTask(String sourceURL, String resourceType, int mode, List<String> emails, long period, long lastHarvest) {
         final HarvestTask newTask = new HarvestTask(sourceURL, resourceType, mode, emails, period, lastHarvest);
-        final File f              = new File(configDir, harvestTaskFileName);
+        final File f              = new File(configDir, HARVEST_TASK_FILE_NAME);
         Marshaller marshaller     = null;
         Unmarshaller unmarshaller = null;
         try {
@@ -199,7 +199,7 @@ public class HarvestTaskSchreduler {
      * @param lastHarvest a long representing the last time where the task was launch
      */
      private void updateSchreduledHarvestTask(String sourceURL, long lastHarvest) {
-        final File f              = new File(configDir, harvestTaskFileName);
+        final File f              = new File(configDir, HARVEST_TASK_FILE_NAME);
         Marshaller marshaller     = null;
         Unmarshaller unmarshaller = null;
         try {
@@ -263,22 +263,22 @@ public class HarvestTaskSchreduler {
         /**
          * The harvest mode SINGLE(0) or CATALOGUE(1)
          */
-        private int mode;
+        private final int mode;
 
         /**
          * The URL of the data source.
          */
-        private String sourceURL;
+        private final String sourceURL;
 
         /**
          * The type of the resource (for single mode).
          */
-        private String resourceType;
+        private final String resourceType;
 
         /**
          * A list of email addresses.
          */
-        private String[] emails;
+        private final String[] emails;
 
         /**
          * Build a new Timer which will Harvest the source periodically.

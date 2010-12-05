@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -84,8 +85,10 @@ public class SpecialOperationsTable extends Table{
             final Statement stmt     = lc.connection().createStatement();
             final ResultSet r        = stmt.executeQuery("SELECT Count(*) FROM \"observation\".\"observations\" WHERE \"name\" LIKE '%" + observationIdBase + "%' ");
 
-            r.next();
-            final int result = r.getInt(1);
+            int result = 0;
+            if (r.next()) {
+                result = r.getInt(1);
+            }
             r.close();
             stmt.close();
             return result;
@@ -98,8 +101,10 @@ public class SpecialOperationsTable extends Table{
             final Statement stmt     = lc.connection().createStatement();
             final ResultSet r        = stmt.executeQuery("SELECT Count(*) FROM \"observation\".\"measurements\" WHERE \"name\" LIKE '%" + observationIdBase + "%'  ");
 
-            r.next();
-            final int result = r.getInt(1);
+            int result = 0;
+            if (r.next()) {
+                result = r.getInt(1);
+            }
             r.close();
             stmt.close();
             return result;
@@ -115,13 +120,17 @@ public class SpecialOperationsTable extends Table{
                                                    + "WHERE \"feature_of_interest\" ='" + samplingfeatureId + "' "
                                                    + "OR \"feature_of_interest_point\" ='" + samplingfeatureId + "' "
                                                    + "OR \"feature_of_interest_curve\" ='" + samplingfeatureId + "' ");
-
-            r.next();
-            final Date begin = r.getDate(1);
-            final Date end   = r.getDate(2);
+            final List<Date> result;
+            if (r.next()) {
+                final Date begin = r.getDate(1);
+                final Date end   = r.getDate(2);
+                result = Arrays.asList(begin, end);
+            } else {
+                result = new ArrayList<Date>();
+            }
             r.close();
             stmt.close();
-            return Arrays.asList(begin, end);
+            return result;
         }
     }
 

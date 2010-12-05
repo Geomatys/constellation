@@ -584,15 +584,14 @@ public final class WCSWorker extends LayerWorker {
                 throw new CstlServiceException("The section " + section + " does not exist",
                         INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
             }
-            contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata");
+            contentMeta = "/WCS_Capabilities/ContentMetadata".equals(requestedSection);
         }
 
         // We unmarshall the static capabilities document.
         final WCSCapabilitiesType staticCapabilities =
                 (WCSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
         
-        if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") ||
-                                        requestedSection.equals("/"))
+        if (requestedSection == null || "/WCS_Capabilities/Capability".equals(requestedSection) || "/".equals(requestedSection))
         {
             //we update the url in the static part.
             final Request req = WCSConstant.REQUEST_100;
@@ -602,14 +601,14 @@ public final class WCSWorker extends LayerWorker {
         }
 
         final WCSCapabilitiesType responsev100;
-        if (requestedSection == null || contentMeta || requestedSection.equals("/")) {
+        if (requestedSection == null || contentMeta || "/".equals(requestedSection)) {
             responsev100 = staticCapabilities;
         } else {
-            if (requestedSection.equals("/WCS_Capabilities/Capability")) {
+            if ("/WCS_Capabilities/Capability".equals(requestedSection)) {
                 final WCSCapabilityType getStaticCapa = staticCapabilities.getCapability();
                 getStaticCapa.setVersion(ServiceDef.WCS_1_0_0.version.toString());
                 return new WCSCapabilitiesType(getStaticCapa);
-            } else if (requestedSection.equals("/WCS_Capabilities/Service")) {
+            } else if ("/WCS_Capabilities/Service".equals(requestedSection)) {
                 final org.geotoolkit.wcs.xml.v100.ServiceType getStaticService = staticCapabilities.getService();
                 getStaticService.setVersion(ServiceDef.WCS_1_0_0.version.toString());
                 return new WCSCapabilitiesType(getStaticService);
@@ -842,7 +841,7 @@ public final class WCSWorker extends LayerWorker {
         if (inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
-        } else if (!inputVersion.equals("1.0.0") && !inputVersion.equals("1.1.1")) {
+        } else if (!"1.0.0".equals(inputVersion) && !"1.1.1".equals(inputVersion)) {
             throw new CstlServiceException("The version number specified for this request " + inputVersion +
                     " is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }

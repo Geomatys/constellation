@@ -74,7 +74,10 @@ public class FileObservationReader implements ObservationReader {
 
     private File foiDirectory;
 
-    private MarshallerPool marshallerPool;
+    private static final MarshallerPool MARSHALLER_POOL;
+    static {
+        MARSHALLER_POOL = SOSMarshallerPool.getInstance();
+    }
 
     private static final String FILE_EXTENSION = ".xml";
 
@@ -91,8 +94,7 @@ public class FileObservationReader implements ObservationReader {
         } else {
             throw new CstlServiceException("There is no data Directory", NO_APPLICABLE_CODE);
         }
-        this.marshallerPool = SOSMarshallerPool.getInstance();
-        if (marshallerPool == null) {
+        if (MARSHALLER_POOL == null) {
             throw new CstlServiceException("JAXB exception while initializing the file observation reader", NO_APPLICABLE_CODE);
         }
 
@@ -123,7 +125,7 @@ public class FileObservationReader implements ObservationReader {
         if (offeringFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 final Object obj = unmarshaller.unmarshal(offeringFile);
                 if (obj instanceof ObservationOfferingEntry) {
                     return (ObservationOfferingEntry) obj;
@@ -133,7 +135,7 @@ public class FileObservationReader implements ObservationReader {
                 throw new CstlServiceException("Unable to unmarshall The file " + offeringFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
+                    MARSHALLER_POOL.release(unmarshaller);
                 }
             }
         }
@@ -150,7 +152,7 @@ public class FileObservationReader implements ObservationReader {
             for (File offeringFile: offeringDirectory.listFiles()) {
                 Unmarshaller unmarshaller = null;
                 try {
-                    unmarshaller = marshallerPool.acquireUnmarshaller();
+                    unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                     final Object obj = unmarshaller.unmarshal(offeringFile);
                     if (obj instanceof ObservationOfferingEntry) {
                         offerings.add((ObservationOfferingEntry) obj);
@@ -165,7 +167,7 @@ public class FileObservationReader implements ObservationReader {
                     LOGGER.warning("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
                 } finally {
                     if (unmarshaller != null) {
-                        marshallerPool.release(unmarshaller);
+                        MARSHALLER_POOL.release(unmarshaller);
                     }
                 }
             }
@@ -214,7 +216,7 @@ public class FileObservationReader implements ObservationReader {
         if (phenomenonFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(phenomenonFile);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
@@ -227,7 +229,7 @@ public class FileObservationReader implements ObservationReader {
                 throw new CstlServiceException("Unable to unmarshall The file " + phenomenonFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
+                    MARSHALLER_POOL.release(unmarshaller);
                 }
             }
         }
@@ -259,7 +261,7 @@ public class FileObservationReader implements ObservationReader {
         if (samplingFeatureFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(samplingFeatureFile);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
@@ -272,7 +274,7 @@ public class FileObservationReader implements ObservationReader {
                 throw new CstlServiceException("Unable to unmarshall The file " + samplingFeatureFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
+                    MARSHALLER_POOL.release(unmarshaller);
                 }
             }
         }
@@ -291,7 +293,7 @@ public class FileObservationReader implements ObservationReader {
         if (observationFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(observationFile);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
@@ -304,7 +306,7 @@ public class FileObservationReader implements ObservationReader {
                 throw new CstlServiceException("Unable to unmarshall The file " + observationFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
+                    MARSHALLER_POOL.release(unmarshaller);
                 }
             }
         }
@@ -320,7 +322,7 @@ public class FileObservationReader implements ObservationReader {
         if (anyResultFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(anyResultFile);
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
@@ -335,7 +337,7 @@ public class FileObservationReader implements ObservationReader {
                 throw new CstlServiceException("Unable to unmarshall The file " + anyResultFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
+                    MARSHALLER_POOL.release(unmarshaller);
                 }
             }
         }
