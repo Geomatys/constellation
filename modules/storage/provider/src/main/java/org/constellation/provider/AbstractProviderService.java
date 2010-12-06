@@ -95,7 +95,7 @@ public abstract class AbstractProviderService<K, V> implements ProviderService<K
      * {@inheritDoc }
      */
     @Override
-    public final void setConfiguration(ProviderConfig configuration) {
+    public synchronized final void setConfiguration(ProviderConfig configuration) {
         if(configuration == null){
             throw new IllegalArgumentException("Configuration can not be null");
         }
@@ -118,7 +118,7 @@ public abstract class AbstractProviderService<K, V> implements ProviderService<K
      * {@inheritDoc }
      */
     @Override
-    public ProviderConfig getConfiguration() {
+    public synchronized ProviderConfig getConfiguration() {
         return configuration;
     }
 

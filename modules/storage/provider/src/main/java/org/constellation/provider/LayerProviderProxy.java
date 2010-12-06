@@ -21,12 +21,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
+
 import org.geotoolkit.map.ElevationModel;
+
 import org.opengis.feature.type.Name;
 
 /**
@@ -39,9 +43,9 @@ import org.opengis.feature.type.Name;
  */
 public class LayerProviderProxy extends AbstractLayerProvider{
 
-    private static final Collection<LayerProviderService> SERVICES = new ArrayList<LayerProviderService>();
-
-    private static LayerProviderProxy instance = null;
+    private static final LayerProviderProxy INSTANCE = new LayerProviderProxy();
+    //all services
+    private static Collection<LayerProviderService> SERVICES = null;
 
     private LayerProviderProxy(){}
     
@@ -53,7 +57,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
 
         final Set<Name> keys = new HashSet<Name>();
 
-        for(LayerProviderService service : SERVICES){
+        for(LayerProviderService service : getServices()){
             for(LayerProvider provider : service.getProviders()){
                 keys.addAll( provider.getKeys() );
             }
@@ -70,7 +74,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
 
         final Set<Name> keys = new HashSet<Name>();
 
-        for(LayerProviderService service : SERVICES) {
+        for(LayerProviderService service : getServices()) {
             for(LayerProvider provider : service.getProviders()){
                 ProviderSource ps = provider.getSource();
                 if (sourceName.equals(ps.id)) {
@@ -88,7 +92,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
     @Override
     public boolean contains(Name key) {
 
-        for(LayerProviderService service : SERVICES){
+        for(LayerProviderService service : getServices()){
             for(LayerProvider provider : service.getProviders()){
                 if(provider.contains(key)) return true;
             }
@@ -103,7 +107,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
     @Override
     public LayerDetails get(Name key) {
 
-        for(LayerProviderService service : SERVICES){
+        for(LayerProviderService service : getServices()){
             for(LayerProvider provider : service.getProviders()){
                 final LayerDetails layer = provider.get(key);
                 if(layer != null) return layer;
@@ -119,7 +123,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
     @Override
     public ElevationModel getElevationModel(Name name) {
 
-        for(LayerProviderService service : SERVICES){
+        for(LayerProviderService service : getServices()){
             for(LayerProvider provider : service.getProviders()){
                 final ElevationModel model = provider.getElevationModel(name);
                 if(model != null) return model;
@@ -129,76 +133,60 @@ public class LayerProviderProxy extends AbstractLayerProvider{
         return null;
     }
 
-    public Collection<LayerProviderService> getServices() {
-        return Collections.unmodifiableCollection(SERVICES);
+    public synchronized Collection<LayerProviderService> getServices() {
+        if(SERVICES != null){
+            //services are already loaded
+            return SERVICES;
+        }
+
+        //configure each service
+        final List<LayerProviderService> cache = new ArrayList<LayerProviderService>();
+        final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
+        for(final LayerProviderService service : loader){
+            final String name     = service.getName();
+            final String fileName = name + ".xml";
+            final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+            service.setConfiguration(configFile);
+            cache.add(service);
+        }
+
+        SERVICES = Collections.unmodifiableCollection(cache);
+        return SERVICES;
     }
 
     /**
      * {@inheritDoc }
      */
     @Override
-    public void reload() {
+    public synchronized void reload() {
         dispose();
-        loadServices();
+        getServices(); //will load providers
     }
     
     /**
      * {@inheritDoc }
      */
     @Override
-    public void dispose() {
+    public synchronized void dispose() {
+        if(SERVICES == null){
+            //services are not loaded
+            return;
+        }
 
-        for(LayerProviderService service : SERVICES){
-            for(LayerProvider provider : service.getProviders()){
+        //services were loaded, dispose each of them
+        for(final LayerProviderService service : SERVICES){
+            for(final LayerProvider provider : service.getProviders()){
                 provider.dispose();
             }
         }
-
-        SERVICES.clear();
-    }
-
-    private static synchronized void init(){
-        loadServices();
-    }
-
-    public static void loadServices() {
-        SERVICES.clear();
-        final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
-        for(final LayerProviderService service : loader){
-            final String name     = service.getName();
-            final String fileName = name + ".xml";
-            final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
-
-            service.setConfiguration(configFile);
-
-            SERVICES.add(service);
-        }
-    }
-
-
-    /**
-     * Returns the current instance of {@link LayerProviderProxy}. It will create a new one
-     * if it does not already exist.
-     */
-    public static synchronized LayerProviderProxy getInstance(){
-        return getInstance(true);
+        SERVICES = null;
     }
 
     /**
-     * Returns the current instance of {@link LayerProviderProxy}. If there is no current
-     * instance, it will create and return a new one if the parameter {@code createIfNotExists}
-     * is {@code true}, or return {@code null} and do nothing if it is {@code false}.
-     *
-     * @param createIfNotExists {@code True} if we want to create a new instance if not already
-     *                          defined, {@code false} if we do not want.
+     * Returns the current instance of {@link LayerProviderProxy}.
      */
-    public static synchronized LayerProviderProxy getInstance(final boolean createIfNotExists){
-        if(instance == null && createIfNotExists){
-            init();
-            instance = new LayerProviderProxy();
-        }
-        
-        return instance;
+    public static LayerProviderProxy getInstance(){
+        return INSTANCE;
     }
 
 }
