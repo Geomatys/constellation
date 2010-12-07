@@ -157,4 +157,13 @@ public class Source {
     public void setExclude(List<Layer> exclude) {
         this.exclude = new LayerList(exclude);
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Source ");
+        sb.append(" id=").append(id);
+        sb.append(" LoadAll=").append(loadAll);
+        return sb.toString();
+    }
+
 }

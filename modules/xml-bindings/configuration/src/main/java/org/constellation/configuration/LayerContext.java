@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.geotoolkit.util.StringUtilities;
 
 /**
  *
@@ -72,4 +73,12 @@ public class LayerContext {
             return layers.getMainLayer();
         }
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("LayerContext");
+        sb.append(StringUtilities.toStringTree(getLayers()));
+        return sb.toString();
+    }
+
 }
