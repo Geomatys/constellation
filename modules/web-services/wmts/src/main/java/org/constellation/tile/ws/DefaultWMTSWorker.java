@@ -257,6 +257,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             final List<LayerType> outputLayers = new ArrayList<LayerType>();
             // and the list of matrix set
             final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
+            final Map<Name,Layer> layers = getLayers();
 
             final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
             for (Name name : layers.keySet()){

@@ -17,6 +17,8 @@
 
 package org.constellation.provider;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -31,7 +33,9 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 
+    private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
     protected final ProviderSource source;
+    private long lastUpdateTime = System.currentTimeMillis();
 
     public AbstractProvider(ProviderSource source){
         this.source = source;
@@ -69,6 +73,22 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
 
     @Override
     public void dispose() {
+    }
+
+    protected synchronized void fireUpdateEvent(){
+        final long oldTime = lastUpdateTime;
+        lastUpdateTime = System.currentTimeMillis();
+        listeners.firePropertyChange(RELOAD_TIME_PROPERTY, oldTime, lastUpdateTime);
+    }
+
+    @Override
+    public void addPropertyListener(PropertyChangeListener listener) {
+        listeners.addPropertyChangeListener(listener);
+    }
+
+    @Override
+    public void removePropertyListener(PropertyChangeListener listener) {
+        listeners.removePropertyChangeListener(listener);
     }
 
 }

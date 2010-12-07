@@ -17,6 +17,8 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import java.util.Collections;
+import java.beans.PropertyChangeEvent;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.configuration.Reference;
@@ -39,6 +41,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
@@ -162,10 +165,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     /**
      * Output responses of a GetCapabilities request.
      */
-    private static final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE =
-            new HashMap<String,AbstractWMSCapabilities>();
+    private final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE =
+            Collections.synchronizedMap(new HashMap<String,AbstractWMSCapabilities>());
 
-    private static final Map<String, LanguageType> SUPPORTED_LANGUAGES = new HashMap<String, LanguageType>();
+    private static final Map<String, LanguageType> SUPPORTED_LANGUAGES = 
+              new HashMap<String, LanguageType>();
     static {
         LanguageType language = new LanguageType("eng", true);
         SUPPORTED_LANGUAGES.put("eng", language);
@@ -181,6 +185,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);
         }
+
+        //listen to changes on the providers to clear the getcapabilities cache
+        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                CAPS_RESPONSE.clear();
+            }
+        });
+
     }
 
     @Override
@@ -275,6 +288,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         //Build the list of layers
         final List<AbstractLayer> outputLayers = new ArrayList<AbstractLayer>();
         final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
+        final Map<Name,Layer> layers = getLayers();
 
         for (Name name : layers.keySet()) {
             final LayerDetails layer = namedProxy.get(name);

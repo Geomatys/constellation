@@ -72,8 +72,14 @@ public final class ConfigDirectory {
      */
     public static String USER_DIRECTORY = null;
 
+    /**
+     * This should be a class loader from the main constellation application.
+     */
+    private static final ClassLoader baseClassLoader;
+
     //we try to load this variable at the start by reading a properties file
     static {
+        baseClassLoader = Thread.currentThread().getContextClassLoader();
         final File webInfDirectory = getWebInfDiretory();
         File propertiesFile = new File(webInfDirectory, "constellation.properties");
         if (propertiesFile != null && propertiesFile.exists()) {
@@ -87,8 +93,7 @@ public final class ConfigDirectory {
     }
 
     private static File getWebInfDiretory() {
-        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        URL url = classloader.getResource("org/constellation/configuration/ConfigDirectory.class");
+        URL url = baseClassLoader.getResource("org/constellation/configuration/ConfigDirectory.class");
         String path = url.toString();
         path = path.substring(path.lastIndexOf(':') + 1); // we remove the file type
         final int separator = path.indexOf('!'); // we remove the path inside the jar

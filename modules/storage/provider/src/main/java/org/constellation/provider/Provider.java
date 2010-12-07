@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
  */
 package org.constellation.provider;
 
+import java.beans.PropertyChangeListener;
 import java.util.Set;
 import org.constellation.provider.configuration.ProviderSource;
 
@@ -27,6 +28,8 @@ import org.constellation.provider.configuration.ProviderSource;
  * @author Johann Sorel (Geomatys)
  */
 public interface Provider<K,V> {
+
+    final String RELOAD_TIME_PROPERTY = "updateTime";
 
     final String JNDI_GROUP = "Data Provider Properties";
     
@@ -91,5 +94,15 @@ public interface Provider<K,V> {
      * is hard coded.
      */
     ProviderSource getSource();
+
+    /**
+     * Add a property listener.
+     */
+    void addPropertyListener(PropertyChangeListener listener);
+
+    /**
+     * Remove a property listener.
+     */
+    void removePropertyListener(PropertyChangeListener listener);
 
 }

@@ -206,6 +206,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
              *  layer providers
              */
             final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
+            final Map<Name,Layer> layers = getLayers();
             for (final Name layerName : layers.keySet()) {
                 final LayerDetails layer = namedProxy.get(layerName);
                 final Layer configLayer  = layers.get(layerName);
@@ -336,6 +337,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
         final List<QName> names             = request.getTypeName();
         final List<FeatureType> types       = new ArrayList<FeatureType>();
+        final Map<Name,Layer> layers = getLayers();
 
         if (names.isEmpty()) {
             //search all types
@@ -420,6 +422,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final Integer maxFeatures                 = request.getMaxFeatures();
         final List<FeatureCollection> collections = new ArrayList<FeatureCollection>();
         schemaLocations                           = new HashMap<String, String>();
+        final Map<Name,Layer> layers              = getLayers();
 
         if (request.getQuery() == null || request.getQuery().isEmpty()) {
             throw new CstlServiceException("You must specify a query!", MISSING_PARAMETER_VALUE);
@@ -1048,6 +1051,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public List<FeatureType> getFeatureTypes() {
         final List<FeatureType> types       = new ArrayList<FeatureType>();
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+        final Map<Name,Layer> layers        = getLayers();
 
         //search all types
         for (final Name name : layers.keySet()) {

@@ -622,6 +622,7 @@ public final class WCSWorker extends LayerWorker {
         final List<CoverageOfferingBriefType> offBrief = new ArrayList<CoverageOfferingBriefType>();
         final org.geotoolkit.wcs.xml.v100.ObjectFactory wcs100Factory = new org.geotoolkit.wcs.xml.v100.ObjectFactory();
         final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
+        final Map<Name,Layer> layers = getLayers();
         try {
             for (Name name : layers.keySet()) {
                 final LayerDetails layer = namedProxy.get(name);
@@ -762,6 +763,7 @@ public final class WCSWorker extends LayerWorker {
         final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory    = new org.geotoolkit.ows.xml.v110.ObjectFactory();
 
         final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
+        final Map<Name,Layer> layers = getLayers();
         try {
             for (Name name : layers.keySet()) {
                 final LayerDetails layer = namedProxy.get(name);

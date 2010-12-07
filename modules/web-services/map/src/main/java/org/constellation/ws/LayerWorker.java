@@ -42,23 +42,22 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 public abstract class LayerWorker extends AbstractWorker {
 
-    protected LayerContext layerContext;
-
-    protected Map<Name, Layer> layers;
+    private final LayerContext layerContext;
 
     public LayerWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory);
         isStarted = true;
+
+        LayerContext candidate = null;
         if (configurationDirectory != null) {
-            File lcFile = new File(configurationDirectory, "layerContext.xml");
+            final File lcFile = new File(configurationDirectory, "layerContext.xml");
             if (lcFile.exists()) {
                 Unmarshaller unmarshaller = null;
                 try {
                     unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     Object obj   = unmarshaller.unmarshal(lcFile);
                     if (obj instanceof LayerContext) {
-                        layerContext = (LayerContext) obj;
-                        initLayerContext();
+                        candidate = (LayerContext) obj;
                     } else {
                         isStarted = false;
                         LOGGER.log(Level.WARNING, "The layer context File does not contain a layerContext object");
@@ -79,21 +78,24 @@ public abstract class LayerWorker extends AbstractWorker {
             isStarted = false;
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: The configuration directory has not been found", id);
         }
+
+        layerContext = candidate;
     }
 
     /**
-     * Fill the layers Map.
+     * 
+     * @return map of additional informations for each layer declared in the layer context.
      */
-    private void initLayerContext() {
+    protected Map<Name, Layer> getLayers(){
         final LayerProviderProxy namedProxy  = LayerProviderProxy.getInstance();
-        layers = new HashMap<Name, Layer>();
+        final Map<Name, Layer> layers = new HashMap<Name, Layer>();
         /*
          * For each source declared in the layer context we search for layers informations.
          */
-        for (Source source : layerContext.getLayers()) {
-            Set<Name> layerNames = namedProxy.getKeys(source.getId());
-            for(Name layerName : layerNames) {
-                QName qn = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
+        for (final Source source : layerContext.getLayers()) {
+            final Set<Name> layerNames = namedProxy.getKeys(source.getId());
+            for(final Name layerName : layerNames) {
+                final QName qn = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
                 /*
                  * first case : source is in load-all mode
                  */
@@ -103,7 +105,7 @@ public abstract class LayerWorker extends AbstractWorker {
                         continue;
                     // we look for detailled informations in the include sections
                     } else {
-                        Layer layer = source.isIncludedLayer(qn);
+                        final Layer layer = source.isIncludedLayer(qn);
                         if (layer == null) {
                             layers.put(layerName, new Layer(qn));
                         } else {
@@ -121,6 +123,7 @@ public abstract class LayerWorker extends AbstractWorker {
                 }
             }
         }
+        return layers;
     }
 
     protected List<LayerDetails> getLayerReferences(final List<Name> layerNames) throws CstlServiceException {
@@ -152,6 +155,9 @@ public abstract class LayerWorker extends AbstractWorker {
         if (name == null) {
             return null;
         }
+
+        final Map<Name,Layer> layers = getLayers();
+
         if (!layers.containsKey(name)) {
             for (Name layerName: layers.keySet()) {
                 if (layerName.getLocalPart().equals(name.getLocalPart())) {

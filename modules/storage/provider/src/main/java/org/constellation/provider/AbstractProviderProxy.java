@@ -145,6 +145,7 @@ abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         }
 
         PROVIDERS = Collections.unmodifiableCollection(cache);
+        fireUpdateEvent();
         return PROVIDERS;
     }
 
