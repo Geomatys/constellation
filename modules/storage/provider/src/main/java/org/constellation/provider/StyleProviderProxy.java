@@ -16,15 +16,12 @@
  */
 package org.constellation.provider;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.ServiceLoader;
-import java.util.Set;
 
-import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.style.MutableStyle;
@@ -38,19 +35,27 @@ import org.geotoolkit.style.MutableStyleFactory;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public final class StyleProviderProxy extends AbstractStyleProvider{
+public final class StyleProviderProxy extends AbstractProviderProxy
+        <String,MutableStyle,StyleProvider,StyleProviderService> implements StyleProvider{
 
     public static final MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)
             FactoryFinder.getStyleFactory(new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
 
     public static final RandomStyleFactory STYLE_RANDOM_FACTORY = new RandomStyleFactory();
 
-    private static final Collection<StyleProviderService> SERVICES = new ArrayList<StyleProviderService>();
+    private static final Collection<StyleProviderService> SERVICES;
+    static {
+        final List<StyleProviderService> cache = new ArrayList<StyleProviderService>();
+        final ServiceLoader<StyleProviderService> loader = ServiceLoader.load(StyleProviderService.class);
+        for(final StyleProviderService service : loader){
+            cache.add(service);
+        }
+        SERVICES = Collections.unmodifiableCollection(cache);
+    }
 
-    private static StyleProviderProxy instance = null;
+    private static final StyleProviderProxy INSTANCE = new StyleProviderProxy();
 
     private StyleProviderProxy(){}
-
 
     /**
      * {@inheritDoc }
@@ -68,129 +73,21 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
         return MutableStyle.class;
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public Set<String> getKeys() {
-
-        final Set<String> keys = new HashSet<String>();
-
-        for(StyleProviderService service : SERVICES){
-            for(StyleProvider provider : service.getProviders()){
-                keys.addAll( provider.getKeys() );
-            }
-        }
-
-        return keys;
+    public MutableStyle getByIdentifier(String key) {
+        return get(key);
     }
 
     @Override
-    public Set<String> getKeys(String service) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    protected Collection<StyleProviderService> getServices() {
+        return SERVICES;
     }
 
     /**
-     * {@inheritDoc }
+     * Returns the current instance of {@link StyleProviderProxy}.
      */
-    @Override
-    public boolean contains(String key) {
-
-        for(StyleProviderService service : SERVICES){
-            for(StyleProvider provider : service.getProviders()){
-                if(provider.contains(key)) return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public MutableStyle get(String key) {
-
-        for(StyleProviderService service : SERVICES){
-            for(StyleProvider provider : service.getProviders()){
-                final MutableStyle style = provider.get(key);
-                if(style != null) return style;
-            }
-        }
-
-        return null;
-    }
-
-    public Collection<StyleProviderService> getServices() {
-        return Collections.unmodifiableCollection(SERVICES);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void reload() {
-        loadServices();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void dispose() {
-
-        for(StyleProviderService service : SERVICES){
-            for(StyleProvider provider : service.getProviders()){
-                provider.dispose();
-            }
-        }
-
-        SERVICES.clear();
-
-    }
-
-    public static synchronized void init() {
-        loadServices();
-    }
-
-    public static void loadServices() {
-        SERVICES.clear();
-        final ServiceLoader<StyleProviderService> loader = ServiceLoader.load(StyleProviderService.class);
-        for(final StyleProviderService service : loader){
-            final String name     = service.getName();
-            final String fileName = name + ".xml";
-            final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
-
-            service.setConfiguration(configFile);
-
-            SERVICES.add(service);
-        }
-    }
-
-
-    /**
-     * Returns the current instance of {@link StyleProviderProxy}. It will create a new one
-     * if it does not already exist.
-     */
-    public static synchronized StyleProviderProxy getInstance(){
-        return getInstance(true);
-    }
-
-    /**
-     * Returns the current instance of {@link StyleProviderProxy}. If there is no current
-     * instance, it will create and return a new one if the parameter {@code createIfNotExists}
-     * is {@code true}, or return {@code null} and do nothing if it is {@code false}.
-     *
-     * @param createIfNotExists {@code True} if we want to create a new instance if not already
-     *                          defined, {@code false} if we do not want.
-     */
-    public static synchronized StyleProviderProxy getInstance(final boolean createIfNotExists){
-        if(instance == null && createIfNotExists){
-            init();
-            instance = new StyleProviderProxy();
-        }
-
-        return instance;
+    public static StyleProviderProxy getInstance(){
+        return INSTANCE;
     }
 
 }

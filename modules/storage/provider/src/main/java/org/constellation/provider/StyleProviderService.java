@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,7 @@
  */
 package org.constellation.provider;
 
-import java.util.Collection;
+import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.style.MutableStyle;
 
@@ -27,9 +27,9 @@ import org.geotoolkit.style.MutableStyle;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface StyleProviderService extends ProviderService<String,MutableStyle>{
+public interface StyleProviderService extends ProviderService<String,MutableStyle,StyleProvider>{
 
     @Override
-    Collection<? extends StyleProvider> getProviders();
+    StyleProvider createProvider(ProviderSource config);
 
 }

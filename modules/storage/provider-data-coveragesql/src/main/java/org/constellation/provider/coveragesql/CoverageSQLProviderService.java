@@ -16,19 +16,14 @@
  */
 package org.constellation.provider.coveragesql;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.Provider;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProvider.*;
@@ -39,58 +34,31 @@ import static org.constellation.provider.coveragesql.CoverageSQLProvider.*;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageSQLProviderService extends AbstractProviderService<Name,LayerDetails> implements LayerProviderService {
+public class CoverageSQLProviderService extends AbstractProviderService
+        <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
-    /**
-     * Default logger.
-     */
-    private static final Logger LOGGER = Logging.getLogger(CoverageSQLProviderService.class);
     private static final String ERROR_MSG = "[PROVIDER]> Invalid coverage-sql provider config";
-
-    private static final Collection<CoverageSQLProvider> PROVIDERS = new ArrayList<CoverageSQLProvider>();
-    private static final Collection<CoverageSQLProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
     public CoverageSQLProviderService(){
         super("coverage-sql");
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public Collection<CoverageSQLProvider> getProviders() {
-        return IMMUTABLE;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void disposeProvider(Provider provider) {
-        if(PROVIDERS.contains(provider)){
-            provider.dispose();
-            PROVIDERS.remove(provider);
-        }else{
-            throw new IllegalArgumentException("This provider doesn't belong to this service.");
-        }
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void loadProvider(ProviderSource ps){
+    public LayerProvider createProvider(ProviderSource ps) {
         try {
             final CoverageSQLProvider provider = new CoverageSQLProvider(ps);
-            PROVIDERS.add(provider);
-            LOGGER.log(Level.INFO, "[PROVIDER]> coverage-sql provider created : "
-                    + provider.getSource().parameters.get(KEY_DATABASE) + " > "
-                    + provider.getSource().parameters.get(KEY_ROOT_DIRECTORY));
+            getLogger().log(Level.INFO, "[PROVIDER]> coverage-sql provider created : {0} > {1}"
+                    , new Object[]{
+                        provider.getSource().parameters.get(KEY_DATABASE),
+                        provider.getSource().parameters.get(KEY_ROOT_DIRECTORY)
+                     });
+            return provider;
         } catch (Exception ex) {
             // we should not catch exception, but here it's better to start all source we can
             // rather than letting a potential exception block the provider proxy
-            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
+            getLogger().log(Level.SEVERE, ERROR_MSG, ex);
         }
+        return null;
     }
 
 }

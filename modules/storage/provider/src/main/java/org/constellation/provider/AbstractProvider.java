@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009-2010, Geomatys
+ *    (C) 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,42 +17,50 @@
 
 package org.constellation.provider;
 
+import java.util.Collections;
+import java.util.Set;
 import org.constellation.provider.configuration.ProviderSource;
-import org.geotoolkit.style.MutableStyle;
 
 /**
- * Abstract implementation of StyleProvider which only handle the
- * getByIdentifier(String key) method.
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractStyleProvider extends AbstractProvider<String,MutableStyle> implements StyleProvider{
+public abstract class AbstractProvider<K,V> implements Provider<K, V>{
 
-    protected AbstractStyleProvider(ProviderSource source){
-        super(source);
+    protected final ProviderSource source;
+
+    public AbstractProvider(ProviderSource source){
+        this.source = source;
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public Class<String> getKeyClass() {
-        return String.class;
+    public ProviderSource getSource() {
+        return source;
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public Class<MutableStyle> getValueClass() {
-        return MutableStyle.class;
+    public Set<K> getKeys(String sourceId) {
+        if(sourceId != null && source != null){
+            if(sourceId.equals(source.id)){
+                return getKeys();
+            }else{
+                return Collections.emptySet();
+            }
+        }
+        return getKeys();
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public MutableStyle getByIdentifier(String key) {
-        return get(key);
+    public boolean contains(K key) {
+        return getKeys().contains(key);
     }
+
+    @Override
+    public void reload() {
+    }
+
+    @Override
+    public void dispose() {
+    }
+
 }

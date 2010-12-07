@@ -26,16 +26,16 @@ import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
-import org.geotoolkit.coverage.io.CoverageStoreException;
 
-import org.geotoolkit.coverage.sql.CoverageDatabase;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
+
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.sql.CoverageDatabase;
 import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.geotoolkit.feature.DefaultName;
-
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.jdbc.WrappedDataSource;
 import org.geotoolkit.map.MapBuilder;
@@ -70,14 +70,12 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     public static final String KEY_ROOT_DIRECTORY = "rootDirectory";
     public static final String KEY_NAMESPACE = "namespace";
 
-    private final ProviderSource source;
     private CoverageDatabase database;
 
     private final Set<Name> index = new HashSet<Name>();
 
     protected CoverageSQLProvider(ProviderSource source) throws IOException, SQLException {
-        this.source = source;
-
+        super(source);
         loadDataBase();
         visit();
     }
@@ -146,37 +144,12 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         database = new CoverageDatabase(dataSource, properties);
     }
 
-
-    @Override
-    public ProviderSource getSource(){
-        return source;
-    }
-
     /**
      * {@inheritDoc }
      */
     @Override
     public Set<Name> getKeys() {
         return Collections.unmodifiableSet(index);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<Name> getKeys(String sourceName) {
-        if (source.id.equals(sourceName)) {
-            return getKeys();
-        }
-        return new HashSet();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(Name key) {
-        return index.contains(key);
     }
 
     /**

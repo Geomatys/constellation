@@ -17,6 +17,7 @@
 package org.constellation.provider;
 
 import java.util.Set;
+import org.constellation.provider.configuration.ProviderSource;
 
 /**
  * A dataprovider is basicly a index class  
@@ -45,11 +46,11 @@ public interface Provider<K,V> {
      */
     Set<K> getKeys();
 
-     /**
-     * Use this method if you need the complete list of entries in this data provider for the specified service.
+    /**
+     * Use this method if you need the complete list of entries in this data provider for the specified source id.
      * If you are just searching if a special key exists than you should use the contains method.
      */
-    Set<K> getKeys(String sourceName);
+    Set<K> getKeys(String sourceId);
     
     /**
      * If you want to intend to get the related data, you should use the
@@ -84,5 +85,11 @@ public interface Provider<K,V> {
      * to this method.
      */
     void dispose();
+
+    /**
+     * The configuration of this provider. Can be null if the provider
+     * is hard coded.
+     */
+    ProviderSource getSource();
 
 }

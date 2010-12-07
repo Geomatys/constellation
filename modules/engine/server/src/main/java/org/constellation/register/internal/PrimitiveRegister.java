@@ -152,13 +152,10 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     public List<String> getRootDirectory() throws RegisterException {
 
         final List<String> rootDirectories = new ArrayList<String>();
-        final Collection<LayerProviderService> services = LayerProviderProxy.getInstance().getServices();
-        for (LayerProviderService service : services) {
-            for (LayerProvider p : service.getProviders()) {
-                final String s = p.getSource().parameters.get("rootDirectory");
-                if (s != null) {
-                   rootDirectories.add(s);
-                }
+        for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
+            final String s = p.getSource().parameters.get("rootDirectory");
+            if (s != null) {
+               rootDirectories.add(s);
             }
         }
         return rootDirectories;

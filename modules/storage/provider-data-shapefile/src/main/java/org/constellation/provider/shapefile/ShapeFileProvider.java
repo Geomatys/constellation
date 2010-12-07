@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -36,11 +36,10 @@ import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.storage.DataStoreException;
-import org.opengis.feature.type.Name;
 
+import org.opengis.feature.type.Name;
 
 
 /**
@@ -77,7 +76,6 @@ public class ShapeFileProvider extends AbstractLayerProvider {
      * Folder where are stored shape files.
      */
     private final File folder;
-    private final ProviderSource source;
 
     /**
      * Keeps a link between the file name and the file.
@@ -87,7 +85,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
 
 
     protected ShapeFileProvider(final ProviderSource source) throws IllegalArgumentException {
-        this.source = source;
+        super(source);
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
         if (path == null) {
@@ -102,12 +100,6 @@ public class ShapeFileProvider extends AbstractLayerProvider {
 
         visit(folder);
     }
-
-    @Override
-    public ProviderSource getSource(){
-        return source;
-    }
-
 
     /**
      * {@inheritDoc }
@@ -126,14 +118,6 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             return index.keySet();
         }
         return new HashSet();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(final Name key) {
-        return index.containsKey(key);
     }
 
     /**
@@ -263,12 +247,6 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             LOGGER.log(Level.WARNING, null, ex);
             return null;
         }
-    }
-
-
-    @Override
-    public ElevationModel getElevationModel(Name name) {
-        return null;
     }
 
 }

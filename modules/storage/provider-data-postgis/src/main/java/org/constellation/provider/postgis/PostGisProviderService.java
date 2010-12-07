@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,17 +16,14 @@
  */
 package org.constellation.provider.postgis;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.Provider;
 import org.constellation.provider.configuration.ProviderSource;
+
 import org.opengis.feature.type.Name;
 
 import static org.constellation.provider.postgis.PostGisProvider.*;
@@ -37,58 +34,28 @@ import static org.constellation.provider.postgis.PostGisProvider.*;
  *
  * @author Johann Sorel (Geoamtys)
  */
-public class PostGisProviderService extends AbstractProviderService<Name,LayerDetails> implements LayerProviderService {
+public class PostGisProviderService extends AbstractProviderService<Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
-    /**
-     * Default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(PostGisProviderService.class.getName());
     private static final String ERROR_MSG = "[PROVIDER]> Invalid postgis provider config";
-
-    private static final Collection<PostGisProvider> PROVIDERS = new ArrayList<PostGisProvider>();
-    private static final Collection<PostGisProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
     public PostGisProviderService(){
         super("postgis");
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public Collection<PostGisProvider> getProviders() {
-        return IMMUTABLE;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void disposeProvider(Provider provider) {
-        if(PROVIDERS.contains(provider)){
-            provider.dispose();
-            PROVIDERS.remove(provider);
-        }else{
-            throw new IllegalArgumentException("This provider doesn't belong to this service.");
-        }
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void loadProvider(ProviderSource ps) {
+    public LayerProvider createProvider(ProviderSource ps) {
         try {
             final PostGisProvider provider = new PostGisProvider(ps);
-            PROVIDERS.add(provider);
-            LOGGER.log(Level.INFO, "[PROVIDER]> postgis provider created : "
-                    + provider.getSource().parameters.get(KEY_HOST) + " > "
-                    + provider.getSource().parameters.get(KEY_DATABASE));
+            getLogger().log(Level.INFO, "[PROVIDER]> postgis provider created : {0} > {1}",
+                    new Object[]{provider.getSource().parameters.get(KEY_HOST),
+                                 provider.getSource().parameters.get(KEY_DATABASE)});
+            return provider;
         } catch (Exception ex) {
             // we should not catch exception, but here it's better to start all source we can
             // rather than letting a potential exception block the provider proxy
-            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
+            getLogger().log(Level.SEVERE, ERROR_MSG, ex);
         }
+        return null;
     }
 
 }

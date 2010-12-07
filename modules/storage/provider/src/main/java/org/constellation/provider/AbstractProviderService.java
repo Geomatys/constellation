@@ -16,47 +16,31 @@
  */
 package org.constellation.provider;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.logging.Level;
+import java.util.Collections;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
 
-import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderSource;
-
-import org.xml.sax.SAXException;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
  * @version $Id$
- *
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractProviderService<K, V> implements ProviderService<K, V> {
-
-    private static final Logger LOGGER = Logger.getLogger(AbstractProviderService.class.getName());
+public abstract class AbstractProviderService<K,V,P extends Provider<K,V>> implements ProviderService<K,V,P> {
+   
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 
     private final String name;
-    private ProviderConfig configuration = new ProviderConfig();
 
     protected AbstractProviderService(String name){
         this.name = name;
     }
 
-    /**
-     * Used by setConfiguration to dispose providers before the new ones
-     * are loaded.
-     */
-    protected abstract void disposeProvider(Provider provider);
-
-    /**
-     * Used by setConfiguration to load a single source.
-     */
-    protected abstract void loadProvider(ProviderSource ps);
+    protected static Logger getLogger() {
+        return LOGGER;
+    }
 
     /**
      * {@inheritDoc }
@@ -66,60 +50,9 @@ public abstract class AbstractProviderService<K, V> implements ProviderService<K
         return name;
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public final void setConfiguration(File file) {
-        //unload previous providers
-        final Collection<Provider> providers = new ArrayList<Provider>(getProviders());
-        for(Provider p : providers){
-            disposeProvider(p);
-        }
-
-        ProviderConfig config = null;
-        try {
-            config = ProviderConfig.read(file);
-        } catch (ParserConfigurationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (SAXException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
-
-        setConfiguration(config);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public synchronized final void setConfiguration(ProviderConfig configuration) {
-        if(configuration == null){
-            throw new IllegalArgumentException("Configuration can not be null");
-        }
-
-        //unload previous providers
-        final Collection<Provider> providers = new ArrayList<Provider>(getProviders());
-        for(Provider p : providers){
-            disposeProvider(p);
-        }
-        
-        this.configuration = configuration;
-
-        for (final ProviderSource ps : configuration.sources) {
-            loadProvider(ps);
-        }
-
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public synchronized ProviderConfig getConfiguration() {
-        return configuration;
+    public Collection<? extends P> getAdditionalProviders() {
+        return Collections.emptyList();
     }
 
 }

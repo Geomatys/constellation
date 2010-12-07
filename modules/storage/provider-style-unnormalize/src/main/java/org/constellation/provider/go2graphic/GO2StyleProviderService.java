@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,9 @@ package org.constellation.provider.go2graphic;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.logging.Logger;
 
 import org.constellation.provider.AbstractProviderService;
-import org.constellation.provider.Provider;
+import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderSource;
 
@@ -34,12 +33,9 @@ import org.geotoolkit.style.MutableStyle;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class GO2StyleProviderService extends AbstractProviderService<String,MutableStyle> implements StyleProviderService {
+public class GO2StyleProviderService extends AbstractProviderService
+        <String,MutableStyle,StyleProvider> implements StyleProviderService {
 
-    /**
-     * Default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(GO2StyleProviderService.class.getName());
     private static final Collection<GO2StyleProvider> PROVIDERS = new ArrayList<GO2StyleProvider>();
     private static final Collection<GO2StyleProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
@@ -50,26 +46,14 @@ public class GO2StyleProviderService extends AbstractProviderService<String,Muta
         PROVIDERS.add(new GO2StyleProvider());
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public Collection<GO2StyleProvider> getProviders() {
+    public StyleProvider createProvider(ProviderSource config) {
+        return null;
+    }
+
+    @Override
+    public Collection<? extends StyleProvider> getAdditionalProviders() {
         return IMMUTABLE;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void disposeProvider(Provider provider) {
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void loadProvider(ProviderSource ps) {
     }
 
 }

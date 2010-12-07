@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -39,16 +39,13 @@ import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.om.OMProvider;
-import org.constellation.provider.om.OMProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.provider.sml.SMLProvider;
-import org.constellation.provider.sml.SMLProviderService;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
@@ -58,7 +55,6 @@ import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
@@ -970,142 +966,96 @@ public class WFSWorkerTest {
     }
 
     private static void initFeatureSource() throws Exception {
-
          final File outputDir = initDataDirectory();
 
-         clearService();
-        /****************************************
-         *                                      *
-         * Defines a ShapeFile data provider    *
-         *                                      *
-         ****************************************/
-        final ProviderSource sourceShape = new ProviderSource();
-        sourceShape.id = "shapeSrc";
-        sourceShape.loadAll = true;
-        sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
-                "/org/constellation/ws/embedded/wms111/shapefiles");
+         final Configurator config = new Configurator() {
+            @Override
+            public ProviderConfig getConfiguration(String serviceName) {
+                final ProviderConfig config = new ProviderConfig();
 
-        sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "http://www.opengis.net/gml");
+                if("shapefile".equals(serviceName)){
+                    final ProviderSource sourceShape = new ProviderSource();
+                    sourceShape.id = "shapeSrc";
+                    sourceShape.loadAll = true;
+                    sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
+                            "/org/constellation/ws/embedded/wms111/shapefiles");
+                    sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "http://www.opengis.net/gml");
+                    sourceShape.layers.add(new ProviderLayer("BasicPolygons", Collections.singletonList("cite_style_BasicPolygons"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Bridges", Collections.singletonList("cite_style_Bridges"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("BuildingCenters", Collections.singletonList("cite_style_BuildingCenters"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Buildings", Collections.singletonList("cite_style_Buildings"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("DividedRoutes", Collections.singletonList("cite_style_DividedRoutes"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Forests", Collections.singletonList("cite_style_Forests"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Lakes", Collections.singletonList("cite_style_Lakes"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("MapNeatline", Collections.singletonList("cite_style_MapNeatLine"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Ponds", Collections.singletonList("cite_style_Ponds"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("RoadSegments", Collections.singletonList("cite_style_RoadSegments"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Streams", Collections.singletonList("cite_style_Streams"),
+                                           null, null, null, null, false, null));
+                    config.sources.add(sourceShape);
 
-        sourceShape.layers.add(new ProviderLayer("BasicPolygons", Collections.singletonList("cite_style_BasicPolygons"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Bridges", Collections.singletonList("cite_style_Bridges"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("BuildingCenters", Collections.singletonList("cite_style_BuildingCenters"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Buildings", Collections.singletonList("cite_style_Buildings"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("DividedRoutes", Collections.singletonList("cite_style_DividedRoutes"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Forests", Collections.singletonList("cite_style_Forests"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Lakes", Collections.singletonList("cite_style_Lakes"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("MapNeatline", Collections.singletonList("cite_style_MapNeatLine"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Ponds", Collections.singletonList("cite_style_Ponds"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("RoadSegments", Collections.singletonList("cite_style_RoadSegments"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Streams", Collections.singletonList("cite_style_Streams"),
-                               null, null, null, null, false, null));
+                }else if("observation".equals(serviceName)){
+                    try{
+                        final String url = "jdbc:derby:memory:TestWFSWorker";
+                        ds = new DefaultDataSource(url + ";create=true");
+                        Connection con = ds.getConnection();
+                        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+                        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                        con.close();
+                        final ProviderSource sourceOM = new ProviderSource();
+                        sourceOM.id      = "omSrc";
+                        sourceOM.loadAll = true;
+                        sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
+                        sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
+                        config.sources.add(sourceOM);
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(), ex);
+                    }
+                }else if("sensorML".equals(serviceName)){
+                    try{
+                        final String url2 = "jdbc:derby:memory:TestWFSWorkerSMl";
+                        ds2 = new DefaultDataSource(url2 + ";create=true");
+                        Connection con = ds2.getConnection();
+                        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
+                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
+                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
+                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
+                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
+                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
+                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
+                        con.close();
 
-
-        final ProviderConfig configShape = new ProviderConfig();
-        configShape.sources.add(sourceShape);
-
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            // Here we should have the shapefile data provider defined previously
-            if (service instanceof ShapeFileProviderService) {
-                service.setConfiguration(configShape);
-                if (service.getProviders().isEmpty()) {
-                    return;
+                        final ProviderSource sourceSML = new ProviderSource();
+                        sourceSML.id      = "smlSrc";
+                        sourceSML.loadAll = true;
+                        sourceSML.parameters.put(SMLProvider.KEY_SGBDTYPE, "derby");
+                        sourceSML.parameters.put(SMLProvider.KEY_DERBYURL, url2);
+                        config.sources.add(sourceSML);
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(), ex);
+                    }
                 }
-                break;
+
+                return config;
             }
-        }
+        };
 
-        /****************************************
-         *                                      *
-         *    Defines a O&M data provider       *
-         *                                      *
-         ****************************************/
-
-        final String url = "jdbc:derby:memory:TestWFSWorker";
-        ds = new DefaultDataSource(url + ";create=true");
-
-        Connection con = ds.getConnection();
-
-        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
-
-        con.close();
-        
-        final ProviderSource sourceOM = new ProviderSource();
-        sourceOM.id      = "omSrc";
-        sourceOM.loadAll = true;
-        sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
-        sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
-
-        final ProviderConfig configOM = new ProviderConfig();
-        configOM.sources.add(sourceOM);
-
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            // Here we should have the shapefile data provider defined previously
-            if (service instanceof OMProviderService) {
-                service.setConfiguration(configOM);
-                if (service.getProviders().isEmpty()) {
-                    return;
-                }
-                break;
-            }
-        }
-
-        /****************************************
-         *                                      *
-         *    Defines a SML data provider       *
-         *                                      *
-         ****************************************/
-
-        final String url2 = "jdbc:derby:memory:TestWFSWorkerSMl";
-        ds2 = new DefaultDataSource(url2 + ";create=true");
-
-        con = ds2.getConnection();
-
-        sr = new DerbySqlScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
-
-        con.close();
-
-        final ProviderSource sourceSML = new ProviderSource();
-        sourceSML.id      = "smlSrc";
-        sourceSML.loadAll = true;
-        sourceSML.parameters.put(SMLProvider.KEY_SGBDTYPE, "derby");
-        sourceSML.parameters.put(SMLProvider.KEY_DERBYURL, url2);
-
-        final ProviderConfig configSML = new ProviderConfig();
-        configSML.sources.add(sourceSML);
-
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            // Here we should have the shapefile data provider defined previously
-            if (service instanceof SMLProviderService) {
-                service.setConfiguration(configSML);
-                if (service.getProviders().isEmpty()) {
-                    return;
-                }
-                break;
-            }
-        }
+        LayerProviderProxy.getInstance().setConfigurator(config);
     }
     /**
      * Initialises the data directory in unzipping the jar containing the resources
@@ -1116,18 +1066,22 @@ public class WFSWorkerTest {
      */
     private static File initDataDirectory() throws IOException {
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
+        final String stylePath = "org/constellation/ws/embedded/wms111/styles";
+        String styleResource = classloader.getResource(stylePath).getFile();
+
         if (styleResource.indexOf('!') != -1) {
             styleResource = styleResource.substring(0, styleResource.indexOf('!'));
         }
         if (styleResource.startsWith("file:")) {
             styleResource = styleResource.substring(5);
         }
-        final File styleJar = new File(styleResource);
+
+        File styleJar = new File(styleResource);
         if (styleJar == null || !styleJar.exists()) {
             throw new IOException("Unable to find the style folder: "+ styleJar);
         }
         if (styleJar.isDirectory()) {
+            styleJar = new File(styleJar.getPath().replaceAll(stylePath, ""));
             return styleJar;
         }
         final InputStream in = new FileInputStream(styleJar);
@@ -1141,10 +1095,5 @@ public class WFSWorkerTest {
         return outputDir;
     }
 
-    private static void clearService() {
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            service.setConfiguration(new ProviderConfig());
-        }
-    }
 
 }

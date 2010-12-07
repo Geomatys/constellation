@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,14 +18,13 @@ package org.constellation.provider.sld;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.xml.bind.JAXBException;
 
 import org.constellation.provider.AbstractStyleProvider;
 import org.constellation.provider.configuration.ProviderSource;
@@ -44,6 +43,7 @@ import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
+
 import org.opengis.util.FactoryException;
 
 /**
@@ -71,11 +71,10 @@ public class SLDProvider extends AbstractStyleProvider{
     private final File folder;
     private final Map<String,File> index = new HashMap<String,File>();
     private final Cache<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
-    private final ProviderSource source;
     
     
     protected SLDProvider(ProviderSource source){
-        this.source = source;
+        super(source);
         folder = new File(source.parameters.get(KEY_FOLDER_PATH));
 
         if(folder == null || !folder.exists() || !folder.isDirectory()){
@@ -85,51 +84,12 @@ public class SLDProvider extends AbstractStyleProvider{
         visit(folder);
     }
 
-    protected ProviderSource getSource(){
-        return source;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<String> getKeyClass() {
-        return String.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<MutableStyle> getValueClass() {
-        return MutableStyle.class;
-    }
-
     /**
      * {@inheritDoc }
      */
     @Override
     public Set<String> getKeys() {
         return index.keySet();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<String> getKeys(String sourceName) {
-        if (source.id.equals(sourceName)) {
-            return index.keySet();
-        }
-        return new HashSet();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(String key) {
-        return index.containsKey(key);
     }
 
     /**

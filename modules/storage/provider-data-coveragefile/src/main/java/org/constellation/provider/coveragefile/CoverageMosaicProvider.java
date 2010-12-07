@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -72,11 +71,10 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         }
     };
 
-    private final ProviderSource source;
     private final File folder;
 
     protected CoverageMosaicProvider(ProviderSource source) throws IOException, SQLException {
-        this.source = source;
+        super(source);
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
         if (path == null) {
@@ -92,33 +90,12 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         reload();
     }
 
-    @Override
-    public ProviderSource getSource(){
-        return source;
-    }
-
     /**
      * {@inheritDoc }
      */
     @Override
     public Set<Name> getKeys() {
         return index.keySet();
-    }
-
-    @Override
-    public Set<Name> getKeys(String sourceName) {
-       if (source.id.equals(sourceName)) {
-            return index.keySet();
-        }
-        return new HashSet();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(Name key) {
-        return index.containsKey(key);
     }
 
     /**

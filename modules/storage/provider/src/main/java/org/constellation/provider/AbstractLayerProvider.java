@@ -18,9 +18,11 @@
 package org.constellation.provider;
 
 import java.util.Collection;
+
 import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.map.ElevationModel;
+
 import org.opengis.feature.type.Name;
 
 /**
@@ -29,11 +31,15 @@ import org.opengis.feature.type.Name;
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractLayerProvider implements LayerProvider{
+public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerDetails> implements LayerProvider{
 
     protected static final String DEFAULT_NAMESPACE = "http://geotoolkit.org";
-
     protected static final String NO_NAMESPACE = "no namespace";
+
+
+    protected AbstractLayerProvider(ProviderSource config){
+        super(config);
+    }
 
     /**
      * {@inheritDoc }
@@ -85,8 +91,4 @@ public abstract class AbstractLayerProvider implements LayerProvider{
         return null;
     }
 
-    @Override
-    public ProviderSource getSource() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }

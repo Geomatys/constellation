@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -44,23 +44,8 @@ public class GO2StyleProvider extends AbstractStyleProvider{
     
     
     protected GO2StyleProvider(){
+        super(null);
         visit();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<String> getKeyClass() {
-        return String.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<MutableStyle> getValueClass() {
-        return MutableStyle.class;
     }
 
     /**
@@ -69,19 +54,6 @@ public class GO2StyleProvider extends AbstractStyleProvider{
     @Override
     public Set<String> getKeys() {
         return index.keySet();
-    }
-
-    @Override
-    public Set<String> getKeys(String service) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(String key) {
-        return index.containsKey(key);
     }
 
     /**

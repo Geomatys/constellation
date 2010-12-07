@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,16 +16,12 @@
  */
 package org.constellation.provider.shapefile;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.Provider;
 import org.constellation.provider.configuration.ProviderSource;
 import org.opengis.feature.type.Name;
 
@@ -37,56 +33,29 @@ import static org.constellation.provider.shapefile.ShapeFileProvider.*;
  *
  * @author Johann Sorel (Geoamtys)
  */
-public class ShapeFileProviderService extends AbstractProviderService<Name,LayerDetails> implements LayerProviderService {
+public class ShapeFileProviderService extends AbstractProviderService
+        <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
-    /**
-     * Default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(ShapeFileProviderService.class.getName());
     private static final String ERROR_MSG = "[PROVIDER]> Invalid shapefile provider config";
-
-    private static final Collection<ShapeFileProvider> PROVIDERS = new ArrayList<ShapeFileProvider>();
-    private static final Collection<ShapeFileProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
     public ShapeFileProviderService(){
         super("shapefile");
     }
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Collection<ShapeFileProvider> getProviders() {
-        return IMMUTABLE;
-    }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    protected void disposeProvider(Provider provider) {
-        if(PROVIDERS.contains(provider)){
-            provider.dispose();
-            PROVIDERS.remove(provider);
-        }else{
-            throw new IllegalArgumentException("This provider doesn't belong to this service.");
-        }
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void loadProvider(ProviderSource ps) {
+    public LayerProvider createProvider(ProviderSource ps) {
         try {
             final ShapeFileProvider provider = new ShapeFileProvider(ps);
-            PROVIDERS.add(provider);
-            LOGGER.log(Level.INFO, "[PROVIDER]> shapefile provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
+            getLogger().log(Level.INFO, "[PROVIDER]> shapefile provider created : {0}",
+                    provider.getSource().parameters.get(KEY_FOLDER_PATH));
+            return provider;
         } catch (Exception ex) {
             // we should not catch exception, but here it's better to start all source we can
             // rather than letting a potential exception block the provider proxy
-            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
+            getLogger().log(Level.SEVERE, ERROR_MSG, ex);
         }
+        return null;
     }
 
 }

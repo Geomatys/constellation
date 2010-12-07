@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,14 +16,10 @@
  */
 package org.constellation.provider.sld;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.constellation.provider.AbstractProviderService;
-import org.constellation.provider.Provider;
+import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderSource;
 
@@ -38,56 +34,27 @@ import static org.constellation.provider.sld.SLDProvider.*;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class SLDProviderService extends AbstractProviderService<String,MutableStyle> implements StyleProviderService {
+public class SLDProviderService extends AbstractProviderService
+        <String,MutableStyle,StyleProvider> implements StyleProviderService {
 
-    /**
-     * Default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(SLDProviderService.class.getName());
     private static final String ERROR_MSG = "[PROVIDER]> Invalid SLD provider config";
-
-    private static final Collection<SLDProvider> PROVIDERS = new ArrayList<SLDProvider>();
-    private static final Collection<SLDProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
     public SLDProviderService(){
         super("sld");
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public Collection<SLDProvider> getProviders() {
-        return IMMUTABLE;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void disposeProvider(Provider provider) {
-        if(PROVIDERS.contains(provider)){
-            provider.dispose();
-            PROVIDERS.remove(provider);
-        }else{
-            throw new IllegalArgumentException("This provider doesn't belong to this service.");
-        }
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void loadProvider(ProviderSource ps) {
+    public StyleProvider createProvider(ProviderSource ps) {
         try {
             final SLDProvider provider = new SLDProvider(ps);
-            PROVIDERS.add(provider);
-            LOGGER.log(Level.INFO, "[PROVIDER]> SLD provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
+            getLogger().log(Level.INFO, "[PROVIDER]> SLD provider created : {0}", provider.getSource().parameters.get(KEY_FOLDER_PATH));
+            return provider;
         } catch (Exception ex) {
             // we should not catch exception, but here it's better to start all source we can
             // rather than letting a potential exception block the provider proxy
-            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
+            getLogger().log(Level.SEVERE, ERROR_MSG, ex);
         }
+        return null;
     }
 
 }

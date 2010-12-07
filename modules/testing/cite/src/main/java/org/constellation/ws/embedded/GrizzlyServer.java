@@ -22,27 +22,23 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-
-// Constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+// Constellation dependencies
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.map.ws.WMSMapDecoration;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.StyleProviderProxy;
-import org.constellation.provider.StyleProviderService;
+import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.coveragesql.CoverageSQLProvider;
-import org.constellation.provider.coveragesql.CoverageSQLProviderService;
 import org.constellation.provider.postgis.PostGisProvider;
-import org.constellation.provider.postgis.PostGisProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.provider.sld.SLDProvider;
-import org.constellation.provider.sld.SLDProviderService;
+
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.util.FileUtilities;
@@ -97,127 +93,104 @@ public final class GrizzlyServer {
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSMapDecoration.setEmptyExtension(true);
 
-        // Defines a PostGrid data provider
-        final ProviderSource sourcePostGrid = new ProviderSource();
-        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
-        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
-        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_PASSWORD, "test");
-        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_READONLY, "true");
-        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
-        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
-        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
-        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
-        sourcePostGrid.loadAll = true;
-        sourcePostGrid.id = "postgridSrc";
-        final ProviderConfig configPostGrid = new ProviderConfig();
-        configPostGrid.sources.add(sourcePostGrid);
-
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            // Here we should have the postgrid data provider defined previously
-            if (service instanceof CoverageSQLProviderService) {
-                service.setConfiguration(configPostGrid);
-                if (service.getProviders().isEmpty()) {
-                    return;
-                }
-                break;
-            }
-        }
-
         // Extracts the zip data into a temporary folder
         final File outputDir = initDataDirectory();
 
-        // Defines a Styles data provider
-        final ProviderSource sourceStyle = new ProviderSource();
-        sourceStyle.loadAll = true;
-        sourceStyle.parameters.put(SLDProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
-                "/org/constellation/ws/embedded/wms111/styles");
+        final Configurator layerConfig = new Configurator() {
+            @Override
+            public ProviderConfig getConfiguration(String serviceName) {
+                final ProviderConfig config = new ProviderConfig();
 
-        final ProviderConfig configStyle = new ProviderConfig();
-        configStyle.sources.add(sourceStyle);
+                if("coverage-sql".equals(serviceName)){
+                    final ProviderSource sourcePostGrid = new ProviderSource();
+                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
+                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
+                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_PASSWORD, "test");
+                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_READONLY, "true");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
+                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
+                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
+                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
+                    sourcePostGrid.loadAll = true;
+                    sourcePostGrid.id = "postgridSrc";
+                    config.sources.add(sourcePostGrid);
 
-        for (StyleProviderService service : StyleProviderProxy.getInstance().getServices()) {
-            // Here we should have the styles data provider defined previously
-            if (service instanceof SLDProviderService) {
-                service.setConfiguration(configStyle);
-                if (service.getProviders().isEmpty()) {
-                    return;
+                }else if("shapefile".equals(serviceName)){
+                    // Defines a ShapeFile data provider
+                    final ProviderSource sourceShape = new ProviderSource();
+                    sourceShape.loadAll = false;
+                    sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
+                            "/org/constellation/ws/embedded/wms111/shapefiles");
+                    sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "cite");
+
+                    sourceShape.layers.add(new ProviderLayer("BasicPolygons", Collections.singletonList("cite_style_BasicPolygons"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Bridges", Collections.singletonList("cite_style_Bridges"),
+                                           null, null, null, null, false, null));
+                    /*sourceShape.layers.add(new ProviderLayer("BuildingCenters", Collections.singletonList("cite_style_BuildingCenters"),
+                                           null, null, null, null, false, null));*/
+                    sourceShape.layers.add(new ProviderLayer("Buildings", Collections.singletonList("cite_style_Buildings"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("DividedRoutes", Collections.singletonList("cite_style_DividedRoutes"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Forests", Collections.singletonList("cite_style_Forests"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Lakes", Collections.singletonList("cite_style_Lakes"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("MapNeatline", Collections.singletonList("cite_style_MapNeatLine"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Ponds", Collections.singletonList("cite_style_Ponds"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("RoadSegments", Collections.singletonList("cite_style_RoadSegments"),
+                                           null, null, null, null, false, null));
+                    sourceShape.layers.add(new ProviderLayer("Streams", Collections.singletonList("cite_style_Streams"),
+                                           null, null, null, null, false, null));
+                    sourceShape.id = "shapeSrc";
+                    config.sources.add(sourceShape);
+
+                }else if("postgis".equals(serviceName)){
+                    // Defines a PostGis data provider
+                    final ProviderSource sourcePostGis = new ProviderSource();
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_DATABASE, "cite-wfs");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "db.geomatys.com");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "test");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "test");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_NAMESPACE,"http://cite.opengeospatial.org/gmlsf");
+                    sourcePostGis.loadAll = true;
+                    sourcePostGis.id = "postgisSrc";
+
+                    config.sources.add(sourcePostGis);
                 }
-                break;
+
+                return config;
             }
-        }
+        };
+        LayerProviderProxy.getInstance().setConfigurator(layerConfig);
 
-        // Defines a ShapeFile data provider
-        final ProviderSource sourceShape = new ProviderSource();
-        sourceShape.loadAll = false;
-        sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
-                "/org/constellation/ws/embedded/wms111/shapefiles");
-        sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "cite");
-        
-        sourceShape.layers.add(new ProviderLayer("BasicPolygons", Collections.singletonList("cite_style_BasicPolygons"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Bridges", Collections.singletonList("cite_style_Bridges"),
-                               null, null, null, null, false, null));
-        /*sourceShape.layers.add(new ProviderLayer("BuildingCenters", Collections.singletonList("cite_style_BuildingCenters"),
-                               null, null, null, null, false, null));*/
-        sourceShape.layers.add(new ProviderLayer("Buildings", Collections.singletonList("cite_style_Buildings"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("DividedRoutes", Collections.singletonList("cite_style_DividedRoutes"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Forests", Collections.singletonList("cite_style_Forests"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Lakes", Collections.singletonList("cite_style_Lakes"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("MapNeatline", Collections.singletonList("cite_style_MapNeatLine"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Ponds", Collections.singletonList("cite_style_Ponds"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("RoadSegments", Collections.singletonList("cite_style_RoadSegments"),
-                               null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("Streams", Collections.singletonList("cite_style_Streams"),
-                               null, null, null, null, false, null));
-        sourceShape.id = "shapeSrc";
+        final Configurator styleconfig = new Configurator() {
+            @Override
+            public ProviderConfig getConfiguration(String serviceName) {
+                final ProviderConfig config = new ProviderConfig();
 
-
-        final ProviderConfig configShape = new ProviderConfig();
-        configShape.sources.add(sourceShape);
-
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            // Here we should have the shapefile data provider defined previously
-            if (service instanceof ShapeFileProviderService) {
-                service.setConfiguration(configShape);
-                if (service.getProviders().isEmpty()) {
-                    return;
+                if("sld".equals(serviceName)){
+                    
+                    // Defines a Styles data provider
+                    final ProviderSource sourceStyle = new ProviderSource();
+                    sourceStyle.loadAll = true;
+                    sourceStyle.parameters.put(SLDProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
+                            "/org/constellation/ws/embedded/wms111/styles");
+                    config.sources.add(sourceStyle);
                 }
-                break;
-            }
-        }
 
-        // Defines a PostGis data provider
-        final ProviderSource sourcePostGis = new ProviderSource();
-        sourcePostGis.parameters.put(PostGisProvider.KEY_DATABASE, "cite-wfs");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "db.geomatys.com");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "test");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "test");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_NAMESPACE,"http://cite.opengeospatial.org/gmlsf");
-
-        final ProviderConfig configPostGis = new ProviderConfig();
-        configPostGis.sources.add(sourcePostGis);
-        sourcePostGis.loadAll = true;
-        sourcePostGis.id = "postgisSrc";
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            // Here we should have the postgis data provider defined previously
-            if (service instanceof PostGisProviderService) {
-                service.setConfiguration(configPostGis);
-                if (service.getProviders().isEmpty()) {
-                    return;
-                }
-                break;
+                return config;
             }
-        }
+        };
+        StyleProviderProxy.getInstance().setConfigurator(styleconfig);
+
 
         // Starting the grizzly server
         grizzly.start();

@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,9 +30,9 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.configuration.ConfigDirectory;
@@ -75,11 +75,10 @@ public class SMLProvider extends AbstractLayerProvider {
     private final Map<String,Serializable> params = new HashMap<String,Serializable>();
     private final Set<Name> index = new LinkedHashSet<Name>();
     private final DataStore store;
-    private final ProviderSource source;
 
 
     protected SMLProvider(ProviderSource source) throws DataStoreException {
-        this.source = source;
+        super(source);
         params.put(KEY_DBTYPE, "SML");
 
         final String sgbdType = source.parameters.get(KEY_SGBDTYPE);
@@ -137,36 +136,12 @@ public class SMLProvider extends AbstractLayerProvider {
 
     }
 
-    @Override
-    public ProviderSource getSource(){
-        return source;
-    }
-
     /**
      * {@inheritDoc }
      */
     @Override
     public Set<Name> getKeys() {
         return Collections.unmodifiableSet(index);
-    }
-
-     /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<Name> getKeys(String sourceName) {
-        if (source.id.equals(sourceName)) {
-            return Collections.unmodifiableSet(index);
-        }
-        return Collections.emptySet();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(Name key) {
-        return index.contains(key);
     }
 
     /**
@@ -237,7 +212,7 @@ public class SMLProvider extends AbstractLayerProvider {
         }
     }
 
-    public static final Collection<SMLProvider> loadProviders(){
+    public static Collection<SMLProvider> loadProviders(){
         final Collection<SMLProvider> dps = new ArrayList<SMLProvider>();
         final ProviderConfig config;
         try {
@@ -283,9 +258,8 @@ public class SMLProvider extends AbstractLayerProvider {
      *
      * @return List of folders holding shapefiles
      */
-    private static final ProviderConfig getConfig() throws ParserConfigurationException,
-            SAXException, IOException, NamingException
-    {
+    private static ProviderConfig getConfig() throws ParserConfigurationException,
+            SAXException, IOException, NamingException {
 
         final String configFile = ConfigDirectory.getPropertyValue(JNDI_GROUP,KEY_SML_CONFIG);
 

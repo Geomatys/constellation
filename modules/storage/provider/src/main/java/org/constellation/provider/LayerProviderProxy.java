@@ -16,18 +16,11 @@
  */
 package org.constellation.provider;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.Set;
-
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.map.ElevationModel;
 
@@ -41,80 +34,33 @@ import org.opengis.feature.type.Name;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class LayerProviderProxy extends AbstractLayerProvider{
+public class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDetails,LayerProvider,LayerProviderService>
+        implements LayerProvider{
 
     private static final LayerProviderProxy INSTANCE = new LayerProviderProxy();
-    //all services
-    private static Collection<LayerProviderService> SERVICES = null;
+    //all providers factories, unmodifiable
+    private static final Collection<LayerProviderService> SERVICES;
+    
+    static {
+        final List<LayerProviderService> cache = new ArrayList<LayerProviderService>();
+        final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
+        for(final LayerProviderService service : loader){
+            cache.add(service);
+        }
+        SERVICES = Collections.unmodifiableCollection(cache);
+    }
+
 
     private LayerProviderProxy(){}
-    
-    /**
-     * {@inheritDoc }
-     */
+
     @Override
-    public Set<Name> getKeys() {
-
-        final Set<Name> keys = new HashSet<Name>();
-
-        for(LayerProviderService service : getServices()){
-            for(LayerProvider provider : service.getProviders()){
-                keys.addAll( provider.getKeys() );
-            }
-        }
-
-        return keys;
+    public Class<Name> getKeyClass() {
+        return Name.class;
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
-    public Set<Name> getKeys(String sourceName) {
-
-        final Set<Name> keys = new HashSet<Name>();
-
-        for(LayerProviderService service : getServices()) {
-            for(LayerProvider provider : service.getProviders()){
-                ProviderSource ps = provider.getSource();
-                if (sourceName.equals(ps.id)) {
-                    keys.addAll(provider.getKeys(sourceName) );
-                }
-            }
-        }
-
-        return keys;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(Name key) {
-
-        for(LayerProviderService service : getServices()){
-            for(LayerProvider provider : service.getProviders()){
-                if(provider.contains(key)) return true;
-            }
-        }
-        
-        return false;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public LayerDetails get(Name key) {
-
-        for(LayerProviderService service : getServices()){
-            for(LayerProvider provider : service.getProviders()){
-                final LayerDetails layer = provider.get(key);
-                if(layer != null) return layer;
-            }
-        }
-
-        return null;
+    public Class<LayerDetails> getValueClass() {
+        return LayerDetails.class;
     }
 
     /**
@@ -122,64 +68,16 @@ public class LayerProviderProxy extends AbstractLayerProvider{
      */
     @Override
     public ElevationModel getElevationModel(Name name) {
-
-        for(LayerProviderService service : getServices()){
-            for(LayerProvider provider : service.getProviders()){
-                final ElevationModel model = provider.getElevationModel(name);
-                if(model != null) return model;
-            }
+        for(final LayerProvider provider : getProviders()){
+            final ElevationModel model = provider.getElevationModel(name);
+            if(model != null) return model;
         }
-        
         return null;
     }
 
-    public synchronized Collection<LayerProviderService> getServices() {
-        if(SERVICES != null){
-            //services are already loaded
-            return SERVICES;
-        }
-
-        //configure each service
-        final List<LayerProviderService> cache = new ArrayList<LayerProviderService>();
-        final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
-        for(final LayerProviderService service : loader){
-            final String name     = service.getName();
-            final String fileName = name + ".xml";
-            final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
-            service.setConfiguration(configFile);
-            cache.add(service);
-        }
-
-        SERVICES = Collections.unmodifiableCollection(cache);
+    @Override
+    public Collection<LayerProviderService> getServices() {
         return SERVICES;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public synchronized void reload() {
-        dispose();
-        getServices(); //will load providers
-    }
-    
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public synchronized void dispose() {
-        if(SERVICES == null){
-            //services are not loaded
-            return;
-        }
-
-        //services were loaded, dispose each of them
-        for(final LayerProviderService service : SERVICES){
-            for(final LayerProvider provider : service.getProviders()){
-                provider.dispose();
-            }
-        }
-        SERVICES = null;
     }
 
     /**
@@ -187,6 +85,16 @@ public class LayerProviderProxy extends AbstractLayerProvider{
      */
     public static LayerProviderProxy getInstance(){
         return INSTANCE;
+    }
+
+    @Override
+    public LayerDetails getByIdentifier(Name key) {
+        for(final Name n : getKeys()){
+            if(n.equals(key)){
+                return get(n);
+            }
+        }
+        return null;
     }
 
 }

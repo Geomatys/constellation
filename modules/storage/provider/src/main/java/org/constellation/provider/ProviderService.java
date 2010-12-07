@@ -16,11 +16,8 @@
  */
 package org.constellation.provider;
 
-import java.io.File;
 import java.util.Collection;
-
-import org.constellation.provider.configuration.ProviderConfig;
-
+import org.constellation.provider.configuration.ProviderSource;
 
 /**
  *
@@ -28,16 +25,23 @@ import org.constellation.provider.configuration.ProviderConfig;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface ProviderService<K,V> {
+public interface ProviderService<K,V,P extends Provider<K,V>> {
 
     String getName();
 
-    ProviderConfig getConfiguration();
+    /**
+     * Create a provider for the given configuration.
+     *
+     * @param config
+     * @return Provider<K,V>
+     */
+    P createProvider(ProviderSource config);
 
-    void setConfiguration(File config);
-
-    void setConfiguration(ProviderConfig props);
-
-    Collection<? extends Provider<K,V>> getProviders();
+    /**
+     * Special sources might provide hard coded providers.
+     * If they are some, they should be returned by this method.
+     * @return never null but can be empty.
+     */
+    Collection<? extends P> getAdditionalProviders();
 
 }

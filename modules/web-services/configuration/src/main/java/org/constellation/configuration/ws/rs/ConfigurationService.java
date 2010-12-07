@@ -334,15 +334,9 @@ public final class ConfigurationService extends WebService  {
      */
     private AcknowlegementType restartService(boolean forced) {
         LOGGER.info("\n restart requested \n");
-        // Reload the style and layer provider proxies if they already exist.
-        final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
-        if (spp != null) {
-            spp.reload();
-        }
-        final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
-        if (lpp != null) {
-            lpp.reload();
-        }
+        // clear cache
+        StyleProviderProxy.getInstance().dispose();
+        LayerProviderProxy.getInstance().dispose();
 
         if (cn != null) {
             if (!indexing) {

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,10 +16,8 @@
  */
 package org.constellation.provider;
 
-import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.feature.type.Name;
-
 
 /**
  *
@@ -31,5 +29,4 @@ public interface LayerProvider extends Provider<Name,LayerDetails>{
 
     ElevationModel getElevationModel(Name name);
 
-    ProviderSource getSource();
 }

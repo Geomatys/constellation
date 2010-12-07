@@ -31,11 +31,10 @@ import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.postgis.PostGisProvider;
-import org.constellation.provider.postgis.PostGisProviderService;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 
@@ -188,31 +187,30 @@ public class WFSCIteWorkerTest {
          *                                      *
          ****************************************/
 
-        // Defines a PostGis data provider
-        final ProviderSource sourcePostGis = new ProviderSource();
-        sourcePostGis.parameters.put(PostGisProvider.KEY_DATABASE, "cite-wfs");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "db.geomatys.com");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "test");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "test");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_NAMESPACE,"http://cite.opengeospatial.org/gmlsf");
+        final Configurator config = new Configurator() {
+            @Override
+            public ProviderConfig getConfiguration(String serviceName) {
+                final ProviderConfig config = new ProviderConfig();
 
-        final ProviderConfig configPostGis = new ProviderConfig();
-        configPostGis.sources.add(sourcePostGis);
-        sourcePostGis.loadAll = true;
-        sourcePostGis.id      = "src";
+                if("postgis".equals(serviceName)){
+                    // Defines a PostGis data provider
+                    final ProviderSource sourcePostGis = new ProviderSource();
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_DATABASE, "cite-wfs");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "db.geomatys.com");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "test");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "test");
+                    sourcePostGis.parameters.put(PostGisProvider.KEY_NAMESPACE,"http://cite.opengeospatial.org/gmlsf");
+                    sourcePostGis.loadAll = true;
+                    sourcePostGis.id      = "src";
 
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            // Here we should have the postgis data provider defined previously
-            if (service instanceof PostGisProviderService) {
-                service.setConfiguration(configPostGis);
-                if (service.getProviders().isEmpty()) {
-                    return;
+                    config.sources.add(sourcePostGis);
                 }
-                break;
-            }
-        }
 
+                return config;
+            }
+        };
+        LayerProviderProxy.getInstance().setConfigurator(config);
 
     }
 

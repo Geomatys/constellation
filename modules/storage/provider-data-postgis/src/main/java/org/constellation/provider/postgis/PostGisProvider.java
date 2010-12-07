@@ -81,11 +81,10 @@ public class PostGisProvider extends AbstractLayerProvider{
     private final Map<String,Serializable> params = new HashMap<String,Serializable>();
     private final Set<Name> index = new LinkedHashSet<Name>();
     private final DataStore store;
-    private final ProviderSource source;
 
 
     protected PostGisProvider(ProviderSource source) throws DataStoreException {
-        this.source = source;
+        super(source);
         params.put(KEY_DBTYPE, "postgisng");
 
         // HOST ----------------------------------------------------------------
@@ -141,37 +140,12 @@ public class PostGisProvider extends AbstractLayerProvider{
         
     }
 
-    @Override
-    public ProviderSource getSource(){
-        return source;
-    }
-
     /**
      * {@inheritDoc }
      */
     @Override
     public Set<Name> getKeys() {
         return Collections.unmodifiableSet(index);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<Name> getKeys(String sourceName) {
-        if (source.id.equals(sourceName)) {
-            return Collections.unmodifiableSet(index);
-        } else {
-            return Collections.emptySet();
-        }
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(Name key) {
-        return index.contains(key);
     }
 
     /**

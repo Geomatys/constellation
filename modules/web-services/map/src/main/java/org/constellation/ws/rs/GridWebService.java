@@ -61,14 +61,8 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
     @Override
     protected void specificRestart(String identifier) {
         LOGGER.info("reloading provider");
-        // Reload the style and layer provider proxies if they already exist.
-        final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
-        if (spp != null) {
-            spp.reload();
-        }
-        final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
-        if (lpp != null) {
-            lpp.reload();
-        }
+        // clear style and layer caches.
+        StyleProviderProxy.getInstance().dispose();
+        LayerProviderProxy.getInstance().dispose();
     }
 }

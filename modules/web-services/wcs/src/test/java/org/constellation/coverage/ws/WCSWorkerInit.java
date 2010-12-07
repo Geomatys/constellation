@@ -27,6 +27,7 @@ import java.io.File;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.coveragesql.CoverageSQLProvider;
@@ -62,34 +63,33 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        // Defines a PostGrid data provider
-        final ProviderSource source = new ProviderSource();
-        source.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
-        source.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
-        source.parameters.put(CoverageSQLProvider.KEY_PASSWORD, "test");
-        source.parameters.put(CoverageSQLProvider.KEY_READONLY, "true");
-        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-        source.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
-        source.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
-        source.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
-        source.parameters.put(CoverageSQLProvider.KEY_NAMESPACE,   "no namespace");
-        source.loadAll = true;
-        source.id = "src";
+        final Configurator config = new Configurator() {
+            @Override
+            public ProviderConfig getConfiguration(String serviceName) {
+                final ProviderConfig config = new ProviderConfig();
 
-        final ProviderConfig config = new ProviderConfig();
-        config.sources.add(source);
-
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            // Here we should have the postgrid data provider defined previously
-            if (service instanceof CoverageSQLProviderService) {
-                service.setConfiguration(config);
-                assumeTrue(!(service.getProviders().isEmpty()));
-                if (service.getProviders().isEmpty()) {
-                    return;
+                if("coverage-sql".equals(serviceName)){
+                    // Defines a PostGrid data provider
+                    final ProviderSource source = new ProviderSource();
+                    source.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
+                    source.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
+                    source.parameters.put(CoverageSQLProvider.KEY_PASSWORD, "test");
+                    source.parameters.put(CoverageSQLProvider.KEY_READONLY, "true");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    source.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
+                    source.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
+                    source.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
+                    source.parameters.put(CoverageSQLProvider.KEY_NAMESPACE,   "no namespace");
+                    source.loadAll = true;
+                    source.id = "src";
+                    config.sources.add(source);
                 }
-                break;
+                
+                return config;
             }
-        }
+        };
+        LayerProviderProxy.getInstance().setConfigurator(config);
+
 
         File configDir = new File("WCSWorkerTest");
         if (configDir.exists()) {

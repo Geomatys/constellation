@@ -25,10 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageReader;
 
@@ -37,24 +35,22 @@ import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.map.ws.WMSMapDecoration;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.coveragesql.CoverageSQLProvider;
-import org.constellation.provider.coveragesql.CoverageSQLProviderService;
 import org.constellation.provider.om.OMProvider;
-import org.constellation.provider.om.OMProviderService;
+import org.constellation.provider.shapefile.ShapeFileProvider;
+import org.constellation.util.Util;
 
 // JUnit dependencies
-import org.constellation.provider.shapefile.ShapeFileProvider;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
-import org.constellation.util.Util;
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
+
 import org.junit.*;
 import static org.junit.Assume.*;
 
@@ -105,120 +101,73 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
          */
         grizzly = new GrizzlyThread();
 
+        final Configurator config = new Configurator() {
+            @Override
+            public ProviderConfig getConfiguration(String serviceName) {
+
+                final ProviderConfig config = new ProviderConfig();
+
+                if("coverage-sql".equals(serviceName)){
+                    // Defines a PostGrid data provider
+                    final ProviderSource source = new ProviderSource();
+                    source.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
+                    source.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
+                    source.parameters.put(CoverageSQLProvider.KEY_PASSWORD, "test");
+                    source.parameters.put(CoverageSQLProvider.KEY_READONLY, "true");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    source.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
+                    source.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
+                    source.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
+                    source.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
+                    source.loadAll = true;
+                    source.id      = "coverageTestSrc";
+                    config.sources.add(source);
+                }else if("observation".equals(serviceName)){
+                    try{
+                        final String url = "jdbc:derby:memory:TestWFSWorker";
+                        ds = new DefaultDataSource(url + ";create=true");
+                        Connection con = ds.getConnection();
+                        ScriptRunner sr = new ScriptRunner(con);
+                        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                        con.close();
+                        final ProviderSource sourceOM = new ProviderSource();
+                        sourceOM.loadAll = true;
+                        sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
+                        sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
+                        sourceOM.id = "omSrc";
+                        config.sources.add(sourceOM);
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                    }
+                }else if("shapefile".equals(serviceName)){
+                    try{
+                        final File outputDir = initDataDirectory();
+                        final ProviderSource sourceShape = new ProviderSource();
+                        sourceShape.loadAll = true;
+                        sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
+                                "/org/constellation/ws/embedded/wms111/shapefiles");
+                        sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "http://www.opengis.net/gml");
+                        sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
+                                               null, null, null, null, false, null));
+                        sourceShape.id = "shapeSrc";
+                        config.sources.add(sourceShape);
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                    }
+                }
+
+                //empty configuration for others
+                return config;
+            }
+        };
+
+        LayerProviderProxy.getInstance().setConfigurator(config);
+
+
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSMapDecoration.setEmptyExtension(true);
         
-        // Defines a PostGrid data provider
-        final ProviderSource source = new ProviderSource();
-        source.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
-        source.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
-        source.parameters.put(CoverageSQLProvider.KEY_PASSWORD, "test");
-        source.parameters.put(CoverageSQLProvider.KEY_READONLY, "true");
-        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-        source.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
-        source.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
-        source.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
-        source.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
-        source.loadAll = true;
-        source.id      = "coverageTestSrc";
-
-        final ProviderConfig config = new ProviderConfig();
-        config.sources.add(source);
-
-        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-            // Here we should have the postgrid data provider defined previously
-            if (service instanceof CoverageSQLProviderService) {
-                service.setConfiguration(config);
-                assumeTrue(!(service.getProviders().isEmpty()));
-                if (service.getProviders().isEmpty()) {
-                    return;
-                }
-                break;
-            }
-        }
-
-        /****************************************
-         *                                      *
-         *    Defines a O&M data provider       *
-         *                                      *
-         ****************************************/
-         try {
-            final String url = "jdbc:derby:memory:TestWFSWorker";
-            ds = new DefaultDataSource(url + ";create=true");
-
-            Connection con = ds.getConnection();
-
-            ScriptRunner sr = new ScriptRunner(con);
-            sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
-
-            con.close();
-
-            final ProviderSource sourceOM = new ProviderSource();
-            sourceOM.loadAll = true;
-            sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
-            sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
-            sourceOM.id = "omSrc";
-
-            final ProviderConfig configOM = new ProviderConfig();
-            configOM.sources.add(sourceOM);
-
-            for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-                // Here we should have the shapefile data provider defined previously
-                if (service instanceof OMProviderService) {
-                    service.setConfiguration(configOM);
-                    if (service.getProviders().isEmpty()) {
-                        return;
-                    }
-                    break;
-                }
-            }
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE, rootDir, ex);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, rootDir, ex);
-        }
-
-
-        /****************************************
-         *                                      *
-         * Defines a ShapeFile data provider    *
-         *                                      *
-         ****************************************/
-        try {
-
-            final File outputDir = initDataDirectory();
-
-            final ProviderSource sourceShape = new ProviderSource();
-            sourceShape.loadAll = true;
-            sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
-                    "/org/constellation/ws/embedded/wms111/shapefiles");
-
-            sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "http://www.opengis.net/gml");
-
-            sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
-                                   null, null, null, null, false, null));
-            sourceShape.id = "shapeSrc";
-
-
-            final ProviderConfig configShape = new ProviderConfig();
-            configShape.sources.add(sourceShape);
-
-            for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
-                // Here we should have the shapefile data provider defined previously
-                if (service instanceof ShapeFileProviderService) {
-                    service.setConfiguration(configShape);
-                    if (service.getProviders().isEmpty()) {
-                        return;
-                    }
-                    break;
-                }
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-
         // Starting the grizzly server
         grizzly.start();
 

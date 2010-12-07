@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -76,11 +76,10 @@ public class OMProvider extends AbstractLayerProvider {
     private final Map<String,Serializable> params = new HashMap<String,Serializable>();
     private final Set<Name> index = new LinkedHashSet<Name>();
     private final DataStore store;
-    private final ProviderSource source;
 
 
     protected OMProvider(ProviderSource source) throws DataStoreException {
-        this.source = source;
+        super(source);
         params.put(KEY_DBTYPE, "OM");
 
         final String sgbdType = source.parameters.get(KEY_SGBDTYPE);
@@ -135,27 +134,6 @@ public class OMProvider extends AbstractLayerProvider {
 
     }
 
-    @Override
-    public ProviderSource getSource(){
-        return source;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<Name> getKeyClass() {
-        return Name.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<LayerDetails> getValueClass() {
-        return LayerDetails.class;
-    }
-
     /**
      * {@inheritDoc }
      */
@@ -163,26 +141,7 @@ public class OMProvider extends AbstractLayerProvider {
     public Set<Name> getKeys() {
         return Collections.unmodifiableSet(index);
     }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<Name> getKeys(String sourceName) {
-        if (source.id.equals(sourceName)) {
-            return Collections.unmodifiableSet(index);
-        }
-        return Collections.emptySet();
-    }
     
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(Name key) {
-        return index.contains(key);
-    }
-
     /**
      * {@inheritDoc }
      */
@@ -298,8 +257,7 @@ public class OMProvider extends AbstractLayerProvider {
      * @return List of folders holding shapefiles
      */
     private static final ProviderConfig getConfig() throws ParserConfigurationException,
-            SAXException, IOException, NamingException
-    {
+            SAXException, IOException, NamingException {
 
         final String configFile = ConfigDirectory.getPropertyValue(JNDI_GROUP,KEY_OM_CONFIG);
 
