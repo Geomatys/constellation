@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderConfig;
@@ -114,16 +115,33 @@ abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
             final String serviceName = factory.getName();
 
             //load configurable sources
-            final ProviderConfig config = configs.getConfiguration(serviceName);
-            for(final ProviderSource src : config.sources){
-                final P prov = (P) factory.createProvider(src);
-                if(prov != null){
-                    cache.add(prov);
+            try{
+                final ProviderConfig config = configs.getConfiguration(serviceName);
+                if(config != null){
+                    for(final ProviderSource src : config.sources){
+                        try{
+                            final P prov = (P) factory.createProvider(src);
+                            if(prov != null){
+                                cache.add(prov);
+                            }
+                        }catch(Exception ex){
+                            //we must not fail here in any case
+                            getLOGGER().log(Level.SEVERE, "Service "+serviceName+" failed to create a provider.",ex);
+                        }
+                    }
                 }
+            }catch(Exception ex){
+                //we must not fail here in any case
+                getLOGGER().log(Level.SEVERE, "Configurator failed to provide configuration for service : " + serviceName,ex);
             }
 
             //load hard coded sources
-            cache.addAll(factory.getAdditionalProviders());
+            try{
+                cache.addAll(factory.getAdditionalProviders());
+            }catch(Exception ex){
+                //we must not fail here in any case
+                getLOGGER().log(Level.SEVERE, "Service "+serviceName+" failed to create additional providers.",ex);
+            }
         }
 
         PROVIDERS = Collections.unmodifiableCollection(cache);
@@ -152,7 +170,12 @@ abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         try{
             //services were loaded, dispose each of them
             for(final Provider<K,V> provider : getProviders()){
-                provider.dispose();
+                try{
+                    provider.dispose();
+                }catch(Exception ex){
+                    //we must not fail here in any case
+                    getLOGGER().log(Level.SEVERE, "Failed to dispose provider : " + provider.toString(),ex);
+                }
             }
         }finally{
             //there should not be an error, but in worse case ensure this is correctly set to null.

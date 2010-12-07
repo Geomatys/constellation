@@ -139,4 +139,107 @@ public class ConfiguratorTest {
         assertEquals(3, LayerProviderProxy.getInstance().getKeys("id-2").size());
     }
 
+    /**
+     * Test correct loading of all providers even if one of them
+     * raise an error.
+     */
+    @Test
+    public void testLoadingCrashConfig(){
+
+        final Configurator config = new Configurator() {
+            @Override
+            public ProviderConfig getConfiguration(String serviceName) {
+                final ProviderConfig config = new ProviderConfig();
+
+                if(serviceName.equals("mock")){
+                    ProviderSource source = new ProviderSource();
+                    source.parameters.put("layers", "A,B,C,D");
+                    source.id = "id-0";
+                    config.sources.add(source);
+
+                    //this one with crash in initialization
+                    source = new ProviderSource();
+                    source.parameters.put("layers", "E,F");
+                    source.parameters.put("crashOnCreate", "true");
+                    source.id = "id-1";
+                    config.sources.add(source);
+
+                    source = new ProviderSource();
+                    source.parameters.put("layers", "G,H,I");
+                    source.id = "id-2";
+                    config.sources.add(source);
+                }
+
+                return config;
+            }
+        };
+        LayerProviderProxy.getInstance().setConfigurator(config);
+
+        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        assertEquals(2, providers.size());
+        assertEquals(7, LayerProviderProxy.getInstance().getKeys().size());
+        assertEquals(4, LayerProviderProxy.getInstance().getKeys("id-0").size());
+        assertEquals(0, LayerProviderProxy.getInstance().getKeys("id-1").size());
+        assertEquals(3, LayerProviderProxy.getInstance().getKeys("id-2").size());
+    }
+
+    /**
+     * Test correct disposal of all providers even if one of them
+     * raise an error.
+     */
+    @Test
+    public void testDisposeCrashConfig(){
+
+        final Configurator config = new Configurator() {
+            @Override
+            public ProviderConfig getConfiguration(String serviceName) {
+                final ProviderConfig config = new ProviderConfig();
+
+                if(serviceName.equals("mock")){
+                    ProviderSource source = new ProviderSource();
+                    source.parameters.put("layers", "A,B,C,D");
+                    source.id = "id-0";
+                    config.sources.add(source);
+
+                    //this one with crash on dispose
+                    source = new ProviderSource();
+                    source.parameters.put("layers", "E,F");
+                    source.parameters.put("crashOnDispose", "true");
+                    source.id = "id-1";
+                    config.sources.add(source);
+
+                    source = new ProviderSource();
+                    source.parameters.put("layers", "G,H,I");
+                    source.id = "id-2";
+                    config.sources.add(source);
+                }
+
+                return config;
+            }
+        };
+        LayerProviderProxy.getInstance().setConfigurator(config);
+
+        assertEquals(3, LayerProviderProxy.getInstance().getProviders().size());
+
+        //second provider will crash on dispose
+        LayerProviderProxy.getInstance().dispose();
+
+        //ensure all providers even if it crashed before are properly reloaded
+        assertEquals(3, LayerProviderProxy.getInstance().getProviders().size());
+        assertEquals(9, LayerProviderProxy.getInstance().getKeys().size());
+
+        
+        //set an empty configuration and verify nothing remains
+        LayerProviderProxy.getInstance().setConfigurator(new Configurator() {
+            @Override
+            public ProviderConfig getConfiguration(String serviceName) {
+                return null;
+            }
+        });
+
+        assertEquals(0, LayerProviderProxy.getInstance().getProviders().size());
+        assertEquals(0, LayerProviderProxy.getInstance().getKeys().size());
+
+    }
+
 }

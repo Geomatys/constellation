@@ -19,7 +19,9 @@ package org.constellation.provider;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.logging.Logger;
 import org.constellation.provider.configuration.ProviderSource;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -27,10 +29,16 @@ import org.constellation.provider.configuration.ProviderSource;
  */
 public abstract class AbstractProvider<K,V> implements Provider<K, V>{
 
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
+
     protected final ProviderSource source;
 
     public AbstractProvider(ProviderSource source){
         this.source = source;
+    }
+
+    public static Logger getLOGGER() {
+        return LOGGER;
     }
 
     @Override

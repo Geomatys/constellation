@@ -36,6 +36,11 @@ public class MockLayerProviderService extends AbstractProviderService
 
     @Override
     public LayerProvider createProvider(ProviderSource config) {
+
+        if(config.parameters.containsKey("crashOnCreate")){
+            throw new RuntimeException("Some error while loading.");
+        }
+
         return new MockLayerProvider(config);
     }
 
@@ -58,6 +63,15 @@ public class MockLayerProviderService extends AbstractProviderService
         @Override
         public LayerDetails get(Name key) {
             throw new UnsupportedOperationException("Not supported.");
+        }
+
+        @Override
+        public void dispose() {
+            super.dispose();
+
+            if(source.parameters.containsKey("crashOnDispose")){
+                throw new RuntimeException("Some error while dispose.");
+            }
         }
 
     }
