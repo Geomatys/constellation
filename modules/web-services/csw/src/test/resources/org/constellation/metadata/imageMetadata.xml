@@ -3,6 +3,7 @@
     <gmd:fileIdentifier>
         <gco:CharacterString>gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX</gco:CharacterString>
     </gmd:fileIdentifier>
+    <!-- lost language-->
     <gmd:language>
         <gco:CharacterString>eng; USA</gco:CharacterString>
     </gmd:language>
@@ -87,7 +88,6 @@
                     </gmd:title>
                     <gmd:date>
                         <gmd:CI_Date>
-                            <gmd:date gco:nilReason="unpublished material"/>
                             <gmd:dateType>
                                 <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="002">publication</gmd:CI_DateTypeCode>
                             </gmd:dateType>
@@ -352,6 +352,7 @@
                 <gco:CharacterString>Native Dataset Environment: APS v3.4.3 i686-pc-linux-gnu</gco:CharacterString>
             </gmd:environmentDescription>
             <gmd:extent>
+                <!-- lost the two id -->
                 <gmd:EX_Extent id="boundingExtent">
                     <gmd:geographicElement>
                         <gmd:EX_GeographicBoundingBox id="boundingGeographicBoundingBox">
@@ -369,7 +370,8 @@
                             </gmd:northBoundLatitude>
                         </gmd:EX_GeographicBoundingBox>
                     </gmd:geographicElement>
-                    <gmd:temporalElement gco:nilReason="unknown">
+                    <!-- lost the whole temporal extent -->
+                    <gmd:temporalElement>
                         <gmd:EX_TemporalExtent>
                             <gmd:extent>
                                 <gml:TimePeriod gml:id="boundingTemporalExtent">
@@ -408,12 +410,12 @@
             </gmd:contentType>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>1</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -423,12 +425,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>2</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -438,12 +440,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>3</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -453,12 +455,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>4</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -468,12 +470,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>5</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -483,12 +485,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>6</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -498,12 +500,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>7</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -513,12 +515,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>8</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -528,12 +530,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>9</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -543,12 +545,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>10</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -558,12 +560,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>11</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -573,12 +575,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>12</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -588,12 +590,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>13</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -603,12 +605,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>14</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -618,12 +620,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>15</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -633,12 +635,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>16</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -648,12 +650,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>17</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -663,12 +665,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>18</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -678,12 +680,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>19</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -693,12 +695,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>20</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -708,12 +710,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>21</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -723,12 +725,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>22</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -738,12 +740,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>23</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -753,12 +755,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>24</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -768,12 +770,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>25</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -783,12 +785,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>26</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -798,12 +800,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>27</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -813,12 +815,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>28</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -828,12 +830,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>29</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -843,12 +845,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>30</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -858,12 +860,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>31</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -873,12 +875,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>32</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -888,12 +890,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>33</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -903,12 +905,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>34</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -918,12 +920,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>35</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -933,12 +935,12 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
                                 <gco:CharacterString>36</gco:CharacterString>
                             </gco:aName>
-                            <gco:attributeType gco:nilReason="unknown"/>
                         </gco:MemberName>
                     </gmd:sequenceIdentifier>
                     <gmd:descriptor>
@@ -955,7 +957,6 @@
                     <gmd:name>
                         <gco:CharacterString>HDF</gco:CharacterString>
                     </gmd:name>
-                    <gmd:version gco:nilReason="unknown"/>
                 </gmd:MD_Format>
             </gmd:distributionFormat>
             <gmd:distributor>
@@ -1019,7 +1020,6 @@
     </gmd:distributionInfo>
     <gmd:dataQualityInfo>
         <gmd:DQ_DataQuality>
-            <gmd:scope gco:nilReason="unknown"/>
             <gmd:report>
                 <gmd:DQ_CompletenessCommission>
                     <gmd:evaluationMethodDescription>
@@ -1048,7 +1048,6 @@
                             <gmd:description>
                                 <gco:CharacterString>LPC's (Latest Pixel Composites) are processed through NRL's Automated Processing System in real-time. LPC's are the most recent clear pixel using a time scale of seven days and the multiple ocean color sensors are blended using a weighted average. The optical algorithms used were Quasi-Analytical Algorithms (QAA). The chlorophyll product was derived by using NASA's algorithm.</gco:CharacterString>
                             </gmd:description>
-                            <gmd:dateTime gco:nilReason="unknown"/>
                         </gmd:LI_ProcessStep>
                     </gmd:processStep>
                     <gmd:source>
@@ -1058,7 +1057,9 @@
                             </gmd:description>
                             <gmd:scaleDenominator>
                                 <gmd:MD_RepresentativeFraction>
-                                    <gmd:denominator/>
+                                    <gmd:denominator>
+                                        <gco:Integer>0</gco:Integer>
+                                    </gmd:denominator>
                                 </gmd:MD_RepresentativeFraction>
                             </gmd:scaleDenominator>
                             <gmd:sourceCitation>
@@ -1071,13 +1072,11 @@
                                     </gmd:alternateTitle>
                                     <gmd:date>
                                         <gmd:CI_Date>
-                                            <gmd:date gco:nilReason="unpublished material"/>
                                             <gmd:dateType>
                                                 <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="002">publication</gmd:CI_DateTypeCode>
                                             </gmd:dateType>
                                         </gmd:CI_Date>
                                     </gmd:date>
-                                    <gmd:edition/>
                                     <gmd:citedResponsibleParty>
                                         <gmd:CI_ResponsibleParty>
                                             <gmd:organisationName>
@@ -1088,18 +1087,11 @@
                                             </gmd:role>
                                         </gmd:CI_ResponsibleParty>
                                     </gmd:citedResponsibleParty>
-                                    <gmd:presentationForm/>
-                                    <gmd:series>
-                                        <gmd:CI_Series>
-                                            <gmd:name/>
-                                            <gmd:issueIdentification/>
-                                        </gmd:CI_Series>
-                                    </gmd:series>
-                                    <gmd:otherCitationDetails/>
                                 </gmd:CI_Citation>
                             </gmd:sourceCitation>
                             <gmd:sourceExtent>
                                 <gmd:EX_Extent>
+                                    <!-- lost all temporal extent -->
                                     <gmd:temporalElement>
                                         <gmd:EX_TemporalExtent>
                                             <gmd:extent gco:nilReason="unknown">
@@ -1122,13 +1114,11 @@
     </gmd:dataQualityInfo>
     <gmd:metadataMaintenance>
         <gmd:MD_MaintenanceInformation>
-            <gmd:maintenanceAndUpdateFrequency gco:nilReason="Unknown"/>
             <gmd:maintenanceNote>
                 <gco:CharacterString>This metadata was automatically generated from the FGDC Content Standard for Digital Geospatial Metadata standard version FGDC-STD-001-1998 .</gco:CharacterString>
             </gmd:maintenanceNote>
             <gmd:contact>
                 <gmd:CI_ResponsibleParty>
-                    <gmd:individualName/>
                     <gmd:organisationName>
                         <gco:CharacterString>NOAA/NESDIS/NODC/NCDDC; National Coastal Data Development Center</gco:CharacterString>
                     </gmd:organisationName>
@@ -1182,17 +1172,10 @@
                                 <gco:CharacterString>Earth Observing System</gco:CharacterString>
                             </gmd:title>
                             <gmd:date>
-                                <gmd:CI_Date>
-                                    <gmd:date gco:nilReason="unknown"/>
-                                    <gmd:dateType>
-                                        <gmd:CI_DateTypeCode/>
-                                    </gmd:dateType>
-                                </gmd:CI_Date>
+                                <gmd:CI_Date/>
                             </gmd:date>
                         </gmd:CI_Citation>
                     </gmi:citation>
-                    <gmi:status gco:nilReason="unknown"/>
-                    <gmi:parentOperation gco:nilReason="unknown"/>
                 </gmi:MI_Operation>
             </gmi:operation>
             <gmi:operation>
@@ -1203,17 +1186,10 @@
                                 <gco:CharacterString>Earth Observing System</gco:CharacterString>
                             </gmd:title>
                             <gmd:date>
-                                <gmd:CI_Date>
-                                    <gmd:date gco:nilReason="unknown"/>
-                                    <gmd:dateType>
-                                        <gmd:CI_DateTypeCode/>
-                                    </gmd:dateType>
-                                </gmd:CI_Date>
+                                <gmd:CI_Date/>
                             </gmd:date>
                         </gmd:CI_Citation>
                     </gmi:citation>
-                    <gmi:status gco:nilReason="unknown"/>
-                    <gmi:parentOperation gco:nilReason="unknown"/>
                 </gmi:MI_Operation>
             </gmi:operation>
             <gmi:platform>
@@ -1222,9 +1198,6 @@
                         <gmd:MD_Identifier>
                             <gmd:authority>
                                 <gmd:CI_Citation>
-                                    <gmd:title>
-                                        <gco:CharacterString>Terra</gco:CharacterString>
-                                    </gmd:title>
                                     <gmd:title>
                                         <gco:CharacterString>Aqua</gco:CharacterString>
                                     </gmd:title>
@@ -1240,10 +1213,8 @@
                                     </gmd:date>
                                 </gmd:CI_Citation>
                             </gmd:authority>
-                            <gmd:code gco:nilReason="unknown"/>
                         </gmd:MD_Identifier>
                     </gmi:identifier>
-                    <gmi:description gco:nilReason="unknown"/>
                     <gmi:sponsor>
                         <gmd:CI_ResponsibleParty>
                             <gmd:organisationName>
@@ -1261,9 +1232,6 @@
                                     <gmd:title>
                                         <gco:CharacterString>Moderate Resolution Imaging Spectroradiometer</gco:CharacterString>
                                     </gmd:title>
-                                    <gmd:title>
-                                        <gco:CharacterString>Moderate Resolution Imaging Spectroradiometer</gco:CharacterString>
-                                    </gmd:title>
                                     <gmd:alternateTitle>
                                         <gco:CharacterString>MODIS TERRA</gco:CharacterString>
                                     </gmd:alternateTitle>
@@ -1272,7 +1240,6 @@
                                     </gmd:alternateTitle>
                                     <gmd:date>
                                         <gmd:CI_Date>
-                                            <gmd:date gco:nilReason="unknown"/>
                                             <gmd:dateType>
                                                 <gmd:CI_DateTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication" codeSpace="002"/>
                                             </gmd:dateType>
@@ -1290,9 +1257,6 @@
                                     </gmd:citedResponsibleParty>
                                 </gmd:CI_Citation>
                             </gmi:citation>
-                            <gmi:type>
-                                <gmi:MI_SensorTypeCode/>
-                            </gmi:type>
                         </gmi:MI_Instrument>
                     </gmi:instrument>
                 </gmi:MI_Platform>

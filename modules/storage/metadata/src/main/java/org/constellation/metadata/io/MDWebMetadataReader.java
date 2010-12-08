@@ -283,7 +283,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
         this.natureSDIPackage   = FileUtilities.searchSubPackage("org.geotoolkit.naturesdi");
-        this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.internal.jaxb", "org.geotoolkit.metadata.iso.acquisition");
+        this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.metadata.imagery", "org.geotoolkit.metadata.iso.acquisition");
     }
 
     /**

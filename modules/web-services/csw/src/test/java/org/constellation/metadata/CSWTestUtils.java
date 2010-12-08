@@ -5,6 +5,7 @@
 
 package org.constellation.metadata;
 
+import org.opengis.metadata.lineage.Source;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.swe.xml.v100.DataRecordType;
 import org.geotoolkit.sml.xml.v100.IoComponentPropertyType;
@@ -105,6 +106,28 @@ public class CSWTestUtils {
         while (expDqIt.hasNext()) {
             DataQuality expDq = expDqIt.next();
             DataQuality resDq = resDqIt.next();
+            if (expDq.getLineage() != null) {
+                assertEquals(expDq.getLineage().getProcessSteps(), resDq.getLineage().getProcessSteps());
+                assertEquals(expDq.getLineage().getStatement(), resDq.getLineage().getStatement());
+
+                assertEquals(expDq.getLineage().getSources().size(), resDq.getLineage().getSources().size());
+                Iterator<? extends Source> expSrcIt = expDq.getLineage().getSources().iterator();
+                Iterator<? extends Source> resSrcIt = resDq.getLineage().getSources().iterator();
+                while (expSrcIt.hasNext()) {
+                    Source expSrc = expSrcIt.next();
+                    Source resSrc = resSrcIt.next();
+                    assertEquals(expSrc.getDescription(), resSrc.getDescription());
+                    assertEquals(expSrc.getProcessedLevel(), resSrc.getProcessedLevel());
+                    assertEquals(expSrc.getResolution(), resSrc.getResolution());
+                    assertEquals(expSrc.getScaleDenominator(), resSrc.getScaleDenominator());
+                    assertEquals(expSrc.getSourceCitation(), resSrc.getSourceCitation());
+                    assertEquals(expSrc.getSourceExtents(), resSrc.getSourceExtents());
+                    assertEquals(expSrc.getSourceReferenceSystem(), resSrc.getSourceReferenceSystem());
+                    assertEquals(expSrc.getSourceSteps(), resSrc.getSourceSteps());
+                    assertEquals(expSrc, resSrc);
+                }
+                assertEquals(expDq.getLineage().getSources(), resDq.getLineage().getSources());
+            }
             assertEquals(expDq.getLineage(), resDq.getLineage());
             assertEquals(expDq.getReports().size(), resDq.getReports().size());
             Iterator<? extends Element> expDqRep = expDq.getReports().iterator();

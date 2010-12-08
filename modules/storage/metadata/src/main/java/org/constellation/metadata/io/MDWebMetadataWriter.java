@@ -853,7 +853,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 standard = Standard.SENSOR_WEB_ENABLEMENT;
             } else if ("org.geotoolkit.gml.xml.v311".equals(packageName)) {
                 standard = Standard.ISO_19108;
-            } else if ("org.geotoolkit.internal.jaxb".equals(packageName)) {
+            } else if ("org.geotoolkit.metadata.imagery".equals(packageName)) {
                 standard = Standard.ISO_19115_2;
             }
                 
