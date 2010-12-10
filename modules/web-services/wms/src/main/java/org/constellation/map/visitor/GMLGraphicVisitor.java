@@ -17,8 +17,6 @@
 package org.constellation.map.visitor;
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.awt.Dimension;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -40,7 +38,7 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.query.wms.GetFeatureInfo;
 
-import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
@@ -243,14 +241,14 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
     @Override
     public void visit(ProjectedCoverage coverage,  RenderingContext2D context, SearchAreaJ2D queryArea) {
         index++;
-        final Object[][] results = getCoverageValues(coverage, context, queryArea);
+        final List<Entry<GridSampleDimension,Object>> results = getCoverageValues(coverage, context, queryArea);
 
         if (results == null) {
             return;
         }
 
         final Name fullLayerName = coverage.getCoverageLayer().getCoverageName();
-        final String layerName = fullLayerName.getLocalPart();
+        String layerName = fullLayerName.getLocalPart();
 
         List<String> strs = values.get(layerName);
         if (strs == null) {
@@ -259,8 +257,8 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         }
 
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < results.length; i++) {
-            final Object value = results[i][0];
+        for (final Entry<GridSampleDimension,Object> entry : results) {
+            final Object value = entry.getValue();
             if (value == null) {
                 continue;
             }
@@ -271,9 +269,9 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         builder = new StringBuilder();
 
         final String endMark = ">\n";
-        final String layerNameCorrected = layerName.replaceAll("\\W", "");
-        builder.append("\t<").append(layerNameCorrected).append("_layer").append(endMark)
-               .append("\t\t<").append(layerNameCorrected).append("_feature").append(endMark);
+        layerName = layerName.replaceAll("\\W", "");
+        builder.append("\t<").append(layerName).append("_layer").append(endMark)
+               .append("\t\t<").append(layerName).append("_feature").append(endMark);
 
         final LayerDetails layerPostgrid = dp.getByIdentifier(fullLayerName);
         final Envelope objEnv = gfi.getEnvelope2D();
@@ -308,7 +306,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
              * costly. The layerPostgrid.getEnvelope() method is much cheaper, since it can
              * leverage the database index.
              */
-            DateRange dates = null;;
+            DateRange dates = null;
             try {
                 dates = layerPostgrid.getDateRange();
             } catch (DataStoreException ex) {
@@ -337,21 +335,13 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
                        .append("</elevation>").append("\n");
             }
         }
-        final GridCoverage2D grid;
-        try {
-            grid = layerPostgrid.getCoverage(objEnv, new Dimension(gfi.getSize()), elevation, time);
-        } catch (DataStoreException cat) {
-            LOGGER.log(Level.WARNING, cat.getLocalizedMessage(), cat);
-            return;
-        } catch (IOException io) {
-            LOGGER.log(Level.WARNING, io.getLocalizedMessage(), io);
-            return;
-        }
-        if (grid != null ) {
+
+        if (!results.isEmpty()) {
             builder.append("\t\t\t<variable>")
-                   .append(grid.getSampleDimension(0).getDescription())
+                   .append(results.get(0).getKey().getDescription())
                    .append("</variable>").append("\n");
         }
+
         final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
         if (ranges != null && ranges.length > 0) {
             final MeasurementRange range = ranges[0];
@@ -365,8 +355,8 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         }
         builder.append("\t\t\t<value>").append(result)
                .append("</value>").append("\n")
-               .append("\t\t</").append(layerNameCorrected).append("_feature").append(endMark)
-               .append("\t</").append(layerNameCorrected).append("_layer").append(endMark);
+               .append("\t\t</").append(layerName).append("_feature").append(endMark)
+               .append("\t</").append(layerName).append("_layer").append(endMark);
 
         strs.add(builder.toString());
     }

@@ -16,21 +16,20 @@
  */
 package org.constellation.tile.visitor;
 
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.measure.unit.Unit;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDetails.TYPE;
-import org.constellation.tile.ws.DefaultWMTSWorker;
 import org.constellation.util.Util;
-import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.display2d.canvas.RenderingContext2D;
+import org.geotoolkit.coverage.GridSampleDimension;
 
+import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
@@ -103,7 +102,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
     @Override
     public void visit(ProjectedCoverage coverage, RenderingContext2D context, SearchAreaJ2D queryArea) {
         index++;
-        final Object[][] results = getCoverageValues(coverage, context, queryArea);
+        final List<Entry<GridSampleDimension,Object>> results = getCoverageValues(coverage, context, queryArea);
 
         if (results == null) {
             return;
@@ -117,13 +116,13 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
         }
 
         final StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < results.length; i++) {
-            final Object value = results[i][0];
-            final Unit unit = (Unit) results[i][1];
+        for (final Entry<GridSampleDimension,Object> entry : results) {
+            final Object value = entry.getValue();
             if (value == null) {
                 continue;
             }
             builder.append(value);
+            final Unit unit = entry.getKey().getUnits();
             if (unit != null) {
                 builder.append(" ").append(unit.toString());
             }

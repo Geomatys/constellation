@@ -16,23 +16,19 @@
  */
 package org.constellation.tile.visitor;
 
-import java.awt.Dimension;
-import java.awt.Shape;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 
-import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
@@ -44,8 +40,8 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
-import org.opengis.feature.type.Name;
 
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -91,7 +87,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
     @Override
     public void visit(ProjectedCoverage coverage, RenderingContext2D context, SearchAreaJ2D queryArea) {
         index++;
-        final Object[][] results = getCoverageValues(coverage, context, queryArea);
+        final List<Entry<GridSampleDimension,Object>> results = getCoverageValues(coverage, context, queryArea);
 
         if (results == null) {
             return;
@@ -107,8 +103,8 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         }
 
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < results.length; i++) {
-            final Object value = results[i][0];
+        for(final Entry<GridSampleDimension,Object> entry : results) {
+            final Object value = entry.getValue();
             if (value == null) {
                 continue;
             }
@@ -180,22 +176,13 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
                        .append("</elevation>").append("\n");
             }
         }
-        final GridCoverage2D grid;
-        try {
-            Dimension d = null;//gfi.getSize();
-            grid = layerPostgrid.getCoverage(objEnv, new Dimension(d), elevation, time);
-        } catch (DataStoreException cat) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, cat.getMessage(), cat);
-            return;
-        } catch (IOException io) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, io.getMessage(), io);
-            return;
-        }
-        if (grid != null) {
+
+        if (!results.isEmpty()) {
             builder.append("\t\t\t<variable>")
-                   .append(grid.getSampleDimension(0).getDescription())
+                   .append(results.get(0).getKey().getDescription())
                    .append("</variable>").append("\n");
         }
+        
         final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
         if (ranges != null && ranges.length > 0 && !ranges[0].toString().equals("")) {
             builder.append("\t\t\t<unit>").append(ranges[0].getUnits().toString())
