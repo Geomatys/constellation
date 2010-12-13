@@ -330,15 +330,16 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                             paramClass = List.class;
                         }
                         setter = ReflectionUtilities.getSetterFromName(qn.getLocalPart(), paramClass, recordClass);
-                    }
-                    if (setter != null) {
-                        ReflectionUtilities.invokeMethod(setter, filtredResult, param);
-                    } else {
-                        String paramDesc = "null";
-                        if (param != null) {
-                            paramDesc = param.getClass().getName();
+                    
+                        if (setter != null) {
+                            ReflectionUtilities.invokeMethod(setter, filtredResult, param);
+                        } else {
+                            String paramDesc = "null";
+                            if (param != null) {
+                                paramDesc = param.getClass().getName();
+                            }
+                            LOGGER.warning("No setter have been found for attribute " + qn.getLocalPart() +" of type " + paramDesc + " in the class " + recordClass);
                         }
-                        LOGGER.warning("No setter have been found for attribute " + qn.getLocalPart() +" of type " + paramDesc + " in the class " + recordClass);
                     }
 
                 } catch (IllegalArgumentException ex) {

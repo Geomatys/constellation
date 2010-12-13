@@ -283,7 +283,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
         this.natureSDIPackage   = FileUtilities.searchSubPackage("org.geotoolkit.naturesdi");
-        this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.metadata.imagery", "org.geotoolkit.metadata.iso.acquisition");
+        this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.metadata.imagery", "org.geotoolkit.metadata.iso.acquisition",
+                                                                      "org.geotoolkit.metadata.iso.quality", "org.geotoolkit.metadata.iso.spatial",
+                                                                      "org.geotoolkit.metadata.iso.lineage", "org.geotoolkit.metadata.iso.content",
+                                                                      "org.opengis.metadata.acquisition", "org.opengis.metadata.content");
     }
 
     /**
@@ -549,6 +552,26 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     LOGGER.severe("The typeName is mal-formed");
                     return null;
                 }
+
+            /*  WAIT FOR GEOTK PATCH
+               
+             }  else if ("DefaultMemberName".equals(className)) {
+                TextValue child = null;
+
+                //We search the child of the TypeName
+                for (Value childValue : value.getChildren()) {
+                    if (childValue instanceof TextValue) {
+                        child = (TextValue) childValue;
+                        break;
+                    }
+                }
+                if (child != null) {
+                    final CharSequence cs = child.getValue();
+                    return new DefaultMemberName(null, cs, null);
+                } else {
+                    LOGGER.severe("The typeName is mal-formed");
+                    return null;
+                }*/
 
             /**
              * Again another special case QNAME does not have a empty constructor.
@@ -868,7 +891,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         } else {
             if (!className.contains("Code") && !"DCPList".equals(className) && !"SV_CouplingType".equals(className) && !"AxisDirection".equals(className)) {
-                packagesName = geotoolkitPackage;
+            packagesName = geotoolkitPackage;
                 packagesName.addAll(gmlPackage);
             } else {
                 packagesName = opengisPackage;

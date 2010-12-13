@@ -5,6 +5,10 @@
 
 package org.constellation.metadata;
 
+import org.opengis.metadata.lineage.Algorithm;
+import org.opengis.metadata.acquisition.Operation;
+import org.opengis.metadata.acquisition.AcquisitionInformation;
+import org.opengis.metadata.content.RangeDimension;
 import org.opengis.metadata.lineage.Source;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.swe.xml.v100.DataRecordType;
@@ -28,6 +32,7 @@ import org.opengis.metadata.content.FeatureCatalogueDescription;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.VerticalExtent;
+import org.opengis.metadata.lineage.ProcessStep;
 import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.quality.Element;
 import org.opengis.metadata.spatial.Georectified;
@@ -43,6 +48,41 @@ public class CSWTestUtils {
 
     public static void metadataEquals(DefaultMetadata expResult, DefaultMetadata result) {
 
+        assertEquals(expResult.getAcquisitionInformation().size(), result.getAcquisitionInformation().size());
+        Iterator<AcquisitionInformation> expAcquIt = expResult.getAcquisitionInformation().iterator();
+        Iterator<AcquisitionInformation> resAcquIt = result.getAcquisitionInformation().iterator();
+        while (expAcquIt.hasNext()) {
+            AcquisitionInformation expAcqu = expAcquIt.next();
+            AcquisitionInformation resAcqu = resAcquIt.next();
+            assertEquals(expAcqu.getAcquisitionPlans(), resAcqu.getAcquisitionPlans());
+            assertEquals(expAcqu.getAcquisitionRequirements(), resAcqu.getAcquisitionRequirements());
+            assertEquals(expAcqu.getEnvironmentalConditions(), resAcqu.getEnvironmentalConditions());
+            assertEquals(expAcqu.getInstruments(), resAcqu.getInstruments());
+            assertEquals(expAcqu.getObjectives(), resAcqu.getObjectives());
+            assertEquals(expAcqu.getOperations().size(), resAcqu.getOperations().size());
+            Iterator<? extends Operation> expOperationsIt = expAcqu.getOperations().iterator();
+            Iterator<? extends Operation> resOperationsIt = resAcqu.getOperations().iterator();
+            while (expOperationsIt.hasNext()) {
+                Operation expOperation = expOperationsIt.next();
+                Operation resOperation = resOperationsIt.next();
+
+                assertEquals(expOperation.getChildOperations(), resOperation.getChildOperations());
+                assertEquals(expOperation.getCitation(), resOperation.getCitation());
+                assertEquals(expOperation.getDescription(), resOperation.getDescription());
+                assertEquals(expOperation.getIdentifier(), resOperation.getIdentifier());
+                assertEquals(expOperation.getObjectives(), resOperation.getObjectives());
+                assertEquals(expOperation.getParentOperation(), resOperation.getParentOperation());
+                assertEquals(expOperation.getPlan(), resOperation.getPlan());
+                assertEquals(expOperation.getPlatforms(), resOperation.getPlatforms());
+                assertEquals(expOperation.getSignificantEvents(), resOperation.getSignificantEvents());
+                assertEquals(expOperation.getType(), resOperation.getType());
+                assertEquals(expOperation.getStatus(), resOperation.getStatus());
+                assertEquals(expOperation, resOperation);
+            }
+            assertEquals(expAcqu.getOperations(), resAcqu.getOperations());
+            assertEquals(expAcqu.getPlatforms(), resAcqu.getPlatforms());
+            assertEquals(expAcqu, resAcqu);
+        }
         assertEquals(expResult.getAcquisitionInformation(), result.getAcquisitionInformation());
         assertEquals(expResult.getApplicationSchemaInfo(), result.getApplicationSchemaInfo());
         assertEquals(expResult.getCharacterSet(), result.getCharacterSet());
@@ -96,6 +136,16 @@ public class CSWTestUtils {
                 assertEquals(expCovDesc.getAttributeDescription(), resCovDesc.getAttributeDescription());
                 assertEquals(expCovDesc.getContentType(), resCovDesc.getContentType());
                 assertEquals(expCovDesc.getRangeElementDescriptions(), resCovDesc.getRangeElementDescriptions());
+                assertEquals(expCovDesc.getDimensions().size(), resCovDesc.getDimensions().size());
+                Iterator<? extends RangeDimension> expDimIt = expCovDesc.getDimensions().iterator();
+                Iterator<? extends RangeDimension> resDimIt = resCovDesc.getDimensions().iterator();
+                while (expDimIt.hasNext()) {
+                    RangeDimension expDim = expDimIt.next();
+                    RangeDimension resDim = resDimIt.next();
+                    assertEquals(expDim.getDescriptor(), resDim.getDescriptor());
+                    assertEquals(expDim.getSequenceIdentifier(), resDim.getSequenceIdentifier());
+                }
+                assertEquals(expCovDesc.getDimensions(), resCovDesc.getDimensions());
             }
         }
         assertEquals(expResult.getContentInfo(), result.getContentInfo());
@@ -123,6 +173,38 @@ public class CSWTestUtils {
                     assertEquals(expSrc.getSourceCitation(), resSrc.getSourceCitation());
                     assertEquals(expSrc.getSourceExtents(), resSrc.getSourceExtents());
                     assertEquals(expSrc.getSourceReferenceSystem(), resSrc.getSourceReferenceSystem());
+                    assertEquals(expSrc.getSourceSteps().size(), resSrc.getSourceSteps().size());
+                    Iterator<? extends ProcessStep> expStepIt = expSrc.getSourceSteps().iterator();
+                    Iterator<? extends ProcessStep> resStepIt = resSrc.getSourceSteps().iterator();
+                    while (expStepIt.hasNext()) {
+                        ProcessStep expStep = expStepIt.next();
+                        ProcessStep resStep = resStepIt.next();
+                        assertEquals(expStep.getDate(), resStep.getDate());
+                        assertEquals(expStep.getDescription(), resStep.getDescription());
+                        assertEquals(expStep.getOutputs(), resStep.getOutputs());
+                        if (expStep.getProcessingInformation() != null) {
+                            assertEquals(expStep.getProcessingInformation().getAlgorithms().size(), resStep.getProcessingInformation().getAlgorithms().size());
+                            Iterator<? extends Algorithm> expAlgoIt = expStep.getProcessingInformation().getAlgorithms().iterator();
+                            Iterator<? extends Algorithm> resAlgoIt = resStep.getProcessingInformation().getAlgorithms().iterator();
+                            while (expAlgoIt.hasNext()) {
+                                Algorithm expAlgo = expAlgoIt.next();
+                                Algorithm resAlgo = resAlgoIt.next();
+                                assertEquals(expAlgo.getDescription(), resAlgo.getDescription());
+                                assertEquals(expAlgo.getCitation(), resAlgo.getCitation());
+                            }
+                            assertEquals(expStep.getProcessingInformation().getDocumentations(), resStep.getProcessingInformation().getDocumentations());
+                            assertEquals(expStep.getProcessingInformation().getIdentifier(), resStep.getProcessingInformation().getIdentifier());
+                            assertEquals(expStep.getProcessingInformation().getProcedureDescription(), resStep.getProcessingInformation().getProcedureDescription());
+                            assertEquals(expStep.getProcessingInformation().getRunTimeParameter(), resStep.getProcessingInformation().getRunTimeParameter());
+                            assertEquals(expStep.getProcessingInformation().getSoftwareReferences(), resStep.getProcessingInformation().getSoftwareReferences());
+                        }
+                        assertEquals(expStep.getProcessingInformation(), resStep.getProcessingInformation());
+                        assertEquals(expStep.getProcessors(), resStep.getProcessors());
+                        assertEquals(expStep.getRationale(), resStep.getRationale());
+                        assertEquals(expStep.getReports(), resStep.getReports());
+                        assertEquals(expStep.getSources(), resStep.getSources());
+                        assertEquals(expStep, resStep);
+                    }
                     assertEquals(expSrc.getSourceSteps(), resSrc.getSourceSteps());
                     assertEquals(expSrc, resSrc);
                 }
@@ -573,8 +655,10 @@ public class CSWTestUtils {
         assertEquals(expProcess.getOutputs().getOutputList(), resProcess.getOutputs().getOutputList());
         assertEquals(expProcess.getOutputs(), resProcess.getOutputs());
 
-        assertEquals(expProcess.getBoundedBy().getEnvelope().getLowerCorner(), resProcess.getBoundedBy().getEnvelope().getLowerCorner());
-        assertEquals(expProcess.getBoundedBy().getEnvelope(), resProcess.getBoundedBy().getEnvelope());
+        if (expProcess.getBoundedBy() != null) {
+            assertEquals(expProcess.getBoundedBy().getEnvelope().getLowerCorner(), resProcess.getBoundedBy().getEnvelope().getLowerCorner());
+            assertEquals(expProcess.getBoundedBy().getEnvelope(), resProcess.getBoundedBy().getEnvelope());
+        }
         assertEquals(expProcess.getBoundedBy(), resProcess.getBoundedBy());
 
         if (expProcess.getCapabilities().size() > 0 && resProcess.getCapabilities().size() > 0) {

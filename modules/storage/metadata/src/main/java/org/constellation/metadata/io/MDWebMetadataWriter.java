@@ -596,7 +596,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                          propName = "usageDate";
                     } else if (prop.getName().equalsIgnoreCase("dateTime") && object.getClass().getSimpleName().equals("DefaultProcessStep")) {
                         propName = "date";
-                    } else if (prop.getName().equalsIgnoreCase("aName") && object.getClass().getSimpleName().equals("DefaultTypeName")) {
+                    } else if (prop.getName().equalsIgnoreCase("aName") && (object.getClass().getSimpleName().equals("DefaultTypeName") ||
+                                                                            object.getClass().getSimpleName().equals("DefaultMemberName"))) {
                         propName = "name";
                     }else {
                         propName = prop.getName();
@@ -773,6 +774,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         
         //we remove the Type suffix
         if (className.endsWith("Type") && !"CouplingType".equals(className)
+                                       && !"OperationType".equals(className)
+                                       && !"GeometryType".equals(className)
+                                       && !"ObjectiveType".equals(className)
                                        && !"DateType".equals(className)
                                        && !"KeywordType".equals(className)
                                        && !"FeatureType".equals(className)
@@ -782,6 +786,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                        && !"InitiativeType".equals(className)
                                        && !"DimensionNameType".equals(className)
                                        && !"CoverageContentType".equals(className)
+                                       && !"TransferFunctionType".equals(className)
                                        && !"CodeType".equals(className)) {
             className = className.substring(0, className.length() - 4);
         }
@@ -795,7 +800,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         // ISO 19115 and its sub standard (ISO 19119, 19110)
         if (Standard.ISO_19115.equals(mainStandard)) {
             availableStandards.add(Standard.ISO_19115_FRA);
-            availableStandards.add(mainStandard);
+            availableStandards.add(Standard.ISO_19115);
             availableStandards.add(Standard.ISO_19115_2);
             availableStandards.add(Standard.ISO_19108);
             availableStandards.add(Standard.ISO_19103);
@@ -860,7 +865,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             String name = className;
             int nameType = 0;
             final String codeSuffix = "Code";
-            while (nameType < 13) {
+            while (nameType < 17) {
                 
                 LOGGER.finer("searching: " + standard.getName() + ':' + name);
                 result = mdWriter.getClasse(name, standard);
@@ -932,28 +937,44 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             name = "MI_" + className;
                             break;
                         }
-                        //we add the prefix DS_ + the suffix "Code"
+                        //we add the prefix MI_
                         case 10: {
                             nameType = 11;
+                            name = "MI_" + className + codeSuffix;
+                            break;
+                        }
+                        //we add the prefix DS_ + the suffix "Code"
+                        case 11: {
+                            nameType = 12;
                             name = "DS_" + className + codeSuffix;
                             break;
                         }
                         //for the temporal element we remove add prefix
-                        case 11: {
+                        case 12: {
                             name = "Time" + className;
-                            nameType = 12;
+                            nameType = 13;
                             break;
                         }
                         //for the code list we add the "code" suffix
-                        case 12: {
+                        case 13: {
                             if (name.indexOf(codeSuffix) != -1) {
                                 name += codeSuffix;
                             }
-                            nameType = 13;
+                            nameType = 14;
+                            break;
+                        }
+                        case 14: {
+                            nameType = 15;
+                            name = "QE_" + className;
+                            break;
+                        }
+                        case 15: {
+                            nameType = 16;
+                            name = "LE_" + className;
                             break;
                         }
                         default:
-                            nameType = 13;
+                            nameType = 17;
                             break;
                     }
 

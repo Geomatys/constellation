@@ -65,6 +65,32 @@
     <gmd:metadataStandardVersion>
         <gco:CharacterString>2009-02-15</gco:CharacterString>
     </gmd:metadataStandardVersion>
+    <gmd:spatialRepresentationInfo>
+        <gmi:MI_Georectified>
+            <gmi:checkPoint>
+                <gmi:MI_GCP>
+                    <gmi:accuracyReport>
+                        <gmi:QE_Usability>
+                            <gmd:evaluationMethodDescription>
+                                <gco:CharacterString>The classification</gco:CharacterString>
+                            </gmd:evaluationMethodDescription>
+                        </gmi:QE_Usability>
+                    </gmi:accuracyReport>
+                </gmi:MI_GCP>
+            </gmi:checkPoint>
+        </gmi:MI_Georectified>
+    </gmd:spatialRepresentationInfo>
+    <gmd:spatialRepresentationInfo>
+        <gmi:MI_Georeferenceable>
+            <gmi:geolocationInformation>
+                <gmi:MI_GCPCollection>
+                    <gmi:collectionName>
+                        <gco:CharacterString>collection-1</gco:CharacterString>
+                    </gmi:collectionName>
+                </gmi:MI_GCPCollection>
+            </gmi:geolocationInformation>
+        </gmi:MI_Georeferenceable>
+    </gmd:spatialRepresentationInfo>
     <gmd:metadataExtensionInfo>
         <gmd:MD_MetadataExtensionInformation>
             <gmd:extensionOnLineResource>
@@ -409,8 +435,7 @@
                 <gmd:MD_CoverageContentTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CoverageContentTypeCode" codeListValue="image" codeSpace="001"/>
             </gmd:contentType>
             <gmd:dimension>
-                <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
+                <gmi:MI_Band>
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -421,11 +446,20 @@
                     <gmd:descriptor>
                         <gco:CharacterString>620-670</gco:CharacterString>
                     </gmd:descriptor>
-                </gmd:MD_Band>
+                    <gmi:bandBoundaryDefinition>
+                        <gmi:MI_BandDefinition codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_BandDefinition" codeListValue="3dB"/>
+                    </gmi:bandBoundaryDefinition>
+                    <gmi:transferFunctionType>
+                        <gmi:MI_TransferFunctionTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_TransferFunctionTypeCode" codeListValue="linear"/>
+                    </gmi:transferFunctionType>
+                    <!-- here we must replace the 'z' by 's' -->
+                    <gmi:transmittedPolarization>
+                        <gmi:MI_PolarizationOrientationCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_PolarisationOrientationCode" codeListValue="horizontal"/>
+                    </gmi:transmittedPolarization>
+                </gmi:MI_Band>
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -440,7 +474,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -455,7 +488,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -470,7 +502,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -485,7 +516,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -500,7 +530,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -515,7 +544,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                     <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -530,7 +558,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -545,7 +572,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -560,7 +586,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -575,7 +600,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -590,7 +614,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -605,7 +628,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -620,7 +642,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -635,7 +656,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -650,7 +670,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -665,7 +684,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -680,7 +698,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -695,7 +712,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -710,7 +726,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -725,7 +740,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -740,7 +754,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -755,7 +768,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -770,7 +782,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -785,7 +796,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -800,7 +810,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -815,7 +824,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -830,7 +838,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -845,7 +852,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -860,7 +866,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -875,7 +880,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -890,7 +894,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -905,7 +908,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -920,7 +922,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -935,7 +936,6 @@
             </gmd:dimension>
             <gmd:dimension>
                 <gmd:MD_Band>
-                    <!-- lost sequenceidentifier -->
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -949,6 +949,17 @@
                 </gmd:MD_Band>
             </gmd:dimension>
         </gmi:MI_CoverageDescription>
+    </gmd:contentInfo>
+    <gmd:contentInfo>
+        <gmi:MI_ImageDescription>
+            <gmi:rangeElementDescription>
+                <gmi:MI_RangeElementDescription>
+                    <gmi:name>
+                        <gco:CharacterString>name 1</gco:CharacterString>
+                    </gmi:name>
+                </gmi:MI_RangeElementDescription>
+            </gmi:rangeElementDescription>
+        </gmi:MI_ImageDescription>
     </gmd:contentInfo>
     <gmd:distributionInfo>
         <gmd:MD_Distribution>
@@ -1025,14 +1036,68 @@
                     <gmd:evaluationMethodDescription>
                         <gco:CharacterString>The classification scheme comprehensively includes all anticipated land covers, however, not all pixels will contain data due to cloud cover for the past seven days.</gco:CharacterString>
                     </gmd:evaluationMethodDescription>
+                    <gmd:result>
+                        <gmi:QE_CoverageResult>
+                            <gmi:spatialRepresentationType>
+                                <gmd:MD_SpatialRepresentationTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid"/>
+                            </gmi:spatialRepresentationType>
+                            <!-- NOT yet Handled gmi:resultFile>
+                                <gmx:MX_DataFile id="DataFile">
+                                    <gmx:fileName>
+                                        <gmx:FileName>I expect that this will eventually be a URL that provides the grid as a WCS or ...</gmx:FileName>
+                                    </gmx:fileName>
+                                    <gmx:fileDescription>
+                                        <gco:CharacterString>NESDIS Global 50km Sea Surface Temperature (SST50)</gco:CharacterString>
+                                    </gmx:fileDescription>
+                                    <gmx:fileType>
+                                        <gmx:MimeFileType type="data:netCDF"/>
+                                    </gmx:fileType>
+                                    <gmx:fileFormat>
+                                        <gmd:MD_Format>
+                                            <gmd:name>
+                                                <gco:CharacterString>netCDF with CF-Conventions</gco:CharacterString>
+                                            </gmd:name>
+                                            <gmd:version>
+                                                <gco:CharacterString>3</gco:CharacterString>
+                                            </gmd:version>
+                                        </gmd:MD_Format>
+                                    </gmx:fileFormat>
+                                </gmx:MX_DataFile>
+                            </gmi:resultFile-->
+                            <gmi:resultSpatialRepresentation>
+                                <gmd:MD_GridSpatialRepresentation>
+                                    <gmd:numberOfDimensions>
+                                        <gco:Integer>2</gco:Integer>
+                                    </gmd:numberOfDimensions>
+                                    <gmd:transformationParameterAvailability>
+                                        <gco:Boolean>true</gco:Boolean>
+                                    </gmd:transformationParameterAvailability>
+                                </gmd:MD_GridSpatialRepresentation>
+                            </gmi:resultSpatialRepresentation>
+                            <gmi:resultContentDescription>
+                                <gmi:MI_CoverageDescription>
+                                    <gmd:contentType>
+                                        <gmd:MD_CoverageContentTypeCode codeList="MD_CoverageContentTypeCode" codeListValue="physicalMeasurement">physicalMeasurement</gmd:MD_CoverageContentTypeCode>
+                                    </gmd:contentType>
+                                </gmi:MI_CoverageDescription>
+                            </gmi:resultContentDescription>
+                            <gmi:resultFormat>
+                                <gmd:MD_Format>
+                                    <gmd:name>
+                                        <gco:CharacterString>netCDF</gco:CharacterString>
+                                    </gmd:name>
+                                </gmd:MD_Format>
+                            </gmi:resultFormat>
+                        </gmi:QE_CoverageResult>
+                    </gmd:result>
                 </gmd:DQ_CompletenessCommission>
             </gmd:report>
             <gmd:report>
-                <gmd:DQ_CompletenessOmission>
+                <gmi:QE_Usability>
                     <gmd:evaluationMethodDescription>
                         <gco:CharacterString>The classification scheme comprehensively includes all anticipated land covers, however, not all pixels will contain data due to cloud cover for the past seven days.</gco:CharacterString>
                     </gmd:evaluationMethodDescription>
-                </gmd:DQ_CompletenessOmission>
+                </gmi:QE_Usability>
             </gmd:report>
             <gmd:report>
                 <gmd:DQ_ConceptualConsistency>
@@ -1108,6 +1173,52 @@
                             </gmd:sourceExtent>
                         </gmd:LI_Source>
                     </gmd:source>
+                    <gmd:source>
+                        <gmi:LE_Source>
+                            <gmd:description>
+                                <gco:CharacterString>some source</gco:CharacterString>
+                            </gmd:description>
+                            <gmd:sourceStep>
+                                <gmi:LE_ProcessStep>
+                                    <gmd:description>
+                                        <gco:CharacterString>data was collected from this device</gco:CharacterString>
+                                    </gmd:description>
+                                    <gmi:output>
+                                        <gmi:LE_Source>
+                                            <gmd:description>
+                                                <gco:CharacterString>Dataset/ID</gco:CharacterString>
+                                            </gmd:description>
+                                            <gmi:processedLevel>
+                                                <gmd:MD_Identifier>
+                                                    <gmd:code>
+                                                        <gco:CharacterString>666-999</gco:CharacterString>
+                                                    </gmd:code>
+                                                </gmd:MD_Identifier>
+                                            </gmi:processedLevel>
+                                        </gmi:LE_Source>
+                                    </gmi:output>
+                                    <gmi:processingInformation>
+                                        <gmi:LE_Processing>
+                                            <gmi:algorithm>
+                                                <gmi:LE_Algorithm>
+                                                    <gmi:description>
+                                                        <gco:CharacterString>some algo</gco:CharacterString>
+                                                    </gmi:description>
+                                                </gmi:LE_Algorithm>
+                                            </gmi:algorithm>
+                                        </gmi:LE_Processing>
+                                    </gmi:processingInformation>
+                                    <gmi:report>
+                                        <gmi:LE_ProcessStepReport>
+                                            <gmi:name>
+                                                <gco:CharacterString>report 1</gco:CharacterString>
+                                            </gmi:name>
+                                        </gmi:LE_ProcessStepReport>
+                                    </gmi:report>
+                                </gmi:LE_ProcessStep>
+                            </gmd:sourceStep>
+                        </gmi:LE_Source>
+                    </gmd:source>
                 </gmd:LI_Lineage>
             </gmd:lineage>
         </gmd:DQ_DataQuality>
@@ -1166,6 +1277,9 @@
         <gmi:MI_AcquisitionInformation>
             <gmi:operation>
                 <gmi:MI_Operation>
+                    <gmi:description>
+                        <gco:CharacterString>operation EO</gco:CharacterString>
+                    </gmi:description>
                     <gmi:citation>
                         <gmd:CI_Citation>
                             <gmd:title>
@@ -1176,6 +1290,61 @@
                             </gmd:date>
                         </gmd:CI_Citation>
                     </gmi:citation>
+                    <gmi:type>
+                        <gmi:MI_OperationTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_OperationTypeCode" codeListValue="real">real</gmi:MI_OperationTypeCode>
+                    </gmi:type>
+                    <gmi:objective>
+                        <gmi:MI_Objective>
+                            <gmi:type>
+                                <gmi:MI_ObjectiveTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_ObjectiveTypeCode" codeListValue="persistentView">persistentView</gmi:MI_ObjectiveTypeCode>
+                            </gmi:type>
+                            <gmi:pass>
+                                <gmi:MI_PlatformPass>
+                                    <gmi:identifier>
+                                        <gmd:MD_Identifier>
+                                            <gmd:code>
+                                                <gco:CharacterString>007</gco:CharacterString>
+                                            </gmd:code>
+                                        </gmd:MD_Identifier>
+                                    </gmi:identifier>
+                                </gmi:MI_PlatformPass>
+                            </gmi:pass>
+                        </gmi:MI_Objective>
+                    </gmi:objective>
+                    <gmi:plan>
+                        <gmi:MI_Plan>
+                            <gmi:type>
+                                <gmi:MI_GeometryTypeCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_GeometryTypeCode" codeListValue="point">point</gmi:MI_GeometryTypeCode>
+                            </gmi:type>
+                            <gmi:satisfiedRequirement>
+                                <gmi:MI_Requirement>
+                                    <gmi:priority>
+                                        <gmi:MI_PriorityCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_PriorityCode" codeListValue="critical">critical</gmi:MI_PriorityCode>
+                                    </gmi:priority>
+                                    <gmi:requestedDate>
+                                        <gmi:MI_RequestedDate>
+                                            <gmi:latestAcceptableDate>
+                                                <gco:Date>2012-12-03</gco:Date>
+                                            </gmi:latestAcceptableDate>
+                                        </gmi:MI_RequestedDate>
+                                    </gmi:requestedDate>
+                                </gmi:MI_Requirement>
+                            </gmi:satisfiedRequirement>
+                        </gmi:MI_Plan>
+                    </gmi:plan>
+                    <gmi:significantEvent>
+                        <gmi:MI_Event>
+                            <gmi:trigger>
+                                <gmi:MI_TriggerCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_TriggerCode" codeListValue="automatic">automatic</gmi:MI_TriggerCode>
+                            </gmi:trigger>
+                            <gmi:context>
+                                <gmi:MI_ContextCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_ContextCode" codeListValue="acquisition">acquisition</gmi:MI_ContextCode>
+                            </gmi:context>
+                            <gmi:sequence>
+                                <gmi:MI_SequenceCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MI_SequenceCode" codeListValue="start">start</gmi:MI_SequenceCode>
+                            </gmi:sequence>
+                        </gmi:MI_Event>
+                    </gmi:significantEvent>
                 </gmi:MI_Operation>
             </gmi:operation>
             <gmi:operation>
