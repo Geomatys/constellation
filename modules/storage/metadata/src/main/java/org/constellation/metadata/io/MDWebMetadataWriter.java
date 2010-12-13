@@ -20,7 +20,6 @@ package org.constellation.metadata.io;
 
 // J2SE dependencies
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.Date;
@@ -30,6 +29,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -231,76 +231,46 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
       * @param obj the object for which we want a title.
       *
       * @return the founded title or UNKNOW_TITLE
-      *
-      * @deprecated will be replaced by utils.getTitle
       */
-    @Deprecated
-    protected String findTitle(Object obj) {
+    protected final String findTitle(Object obj) {
 
         //here we try to get the title
         String title = UNKNOW_TITLE;
-        
-        Method nameGetter = null;
-        String methodName = "";
-        int i = 0;
-        while (i < 5) {
-            try {
-                switch (i) {
-                    case 0: methodName = "getTitle";
-                            nameGetter = obj.getClass().getMethod(methodName);
-                            break;
 
-                    case 1: methodName = "getName";
-                            nameGetter = obj.getClass().getMethod(methodName);
-                            break;
+        final List<String> paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
+        paths.add("ISO 19115:MD_Metadata:fileIdentifier");
+        paths.add("Catalog Web Service:Record:title:content");
+        paths.add("Catalog Web Service:Record:identifier:content");
+        paths.add("Ebrim v3.0:RegistryObject:name:localizedString:value");
+        paths.add("Ebrim v3.0:RegistryObject:id");
+        paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
+        paths.add("Ebrim v3.0:RegistryPackage:id");
+        paths.add("Ebrim v2.5:RegistryObject:name:localizedString:value");
+        paths.add("Ebrim v2.5:RegistryObject:id");
 
-                    case 2: methodName = "getId";
-                            nameGetter = obj.getClass().getMethod(methodName);
-                            break;
-                    case 3: methodName = "getIdentifier";
-                            nameGetter = obj.getClass().getMethod(methodName);
-                            break;
-                    case 4: methodName = "getFileIdentifier";
-                            nameGetter = obj.getClass().getMethod(methodName);
-                            break;
-                    default: break;
+        for (String path : paths) {
+            Object value = ReflectionUtilities.getValuesFromPath(path, obj);
+            if (value instanceof String) {
+                title = (String) value;
+                // we stop when we have found a response
+                break;
+            } else if (value instanceof Collection) {
+                Collection c = (Collection) value;
+                Iterator it = c.iterator();
+                if (it.hasNext()) {
+                    Object cValue = it.next();
+                    if (cValue instanceof String) {
+                        title = (String) cValue;
+                         break;
+                    } else if (cValue != null) {
+                        title = cValue.toString();
+                         break;
+                    }
                 }
-
-
-            } catch (NoSuchMethodException ex) {
-                LOGGER.finer("There is no " + methodName + " method in " + obj.getClass().getSimpleName());
-            } catch (SecurityException ex) {
-                LOGGER.warning(" security exception while getting the title of the object.");
+            } else if (value != null) {
+                LOGGER.info("\n\n\n unexpected String type: " + value.getClass().getName() + "\ncurrentPath:" + path + "\n\n\n");
             }
-            if (nameGetter != null) {
-                i = 5;
-            } else {
-                i++;
-            }
-        }
-
-        if (nameGetter != null) {
-            try {
-                final Object objT = nameGetter.invoke(obj);
-                if (objT instanceof String) {
-                    title = (String) objT;
-                } else if (objT != null) {
-                    title = objT.toString();
-                } else {
-                    title = UNKNOW_TITLE;
-                }
-
-            } catch (IllegalAccessException ex) {
-                LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + "\ncause: " + ex.getMessage());
-            } catch (IllegalArgumentException ex) {
-                LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +"\ncause: " + ex.getMessage());
-            } catch (InvocationTargetException ex) {
-                LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +"\ncause: " + ex.getMessage());
-            }
-        }
-        if (title == null) {
-            title = UNKNOW_TITLE;
-            LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find a title, using default then.");
         }
         return title;
     }
@@ -313,6 +283,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     protected Form getFormFromObject(Object object) throws MD_IOException {
         final String title = findTitle(object);
+        return getFormFromObject(object, defaultUser, mdRecordSet, null, title);
+    }
+
+    /**
+     * Return an MDWeb formular from an object.
+     *
+     * @param object The object to transform in form.
+     * @return an MDWeb form representing the metadata object.
+     */
+    protected Form getFormFromObject(Object object, String title) throws MD_IOException {
+        if (title == null) {
+            title = findTitle(object);
+        }
         return getFormFromObject(object, defaultUser, mdRecordSet, null, title);
     }
 
@@ -1059,13 +1042,16 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
         return result;
     }
-    
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean storeMetadata(Object obj) throws MetadataIoException {
+        return storeMetadata(obj, null);
+    }
+
+    public boolean storeMetadata(Object obj, String title) throws MetadataIoException {
         // profiling operation
         final long start = System.currentTimeMillis();
         long transTime   = 0;
@@ -1079,7 +1065,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         Form form = null;
         try {
             final long startTrans = System.currentTimeMillis();
-            form                  = getFormFromObject(obj);
+            form                  = getFormFromObject(obj, title);
             transTime             = System.currentTimeMillis() - startTrans;
             
         } catch (IllegalArgumentException e) {

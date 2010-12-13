@@ -21,9 +21,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBElement;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.Logging;
 
@@ -37,6 +43,11 @@ public final class ReflectionUtilities {
     private static final Logger LOGGER = Logging.getLogger(ReflectionUtilities.class);
 
     private static final String INCLASS = " in the class ";
+
+    /**
+     * A map of getters to avoid to seach the same getters many times.
+     */
+    private static final Map<String, Method> GETTERS = new HashMap<String, Method>();
 
     private ReflectionUtilities() {}
 
@@ -644,4 +655,131 @@ public final class ReflectionUtilities {
         return field;
     }
 
+    /**
+     * Return an object value extract from the specified object by using the string path specified.
+     * example : getValuesFromPath("ISO 19115:MD_Metadata:identificationInfo:citation:title", (MetatadataImpl) obj)
+     *           will execute obj.getIdentificationInfo().getTitle() and return the result.
+     *
+     * @param pathID   A String path using MDWeb pattern.
+     * @param metadata An Object.
+     * @return A Object value.
+     */
+    public static Object getValuesFromPath(String pathID, Object metadata) {
+        Object result = null;
+        if (pathMatchObjectType(metadata, pathID)) {
+
+            /*
+             * we remove the prefix path part the path always start with STANDARD:TYPE:
+             */
+            pathID = pathID.substring(pathID.indexOf(':') + 1);
+            pathID = pathID.substring(pathID.indexOf(':') + 1);
+
+            //for each part of the path we execute a (many) getter
+            while (!pathID.isEmpty()) {
+                String attributeName;
+                if (pathID.indexOf(':') != -1) {
+                    attributeName = pathID.substring(0, pathID.indexOf(':'));
+                    pathID        = pathID.substring(pathID.indexOf(':') + 1);
+                } else {
+                    attributeName = pathID;
+                    pathID = "";
+                }
+
+                if (metadata instanceof Collection) {
+                    final List<Object> tmp = new ArrayList<Object>();
+                    for (Object subMeta: (Collection) metadata) {
+                        final Object obj = getAttributeValue(subMeta, attributeName);
+                        if (obj instanceof Collection) {
+                            for (Object o : (Collection)obj) {
+                                if (o != null) tmp.add(o);
+                            }
+                        } else {
+                            if (obj != null) tmp.add(obj);
+                        }
+                    }
+                    metadata = tmp;
+                } else {
+                    metadata = getAttributeValue(metadata, attributeName);
+                }
+            }
+            result = metadata;
+        }
+        return result;
+    }
+
+    /**
+     * Return true if the path is applyable to the specified metadata type.
+     *
+     * @param metadata A metadata object.
+     * @param pathID A path on the form Standard:Type:attribute1:attribute2
+     *
+     * @return True if the specified path starts with the type of the metadata
+     */
+    public static boolean pathMatchObjectType(Object metadata, String pathID) {
+        if (metadata == null) return false;
+
+        return (pathID.startsWith("ISO 19115:MD_Metadata")      && "DefaultMetadata".equals(metadata.getClass().getSimpleName())) ||
+               (pathID.startsWith("Catalog Web Service:Record") && "RecordType".equals(metadata.getClass().getSimpleName())) ||
+               (pathID.startsWith("Ebrim v2.5:ExtrinsicObject") && "org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType".equals(metadata.getClass().getName())||
+               (pathID.startsWith("Ebrim v2.5:RegistryObject")  && "org.geotoolkit.ebrim.xml.v250.RegistryObjectType".equals(metadata.getClass().getName()))||
+               (pathID.startsWith("Ebrim v3.0:RegistryObject")  && "org.geotoolkit.ebrim.xml.v300.RegistryObjectType".equals(metadata.getClass().getName())));
+    }
+
+     /**
+     * Call a get method on the specified object named get'AttributeName'() and return the result.
+     * This method handle the attributeName on the form "attributeName[i]" when you want a specific values in a collection.
+      *
+     * @param object An object.
+     * @param attributeName The name of the attribute that you want the value.
+     * @return
+     */
+    public static Object getAttributeValue(Object object, String attributeName) {
+        Object result = null;
+        int ordinal   = -1;
+        if (attributeName.indexOf('[') != -1){
+            final String tmp = attributeName.substring(attributeName.indexOf('[') + 1, attributeName.length() - 1);
+            attributeName    = attributeName.substring(0, attributeName.indexOf('['));
+            try {
+                ordinal = Integer.parseInt(tmp);
+            } catch (NumberFormatException ex) {
+                LOGGER.log(Level.WARNING, "Unable to parse the ordinal {0}", tmp);
+            }
+        }
+        if (object != null) {
+            if (object instanceof JAXBElement) {
+               object = ((JAXBElement)object).getValue();
+            }
+            final String getterId = object.getClass().getName() + ':' + attributeName;
+            Method getter         = GETTERS.get(getterId);
+            if (getter != null) {
+                result = invokeMethod(object, getter);
+            } else {
+                if (attributeName.equalsIgnoreCase("referenceSystemIdentifier")) {
+                    attributeName = "name";
+                }
+                getter = getGetterFromName(attributeName, object.getClass());
+                if (getter != null) {
+                    GETTERS.put(object.getClass().getName() + ':' + attributeName, getter);
+                    result = invokeMethod(object, getter);
+                } else {
+                    LOGGER.finer("No getter have been found for attribute " + attributeName + " in the class " + object.getClass().getName());
+                }
+            }
+        }
+        if (result instanceof JAXBElement) {
+            result = ((JAXBElement)result).getValue();
+        }
+        if (ordinal != -1 && result instanceof Collection) {
+            final Collection c = (Collection) result;
+            final Iterator t   = c.iterator();
+            int i = 0;
+            while (t.hasNext()) {
+                result = t.next();
+                if (i == ordinal) return result;
+                i++;
+            }
+
+        }
+        return result;
+    }
 }

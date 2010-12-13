@@ -69,8 +69,6 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      */
     private final PreparedStatement newSensorIdStmt;
 
-    private static String currentSensorID;
-
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
      */
@@ -122,8 +120,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     public boolean writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
        
         try {
-            currentSensorID = id;
-            return super.storeMetadata(process);
+            return super.storeMetadata(process, id);
 
         } catch (MetadataIoException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -214,14 +211,6 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      * {@inheritDoc}
      */
     @Override
-    protected String findTitle(Object obj) {
-        return currentSensorID;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void startTransaction() throws CstlServiceException {
         try {
             smlConnection.setAutoCommit(false);
@@ -296,7 +285,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         try {
             newSensorIdStmt.close();
         } catch (SQLException ex) {
-            LOGGER.severe("SQLException while closing SOSWorker");
+            LOGGER.log(Level.SEVERE, "SQLException while closing MDW sensor Writer:{0}", ex.getMessage());
         }
     }
 
