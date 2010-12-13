@@ -250,7 +250,7 @@
             <dependency>
                 <groupId>com.sun.grizzly</groupId>
                 <artifactId>grizzly-servlet-webserver</artifactId>
-                <version>1.9.9</version>
+                <version>1.9.25</version>
             </dependency>
             <dependency>
                 <groupId>commons-collections</groupId>
@@ -680,6 +680,14 @@
             <id>java.net.2</id>
             <name>java.net community</name>
             <url>http://download.java.net/maven/2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>java.net.glassfish</id>
+            <name>java.net community</name>
+            <url>http://download.java.net/maven/glassfish</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
