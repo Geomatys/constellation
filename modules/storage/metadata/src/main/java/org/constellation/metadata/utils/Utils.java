@@ -2,8 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,21 +14,20 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.metadata.utils;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-// Constellation dependencies
 import org.constellation.util.ReflectionUtilities;
 
 /**
  * Utility methods used in CSW object.
  *
- * this classe will be moved to store-metadata when there is no more dependencies to geotk module
- * 
  * @author Guilhem Legal (Geomatys)
  */
 public class Utils {
@@ -37,7 +35,12 @@ public class Utils {
     /**
      * A debugging logger.
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.utils");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.Utils");
+
+    /**
+     * A string constant used when we don't find a title on an object.
+     */
+    private static final String UNKNOW_TITLE = "unknow title";
 
     /**
      * A string constant used when we don't find an identifier on an object.
@@ -47,6 +50,58 @@ public class Utils {
     private Utils() {}
     
     /**
+      * This method try to find a title for this object.
+      * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
+      * else we try to find a getName(), getTitle(), or getId() method.
+      *
+      * @param obj the object for which we want a title.
+      *
+      * @return the founded title or UNKNOW_TITLE
+      */
+    public static String findTitle(Object obj) {
+
+        //here we try to get the title
+        String title = UNKNOW_TITLE;
+
+        final List<String> paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
+        paths.add("ISO 19115:MD_Metadata:fileIdentifier");
+        paths.add("Catalog Web Service:Record:title:content");
+        paths.add("Catalog Web Service:Record:identifier:content");
+        paths.add("Ebrim v3.0:RegistryObject:name:localizedString:value");
+        paths.add("Ebrim v3.0:RegistryObject:id");
+        paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
+        paths.add("Ebrim v3.0:RegistryPackage:id");
+        paths.add("Ebrim v2.5:RegistryObject:name:localizedString:value");
+        paths.add("Ebrim v2.5:RegistryObject:id");
+
+        for (String path : paths) {
+            Object value = ReflectionUtilities.getValuesFromPath(path, obj);
+            if (value instanceof String) {
+                title = (String) value;
+                // we stop when we have found a response
+                break;
+            } else if (value instanceof Collection) {
+                Collection c = (Collection) value;
+                Iterator it = c.iterator();
+                if (it.hasNext()) {
+                    Object cValue = it.next();
+                    if (cValue instanceof String) {
+                        title = (String) cValue;
+                         break;
+                    } else if (cValue != null) {
+                        title = cValue.toString();
+                         break;
+                    }
+                }
+            } else if (value != null) {
+                LOGGER.finer("FIND TITLE => unexpected String type: " + value.getClass().getName() + "\ncurrentPath:" + path);
+            }
+        }
+        return title;
+    }
+
+    /**
      * This method try to find an Identifier for this object.
      *  we try to find a getId(), getIdentifier() or getFileIdentifier() method.
      *
@@ -55,14 +110,14 @@ public class Utils {
      * @return the founded identifier or UNKNOW_IDENTIFIER
      */
     public static String findIdentifier(Object obj) {
-        
+
         /*
          * we try to find one of the thre method named :
          *  - getId()
          *  - getIdentifier()
          *  - getFileIdentifier()
          */
-        
+
         Method nameGetter = null;
         String methodName = "";
         int i = 0;
@@ -107,7 +162,7 @@ public class Utils {
                 return objT.toString();
             }
         }
-        
+
         LOGGER.log(Level.WARNING, "unable to find an identifier in object of type class {0}, using default then.", obj.getClass().getName());
         return UNKNOW_IDENTIFIER;
     }

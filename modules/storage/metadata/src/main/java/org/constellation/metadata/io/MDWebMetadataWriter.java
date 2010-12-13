@@ -29,7 +29,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -44,6 +43,7 @@ import javax.xml.bind.JAXBElement;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.Util;
 
@@ -110,8 +110,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * (in order to avoid infinite loop)
      */
     private Map<Object, Value> alreadyWrite;
-
-    protected static final String UNKNOW_TITLE = "unknow title";
 
     /**
      * A flag indicating that we don't want to write predefined values.
@@ -223,58 +221,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return cat;
     }
 
-     /**
-      * This method try to find a title for this object.
-      * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
-      * else we try to find a getName(), getTitle(), or getId() method.
-      *
-      * @param obj the object for which we want a title.
-      *
-      * @return the founded title or UNKNOW_TITLE
-      */
-    protected final String findTitle(Object obj) {
-
-        //here we try to get the title
-        String title = UNKNOW_TITLE;
-
-        final List<String> paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
-        paths.add("ISO 19115:MD_Metadata:fileIdentifier");
-        paths.add("Catalog Web Service:Record:title:content");
-        paths.add("Catalog Web Service:Record:identifier:content");
-        paths.add("Ebrim v3.0:RegistryObject:name:localizedString:value");
-        paths.add("Ebrim v3.0:RegistryObject:id");
-        paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
-        paths.add("Ebrim v3.0:RegistryPackage:id");
-        paths.add("Ebrim v2.5:RegistryObject:name:localizedString:value");
-        paths.add("Ebrim v2.5:RegistryObject:id");
-
-        for (String path : paths) {
-            Object value = ReflectionUtilities.getValuesFromPath(path, obj);
-            if (value instanceof String) {
-                title = (String) value;
-                // we stop when we have found a response
-                break;
-            } else if (value instanceof Collection) {
-                Collection c = (Collection) value;
-                Iterator it = c.iterator();
-                if (it.hasNext()) {
-                    Object cValue = it.next();
-                    if (cValue instanceof String) {
-                        title = (String) cValue;
-                         break;
-                    } else if (cValue != null) {
-                        title = cValue.toString();
-                         break;
-                    }
-                }
-            } else if (value != null) {
-                LOGGER.info("\n\n\n unexpected String type: " + value.getClass().getName() + "\ncurrentPath:" + path + "\n\n\n");
-            }
-        }
-        return title;
-    }
-
     /**
      * Return an MDWeb formular from an object.
      *
@@ -282,7 +228,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @return an MDWeb form representing the metadata object.
      */
     protected Form getFormFromObject(Object object) throws MD_IOException {
-        final String title = findTitle(object);
+        final String title = Utils.findTitle(object);
         return getFormFromObject(object, defaultUser, mdRecordSet, null, title);
     }
 
@@ -294,7 +240,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     protected Form getFormFromObject(Object object, String title) throws MD_IOException {
         if (title == null) {
-            title = findTitle(object);
+            title = Utils.findTitle(object);
         }
         return getFormFromObject(object, defaultUser, mdRecordSet, null, title);
     }
