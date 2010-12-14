@@ -16,7 +16,10 @@
  */
 package org.constellation.metadata.utils;
 
+// J2SE dependencies
 import java.util.Arrays;
+
+// geotoolkit dependencies
 import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
@@ -28,12 +31,17 @@ import org.geotoolkit.ebrim.xml.v300.RegistryObjectType;
 import org.geotoolkit.ebrim.xml.v300.LocalizedStringType;
 import org.geotoolkit.ebrim.xml.v300.InternationalStringType;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
+
+// JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
+ * Test the utilities class org.constellation.metadata.utils.utils from the storage-metadata.
+ * 
+ * This class is tested here because it use reflection and the storage metadata has no dependencies with the tested object.
  *
- * @author guilhem
+ * @author Guilhem Legal (Geomatys)
  */
 public class UtilsTest {
 

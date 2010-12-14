@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -387,7 +386,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                     if (value != null && !value.isEmpty() && !value.equals(NULL_VALUE))
                         response.append(value).append(',');
                 } else {
-                    response.append(getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata)).append(',');
+                    final Object brutValue = ReflectionUtilities.getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata);
+                    final String value     = getStringValue(brutValue);
+                    response.append(value).append(',');
                 }
             }
         }
@@ -475,98 +476,6 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         } else {
             throw new IllegalArgumentException("this type is unexpected: " + obj.getClass().getSimpleName());
         }
-        return result;
-    }
-    
-    /**
-     * TODO 
-     * 
-     * @param pathID
-     * @param conditionalPathID
-     * @param conditionalValue
-     * @param metadata
-     * @return
-     */
-    private static String getConditionalValuesFromPath(String pathID, String conditionalAttribute, String conditionalValue, Object metadata) {
-        String result = "";
-        /*
-         * we remove the prefix path part the path always start with STANDARD:TYPE:
-         */
-        pathID = pathID.substring(pathID.indexOf(':') + 1);
-        pathID = pathID.substring(pathID.indexOf(':') + 1);
-
-        //for each part of the path we execute a (many) getter
-        while (!pathID.isEmpty()) {
-            String attributeName;
-            if (pathID.indexOf(':') != -1) {
-                attributeName = pathID.substring(0, pathID.indexOf(':'));
-                pathID        = pathID.substring(pathID.indexOf(':') + 1);
-            } else {
-                attributeName = pathID;
-                pathID = "";
-            }
-
-            if (metadata instanceof Collection) {
-                final List<Object> tmp = new ArrayList<Object>();
-                if (pathID.isEmpty()) {
-                    for (Object subMeta: (Collection)metadata) {
-                        if (matchCondition(subMeta, conditionalAttribute, conditionalValue)) {
-                            tmp.add(ReflectionUtilities.getAttributeValue(subMeta, attributeName));
-                        }
-                    }
-                } else {
-                    for (Object subMeta: (Collection)metadata) {
-                        final Object obj = ReflectionUtilities.getAttributeValue(subMeta, attributeName);
-                        if (obj instanceof Collection) {
-                            for (Object o : (Collection)obj) {
-                                if (o != null) tmp.add(o);
-                            }
-                        } else {
-                            if (obj != null) tmp.add(obj);
-                        }
-                    }
-                }
-
-                if (tmp.size() == 1) metadata = tmp.get(0);
-                else metadata = tmp;
-
-            } else {
-                if (pathID.isEmpty()) {
-                    if (matchCondition(metadata, conditionalAttribute, conditionalValue)) {
-                        metadata = ReflectionUtilities.getAttributeValue(metadata, attributeName);
-                    } else {
-                        metadata = null;
-                    }
-                } else {
-                    metadata = ReflectionUtilities.getAttributeValue(metadata, attributeName);
-                }
-            }
-        }
-        result = getStringValue(metadata);
-        return result;
-    }
-    
-    /**
-     * 
-     * @param metadata
-     * @param conditionalAttribute
-     * @param conditionalValue
-     * @return
-     */
-    private static boolean matchCondition(Object metadata, String conditionalAttribute, String conditionalValue) {
-        final Object conditionalObj = ReflectionUtilities.getAttributeValue(metadata, conditionalAttribute);
-        final String attributValue  = getStringValue(conditionalObj);
-        final boolean result;
-        // if we a have a pattern matching
-        if (conditionalValue.contains("[")) {
-            result = attributValue.matches(conditionalValue);
-        } else {
-            result = conditionalValue.equalsIgnoreCase(attributValue);
-        }
-        LOGGER.finer("contionalObj: "       + attributValue +
-                     "\nconditionalValue: " + conditionalValue             +
-                     "\nmatch? "            + result);
-        
         return result;
     }
     
