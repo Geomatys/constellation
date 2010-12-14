@@ -870,8 +870,10 @@ public final class ReflectionUtilities {
         if (conditionalObj instanceof org.opengis.util.CodeList) {
             attributValue = ((org.opengis.util.CodeList)conditionalObj).name();
 
-        } else {
+        } else if (conditionalObj != null) {
             attributValue  = conditionalObj.toString();
+        } else {
+            attributValue = "null";
         }
         final boolean result;
         // if we a have a pattern matching

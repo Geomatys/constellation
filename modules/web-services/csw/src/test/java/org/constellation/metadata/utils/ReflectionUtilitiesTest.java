@@ -18,6 +18,11 @@
 package org.constellation.metadata.utils;
 
 // JUnit dependencies
+import org.geotoolkit.metadata.iso.extent.DefaultExtent;
+import org.opengis.metadata.extent.TemporalExtent;
+import org.geotoolkit.metadata.iso.extent.DefaultTemporalExtent;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.metadata.iso.identification.DefaultKeywords;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
@@ -112,6 +117,22 @@ public class ReflectionUtilitiesTest {
         kw2.setType(KeywordType.valueOf("StationType"));
         keywords.add(kw2);
         identification.setDescriptiveKeywords(keywords);
+
+        final List<TemporalExtent> tempExtents = new ArrayList<TemporalExtent>();
+        final Date start = new Date(1547845121);
+        final Date stop  = new Date(1747845121);
+        final TimePositionType startPos = new TimePositionType(start);
+        final TimePositionType stopPos = new TimePositionType(stop);
+        TimePeriodType allPeriod = new TimePeriodType(startPos, stopPos);
+        allPeriod.setId("1-all");
+
+        final DefaultExtent extent = new DefaultExtent();
+        final DefaultTemporalExtent stationTempExtent = new DefaultTemporalExtent();
+        stationTempExtent.setExtent(allPeriod);
+        tempExtents.add(stationTempExtent);
+        extent.setTemporalElements(tempExtents);
+        identification.setExtents(Arrays.asList(extent));
+
         metadata.setIdentificationInfo(Arrays.asList(identification));
 
         /*
@@ -182,6 +203,14 @@ public class ReflectionUtilitiesTest {
 
         assertTrue("result type was:" + result.getClass().getName(), result instanceof List);
         assertEquals(key2, ((List)result).get(0));
+
+        /**
+         * Test 8 ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition#id=[0-9]+-all
+         */
+        result = ReflectionUtilities.getConditionalValuesFromPath("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition", "id", "[0-9]+-all", metadata);
+
+        assertTrue("result type was:" + result.getClass().getName(), result instanceof TimePositionType);
+        assertEquals(startPos, result);
 
     }
 
