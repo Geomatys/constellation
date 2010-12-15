@@ -17,6 +17,8 @@
 
 package org.constellation.sos.ws;
 
+import org.geotoolkit.swe.xml.v101.TextBlockEntry;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -282,5 +284,58 @@ public final class Utils {
         env.setSrsDimension(2);
         env.setAxisLabels("Y X");
         return env;
+    }
+
+    /**
+     * Used for CSV encoding, while iterating on a resultSet.
+     * 
+     * if the round on the current date is over, and some field data are not present,
+     * we have to add empty token before to start the next date round.
+     *
+     * example : we are iterating on some date with temperature an salinity
+     *
+     * date       |  phenomenon | value
+     * 2010-01-01    TEMP          1
+     * 2010-01-01    SAL           202
+     * 2010-01-02    TEMP          3
+     * 2010-01-02    SAL           201
+     * 2010-01-03    TEMP          4
+     * 2010-01-04    TEMP          2
+     * 2010-01-04    SAL           210
+     *
+     * CSV encoding will be : @@2010-01-01,1,202@@2010-01-02,3,201@@2010-01-03,4,@@2010-01-04,2,210
+     *
+     * @param value the datablock builder.
+     * @param phenomenonIndex the current phenomenon index.
+     */
+    public static void fillEndingDataHoles(Appendable value, int phenomenonIndex, List<String> fieldList, TextBlockEntry encoding) throws IOException {
+        while (phenomenonIndex < fieldList.size()) {
+            value.append(encoding.getTokenSeparator());
+            phenomenonIndex++;
+        }
+    }
+
+    /**
+     * Used for CSV encoding, while iterating on a resultSet.
+     * 
+     * if some field data are not present in the middle of a date round,
+     * we have to add empty token until we got the next phenomenon data.
+     *
+     * @param value the datablock builder.
+     * @param phenomenonIndex the current phenomenon index.
+     * @param phenomenonName the name of the current phenomenon.
+     *
+     * @return the updated phenomenon index.
+     */
+    public static int fillDataHoles(Appendable value, int currentIndex, String searchedField, List<String> fieldList, TextBlockEntry encoding, int nbBlockByHole) throws IOException {
+        while (currentIndex < fieldList.size() && !fieldList.get(currentIndex).equals(searchedField)) {
+            if (value != null) {
+                for (int i = 0; i < nbBlockByHole; i++) {
+                    value.append(encoding.getTokenSeparator());
+                }
+            }
+            currentIndex++;
+        }
+        return currentIndex;
     }
 }

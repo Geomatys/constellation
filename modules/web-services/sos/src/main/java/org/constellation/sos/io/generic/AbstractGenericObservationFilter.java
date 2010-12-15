@@ -69,6 +69,16 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      */
     protected DataSource dataSource;
 
+    /**
+     * A flag indicating that the service is trying to reconnect the database.
+     */
+    private boolean isReconnecting = false;
+
+     /**
+     * The database informations.
+     */
+    private Automatic configuration;
+    
     
     protected Level logLevel = Level.INFO;
 
@@ -83,6 +93,8 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
+        this.configuration = configuration;
+        
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
@@ -148,5 +160,26 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
     @Override
     public void setResultEquals(String propertyName, String value) throws CstlServiceException{
         throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
+    }
+
+    /**
+     * Try to reconnect to the database if the connection have been lost.
+     *
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    protected void reloadConnection() throws CstlServiceException {
+        if (!isReconnecting) {
+            try {
+               LOGGER.info("refreshing the connection");
+               BDD db          = configuration.getBdd();
+               this.dataSource = db.getDataSource();
+               isReconnecting  = false;
+
+            } catch(SQLException ex) {
+                LOGGER.log(Level.SEVERE, "SQLException while restarting the connection:{0}", ex);
+                isReconnecting = false;
+            }
+        }
+        throw new CstlServiceException("The database connection has been lost, the service is trying to reconnect", NO_APPLICABLE_CODE);
     }
 }
