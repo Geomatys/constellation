@@ -17,6 +17,8 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
+import java.util.logging.Logger;
+import org.opengis.coverage.grid.RectifiedGrid;
 import java.util.logging.Level;
 import java.util.Arrays;
 import org.constellation.configuration.Layer;
@@ -118,6 +120,7 @@ import org.geotoolkit.feature.DefaultName;
 
 
 // GeoAPI dependencies
+import org.geotoolkit.gml.xml.v311.RectifiedGridType;
 import org.geotoolkit.ows.xml.v110.MetadataType;
 import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
 import org.opengis.geometry.Envelope;
@@ -293,8 +296,18 @@ public final class WCSWorker extends LayerWorker {
             final Keywords keywords = new Keywords(ServiceDef.Specification.WCS.toString(), coverageName);
 
             //Spatial metadata
+            RectifiedGridType grid = null;
+            try {
+                RectifiedGrid brutGrid = coverageRef.getRectifiedGrid();
+                if (brutGrid != null) {
+                    grid = new RectifiedGridType(brutGrid);
+                }
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
+
             final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
-                    new org.geotoolkit.wcs.xml.v100.SpatialDomainType(llenvelope);
+                    new org.geotoolkit.wcs.xml.v100.SpatialDomainType(llenvelope, grid);
 
             // temporal metadata
             final SortedSet<Date> dates;

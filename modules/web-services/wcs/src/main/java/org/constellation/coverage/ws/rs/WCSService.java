@@ -474,20 +474,24 @@ public class WCSService extends GridWebService<WCSWorker> {
         final List<String> axis = new ArrayList<String>();
         axis.add("width");
         axis.add("height");
-        List<Integer> low = null;
-        List<Integer> high = null;
+        int[] low = null;
+        int[] high = null;
         if (width != null && height != null) {
-            low = new ArrayList<Integer>();
-            high = new ArrayList<Integer>();
-            low.add(0);
-            low.add(0);
-            high.add(Integer.valueOf(width));
-            high.add(Integer.valueOf(height));
             if (depth != null) {
+                low  = new int[3];
+                high = new int[3];
                 axis.add("depth");
-                low.add(0);
-                high.add(Integer.valueOf(depth));
+                low[2]  = 0;
+                high[2] = Integer.valueOf(depth);
+            } else {
+                low  = new int[2];
+                high = new int[2];
             }
+            low[0] = 0;
+            low[1] = 0;
+            high[0] = Integer.valueOf(width);
+            high[1] = Integer.valueOf(height);
+            
         }
         final GridLimitsType limits = new GridLimitsType(low, high);
         final GridType grid = new GridType(limits, axis);

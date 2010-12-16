@@ -45,6 +45,7 @@ import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.ElevationModel;
@@ -54,6 +55,7 @@ import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.MeasurementRange;
+import org.opengis.coverage.grid.RectifiedGrid;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -93,6 +95,20 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
 
         this.reader = reader;
         this.elevationModel = elevationModel;
+    }
+
+    /**
+     * Returns the rectified grid of this layer.
+     */
+    @Override
+    public RectifiedGrid getRectifiedGrid() throws DataStoreException {
+        SpatialMetadata meta = reader.getCoverageMetadata(0);
+        if (meta != null) {
+            return meta.getInstanceForType(RectifiedGrid.class);
+        } else {
+            LOGGER.log(Level.WARNING, "There is no coverage metadata for layer:{0}", name);
+        }
+        return null;
     }
 
     /**
@@ -202,8 +218,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
         final Envelope env;
         final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
         if (generalGridGeom == null) {
-            LOGGER.info("The layer \""+ name +"\" does not contain" +
-                    " a grid geometry information.");
+            LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
             return null;
         }
         try {
