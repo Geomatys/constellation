@@ -24,7 +24,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import org.constellation.provider.AbstractLayerProvider;
@@ -39,7 +38,6 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.jdbc.WrappedDataSource;
 import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
 
@@ -51,10 +49,6 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
  * @author Johann Sorel (Geomatys)
  */
 public class CoverageSQLProvider extends AbstractLayerProvider{
-    /**
-     * Default logger for this provider.
-     */
-    private static final Logger LOGGER = Logging.getLogger(CoverageSQLProvider.class);
 
     /**
      * Keys to use in configuration file.
@@ -124,7 +118,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
                 port = Integer.parseInt(portTxt);
             }catch(Exception nf){
                 //catch numberformat and nullpointer
-                LOGGER.log(Level.WARNING, "Port value for coverage-sql is not valid : {0}", portTxt);
+                getLogger().log(Level.WARNING, "Port value for coverage-sql is not valid : {0}", portTxt);
                 port = 5432;
             }
             dbName = properties.getProperty(KEY_DATABASE);
@@ -167,7 +161,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         try {
             reader = database.createGridCoverageReader(key.getLocalPart());
         } catch (CoverageStoreException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
 
 
@@ -197,7 +191,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
             try {
                 loadDataBase();
             } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                getLogger().log(Level.WARNING, ex.getMessage(), ex);
             }
             visit();
         }
@@ -217,7 +211,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     /**
      * Visit all layers detected from the database table {@code Layers}.
      */
-    private void visit() {
+    protected void visit() {
         try {
             final Set<String> layers = database.getLayers().result();
 
@@ -225,11 +219,11 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
                 test(name);
             }
         } catch (CoverageStoreException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            getLogger().log(Level.WARNING, ex.getMessage(), ex);
         } catch (CancellationException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
-
+        super.visit();
     }
 
 

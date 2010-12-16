@@ -61,7 +61,6 @@ import org.xml.sax.SAXException;
  */
 public class PostGisProvider extends AbstractLayerProvider{
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgis");
     private static final String KEY_POSTGIS_CONFIG  = "postgis_config";
     public static final String KEY_DBTYPE          = PostgisNGDataStoreFactory.DBTYPE.getName().toString();
     public static final String KEY_HOST            = PostgisNGDataStoreFactory.HOST.getName().toString();
@@ -100,7 +99,7 @@ public class PostGisProvider extends AbstractLayerProvider{
             } catch (NumberFormatException ex) {
                 //just log it, use the default port
                 params.put(KEY_PORT, 5432);
-                LOGGER.log(Level.SEVERE, null, ex);
+                getLogger().log(Level.SEVERE, null, ex);
             }
         } else {
             //this parameter is needed
@@ -195,7 +194,8 @@ public class PostGisProvider extends AbstractLayerProvider{
         }
     }
 
-    private void visit() {
+    @Override
+    protected void visit() {
         try {
             for (final Name name : store.getNames()) {
                 if (source.loadAll || source.containsLayer(name.getLocalPart())) {
@@ -205,23 +205,24 @@ public class PostGisProvider extends AbstractLayerProvider{
         } catch (DataStoreException ex) {
             //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
             //won't be able to find thoses layers.
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
         }
+        super.visit();
     }
 
-    public static final Collection<PostGisProvider> loadProviders(){
+    public static Collection<PostGisProvider> loadProviders(){
         final Collection<PostGisProvider> dps = new ArrayList<PostGisProvider>();
         final ProviderConfig config;
         try {
             config = getConfig();
         } catch (ParserConfigurationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (SAXException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (NamingException ex) {
             return Collections.emptyList();
@@ -234,19 +235,19 @@ public class PostGisProvider extends AbstractLayerProvider{
             try {
                 dps.add(new PostGisProvider(ps));
             } catch(DataStoreException ex){
-                LOGGER.log(Level.WARNING, "Invalide postgis provider config", ex);
+                getLogger().log(Level.WARNING, "Invalide postgis provider config", ex);
             }
         }
 
         final StringBuilder builder = new StringBuilder("DATA PROVIDER : PostGIS ");
         for(final PostGisProvider dp : dps){
-            builder.append("\n["+ dp.source.parameters.get(KEY_DATABASE)+"=");
+            builder.append("\n[").append(dp.source.parameters.get(KEY_DATABASE)).append("=");
             for(final Name layer : dp.getKeys()){
-                builder.append(layer + ",");
+                builder.append(layer).append(",");
             }
             builder.append("]");
         }
-        LOGGER.log(Level.INFO, builder.toString());
+        getLogger().log(Level.INFO, builder.toString());
 
         return dps;
     }
@@ -255,7 +256,7 @@ public class PostGisProvider extends AbstractLayerProvider{
      *
      * @return List of folders holding shapefiles
      */
-    private static final ProviderConfig getConfig() throws ParserConfigurationException,
+    private static ProviderConfig getConfig() throws ParserConfigurationException,
             SAXException, IOException, NamingException
     {
 

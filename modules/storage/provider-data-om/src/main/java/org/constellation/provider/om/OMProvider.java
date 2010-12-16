@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -61,7 +60,6 @@ import org.xml.sax.SAXException;
  */
 public class OMProvider extends AbstractLayerProvider {
 
-    private static final Logger LOGGER         = Logger.getLogger("org.constellation.provider.om");
     private static final String KEY_OM_CONFIG  = "om_config";
     public  static final String KEY_DBTYPE     = OMDataStoreFactory.DBTYPE.getName().toString();
     public  static final String KEY_SGBDTYPE   = OMDataStoreFactory.SGBDTYPE.getName().toString();
@@ -102,7 +100,7 @@ public class OMProvider extends AbstractLayerProvider {
                 } catch (NumberFormatException ex) {
                     //just log it, use the default port
                     params.put(KEY_PORT, 5432);
-                    LOGGER.log(Level.SEVERE, null, ex);
+                    getLogger().log(Level.SEVERE, null, ex);
                 }
             } else {
                 //this parameter is needed
@@ -198,7 +196,8 @@ public class OMProvider extends AbstractLayerProvider {
         }
     }
 
-    private void visit() {
+    @Override
+    protected void visit() {
         try {
             for (final Name name : store.getNames()) {
                 index.add(name);
@@ -206,23 +205,24 @@ public class OMProvider extends AbstractLayerProvider {
         } catch (DataStoreException ex) {
             //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
             //won't be able to find thoses layers.
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
         }
+        super.visit();
     }
 
-    public static final Collection<OMProvider> loadProviders(){
+    public static Collection<OMProvider> loadProviders(){
         final Collection<OMProvider> dps = new ArrayList<OMProvider>();
         final ProviderConfig config;
         try {
             config = getConfig();
         } catch (ParserConfigurationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (SAXException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (NamingException ex) {
             return Collections.emptyList();
@@ -235,7 +235,7 @@ public class OMProvider extends AbstractLayerProvider {
             try {
                 dps.add(new OMProvider(ps));
             } catch(DataStoreException ex){
-                LOGGER.log(Level.WARNING, "Invalide O&M provider config", ex);
+                getLogger().log(Level.WARNING, "Invalide O&M provider config", ex);
             }
         }
 
@@ -247,7 +247,7 @@ public class OMProvider extends AbstractLayerProvider {
             }
             builder.append("]");
         }
-        LOGGER.log(Level.INFO, builder.toString());
+        getLogger().log(Level.INFO, builder.toString());
 
         return dps;
     }
@@ -256,7 +256,7 @@ public class OMProvider extends AbstractLayerProvider {
      *
      * @return List of folders holding shapefiles
      */
-    private static final ProviderConfig getConfig() throws ParserConfigurationException,
+    private static ProviderConfig getConfig() throws ParserConfigurationException,
             SAXException, IOException, NamingException {
 
         final String configFile = ConfigDirectory.getPropertyValue(JNDI_GROUP,KEY_OM_CONFIG);

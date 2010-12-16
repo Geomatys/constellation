@@ -126,13 +126,13 @@ abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
                             }
                         }catch(Exception ex){
                             //we must not fail here in any case
-                            getLOGGER().log(Level.SEVERE, "Service "+serviceName+" failed to create a provider.",ex);
+                            getLogger().log(Level.SEVERE, "Service "+serviceName+" failed to create a provider.",ex);
                         }
                     }
                 }
             }catch(Exception ex){
                 //we must not fail here in any case
-                getLOGGER().log(Level.SEVERE, "Configurator failed to provide configuration for service : " + serviceName,ex);
+                getLogger().log(Level.SEVERE, "Configurator failed to provide configuration for service : " + serviceName,ex);
             }
 
             //load hard coded sources
@@ -140,7 +140,7 @@ abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
                 cache.addAll(factory.getAdditionalProviders());
             }catch(Exception ex){
                 //we must not fail here in any case
-                getLOGGER().log(Level.SEVERE, "Service "+serviceName+" failed to create additional providers.",ex);
+                getLogger().log(Level.SEVERE, "Service "+serviceName+" failed to create additional providers.",ex);
             }
         }
 
@@ -175,7 +175,7 @@ abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
                     provider.dispose();
                 }catch(Exception ex){
                     //we must not fail here in any case
-                    getLOGGER().log(Level.SEVERE, "Failed to dispose provider : " + provider.toString(),ex);
+                    getLogger().log(Level.SEVERE, "Failed to dispose provider : " + provider.toString(),ex);
                 }
             }
         }finally{

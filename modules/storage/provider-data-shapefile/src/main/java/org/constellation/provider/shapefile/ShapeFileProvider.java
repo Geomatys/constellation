@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,11 +51,6 @@ import org.opengis.feature.type.Name;
  * @author Cédric Briançon (Geomatys)
  */
 public class ShapeFileProvider extends AbstractLayerProvider {
-
-    /**
-     * Default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.shapefile");
 
     /**
      * Key for the path of the directory which contains shapefiles.
@@ -98,7 +92,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
         }
 
-        visit(folder);
+        visit();
     }
 
     /**
@@ -142,7 +136,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
                 try {
                     key = store.getNames().iterator().next();
                 } catch (DataStoreException ex) {
-                    LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                    getLogger().log(Level.WARNING, ex.getLocalizedMessage(), ex);
                 }
             }
         }
@@ -171,7 +165,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         synchronized(this){
             index.clear();
             cache.clear();
-            visit(folder);
+            visit();
         }
     }
 
@@ -186,6 +180,12 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             source.layers.clear();
             source.parameters.clear();
         }
+    }
+
+    @Override
+    protected void visit() {
+        visit(folder);
+        super.visit();
     }
 
     /**
@@ -241,10 +241,10 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             params.put(KEY_NAMESPACE, namespace);
             return DataStoreFinder.getDataStore(params);
        } catch (DataStoreException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            getLogger().log(Level.WARNING, null, ex);
             return null;
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            getLogger().log(Level.WARNING, null, ex);
             return null;
         }
     }

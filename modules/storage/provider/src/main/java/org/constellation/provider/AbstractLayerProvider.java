@@ -17,11 +17,18 @@
 
 package org.constellation.provider;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import org.constellation.provider.configuration.ProviderLayer;
 
 import org.constellation.provider.configuration.ProviderSource;
+import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
+import org.geotoolkit.util.StringUtilities;
 
 import org.opengis.feature.type.Name;
 
@@ -76,6 +83,33 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
     @Override
     public ElevationModel getElevationModel(Name name) {
         return null;
+    }
+
+    /**
+     * Provider should pass by this method to fill there index.
+     * This method will only log miss configurations, loading the index
+     * is part of the child class.
+     */
+    protected void visit(){
+        final ProviderSource config = getSource();
+        final Set<Name> keys = getKeys();
+
+        final List<String> missingLayers = new ArrayList<String>();
+
+        for(final ProviderLayer declaredLayer : config.layers){
+            for(Name n : keys){
+                if(DefaultName.match(n, declaredLayer.name)) continue;
+            }
+            missingLayers.add(declaredLayer.name);
+        }
+
+        if(!missingLayers.isEmpty()){
+            //log list of missing layers
+            final StringBuilder sb = new StringBuilder("Provider ");
+            sb.append(source.id).append(" declares layers missing in the source\n");
+            sb.append(StringUtilities.toStringTree(missingLayers));
+            getLogger().log(Level.WARNING, sb.toString());
+        }
     }
 
     public static Name containsOnlyLocalPart(Collection<Name> index, Name layerName) {

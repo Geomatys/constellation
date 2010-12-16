@@ -54,8 +54,6 @@ public class CoverageFileProvider extends AbstractLayerProvider{
     public static final String KEY_FOLDER_PATH = "path";
     public static final String KEY_NAMESPACE = "namespace";
 
-    private static final Logger LOGGER = Logging.getLogger(CoverageFileProvider.class);
-
     private final Map<Name,File> index = new HashMap<Name,File>(){
 
         @Override
@@ -112,7 +110,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
         }
 
-        visit(folder);
+        visit();
     }
 
     /**
@@ -138,9 +136,9 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                     //we have this data source in the folder
                     reader = loadReader(f);
                 } catch (IOException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
+                    getLogger().log(Level.SEVERE, null, ex);
                 } catch (CoverageStoreException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
+                    getLogger().log(Level.SEVERE, null, ex);
                 }
                 if (reader != null) {
                     //cache the reader
@@ -178,7 +176,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         synchronized(this){
             index.clear();
             cache.clear();
-            visit(folder);
+            visit();
         }
     }
 
@@ -193,6 +191,12 @@ public class CoverageFileProvider extends AbstractLayerProvider{
             source.layers.clear();
             source.parameters.clear();
         }
+    }
+
+    @Override
+    protected void visit() {
+        visit(folder);
+        super.visit();
     }
 
     /**

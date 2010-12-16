@@ -113,7 +113,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             try {
                 reader = GridCoverageReaders.toCoverageReader(entry.getKey(), entry.getValue());
             } catch (CoverageStoreException ex) {
-                Logger.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load coverage reader from tile manager.", ex);
+                getLogger().log(Level.WARNING, "Failed to load coverage reader from tile manager.", ex);
                 return null;
             }
             if (layer == null) {
@@ -156,6 +156,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             try{
                 final Entry<TileManager,CoordinateReferenceSystem> entry = GridCoverageReaders.openTileManager(folder);
                 index.put(name, entry);
+                visit(); //will log errors if any
             }catch(IOException ex){
                 Logger.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
             }catch(CoverageStoreException ex){

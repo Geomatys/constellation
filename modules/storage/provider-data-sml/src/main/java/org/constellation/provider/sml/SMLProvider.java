@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -60,7 +59,6 @@ import org.xml.sax.SAXException;
  */
 public class SMLProvider extends AbstractLayerProvider {
 
-    private static final Logger LOGGER         = Logger.getLogger("org.constellation.provider.postgis");
     private static final String KEY_SML_CONFIG = "sml_config";
     public  static final String KEY_DBTYPE     = SMLDataStoreFactory.DBTYPE.getName().toString();
     public  static final String KEY_SGBDTYPE   = SMLDataStoreFactory.SGBDTYPE.getName().toString();
@@ -103,7 +101,7 @@ public class SMLProvider extends AbstractLayerProvider {
                 } catch (NumberFormatException ex) {
                     //just log it, use the default port
                     params.put(KEY_PORT, 5432);
-                    LOGGER.log(Level.SEVERE, null, ex);
+                    getLogger().log(Level.SEVERE, null, ex);
                 }
             } else {
                 //this parameter is needed
@@ -200,7 +198,8 @@ public class SMLProvider extends AbstractLayerProvider {
         }
     }
 
-    private void visit() {
+    @Override
+    protected void visit() {
         try {
             for (final Name name : store.getNames()) {
                 index.add(name);
@@ -208,8 +207,9 @@ public class SMLProvider extends AbstractLayerProvider {
         } catch (DataStoreException ex) {
             //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
             //won't be able to find thoses layers.
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
         }
+        super.visit();
     }
 
     public static Collection<SMLProvider> loadProviders(){
@@ -218,13 +218,13 @@ public class SMLProvider extends AbstractLayerProvider {
         try {
             config = getConfig();
         } catch (ParserConfigurationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (SAXException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            getLogger().log(Level.SEVERE, null, ex);
             return Collections.emptyList();
         } catch (NamingException ex) {
             return Collections.emptyList();
@@ -237,7 +237,7 @@ public class SMLProvider extends AbstractLayerProvider {
             try {
                 dps.add(new SMLProvider(ps));
             } catch(DataStoreException ex){
-                LOGGER.log(Level.WARNING, "Invalide SML provider config", ex);
+                getLogger().log(Level.WARNING, "Invalide SML provider config", ex);
             }
         }
 
@@ -249,7 +249,7 @@ public class SMLProvider extends AbstractLayerProvider {
             }
             builder.append("]");
         }
-        LOGGER.log(Level.INFO, builder.toString());
+        getLogger().log(Level.INFO, builder.toString());
 
         return dps;
     }

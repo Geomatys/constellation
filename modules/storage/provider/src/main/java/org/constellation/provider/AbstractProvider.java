@@ -41,7 +41,7 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         this.source = source;
     }
 
-    public static Logger getLOGGER() {
+    public static Logger getLogger() {
         return LOGGER;
     }
 
