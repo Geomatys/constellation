@@ -96,10 +96,12 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
 
         final List<String> missingLayers = new ArrayList<String>();
 
+        loop:
         for(final ProviderLayer declaredLayer : config.layers){
             for(Name n : keys){
-                if(DefaultName.match(n, declaredLayer.name)) continue;
+                if(DefaultName.match(n, declaredLayer.name)) continue loop;
             }
+
             missingLayers.add(declaredLayer.name);
         }
 
