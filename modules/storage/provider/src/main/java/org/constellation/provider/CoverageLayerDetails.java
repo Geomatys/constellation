@@ -18,6 +18,7 @@ package org.constellation.provider;
 
 import org.geotoolkit.storage.DataStoreException;
 import org.opengis.coverage.grid.RectifiedGrid;
+import org.opengis.geometry.Envelope;
 
 /**
  * Coverage extension of a {@link LayerDetails}, which add some methods specific
@@ -45,4 +46,6 @@ public interface CoverageLayerDetails extends LayerDetails {
     String getThematic();
 
     RectifiedGrid getRectifiedGrid() throws DataStoreException;
+
+    Envelope getEnvelope() throws DataStoreException;
 }

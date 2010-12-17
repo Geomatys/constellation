@@ -31,6 +31,7 @@ import org.constellation.provider.AbstractLayerDetails;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
@@ -171,9 +172,13 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
      */
     @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
-        Envelope env;
+        final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
+        if (generalGridGeom == null) {
+            LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
+            return null;
+        }
         try {
-            env = reader.getGridGeometry(0).getEnvelope();
+            final Envelope env = generalGridGeom.getEnvelope();
             return new DefaultGeographicBoundingBox(env);
         } catch (CancellationException ex) {
             throw new DataStoreException(ex);
@@ -181,6 +186,23 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
             throw new DataStoreException(ex);
         }
 
+    }
+
+    /**
+     * Returns the netive envelope of this layer.
+     */
+    @Override
+    public Envelope getEnvelope() throws DataStoreException {
+        final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
+        if (generalGridGeom == null) {
+            LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
+            return null;
+        }
+        try {
+            return generalGridGeom.getEnvelope();
+        } catch (CancellationException ex) {
+            throw new DataStoreException(ex);
+        }
     }
 
     /**

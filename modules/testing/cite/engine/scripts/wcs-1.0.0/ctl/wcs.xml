@@ -6039,7 +6039,8 @@ offering. Enter the grid resolutions below.</p>
                                        <gml:high>
                                           <xsl:value-of select="number(substring-before($lows, ' ')) + 2"/>
                                           <xsl:value-of select="' '"/>
-                                          <xsl:value-of select="number(substring-after($lows, ' ')) + 2"/>
+                                          <xsl:variable name="afterFirstLows" select="substring-after($lows, ' ')"/>
+                                          <xsl:value-of select="number(substring-before($afterFirstLows, ' ')) + 2"/>
                                        </gml:high>
                                     </gml:GridEnvelope>
                                  </gml:limits>
@@ -6048,7 +6049,7 @@ offering. Enter the grid resolutions below.</p>
                            </wcs:spatialSubset>
                         </wcs:domainSubset>
                         <wcs:output>
-                           <wcs:format><xsl:value-of select="wcs:supportedFormats/wcs:formats[1]"/></wcs:format>
+                           <wcs:format><xsl:value-of select="../../../wcs:supportedFormats/wcs:formats[1]"/></wcs:format>
                         </wcs:output>
                      </wcs:GetCoverage>
                   </ctl:body>

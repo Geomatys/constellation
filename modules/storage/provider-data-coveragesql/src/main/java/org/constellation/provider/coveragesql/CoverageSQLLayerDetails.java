@@ -215,14 +215,13 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
      */
     @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
-        final Envelope env;
         final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
         if (generalGridGeom == null) {
             LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
             return null;
         }
         try {
-            env = generalGridGeom.getEnvelope();
+            final Envelope env = generalGridGeom.getEnvelope();
             return new DefaultGeographicBoundingBox(env);
         } catch (CancellationException ex) {
             throw new DataStoreException(ex);
@@ -230,6 +229,23 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
             throw new DataStoreException(ex);
         }
 
+    }
+
+    /**
+     * Returns the netive envelope of this layer.
+     */
+    @Override
+    public Envelope getEnvelope() throws DataStoreException {
+        final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
+        if (generalGridGeom == null) {
+            LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
+            return null;
+        }
+        try {
+            return generalGridGeom.getEnvelope();
+        } catch (CancellationException ex) {
+            throw new DataStoreException(ex);
+        } 
     }
 
     /**

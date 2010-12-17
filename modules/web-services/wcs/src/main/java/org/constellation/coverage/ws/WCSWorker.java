@@ -17,12 +17,8 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
-import org.opengis.coverage.grid.RectifiedGrid;
 import java.util.logging.Level;
 import java.util.Arrays;
-import org.constellation.configuration.Layer;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.ws.LayerWorker;
 import java.io.File;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -52,6 +48,10 @@ import org.constellation.provider.StyleProviderProxy;
 import org.constellation.util.StyleUtils;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.constellation.configuration.Layer;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.ws.LayerWorker;
+import static org.constellation.query.wcs.WCSQuery.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -116,12 +116,14 @@ import org.geotoolkit.wcs.xml.v111.RangeType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.wcs.xml.v100.InterpolationMethod;
 import org.geotoolkit.feature.DefaultName;
-
-
-// GeoAPI dependencies
 import org.geotoolkit.gml.xml.v311.RectifiedGridType;
+import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.ows.xml.v110.MetadataType;
 import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
+import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// GeoAPI dependencies
 import org.opengis.geometry.Envelope;
 import org.opengis.feature.type.Name;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -129,9 +131,7 @@ import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;
-
-import static org.constellation.query.wcs.WCSQuery.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.opengis.coverage.grid.RectifiedGrid;
 
 
 /**
@@ -280,6 +280,7 @@ public final class WCSWorker extends LayerWorker {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
             final LonLatEnvelopeType llenvelope;
+            final EnvelopeEntry envelope;
             if (inputGeoBox != null) {
                 final SortedSet<Number> elevations;
                 try {
@@ -287,27 +288,51 @@ public final class WCSWorker extends LayerWorker {
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                 }
-                llenvelope = createEnvelope("urn:ogc:def:crs:OGC:1.3:CRS84", inputGeoBox, elevations);
+
+                final List<DirectPositionType> pos = buildPositions(inputGeoBox, elevations);
+                llenvelope = new LonLatEnvelopeType(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
+                envelope   = new EnvelopeEntry(pos, "EPSG:4326");
             } else {
                 throw new CstlServiceException("The geographic bbox for the layer is null !",
                         NO_APPLICABLE_CODE);
             }
             final Keywords keywords = new Keywords(ServiceDef.Specification.WCS.toString(), coverageName);
 
-            //Spatial metadata
-            RectifiedGridType grid = null;
+            /*
+             * Spatial metadata
+             */
+            final EnvelopeEntry nativeEnvelope;
+            try {
+                nativeEnvelope = new EnvelopeEntry(coverageRef.getEnvelope());
+            } catch (DataStoreException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+            }
+            GridType grid = null;
             try {
                 RectifiedGrid brutGrid = coverageRef.getRectifiedGrid();
                 if (brutGrid != null) {
-                    System.out.println("gridLimits:" + brutGrid.getExtent() +'\n' + brutGrid.getExtent().getHigh());
                     grid = new RectifiedGridType(brutGrid);
+                    /*
+                     * UGLY PATCH : remove it when geotk will fill this data
+                     */
+                    if (grid.getDimension() == 0) {
+                        int dimension = brutGrid.getOffsetVectors().size();
+                        grid.setDimension(dimension);
+                    }
+                    if (grid.getAxisName().isEmpty()) {
+                        if (grid.getDimension() == 2) {
+                            grid.setAxisName(Arrays.asList("x", "y"));
+                        } else if (grid.getDimension() == 3) {
+                            grid.setAxisName(Arrays.asList("x", "y", "z"));
+                        }
+                    }
                 }
             } catch (DataStoreException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
             }
 
             final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
-                    new org.geotoolkit.wcs.xml.v100.SpatialDomainType(llenvelope, grid);
+                    new org.geotoolkit.wcs.xml.v100.SpatialDomainType(Arrays.asList(envelope, nativeEnvelope), Arrays.asList(grid));
 
             // temporal metadata
             final SortedSet<Date> dates;
@@ -335,6 +360,7 @@ public final class WCSWorker extends LayerWorker {
             final RangeSet rangeSet = new RangeSet(rangeSetT);
             //supported CRS
             final SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
+            supCRS.addNativeCRSs(new CodeListType(nativeEnvelope.getSrsName()));
 
             // supported formats
             final List<CodeListType> supportedFormats = new ArrayList<CodeListType>();
@@ -365,8 +391,16 @@ public final class WCSWorker extends LayerWorker {
         return new CoverageDescription(coverageOfferings, ServiceDef.WCS_1_0_0.version.toString());
     }
 
-    private LonLatEnvelopeType createEnvelope(String srsName, GeographicBoundingBox inputGeoBox, SortedSet<Number> elevations) {
-         final List<Double> pos1 = new ArrayList<Double>();
+
+    /**
+     * Transform a geographicBoundingBox into a list of direct positions.
+     *
+     * @param inputGeoBox
+     * @param elevations
+     * @return
+     */
+    private List<DirectPositionType> buildPositions(GeographicBoundingBox inputGeoBox, SortedSet<Number> elevations) {
+        final List<Double> pos1 = new ArrayList<Double>();
         pos1.add(inputGeoBox.getWestBoundLongitude());
         pos1.add(inputGeoBox.getSouthBoundLatitude());
         final List<Double> pos2 = new ArrayList<Double>();
@@ -379,9 +413,9 @@ public final class WCSWorker extends LayerWorker {
         final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
         pos.add(new DirectPositionType(pos1));
         pos.add(new DirectPositionType(pos2));
-        return new LonLatEnvelopeType(pos, srsName);
+        return pos;
     }
-    
+
     /**
      * Returns the description of the coverage requested in version 1.1.1 of WCS standard.
      *
@@ -665,8 +699,8 @@ public final class WCSWorker extends LayerWorker {
                     // in the capabilities response.
                     continue;
                 }
-                
-                final LonLatEnvelopeType outputBBox = createEnvelope("urn:ogc:def:crs:OGC:1.3:CRS84", inputGeoBox, layer.getAvailableElevations());
+                final List<DirectPositionType> pos = buildPositions(inputGeoBox, layer.getAvailableElevations());
+                final LonLatEnvelopeType outputBBox = new LonLatEnvelopeType(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
 
                 final SortedSet<Date> dates = layer.getAvailableTimes();
                 if (dates != null && dates.size() >= 2) {
