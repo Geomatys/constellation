@@ -17,7 +17,6 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
-import java.util.logging.Logger;
 import org.opengis.coverage.grid.RectifiedGrid;
 import java.util.logging.Level;
 import java.util.Arrays;
@@ -300,6 +299,7 @@ public final class WCSWorker extends LayerWorker {
             try {
                 RectifiedGrid brutGrid = coverageRef.getRectifiedGrid();
                 if (brutGrid != null) {
+                    System.out.println("gridLimits:" + brutGrid.getExtent() +'\n' + brutGrid.getExtent().getHigh());
                     grid = new RectifiedGridType(brutGrid);
                 }
             } catch (DataStoreException ex) {
@@ -640,7 +640,7 @@ public final class WCSWorker extends LayerWorker {
             for (Name name : layers.keySet()) {
                 final LayerDetails layer = namedProxy.get(name);
                 final Layer configLayer  = layers.get(name);
-                
+
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
                     continue;
                 }

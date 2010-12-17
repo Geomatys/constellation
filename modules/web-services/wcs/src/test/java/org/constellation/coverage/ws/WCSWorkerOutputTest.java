@@ -157,12 +157,12 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         final List<String> axis = new ArrayList<String>();
         axis.add("width");
         axis.add("height");
-        final List<Integer> low  = new ArrayList<Integer>();
-        low.add(0);
-        low.add(0);
-        final List<Integer> high = new ArrayList<Integer>();
-        high.add(1024);
-        high.add(512);
+        final int[] low  = new int[2];
+        low[0] = 0;
+        low[1] = 0;
+        final int[] high = new int[2];
+        high[0] = 1024;
+        high[1] = 512;
         final GridLimitsType limits = new GridLimitsType(low, high);
         final GridType grid = new GridType(limits, axis);
         final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
