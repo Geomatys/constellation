@@ -27,7 +27,7 @@
     <groupId>org.constellation</groupId>
     <artifactId>constellation-sdi</artifactId>
     <packaging>pom</packaging>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.7-SNAPSHOT</version>
     <name>Constellation Spatial Data Infrastructure</name>
     <url>http://www.constellation-sdi.org</url>
     <description>
@@ -164,7 +164,7 @@
         <geotoolkit.version>SNAPSHOT</geotoolkit.version>
         <geotoolkit-pending.version>SNAPSHOT</geotoolkit-pending.version>
         <mdweb-meta.version>2.2-SNAPSHOT</mdweb-meta.version>
-        <mapfaces.version>0.42-SNAPSHOT</mapfaces.version>
+        <mapfaces.version>0.44-SNAPSHOT</mapfaces.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
