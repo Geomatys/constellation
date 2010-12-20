@@ -291,7 +291,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (request.getSections() == null || request.containsSection("operationsMetadata")) {
             final String url = getServiceUrl();
             if (url != null) {
-                updateURL(OPERATIONS_METADATA, url);
+                OPERATIONS_METADATA.updateURL(url);
             }
             om = OPERATIONS_METADATA;
         }
@@ -549,7 +549,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     final String prefix = typeName.getPrefix();
                     final String url    = getServiceUrl();
                     if (getServiceUrl() != null) {
-                        String describeRequest = url + "?request=DescribeFeatureType&version=1.1.0&service=WFS";
+                        String describeRequest = url + "request=DescribeFeatureType&version=1.1.0&service=WFS";
                         describeRequest        = describeRequest + "&namespace=xmlns(" + prefix + "=" + namespace + ")";
                         describeRequest        = describeRequest + "&Typename=" + prefix + ':' + typeName.getLocalPart();
                         schemaLocations.put(namespace, describeRequest);

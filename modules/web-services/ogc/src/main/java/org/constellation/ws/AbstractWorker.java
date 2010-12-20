@@ -94,7 +94,7 @@ public abstract class AbstractWorker implements Worker {
      */
     @Override
     public void setServiceUrl(String serviceUrl) {
-        this.serviceUrl = serviceUrl + specification.toString().toLowerCase() + '/' + id;
+        this.serviceUrl = serviceUrl + specification.toString().toLowerCase() + '/' + id + '?';
     }
 
     /**
@@ -209,31 +209,4 @@ public abstract class AbstractWorker implements Worker {
             throw new CstlServiceException("The service is not running!", OWSExceptionCode.NO_APPLICABLE_CODE);
         }
     }
-
-    /**
-     * TODO temporary for 0.7
-     */
-    public void updateURL(org.geotoolkit.ows.xml.v100.OperationsMetadata om, String url) {
-        for (org.geotoolkit.ows.xml.v100.Operation op: om.getOperation()) {
-            for (org.geotoolkit.ows.xml.v100.DCP dcp: op.getDCP()) {
-                for (org.geotoolkit.ows.xml.v100.OnlineResourceType method:dcp.getHTTP().getGetOrPost()) {
-                    method.setHref(url + "?");
-                }
-            }
-       }
-    }
-
-    /**
-     * TODO temporary for 0.7
-     */
-    public void updateURL(org.geotoolkit.ows.xml.v110.OperationsMetadata om, String url) {
-        for (org.geotoolkit.ows.xml.v110.Operation op: om.getOperation()) {
-            for (org.geotoolkit.ows.xml.v110.DCP dcp: op.getDCP()) {
-                for (org.geotoolkit.ows.xml.v110.OnlineResourceType method:dcp.getHTTP().getGetOrPost()) {
-                    method.setHref(url + "?");
-                }
-            }
-       }
-    }
-    
 }

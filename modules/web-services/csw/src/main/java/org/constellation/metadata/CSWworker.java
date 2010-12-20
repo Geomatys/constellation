@@ -561,7 +561,7 @@ public class CSWworker extends AbstractWorker {
                 }
             
                 // we update the URL
-                updateURL(om, getServiceUrl());
+                om.updateURL(getServiceUrl());
 
                 // we add the cascaded services (if there is some)
                 final DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");

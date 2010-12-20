@@ -654,7 +654,7 @@ public class SOSworker extends AbstractWorker {
             }
 
             //we update the URL
-            updateURL(om, getServiceUrl());
+            om.updateURL(getServiceUrl());
 
            if (!keepCapabilities) {
 
@@ -1343,7 +1343,8 @@ public class SOSworker extends AbstractWorker {
             }
             values = datablock.toString();
         }
-        final GetResultResponse.Result r = new GetResultResponse.Result(values, getServiceUrl() + '/' + requestResult.getObservationTemplateId());
+        final String url = getServiceUrl().substring(0, getServiceUrl().length() -1);
+        final GetResultResponse.Result r = new GetResultResponse.Result(values, url + '/' + requestResult.getObservationTemplateId());
         final GetResultResponse response = new GetResultResponse(r);
         LOGGER.log(logLevel, "GetResult processed in {0} ms", (System.currentTimeMillis() - start));
         return response;

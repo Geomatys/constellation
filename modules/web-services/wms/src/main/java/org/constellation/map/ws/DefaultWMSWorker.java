@@ -213,7 +213,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      */
     @Override
     public DescribeLayerResponseType describeLayer(final DescribeLayer descLayer) throws CstlServiceException {
-        final OnlineResourceType or = new OnlineResourceType(getServiceUrl() + "wcs?");
+        final OnlineResourceType or = new OnlineResourceType(getServiceUrl());
 
         final List<LayerDescriptionType> layerDescriptions = new ArrayList<LayerDescriptionType>();
         final List<String> layerNames = descLayer.getLayers();
@@ -271,7 +271,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         } else {
             request = WMSConstant.REQUEST_130;
         }
-        request.updateURL(getServiceUrl() + '?');
+        request.updateURL(getServiceUrl());
         inCapabilities.getCapability().setRequest(request);
 
         final List<String> exceptionFormats;
@@ -430,7 +430,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             } else {
                 layerName = fullLayerName.getLocalPart();
             }
-            final String beginLegendUrl = getServiceUrl() + "?REQUEST=GetLegendGraphic&" +
+            final String beginLegendUrl = getServiceUrl() + "REQUEST=GetLegendGraphic&" +
                                                     "VERSION=1.1.1&" +
                                                     "FORMAT=";
             final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;

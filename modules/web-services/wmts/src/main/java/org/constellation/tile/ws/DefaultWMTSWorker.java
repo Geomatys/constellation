@@ -247,7 +247,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
            om = WMTSConstant.OPERATIONS_METADATA;
 
            //we update the URL
-           updateURL(om, getServiceUrl());
+           om.updateURL(getServiceUrl());
 
         }
 
