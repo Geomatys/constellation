@@ -95,7 +95,7 @@ public class SOSWorkerTest {
 
     protected static Capabilities capabilities;
 
-    protected static final String URL = "http://pulsar.geomatys.fr/SOServer/SOService";
+    protected static final String URL = "http://pulsar.geomatys.fr/SOServer/SOService/";
 
     protected static void init() throws JAXBException {
         marshallerPool = SOSMarshallerPool.getInstance();
@@ -1850,7 +1850,7 @@ public class SOSWorkerTest {
         String value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@" + '\n' +
                        "2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@" + '\n' +
                        "2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n';
-        GetResultResponse expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "//" + templateId));
+        GetResultResponse expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1920,7 +1920,7 @@ public class SOSWorkerTest {
         result = worker.getResult(request);
 
         value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@" + '\n';
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1941,7 +1941,7 @@ public class SOSWorkerTest {
         result = worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@" + '\n';
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1962,7 +1962,7 @@ public class SOSWorkerTest {
         result = worker.getResult(request);
 
         value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@" + '\n';
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -1983,7 +1983,7 @@ public class SOSWorkerTest {
         result = worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.560@@" + '\n';
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -2004,7 +2004,7 @@ public class SOSWorkerTest {
         result = worker.getResult(request);
 
         value = "2007-05-01T03:59:00,6.560@@" + '\n';
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -2076,7 +2076,7 @@ public class SOSWorkerTest {
         result = worker.getResult(request);
 
         value = "2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n';
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -2145,7 +2145,7 @@ public class SOSWorkerTest {
         result = worker.getResult(request);
 
         value = "2007-05-01T20:59:00,6.550@@" + '\n';
-        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "//" + templateId));
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
@@ -2207,7 +2207,7 @@ public class SOSWorkerTest {
                        "2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@" + '\n' +
                        "2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n' +
                        "2007-06-01T01:01:00,6.560@@2007-06-01T02:00:00,6.550@@2007-06-01T03:00:00,6.550@@" + '\n';
-        GetResultResponse expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "//" + templateId));
+        GetResultResponse expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + "sos//" + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());

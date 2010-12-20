@@ -250,7 +250,7 @@ offering. Enter the grid resolutions below.</p>
       <ctl:code>
          <xsl:variable name="VAR_WCS_CAPABILITIES">
             <ctl:request>
-               <ctl:url>http://localhost:9090/default/wcs</ctl:url>
+               <ctl:url>http://localhost:9090/wcs/default</ctl:url>
                <ctl:method>get</ctl:method>
                <ctl:param name="request">GetCapabilities</ctl:param>
                <ctl:param name="service">WCS</ctl:param>

@@ -180,9 +180,9 @@ public class CSWworkerTest {
         acceptVersions = new AcceptVersionsType("2.0.2");
         sections       = new SectionsType("OperationsMetadata");
         acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
+        request        = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
 
-        result = worker.getCapabilities(request);
+        result         = worker.getCapabilities(request);
 
         assertTrue(result.getVersion().equals("2.0.2"));
         assertTrue(result.getFilterCapabilities() != null);

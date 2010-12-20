@@ -73,7 +73,7 @@
 		 
 		 
 			<!-- Get user input: -->	
-			<xsl:variable name="sos.service.url" select="'http://localhost:9090/default/sos'"/>
+			<xsl:variable name="sos.service.url" select="'http://localhost:9090/sos/default'"/>
 			
 		
         

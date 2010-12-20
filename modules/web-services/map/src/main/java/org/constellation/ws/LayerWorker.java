@@ -16,6 +16,7 @@
  */
 package org.constellation.ws;
 
+import org.constellation.ServiceDef.Specification;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
@@ -44,8 +45,8 @@ public abstract class LayerWorker extends AbstractWorker {
 
     private final LayerContext layerContext;
 
-    public LayerWorker(String id, File configurationDirectory) {
-        super(id, configurationDirectory);
+    public LayerWorker(String id, File configurationDirectory, Specification specification) {
+        super(id, configurationDirectory, specification);
         isStarted = true;
 
         LayerContext candidate = null;

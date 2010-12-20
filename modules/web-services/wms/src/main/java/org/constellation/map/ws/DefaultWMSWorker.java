@@ -180,7 +180,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     private final WMSMapDecoration mapDecoration;
 
     public DefaultWMSWorker(String id, File configurationDirectory) {
-        super(id, configurationDirectory);
+        super(id, configurationDirectory, ServiceDef.Specification.WMS);
         mapDecoration = new WMSMapDecoration(configurationDirectory);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);
@@ -265,15 +265,13 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
-        final String url = getServiceUrl() + "wms?";
-        
         final AbstractRequest request;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
             request = WMSConstant.REQUEST_111;
         } else {
             request = WMSConstant.REQUEST_130;
         }
-        request.updateURL(url);
+        request.updateURL(getServiceUrl());
         inCapabilities.getCapability().setRequest(request);
 
         final List<String> exceptionFormats;
@@ -432,7 +430,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             } else {
                 layerName = fullLayerName.getLocalPart();
             }
-            final String beginLegendUrl = url + "REQUEST=GetLegendGraphic&" +
+            final String beginLegendUrl = getServiceUrl() + "REQUEST=GetLegendGraphic&" +
                                                     "VERSION=1.1.1&" +
                                                     "FORMAT=";
             final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;

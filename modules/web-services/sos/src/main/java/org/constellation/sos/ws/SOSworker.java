@@ -50,6 +50,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.ServiceDef;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
@@ -310,7 +311,7 @@ public class SOSworker extends AbstractWorker {
      * Initialize the database connection.
      */
     public SOSworker(String id, File configurationDirectory) {
-        super(id, configurationDirectory);
+        super(id, configurationDirectory, ServiceDef.Specification.SOS);
         
         isStarted                      = true;
         SOSConfiguration configuration = null;
@@ -653,7 +654,7 @@ public class SOSworker extends AbstractWorker {
             }
 
             //we update the URL
-            om.updateURL(getServiceUrl(), SOS);
+            updateURL(om, getServiceUrl());
 
            if (!keepCapabilities) {
 

@@ -58,37 +58,37 @@ public class WCSRequestsTest extends AbstractTestRequest {
      * URLs which will be tested on the server.
      */
     private static final String WCS_FALSE_REQUEST =
-            "http://localhost:9090/default/wcs?request=SomethingElse";
+            "http://localhost:9090/wcs/default?request=SomethingElse";
 
     private static final String WCS_FALSE_REQUEST_100 =
-            "http://localhost:9090/default/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
+            "http://localhost:9090/wcs/default?request=GetCoverage&service=WCS&version=1.0.0&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "coverage=wrongLayer";
 
     private static final String WCS_FALSE_REQUEST_111 =
-            "http://localhost:9090/default/wcs?request=GetCoverage&service=WCS&version=1.1.1&" +
+            "http://localhost:9090/wcs/default?request=GetCoverage&service=WCS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=EPSG:4326&boundingbox=-180,-90,180,90,EPSG4326&" +
                                       "identifier=wrongLayer";
 
     private static final String WCS_GETCOVERAGE =
-            "http://localhost:9090/default/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
+            "http://localhost:9090/wcs/default?request=GetCoverage&service=WCS&version=1.0.0&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "coverage="+ LAYER_TEST;
 
     private static final String WCS_GETCOVERAGE_MATRIX =
-            "http://localhost:9090/default/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
+            "http://localhost:9090/wcs/default?request=GetCoverage&service=WCS&version=1.0.0&" +
                                       "format=matrix&width=1024&height=512&" +
                                       "crs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "coverage="+ LAYER_TEST;
 
     private static final String WCS_GETCAPABILITIES =
-            "http://localhost:9090/default/wcs?request=GetCapabilities&service=WCS&version=1.0.0";
+            "http://localhost:9090/wcs/default?request=GetCapabilities&service=WCS&version=1.0.0";
 
     private static final String WCS_DESCRIBECOVERAGE =
-            "http://localhost:9090/default/wcs?request=DescribeCoverage&coverage=SST_tests&service=wcs&version=1.0.0";
+            "http://localhost:9090/wcs/default?request=DescribeCoverage&coverage=SST_tests&service=wcs&version=1.0.0";
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.

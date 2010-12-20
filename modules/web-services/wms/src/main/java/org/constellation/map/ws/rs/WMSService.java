@@ -91,7 +91,7 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.1
  */
-@Path("{serviceId}/wms")
+@Path("wms/{serviceId}")
 @Singleton
 public class WMSService extends GridWebService<WMSWorker> {
     

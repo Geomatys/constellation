@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.ServiceDef.Specification;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 
 import org.geotoolkit.util.logging.Logging;
@@ -80,9 +81,12 @@ public abstract class AbstractWorker implements Worker {
      */
     private final String id;
 
-    public AbstractWorker(String id, File configurationDirectory) {
+    private final Specification specification;
+
+    public AbstractWorker(String id, File configurationDirectory, Specification specification) {
         this.id = id;
         this.configurationDirectory = configurationDirectory;
+        this.specification = specification;
     }
     
     /**
@@ -90,7 +94,7 @@ public abstract class AbstractWorker implements Worker {
      */
     @Override
     public void setServiceUrl(String serviceUrl) {
-        this.serviceUrl = serviceUrl + id + '/';
+        this.serviceUrl = serviceUrl + specification.toString().toLowerCase() + '/' + id;
     }
 
     /**
@@ -204,6 +208,32 @@ public abstract class AbstractWorker implements Worker {
         if (!isStarted) {
             throw new CstlServiceException("The service is not running!", OWSExceptionCode.NO_APPLICABLE_CODE);
         }
+    }
+
+    /**
+     * TODO temporary for 0.7
+     */
+    public void updateURL(org.geotoolkit.ows.xml.v100.OperationsMetadata om, String url) {
+        for (org.geotoolkit.ows.xml.v100.Operation op: om.getOperation()) {
+            for (org.geotoolkit.ows.xml.v100.DCP dcp: op.getDCP()) {
+                for (org.geotoolkit.ows.xml.v100.OnlineResourceType method:dcp.getHTTP().getGetOrPost()) {
+                    method.setHref(url + "?");
+                }
+            }
+       }
+    }
+
+    /**
+     * TODO temporary for 0.7
+     */
+    public void updateURL(org.geotoolkit.ows.xml.v110.OperationsMetadata om, String url) {
+        for (org.geotoolkit.ows.xml.v110.Operation op: om.getOperation()) {
+            for (org.geotoolkit.ows.xml.v110.DCP dcp: op.getDCP()) {
+                for (org.geotoolkit.ows.xml.v110.OnlineResourceType method:dcp.getHTTP().getGetOrPost()) {
+                    method.setHref(url + "?");
+                }
+            }
+       }
     }
     
 }

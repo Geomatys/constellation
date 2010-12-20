@@ -63,7 +63,7 @@
          </xsl:variable-->
 
 		<!-- Populate global variables from form data -->
-		<xsl:variable name="csw.capabilities.url">http://localhost:9090/default/csw?request=GetCapabilities&amp;service=CSW&amp;version=2.0.2</xsl:variable>
+		<xsl:variable name="csw.capabilities.url">http://localhost:9090/csw/default?request=GetCapabilities&amp;service=CSW&amp;version=2.0.2</xsl:variable>
 
 		<!-- Attempt to retrieve capabilities document -->
 		<xsl:variable name="csw.capabilities.doc">

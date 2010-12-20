@@ -129,7 +129,7 @@
  
             <xsl:variable name="wfs.GetCapabilities.document">
                 <ctl:request>
-                    <ctl:url>http://localhost:9090/default/wfs</ctl:url>
+                    <ctl:url>http://localhost:9090/wfs/default</ctl:url>
                     <ctl:method>get</ctl:method>
                     <ctl:param name="SERVICE">WFS</ctl:param>
                     <ctl:param name="VERSION">1.1.0</ctl:param>

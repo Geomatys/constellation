@@ -88,7 +88,7 @@ import static org.constellation.metadata.CSWConstants.*;
  * 
  * @author Guilhem Legal
  */
-@Path("{serviceId}/csw")
+@Path("csw/{serviceId}")
 @Singleton
 public class CSWService extends OGCWebService<CSWworker> {
     

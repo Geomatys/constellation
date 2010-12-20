@@ -60,7 +60,7 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-@Path("{serviceId}/wmts")
+@Path("wmts/{serviceId}")
 @Singleton
 public class WMTSService extends GridWebService<WMTSWorker> {
     

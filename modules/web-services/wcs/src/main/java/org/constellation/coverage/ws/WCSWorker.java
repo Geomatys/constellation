@@ -202,12 +202,15 @@ public final class WCSWorker extends LayerWorker {
             new HashMap<String,GetCapabilitiesResponse>();
 
     public WCSWorker(String id, File configurationDirectory) {
-        super(id, configurationDirectory);
+        super(id, configurationDirectory, ServiceDef.Specification.WCS);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WCS worker {0} running", id);
         }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     protected MarshallerPool getMarshallerPool() {
         return WCSMarshallerPool.getInstance();
@@ -655,7 +658,7 @@ public final class WCSWorker extends LayerWorker {
         {
             //we update the url in the static part.
             final Request req = WCSConstant.REQUEST_100;
-            final String url  = getServiceUrl() + "wcs?SERVICE=WCS&";
+            final String url  = getServiceUrl() + "?SERVICE=WCS&";
             req.updateURL(url);
             staticCapabilities.getCapability().setRequest(req);
         }
@@ -806,8 +809,8 @@ public final class WCSWorker extends LayerWorker {
         }
         if (requestedSections.contains("OperationsMetadata") || requestedSections.contains(all)) {
             om = WCSConstant.OPERATIONS_METADATA_111;
-            //we update the url in the static part.
-            om.updateURL(getServiceUrl(), ServiceDef.Specification.WCS.toString());
+            //we update the url in the static part. TODO
+            updateURL(om, getServiceUrl());
         }
         final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), null, null);
 

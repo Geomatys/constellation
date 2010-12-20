@@ -160,7 +160,7 @@
       <ctl:code>
          <xsl:variable name="capabilities">
             <ctl:request>
-               <ctl:url>http://localhost:9090/default/wms</ctl:url>
+               <ctl:url>http://localhost:9090/wms/default</ctl:url>
                <ctl:method>get</ctl:method>
                <ctl:param name="SERVICE">WMS</ctl:param>
                <ctl:param name="VERSION">1.3.0</ctl:param>

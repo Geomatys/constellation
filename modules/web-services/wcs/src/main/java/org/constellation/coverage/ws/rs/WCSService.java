@@ -93,7 +93,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * @author Cédric Briançon
  * @since 0.3
  */
-@Path("{serviceId}/wcs")
+@Path("wcs/{serviceId}")
 @Singleton
 public class WCSService extends GridWebService<WCSWorker> {
 

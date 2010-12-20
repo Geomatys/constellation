@@ -49,8 +49,8 @@
         <ows:Operation name="GetCapabilities">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
+                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="AcceptVersions">
@@ -66,8 +66,8 @@
         <ows:Operation name="DescribeFeatureType">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
+                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="outputFormat">
@@ -83,8 +83,8 @@
         <ows:Operation name="GetFeature">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
+                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="resultType">
@@ -107,7 +107,7 @@
         <ows:Operation name="Transaction">
             <ows:DCP>
                 <ows:HTTP>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/default/wfs?"/>
+                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
                 </ows:HTTP>
             </ows:DCP>
             <ows:Parameter name="inputFormat">

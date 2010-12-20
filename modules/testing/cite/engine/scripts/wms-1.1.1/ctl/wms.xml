@@ -255,7 +255,7 @@ longitude</td>
       <code>
          <xsl:variable name="VAR_WMS_CAPABILITIES">
             <request>
-               <url>http://localhost:9090/default/wms</url>
+               <url>http://localhost:9090/wms/default</url>
                <method>get</method>
                <param name="SERVICE">WMS</param>
                <param name="VERSION">1.1.1</param>

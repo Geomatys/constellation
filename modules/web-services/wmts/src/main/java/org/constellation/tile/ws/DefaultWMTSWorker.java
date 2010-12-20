@@ -151,7 +151,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      * Instanciates the working class for a SOAP client, that do request on a SOAP PEP service.
      */
     public DefaultWMTSWorker(String id, File configurationDirectory) {
-        super(id, configurationDirectory);
+        super(id, configurationDirectory, ServiceDef.Specification.WMTS);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMTS worker {0} running", id);
         }
@@ -247,7 +247,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
            om = WMTSConstant.OPERATIONS_METADATA;
 
            //we update the URL
-           om.updateURL(getServiceUrl(), "WMTS");
+           updateURL(om, getServiceUrl());
 
         }
 

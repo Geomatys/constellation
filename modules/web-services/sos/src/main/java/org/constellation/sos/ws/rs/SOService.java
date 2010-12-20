@@ -59,7 +59,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  *
  * @author Guilhem Legal
  */
-@Path("{serviceId}/sos")
+@Path("sos/{serviceId}")
 @Singleton
 public class SOService extends OGCWebService<SOSworker> {
 

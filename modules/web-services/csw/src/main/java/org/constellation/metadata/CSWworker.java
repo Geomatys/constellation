@@ -260,7 +260,7 @@ public class CSWworker extends AbstractWorker {
      *
      */
     public CSWworker(final String serviceID, File configDir, Automatic configuration) {
-        super(serviceID, configDir);
+        super(serviceID, configDir, ServiceDef.Specification.CSW);
         isStarted = true;
         try {
             //we look if the configuration have been specified
@@ -561,7 +561,7 @@ public class CSWworker extends AbstractWorker {
                 }
             
                 // we update the URL
-                om.updateURL(getServiceUrl(), CSW);
+                updateURL(om, getServiceUrl());
 
                 // we add the cascaded services (if there is some)
                 final DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");

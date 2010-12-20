@@ -51,7 +51,7 @@ public class GridCoverageWriter<T extends Entry> implements MessageBodyWriter<T>
         ImageWriter iowriter             = ImageIO.getImageWritersByFormatName("geotiff").next();
         /*System.out.println("iowriter:" + iowriter.getClass().getName());
         System.out.println("out:" + out.getClass().getName());*/
-        iowriter.setOutput(out);
+        iowriter.setOutput(ImageIO.createImageOutputStream(out));
         iowriter.write(null, iioimage, null);
 
         /*final ImageCoverageWriter writer = new ImageCoverageWriter();

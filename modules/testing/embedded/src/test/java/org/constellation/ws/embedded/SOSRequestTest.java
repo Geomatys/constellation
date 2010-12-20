@@ -44,9 +44,9 @@ import static org.junit.Assert.*;
  */
 public class SOSRequestTest extends AbstractTestRequest {
 
-    private static final String SOS_POST_URL = "http://localhost:9090/default/sos?";
+    private static final String SOS_POST_URL = "http://localhost:9090/sos/default?";
 
-    private static final String SOS_GETCAPABILITIES_URL = "http://localhost:9090/default/sos?request=GetCapabilities&service=SOS&version=1.0.0";
+    private static final String SOS_GETCAPABILITIES_URL = "http://localhost:9090/sos/default?request=GetCapabilities&service=SOS&version=1.0.0";
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.

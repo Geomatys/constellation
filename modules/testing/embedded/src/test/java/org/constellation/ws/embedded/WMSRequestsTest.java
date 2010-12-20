@@ -61,19 +61,19 @@ public class WMSRequestsTest extends AbstractTestRequest {
      * URLs which will be tested on the server.
      */
     private static final String WMS_GETCAPABILITIES =
-            "http://localhost:9090/default/wms?request=GetCapabilities&service=WMS&version=1.1.1";
+            "http://localhost:9090/wms/default?request=GetCapabilities&service=WMS&version=1.1.1";
 
     private static final String WMS_FALSE_REQUEST =
-            "http://localhost:9090/default/wms?request=SomethingElse";
+            "http://localhost:9090/wms/default?request=SomethingElse";
 
     private static final String WMS_GETMAP =
-            "http://localhost:9090/default/wms?request=GetMap&service=WMS&version=1.1.1&" +
+            "http://localhost:9090/wms/default?request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
 
     private static final String WMS_GETFEATUREINFO =
-            "http://localhost:9090/default/wms?request=GetFeatureInfo&service=WMS&version=1.1.1&" +
+            "http://localhost:9090/wms/default?request=GetFeatureInfo&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=&" +
@@ -81,23 +81,23 @@ public class WMSRequestsTest extends AbstractTestRequest {
                                       "X=300&Y=200";
 
     private static final String WMS_GETLEGENDGRAPHIC =
-            "http://localhost:9090/default/wms?request=GetLegendGraphic&service=wms&" +
+            "http://localhost:9090/wms/default?request=GetLegendGraphic&service=wms&" +
             "width=200&height=40&layer="+ LAYER_TEST +"&format=image/png&version=1.1.0";
 
     private static final String WMS_DESCRIBELAYER =
-            "http://localhost:9090/default/wms?request=DescribeLayer&service=WMS&" +
+            "http://localhost:9090/wms/default?request=DescribeLayer&service=WMS&" +
             "version=1.1.1&layers="+ LAYER_TEST;
 
-    private static final String WMS_GETMAP2 = "http://localhost:9090/default/wms?" +
+    private static final String WMS_GETMAP2 = "http://localhost:9090/wms/default?" +
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/png&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
-    private static final String WMS_GETMAP_BMP = "http://localhost:9090/default/wms?" +
+    private static final String WMS_GETMAP_BMP = "http://localhost:9090/wms/default?" +
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/bmp&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
-    private static final String WMS_GETMAP_PPM = "http://localhost:9090/default/wms?" +
+    private static final String WMS_GETMAP_PPM = "http://localhost:9090/wms/default?" +
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/x-portable-pixmap&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
-    private static final String WMS_GETMAP_GIF = "http://localhost:9090/default/wms?" +
+    private static final String WMS_GETMAP_GIF = "http://localhost:9090/wms/default?" +
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/gif&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
     
     /**

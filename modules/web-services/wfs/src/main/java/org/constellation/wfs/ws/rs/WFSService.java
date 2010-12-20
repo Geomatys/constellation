@@ -100,7 +100,7 @@ import static org.constellation.wfs.ws.WFSConstants.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@Path("{serviceId}/wfs")
+@Path("wfs/{serviceId}")
 @Singleton
 public class WFSService extends OGCWebService<WFSWorker> {
 
