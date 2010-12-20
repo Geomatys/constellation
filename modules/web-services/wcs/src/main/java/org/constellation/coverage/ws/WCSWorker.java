@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -121,6 +122,7 @@ import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.ows.xml.v110.MetadataType;
 import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
@@ -176,6 +178,22 @@ public final class WCSWorker extends LayerWorker {
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC);
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR);
     }
+
+    /*
+     * A list supported formats
+     *
+     */
+     private static final List<CodeListType> SUPPORTED_FORMATS_100 = new ArrayList<CodeListType>();
+     static {
+            SUPPORTED_FORMATS_100.add(new CodeListType("png"));
+            SUPPORTED_FORMATS_100.add(new CodeListType("gif"));
+            SUPPORTED_FORMATS_100.add(new CodeListType("jpeg"));
+            SUPPORTED_FORMATS_100.add(new CodeListType("bmp"));
+            SUPPORTED_FORMATS_100.add(new CodeListType("tiff"));
+            SUPPORTED_FORMATS_100.add(new CodeListType("geotiff"));
+            SUPPORTED_FORMATS_100.add(new CodeListType("matrix"));
+            SUPPORTED_FORMATS_100.add(new CodeListType("ascii-grid"));
+     }
 
     /**
      * Output responses of a GetCapabilities request.
@@ -309,21 +327,24 @@ public final class WCSWorker extends LayerWorker {
             }
             GridType grid = null;
             try {
-                RectifiedGrid brutGrid = coverageRef.getRectifiedGrid();
-                if (brutGrid != null) {
-                    grid = new RectifiedGridType(brutGrid);
-                    /*
-                     * UGLY PATCH : remove it when geotk will fill this data
-                     */
-                    if (grid.getDimension() == 0) {
-                        int dimension = brutGrid.getOffsetVectors().size();
-                        grid.setDimension(dimension);
-                    }
-                    if (grid.getAxisName().isEmpty()) {
-                        if (grid.getDimension() == 2) {
-                            grid.setAxisName(Arrays.asList("x", "y"));
-                        } else if (grid.getDimension() == 3) {
-                            grid.setAxisName(Arrays.asList("x", "y", "z"));
+                SpatialMetadata meta = coverageRef.getSpatialMetadata();
+                if (meta != null) {
+                    RectifiedGrid brutGrid =  meta.getInstanceForType(RectifiedGrid.class);
+                    if (brutGrid != null) {
+                        grid = new RectifiedGridType(brutGrid);
+                        /*
+                         * UGLY PATCH : remove it when geotk will fill this data
+                         */
+                        if (grid.getDimension() == 0) {
+                            int dimension = brutGrid.getOffsetVectors().size();
+                            grid.setDimension(dimension);
+                        }
+                        if (grid.getAxisName().isEmpty()) {
+                            if (grid.getDimension() == 2) {
+                                grid.setAxisName(Arrays.asList("x", "y"));
+                            } else if (grid.getDimension() == 3) {
+                                grid.setAxisName(Arrays.asList("x", "y", "z"));
+                            }
                         }
                     }
                 }
@@ -363,19 +384,11 @@ public final class WCSWorker extends LayerWorker {
             supCRS.addNativeCRSs(new CodeListType(nativeEnvelope.getSrsName()));
 
             // supported formats
-            final List<CodeListType> supportedFormats = new ArrayList<CodeListType>();
-            supportedFormats.add(new CodeListType("png"));
-            supportedFormats.add(new CodeListType("gif"));
-            supportedFormats.add(new CodeListType("jpeg"));
-            supportedFormats.add(new CodeListType("bmp"));
-            supportedFormats.add(new CodeListType("tiff"));
-            supportedFormats.add(new CodeListType("matrix"));
-            supportedFormats.add(new CodeListType("ascii-grid"));
             String nativeFormat = coverageRef.getImageFormat();
-            if(nativeFormat == null || nativeFormat.isEmpty()){
+            if (nativeFormat == null || nativeFormat.isEmpty()) {
                 nativeFormat = "unknown";
             }
-            final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, supportedFormats);
+            final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, SUPPORTED_FORMATS_100);
 
             //supported interpolations
             final SupportedInterpolationsType supInt = new SupportedInterpolationsType(
@@ -884,7 +897,7 @@ public final class WCSWorker extends LayerWorker {
      *
      * @throws CstlServiceException
      */
-    public RenderedImage getCoverage(final GetCoverage request) throws CstlServiceException {
+    public Object getCoverage(final GetCoverage request) throws CstlServiceException {
         isWorking();
         final String inputVersion = request.getVersion().toString();
         if (inputVersion == null) {
@@ -910,11 +923,17 @@ public final class WCSWorker extends LayerWorker {
                     KEY_COVERAGE.toLowerCase());
         }
         final Name tmpName = parseCoverageName(request.getCoverage());
-        final LayerDetails layerRef = getLayerReference(tmpName);
-        if (!layerRef.isQueryable(ServiceDef.Query.WCS_ALL) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
+        final LayerDetails tmplayerRef = getLayerReference(tmpName);
+        if (!tmplayerRef.isQueryable(ServiceDef.Query.WCS_ALL) || tmplayerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
-                    layerRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
+                    tmplayerRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
         }
+        if (!(tmplayerRef instanceof CoverageLayerDetails)) {
+                // Should not occurs, since we have previously verified the type of layer.
+                throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
+                        LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
+        }
+        CoverageLayerDetails layerRef = (CoverageLayerDetails) tmplayerRef;
 
         // we verify the interpolation method even if we don't use it
         if (request instanceof GetCoverageType) {
@@ -1036,6 +1055,9 @@ public final class WCSWorker extends LayerWorker {
             final int newHeight = (int) Math.round(envHeight / resy);
             size = new Dimension(newWidth, newHeight);
         }
+
+        final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
+
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (png, gif ...).
@@ -1044,7 +1066,6 @@ public final class WCSWorker extends LayerWorker {
         if ( format.equalsIgnoreCase(MATRIX) || format.equalsIgnoreCase(ASCII_GRID)) {
 
             //NOTE ADRIAN HACKED HERE
-            final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             final RenderedImage image;
             try {
                 final GridCoverage2D gridCov = layerRef.getCoverage(refEnvel, size, elevation, date);
@@ -1064,10 +1085,15 @@ public final class WCSWorker extends LayerWorker {
                                            INVALID_FORMAT, KEY_FORMAT.toLowerCase());
 
         } else if( format.equalsIgnoreCase(GEOTIFF) ){
-
-            throw new CstlServiceException(new IllegalArgumentException(
-                                               "Constellation does not support geotiff writing."),
-                                           INVALID_FORMAT, KEY_FORMAT.toLowerCase());
+            try {
+                final SpatialMetadata metadata = layerRef.getSpatialMetadata();
+                final GridCoverage2D coverage  = layerRef.getCoverage(refEnvel, size, elevation, date);
+                return new SimpleEntry(coverage, metadata);
+            } catch (IOException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            } catch (DataStoreException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
 
         } else {
             // We are in the case of an image format requested.
@@ -1075,7 +1101,7 @@ public final class WCSWorker extends LayerWorker {
 
             // SCENE
             final Map<String, Object> renderParameters = new HashMap<String, Object>();
-            final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
+            
             renderParameters.put(KEY_TIME, date);
             renderParameters.put("ELEVATION", elevation);
             final SceneDef sdef = new SceneDef();

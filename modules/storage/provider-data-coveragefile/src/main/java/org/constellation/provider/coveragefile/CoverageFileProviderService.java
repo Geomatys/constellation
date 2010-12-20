@@ -25,6 +25,7 @@ import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.image.io.plugin.GeoTiffImageReader;
+import org.geotoolkit.image.io.plugin.GeoTiffImageWriter;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.io.plugin.WorldFileImageWriter;
 
@@ -47,6 +48,7 @@ public class CoverageFileProviderService extends AbstractProviderService<Name,La
         WorldFileImageReader.Spi.registerDefaults(null);
         WorldFileImageWriter.Spi.registerDefaults(null);
         GeoTiffImageReader.Spi.registerDefaults(null);
+        GeoTiffImageWriter.Spi.registerDefaults(null);
         //DimapImageReader.Spi.registerDefaults(null);
     }
 

@@ -25,7 +25,6 @@ import org.geotoolkit.ows.xml.ExceptionResponse;
 import com.sun.jersey.spi.resource.Singleton;
 
 // J2SE dependencies
-import java.awt.image.RenderedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -196,9 +195,9 @@ public class WCSService extends GridWebService<WCSWorker> {
                         "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT,
                         KEY_FORMAT.toLowerCase());
                 }
-                final RenderedImage rendered = worker.getCoverage(getcov);
+                
                 format = getOutputFormat(format);
-                return Response.ok(rendered, format).build();
+                return Response.ok(worker.getCoverage(getcov), format).build();
             }
 
             throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",
@@ -233,6 +232,8 @@ public class WCSService extends GridWebService<WCSWorker> {
             format = MimeType.IMAGE_JPEG;
         } else if (format.equalsIgnoreCase(TIF) || format.equalsIgnoreCase(TIFF)) {
             format = MimeType.IMAGE_TIFF;
+        } else if (format.equalsIgnoreCase(GEOTIFF)) {
+            format = "image/geotiff";
         }
         return format;
     }

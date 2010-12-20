@@ -88,14 +88,8 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
      * Returns the rectified grid of this layer.
      */
     @Override
-    public RectifiedGrid getRectifiedGrid() throws DataStoreException {
-        SpatialMetadata meta = reader.getCoverageMetadata(0);
-        if (meta != null) {
-            return meta.getInstanceForType(RectifiedGrid.class);
-        } else {
-            LOGGER.log(Level.WARNING, "There is no coverage metadata for layer:{0}", name);
-        }
-        return null;
+    public SpatialMetadata getSpatialMetadata() throws DataStoreException {
+        return reader.getCoverageMetadata(0);
     }
 
 

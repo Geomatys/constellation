@@ -16,8 +16,8 @@
  */
 package org.constellation.provider;
 
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.storage.DataStoreException;
-import org.opengis.coverage.grid.RectifiedGrid;
 import org.opengis.geometry.Envelope;
 
 /**
@@ -45,7 +45,7 @@ public interface CoverageLayerDetails extends LayerDetails {
      */
     String getThematic();
 
-    RectifiedGrid getRectifiedGrid() throws DataStoreException;
+    SpatialMetadata getSpatialMetadata() throws DataStoreException;
 
     Envelope getEnvelope() throws DataStoreException;
 }

@@ -125,7 +125,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
                     final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
                     pos.add(new DirectPositionType(-180.0, -90.0));
                     pos.add(new DirectPositionType(180.0, 90.0));
-                    final EnvelopeEntry expectedEnvelope = new EnvelopeEntry(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
+                    final EnvelopeEntry expectedEnvelope = new EnvelopeEntry(pos, "EPSG:4326");
                     // Builds expected temporal domain
                     final List<TimePositionType> expectedTimes =
                             Collections.singletonList(new TimePositionType("2003-05-16T00:00:00Z"));
@@ -174,7 +174,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
                 LAYER_TEST, domain, null, null, new OutputType(MimeType.IMAGE_PNG, "CRS:84"));
 
         // Finally execute the request on the worker.
-        final RenderedImage image = WORKER.getCoverage(request);
+        final RenderedImage image = (RenderedImage) WORKER.getCoverage(request);
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
         assertEquals(image.getHeight(), 512);
