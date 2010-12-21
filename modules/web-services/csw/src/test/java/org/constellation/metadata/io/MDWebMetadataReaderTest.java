@@ -54,7 +54,7 @@ public class MDWebMetadataReaderTest {
 
     private static Automatic configuration;
 
-    private MDWebMetadataReader reader;
+    private static MDWebMetadataReader reader;
 
     private static MarshallerPool pool;
 
@@ -98,11 +98,14 @@ public class MDWebMetadataReaderTest {
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
         configuration = new Automatic("mdweb", bdd);
-
+        reader = new MDWebMetadataReader(configuration);
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        if (reader != null) {
+            reader.destroy();
+        }
         if (ds != null) {
             ds.shutdown();
         }
@@ -111,14 +114,11 @@ public class MDWebMetadataReaderTest {
     @Before
     public void setUp() throws Exception {
 
-        reader = new MDWebMetadataReader(configuration);
     }
 
     @After
     public void tearDown() throws Exception {
-        if (reader != null) {
-            reader.destroy();
-        }
+        
     }
 
     /**

@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -49,7 +50,9 @@ import org.constellation.generic.database.BDD;
 import org.constellation.util.ReflectionUtilities;
         
 // MDWeb dependencies
+import org.constellation.util.Util;
 import org.mdweb.model.schemas.CodeListElement;
+import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.Path;
 import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
@@ -59,6 +62,8 @@ import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Reader20;
 import org.mdweb.io.Reader;
+import org.mdweb.io.sql.AbstractReader;
+import org.mdweb.io.sql.v21.Reader21;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
@@ -72,9 +77,7 @@ import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
-import org.mdweb.io.sql.AbstractReader;
-import org.mdweb.io.sql.v21.Reader21;
-import org.mdweb.model.schemas.Classe;
+import org.geotoolkit.util.StringUtilities;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 
@@ -124,10 +127,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     private List<String> swePackage;
 
+
     /**
-     * A list of package containing the natureSDI implementation
+     * A map of standardName / List of package axtract from a properties file
      */
-    private List<String> natureSDIPackage;
+    private final Map<String, List<String>> extraPackage = new HashMap<String, List<String>>();
 
     /**
      * A list of package containing the GML implementation (JAXB binding not referencing)
@@ -282,11 +286,29 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                "org.geotoolkit.ogc.xml");
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
-        this.natureSDIPackage   = FileUtilities.searchSubPackage("org.geotoolkit.naturesdi");
         this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.metadata.imagery", "org.geotoolkit.metadata.iso.acquisition",
                                                                       "org.geotoolkit.metadata.iso.quality", "org.geotoolkit.metadata.iso.spatial",
                                                                       "org.geotoolkit.metadata.iso.lineage", "org.geotoolkit.metadata.iso.content",
                                                                       "org.opengis.metadata.acquisition", "org.opengis.metadata.content");
+        // we add the extra binding extracted from a properties file
+        try {
+            final InputStream extraIn = Util.getResourceAsStream("org/constellation/metadata/io/extra-package.properties");
+            if (extraIn != null) {
+                final Properties extraProperties = new Properties();
+                extraProperties.load(extraIn);
+                extraIn.close();
+                for (Entry<Object, Object> entry : extraProperties.entrySet()) {
+                    final String standardName = (String) entry.getKey();
+                    List<String> packageList  = StringUtilities.toStringList((String) entry.getValue());
+                    packageList               = FileUtilities.searchSubPackage(packageList.toArray(new String[packageList.size()]));
+                    extraPackage.put(standardName, packageList);
+                }
+            } else {
+                LOGGER.warning("Unable to find the extra-package properties file");
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "IO exception while reading extra package properties for MDW meta reader", ex);
+        }
     }
 
     /**
@@ -874,9 +896,6 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else if ("Ebrim v2.5".equals(standardName) || "Web Registry Service v0.9".equals(standardName)) {
             packagesName = ebrimV25Package;
 
-        } else if ("NATSDI".equals(standardName)) {
-            packagesName = natureSDIPackage;
-
         } else if ("SensorML".equals(standardName)) {
             packagesName = sensorMLPackage;
 
@@ -888,6 +907,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         } else if ("ISO 19115-2".equals(standardName)) {
             packagesName = geotkAcquisitionPackage;
+
+        } else if (extraPackage.containsKey(standardName)) {
+            packagesName = extraPackage.get(standardName);
 
         } else {
             if (!className.contains("Code") && !"DCPList".equals(className) && !"SV_CouplingType".equals(className) && !"AxisDirection".equals(className)) {

@@ -19,6 +19,8 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -34,7 +36,9 @@ import java.util.Locale;
 import java.util.Map;
 
 // JAXB dependencies
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Level;
 import javax.sql.DataSource;
@@ -121,6 +125,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     private final boolean noIndexation;
 
+    private final Map<Standard, List<Standard>> standardMapping = new HashMap<Standard, List<Standard>>();
+
     /**
      * Build a new metadata writer.
      * 
@@ -168,6 +174,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 noIndexation = false;
             }
 
+            initStandardMapping();
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while initializing the MDWeb writer:" +'\n'+
                                            "cause:" + ex.getMessage());
@@ -190,6 +197,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         try {
             this.mdRecordSet = getRecordSet(defaultrecordSet);
             this.defaultUser = mdWriter.getUser("admin");
+            initStandardMapping();
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while getting the catalog and user:" +'\n'+
                                            "cause:" + ex.getMessage());
@@ -203,7 +211,97 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         this.defaultUser = null;
         this.noIndexation = false;
     }
-    
+
+    private void initStandardMapping() {
+        // ISO 19115 and its sub standard (ISO 19119, 19110)
+        List<Standard> availableStandards = new ArrayList<Standard>();
+        availableStandards.add(Standard.ISO_19115_FRA);
+        availableStandards.add(Standard.ISO_19115);
+        availableStandards.add(Standard.ISO_19115_2);
+        availableStandards.add(Standard.ISO_19108);
+        availableStandards.add(Standard.ISO_19103);
+        availableStandards.add(Standard.ISO_19119);
+        availableStandards.add(Standard.ISO_19110);
+
+        /*final Standard nsdi = mdWriter.getStandard("NATSDI");
+            if (nsdi != null)  {
+                availableStandards.add(nsdi);
+            }*/
+        standardMapping.put(Standard.ISO_19115, availableStandards);
+
+        // CSW standard
+        availableStandards = new ArrayList<Standard>();
+        availableStandards.add(Standard.CSW);
+        availableStandards.add(Standard.DUBLINCORE);
+        availableStandards.add(Standard.DUBLINCORE_TERMS);
+        availableStandards.add(Standard.OWS);
+        standardMapping.put(Standard.CSW, availableStandards);
+
+        // Ebrim v3 standard
+        availableStandards = new ArrayList<Standard>();
+        availableStandards.add(Standard.EBRIM_V3);
+        availableStandards.add(Standard.CSW);
+        availableStandards.add(Standard.OGC_FILTER);
+        availableStandards.add(Standard.MDWEB);
+        standardMapping.put(Standard.EBRIM_V3, availableStandards);
+
+        // Ebrim v2.5 standard
+        availableStandards = new ArrayList<Standard>();
+        availableStandards.add(Standard.EBRIM_V2_5);
+        availableStandards.add(Standard.CSW);
+        availableStandards.add(Standard.OGC_FILTER);
+        availableStandards.add(Standard.MDWEB);
+        standardMapping.put(Standard.EBRIM_V2_5, availableStandards);
+
+        // SensorML standard
+        availableStandards.add(Standard.SENSORML);
+        availableStandards.add(Standard.SENSOR_WEB_ENABLEMENT);
+        availableStandards.add(Standard.ISO_19108);
+        standardMapping.put(Standard.SENSORML, availableStandards);
+
+        // we add the extra binding extracted from a properties file
+        try {
+            final InputStream extraIn = Util.getResourceAsStream("org/constellation/metadata/io/extra-standard.properties");
+            if (extraIn != null) {
+                final Properties extraProperties = new Properties();
+                extraProperties.load(extraIn);
+                extraIn.close();
+                for (Entry<Object, Object> entry : extraProperties.entrySet()) {
+                     String mainStandardName = (String) entry.getKey();
+                     mainStandardName = mainStandardName.replace('_', ' ');
+                    final Standard newMainStandard = mdWriter.getStandard(mainStandardName);
+                    if (newMainStandard == null) {
+                        LOGGER.log(Level.WARNING, "Unable to find the extra main standard:{0}", mainStandardName);
+                        continue;
+                    }
+                    final List<String> standardList  = StringUtilities.toStringList((String) entry.getValue());
+                    final List<Standard> standards   = new ArrayList<Standard>();
+                    for (String standardName : standardList) {
+                        Standard standard = mdWriter.getStandard(standardName);
+                        if (standard == null) {
+                            LOGGER.log(Level.WARNING, "Unable to find the extra standard:{0}", standardName);
+                        } else {
+                            standards.add(standard);
+                        }
+                    }
+                    if (standardMapping.containsKey(newMainStandard)) {
+                        final List<Standard> previousStandards = standardMapping.get(newMainStandard);
+                        previousStandards.addAll(standards);
+                        standardMapping.put(newMainStandard, previousStandards);
+                    } else {
+                        standardMapping.put(newMainStandard, standards);
+                    }
+                }
+            } else {
+                LOGGER.warning("Unable to find the extra-standard properties file");
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "IO exception while reading extra standard properties for MDW meta writer", ex);
+        } catch (MD_IOException ex) {
+            LOGGER.log(Level.WARNING, "MD_IO exception while reading extra standard properties for MDW meta writer", ex);
+        }
+    }
+
     // TODO move this to CSW implementation
     public RecordSet getRecordSet(String defaultRecordSet) throws MD_IOException {
         RecordSet cat = null;
@@ -724,51 +822,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             className = className.substring(0, className.length() - 5);
         }
         
-        final List<Standard> availableStandards = new ArrayList<Standard>();
-        
-        // ISO 19115 and its sub standard (ISO 19119, 19110)
-        if (Standard.ISO_19115.equals(mainStandard)) {
-            availableStandards.add(Standard.ISO_19115_FRA);
-            availableStandards.add(Standard.ISO_19115);
-            availableStandards.add(Standard.ISO_19115_2);
-            availableStandards.add(Standard.ISO_19108);
-            availableStandards.add(Standard.ISO_19103);
-            availableStandards.add(Standard.ISO_19119);
-            availableStandards.add(Standard.ISO_19110);
-            final Standard nsdi = mdWriter.getStandard("NATSDI");
-            if (nsdi != null)  {
-                availableStandards.add(nsdi);
-            }
-        
-        // CSW standard    
-        } else if (Standard.CSW.equals(mainStandard)) {
-            availableStandards.add(Standard.CSW);
-            availableStandards.add(Standard.DUBLINCORE);
-            availableStandards.add(Standard.DUBLINCORE_TERMS);
-            availableStandards.add(Standard.OWS);
-        
-        // Ebrim v3 standard    
-        } else if (Standard.EBRIM_V3.equals(mainStandard)) {
-            availableStandards.add(Standard.EBRIM_V3);
-            availableStandards.add(Standard.CSW);
-            availableStandards.add(Standard.OGC_FILTER);
-            availableStandards.add(Standard.MDWEB);
-            
-        // Ebrim v2.5 standard
-        } else if (Standard.EBRIM_V2_5.equals(mainStandard)) {
-            availableStandards.add(Standard.EBRIM_V2_5);
-            availableStandards.add(Standard.CSW);
-            availableStandards.add(Standard.OGC_FILTER);
-            availableStandards.add(Standard.MDWEB);
-        
-        // Ebrim v2.5 tandard
-        } else if (Standard.SENSORML.equals(mainStandard)) {
-            availableStandards.add(Standard.SENSORML);
-            availableStandards.add(Standard.SENSOR_WEB_ENABLEMENT);
-            availableStandards.add(Standard.ISO_19108);
-            
-
-        } else {
+        final List<Standard> availableStandards = standardMapping.get(mainStandard);
+        if (availableStandards == null) {
             throw new IllegalArgumentException("Unexpected Main standard: " + mainStandard);
         }
         
@@ -916,7 +971,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     /**
-     * Find an MDWeb Classe by extracting the GeoAPI UML annotation.
+     * Find an MDWeb Classe by extracting the GeoAPI UML annotation. (hope i can use this later)
      * 
      * @param object
      * @return
