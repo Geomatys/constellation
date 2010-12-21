@@ -66,6 +66,7 @@ public class MDWebMetadataWriterTest {
     public static void setUpClass() throws Exception {
         List<Class> classes = EBRIMClassesContext.getAllClassesList();
         classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
+        classes.add(org.geotoolkit.naturesdi.NATSDI_DataIdentification.class);
 
         pool = new AnchoredMarshallerPool(classes.toArray(new Class[]{}));
         CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) pool);
@@ -82,6 +83,7 @@ public class MDWebMetadataWriterTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115-2.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/Classe_Nature_SDI.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
@@ -317,6 +319,28 @@ public class MDWebMetadataWriterTest {
      *
      * @throws java.lang.Exception
      */
+    @Test
+    public void writeMetadataNsdiTest() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/nsdiMetadata.xml"));
+        writer.storeMetadata(absExpResult);
+        Object absResult = reader.getMetadata("14:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        DefaultMetadata result = (DefaultMetadata) absResult;
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/nsdiMetadata.xml"));
+
+        pool.release(unmarshaller);
+        metadataEquals(expResult,result);
+    }
+
+    /**
+     * Tests the storeMetadata method for SML data
+     *
+     * @throws java.lang.Exception
+     */
     @Ignore
     public void writeMetadata191152Test() throws Exception {
 
@@ -324,7 +348,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("14:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("15:CSWCat", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;

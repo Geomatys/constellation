@@ -64,6 +64,7 @@ public class MDWebMetadataReaderTest {
     public static void setUpClass() throws Exception {
         List<Class> classes = EBRIMClassesContext.getAllClassesList();
         classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
+        classes.add(org.geotoolkit.naturesdi.NATSDI_DataIdentification.class);
 
         pool = new AnchoredMarshallerPool(classes.toArray(new Class[]{}));
         CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) pool);
@@ -80,6 +81,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115-2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/Classe_Nature_SDI.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
@@ -266,6 +268,25 @@ public class MDWebMetadataReaderTest {
         Object result = reader.getMetadata("24:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
+
+        assertTrue(result instanceof DefaultMetadata);
+        metadataEquals(expResult, (DefaultMetadata)result);
+
+        pool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the getMetadata method for NATURE SDI data
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getMetadataNatSDITest() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("26:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/nsdiMetadata.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);

@@ -156,7 +156,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     protected Map<Value, Object> alreadyRead;
     
     /**
-     * A List of the already logged Missing MDWeb Classe.
+     * A List of the already logged missing MDWeb Classe.
      */
     private final List<String> classeNotFound = new ArrayList<String>();
 
