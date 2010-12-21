@@ -63,8 +63,8 @@ public class MDWebMetadataReaderTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         List<Class> classes = EBRIMClassesContext.getAllClassesList();
-        classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
-        classes.add(org.geotoolkit.naturesdi.NATSDI_DataIdentification.class);
+        //classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
+        //classes.add(org.geotoolkit.naturesdi.NATSDI_DataIdentification.class);
 
         pool = new AnchoredMarshallerPool(classes.toArray(new Class[]{}));
         CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) pool);
@@ -98,27 +98,34 @@ public class MDWebMetadataReaderTest {
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
         configuration = new Automatic("mdweb", bdd);
-        reader = new MDWebMetadataReader(configuration);
+        
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        if (reader != null) {
-            reader.destroy();
-        }
+        
         if (ds != null) {
             ds.shutdown();
         }
     }
 
+    /*
+     * TODO LOOK out for cache of CLasses in mdw meta reader
+     *
+     * SensorML timePeriod != iso timePeriod
+     *
+     */
+
     @Before
     public void setUp() throws Exception {
-
+        reader = new MDWebMetadataReader(configuration);
     }
 
     @After
     public void tearDown() throws Exception {
-        
+        if (reader != null) {
+            reader.destroy();
+        }
     }
 
     /**

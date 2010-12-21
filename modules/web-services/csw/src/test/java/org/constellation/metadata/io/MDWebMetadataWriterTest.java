@@ -65,8 +65,8 @@ public class MDWebMetadataWriterTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         List<Class> classes = EBRIMClassesContext.getAllClassesList();
-        classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
-        classes.add(org.geotoolkit.naturesdi.NATSDI_DataIdentification.class);
+        //classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
+        //classes.add(org.geotoolkit.naturesdi.NATSDI_DataIdentification.class);
 
         pool = new AnchoredMarshallerPool(classes.toArray(new Class[]{}));
         CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) pool);
