@@ -18,6 +18,7 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
@@ -32,11 +33,11 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
-import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.metadata.CSWTestUtils.*;
+import static org.constellation.metadata.CSWConstants.*;
 
 // geotoolkit dependencies
 import org.geotoolkit.metadata.iso.DefaultMetadata;
@@ -89,7 +90,6 @@ import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.csw.xml.TypeNames.*;
-import static org.constellation.metadata.CSWConstants.*;
 
 // GeoAPI dependencies
 import org.opengis.metadata.Datatype;
@@ -135,6 +135,11 @@ public class CSWworkerTest {
             pool.addAnchor("MEDATLAS ASCII", new URI("SDN:L241:1:MEDATLAS"));
         } catch (URISyntaxException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
+        } catch (IllegalStateException ex) {
+            // this exception happen when we try to put 2 twice the same anchor.
+            // for this test we call many times this method in a static instance (CSWMarshallerPool)
+            // so for now we do bnothing here
+            // TODO find a way to call this only one time in the CSW test
         }
     }
     /**

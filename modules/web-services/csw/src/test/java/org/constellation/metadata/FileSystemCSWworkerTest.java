@@ -27,9 +27,9 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.util.Util;
-import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.junit.*;
 
 /**
@@ -67,7 +67,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);
         }
 
-        pool = new AnchoredMarshallerPool(EBRIMClassesContext.getAllClasses());
+        pool = CSWMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         Unmarshaller u = pool.acquireUnmarshaller();

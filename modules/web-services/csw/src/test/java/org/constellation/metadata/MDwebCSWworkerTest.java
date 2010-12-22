@@ -27,13 +27,13 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.util.Util;
 
-import org.geotoolkit.csw.xml.CSWClassesContext;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 import org.junit.*;
 
@@ -84,7 +84,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             marshaller.marshal(configuration, configFile);
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);
         }
-        pool = new AnchoredMarshallerPool(CSWClassesContext.getAllClasses());
+        pool = CSWMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         Unmarshaller u = pool.acquireUnmarshaller();

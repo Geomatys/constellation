@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +39,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // Junit dependencies
-import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -48,7 +46,7 @@ import static org.junit.Assert.*;
 import org.constellation.util.Util;
 
 // geotoolkit dependencies
-import org.geotoolkit.csw.xml.CSWClassesContext;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.geotoolkit.internal.jaxb.text.AnchorType;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
@@ -87,6 +85,7 @@ import org.geotoolkit.temporal.object.DefaultPosition;
 import org.geotoolkit.util.SimpleInternationalString;
 
 // GeoAPI dependencies
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
@@ -127,9 +126,7 @@ public class MetadataUnmarshallTest {
 
     @BeforeClass
     public static void setUp() throws JAXBException, URISyntaxException {
-        final List<Class> classes = CSWClassesContext.FRA_CLASSES;
-        classes.add(DefaultMetadata.class);
-        testPool = new AnchoredMarshallerPool(classes.toArray(new Class[]{}));
+        testPool = CSWMarshallerPool.getInstance();
         CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) testPool);
     }
 

@@ -18,22 +18,21 @@
 
 package org.constellation.metadata.io;
 
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 import java.io.StringReader;
 import java.sql.Connection;
-import java.util.List;
 import javax.xml.bind.Unmarshaller;
 
 // cstl dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import static org.constellation.metadata.CSWTestUtils.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
@@ -62,11 +61,8 @@ public class MDWebMetadataReaderTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        List<Class> classes = EBRIMClassesContext.getAllClassesList();
-        //classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
-        //classes.add(org.geotoolkit.naturesdi.NATSDI_DataIdentification.class);
 
-        pool = new AnchoredMarshallerPool(classes.toArray(new Class[]{}));
+        pool = CSWMarshallerPool.getInstance();
         CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         final String url = "jdbc:derby:memory:MMRTest;create=true";
