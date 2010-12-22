@@ -764,7 +764,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 metaMap.put(attribName, param);
                 return true;
             } catch (IllegalArgumentException e) {
-                LOGGER.finer(e.getMessage());
+                LOGGER.log(Level.FINER, e.getMessage(), e);
                 switch (casee) {
 
                     case 0:

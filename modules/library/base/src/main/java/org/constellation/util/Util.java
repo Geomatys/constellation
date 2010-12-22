@@ -29,6 +29,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -91,8 +92,7 @@ public final class Util {
                     response = ((JAXBElement<?>) response).getValue();
                 }
             } catch (JAXBException ex) {
-                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
-                        "cause: " + ex.getMessage());
+                LOGGER.log(Level.SEVERE, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             }
         } catch (IOException ex) {
             LOGGER.severe("The Distant service have made an error");
@@ -116,10 +116,9 @@ public final class Util {
         } catch (IllegalArgumentException ex) {
             LOGGER.severe("IllegalArguement exeption in value()");
         } catch (InvocationTargetException ex) {
-            LOGGER.severe("Exception throw in the invokated getter value() " + '\n' +
-                       "Cause: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "Exception throw in the invokated getter value() \nCause: {0}", ex.getMessage());
         } catch (NoSuchMethodException ex) {
-           LOGGER.severe("no such method value() in " + enumeration.getClass().getSimpleName());
+           LOGGER.log(Level.SEVERE, "no such method value() in {0}", enumeration.getClass().getSimpleName());
         } catch (SecurityException ex) {
            LOGGER.severe("security Exception while getting the codelistElement in value() method");
         }

@@ -267,8 +267,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 extraProperties.load(extraIn);
                 extraIn.close();
                 for (Entry<Object, Object> entry : extraProperties.entrySet()) {
-                     String mainStandardName = (String) entry.getKey();
-                     mainStandardName = mainStandardName.replace('_', ' ');
+                    String mainStandardName = (String) entry.getKey();
+                    mainStandardName = mainStandardName.replace('_', ' ');
                     final Standard newMainStandard = mdWriter.getStandard(mainStandardName);
                     if (newMainStandard == null) {
                         LOGGER.log(Level.WARNING, "Unable to find the extra main standard:{0}", mainStandardName);
