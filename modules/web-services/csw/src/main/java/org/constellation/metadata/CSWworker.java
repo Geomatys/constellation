@@ -56,7 +56,7 @@ import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.jaxb.AnchoredMarshallerPool;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
