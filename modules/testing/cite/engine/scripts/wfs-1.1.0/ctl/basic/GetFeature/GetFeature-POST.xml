@@ -1181,7 +1181,7 @@
                     <ctl:message>FAILURE: Expected 5 sf:PrimitiveGeoFeature instances in response (<xsl:value-of select="$featureCount"/> were included)</ctl:message>
                     <ctl:fail/>
                   </xsl:if>
-                                  <xsl:variable name="expression">//@srsName='urn:ogc:def:crs:epsg:7.5.0.1:4326'</xsl:variable>
+                                  <xsl:variable name="expression">//@srsName='urn:ogc:def:crs:epsg:7.6:4326'</xsl:variable>
                                   <ctl:call-test name="ctl:assert-xpath">
                                                 <ctl:with-param name="expr" select="$expression"/>
                                                 <ctl:with-param name="doc" select="$request1"/>
@@ -1571,7 +1571,7 @@
                                                 <ctl:with-param name="expr" select="$expression"/>
                                                 <ctl:with-param name="doc" select="$request1"/>
                                         </ctl:call-test>
-                                        <xsl:variable name="expression">//@srsName='urn:ogc:def:crs:epsg:7.5.0.1:4326'</xsl:variable>
+                                        <xsl:variable name="expression">//@srsName='urn:ogc:def:crs:epsg:7.6:4326'</xsl:variable>
                                         <ctl:call-test name="ctl:assert-xpath">
                                                 <ctl:with-param name="expr" select="$expression"/>
                                                 <ctl:with-param name="doc" select="$request1"/>
@@ -4354,8 +4354,8 @@
                     <ctl:fail/>
                   </xsl:if>
                   <xsl:for-each select="$request1//@srsName">
-                    <xsl:if test=". != 'urn:ogc:def:crs:epsg:7.5.0.1:4326'">
-                                                <ctl:message>FAILURE: @srsName="<xsl:value-of select="."/>" does not match expected value ("urn:ogc:def:crs:epsg:7.5.0.1:4326")</ctl:message>
+                    <xsl:if test=". != 'urn:ogc:def:crs:epsg:7.6:4326'">
+                                                <ctl:message>FAILURE: @srsName="<xsl:value-of select="."/>" does not match expected value ("urn:ogc:def:crs:epsg:7.6:4326")</ctl:message>
                                                 <ctl:fail/>
                                         </xsl:if>
                   </xsl:for-each>
