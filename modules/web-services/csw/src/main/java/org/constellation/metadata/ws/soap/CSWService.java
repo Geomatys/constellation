@@ -20,7 +20,6 @@ package org.constellation.metadata.ws.soap;
 // J2SE dependencies 
 import java.io.File;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // JAX-WS dependencies
 import javax.jws.WebMethod;
@@ -30,11 +29,12 @@ import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 
 // constellation dependencies
+import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 
 //geotoolkit dependencies
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.ws.soap.OGCWebService;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordType;
@@ -55,39 +55,24 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
  */
 @WebService(name = "CSWService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
-public class CSWService {
+public class CSWService extends OGCWebService<CSWworker>{
     
     /**
-     * use for debugging purpose
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.costellation.metadata");
-    
-    /**
-     * a service worker
-     */
-    private CSWworker worker;
-
-    /**
-     * Initialize the database connection.
+     * Initialize the workers.
      */
     public CSWService() {
-       File configDirectory = ConfigDirectory.getConfigDirectory();
-       if (configDirectory != null && configDirectory.exists()) {
-            File serviceDirectory = new File(configDirectory, "CSW");
-            if (serviceDirectory.exists()) {
-                File instanceDirectory = new File(serviceDirectory, "default");
-                if (instanceDirectory.exists()) {
-                    worker = new CSWworker("default", instanceDirectory);
-                    //TODO find real url
-                    worker.setServiceUrl("http://localhost:8080/CSWServer/CSWService");
-                } else {
-                    LOGGER.log(Level.SEVERE, "The CSW service is not working!\nCause: The configuration directory has not been found");
-                }
-            }
-       }
-       
+      super(Specification.CSW);
+      LOGGER.log(Level.INFO, "CSW SOAP service running ({0} instances)\n", workersMap.size());
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected CSWworker createWorker(File instanceDirectory) {
+        return new CSWworker(instanceDirectory.getName(), instanceDirectory);
+    }
+
     /**
      * Web service operation describing the service and its capabilities.
      * 
@@ -99,6 +84,8 @@ public class CSWService {
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilitiesType requestCapabilities) throws SOAPServiceException  {
         try {
             LOGGER.info("received SOAP getCapabilities request");
+            final CSWworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.getCapabilities(requestCapabilities);
             
         } catch (CstlServiceException ex) {
@@ -113,6 +100,8 @@ public class CSWService {
     public GetDomainResponseType getDomain(@WebParam(name = "GetDomain") GetDomainType requestGetDomain) throws SOAPServiceException  {
         try {
             LOGGER.info("received SOAP GetDomain request");
+            final CSWworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return (GetDomainResponseType) worker.getDomain(requestGetDomain);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -128,6 +117,8 @@ public class CSWService {
     public GetRecordByIdResponseType getRecordById(@WebParam(name = "GetRecordById") GetRecordByIdType requestRecordById) throws SOAPServiceException {
         try {
             LOGGER.info("received SOAP getRecordById request");
+            final CSWworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return (GetRecordByIdResponseType) worker.getRecordById(requestRecordById);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -142,6 +133,8 @@ public class CSWService {
     public Object getRecords(@WebParam(name = "GetRecords") GetRecordsType requestRecords) throws SOAPServiceException {
         try {
             LOGGER.info("received SOAP getRecords request");
+            final CSWworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.getRecords(requestRecords);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -156,6 +149,8 @@ public class CSWService {
     public DescribeRecordResponseType describeRecord(@WebParam(name = "DescribeRecord") DescribeRecordType requestDescribeRecord) throws SOAPServiceException {
         try {
             LOGGER.info("received SOAP describeRecord request");
+            final CSWworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.describeRecord(requestDescribeRecord);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -170,6 +165,8 @@ public class CSWService {
     public HarvestResponseType harvest(@WebParam(name = "Harvest") HarvestType requestHarvest) throws SOAPServiceException {
         try {
             LOGGER.info("received SOAP harvest request");
+            final CSWworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.harvest(requestHarvest);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -184,6 +181,8 @@ public class CSWService {
     public TransactionResponseType transaction(@WebParam(name = "Transaction") TransactionType requestTransaction) throws SOAPServiceException {
         try {
             LOGGER.info("received SOAP transaction request");
+            final CSWworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.transaction(requestTransaction);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),

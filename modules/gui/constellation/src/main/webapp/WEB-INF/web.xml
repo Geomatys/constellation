@@ -54,7 +54,6 @@
     
 
     <!-- to enable the SOS service SOAP (in tomcat) uncomment the following servlet -->
-
     <!--listener>
         <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
     </listener>
@@ -66,7 +65,7 @@
     
     <servlet-mapping>
         <servlet-name>SOService</servlet-name>
-        <url-pattern>/SOService</url-pattern>
+        <url-pattern>/WS-SOAP/sos/*</url-pattern>
     </servlet-mapping-->
 
     <!-- to enable the CSW service SOAP (in tomcat) uncomment the following servlet -->
@@ -81,7 +80,22 @@
     
     <servlet-mapping>
         <servlet-name>CSWService</servlet-name>
-        <url-pattern>/CSWService</url-pattern>
+        <url-pattern>/WS-SOAP/sos/*</url-pattern>
+    </servlet-mapping-->
+
+    <!-- to enable the WMTS service SOAP (in tomcat) uncomment the following servlet -->
+    <!--listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>WMTSService</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>WMTSService</servlet-name>
+        <url-pattern>/WS-SOAP/wmts/*</url-pattern>
     </servlet-mapping-->
 
     

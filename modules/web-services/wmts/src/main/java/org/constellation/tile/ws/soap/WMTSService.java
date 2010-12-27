@@ -17,21 +17,20 @@
 package org.constellation.tile.ws.soap;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.tile.ws.DefaultWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
+import org.constellation.ws.soap.OGCWebService;
 import org.geotoolkit.util.ImageIOUtilities;
 import org.geotoolkit.wmts.xml.v100.BinaryPayload;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
@@ -52,35 +51,22 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
  */
 //@WebService(name = "WMTSpepRegion", serviceName = "WMTSpepRegion")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
-public class WMTSService {
-    /**
-     * The default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.tile.ws.soap");
-
-    /**
-     * The worker for the SOAP service.
-     */
-    protected WMTSWorker worker;
+public class WMTSService extends OGCWebService<WMTSWorker>{
 
     /**
      * Creates a WMTS SOAP service.
      */
     public WMTSService() {
-       File configDirectory = ConfigDirectory.getConfigDirectory();
-       if (configDirectory != null && configDirectory.exists()) {
-            File serviceDirectory = new File(configDirectory, "WMTS");
-            if (serviceDirectory.exists()) {
-                File instanceDirectory = new File(serviceDirectory, "default");
-                if (instanceDirectory.exists()) {
-                    worker = new DefaultWMTSWorker("default", instanceDirectory);
-                    //TODO find real url
-                    worker.setServiceUrl("http://localhost:8080/WMTSServer/WMTSService");
-                } else {
-                    LOGGER.log(Level.SEVERE, "The WMTS service is not working!\nCause: The configuration directory has not been found");
-                }
-            }
-       }
+       super(Specification.WMTS);
+       LOGGER.log(Level.INFO, "WMTS SOAP service running ({0} instances)\n", workersMap.size());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected WMTSWorker createWorker(File instanceDirectory) {
+        return new DefaultWMTSWorker(instanceDirectory.getName(), instanceDirectory);
     }
 
     /**
@@ -97,7 +83,8 @@ public class WMTSService {
     {
         try {
             LOGGER.info("received SOAP getCapabilities request");
-
+            final WMTSWorker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.getCapabilities(requestCapabilities);
 
         } catch (CstlServiceException ex) {
@@ -119,7 +106,8 @@ public class WMTSService {
     {
         try {
             LOGGER.info("received SOAP getFeatureInfo request");
-
+            final WMTSWorker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.getFeatureInfo(requestFeatureInfo);
 
         } catch (CstlServiceException ex) {

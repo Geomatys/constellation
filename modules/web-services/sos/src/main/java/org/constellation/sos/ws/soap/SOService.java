@@ -20,7 +20,6 @@ package org.constellation.sos.ws.soap;
 // JDK dependencies
 import java.io.File;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 // JAX-WS dependencies
@@ -32,11 +31,12 @@ import javax.jws.soap.SOAPBinding.ParameterStyle;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
-import org.constellation.configuration.ConfigDirectory;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.sos.ws.SOSworker;
 
 // Geotoolkit dependencies
+import org.constellation.ws.soap.OGCWebService;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
@@ -65,36 +65,22 @@ import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
              org.geotoolkit.sml.xml.v101.ObjectFactory.class,
              org.geotoolkit.sampling.xml.v100.ObjectFactory.class,
              org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
-public class SOService {
+public class SOService extends OGCWebService<SOSworker> {
     
     /**
-     * use for debugging purpose
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
-    
-    /**
-     * a service worker
-     */
-    private SOSworker worker;
-    
-    /**
-     * Initialize the database connection.
+     * Initialize the workers.
      */
     public SOService() throws CstlServiceException {
-       File configDirectory = ConfigDirectory.getConfigDirectory();
-       if (configDirectory != null && configDirectory.exists()) {
-            File serviceDirectory = new File(configDirectory, "SOS");
-            if (serviceDirectory.exists()) {
-                File instanceDirectory = new File(serviceDirectory, "default");
-                if (instanceDirectory.exists()) {
-                    worker = new SOSworker("default", instanceDirectory);
-                   //TODO find real url
-                    worker.setServiceUrl("http://localhost:8080/SOServer/SOService");
-                } else {
-                    LOGGER.log(Level.SEVERE, "The SOS service is not working!\nCause: The configuration directory has not been found");
-                }
-            }
-       }
+       super(Specification.SOS);
+       LOGGER.log(Level.INFO, "SOS SOAP service running ({0} instances)\n", workersMap.size());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected SOSworker createWorker(File instanceDirectory) {
+        return new SOSworker(instanceDirectory.getName(), instanceDirectory);
     }
     
     /**
@@ -108,6 +94,9 @@ public class SOService {
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities) throws SOServiceException  {
         try {
             LOGGER.info("received SOAP getCapabilities request");
+            final SOSworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
+            
             return worker.getCapabilities(requestCapabilities);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -125,6 +114,8 @@ public class SOService {
     public AbstractSensorML describeSensor(@WebParam(name = "DescribeSensor") DescribeSensor requestDescSensor) throws SOServiceException  {
         try {
             LOGGER.info("received SOAP DescribeSensor request");
+            final SOSworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.describeSensor(requestDescSensor);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -144,6 +135,8 @@ public class SOService {
     public ObservationCollectionEntry getObservation(@WebParam(name = "GetObservation") GetObservation requestObservation) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getObservation request");
+            final SOSworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return (ObservationCollectionEntry) worker.getObservation(requestObservation);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -162,6 +155,8 @@ public class SOService {
     public AbstractFeatureEntry getFeatureOfInterest(@WebParam(name = "GetFeatureOfInterest") GetFeatureOfInterest requestfeatureOfInterest) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getfeatureOfInterest request");
+            final SOSworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.getFeatureOfInterest(requestfeatureOfInterest);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -180,6 +175,8 @@ public class SOService {
     public AbstractTimePrimitiveType getFeatureOfInterestTime(@WebParam(name = "GetFeatureOfInterestTime") GetFeatureOfInterestTime requestfeatureOfInterestTime) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getfeatureOfInterest request");
+            final SOSworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.getFeatureOfInterestTime(requestfeatureOfInterestTime);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -196,6 +193,8 @@ public class SOService {
     public GetResultResponse getResult(@WebParam(name = "GetResult") GetResult requestResult) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getResult request");
+            final SOSworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.getResult(requestResult);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -215,6 +214,8 @@ public class SOService {
     public RegisterSensorResponse registerSensor(@WebParam(name = "RegisterSensor") RegisterSensor requestRegSensor) throws SOServiceException {
         try {
             LOGGER.info("received SOAP registerSensor request");
+            final SOSworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.registerSensor(requestRegSensor);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -233,6 +234,8 @@ public class SOService {
     public InsertObservationResponse insertObservation(@WebParam(name = "InsertObservation") InsertObservation requestInsObs) throws SOServiceException {
         try {
             LOGGER.info("received SOAP insertObservation request");
+            final SOSworker worker = getCurrentWorker();
+            worker.setServiceUrl(getServiceURL());
             return worker.insertObservation(requestInsObs);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
