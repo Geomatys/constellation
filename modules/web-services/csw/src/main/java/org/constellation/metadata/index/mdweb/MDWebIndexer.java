@@ -73,9 +73,19 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     private Reader mdWebReader;
 
+    /**
+     * main ebrim 3.0 classes
+     */
     private Classe identifiable;
 
+    /**
+     * main ebrim 2.5 classes
+     */
     private Classe registryObject;
+
+    private final boolean indexOnlyPusblishedMetadata;
+
+    private final boolean indexInternalRecordset;
 
     /**
      * Creates a new CSW indexer for a MDWeb database.
@@ -85,6 +95,10 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     public MDWebIndexer(Automatic configuration, String serviceID) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory(), INSPIRE_QUERYABLE);
+
+        this.indexOnlyPusblishedMetadata = configuration.getIndexOnlyPublishedMetadata();
+        this.indexInternalRecordset      = configuration.getIndexInternalRecordset();
+        
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
@@ -148,17 +162,22 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
             // getting the objects list and index avery item in the IndexWriter.
-            final List<RecordSet> cats       = mdWebReader.getRecordSets();
-            final List<RecordSet> catToIndex = new ArrayList<RecordSet>();
-            for (RecordSet r : cats) {
-                if (r.getExposure() != EXPOSURE.INTERNAL) {
-                    catToIndex.add(r);
-                } else {
-                    LOGGER.log(logLevel, "RecordSet:{0} is internal we exclude it.", r.getCode());
+            final List<RecordSet> cats = mdWebReader.getRecordSets();
+            final List<RecordSet> catToIndex;
+            if (indexInternalRecordset) {
+                catToIndex = cats;
+            } else {
+                catToIndex = new ArrayList<RecordSet>();
+                for (RecordSet r : cats) {
+                    if (r.getExposure() != EXPOSURE.INTERNAL) {
+                        catToIndex.add(r);
+                    } else {
+                        LOGGER.log(logLevel, "RecordSet:{0} is internal we exclude it.", r.getCode());
+                    }
                 }
             }
             nbRecordSets = cats.size();
-            final Set<Entry<Integer, RecordSet>> results = mdWebReader.getAllIdentifiers(catToIndex);
+            final Set<Entry<Integer, RecordSet>> results = mdWebReader.getAllIdentifiers(catToIndex, indexOnlyPusblishedMetadata);
             LOGGER.log(logLevel, "{0} forms to read.", results.size());
             for (Entry<Integer, RecordSet> entry : results) {
                 final Form form = mdWebReader.getForm(entry.getValue(), entry.getKey());

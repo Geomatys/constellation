@@ -105,6 +105,16 @@ public class Automatic {
     private String enableCache;
 
     /**
+     * Enable the indexation of pusblished/all metadata.
+     */
+    private Boolean indexOnlyPublishedMetadata;
+
+    /**
+     * Enable the indexation of internal recordset.
+     */
+    private Boolean indexInternalRecordset;
+
+    /**
      * Allow to store the mapping between MDWeb classes and GEOTK classes
      * in a properties file at the shutdown of the reader.
      */
@@ -546,6 +556,40 @@ public class Automatic {
         hash = 37 * hash + (this.noIndexation != null ? this.noIndexation.hashCode() : 0);
         hash = 37 * hash + (this.harvester != null ? this.harvester.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * @return the indexOnlyPublishedMetadata
+     */
+    public boolean getIndexOnlyPublishedMetadata() {
+        if (indexOnlyPublishedMetadata == null) {
+            return true;
+        }
+        return indexOnlyPublishedMetadata;
+    }
+
+    /**
+     * @param indexOnlyPublishedMetadata the indexOnlyPublishedMetadata to set
+     */
+    public void setIndexOnlyPublishedMetadata(Boolean indexOnlyPublishedMetadata) {
+        this.indexOnlyPublishedMetadata = indexOnlyPublishedMetadata;
+    }
+
+    /**
+     * @return the indexInternalRecordset
+     */
+    public boolean getIndexInternalRecordset() {
+        if (indexInternalRecordset == null) {
+            return false;
+        }
+        return indexInternalRecordset;
+    }
+
+    /**
+     * @param indexInternalRecordset the indexInternalRecordset to set
+     */
+    public void setIndexInternalRecordset(Boolean indexInternalRecordset) {
+        this.indexInternalRecordset = indexInternalRecordset;
     }
 
 }
