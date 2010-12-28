@@ -203,4 +203,54 @@ public class StaticMetadata {
         "</gmd:MD_Metadata>";
 
 
+        public static final String META_18 =
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "   <gmd:identificationInfo>" + '\n' +
+        "       <gmd:MD_DataIdentification>" + '\n' +
+        "           <gmd:extent>" + '\n' +
+        "               <gmd:EX_Extent>" + '\n' +
+        "                   <gmd:geographicElement>" + '\n' +
+        "                       <gmd:EX_BoundingPolygon>" + '\n' +
+        "                           <gmd:polygon>" + '\n' +
+        "                               <gml:Surface gml:id=\"id3142226\" srsName=\"http://eden.ign.fr/catalogue/cargene/20050620/crs/crs.xml#WGS84G\">" + '\n' +
+        "                                  <gml:patches>" + '\n' +
+        "                                    <gml:PolygonPatch>" + '\n' +
+        "                                      <gml:exterior>" + '\n' +
+        "                                        <gml:Ring>" + '\n' +
+        "                                          <gml:curveMember>" + '\n' +
+        "                                            <gml:Curve gml:id=\"curveid3142225\">" + '\n' +
+        "                                              <gml:segments>" + '\n' +
+        "                                                <gml:LineStringSegment>" + '\n' +
+        "                                                  <gml:pos>1.0 1.0</gml:pos>" + '\n' +
+        "                                                  <gml:pos>1.0 2.0</gml:pos>" + '\n' +
+        "                                                </gml:LineStringSegment>" + '\n' +
+        "                                               <gml:LineStringSegment>" + '\n' +
+        "                                                  <gml:pos>1.0 2.0</gml:pos>" + '\n' +
+        "                                                  <gml:pos>2.0 2.0</gml:pos>" + '\n' +
+        "                                                </gml:LineStringSegment>" + '\n' +
+        "                                                <gml:LineStringSegment>" + '\n' +
+        "                                                  <gml:pos>2.0 2.0</gml:pos>" + '\n' +
+        "                                                  <gml:pos>2.0 1.0</gml:pos>" + '\n' +
+        "                                                </gml:LineStringSegment>" + '\n' +
+        "                                                <gml:LineStringSegment>" + '\n' +
+        "                                                  <gml:pos>2.0 1.0</gml:pos>" + '\n' +
+        "                                                  <gml:pos>1.0 1.0</gml:pos>" + '\n' +
+        "                                                </gml:LineStringSegment>" + '\n' +
+        "                                              </gml:segments>" + '\n' +
+        "                                            </gml:Curve>" + '\n' +
+        "                                          </gml:curveMember>" + '\n' +
+        "                                        </gml:Ring>" + '\n' +
+        "                                      </gml:exterior>" + '\n' +
+        "                                    </gml:PolygonPatch>" + '\n' +
+        "                                  </gml:patches>" + '\n' +
+        "                                </gml:Surface>" + '\n' +
+        "                           </gmd:polygon>" + '\n' +
+        "                       </gmd:EX_BoundingPolygon>" + '\n' +
+        "                   </gmd:geographicElement>" + '\n' +
+        "               </gmd:EX_Extent>" + '\n' +
+        "           </gmd:extent>" + '\n' +
+        "       </gmd:MD_DataIdentification>" + '\n' +
+        "   </gmd:identificationInfo>" + '\n' +
+        "</gmd:MD_Metadata>";
+
 }

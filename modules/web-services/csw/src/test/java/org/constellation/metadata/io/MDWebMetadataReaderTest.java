@@ -219,6 +219,13 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
+        result = reader.getMetadata("27:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_18));
+
+        assertTrue(result instanceof DefaultMetadata);
+        metadataEquals(expResult, (DefaultMetadata)result);
+
         pool.release(unmarshaller);
     }
 
