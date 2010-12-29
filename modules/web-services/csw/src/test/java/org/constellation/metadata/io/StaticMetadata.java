@@ -265,4 +265,42 @@ public class StaticMetadata {
         "   </gmd:identificationInfo>" + '\n' +
         "</gmd:MD_Metadata>";
 
+        public static final String META_19 =
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "   <gmd:identificationInfo>" + '\n' +
+        "       <gmd:MD_DataIdentification>" + '\n' +
+        "           <gmd:extent>" + '\n' +
+        "               <gmd:EX_Extent>" + '\n' +
+        "                   <gmd:geographicElement>" + '\n' +
+        "                       <gmd:EX_BoundingPolygon>" + '\n' +
+        "                           <gmd:polygon>" + '\n' +
+        "                               <gml:Polygon srsName=\"EPSG:4326\">" + '\n' +
+        "                                   <gml:exterior>" + '\n' +
+        "                                       <gml:Ring>" + '\n' +
+        "                                          <gml:curveMember>" + '\n' +
+        "                                            <gml:Curve gml:id=\"curveid3142226\">" + '\n' +
+        "                                              <gml:segments>" + '\n' +
+        "                                                <gml:LineStringSegment>" + '\n' +
+        "                                                  <gml:pos>1.0 1.0</gml:pos>" + '\n' +
+        "                                                  <gml:pos>1.0 2.0</gml:pos>" + '\n' +
+        "                                                </gml:LineStringSegment>" + '\n' +
+        "                                               <gml:LineStringSegment>" + '\n' +
+        "                                                  <gml:pos>1.0 2.0</gml:pos>" + '\n' +
+        "                                                  <gml:pos>2.0 2.0</gml:pos>" + '\n' +
+        "                                                </gml:LineStringSegment>" + '\n' +
+        "                                              </gml:segments>" + '\n' +
+        "                                            </gml:Curve>" + '\n' +
+        "                                          </gml:curveMember>" + '\n' +
+        "                                        </gml:Ring>" + '\n' +
+        "                                     </gml:exterior>" + '\n' +
+        "                                </gml:Polygon>" + '\n' +
+        "                           </gmd:polygon>" + '\n' +
+        "                       </gmd:EX_BoundingPolygon>" + '\n' +
+        "                   </gmd:geographicElement>" + '\n' +
+        "               </gmd:EX_Extent>" + '\n' +
+        "           </gmd:extent>" + '\n' +
+        "       </gmd:MD_DataIdentification>" + '\n' +
+        "   </gmd:identificationInfo>" + '\n' +
+        "</gmd:MD_Metadata>";
+
 }

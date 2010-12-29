@@ -261,6 +261,16 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
+        /*
+         * Polygon
+         */
+        result = reader.getMetadata("30:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_19));
+
+        assertTrue(result instanceof DefaultMetadata);
+        metadataEquals(expResult, (DefaultMetadata)result);
+
         pool.release(unmarshaller);
     }
 
