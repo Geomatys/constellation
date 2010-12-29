@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import java.util.UUID;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import java.io.StringReader;
 import java.sql.Connection;
@@ -62,6 +63,7 @@ public class MDWebMetadataReaderTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
+        System.out.println(UUID.randomUUID());
         pool = CSWMarshallerPool.getInstance();
         CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) pool);
 
@@ -187,6 +189,9 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
+        /*
+         * Point coordinates
+         */
         result = reader.getMetadata("18:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_11));
@@ -194,7 +199,9 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
-
+        /*
+         * Point pos
+         */
         result = reader.getMetadata("19:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_12));
@@ -202,8 +209,9 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
-        
-
+        /*
+         * Curve posList
+         */
         result = reader.getMetadata("20:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_13));
@@ -212,6 +220,9 @@ public class MDWebMetadataReaderTest {
         metadataEquals(expResult, (DefaultMetadata)result);
 
 
+        /*
+         * LineString coordinates
+         */
         result = reader.getMetadata("21:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_14));
@@ -219,6 +230,30 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
+        /*
+         * MultiLineString
+         */
+        result = reader.getMetadata("28:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_15));
+
+        assertTrue(result instanceof DefaultMetadata);
+        metadataEquals(expResult, (DefaultMetadata)result);
+
+         /*
+         * MultiPoint
+         */
+        result = reader.getMetadata("29:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_16));
+
+        assertTrue(result instanceof DefaultMetadata);
+        metadataEquals(expResult, (DefaultMetadata)result);
+
+
+        /*
+         * Surface
+         */
         result = reader.getMetadata("27:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_18));

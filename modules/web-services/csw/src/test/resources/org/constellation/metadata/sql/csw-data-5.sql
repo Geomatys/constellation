@@ -377,7 +377,7 @@ INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard
 
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (21, 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4:polygon:coordinates:value', 1, 'CharacterString', 'ISO 19103', 'ISO 19115:MD_Metadata.1:identificationInfo.1:extent.1:geographicElement4.1:polygon.1:coordinates.1:value.1', '12.3 14.5');
 
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (22, 'CSWCat', '81a25c84-2bb0-4727-8f36-4a296e1e7b57','meta 15', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (22, 'CSWCat', '81a25c84-2bb0-4727-8f36-4a296e1e7b57','meta 17', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'NORMALFORM');
 
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (22, 'ISO 19115:MD_Metadata', 1, 'MD_Metadata', 'ISO 19115', 'ISO 19115:MD_Metadata.1');
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (22, 'ISO 19115:MD_Metadata:spatialRepresentationInfo', 1, 'MD_Georectified', 'ISO 19115', 'ISO 19115:MD_Metadata.1:spatialRepresentationInfo.1');
