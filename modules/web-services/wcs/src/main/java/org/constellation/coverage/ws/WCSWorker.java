@@ -126,6 +126,7 @@ import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
+import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.opengis.geometry.Envelope;
 import org.opengis.feature.type.Name;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -492,16 +493,34 @@ public final class WCSWorker extends LayerWorker {
                         inputGeoBox.getEastBoundLongitude(),
                         inputGeoBox.getNorthBoundLatitude());
                 bboxs.add(owsFactory.createWGS84BoundingBox(outputBBox));
-
-                final String crs = "EPSG:4326";
-                final BoundingBoxType outputBBox2 = new BoundingBoxType(crs,
-                        inputGeoBox.getWestBoundLongitude(),
-                        inputGeoBox.getSouthBoundLatitude(),
-                        inputGeoBox.getEastBoundLongitude(),
-                        inputGeoBox.getNorthBoundLatitude());
-
-                bboxs.add(owsFactory.createBoundingBox(outputBBox2));
             }
+            /*
+             * Spatial metadata
+             */
+            final BoundingBoxType nativeEnvelope;
+            try {
+                nativeEnvelope = new BoundingBoxType(coverageRef.getEnvelope());
+                bboxs.add(owsFactory.createBoundingBox(nativeEnvelope));
+            } catch (DataStoreException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+            }
+            GridCrsType grid = null;
+            try {
+                SpatialMetadata meta = coverageRef.getSpatialMetadata();
+                if (meta != null) {
+                    RectifiedGrid brutGrid =  meta.getInstanceForType(RectifiedGrid.class);
+                    if (brutGrid != null) {
+                        grid = new GridCrsType(brutGrid);
+                    }
+                }
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
+                
+            // spatial metadata
+            final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
+                    new org.geotoolkit.wcs.xml.v111.SpatialDomainType(bboxs, grid, null, null, null);
+            
 
             //general metadata
             final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
@@ -511,10 +530,6 @@ public final class WCSWorker extends LayerWorker {
             final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
             keywords.add(new KeywordsType(new LanguageStringType(ServiceDef.Specification.WCS.toString()),
                     new LanguageStringType(coverageName)));
-
-            // spatial metadata
-            final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
-                    new org.geotoolkit.wcs.xml.v111.SpatialDomainType(bboxs);
 
             // temporal metadata
             final List<Object> times = new ArrayList<Object>();
