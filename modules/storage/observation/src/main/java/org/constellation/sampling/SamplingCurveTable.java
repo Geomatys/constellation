@@ -192,7 +192,7 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
                     statement.statement.setString(indexOf(query.srsName), lineString.getSrsName());
 
                     linestrings = getLineStringTable();
-                    final List<DirectPositionType> positions = lineString.getPositions();
+                    final List<DirectPositionType> positions = lineString.getPos();
                     for (DirectPositionType position : positions) {
                         linestrings.getIdentifier(id, position);
                     }
