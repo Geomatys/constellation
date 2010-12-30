@@ -40,7 +40,7 @@ public class NavigationBean {
      * Debugging purpose
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.bean");
-    private static final String AUTH_FILE_PATH = "WEB-INF/authentication.properties";
+    static final String AUTH_FILE_PATH = "WEB-INF/authentication.properties";
     private static final String HOME_HREF = "pages/home.xhtml";
     private static final String SERVICES_HREF = "pages/services.xhtml";
     private static final String USERCONFIG_HREF = "pages/configuration.xhtml";

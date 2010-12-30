@@ -17,13 +17,20 @@
 
 package org.constellation.bean;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.Authenticator;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +69,7 @@ public class ConfigurationBean {
         servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
     }
     
-    public void restartServices() {
+    public void restartServices() throws IOException {
         LOGGER.info("GUI restart services");
         refreshServletRequest();
         final String url = getConfigurationURL() + "/WS/configuration?request=restart";
@@ -70,8 +77,18 @@ public class ConfigurationBean {
         performRequest(url);
     }
 
-    protected String performRequest(String url) {
+    private String performRequest(String url) {
         try {
+
+            final Properties properties = getProperties();
+            final String login = properties.getProperty("user");
+            final String passwd = properties.getProperty("passwd");
+            Authenticator.setDefault(new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(login, passwd.toCharArray());
+                }
+            });
 
             final URL source          = new URL(url);
             final URLConnection conec = source.openConnection();
@@ -94,5 +111,39 @@ public class ConfigurationBean {
             LOGGER.severe("IO exception: " + ex.getMessage());
         }
         return null;
+    }
+
+    private Properties getProperties() throws IOException {
+        final Properties properties = new Properties();
+        InputStream inputStream = null;
+        final FacesContext context = FacesContext.getCurrentInstance();
+        if (context != null) {
+            final ExternalContext externalContext = context.getExternalContext();
+            if (externalContext != null) {
+                final ServletContext sc = (ServletContext) externalContext.getContext();
+                if (sc != null) {
+                    try {
+                        inputStream = new FileInputStream(sc.getRealPath(NavigationBean.AUTH_FILE_PATH));
+                    } catch (FileNotFoundException e) {
+                        LOGGER.log(Level.SEVERE, "No configuration file found.");
+                    }
+                }
+            }
+        }
+
+        if (inputStream == null) {
+            inputStream = getClass().getResourceAsStream(NavigationBean.AUTH_FILE_PATH);
+        }
+
+        if (inputStream == null) {
+            LOGGER.log(Level.SEVERE, "No configuration file found. in resource");
+        } else {
+            try {
+                properties.load(inputStream);
+            } finally {
+                inputStream.close();
+            }
+        }
+        return properties;
     }
 }
