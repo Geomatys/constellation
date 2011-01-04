@@ -354,7 +354,16 @@
                 <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
                 <version>${mdweb-meta.version}</version>
             </dependency>
-
+	    <dependency>
+               <groupId>org.mdweb.metamodel</groupId>
+               <artifactId>mdweb-metamodel-lib-sql-data-gnc</artifactId>
+               <version>${mdweb-meta.version}</version>
+            </dependency>
+            <dependency>
+               <groupId>org.mdweb.metamodel</groupId>
+               <artifactId>mdweb-metamodel-lib-sql-data-natsdi</artifactId>
+               <version>${mdweb-meta.version}</version>
+            </dependency>
             <!-- GeoAPI -->
             <dependency>
                 <groupId>org.opengis</groupId>
