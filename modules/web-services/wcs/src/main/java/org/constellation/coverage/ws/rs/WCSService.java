@@ -32,7 +32,6 @@ import java.util.StringTokenizer;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -123,7 +122,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest, WCSWorker worker) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest, WCSWorker worker) {
         final UriInfo uriContext = getUriContext();
 
         ServiceDef serviceDef = null;

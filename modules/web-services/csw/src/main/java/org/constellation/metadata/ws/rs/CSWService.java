@@ -28,13 +28,11 @@ import java.util.StringTokenizer;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
-import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import org.apache.xml.serialize.XMLSerializer;
 
 //JAXB dependencies
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
@@ -136,7 +134,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      * {@inheritDoc}
      */
     @Override
-    protected Response treatIncomingRequest(final Object objectRequest, CSWworker worker) throws JAXBException {
+    protected Response treatIncomingRequest(final Object objectRequest, CSWworker worker) {
         ServiceDef serviceDef = null;
         
         try {

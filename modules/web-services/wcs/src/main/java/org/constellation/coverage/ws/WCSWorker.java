@@ -589,8 +589,7 @@ public final class WCSWorker extends LayerWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    public GetCapabilitiesResponse getCapabilities(GetCapabilities request)
-                                  throws JAXBException, CstlServiceException {
+    public GetCapabilitiesResponse getCapabilities(GetCapabilities request) throws CstlServiceException {
         isWorking();
         //we begin by extract the base attribute
         String version = request.getVersion().toString();
@@ -647,7 +646,7 @@ public final class WCSWorker extends LayerWorker {
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
     private GetCapabilitiesResponse getCapabilities100(final org.geotoolkit.wcs.xml.v100.GetCapabilitiesType request)
-            throws CstlServiceException, JAXBException {
+            throws CstlServiceException {
         /*
          * In WCS 1.0.0 the user can request only one section
          * ( or all by omitting the parameter section)
@@ -666,8 +665,12 @@ public final class WCSWorker extends LayerWorker {
         }
 
         // We unmarshall the static capabilities document.
-        final WCSCapabilitiesType staticCapabilities =
-                (WCSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
+        final WCSCapabilitiesType staticCapabilities;
+        try {
+            staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
+        } catch (JAXBException ex) {
+            throw new CstlServiceException(ex);
+        }
         
         if (requestedSection == null || "/WCS_Capabilities/Capability".equals(requestedSection) || "/".equals(requestedSection))
         {
@@ -790,10 +793,9 @@ public final class WCSWorker extends LayerWorker {
      * @return a WCSCapabilities XML document describing the capabilities of this service.
      *
      * @throws CstlServiceException
-     * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
     private Capabilities getCapabilities111(final org.geotoolkit.wcs.xml.v111.GetCapabilitiesType request)
-                                throws CstlServiceException, JAXBException {
+                                throws CstlServiceException {
         // First we try to extract only the requested section.
         List<String> requestedSections =
                 SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
@@ -809,7 +811,12 @@ public final class WCSWorker extends LayerWorker {
         }
 
         // We unmarshall the static capabilities document.
-        final Capabilities staticCapabilities = (Capabilities) getStaticCapabilitiesObject(ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
+        final Capabilities staticCapabilities;
+        try {
+            staticCapabilities = (Capabilities) getStaticCapabilitiesObject(ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
+        } catch (JAXBException ex) {
+            throw new CstlServiceException(ex);
+        }
         
         ServiceIdentification si = null;
         ServiceProvider sp       = null;

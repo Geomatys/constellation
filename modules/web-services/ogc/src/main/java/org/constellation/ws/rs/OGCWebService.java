@@ -26,7 +26,6 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.core.Response;
 
 // Constellation dependencies
-import javax.xml.bind.JAXBException;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
@@ -202,7 +201,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest) {
         try {
             final String serviceID = getParameter("serviceId", false);
             // request is send to the specified worker
@@ -212,34 +211,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 
             // administration a the instance
             } else if ("admin".equals(serviceID)){
-                final String request    = getParameter("request", true);
-                final String identifier = getParameter("id", false);
-                
-                // restart operation
-                if ("restart".equals(request)) {
-                    LOGGER.info("\nrefreshing the workers\n");
-                    specificRestart(identifier);
-                    if (identifier == null) {
-                        for (final Worker worker : workersMap.values()) {
-                            worker.destroy();
-                        }
-                        workersMap.clear();
-                        buildWorkerMap();
-                    } else {
-                        if (workersMap.containsKey(identifier)){
-                            Worker worker = workersMap.get(identifier);
-                            workersMap.remove(identifier);
-                            worker.destroy();
-                            buildWorker(identifier);
-                        } else {
-                            throw new CstlServiceException("There is no worker " +  identifier, INVALID_PARAMETER_VALUE, "id");
-                        }
-                    }
-                    return Response.ok(RESTART_ANCKNOWLEDEGEMENT, "text/xml").build();
-                } else {
-                    throw new CstlServiceException("The operation " +  request + " is not supported by the administration service",
-                        INVALID_PARAMETER_VALUE, "request");
-                }
+                return treatAdminRequest(objectRequest);
 
             // unbounded URL
             } else {
@@ -251,6 +223,45 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
     }
 
+    /**
+     * treat the request sent to the admin instance.
+     */
+    public Response treatAdminRequest(Object objectRequest) throws CstlServiceException {
+        final String request = getParameter("request", true);
+        final String identifier = getParameter("id", false);
+
+        // restart operation
+        if ("restart".equals(request)) {
+            LOGGER.info("\nrefreshing the workers\n");
+            specificRestart(identifier);
+            if (identifier == null) {
+                for (final Worker worker : workersMap.values()) {
+                    worker.destroy();
+                }
+                workersMap.clear();
+                buildWorkerMap();
+            } else {
+                if (workersMap.containsKey(identifier)) {
+                    Worker worker = workersMap.get(identifier);
+                    workersMap.remove(identifier);
+                    worker.destroy();
+                    buildWorker(identifier);
+                } else {
+                    throw new CstlServiceException("There is no worker " + identifier, INVALID_PARAMETER_VALUE, "id");
+                }
+            }
+            return Response.ok(RESTART_ANCKNOWLEDEGEMENT, "text/xml").build();
+        } else {
+            throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
+                    INVALID_PARAMETER_VALUE, "request");
+        }
+    }
+
+    /**
+     * Service specific task which has to be executed when a restart is asked.
+     * 
+     * @param identifier the instance indentifier or {@code null} for all the instance.
+     */
     protected void specificRestart(String identifier) {
         // do nothing in this implementation
     }
@@ -265,9 +276,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param worker the selected worker on whitch apply the request.
      * 
      * @return an xml response.
-     * @throw JAXBException
      */
-    protected abstract Response treatIncomingRequest(final Object objectRequest, W worker) throws JAXBException;
+    protected abstract Response treatIncomingRequest(final Object objectRequest, W worker);
 
     /**
      * Verify if the version is supported by this serviceType.

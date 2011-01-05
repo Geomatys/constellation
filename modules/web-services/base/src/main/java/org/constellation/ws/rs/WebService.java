@@ -222,7 +222,7 @@ public abstract class WebService {
      * @return a Response, either an image or an XML document depending on the
      *           user's request.
      */
-    public abstract Response treatIncomingRequest(Object objectRequest) throws JAXBException;
+    public abstract Response treatIncomingRequest(Object objectRequest);
 
     /**
      * This method is called at undeploy time
@@ -259,10 +259,9 @@ public abstract class WebService {
      * Treat the incoming GET request.
      *
      * @return an image or xml response.
-     * @throw JAXBException
      */
     @GET
-    public Response doGET() throws JAXBException  {
+    public Response doGET() {
         return treatIncomingRequest(null);
     }
 
@@ -271,11 +270,10 @@ public abstract class WebService {
      * for each parameters in the request it fill the httpContext.
      *
      * @return an image or xml response.
-     * @throw JAXBException
      */
     @POST
     @Consumes("application/x-www-form-urlencoded")
-    public Response doPOSTKvp(String request) throws JAXBException  {
+    public Response doPOSTKvp(String request){
         final StringTokenizer tokens = new StringTokenizer(request, "&");
         final StringBuilder log = new StringBuilder();
         while (tokens.hasMoreTokens()) {

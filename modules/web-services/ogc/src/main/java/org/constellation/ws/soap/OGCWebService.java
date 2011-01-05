@@ -185,6 +185,12 @@ public abstract class OGCWebService<W extends Worker> {
         return url.substring(url.lastIndexOf('/') + 1);
     }
 
+    /**
+     * Return the current worker dpecified by the url.
+     *
+     * @return
+     * @throws CstlServiceException
+     */
     protected W getCurrentWorker() throws CstlServiceException {
         final String serviceID = extractWorkerID();
         if (serviceID == null || !workersMap.containsKey(serviceID)) {

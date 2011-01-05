@@ -66,7 +66,7 @@ public class SOService extends OGCWebService<SOSworker> {
     /**
      * Build a new Restfull SOS service.
      */
-    public SOService() throws JAXBException, CstlServiceException {
+    public SOService() throws CstlServiceException {
         super(ServiceDef.SOS_1_0_0);
         setXMLContext(SOSMarshallerPool.getInstance());
         LOGGER.log(Level.INFO, "SOS REST service running ({0} instances)\n", workersMap.size());
@@ -85,7 +85,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest, SOSworker worker) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest, SOSworker worker) {
         ServiceDef serviceDef = null;
         try {
             worker.setServiceUrl(getServiceURL());

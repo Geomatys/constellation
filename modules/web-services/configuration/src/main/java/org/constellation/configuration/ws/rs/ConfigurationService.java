@@ -141,7 +141,7 @@ public final class ConfigurationService extends WebService  {
      * Handle the various types of requests made to the service.
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest) {
         Marshaller marshaller = null;
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
@@ -256,7 +256,11 @@ public final class ConfigurationService extends WebService  {
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
             
-        
+
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Error while marshalling the configuration service response", ex);
+            return Response.ok("<error>JAXB Exception</error>", MimeType.TEXT_XML).build();
+
         } catch (CstlServiceException ex) {
             final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),

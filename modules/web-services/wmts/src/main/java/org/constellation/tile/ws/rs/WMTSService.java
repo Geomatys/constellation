@@ -27,7 +27,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
 
 import org.constellation.ServiceDef;
 import org.constellation.ws.CstlServiceException;
@@ -91,7 +90,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(final Object objectRequest, WMTSWorker worker) throws JAXBException {
+    public Response treatIncomingRequest(final Object objectRequest, WMTSWorker worker) {
         ServiceDef serviceDef = null;
         try {
             if (worker == null) {

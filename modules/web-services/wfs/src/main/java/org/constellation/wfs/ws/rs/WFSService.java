@@ -146,7 +146,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest, WFSWorker worker) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest, WFSWorker worker) {
 
         ServiceDef version    = null;
 
