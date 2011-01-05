@@ -115,7 +115,12 @@
         <web-resource-collection>
             <web-resource-name>Constellation secured service</web-resource-name>
             <url-pattern>/WS/configuration</url-pattern>
-            <url-pattern>/WS/admin/*</url-pattern>
+            <url-pattern>/WS/wms/admin</url-pattern>
+            <url-pattern>/WS/wmts/admin</url-pattern>
+            <url-pattern>/WS/wcs/admin</url-pattern>
+            <url-pattern>/WS/csw/admin</url-pattern>
+            <url-pattern>/WS/sos/admin</url-pattern>
+            <url-pattern>/WS/wfs/admin</url-pattern>
             <http-method>GET</http-method>
             <http-method>POST</http-method>
         </web-resource-collection>
