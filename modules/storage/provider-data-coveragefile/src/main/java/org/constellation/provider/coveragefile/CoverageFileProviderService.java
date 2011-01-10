@@ -24,11 +24,6 @@ import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotoolkit.image.io.plugin.GeoTiffImageReader;
-import org.geotoolkit.image.io.plugin.GeoTiffImageWriter;
-import org.geotoolkit.image.io.plugin.WorldFileImageReader;
-import org.geotoolkit.image.io.plugin.WorldFileImageWriter;
-
 import org.opengis.feature.type.Name;
 
 import static org.constellation.provider.coveragefile.CoverageFileProvider.*;
@@ -42,15 +37,6 @@ import static org.constellation.provider.coveragefile.CoverageFileProvider.*;
 public class CoverageFileProviderService extends AbstractProviderService<Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
     private static final String ERROR_MSG = "[PROVIDER]> Invalid file coverage provider config";
-
-    static {
-        //load additional readers.
-        WorldFileImageReader.Spi.registerDefaults(null);
-        WorldFileImageWriter.Spi.registerDefaults(null);
-        GeoTiffImageReader.Spi.registerDefaults(null);
-        GeoTiffImageWriter.Spi.registerDefaults(null);
-        //DimapImageReader.Spi.registerDefaults(null);
-    }
 
     public CoverageFileProviderService(){
         super("coverage-file");

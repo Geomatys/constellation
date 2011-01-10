@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map.Entry;
+import javax.imageio.ImageIO;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -56,6 +57,8 @@ import org.geotoolkit.util.Versioned;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.internal.io.Installation;
+import org.geotoolkit.lang.Setup;
 import org.xml.sax.SAXException;
 
 
@@ -123,6 +126,20 @@ public abstract class WebService {
 
     static {
         Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
+
+        //Initialize geotoolkit
+        //TODO, this is not the best place since a service must be started
+        //to load everything, but what else do we have ?
+        Installation.allowSystemPreferences = false;
+        Setup.initialize(null);
+
+        ImageIO.scanForPlugins();
+        try {
+            Class.forName("javax.media.jai.JAI");
+        } catch (ClassNotFoundException ex) {
+            LOGGER.log(Level.SEVERE, "JAI librairies are not in the classpath. Please install it.\n "
+                    + ex.getLocalizedMessage(), ex);
+        }
     }
 
     /**
@@ -227,7 +244,9 @@ public abstract class WebService {
     /**
      * This method is called at undeploy time
      */
-    public abstract void destroy();
+    public void destroy(){
+        Setup.shutdown();
+    }
 
     /**
      * build an service Exception and marshall it into a StringWriter

@@ -24,10 +24,6 @@ import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotoolkit.image.io.plugin.GeoTiffImageReader;
-import org.geotoolkit.image.io.plugin.WorldFileImageReader;
-import org.geotoolkit.image.io.plugin.WorldFileImageWriter;
-
 import org.opengis.feature.type.Name;
 
 import static org.constellation.provider.coveragefile.CoverageMosaicProvider.*;
@@ -42,12 +38,6 @@ public class CoverageMosaicProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
     private static final String ERROR_MSG = "[PROVIDER]> Invalid mosaic coverage provider config";
-
-    static {
-        WorldFileImageReader.Spi.registerDefaults(null);
-        WorldFileImageWriter.Spi.registerDefaults(null);
-        GeoTiffImageReader.Spi.registerDefaults(null);
-    }
 
     public CoverageMosaicProviderService(){
         super("coverage-mosaic");

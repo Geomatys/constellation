@@ -17,16 +17,10 @@
  */
 package org.constellation.ws.rs;
 
-import java.util.logging.Level;
-import javax.imageio.ImageIO;
 import org.constellation.ServiceDef;
-import org.constellation.management.ConstellationsMBeans;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.Worker;
-import org.geotoolkit.image.jai.Registry;
-import org.geotoolkit.internal.io.Installation;
-
 
 /**
  * A Super class for WMS, WMTS, WFS and WCS Webservice.
@@ -37,22 +31,6 @@ import org.geotoolkit.internal.io.Installation;
  * @since 0.5
  */
 public abstract class GridWebService<W extends Worker> extends OGCWebService<W> {
-    static {
-        //register managed bean
-        ConstellationsMBeans.register();
-
-        //loading JAI codecs
-        Registry.setDefaultCodecPreferences();
-
-        Installation.allowSystemPreferences = false;
-        ImageIO.scanForPlugins();
-        try {
-            Class.forName("javax.media.jai.JAI");
-        } catch (ClassNotFoundException ex) {
-            LOGGER.log(Level.SEVERE, "JAI librairies are not in the classpath. Please install it.\n "
-                    + ex.getLocalizedMessage(), ex);
-        }
-    }
 
     public GridWebService(final ServiceDef... supportedVersions) {
         super(supportedVersions);

@@ -421,6 +421,7 @@ public final class ConfigurationService extends WebService  {
     @Override
     @PreDestroy
     public void destroy() {
+        super.destroy();
         LOGGER.info("Shutting down the REST Configuration service facade. Disposing " +
                 "all datastore instances.");
         if (cswConfigurer != null) {

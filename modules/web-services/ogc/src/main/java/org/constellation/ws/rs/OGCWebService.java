@@ -432,6 +432,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     @PreDestroy
     @Override
     public void destroy() {
+        super.destroy();
         LOGGER.log(Level.INFO, "Shutting down the REST {0} service facade.", supportedVersions.get(0).specification.name());
         for (final Worker worker : workersMap.values()) {
             worker.destroy();
