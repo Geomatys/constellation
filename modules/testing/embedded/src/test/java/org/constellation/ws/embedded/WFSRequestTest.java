@@ -18,6 +18,7 @@
 package org.constellation.ws.embedded;
 
 // JUnit dependencies
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
 import java.net.MalformedURLException;
 import java.io.File;
@@ -30,7 +31,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
-import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.InsertResultsType;
@@ -60,11 +60,14 @@ public class WFSRequestTest extends AbstractTestRequest {
             + "%3C/ogc:PropertyIsEqualTo%3E"
             + "%3C/ogc:Filter%3E";
 
+    private static String EPSG_VERSION;
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
+        EPSG_VERSION = CRS.getVersion("EPSG").toString();
         pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
             		  ":org.geotoolkit.gml.xml.v311"  +
@@ -171,6 +174,7 @@ public class WFSRequestTest extends AbstractTestRequest {
         String xmlResult    = getStringResponse(conec);
         String xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-1.xml");
 
+        xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
         assertEquals(xmlExpResult, xmlResult);
 
         // for a POST request
@@ -210,7 +214,8 @@ public class WFSRequestTest extends AbstractTestRequest {
         xmlResult    = getStringResponse(conec);
         
         xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-2.xml");
-
+        xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
+        
         assertEquals(xmlExpResult, xmlResult);
 
 
@@ -249,8 +254,8 @@ public class WFSRequestTest extends AbstractTestRequest {
         
         // Try to unmarshall something from the response returned by the server.
         xmlResult    = getStringResponse(conec);
-
         xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-3.xml");
+        xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         assertEquals(xmlExpResult, xmlResult);
 
