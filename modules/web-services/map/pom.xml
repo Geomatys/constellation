@@ -66,6 +66,10 @@
       <artifactId>cstl-engine-server</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-clients-core</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

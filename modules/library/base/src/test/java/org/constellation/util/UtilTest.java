@@ -18,14 +18,13 @@
 
 package org.constellation.util;
 
-// Junit dependencies
 import java.util.ArrayList;
 import java.util.List;
-import org.geotoolkit.client.util.RequestsUtilities;
-import org.geotoolkit.geometry.GeneralEnvelope;
+
 import org.geotoolkit.util.StringUtilities;
+
+// Junit dependencies
 import org.junit.*;
-import org.opengis.geometry.Envelope;
 import static org.junit.Assert.*;
 
 /**
@@ -243,35 +242,6 @@ public class UtilTest {
         expResult.add(s3);
 
         assertEquals(expResult, result);
-    }
-
-     /**
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void toBboxValueListTest() throws Exception {
-        double[] min = {20.0, 35.0};
-        double[] max = {110.0, 80.0};
-        Envelope envelope = new GeneralEnvelope(min, max);
-
-        String result    = RequestsUtilities.toBboxValue(envelope);
-        String expResult = "20.0,35.0,110.0,80.0";
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void toBooleanTest() throws Exception {
-
-        assertFalse(RequestsUtilities.toBoolean(null));
-        assertFalse(RequestsUtilities.toBoolean("whatever"));
-        assertFalse(RequestsUtilities.toBoolean("FALSE"));
-        assertFalse(RequestsUtilities.toBoolean("false"));
-
-        assertTrue(RequestsUtilities.toBoolean("true"));
-        assertTrue(RequestsUtilities.toBoolean("TRUE"));
     }
 
     /**
