@@ -1149,48 +1149,59 @@
                 </code>
         </test>
 
-        <test name="wfs:wfs-1.1.0-Basic-GetFeature-tc14.1">
-      <param name="wfs.GetFeature.post.url"/>
-      <assertion>The geometry representations in the response must correspond to the CRS specified in the @srsName attribute, or the service default if not specified or unknown. Use values as recommended in OGC 06-023 (e.g. 'urn:x-ogc:def:crs:EPSG:6.10.2:4326').</assertion>
-      <comment>GetFeature with the srs 'urn:x-ogc:def:crs:EPSG:4326'.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is a wfs:FeatureCollection document; (3)  the response srs must be that which was requested.</comment>
-      <link>wfs-1.1.0-Basic-GetFeature-atc8</link>
-      <link>OGC 04-094, 9.2, p.36</link>
-                <code>
+    <test name="wfs:wfs-1.1.0-Basic-GetFeature-tc14.1">
+        <param name="wfs.GetFeature.post.url"/>
+        <assertion>The geometry representations in the response must correspond to the CRS specified in the @srsName attribute, or the service default if not specified or unknown. Use values as recommended in OGC 06-023 (e.g. 'urn:x-ogc:def:crs:EPSG:6.10.2:4326').</assertion>
+        <comment>GetFeature with the srs 'urn:x-ogc:def:crs:EPSG:4326'.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is a wfs:FeatureCollection document; (3)  the response srs must be that which was requested.</comment>
+        <link>wfs-1.1.0-Basic-GetFeature-atc8</link>
+        <link>OGC 04-094, 9.2, p.36</link>
+        <code>
 
-                        <xsl:variable name="request1">
-                                <request>
-                                        <url>
-                                                <xsl:value-of select="$wfs.GetFeature.post.url"/>
-                                        </url>
-                                   <method>post</method>
-                                   <body>
-                                           <xi:include href="wfs-1.1.0-Basic-GetFeature-tc14.1.body.xml"/>
-                                   </body>
-                                        <p:XMLValidatingParser.GMLSF1/>
-                                </request>
-                        </xsl:variable>
+            <xsl:variable name="request1">
+                <request>
+                    <url>
+                        <xsl:value-of select="$wfs.GetFeature.post.url"/>
+                    </url>
+                    <method>post</method>
+                    <body>
+                        <xi:include href="wfs-1.1.0-Basic-GetFeature-tc14.1.body.xml"/>
+                    </body>
+                    <p:XMLValidatingParser.GMLSF1/>
+                </request>
+            </xsl:variable>
 
-                        <xsl:choose>
-                                <xsl:when test="not($request1/*)">
-                                <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
-                                        <ctl:fail/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                  <xsl:variable name="featureCount" select="count($request1//sf:PrimitiveGeoFeature)" />
-                  <xsl:if test="$featureCount lt 5">
-                    <ctl:message>FAILURE: Expected 5 sf:PrimitiveGeoFeature instances in response (<xsl:value-of select="$featureCount"/> were included)</ctl:message>
+            <xsl:choose>
+                <xsl:when test="not($request1/*)">
+                    <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
                     <ctl:fail/>
-                  </xsl:if>
-                                  <xsl:variable name="expression">//@srsName='urn:ogc:def:crs:epsg:7.6:4326'</xsl:variable>
-                                  <ctl:call-test name="ctl:assert-xpath">
-                                                <ctl:with-param name="expr" select="$expression"/>
-                                                <ctl:with-param name="doc" select="$request1"/>
-                                  </ctl:call-test>
-                                </xsl:otherwise>
-                        </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:variable name="featureCount" select="count($request1//sf:PrimitiveGeoFeature)" />
+                    <xsl:if test="$featureCount lt 5">
+                    <ctl:message>FAILURE: Expected 5 sf:PrimitiveGeoFeature instances in response (<xsl:value-of select="$featureCount"/> were included)</ctl:message>
+                        <ctl:fail/>
+                    </xsl:if>
+                    <xsl:for-each select="$request1">
+                        <xsl:if test="not(matches(//@srsName, 'urn:ogc:def:crs:epsg:.*:4326'))">
+                            <ctl:message>FAILURE: @srsName="<xsl:value-of select="//@srsName"/>" does not match expected value ("urn:ogc:def:crs:epsg:*:4326")</ctl:message>
+                            <ctl:fail/>
+                        </xsl:if>
+                        <xsl:if test="matches(//@srsName, 'urn:ogc:def:crs:epsg:.*:4325')">
+                            <ctl:message>FAILURE: @srsName="<xsl:value-of select="//@srsName"/>" match unexpected value ("urn:ogc:def:crs:epsg:*:4325")</ctl:message>
+                            <ctl:fail/>
+                        </xsl:if>
+                    </xsl:for-each>
 
-                </code>
-        </test>
+                    <!--xsl:variable name="expression">//@srsName='urn:ogc:def:crs:epsg:7.6:4326'</xsl:variable>
+                    <ctl:call-test name="ctl:assert-xpath">
+                        <ctl:with-param name="expr" select="$expression"/>
+                        <ctl:with-param name="doc" select="$request1"/>
+                    </ctl:call-test-->
+                </xsl:otherwise>
+            </xsl:choose>
+
+        </code>
+    </test>
 
         <test name="wfs:wfs-1.1.0-Basic-GetFeature-tc14.2">
       <param name="wfs.GetFeature.post.url"/>
@@ -1571,11 +1582,25 @@
                                                 <ctl:with-param name="expr" select="$expression"/>
                                                 <ctl:with-param name="doc" select="$request1"/>
                                         </ctl:call-test>
-                                        <xsl:variable name="expression">//@srsName='urn:ogc:def:crs:epsg:7.6:4326'</xsl:variable>
+                                        <xsl:for-each select="$request1">
+                                            <xsl:if test="not(matches(//@srsName, 'urn:ogc:def:crs:epsg:.*:4326'))">
+                                                <ctl:message>FAILURE: @srsName="
+                                                    <xsl:value-of select="//@srsName"/>" does not match expected value ("urn:ogc:def:crs:epsg:*:4326")
+                                                </ctl:message>
+                                                <ctl:fail/>
+                                            </xsl:if>
+                                            <xsl:if test="matches(//@srsName, 'urn:ogc:def:crs:epsg:.*:4325')">
+                                                <ctl:message>FAILURE: @srsName="
+                                                    <xsl:value-of select="//@srsName"/>" match unexpected value ("urn:ogc:def:crs:epsg:*:4325")
+                                                </ctl:message>
+                                                <ctl:fail/>
+                                            </xsl:if>
+                                        </xsl:for-each>
+                                        <!--xsl:variable name="expression">//@srsName='urn:ogc:def:crs:epsg:7.6:4326'</xsl:variable>
                                         <ctl:call-test name="ctl:assert-xpath">
                                                 <ctl:with-param name="expr" select="$expression"/>
                                                 <ctl:with-param name="doc" select="$request1"/>
-                                        </ctl:call-test>
+                                        </ctl:call-test-->
                                 </xsl:otherwise>
                         </xsl:choose>
 
@@ -4329,39 +4354,43 @@
       <comment>GetFeature spatial query, with an srsName specified (default), and the response should use the requested SRS.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an wfs:FeatureCollection document; (3) the response shall use the default srs value requested.</comment>
       <link>filter-1.1.0-spatial-</link>
       <link>OGC 04-095, 8.3, p.11</link>
-                <code>
-                        <xsl:variable name="request1">
-                                <request>
-                                        <url>
-                                                <xsl:value-of select="$wfs.GetFeature.post.url"/>
-                                        </url>
-                                   <method>post</method>
-                                   <body>
-                                           <xi:include href="wfs-1.1.0-Basic-GetFeature-tc49.1.body.xml"/>
-                                        </body>
-                                        <p:XMLValidatingParser.GMLSF1/>
-                                </request>
-                        </xsl:variable>
+        <code>
+            <xsl:variable name="request1">
+                <request>
+                    <url>
+                        <xsl:value-of select="$wfs.GetFeature.post.url"/>
+                    </url>
+                    <method>post</method>
+                    <body>
+                        <xi:include href="wfs-1.1.0-Basic-GetFeature-tc49.1.body.xml"/>
+                    </body>
+                    <p:XMLValidatingParser.GMLSF1/>
+                </request>
+            </xsl:variable>
 
-                        <xsl:choose>
-                                <xsl:when test="not($request1/*)">
-                                <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
-                                        <ctl:fail/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                  <xsl:if test="count($request1//sf:PrimitiveGeoFeature) lt 1">
+            <xsl:choose>
+                <xsl:when test="not($request1/*)">
+                    <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
+                    <ctl:fail/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:if test="count($request1//sf:PrimitiveGeoFeature) lt 1">
                     <ctl:message>FAILURE: Empty response</ctl:message>
                     <ctl:fail/>
                   </xsl:if>
-                  <xsl:for-each select="$request1//@srsName">
-                    <xsl:if test=". != 'urn:ogc:def:crs:epsg:7.6:4326'">
-                                                <ctl:message>FAILURE: @srsName="<xsl:value-of select="."/>" does not match expected value ("urn:ogc:def:crs:epsg:7.6:4326")</ctl:message>
-                                                <ctl:fail/>
-                                        </xsl:if>
-                  </xsl:for-each>
-                                </xsl:otherwise>
-                        </xsl:choose>
-                </code>
+                    <xsl:for-each select="$request1//@srsName">
+                        <xsl:if test="matches(., 'urn:ogc:def:crs:epsg:.*:4325')">
+                            <ctl:message>FAILURE: @srsName="<xsl:value-of select="."/>" match unexpected value ("urn:ogc:def:crs:epsg:*:4325")</ctl:message>
+                            <ctl:fail/>
+                        </xsl:if>
+                        <xsl:if test="not(matches(., 'urn:ogc:def:crs:epsg:.*:4326'))">
+                            <ctl:message>FAILURE: @srsName="<xsl:value-of select="."/>" does not match expected value ("urn:ogc:def:crs:epsg:*:4326")</ctl:message>
+                            <ctl:fail/>
+                        </xsl:if>
+                    </xsl:for-each>
+                </xsl:otherwise>
+            </xsl:choose>
+        </code>
         </test>
 
    <test name="wfs:wfs-1.1.0-Basic-GetFeature-tc51.1">
