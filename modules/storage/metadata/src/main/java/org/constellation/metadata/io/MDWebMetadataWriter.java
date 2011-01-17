@@ -812,7 +812,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                        && !"AssociationType".equals(className)
                                        && !"InitiativeType".equals(className)
                                        && !"DimensionNameType".equals(className)
-                                       && !"GNC_RelationType"equals(className)
+                                       && !"GNC_RelationType".equals(className)
                                        && !"CoverageContentType".equals(className)
                                        && !"TransferFunctionType".equals(className)
                                        && !"CodeType".equals(className)) {
