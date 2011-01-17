@@ -26,7 +26,6 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -209,7 +208,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
      * @return An array containing: the number of inserted records, the number of updated records and the number of deleted records.
      */
     @Override
-    public int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, CstlServiceException, SQLException {
+    public int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, CstlServiceException {
         
         if (metadataWriter == null)
             throw new CstlServiceException("The Service can not write into the database",
