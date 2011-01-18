@@ -17,6 +17,8 @@
 package org.constellation.metadata.harvest;
 
 // J2SE dependencies
+import java.io.BufferedInputStream;
+import java.io.InputStreamReader;
 import org.constellation.metadata.DistributedResults;
 import java.io.IOException;
 import java.io.InputStream;
@@ -653,14 +655,53 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 wr.write(xmlRequest);
                 wr.flush();
             }
-        
-            // we get the response document
-            final InputStream in   = conec.getInputStream();
+
+            /*
+             * 4.2- Check if it is XML, first line must start with '<?xml'
+             */
+            conec.setReadTimeout(20000);
+            InputStream in = conec.getInputStream();
+            if (!in.markSupported()) {
+                in = new BufferedInputStream(in);
+            }
+            in.mark(60);
+            final StringWriter firstBlock = new StringWriter();
+            final byte[] firstbuffer = new byte[60];
+            firstBlock.write(new String(firstbuffer, 0, in.read(firstbuffer, 0, 60)));
+            String first = firstBlock.toString();
+            if (!first.startsWith("<?xml version=\"1.0\"")) {
+                throw new CstlServiceException("The response when communicating with " + sourceURL + "  is not a valid XML format !");
+            }
+
+
+            /*
+             * 4.3- Find encoding and convert to string,
+             * @TODO at first we need to use a string here because there are several usecases to apply some fix for special catalogs
+             * but it could be better to use a filter writer
+             */
+            String encoding = "UTF-8";
+            if (first != null && first.indexOf("encoding=\"") != -1) {
+                final String temp = first.substring(first.indexOf("encoding=\"") + 10);
+                encoding = temp.substring(0, temp.indexOf("\""));
+            }
+
+            LOGGER.info("response encoding : "+encoding);
+
+            /*
+             * 4.4- Return string or unmarshalled object depending on if the MarshallerPool mpool is null
+             */
+            //we must use a string because we have a fix for no standard catalogs
+            //@TODO use a FilterReader/Writer to apply the fix per lines when reading the response instead of passing by a string.
+
+            in.reset();
+            InputStreamReader conv = new InputStreamReader(in, encoding);
+
+            
             final StringWriter out = new StringWriter();
-            final byte[] buffer    = new byte[1024];
+            char[] buffer          = new char[1024];
             int size;
 
-            while ((size = in.read(buffer, 0, 1024)) > 0) {
+            while ((size = conv.read(buffer, 0, 1024)) > 0) {
                 out.write(new String(buffer, 0, size));
             }
 
