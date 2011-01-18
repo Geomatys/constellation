@@ -34,8 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-// JAXB dependencies
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Properties;
@@ -77,6 +75,7 @@ import org.mdweb.io.sql.v21.Writer21;
 import org.mdweb.model.storage.FormInfo;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
 import org.opengis.annotation.UML;
+import org.opengis.metadata.Metadata;
 
 /**
  *
@@ -1062,19 +1061,32 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
         }
-        
+
         // we create a MDWeb form form the object
         Form form = null;
         try {
+            final Profile profile;
+            // we try to determine the profile for the Object
+            if ("org.geotoolkit.csw.xml.v202.RecordType".equals(obj.getClass().getName())) {
+                profile = mdWriter.getProfile("DublinCore");
+            } else if (obj instanceof Metadata) {
+                profile = mdWriter.getProfileByUrn(Utils.findStandardName(obj));
+            } else {
+                profile = null;
+            }
+
             final long startTrans = System.currentTimeMillis();
             form                  = getFormFromObject(obj, title);
             transTime             = System.currentTimeMillis() - startTrans;
+	    if (profile != null) {
+	        form.setProfile(profile);
+            }
             
         } catch (IllegalArgumentException e) {
              throw new MetadataIoException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
                                            "cause: " + e.getMessage(), e, null);
         } catch (MD_IOException e) {
-             throw new MetadataIoException("The service has throw an SQLException while writing the metadata: " + e.getMessage());
+             throw new MetadataIoException("The service has throw an SQLException while transforming the metadata to a MDWeb object: " + e.getMessage(), e, null);
         }
         
         // and we store it in the database

@@ -102,6 +102,36 @@ public class Utils {
     }
 
     /**
+      * This method try to find a standard name for this object.
+      * if the object is a ISO19115:Metadata we know were to search,
+      *
+      * @param obj the object for which we want a title.
+      *
+      * @return the founded standard name or {@code null}
+      */
+    public static String findStandardName(Object obj) {
+
+        //here we try to get the title
+        String standardName = null;
+
+        final List<String> paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:metadataStandardName");
+        
+        for (String path : paths) {
+            Object value = ReflectionUtilities.getValuesFromPath(path, obj);
+            if (value instanceof String) {
+                standardName = (String) value;
+                // we stop when we have found a response
+                break;
+            } else if (value != null){
+                LOGGER.finer("FIND Standard name => unexpected String type: " + value.getClass().getName() + "\ncurrentPath:" + path);
+            }
+        }
+        return standardName;
+    }
+
+
+    /**
      * This method try to find an Identifier for this object.
      *  we try to find a getId(), getIdentifier() or getFileIdentifier() method.
      *
