@@ -76,6 +76,7 @@ import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
@@ -758,10 +759,11 @@ public class CSWworkerTest {
         RecordType customResult4 = null;
         RecordType customResult5 = null;
 
-        for (JAXBElement ob : result.getSearchResults().getAbstractRecord()) {
-            obj = ((JAXBElement) ob).getValue();
-            assertTrue(obj instanceof RecordType);
-            RecordType r = (RecordType)obj;
+        List<? extends AbstractRecordType> records = result.getSearchResults().getAbstractRecord();
+        for (AbstractRecordType rec : records) {
+            
+            assertTrue(rec instanceof RecordType);
+            RecordType r = (RecordType)rec;
             if (r.getIdentifier().getContent().get(0).equals("42292_9s_19900610041000")){
                 customResult2 = r;
             } else if (r.getIdentifier().getContent().get(0).equals("40510_145_19930221211500")){
