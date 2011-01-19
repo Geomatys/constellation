@@ -285,7 +285,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                     final GetRecordsResponse serviceResponse = (GetRecordsResponse) harvested;
                     final SearchResults results              = serviceResponse.getSearchResults();
                     final List<Object> records               = results.getAny();
-                    records.add(results.getAbstractRecord());
+                    records.addAll(results.getAbstractRecord());
                     
                     //we looking for CSW record
                     for (Object record: records) {
