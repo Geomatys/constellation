@@ -17,6 +17,9 @@
 package org.constellation.metadata.harvest;
 
 // J2SE dependencies
+import org.geotoolkit.csw.xml.AbstractRecord;
+import org.geotoolkit.csw.xml.SearchResults;
+import org.geotoolkit.csw.xml.GetRecordsResponse;
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
 import org.constellation.metadata.DistributedResults;
@@ -50,7 +53,6 @@ import org.constellation.ws.MimeType;
 import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.ElementSetNameType;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
@@ -276,17 +278,21 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                     distantException.add(exe);
                     moreResults = false;
             
-                // if the service respond correctly    
-                } else if (harvested instanceof GetRecordsResponseType) {
+                // if the service respond correctly  (CSW 2.0.2 and 2.0.0)
+                } else if (harvested instanceof GetRecordsResponse) {
                     succeed = true;
                     LOGGER.log(Level.INFO, "Response of distant service:\n{0}", harvested.toString());
-                    final GetRecordsResponseType serviceResponse = (GetRecordsResponseType) harvested;
-                    final SearchResultsType results              = serviceResponse.getSearchResults();
-            
+                    final GetRecordsResponse serviceResponse = (GetRecordsResponse) harvested;
+                    final SearchResults results              = serviceResponse.getSearchResults();
+                    final List<Object> records               = results.getAny();
+                    records.add(results.getAbstractRecord());
+                    
                     //we looking for CSW record
-                    for (JAXBElement<? extends AbstractRecordType> jbRecord: results.getAbstractRecord()) {
-                        final AbstractRecordType record = jbRecord.getValue();
-                        
+                    for (Object record: records) {
+                        if (record instanceof JAXBElement) {
+                            record = ((JAXBElement)record).getValue();
+                        }
+
                         //Temporary ugly patch TODO handle update in CSW
                         try {
                             if (metadataWriter.storeMetadata(record))
@@ -298,78 +304,14 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                         }
                     }
                     
-                    //we looking for any other Record type
-                    for (Object otherRecord: results.getAny()) {
-                        if (otherRecord instanceof JAXBElement)
-                            otherRecord = ((JAXBElement)otherRecord).getValue();
-                        
-                        LOGGER.log(Level.INFO, "other Record Type: {0}", otherRecord.getClass().getSimpleName());
-                        
-                        //Temporary ugly patch TODO handle update in CSW
-                        try {
-                            if (metadataWriter.storeMetadata(otherRecord))
-                                nbRecordInserted++;
-                        } catch (IllegalArgumentException e) {
-                            nbRecordUpdated++;
-                        } catch (MetadataIoException ex) {
-                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                        }
-                    }
-                
                     //if there is more results we need to make another request
                     moreResults = results.getNumberOfRecordsReturned() != 0;
                     if (moreResults) {
-                        startPosition = startPosition + results.getAbstractRecord().size() + results.getAny().size();
+                        startPosition = startPosition + records.size();
                         LOGGER.log(Level.INFO, "startPosition={0}", startPosition);
                         getRecordRequest.setStartPosition(startPosition);
                     } 
                     
-                // a correct response v2.0.0
-                } else if (harvested instanceof org.geotoolkit.csw.xml.v200.GetRecordsResponseType) {
-                    succeed = true;
-                    LOGGER.log(Level.INFO, "Response of distant service:\n{0}", harvested.toString());
-                    final org.geotoolkit.csw.xml.v200.GetRecordsResponseType serviceResponse = (org.geotoolkit.csw.xml.v200.GetRecordsResponseType) harvested;
-                    final org.geotoolkit.csw.xml.v200.SearchResultsType results              = serviceResponse.getSearchResults();
-            
-                    //we looking for CSW record
-                    for (JAXBElement<? extends org.geotoolkit.csw.xml.v200.AbstractRecordType> jbRecord: results.getAbstractRecord()) {
-                        final org.geotoolkit.csw.xml.v200.AbstractRecordType record = jbRecord.getValue();
-                        
-                        //Temporary ugly patch TODO handle update in CSW
-                        try {
-                            if (metadataWriter.storeMetadata(record))
-                                nbRecordInserted++;
-                        } catch (IllegalArgumentException e) {
-                            nbRecordUpdated++;
-                        }  catch (MetadataIoException ex) {
-                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                        }
-                    }
-                
-                    //we looking for any other Record type
-                    for (Object otherRecord: results.getAny()) {
-                        if (otherRecord instanceof JAXBElement)
-                            otherRecord = ((JAXBElement)otherRecord).getValue();
-                        
-                        //Temporary ugly patch TODO handle update in CSW
-                        try {
-                            if (metadataWriter.storeMetadata(otherRecord))
-                                nbRecordInserted++;
-                        } catch (IllegalArgumentException e) {
-                            nbRecordUpdated++;
-                        }  catch (MetadataIoException ex) {
-                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                        }
-                    }
-                    
-                    //if there is more results we need to make another request
-                    moreResults = (results.getAbstractRecord().size() + results.getAny().size()) != 0;
-                    if (moreResults) {
-                        startPosition = startPosition +  results.getAbstractRecord().size() + results.getAny().size();
-                        LOGGER.log(Level.INFO, "startPosition={0}", startPosition);
-                        getRecordRequest.setStartPosition(startPosition);
-                    }
-                     
                 // if the distant service has launch a standardized exception    
                 } else if (harvested instanceof ExceptionReport) {
                     final ExceptionReport ex = (ExceptionReport) harvested;
@@ -685,7 +627,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 encoding = temp.substring(0, temp.indexOf("\""));
             }
 
-            LOGGER.info("response encoding : "+encoding);
+            LOGGER.log(Level.INFO, "response encoding : {0}", encoding);
 
             /*
              * 4.4- Return string or unmarshalled object depending on if the MarshallerPool mpool is null
@@ -819,8 +761,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                     final SearchResultsType results = serviceResponse.getSearchResults();
 
                     //we looking for CSW record
-                    for (JAXBElement<? extends AbstractRecordType> jbRecord : results.getAbstractRecord()) {
-                        final AbstractRecordType record = jbRecord.getValue();
+                    for (AbstractRecord record : results.getAbstractRecord()) {
                         additionalResults.add(record);
                     }
 
