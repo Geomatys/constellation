@@ -190,12 +190,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * Build a new metadata writer.
      *
      */
-    public MDWebMetadataWriter(Writer mdWriter, String defaultrecordSet) throws MetadataIoException {
+    public MDWebMetadataWriter(Writer mdWriter, String defaultrecordSet, String userLogin) throws MetadataIoException {
         super();
         this.mdWriter    = mdWriter;
         try {
             this.mdRecordSet = getRecordSet(defaultrecordSet);
-            this.defaultUser = mdWriter.getUser("admin");
+            this.defaultUser = mdWriter.getUser(userLogin);
             initStandardMapping();
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while getting the catalog and user:" +'\n'+
