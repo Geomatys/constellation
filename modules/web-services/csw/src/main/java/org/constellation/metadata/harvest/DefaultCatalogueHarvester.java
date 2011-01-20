@@ -298,8 +298,9 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                             if (metadataWriter.storeMetadata(record)) {
                                 nbRecordInserted++;
                             } else {
-                                metadataWriter.replaceMetadata(null, record);
-                                nbRecordUpdated++;
+                                if (metadataWriter.replaceMetadata(null, record)) {
+                                    nbRecordUpdated++;
+                                }
                             }
                         } catch (IllegalArgumentException e) {
                             throw new CstlServiceException(e, NO_APPLICABLE_CODE);

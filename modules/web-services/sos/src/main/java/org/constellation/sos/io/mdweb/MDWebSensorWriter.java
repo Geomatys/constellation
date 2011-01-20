@@ -120,7 +120,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     public boolean writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
        
         try {
-            return super.storeMetadata(process, id, false);
+            return super.storeMetadata(process, id);
 
         } catch (MetadataIoException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

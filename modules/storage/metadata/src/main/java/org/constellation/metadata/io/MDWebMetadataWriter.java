@@ -1049,10 +1049,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     @Override
     public boolean storeMetadata(Object obj) throws MetadataIoException {
-        return storeMetadata(obj, null, false);
+        return storeMetadata(obj, null);
     }
 
-    public boolean storeMetadata(Object obj, String title, boolean overwrite) throws MetadataIoException {
+    public boolean storeMetadata(Object obj, String title) throws MetadataIoException {
         // profiling operation
         final long start = System.currentTimeMillis();
         long transTime   = 0;
@@ -1093,7 +1093,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (form != null) {
             try {
                 final long startWrite = System.currentTimeMillis();
-                final int result      = ((Writer21)mdWriter).writeForm(form, false, true, overwrite);
+                final int result      = ((Writer21)mdWriter).writeForm(form, false, true);
                 writeTime             = System.currentTimeMillis() - startWrite;
                 if (result == 1) {
                     LOGGER.log(logLevel, "The record have been skipped:{0}", form.getTitle());
@@ -1160,17 +1160,20 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteMetadata(String identifier) throws MetadataIoException {
+    public boolean deleteMetadata(final String identifier) throws MetadataIoException {
         LOGGER.log(logLevel, "metadata to delete:{0}", identifier);
 
-        int id;
-        String recordSetCode = "";
+        if (identifier == null) {
+            return false;
+        }
+        final int id;
+        final String recordSetCode;
         //we parse the identifier (Form_ID:RecordSet_Code)
         try  {
             if (identifier.indexOf(':') != -1) {
                 recordSetCode = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
-                identifier    = identifier.substring(0, identifier.indexOf(':'));
-                id            = Integer.parseInt(identifier);
+                String formID = identifier.substring(0, identifier.indexOf(':'));
+                id            = Integer.parseInt(formID);
             } else {
                 throw new NumberFormatException();
             }
@@ -1198,7 +1201,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     @Override
     public boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException {
-        return storeMetadata(any, null, true);
+        final boolean succeed = deleteMetadata(metadataID);
+        if (!succeed) {
+            return false;
+        }
+        return storeMetadata(any);
     }
 
     /**
