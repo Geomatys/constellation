@@ -1049,10 +1049,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     @Override
     public boolean storeMetadata(Object obj) throws MetadataIoException {
-        return storeMetadata(obj, null);
+        return storeMetadata(obj, null, false);
     }
 
-    public boolean storeMetadata(Object obj, String title) throws MetadataIoException {
+    public boolean storeMetadata(Object obj, String title, boolean overwrite) throws MetadataIoException {
         // profiling operation
         final long start = System.currentTimeMillis();
         long transTime   = 0;
@@ -1093,7 +1093,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (form != null) {
             try {
                 final long startWrite = System.currentTimeMillis();
-                final int result      = mdWriter.writeForm(form, false, true);
+                final int result      = ((Writer21)mdWriter).writeForm(form, false, true, overwrite);
                 writeTime             = System.currentTimeMillis() - startWrite;
                 if (result == 1) {
                     LOGGER.log(logLevel, "The record have been skipped:{0}", form.getTitle());
@@ -1198,10 +1198,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     @Override
     public boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException {
-        final boolean succeed = deleteMetadata(metadataID);
-        if (!succeed)
-            return false;
-        return storeMetadata(any);
+        return storeMetadata(any, null, true);
     }
 
     /**

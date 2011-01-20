@@ -295,10 +295,14 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
 
                         //Temporary ugly patch TODO handle update in CSW
                         try {
-                            if (metadataWriter.storeMetadata(record))
+                            if (metadataWriter.storeMetadata(record)) {
                                 nbRecordInserted++;
+                            } else {
+                                metadataWriter.replaceMetadata(null, record);
+                                nbRecordUpdated++;
+                            }
                         } catch (IllegalArgumentException e) {
-                            nbRecordUpdated++;
+                            throw new CstlServiceException(e, NO_APPLICABLE_CODE);
                         }  catch (MetadataIoException ex) {
                             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                         }
