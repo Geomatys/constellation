@@ -41,7 +41,6 @@ import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
-import org.mdweb.io.sql.AbstractReader;
 
 /**
  * A CSW Metadata Writer specific for MDweb data source.
@@ -64,7 +63,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
     public MDWebCSWMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException {
         super(configuration);
         this.indexer = index;
-        ((AbstractReader)mdWriter).setSkipSameTitle(false);
+        mdWriter.setProperty("skipSameTitle", false);
     }
 
     /**

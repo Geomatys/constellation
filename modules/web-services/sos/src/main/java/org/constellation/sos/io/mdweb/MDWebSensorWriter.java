@@ -92,7 +92,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             }
 
             // we enbale the fast storage mode
-            ((AbstractReader)mdWriter).setFastStorage(true);
+            mdWriter.setProperty("fastStorage", true);
 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

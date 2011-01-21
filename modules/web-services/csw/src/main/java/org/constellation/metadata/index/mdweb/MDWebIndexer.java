@@ -56,7 +56,6 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.io.Reader;
 import org.mdweb.io.MD_IOException;
-import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.io.sql.v20.Reader20;
 import org.mdweb.io.sql.v21.Reader21;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
@@ -125,7 +124,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             } else {
                 throw new IndexingException("unexpected database version:" + version);
             }
-            ((AbstractReader) mdWebReader).setReadProfile(false);
+            mdWebReader.setProperty("readProfile", false);
             initEbrimClasses();
             if (create) {
                 createIndex();

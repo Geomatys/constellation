@@ -62,7 +62,6 @@ import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Reader20;
 import org.mdweb.io.Reader;
-import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.io.sql.v21.Reader21;
 
 // Geotoolkit dependencies
@@ -205,7 +204,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             } else {
                 throw new MetadataIoException("unexpected database version:" + version);
             }
-            ((AbstractReader) mdReader).setReadProfile(false);
+            mdReader.setProperty("readProfile", false);
         } catch (SQLException ex) {
             throw new MetadataIoException("SQLException while initializing the MDWeb reader:" +'\n'+
                                            "cause:" + ex.getMessage());
@@ -225,7 +224,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 LOGGER.info("cache system have been disabled");
             }
             setIsCacheEnabled(c);
-            ((AbstractReader)mdReader).setCacheStorage(c);
+            mdReader.setProperty("cacheStorage", c);
         }
 
         if (configuration.getStoreMapping() != null && !configuration.getStoreMapping().isEmpty()) {
