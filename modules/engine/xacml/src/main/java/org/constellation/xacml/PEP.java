@@ -40,7 +40,7 @@ import org.constellation.xacml.factory.RequestAttributeFactory;
  */
 public class PEP {
     
-    private final String issuer = "constellation.org";
+    private final static String ISSUER = "constellation.org";
     
     private final PolicyDecisionPoint pdp;
     
@@ -141,14 +141,14 @@ public class PEP {
         final SubjectType subject = new SubjectType();
         subject.getAttribute().add(
                 RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_SUBJECT_SUBJECTID.key, 
-                                                                  issuer, 
+                                                                  ISSUER,
                                                                   user.getName()));
         
         final Enumeration<Principal> roles = (Enumeration<Principal>) roleGroup.members();
         while (roles.hasMoreElements()) {
             final Principal rolePrincipal = roles.nextElement();
             final AttributeType attSubjectID = RequestAttributeFactory.createStringAttributeType(
-                    XACMLConstants.ATTRIBUTEID_SUBJECT_ROLE.key, issuer, rolePrincipal.getName());
+                    XACMLConstants.ATTRIBUTEID_SUBJECT_ROLE.key, ISSUER, rolePrincipal.getName());
             subject.getAttribute().add(attSubjectID);
         }
         return subject;
@@ -198,7 +198,7 @@ public class PEP {
         //Create an action type
         final ActionType actionType = new ActionType();
         actionType.getAttribute().add(
-                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_ACTION_ACTIONID.key, issuer, action));
+                RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_ACTION_ACTIONID.key, ISSUER, action));
         
         return actionType;
     
@@ -212,7 +212,7 @@ public class PEP {
         //Create an Environment Type
         final EnvironmentType environmentType = new EnvironmentType();
         environmentType.getAttribute().add(
-                RequestAttributeFactory.createDateTimeAttributeType(XACMLConstants.ATTRIBUTEID_ENVIRONMENT_CURRENTTIME.key, issuer));
+                RequestAttributeFactory.createDateTimeAttributeType(XACMLConstants.ATTRIBUTEID_ENVIRONMENT_CURRENTTIME.key, ISSUER));
         return environmentType;
         
     }

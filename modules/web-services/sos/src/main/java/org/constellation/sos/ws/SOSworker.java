@@ -310,7 +310,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * Initialize the database connection.
      */
-    public SOSworker(String id, File configurationDirectory) {
+    public SOSworker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.SOS);
         
         isStarted                      = true;
@@ -510,7 +510,7 @@ public class SOSworker extends AbstractWorker {
      * @param configurationDirectory
      * @throws JAXBException
      */
-    private void cacheCapabilities(File configurationDirectory) throws JAXBException {
+    private void cacheCapabilities(final File configurationDirectory) throws JAXBException {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
         final Unmarshaller capaUM = JAXBContext.newInstance(Capabilities.class, org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class).createUnmarshaller();
@@ -533,7 +533,7 @@ public class SOSworker extends AbstractWorker {
      * 
      * @param configDirectory
      */
-    private void loadMapping(File configDirectory) {
+    private void loadMapping(final File configDirectory) {
         // the file who record the map between phisycal ID and DB ID.
         try {
             final File f = new File(configDirectory, "mapping.properties");
@@ -562,7 +562,7 @@ public class SOSworker extends AbstractWorker {
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
-    public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
+    public Capabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
         LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long start = System.currentTimeMillis();
@@ -755,7 +755,7 @@ public class SOSworker extends AbstractWorker {
      * 
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
-    public AbstractSensorML describeSensor(DescribeSensor requestDescSensor) throws CstlServiceException  {
+    public AbstractSensorML describeSensor(final DescribeSensor requestDescSensor) throws CstlServiceException  {
         LOGGER.log(logLevel, "DescribeSensor request processing\n");
         final long start = System.currentTimeMillis();
 
@@ -803,7 +803,7 @@ public class SOSworker extends AbstractWorker {
      * 
      * @param requestObservation a document specifying the parameter of the request.
      */
-    public Object getObservation(GetObservation requestObservation) throws CstlServiceException {
+    public Object getObservation(final GetObservation requestObservation) throws CstlServiceException {
         LOGGER.log(logLevel, "getObservation request processing\n");
         final long start = System.currentTimeMillis();
         
@@ -1220,7 +1220,14 @@ public class SOSworker extends AbstractWorker {
         return response;
     }
 
-    private boolean samplingPointMatchEnvelope(SamplingPointEntry sp, EnvelopeEntry e) {
+    /**
+     * Return true if the samplingPoint entry is strictly inside the specified envelope.
+     *
+     * @param sp A sampling point (2D) station.
+     * @param e An envelope (2D).
+     * @return True if the sampling point is strictly inside the specified envelope.
+     */
+    private boolean samplingPointMatchEnvelope(final SamplingPointEntry sp, final EnvelopeEntry e) {
         if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
 
             final double stationX = sp.getPosition().getPos().getValue().get(0);
@@ -1240,7 +1247,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * Web service operation
      */
-    public GetResultResponse getResult(GetResult requestResult) throws CstlServiceException {
+    public GetResultResponse getResult(final GetResult requestResult) throws CstlServiceException {
         LOGGER.log(logLevel, "getResult request processing\n");
         final long start = System.currentTimeMillis();
         
@@ -1350,7 +1357,7 @@ public class SOSworker extends AbstractWorker {
         return response;
     }
     
-    private String getResultValues(Timestamp tBegin, Timestamp tEnd, DataArray array, List<EventTime> eventTimes) throws CstlServiceException {
+    private String getResultValues(final Timestamp tBegin, final Timestamp tEnd, final DataArray array, final List<EventTime> eventTimes) throws CstlServiceException {
         String values = null;
         
         //for multiple observations we parse the brut values (if we got a time constraint)
@@ -1437,7 +1444,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @return a datablock containing only the matching observations.
      */
-    private String parseDataBlock(String brutValues, AbstractEncoding abstractEncoding, Timestamp boundBegin, Timestamp boundEnd, Timestamp boundEquals) {
+    private String parseDataBlock(final String brutValues, final AbstractEncoding abstractEncoding, final Timestamp boundBegin, final Timestamp boundEnd, final Timestamp boundEquals) {
         String values = "";
         if (abstractEncoding instanceof TextBlock) {
                 final TextBlock encoding        = (TextBlock) abstractEncoding;
@@ -1495,7 +1502,7 @@ public class SOSworker extends AbstractWorker {
         return values;
     }
 
-    public AbstractFeatureEntry getFeatureOfInterest(GetFeatureOfInterest request) throws CstlServiceException {
+    public AbstractFeatureEntry getFeatureOfInterest(final GetFeatureOfInterest request) throws CstlServiceException {
         verifyBaseRequest(request);
         LOGGER.log(logLevel, "GetFeatureOfInterest request processing\n");
         final long start = System.currentTimeMillis();
@@ -1563,7 +1570,7 @@ public class SOSworker extends AbstractWorker {
         return null;
     }
 
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(GetFeatureOfInterestTime request) throws CstlServiceException {
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(final GetFeatureOfInterestTime request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetFeatureOfInterestTime request processing\n");
         final long start = System.currentTimeMillis();
         verifyBaseRequest(request);
@@ -1591,7 +1598,7 @@ public class SOSworker extends AbstractWorker {
      * @param feature
      * @return
      */
-    private FeaturePropertyType buildFeatureProperty(SamplingFeature feature) {
+    private FeaturePropertyType buildFeatureProperty(final SamplingFeature feature) {
         final ObjectFactory samplingFactory = new ObjectFactory();
         if (feature instanceof SamplingPointEntry) {
             return new FeaturePropertyType(samplingFactory.createSamplingPoint((SamplingPointEntry)feature));
@@ -1607,7 +1614,7 @@ public class SOSworker extends AbstractWorker {
         }
     }
 
-    private List<SamplingFeature> spatialFiltering(BBOXType bbox) throws CstlServiceException {
+    private List<SamplingFeature> spatialFiltering(final BBOXType bbox) throws CstlServiceException {
         final EnvelopeEntry e = bbox.getEnvelope();
         if (e != null && e.isCompleteEnvelope2D()) {
 
@@ -1645,7 +1652,7 @@ public class SOSworker extends AbstractWorker {
      * @param requestRegSensor A request containing a SensorML File describing a Sensor,
      *                         and an observation template for this sensor.
      */
-    public RegisterSensorResponse registerSensor(RegisterSensor requestRegSensor) throws CstlServiceException {
+    public RegisterSensorResponse registerSensor(final RegisterSensor requestRegSensor) throws CstlServiceException {
         if (profile == DISCOVERY) {
             throw new CstlServiceException("The operation registerSensor is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
@@ -1749,7 +1756,7 @@ public class SOSworker extends AbstractWorker {
      * 
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
      */
-    public InsertObservationResponse insertObservation(InsertObservation requestInsObs) throws CstlServiceException {
+    public InsertObservationResponse insertObservation(final InsertObservation requestInsObs) throws CstlServiceException {
         if (profile == DISCOVERY) {
             throw new CstlServiceException("The operation insertObservation is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
@@ -1834,7 +1841,7 @@ public class SOSworker extends AbstractWorker {
      * 
      * @return true if there is no errors in the time constraint else return false.
      */
-    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(List<EventTime> times, boolean template, ObservationFilter localOmFilter) throws CstlServiceException {
+    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(final List<EventTime> times, final boolean template, final ObservationFilter localOmFilter) throws CstlServiceException {
         
         //In template mode  his method return a temporal Object.
         AbstractTimeGeometricPrimitiveType templateTime = null;
@@ -1931,7 +1938,7 @@ public class SOSworker extends AbstractWorker {
     /**
      *  Verify that the bases request attributes are correct.
      */ 
-    private void verifyBaseRequest(RequestBaseType request) throws CstlServiceException {
+    private void verifyBaseRequest(final RequestBaseType request) throws CstlServiceException {
         isWorking();
         if (request != null) {
             if (request.getService() != null) {
@@ -1960,7 +1967,7 @@ public class SOSworker extends AbstractWorker {
      * 
      * @return an integer to paste after the template name;
      */
-    private int getTemplateSuffix(String templateName) {
+    private int getTemplateSuffix(final String templateName) {
         int i = 0;
         boolean notFound = true;
         while (notFound) {
@@ -1980,7 +1987,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If an error occurs during the the storage of offering in the datasource.
      */
-    private void addSensorToOffering(AbstractSensorML sensor, Observation template) throws CstlServiceException {
+    private void addSensorToOffering(final AbstractSensorML sensor, final Observation template) throws CstlServiceException {
      
         //we search which are the networks binded to this sensor
         final List<String> networkNames = getNetworkNames(sensor);
@@ -2021,7 +2028,7 @@ public class SOSworker extends AbstractWorker {
      * 
      * @throws CstlServiceException If the service does not succeed to update the offering in the datasource.
      */
-    private void updateOffering(ObservationOfferingEntry offering, Observation template) throws CstlServiceException {
+    private void updateOffering(final ObservationOfferingEntry offering, final Observation template) throws CstlServiceException {
 
         //we add the new sensor to the offering
         OfferingProcedureEntry offProc = null;
@@ -2062,7 +2069,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If the service does not succeed to store the offering in the datasource.
      */
-    private void createOffering(String offeringName, Observation template) throws CstlServiceException {
+    private void createOffering(final String offeringName, final Observation template) throws CstlServiceException {
        LOGGER.log(logLevel, "offering {0} not present, first build", offeringName);
 
         // TODO bounded by??? station?
@@ -2128,7 +2135,7 @@ public class SOSworker extends AbstractWorker {
      * @param form The "form" containing the sensorML data.
      * @param dbId The identifier of the sensor in the O&M database.
      */
-    private void recordMapping(String dbId, String physicalID) throws CstlServiceException {
+    private void recordMapping(final String dbId, final String physicalID) throws CstlServiceException {
         try {
             if (dbId != null && physicalID != null) {
                 map.setProperty(physicalID, dbId);
@@ -2158,7 +2165,7 @@ public class SOSworker extends AbstractWorker {
      * @param ID The ID of the service in a case of multiple sos server.
      * @param filePath The path to the log folder.
      */
-    private void initLogger(String id, String filePath) {
+    private void initLogger(String id, final String filePath) {
         try {
             if (id != null && !id.isEmpty()) {
                 id = id + '-';
@@ -2193,7 +2200,7 @@ public class SOSworker extends AbstractWorker {
     }
 
     @Override
-    public void setLogLevel(Level logLevel) {
+    public void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
         if (omFilter != null) {
             omFilter.setLoglevel(logLevel);
@@ -2229,7 +2236,7 @@ public class SOSworker extends AbstractWorker {
          * 
          * @param templateId The identifier of the temporary template.
          */
-        public DestroyTemplateTask(String templateId) {
+        public DestroyTemplateTask(final String templateId) {
             this.templateId  = templateId;
         }
         

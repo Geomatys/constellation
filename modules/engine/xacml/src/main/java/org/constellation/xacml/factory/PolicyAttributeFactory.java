@@ -46,7 +46,7 @@ public final class PolicyAttributeFactory {
     private PolicyAttributeFactory() {}
 
     public static AttributeValueType createAnyURIAttributeType(final URI value) {
-        return getBareAttributeValueType("" + value, XMLSchemaConstants.DATATYPE_ANYURI);
+        return getBareAttributeValueType(value.toString(), XMLSchemaConstants.DATATYPE_ANYURI);
     }
 
     public static AttributeValueType createBase64BinaryAttributeType(final byte[] value) {
@@ -78,7 +78,7 @@ public final class PolicyAttributeFactory {
     }
 
     public static AttributeValueType createDoubleAttributeType(final double value) {
-        return getBareAttributeValueType("" + value, XMLSchemaConstants.DATATYPE_DOUBLE);
+        return getBareAttributeValueType(Double.toString(value), XMLSchemaConstants.DATATYPE_DOUBLE);
     }
 
     public static AttributeValueType createEmailAttributeType(final String value) {
@@ -90,7 +90,7 @@ public final class PolicyAttributeFactory {
     }
 
     public static AttributeValueType createIntegerAttributeType(final int value) {
-        return getBareAttributeValueType("" + value, XMLSchemaConstants.DATATYPE_INTEGER);
+        return getBareAttributeValueType(Integer.toString(value), XMLSchemaConstants.DATATYPE_INTEGER);
     }
 
     public static AttributeValueType createIPAddressAttributeType(final InetAddress address) {

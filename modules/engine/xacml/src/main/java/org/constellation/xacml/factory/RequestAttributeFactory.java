@@ -47,7 +47,7 @@ public final class RequestAttributeFactory {
     public static AttributeType createAnyURIAttributeType(final String attrID,
             final String issuer, final URI value)
     {
-        return getBareAttributeType(attrID, issuer, "" + value, XMLSchemaConstants.DATATYPE_ANYURI);
+        return getBareAttributeType(attrID, issuer, value.toString(), XMLSchemaConstants.DATATYPE_ANYURI);
     }
 
     public static AttributeType createBase64BinaryAttributeType(final String attrID,
@@ -91,7 +91,7 @@ public final class RequestAttributeFactory {
     public static AttributeType createDoubleAttributeType(final String attrID, final String issuer,
             final double value)
     {
-        return getBareAttributeType(attrID, issuer, "" + value, XMLSchemaConstants.DATATYPE_DOUBLE);
+        return getBareAttributeType(attrID, issuer, Double.toString(value), XMLSchemaConstants.DATATYPE_DOUBLE);
     }
 
     public static AttributeType createEmailAttributeType(final String attrID, final String issuer,
@@ -109,7 +109,7 @@ public final class RequestAttributeFactory {
     public static AttributeType createIntegerAttributeType(final String attrID, final String issuer,
             final int value)
     {
-        return getBareAttributeType(attrID, issuer, "" + value, XMLSchemaConstants.DATATYPE_INTEGER);
+        return getBareAttributeType(attrID, issuer, Integer.toString(value), XMLSchemaConstants.DATATYPE_INTEGER);
     }
 
     public static AttributeType createIPAddressAttributeType(final String attrID, final String issuer,

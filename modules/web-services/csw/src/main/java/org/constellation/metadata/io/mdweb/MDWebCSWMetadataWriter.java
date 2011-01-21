@@ -60,28 +60,17 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      *
      * @param MDReader an MDWeb database reader.
      */
-    public MDWebCSWMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException {
+    public MDWebCSWMetadataWriter(final Automatic configuration, final AbstractIndexer index) throws MetadataIoException {
         super(configuration);
         this.indexer = index;
         mdWriter.setProperty("skipSameTitle", false);
     }
 
     /**
-     * Build a MDweb CSW metadata writer with no database and no index.
-     * Used for JUnit test only.
-     * 
-     * @throws MetadataIoException
-     */
-    public MDWebCSWMetadataWriter() throws MetadataIoException {
-        super();
-        indexer = null;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public void indexDocument(Form f) {
+    public void indexDocument(final Form f) {
         if (indexer != null) {
             indexer.indexDocument(f);
         }
@@ -107,14 +96,13 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException {
+    public boolean updateMetadata(String metadataID, final List<RecordPropertyType> properties) throws MetadataIoException {
         LOGGER.log(logLevel, "metadataID: {0}", metadataID);
         int id;
-        String recordSetCode = "";
-        Form f = null;
+        final String recordSetCode;
         //we parse the identifier (Form_ID:RecordSet_Code)
         try  {
-            if (metadataID.indexOf(':') != -1) {
+            if (metadataID != null && metadataID.indexOf(':') != -1) {
                 recordSetCode = metadataID.substring(metadataID.indexOf(':') + 1, metadataID.length());
                 metadataID    = metadataID.substring(0, metadataID.indexOf(':'));
                 id            = Integer.parseInt(metadataID);
@@ -124,6 +112,8 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
         } catch (NumberFormatException e) {
              throw new MetadataIoException("Unable to parse: " + metadataID, NO_APPLICABLE_CODE, "id");
         }
+
+        Form f = null;
         try {
             final RecordSet recordSet = mdWriter.getRecordSet(recordSetCode);
             f                     = mdWriter.getForm(recordSet, id);
@@ -195,7 +185,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public void setLogLevel(Level logLevel) {
+    public void setLogLevel(final Level logLevel) {
         super.setLogLevel(logLevel);
         if (this.indexer != null) {
             this.indexer.setLogLevel(logLevel);
