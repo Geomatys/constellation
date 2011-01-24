@@ -766,18 +766,18 @@ public class SOSworker extends AbstractWorker {
         final String out = requestDescSensor.getOutputFormat();
         if (out != null) {
             if (!StringUtilities.containsIgnoreCase(ACCEPTED_SENSORML_FORMATS, requestDescSensor.getOutputFormat())) {
-                String msg = "Accepted values for outputFormat:";
+                final StringBuilder msg = new StringBuilder("Accepted values for outputFormat:");
                 for (String s : ACCEPTED_SENSORML_FORMATS) {
-                    msg = msg + '\n' + s;
+                    msg.append('\n').append(s);
                 }
-                throw new CstlServiceException(msg, INVALID_PARAMETER_VALUE, "outputFormat");
+                throw new CstlServiceException(msg.toString(), INVALID_PARAMETER_VALUE, "outputFormat");
             }
         } else {
-            String msg = "output format must be specify, accepted value are:";
+            final StringBuilder msg = new StringBuilder("output format must be specify, accepted value are:");
             for (String s : ACCEPTED_SENSORML_FORMATS) {
-                msg = msg + '\n' + s;
+                msg.append('\n').append(s);
             }
-            throw new CstlServiceException(msg, MISSING_PARAMETER_VALUE, "outputFormat");
+            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, "outputFormat");
         }
 
         // we verify that we have a sensor ID.
@@ -856,12 +856,12 @@ public class SOSworker extends AbstractWorker {
             try {
                 mode = ResponseModeType.fromValue(requestObservation.getResponseMode());
             } catch (IllegalArgumentException e) {
-                String arm = "";
+                final StringBuilder arm = new StringBuilder();
                 for (ResponseModeType s : acceptedResponseMode) {
-                    arm = arm + s.value() + '\n';
+                    arm.append(s.value()).append('\n');
                 }
                 throw new CstlServiceException("The response Mode: " + requestObservation.getResponseMode() + " is not supported by the service." +
-                                               "Supported Values are:\n" + arm,
+                                               "Supported Values are:\n" + arm.toString(),
                                                  INVALID_PARAMETER_VALUE, RESPONSE_MODE);
             }
         }
@@ -876,12 +876,12 @@ public class SOSworker extends AbstractWorker {
         } else if (mode == RESULT_TEMPLATE) {
             template = true;
         } else if (!acceptedResponseMode.contains(mode)) {
-            String arm = "";
+            final StringBuilder arm = new StringBuilder();
             for (ResponseModeType s : acceptedResponseMode) {
-                arm = arm + s.value() + '\n';
+                arm.append(s.value()).append('\n');
             }
             throw new CstlServiceException("This response Mode is not supported by the service" + 
-                                           "Supported Values are:\n" + arm,
+                                           "Supported Values are:\n" + arm.toString(),
                                              OPERATION_NOT_SUPPORTED, RESPONSE_MODE);
         }
 
@@ -901,12 +901,12 @@ public class SOSworker extends AbstractWorker {
         //we verify that the srsName (if there is one) is advertised in the offering
         if (requestObservation.getSrsName() != null) {
             if (!off.getSrsName().contains(requestObservation.getSrsName())) {
-                String availableSrs = "";
+                final StringBuilder availableSrs = new StringBuilder();
                 for (String s : off.getSrsName()) {
-                    availableSrs = availableSrs + s + '\n';
+                    availableSrs.append(s).append('\n');
                 }
                 throw new CstlServiceException("This srs name is not advertised in the offering.\n" +
-                                               "Available srs name are:\n" + availableSrs,
+                                               "Available srs name are:\n" + availableSrs.toString(),
                                                 INVALID_PARAMETER_VALUE, "srsName");
             }
         }
@@ -914,9 +914,9 @@ public class SOSworker extends AbstractWorker {
         //we verify that the resultModel (if there is one) is advertised in the offering
         if (requestObservation.getResultModel() != null) {
             if (!off.getResultModel().contains(requestObservation.getResultModel())) {
-                String availableRM = "";
+                final StringBuilder availableRM = new StringBuilder();
                 for (QName s : off.getResultModel()) {
-                    availableRM = availableRM + s + '\n';
+                    availableRM.append(s).append('\n');
                 }
                 throw new CstlServiceException("This result model is not advertised in the offering:" + requestObservation.getResultModel() + '\n' +
                                                "Available result model for this offering are:",
