@@ -115,6 +115,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     private Map<Object, Value> alreadyWrite;
 
     /**
+     * A List of contact record.
+     */
+    private Map<Object, Value> contacts;
+
+    /**
      * A flag indicating that we don't want to write predefined values.
      */
     private boolean noLink = false;
@@ -173,7 +178,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 noIndexation = false;
             }
 
+            this.contacts = new HashMap<Object, Value>();
             initStandardMapping();
+            initContactMap();
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while initializing the MDWeb writer:" +'\n'+
                                            "cause:" + ex.getMessage());
@@ -196,7 +203,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         try {
             this.mdRecordSet = getRecordSet(defaultrecordSet);
             this.defaultUser = mdWriter.getUser(userLogin);
+            this.contacts    = new HashMap<Object, Value>();
             initStandardMapping();
+            initContactMap();
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while getting the catalog and user:" +'\n'+
                                            "cause:" + ex.getMessage());
@@ -316,6 +325,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
         }
         return cat;
+    }
+
+    private void initContactMap() throws MD_IOException {
+        final List<Form> contactForms = mdWriter.getContacts();
+        if (contactForms.size() > 0) {
+            LOGGER.log(Level.INFO, "initiazing {0} contacts", contactForms.size());
+            final MDWebMetadataReader reader = new MDWebMetadataReader(mdWriter);
+            for (Form contactForm : contactForms) {
+                Object responsibleParty = reader.getObjectFromForm(null, contactForm, AbstractMetadataReader.ISO_19115);
+                contacts.put(responsibleParty, contactForm.getTopValue());
+            }
+        }
+
     }
 
     /**
@@ -472,7 +494,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         
         //we look if the object have been already write
         final Value linkedValue;
-        if (isNoLink()) {
+        if (contacts.get(object) != null) {
+            linkedValue = contacts.get(object);
+            System.out.println("contact detected:" + linkedValue);
+        } else if (isNoLink()) {
             linkedValue = null;
         } else {
             linkedValue = alreadyWrite.get(object);
@@ -572,7 +597,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
             
-            final LinkedValue value = new LinkedValue(path, form, ordinal, form, linkedValue, classe, parentValue);
+            final LinkedValue value = new LinkedValue(path, form, ordinal, linkedValue.getForm(), linkedValue, classe, parentValue);
             result.add(value);
             //LOGGER.finer("new LinkedValue: " + path.getId() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
         
