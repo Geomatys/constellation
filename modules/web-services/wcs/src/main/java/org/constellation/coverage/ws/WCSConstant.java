@@ -37,7 +37,7 @@ import org.geotoolkit.wcs.xml.v100.WCSCapabilityType.Request;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WCSConstant {
+public final class WCSConstant {
 
     private WCSConstant() {}
     

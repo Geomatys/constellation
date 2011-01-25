@@ -170,7 +170,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * 
      * @param MDReader a reader to the MDWeb database.
      */
-    public MDWebMetadataReader(Automatic configuration) throws MetadataIoException {
+    public MDWebMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(true, false);
         if (configuration == null) {
             throw new MetadataIoException("The configuration object is null");
@@ -245,7 +245,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @param MDReader a reader to the MDWeb database.
      */
-    protected MDWebMetadataReader(DataSource mdConnection) {
+    protected MDWebMetadataReader(final DataSource mdConnection) {
         super(true, false);
         this.mdReader           = new Reader20(mdConnection);
         initPackage();
@@ -258,7 +258,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @param MDReader a reader to the MDWeb database.
      */
-    public MDWebMetadataReader(Reader mdReader) {
+    public MDWebMetadataReader(final Reader mdReader) {
         super(true, false);
         this.mdReader           = mdReader;
         initPackage();
@@ -316,7 +316,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * We give the possibility to the user to add a configuration file making the mapping.
      * @return
      */
-    private Map<String, Class> initClassBinding(File configDir) {
+    private Map<String, Class> initClassBinding(final File configDir) {
         final Map<String, Class> result = new HashMap<String, Class>();
         try {
             // we get the configuration file
@@ -357,7 +357,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @throws java.sql.MetadataIoException
      */
     @Override
-    public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
+    public Object getMetadata(String identifier, final int mode, final List<QName> elementName) throws MetadataIoException {
         int id;
         String recordSetCode = "";
         
@@ -409,11 +409,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * 
      * @return a geotoolkit/constellation object representing the metadata.
      */
-    protected Object getObjectFromForm(String identifier, Form form, int mode) {
+    protected Object getObjectFromForm(final String identifier, final Form form, final int mode) {
 
         if (form != null && form.getTopValue() != null && form.getTopValue().getType() != null) {
             final Value topValue = form.getTopValue();
-            final Object result  = getObjectFromValue(form, topValue, mode);
+            final Object result  = getObjectFromValue(topValue, mode);
             
             //we put the full object in the already read metadatas.
             if (result != null && isCacheEnabled()) {
@@ -443,7 +443,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * 
      * @return a geotoolkit metadat object.
      */
-    private Object getObjectFromValue(Form form, Value value, int mode) {
+    private Object getObjectFromValue(final Value value, final int mode) {
         Class classe = null;
         // we get the value's class
         if (value.getType() != null) {
@@ -544,7 +544,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             if (tempobj != null) {
                 return tempobj;
             } else {
-                return getObjectFromValue(lv.getLinkedForm(), lv.getLinkedValue(), mode);
+                return getObjectFromValue(lv.getLinkedValue(), mode);
             }
 
         // else if the value is a complex object
@@ -689,7 +689,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 
 
                 // we get the object from the child Value
-                final Object param = getObjectFromValue(form, childValue, mode);
+                final Object param = getObjectFromValue(childValue, mode);
                 if (param == null) {
                     continue;
                 }
@@ -755,7 +755,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     }
 
 
-    private boolean putMeta(Map<String, Object> metaMap, String attribName, Object param, Object result, Path path) {
+    private boolean putMeta(final Map<String, Object> metaMap, String attribName, final Object param, final Object result, final Path path) {
         boolean tryAgain = true;
         int casee = 0;
         while (tryAgain) {
@@ -798,7 +798,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         return false;
     }
 
-    private void setFieldToValue(Field field, String attribName, Object result, Object param) {
+    private void setFieldToValue(final Field field, final String attribName, final Object result, final Object param) {
         field.setAccessible(true);
         try {
             if ("axis".equals(attribName)) {
@@ -841,7 +841,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @param className the standard name of a class. 
      * @return a primitive class.
      */
-    private static Class getPrimitiveTypeFromName(String className, String standardName) {
+    private static Class getPrimitiveTypeFromName(final String className, final String standardName) {
 
         if (className.equalsIgnoreCase("CharacterString")) {
             return String.class;
@@ -883,7 +883,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @param mode
      * @return
      */
-    private List<String> getPackageFromStandard(String standardName, String className, int mode) {
+    private List<String> getPackageFromStandard(final String standardName, final String className, final int mode) {
         final List<String> packagesName;
         if ("Catalog Web Service".equals(standardName) || "DublinCore".equals(standardName) ||
             "OGC Web Service".equals(standardName)     || "OGC Filter".equals(standardName)) {
@@ -928,7 +928,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * 
      * @return a class object corresponding to the specified name.
      */
-    private Class getClassFromName(Classe type, int mode) {
+    private Class getClassFromName(final Classe type, final int mode) {
         String className          = type.getName();
         final String standardName = type.getStandard().getName();
 

@@ -33,7 +33,7 @@ import org.geotoolkit.ows.xml.v110.RequestMethodType;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WMTSConstant {
+public final class WMTSConstant {
 
     private WMTSConstant() {}
     

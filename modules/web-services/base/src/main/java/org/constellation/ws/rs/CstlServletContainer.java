@@ -32,7 +32,7 @@ import javax.ws.rs.core.Context;
  */
 public class CstlServletContainer extends ServletContainer {
 
-    public static boolean configured = false;
+    private static boolean configured = false;
 
     /**
      * {@inheritDoc }

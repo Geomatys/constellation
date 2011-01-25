@@ -64,6 +64,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/profiles/inputLevels.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
 
         final String url = "jdbc:derby:memory:Test1;create=true";

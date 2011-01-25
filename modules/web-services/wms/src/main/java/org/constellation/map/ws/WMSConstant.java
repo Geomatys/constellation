@@ -41,7 +41,7 @@ import org.geotoolkit.wms.xml.v130.Request;
  * @author Guilhem Legal (Geomatys)
  */
 @Immutable
-public class WMSConstant {
+public final class WMSConstant {
 
     private WMSConstant() {}
 

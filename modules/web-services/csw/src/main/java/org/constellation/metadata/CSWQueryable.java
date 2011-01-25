@@ -410,6 +410,7 @@ public final class CSWQueryable {
     
     /**
      * The queryable element from ebrim and their path id.
+     * @deprecated
      */
     @Deprecated
     public static final Map<String, List<String>> EBRIM_QUERYABLE;

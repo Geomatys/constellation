@@ -91,7 +91,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param configuration  A configuration object containing the directory where the index can write indexation file.
      * @param serviceID The identifier, if there is one, of the index/service.
      */
-    public GenericIndexer(CSWMetadataReader reader, Automatic configuration, String serviceID) throws IndexingException {
+    public GenericIndexer(final CSWMetadataReader reader, final Automatic configuration, final String serviceID) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory(), reader.getAdditionalQueryablePathMap());
         this.reader = reader;
         if (create) {
@@ -104,7 +104,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      *
      * @param configDirectory A directory where the index can write indexation file.
      */
-    public GenericIndexer(List<Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID, Analyzer analyzer, Level logLevel) throws IndexingException {
+    public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
+            final String serviceID, final Analyzer analyzer, final Level logLevel) throws IndexingException {
         super(serviceID, configDirectory, analyzer, additionalQueryable);
         this.logLevel            = logLevel;
         this.reader              = null;
@@ -118,7 +119,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      *
      * @param configDirectory A directory where the index can write indexation file.
      */
-    public GenericIndexer(List<Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID) throws IndexingException {
+    public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory, 
+            final String serviceID) throws IndexingException {
         super(serviceID, configDirectory, additionalQueryable);
         this.reader = null;
         if (create) {
@@ -171,7 +173,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    public void createIndex(List<Object> toIndex) throws IndexingException {
+    public void createIndex(final List<Object> toIndex) throws IndexingException {
         LOGGER.log(logLevel, "Creating lucene index for Generic database please wait...");
         final long time = System.currentTimeMillis();
         IndexWriter writer;
@@ -200,7 +202,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 " documents indexed: " + nbEntries);
     }
 
-    private void stopIndexation(IndexWriter writer, String serviceID) throws IOException {
+    private void stopIndexation(final IndexWriter writer, final String serviceID) throws IOException {
         writer.optimize();
         writer.close();
         FileUtilities.deleteDirectory(getFileDirectory());
@@ -228,7 +230,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected String getType(Object metadata) {
+    protected String getType(final Object metadata) {
         return metadata.getClass().getSimpleName();
     }
 
@@ -236,7 +238,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected boolean isISO19139(Object meta) {
+    protected boolean isISO19139(final Object meta) {
         return meta instanceof DefaultMetadata;
     }
 
@@ -244,7 +246,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected boolean isDublinCore(Object meta) {
+    protected boolean isDublinCore(final Object meta) {
         return meta instanceof RecordType;
     }
 
@@ -252,7 +254,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected boolean isEbrim25(Object meta) {
+    protected boolean isEbrim25(final Object meta) {
         return meta instanceof RegistryObjectType;
     }
 
@@ -260,7 +262,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected boolean isEbrim30(Object meta) {
+    protected boolean isEbrim30(final Object meta) {
         return meta instanceof IdentifiableType;
     }
 
@@ -303,7 +305,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param values
      * @return
      */
-    private TermValue formatStringValue(TermValue values) {
+    private TermValue formatStringValue(final TermValue values) {
          if ("date".equals(values.term)) {
              String value = values.value;
              if (value.endsWith("z") || value.endsWith("Z")) {
@@ -319,7 +321,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected String getIdentifier(Object obj) {
+    protected String getIdentifier(final Object obj) {
         final String identifier;
         if (obj instanceof DefaultMetadata) {
             identifier = ((DefaultMetadata)obj).getFileIdentifier();
@@ -342,7 +344,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    protected String getValues(Object metadata, List<String> paths) {
+    protected String getValues(final Object metadata, final List<String> paths) {
         return extractValues(metadata, paths);
     }
 
@@ -355,7 +357,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param paths
      * @return
      */
-    public static String extractValues(Object metadata, List<String> paths) {
+    public static String extractValues(final Object metadata, final List<String> paths) {
         final StringBuilder response  = new StringBuilder("");
         
         if (paths != null) {
@@ -408,7 +410,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param obj
      * @return
      */
-    private static String getStringValue(Object obj) {
+    private static String getStringValue(final Object obj) {
         String result = "";
         if (obj == null) {
             return NULL_VALUE;

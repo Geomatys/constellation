@@ -135,7 +135,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * Build a new metadata writer.
      * 
      */
-    public MDWebMetadataWriter(Automatic configuration) throws MetadataIoException {
+    public MDWebMetadataWriter(final Automatic configuration) throws MetadataIoException {
         super();
         if (configuration == null) {
             throw new MetadataIoException("The configuration object is null");
@@ -197,7 +197,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * Build a new metadata writer.
      *
      */
-    public MDWebMetadataWriter(Writer mdWriter, String defaultrecordSet, String userLogin) throws MetadataIoException {
+    public MDWebMetadataWriter(final Writer mdWriter, final String defaultrecordSet, final String userLogin) throws MetadataIoException {
         super();
         this.mdWriter    = mdWriter;
         try {
@@ -311,7 +311,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     // TODO move this to CSW implementation
-    public RecordSet getRecordSet(String defaultRecordSet) throws MD_IOException {
+    public RecordSet getRecordSet(final String defaultRecordSet) throws MD_IOException {
         RecordSet cat = null;
         if (defaultRecordSet != null) {
             cat = mdWriter.getRecordSet(defaultRecordSet);
@@ -346,7 +346,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @param object The object to transform in form.
      * @return an MDWeb form representing the metadata object.
      */
-    protected Form getFormFromObject(Object object) throws MD_IOException {
+    protected Form getFormFromObject(final Object object) throws MD_IOException {
         final String title = Utils.findTitle(object);
         return getFormFromObject(object, defaultUser, mdRecordSet, null, title);
     }
@@ -357,7 +357,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @param object The object to transform in form.
      * @return an MDWeb form representing the metadata object.
      */
-    protected Form getFormFromObject(Object object, String title) throws MD_IOException {
+    protected Form getFormFromObject(final Object object, String title) throws MD_IOException {
         if (title == null) {
             title = Utils.findTitle(object);
         }
@@ -370,7 +370,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @param object The object to transform in form.
      * @return an MDWeb form representing the metadata object.
      */
-    protected Form getFormFromObject(Object object, User user, RecordSet recordSet, Profile profile, String title) throws MD_IOException {
+    protected Form getFormFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
         
         if (object != null) {
             //we try to find a title for the from
@@ -445,7 +445,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @param form The created form.
      * 
      */
-    protected List<Value> addValueFromObject(Form form, Object object, Path path, Value parentValue) throws MD_IOException {
+    protected List<Value> addValueFromObject(final Form form, Object object, Path path, Value parentValue) throws MD_IOException {
 
         final List<Value> result = new ArrayList<Value>();
 
@@ -496,7 +496,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         final Value linkedValue;
         if (contacts.get(object) != null) {
             linkedValue = contacts.get(object);
-            System.out.println("contact detected:" + linkedValue);
         } else if (isNoLink()) {
             linkedValue = null;
         } else {
@@ -719,14 +718,14 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      *
      * @return The value of the specified field or {@code null}
      */
-    private Object getValueFromField(Class valueClass, String propName, Object object) {
+    private Object getValueFromField(Class valueClass, final String propName, final Object object) {
         final Class origClass = valueClass;
         do {
             try {
                 final Field field = valueClass.getDeclaredField(propName);
-                field.setAccessible(true);
                 final Object propertyValue;
                 if (field != null) {
+                    field.setAccessible(true);
                     propertyValue = field.get(object);
                 } else {
                     propertyValue = null;
@@ -753,7 +752,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      *
      * @throws java.sql.SQLException
      */
-    protected Classe getClasseFromObject(Object object) throws MD_IOException {
+    protected Classe getClasseFromObject(final Object object) throws MD_IOException {
         
         String className;
         String packageName;
@@ -1002,7 +1001,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @return
      * @throws MD_IOException
      */
-    private Classe getClasseFromAnnotation(Object object) throws MD_IOException {
+    private Classe getClasseFromAnnotation(final Object object) throws MD_IOException {
         Class[] interfaces = object.getClass().getInterfaces();
         for (Class interf : interfaces) {
             if (interf.getName().startsWith("org.opengis")) {
@@ -1028,7 +1027,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @param className the standard name of a class. 
      * @return a primitive class.
      */
-    private Classe getPrimitiveTypeFromName(String className) throws MD_IOException {
+    private Classe getPrimitiveTypeFromName(final String className) throws MD_IOException {
         final String mdwclassName;
         final Standard mdwStandard;
         if ("String".equals(className) || "SimpleInternationalString".equals(className) || "BaseUnit".equals(className)) {
@@ -1073,11 +1072,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean storeMetadata(Object obj) throws MetadataIoException {
+    public boolean storeMetadata(final Object obj) throws MetadataIoException {
         return storeMetadata(obj, null);
     }
 
-    public boolean storeMetadata(Object obj, String title) throws MetadataIoException {
+    public boolean storeMetadata(Object obj, final String title) throws MetadataIoException {
         // profiling operation
         final long start = System.currentTimeMillis();
         long transTime   = 0;
@@ -1147,7 +1146,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return false;
     }
 
-    protected void indexDocument(Form f) {
+    protected void indexDocument(final Form f) {
         //need to be override by child
     }
 
@@ -1228,7 +1227,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException {
+    public boolean replaceMetadata(final String metadataID, final Object any) throws MetadataIoException {
         final boolean succeed = deleteMetadata(metadataID);
         if (!succeed) {
             return false;
@@ -1363,7 +1362,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * @param noLink the noLink to set
      */
-    public void setNoLink(boolean noLink) {
+    public void setNoLink(final boolean noLink) {
         this.noLink = noLink;
     }
 

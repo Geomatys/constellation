@@ -30,7 +30,7 @@ import org.constellation.util.ReflectionUtilities;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class Utils {
+public final class Utils {
 
     /**
      * A debugging logger.

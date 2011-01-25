@@ -20,14 +20,12 @@ package org.constellation.ws;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
-import org.geotoolkit.util.logging.Logging;
 
 /**
  * 
  * @author Guilhem Legal (Geomatys)
  */
-public class WebServiceUtilities {
+public final class WebServiceUtilities {
 
     private WebServiceUtilities(){}
 

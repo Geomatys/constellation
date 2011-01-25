@@ -629,7 +629,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
             String encoding = "UTF-8";
             if (first != null && first.indexOf("encoding=\"") != -1) {
                 final String temp = first.substring(first.indexOf("encoding=\"") + 10);
-                encoding = temp.substring(0, temp.indexOf("\""));
+                encoding = temp.substring(0, temp.indexOf('"'));
             }
 
             LOGGER.log(Level.INFO, "response encoding : {0}", encoding);
