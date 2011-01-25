@@ -1105,6 +1105,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             transTime             = System.currentTimeMillis() - startTrans;
 	    if (profile != null) {
 	        form.setProfile(profile);
+            // if the profile is null we set the level completion to complete
+            } else {
+                form.setInputLevelCompletion(new boolean[]{true, true, true}, new Date(System.currentTimeMillis()));
             }
             
         } catch (IllegalArgumentException e) {
