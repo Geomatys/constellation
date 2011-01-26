@@ -4,8 +4,7 @@
         <gco:CharacterString>IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.xml</gco:CharacterString>
     </gmd:fileIdentifier>
     <gmd:language>
-        <!--gmd:LanguageCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#LanguageCode" codeListValue="fre">fre</gmd:LanguageCode-->
-        <gco:CharacterString>fre</gco:CharacterString>
+        <gmd:LanguageCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#LanguageCode" codeListValue="fre">fre</gmd:LanguageCode>
     </gmd:language>
     <gmd:characterSet>
         <gmd:MD_CharacterSetCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>

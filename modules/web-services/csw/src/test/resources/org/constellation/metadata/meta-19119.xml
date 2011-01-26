@@ -11,7 +11,7 @@
         <gco:CharacterString>mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4</gco:CharacterString>
     </gmd:fileIdentifier>
     <gmd:language>
-        <gco:CharacterString>fra</gco:CharacterString>
+        <gmd:LanguageCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="fra">fra</gmd:LanguageCode>
     </gmd:language>
     <gmd:hierarchyLevel>
         <gmd:MD_ScopeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#service" codeListValue="service"/>

@@ -4,7 +4,7 @@
         <gco:CharacterString>MDweb-4182ec3f-60ad-4227-9f8b-b26929f77b8a</gco:CharacterString>
     </gmd:fileIdentifier>
     <gmd:language>
-        <gco:CharacterString>fre</gco:CharacterString>
+        <gmd:LanguageCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="fre">fre</gmd:LanguageCode>
     </gmd:language>
     <gmd:metadataStandardName>
         <gco:CharacterString>x-urn:mdweb:schema:exp:ISO19115:INSPIRE:nature-sdi:spp-distrib:mdweb-grid</gco:CharacterString>

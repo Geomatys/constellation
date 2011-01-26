@@ -457,10 +457,14 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 customRecord.setPublisher(distributor);
             }
 
-
-            final SimpleLiteral language = new SimpleLiteral(metadata.getLanguage().getISO3Language());
-            if (elementName != null && elementName.contains(_Language_QNAME)) {
-                customRecord.setLanguage(language);
+            final SimpleLiteral language;
+            if (metadata.getLanguage() != null) {
+                language = new SimpleLiteral(metadata.getLanguage().getISO3Language());
+                if (elementName != null && elementName.contains(_Language_QNAME)) {
+                    customRecord.setLanguage(language);
+                }
+            } else {
+                language = null;
             }
 
             // TODO
