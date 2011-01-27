@@ -884,38 +884,39 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @return
      */
     private List<String> getPackageFromStandard(final String standardName, final String className, final int mode) {
-        final List<String> packagesName;
+        final List<String> packagesName = new ArrayList<String>();
+        
         if ("Catalog Web Service".equals(standardName) || "DublinCore".equals(standardName) ||
             "OGC Web Service".equals(standardName)     || "OGC Filter".equals(standardName)) {
-            packagesName = cswPackage;
+            packagesName.addAll(cswPackage);
 
         } else if ("Ebrim v3.0".equals(standardName) || "Web Registry Service v1.0".equals(standardName)) {
-            packagesName = ebrimV3Package;
+            packagesName.addAll(ebrimV3Package);
 
         } else if ("Ebrim v2.5".equals(standardName) || "Web Registry Service v0.9".equals(standardName)) {
-            packagesName = ebrimV25Package;
+            packagesName.addAll(ebrimV25Package);
 
         } else if ("SensorML".equals(standardName)) {
-            packagesName = sensorMLPackage;
+            packagesName.addAll(sensorMLPackage);
 
         } else if ("Sensor Web Enablement".equals(standardName)) {
-            packagesName = swePackage;
+            packagesName.addAll(swePackage);
 
         } else if ("ISO 19108".equals(standardName) && mode == SENSORML) {
-            packagesName = gmlPackage;
+            packagesName.addAll(gmlPackage);
 
         } else if ("ISO 19115-2".equals(standardName)) {
-            packagesName = geotkAcquisitionPackage;
+            packagesName.addAll(geotkAcquisitionPackage);
 
         } else if (extraPackage.containsKey(standardName)) {
-            packagesName = extraPackage.get(standardName);
+            packagesName.addAll(extraPackage.get(standardName));
 
         } else {
             if (!className.contains("Code") && !"DCPList".equals(className) && !"SV_CouplingType".equals(className) && !"AxisDirection".equals(className)) {
-            packagesName = geotoolkitPackage;
+                packagesName.addAll(geotoolkitPackage);
                 packagesName.addAll(gmlPackage);
             } else {
-                packagesName = opengisPackage;
+                packagesName.addAll(opengisPackage);
             }
         }
         return packagesName;

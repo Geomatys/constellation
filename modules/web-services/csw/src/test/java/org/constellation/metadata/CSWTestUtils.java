@@ -168,6 +168,11 @@ public class CSWTestUtils {
                 while (expSrcIt.hasNext()) {
                     Source expSrc = expSrcIt.next();
                     Source resSrc = resSrcIt.next();
+                    if (expSrc != null && resSrc == null) {
+                        assertTrue(false);
+                    } else if (expSrc == null && resSrc != null) {
+                        assertTrue(false);
+                    }
                     assertEquals(expSrc.getDescription(), resSrc.getDescription());
                     assertEquals(expSrc.getProcessedLevel(), resSrc.getProcessedLevel());
                     assertEquals(expSrc.getResolution(), resSrc.getResolution());
