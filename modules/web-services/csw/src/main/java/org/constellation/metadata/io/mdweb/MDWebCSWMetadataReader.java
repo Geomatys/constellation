@@ -262,7 +262,13 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                      * if the record have to be transform from the orginal standard to CSW we process.
                      */
                     if (!recordStandard.equals(Standard.CSW) || result == null) {
-                        result = getRecordFromForm(identifier, form, type, elementName);
+                        try {
+                            result = getRecordFromForm(identifier, form, type, elementName);
+                        }  catch (IllegalArgumentException ex) {
+                            LOGGER.warning(ex.getMessage());
+                            // the metadata is not convertible to DublinCore
+                            return null;
+                        }
                     }
                     result = applyElementSet(result, type, elementName);
                 } else {
