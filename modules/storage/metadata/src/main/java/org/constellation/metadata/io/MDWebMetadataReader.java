@@ -79,6 +79,7 @@ import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
+import org.opengis.util.UnlimitedInteger;
 
 
 /**
@@ -620,6 +621,41 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 }
 
             /**
+             * Again another special case UnlimitedInteger does not have a empty constructor.
+             * and no setters so we must call the normal constructor.
+             */
+            } else if (className.equals("UnlimitedInteger")) {
+                String intValue    = null;
+                String isInfinite  = null;
+
+                //We search the children of the QName
+                for (Value childValue : value.getChildren()) {
+                    if (childValue instanceof TextValue) {
+                        if (childValue.getPath().getName().equals("value"))
+                            intValue = ((TextValue)childValue).getValue();
+                        else  if (childValue.getPath().getName().equals("isInfinite"))
+                            isInfinite = ((TextValue)childValue).getValue();
+                    }
+                }
+                UnlimitedInteger u = null;
+                if (intValue != null && !intValue.isEmpty()) {
+                    try {
+                        u = new UnlimitedInteger(Integer.parseInt(intValue));
+                    } catch (NumberFormatException ex) {
+                        LOGGER.warning("Unable to parse value for Unlimited Integer: " + intValue);
+                    }
+                }
+
+                // if the flag isInfinite is set to true we overwrite the int value.
+                if (isInfinite != null && !isInfinite.isEmpty()) {
+                    boolean inf = Boolean.parseBoolean(isInfinite);
+                    if (inf) {
+                        u = UnlimitedInteger.POSITIVE_INFINITY;
+                    }
+                }
+                return u;
+
+            /**
              * Again another special case PT_FreeText has a special construction.
              */
             } else if ("DefaultInternationalString".equals(className)) {
@@ -870,6 +906,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             return String.class;
         } else if (className.equalsIgnoreCase("QName")) {
             return QName.class;
+        } else if (className.equalsIgnoreCase("UnlimitedInteger")) {
+            return UnlimitedInteger.class;
         } else {
             return null;
         }
