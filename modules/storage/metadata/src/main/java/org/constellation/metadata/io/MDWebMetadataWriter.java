@@ -1366,6 +1366,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         this.noLink = noLink;
     }
 
+    /**
+     * @return the mdRecordSet
+     */
+    public RecordSet getMdRecordSet() {
+        return mdRecordSet;
+    }
+
     protected static final class MixedPath {
 
         public Path path;
