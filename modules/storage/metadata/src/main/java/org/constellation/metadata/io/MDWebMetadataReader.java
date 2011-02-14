@@ -412,8 +412,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     protected Object getObjectFromForm(final String identifier, final Form form, final int mode) {
 
-        if (form != null && form.getTopValue() != null && form.getTopValue().getType() != null) {
-            final Value topValue = form.getTopValue();
+        if (form != null && form.getRoot() != null && form.getRoot().getType() != null) {
+            final Value topValue = form.getRoot();
             final Object result  = getObjectFromValue(topValue, mode);
             
             //we put the full object in the already read metadatas.
@@ -426,7 +426,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else {
             if (form == null) {
                 LOGGER.severe("form is null");
-            } else if (form.getTopValue() == null) {
+            } else if (form.getRoot() == null) {
                 LOGGER.severe("Top value is null");
             } else {
                 LOGGER.severe("Top value Type is null");

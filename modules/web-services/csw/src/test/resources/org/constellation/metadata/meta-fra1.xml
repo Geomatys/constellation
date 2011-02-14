@@ -4,7 +4,7 @@
         <gco:CharacterString>MDweb-2064d5c7-80b5-4840-ba3d-4fa4e23be750</gco:CharacterString>
     </gmd:fileIdentifier>
     <gmd:language>
-        <gmd:LanguageCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="eng">eng</gmd:LanguageCode>
+        <gmd:LanguageCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="eng">eng</gmd:LanguageCode>
     </gmd:language>
     <gmd:contact>
         <gmd:CI_ResponsibleParty>

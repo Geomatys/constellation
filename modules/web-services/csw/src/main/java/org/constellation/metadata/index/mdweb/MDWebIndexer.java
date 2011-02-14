@@ -240,10 +240,10 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     @Override
     protected void indexSpecialField(final Form metadata, final Document doc) throws IndexingException {
-        if (metadata.getTopValue() == null) {
+        if (metadata.getRoot() == null) {
             throw new IndexingException("unable to index form:" + metadata.getId() + " top value is null");
 
-        } else if (metadata.getTopValue().getType() == null) {
+        } else if (metadata.getRoot().getType() == null) {
             throw new IndexingException("unable to index form:" + metadata.getId() + " top value type is null");
         }
 
@@ -257,7 +257,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     @Override
     protected boolean isISO19139(Form form) {
-       return form.getTopValue().getType().getName().equals("MD_Metadata");
+       return form.getRoot().getType().getName().equals("MD_Metadata");
     }
 
     /**
@@ -265,7 +265,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     @Override
     protected boolean isDublinCore(Form form) {
-        return form.getTopValue().getType().getName().equals("Record");
+        return form.getRoot().getType().getName().equals("Record");
     }
 
     /**
@@ -273,7 +273,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     @Override
     protected boolean isEbrim25(Form form) {
-        return form.getTopValue().getType().isSubClassOf(registryObject);
+        return form.getRoot().getType().isSubClassOf(registryObject);
     }
 
     /**
@@ -281,7 +281,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     @Override
     protected boolean isEbrim30(Form form) {
-        return form.getTopValue().getType().isSubClassOf(identifiable);
+        return form.getRoot().getType().isSubClassOf(identifiable);
     }
 
     /**
@@ -289,7 +289,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     @Override
     protected String getType(Form f) {
-        return f.getTopValue().getType().getName();
+        return f.getRoot().getType().getName();
     }
 
     /**

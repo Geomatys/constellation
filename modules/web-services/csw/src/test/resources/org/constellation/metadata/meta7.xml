@@ -9,7 +9,7 @@
         <gco:CharacterString>MDWeb_FR_SY_couche_vecteur_258</gco:CharacterString>
     </gmd:fileIdentifier>
     <gmd:language>
-        <gmd:LanguageCode codeList="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="fre">fre</gmd:LanguageCode>
+        <gmd:LanguageCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="fre">fre</gmd:LanguageCode>
     </gmd:language>
     <gmd:characterSet>
         <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#8859part1" codeListValue="8859part1"/>

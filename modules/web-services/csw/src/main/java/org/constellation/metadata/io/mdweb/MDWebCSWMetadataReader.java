@@ -253,7 +253,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
                 final Form form                   = mdReader.getForm(recordSet, id);
                 if (form != null) {
-                    final Value top               = form.getTopValue();
+                    final Value top               = form.getRoot();
                     final Standard recordStandard = top.getType().getStandard();
 
                     /*
@@ -360,7 +360,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * @return a CSW object representing the metadata.
      */
     private AbstractRecordType getRecordFromForm(String identifier, Form form, ElementSetType type, List<QName> elementName) throws MD_IOException {
-        final Value top                   = form.getTopValue();
+        final Value top                   = form.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
 
         if (recordStandard.equals(Standard.ISO_19115) || recordStandard.equals(Standard.EBRIM_V3)) {
@@ -390,7 +390,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      */
     private AbstractRecordType transformMDFormInRecord(Form form, ElementSetType type, List<QName> elementName) throws MD_IOException {
         
-        final Value top                   = form.getTopValue();
+        final Value top                   = form.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
         final Map<String, String> pathMap = DUBLINCORE_PATH_MAP.get(recordStandard);
 

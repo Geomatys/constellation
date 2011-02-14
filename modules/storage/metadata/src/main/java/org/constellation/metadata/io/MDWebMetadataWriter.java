@@ -334,7 +334,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final MDWebMetadataReader reader = new MDWebMetadataReader(mdWriter);
             for (Form contactForm : contactForms) {
                 Object responsibleParty = reader.getObjectFromForm(null, contactForm, AbstractMetadataReader.ISO_19115);
-                contacts.put(responsibleParty, contactForm.getTopValue());
+                contacts.put(responsibleParty, contactForm.getRoot());
             }
         }
 
