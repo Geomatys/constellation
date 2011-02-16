@@ -22,14 +22,9 @@ import java.util.List;
 import java.io.File;
 
 // Constellation dependencies
-import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-
-// geotoolkit pending
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
@@ -39,22 +34,6 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
 
     public DefaultCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         super(cn);
-    }
-    
-    /**
-     * Update all the vocabularies skos files and the list of contact.
-     */
-    @Override
-    public AcknowlegementType updateVocabularies() throws CstlServiceException {
-        throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
-    }
-    
-    /**
-     * Update all the contact retrieved from files and the list of contact.
-     */
-    @Override
-    public AcknowlegementType updateContacts() throws CstlServiceException {
-        throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
     }
     
     @Override

@@ -176,18 +176,8 @@ public abstract class AbstractCSWConfigurer {
      * @throws ConfigurationException
      */
     private void refreshServiceConfiguration() throws ConfigurationException {
-        serviceConfiguration = new HashMap<String, Automatic>();
-
-        final File configDir = ConfigDirectory.getConfigDirectory();
-        final File cswConfigDir;
-        if (configDir == null || !configDir.isDirectory()) {
-            throw new ConfigurationException("No configuration directory have been found");
-        } else {
-            cswConfigDir = new File(configDir, "CSW");
-            if (cswConfigDir == null || !cswConfigDir.isDirectory()) {
-                throw new ConfigurationException("No CSW configuration directory have been found");
-            }
-        }
+        serviceConfiguration    = new HashMap<String, Automatic>();
+        final File cswConfigDir = getConfigurationDirectory();
         try {
             final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
 
@@ -393,9 +383,40 @@ public abstract class AbstractCSWConfigurer {
         this.containerNotifier = containerNotifier;
     }
 
-    public abstract AcknowlegementType updateContacts() throws CstlServiceException;
+    /**
+     * Return the CSW configuration directory.
+     * example for regular constellation configuration it return the file USER_DIRECTORY/.constellation/CSW
+     *
+     * @return Return the CSW configuration directory.
+     * @throws ConfigurationException
+     */
+    protected File getConfigurationDirectory() throws ConfigurationException {
+        final File configDir = ConfigDirectory.getConfigDirectory();
+        final File cswConfigDir;
+        if (configDir == null || !configDir.isDirectory()) {
+            throw new ConfigurationException("No configuration directory have been found");
+        } else {
+            cswConfigDir = new File(configDir, "CSW");
+            if (cswConfigDir == null || !cswConfigDir.isDirectory()) {
+                throw new ConfigurationException("No CSW configuration directory have been found");
+            }
+            return cswConfigDir;
+        }
+    }
     
-    public abstract AcknowlegementType updateVocabularies() throws CstlServiceException;
+    /**
+     * Update all the vocabularies skos files and the list of contact.
+     */
+    public AcknowlegementType updateVocabularies() throws CstlServiceException {
+        throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
+    }
+
+    /**
+     * Update all the contact retrieved from files and the list of contact.
+     */
+    public AcknowlegementType updateContacts() throws CstlServiceException {
+        throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
+    }
 
     protected abstract File getCswInstanceDirectory(String instanceId);
 
