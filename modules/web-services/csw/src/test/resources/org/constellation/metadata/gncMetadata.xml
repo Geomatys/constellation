@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gmd:MD_Metadata xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gnc="http://www.mdweb-project.org/files/xsd">
     <gmd:identificationInfo>
-        <gnc:GNC_OrganisationEntitie>
+        <gnc:GNC_Organisation>
             <gmd:citation>
                 <gmd:CI_Citation>
                     <gmd:title>
@@ -16,102 +16,17 @@
                     </gmd:linkage>
                 </gmd:CI_OnlineResource>
             </gnc:onlineInformation>
-            <gnc:reference>
-                <gnc:GNC_MaterialResource>
-                    <gnc:isStillInProduction>
-                        <gco:Boolean>true</gco:Boolean>
-                    </gnc:isStillInProduction>
-                    <gnc:access>
-                        <gnc:GNC_Access>
-                            <gnc:description>
-                                <gco:CharacterString>desc1</gco:CharacterString>
-                            </gnc:description>
-                            <gnc:detailAccessConstraints>
-                                <gnc:GNC_AccessConstraints>
-                                    <gnc:dataAccessConditionPortal>
-                                        <gmd:URL>http://danstonchat.com</gmd:URL>
-                                    </gnc:dataAccessConditionPortal>
-                                    <gnc:nameOfConditions>
-                                        <gco:CharacterString>names</gco:CharacterString>
-                                    </gnc:nameOfConditions>
-                                    <gnc:nonCommercialUse>
-                                        <gco:Boolean>true</gco:Boolean>
-                                    </gnc:nonCommercialUse>
-                                    <gnc:thematicUsage>
-                                        <gnc:GNC_ThematicTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#Agriculture" codeListValue="Agriculture"/>
-                                    </gnc:thematicUsage>
-                                    <gnc:useRestrictions>
-                                        <gnc:GNC_UseRestrictions>
-                                            <gnc:extentOfRestrictions>
-                                                <gmd:EX_GeographicDescription>
-                                                    <gmd:geographicIdentifier>
-                                                        <gmd:RS_Identifier>
-                                                            <gmd:code>
-                                                                <gco:CharacterString>N_43.456_E_3.692_S_43.331_W_3.543</gco:CharacterString>
-                                                            </gmd:code>
-                                                        </gmd:RS_Identifier>
-                                                    </gmd:geographicIdentifier>
-                                                </gmd:EX_GeographicDescription>
-                                            </gnc:extentOfRestrictions>
-                                            <gnc:geographicRestrictions>
-                                                <gco:Boolean>false</gco:Boolean>
-                                            </gnc:geographicRestrictions>
-                                            <gnc:otherConstraints>
-                                                <gco:CharacterString>military</gco:CharacterString>
-                                            </gnc:otherConstraints>
-                                        </gnc:GNC_UseRestrictions>
-                                    </gnc:useRestrictions>
-                                    <gnc:usersRestrictions>
-                                        <gnc:GNC_UsersRestrictions>
-                                            <gnc:categoryOfUsers>
-                                                <gnc:GNC_OrganisationTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#Experts" codeListValue="Experts"/>
-                                            </gnc:categoryOfUsers>
-                                            <gnc:extentOfRestrictions>
-                                                <gmd:EX_GeographicDescription>
-                                                    <gmd:geographicIdentifier>
-                                                        <gmd:RS_Identifier>
-                                                            <gmd:code>
-                                                                <gco:CharacterString>N_43.456_E_3.692_S_43.331_W_3.543</gco:CharacterString>
-                                                            </gmd:code>
-                                                        </gmd:RS_Identifier>
-                                                    </gmd:geographicIdentifier>
-                                                </gmd:EX_GeographicDescription>
-                                            </gnc:extentOfRestrictions>
-                                            <gnc:otherConstraints>
-                                                <gco:CharacterString>confidential</gco:CharacterString>
-                                            </gnc:otherConstraints>
-                                        </gnc:GNC_UsersRestrictions>
-                                    </gnc:usersRestrictions>
-                                </gnc:GNC_AccessConstraints>
-                            </gnc:detailAccessConstraints>
-                        </gnc:GNC_Access>
-                    </gnc:access>
-                </gnc:GNC_MaterialResource>
-            </gnc:reference>
-            <gnc:reference>
-                <gnc:GNC_Reference/>
-            </gnc:reference>
-            <gnc:reference>
-                <gnc:GNC_Document/>
-            </gnc:reference>
-            <gnc:reference>
-                <gnc:GNC_Product/>
-            </gnc:reference>
-            <gnc:reference>
-                <gnc:GNC_Service/>
-            </gnc:reference>
-            <gnc:reference>
-                <gnc:GNC_Software/>
-            </gnc:reference>
-            <gnc:reference>
-                <gnc:GNC_Training/>
-            </gnc:reference>
-            <gnc:reference>
-                <gnc:GNC_EOProduct/>
-            </gnc:reference>
+            <gnc:relationType>
+                <gnc:GNC_RelationType>
+                    <gnc:organisationIdentifier>
+                        <gco:CharacterString>org1
+                        </gco:CharacterString>
+                    </gnc:organisationIdentifier>
+                </gnc:GNC_RelationType>
+            </gnc:relationType>
             <gnc:typeOfOrganisation>
                 <gnc:GNC_OrganisationTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#Experts" codeListValue="Experts"/>
             </gnc:typeOfOrganisation>
-        </gnc:GNC_OrganisationEntitie>
+        </gnc:GNC_Organisation>
     </gmd:identificationInfo>
 </gmd:MD_Metadata>

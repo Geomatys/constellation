@@ -336,13 +336,20 @@ public class MDWebMetadataReaderTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     public void getMetadataGncTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object result = reader.getMetadata("25:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata.xml"));
+
+        assertTrue(result instanceof DefaultMetadata);
+        metadataEquals(expResult, (DefaultMetadata)result);
+
+        result = reader.getMetadata("31:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata2.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);

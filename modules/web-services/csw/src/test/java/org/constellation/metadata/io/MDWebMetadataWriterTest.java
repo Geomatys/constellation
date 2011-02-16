@@ -372,7 +372,7 @@ public class MDWebMetadataWriterTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     public void writeMetadataGncTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -385,8 +385,20 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata result = (DefaultMetadata) absResult;
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata.xml"));
 
-        pool.release(unmarshaller);
         metadataEquals(expResult,result);
+
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata2.xml"));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("19:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata2.xml"));
+
+        metadataEquals(expResult,result);
+
+        pool.release(unmarshaller);
+        
     }
 
     /**
@@ -401,7 +413,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("19:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("20:CSWCat", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
