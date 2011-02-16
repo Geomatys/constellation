@@ -138,7 +138,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         this.workersMap        = workers;
     }
 
-    private File getServiceDirectory() {
+    protected File getServiceDirectory() {
         final File configDirectory   = ConfigDirectory.getConfigDirectory();
         if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
             final File serviceDirectory = new File(configDirectory, supportedVersions.get(0).specification.name());
