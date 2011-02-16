@@ -27,6 +27,7 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
 /**
+ * Default implementation of CSW Configurer
  *
  * @author Guilhem Legal
  */
@@ -35,7 +36,10 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     public DefaultCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         super(cn);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected File getCswInstanceDirectory(String instanceId) {
         final File configDir = ConfigDirectory.getConfigDirectory();
@@ -52,6 +56,9 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected List<File> getAllCswInstanceDirectory() {
         final File configDir     = ConfigDirectory.getConfigDirectory();

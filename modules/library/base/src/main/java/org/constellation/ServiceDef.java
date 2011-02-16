@@ -56,7 +56,9 @@ public enum ServiceDef {
     PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE, null, false),
     PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE, null, false),
     // MDWeb services definitions
-    MDW(Specification.MDW, Organization.NONE, null, Profile.NONE, null, false);
+    MDW(Specification.MDW, Organization.NONE, null, Profile.NONE, null, false),
+    // Thesaurus services definitions
+    THW(Specification.THW, Organization.NONE, null, Profile.NONE, null, false);
     /**
      * Name of the specification.
      */
@@ -163,7 +165,8 @@ public enum ServiceDef {
         WMTS("Web Map Tile Service"),
         PEP("Policy Enforcement Point"),
         PDP("Policy Decision Point"),
-        MDW("MDWeb");
+        MDW("MDWeb"),
+        THW("Thesaurus");
         public final String fullName;
 
         private Specification(String full) {

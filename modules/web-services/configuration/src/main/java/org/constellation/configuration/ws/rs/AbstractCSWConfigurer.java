@@ -418,8 +418,15 @@ public abstract class AbstractCSWConfigurer {
         throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
     }
 
+    /*
+     * Return the configuration directory for the specified instance identifier.
+     */
     protected abstract File getCswInstanceDirectory(String instanceId);
 
+    /**
+     * Return the configuration directory for all the instances.
+     * @return
+     */
     protected abstract List<File> getAllCswInstanceDirectory();
 
     /**
