@@ -48,7 +48,7 @@ import org.constellation.util.Util;
 // geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
-import org.geotoolkit.internal.jaxb.text.AnchorType;
+import org.geotoolkit.internal.jaxb.gco.AnchorType;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
