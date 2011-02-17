@@ -29,6 +29,7 @@ import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 
 // constellation dependencies
+import javax.xml.bind.annotation.XmlSeeAlso;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
@@ -55,6 +56,7 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
  */
 @WebService(name = "CSWService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
+@XmlSeeAlso({org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
 public class CSWService extends OGCWebService<CSWworker>{
     
     /**
