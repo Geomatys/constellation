@@ -18,6 +18,7 @@
 package org.constellation.ws.embedded;
 
 // JUnit dependencies
+import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
 import java.net.MalformedURLException;
@@ -59,6 +60,8 @@ public class WFSRequestTest extends AbstractTestRequest {
             + "%3Cogc:Literal%3E10972X0137-PONT%3C/ogc:Literal%3E"
             + "%3C/ogc:PropertyIsEqualTo%3E"
             + "%3C/ogc:Filter%3E";
+
+     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL = "http://localhost:9090/wfs/default?request=DescribeFeatureType&service=WFS&version=1.1.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.1.1";
 
     private static String EPSG_VERSION;
     
@@ -129,6 +132,27 @@ public class WFSRequestTest extends AbstractTestRequest {
         SamplingPointEntry sp = (SamplingPointEntry) feat.getFeatureMember().get(0).getAbstractFeature();
 
         assertEquals("10972X0137-PONT", sp.getName());
+    }
+
+    /**
+     */
+    @Test
+    public void testWFSDescribeFeatureGET() throws Exception {
+        final URL getfeatsUrl;
+        try {
+            getfeatsUrl = new URL(WFS_DESCRIBE_FEATURE_TYPE_URL);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        Object obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue(obj instanceof Schema);
+
+        Schema schema = (Schema) obj;
+        assertEquals(13, schema.getElements().size());
+
     }
 
     /**
