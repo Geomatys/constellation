@@ -70,7 +70,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 	
     /**
      * The supported supportedVersions supported by this web serviceType.
-     * avoid modification after instanciation.
+     * avoid modification after instantiation.
      */
     private final UnmodifiableArrayList<ServiceDef> supportedVersions;
 
@@ -83,6 +83,12 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     private static final String RESTART_ANCKNOWLEDEGEMENT ="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
                                                            "<Acknowlegement xmlns=\"http://www.constellation.org/config\">\n" +
                                                            "    <message>workers succefully restarted</message>\n" +
+                                                           "    <status>Success</status>\n" +
+                                                           "</Acknowlegement>";
+
+    private static final String START_ANCKNOWLEDEGEMENT ="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
+                                                           "<Acknowlegement xmlns=\"http://www.constellation.org/config\">\n" +
+                                                           "    <message>new worker succefully started</message>\n" +
                                                            "    <status>Success</status>\n" +
                                                            "</Acknowlegement>";
     
@@ -158,7 +164,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     /**
-     * Scan the configuration directory to instanciate Web service workers.
+     * Scan the configuration directory to instantiate Web service workers.
      */
     private void buildWorkerMap() {
         final File serviceDirectory = getServiceDirectory();
@@ -175,17 +181,19 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
     }
 
-    private void buildWorker(String identifier) {
+    private W buildWorker(String identifier) {
         final File serviceDirectory = getServiceDirectory();
         if (serviceDirectory != null) {
             final File instanceDirectory = new File(serviceDirectory, identifier);
             if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
                 final W newWorker = createWorker(instanceDirectory);
                 workersMap.put(instanceDirectory.getName(), newWorker);
+                return newWorker;
             } else {
                 LOGGER.log(Level.SEVERE, "The instance directory: {0} does not exist or is not a directory.", instanceDirectory.getPath());
             }
         }
+        return null;
     }
 
     /**
@@ -230,7 +238,10 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         final String request = getParameter("request", true);
         final String identifier = getParameter("id", false);
 
-        // restart operation
+        /*
+         * restart operation
+         * kill all the workers and rebuild each one.
+         */
         if ("restart".equals(request)) {
             LOGGER.info("\nrefreshing the workers\n");
             specificRestart(identifier);
@@ -247,10 +258,26 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     worker.destroy();
                     buildWorker(identifier);
                 } else {
-                    throw new CstlServiceException("There is no worker " + identifier, INVALID_PARAMETER_VALUE, "id");
+                    throw new CstlServiceException("There is no instance " + identifier, INVALID_PARAMETER_VALUE, "id");
                 }
             }
             return Response.ok(RESTART_ANCKNOWLEDEGEMENT, "text/xml").build();
+        } else if ("start".equals(request)) {
+            LOGGER.info("\nstarting a new worker\n");
+            specificRestart(identifier);
+            if (identifier == null) {
+                throw new CstlServiceException("The parameter id is not specified.", MISSING_PARAMETER_VALUE, "id");
+            } else {
+                if (workersMap.containsKey(identifier)) {
+                    throw new CstlServiceException("The instance " + identifier + " is already started try restart method instead.", INVALID_PARAMETER_VALUE);
+                } else {
+                    final Worker worker = buildWorker(identifier);
+                    if (worker == null) {
+                        throw new CstlServiceException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", INVALID_PARAMETER_VALUE);
+                    }
+                }
+            }
+            return Response.ok(START_ANCKNOWLEDEGEMENT, "text/xml").build();
         } else {
             throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
                     INVALID_PARAMETER_VALUE, "request");
@@ -260,20 +287,20 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     /**
      * Service specific task which has to be executed when a restart is asked.
      * 
-     * @param identifier the instance indentifier or {@code null} for all the instance.
+     * @param identifier the instance identifier or {@code null} for all the instance.
      */
     protected void specificRestart(String identifier) {
         // do nothing in this implementation
     }
 
     /**
-     * Treat the incomming request and call the right function.
+     * Treat the incoming request and call the right function.
      *
      * @param objectRequest if the server receive a POST request in XML,
      *        this object contain the request. Else for a GET or a POST kvp
-     *        request this param is {@code null}
+     *        request this parameter is {@code null}
      * 
-     * @param worker the selected worker on whitch apply the request.
+     * @param worker the selected worker on which apply the request.
      * 
      * @return an xml response.
      */
@@ -303,7 +330,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      *   <li>if the exception code indicates a mistake done by the user, just display a single
      *       line message in logs.</li>
      *   <li>otherwise logs the full stack trace in logs, because it is something interesting for
-     *       a developper</li>
+     *       a developer</li>
      * </ul>
      * In both ways, the exception is then marshalled and returned to the client.
      *
