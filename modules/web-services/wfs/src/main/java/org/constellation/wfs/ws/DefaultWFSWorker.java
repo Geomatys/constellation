@@ -560,10 +560,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         }
 
         /**
-         * 3 possibilité ici :
-         *    1) mergé les collections
-         *    2) retourné une collection de collection.
-         *    3) si il n'y a qu'un feature on le retourne (changer le type de retour en object)
+         * 3 possibility here :
+         *    1) merge the collections
+         *    2) return a collection of collection.
+         *    3) id there is only one feature we return (change the return type in object)
          *
          * result TODO find an id and a member type
          */
@@ -638,7 +638,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 // what to do with the CRS ?
                 final CoordinateReferenceSystem insertCRS = extractCRS(insertRequest.getSrsName());
 
-                // what to do with that, whitch ones are supported ??
+                // what to do with that, which ones are supported ??
                 final IdentifierGenerationOptionType idGen = insertRequest.getIdgen();
 
                 for (Object featureObject : insertRequest.getFeature()) {
@@ -962,7 +962,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     
     /**
      * Extract the WGS84 BBOx from a featureSource.
-     * what ? may not be wgs84 exactly ? why is there a crs attribut on a wgs84 bbox ?
+     * what ? may not be wgs84 exactly ? why is there a crs attribute on a wgs84 bbox ?
      */
     private static WGS84BoundingBoxType toBBox(DataStore source, Name groupName) throws CstlServiceException{
         try {

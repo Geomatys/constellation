@@ -168,22 +168,22 @@ public class CSWworker extends AbstractWorker {
     private AbstractIndexSearcher indexSearcher;
     
     /**
-     * A filter parser whitch create lucene query from OGC filter
+     * A filter parser which create lucene query from OGC filter
      */
     private final FilterParser luceneFilterParser = new LuceneFilterParser();
     
     /**
-     * A filter parser whitch create SQL query from OGC filter (used for ebrim query)
+     * A filter parser which create SQL query from OGC filter (used for ebrim query)
      */
     private final FilterParser sqlFilterParser = new SQLFilterParser();
     
     /**
-     * A catalogue Harvester comunicating with other CSW 
+     * A catalogue Harvester communicating with other CSW
      */
     private CatalogueHarvester catalogueHarvester;
     
     /**
-     * A task schreduler for asynchronous harvest.
+     * A task scheduler for asynchronous harvest.
      */
     private HarvestTaskSchreduler harvestTaskSchreduler;
 
@@ -198,7 +198,7 @@ public class CSWworker extends AbstractWorker {
     private List<String> supportedSchemaLanguage;
     
     /**
-     * A map of QName - xsd svhema object
+     * A map of QName - xsd schema object
      */
     private final Map<QName, Object> schemas = new HashMap<QName, Object>();
 
@@ -312,14 +312,14 @@ public class CSWworker extends AbstractWorker {
 
     /**
      * Initialize the readers and indexSearcher to the datasource for the discovery profile.
-     * If The transactionnal part is enabled, it also initialize Writer and catalog harvester.
+     * If The transactional part is enabled, it also initialize Writer and catalog harvester.
      *
      * @param configuration A configuration object containing the datasource informations
      * @param serviceID The identifier of the instance.
-     * @param configDir The direcory containing the configuration files.
+     * @param configDir The directory containing the configuration files.
      *
      * @throws MetadataIoException If an error occurs while querying the datasource.
-     * @throws IndexingException If an error occurs while initialiazing the indexation.
+     * @throws IndexingException If an error occurs while initializing the indexation.
      */
     private void init(final Automatic configuration, String serviceID, File configDir) throws MetadataIoException, IndexingException, JAXBException, CstlServiceException {
 
@@ -398,7 +398,7 @@ public class CSWworker extends AbstractWorker {
     }
 
     /**
-     * Load from the resource the XSD schemas used for the reponse of describeRecord.
+     * Load from the resource the XSD schemas used for the response of describeRecord.
      * 
      * @throws CstlServiceException if there is a JAXBException while using the unmarshaller.
      */
@@ -1120,7 +1120,7 @@ public class CSWworker extends AbstractWorker {
     }
     
     /**
-     * Return one or more xsd schemas correspounding to the metadata records.
+     * Return one or more xsd schemas corresponding to the metadata records.
      * 
      * @param request
      * @return
@@ -1280,7 +1280,7 @@ public class CSWworker extends AbstractWorker {
     }
     
     /**
-     * A web service method alowing to Insert / update / delete record from the CSW.
+     * A web service method allowing to Insert / update / delete record from the CSW.
      * 
      * @param request
      * @return

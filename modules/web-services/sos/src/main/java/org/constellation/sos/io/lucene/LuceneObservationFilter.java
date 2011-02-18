@@ -214,7 +214,7 @@ public class LuceneObservationFilter implements ObservationFilter {
             final String position    = getLuceneTimeValue(ti.getTimePosition());
             luceneRequest.append("AND (");
 
-            // the single and multpile observations whitch begin after the bound
+            // the single and multpile observations which begin after the bound
             luceneRequest.append("(sampling_time_begin: [19700000000000 ").append(position).append("]))");
 
         } else {
@@ -234,7 +234,7 @@ public class LuceneObservationFilter implements ObservationFilter {
             final String position    = getLuceneTimeValue(ti.getTimePosition());
             luceneRequest.append("AND (");
 
-            // the single and multpile observations whitch begin after the bound
+            // the single and multpile observations which begin after the bound
             luceneRequest.append("(sampling_time_begin:[").append(position).append(" 30000000])");
             luceneRequest.append(OR_OPERATOR);
             // the multiple observations overlapping the bound
@@ -264,13 +264,13 @@ public class LuceneObservationFilter implements ObservationFilter {
             // the single observations included in the period
             luceneRequest.append(" (sampling_time_begin:[").append(begin).append(" 30000000] AND sampling_time_begin:[19700000 ").append(end).append("] AND sampling_time_end IS NULL)");
             luceneRequest.append(OR_OPERATOR);
-            // the multiple observations whitch overlaps the first bound
+            // the multiple observations which overlaps the first bound
             luceneRequest.append(" (sampling_time_begin:[19700000 ").append(begin).append("] AND sampling_time_end:[19700000 ").append(end).append("] AND sampling_time_end:[").append(begin).append(" 30000000])");
             luceneRequest.append(OR_OPERATOR);
-            // the multiple observations whitch overlaps the second bound
+            // the multiple observations which overlaps the second bound
             luceneRequest.append(" (sampling_time_begin:[").append(begin).append(" 30000000] AND sampling_time_end:[").append(end).append(" 30000000] AND sampling_time_begin:[19700000 ").append(end).append("])");
             luceneRequest.append(OR_OPERATOR);
-            // the multiple observations whitch overlaps the whole period
+            // the multiple observations which overlaps the whole period
             luceneRequest.append(" (sampling_time_begin:[19700000 ").append(begin).append("] AND sampling_time_end:[").append(end).append(" 30000000]))");
 
 

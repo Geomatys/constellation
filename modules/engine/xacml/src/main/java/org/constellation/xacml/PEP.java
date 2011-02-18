@@ -133,7 +133,7 @@ public class PEP {
      * @param user      The authentified user.
      * @param roleGroup The user group.
      * 
-     * @return a subject Type whitch is a part of XACML request.
+     * @return a subject Type which is a part of XACML request.
      */
     protected SubjectType createSubject(Principal user, Group roleGroup) {
     
@@ -159,7 +159,7 @@ public class PEP {
      * 
      * @param URI the requested resource URI.
      * 
-     * @return a resource Type whitch is a part of XACML request.
+     * @return a resource Type which is a part of XACML request.
      */
     protected ResourceType createResource(String uri) throws URISyntaxException {
     
@@ -175,7 +175,7 @@ public class PEP {
      * 
      * @param URI the requested resource URI.
      * 
-     * @return a resource Type whitch is a part of XACML request.
+     * @return a resource Type which is a part of XACML request.
      */
     protected ResourceType createResource(URI uri) {
     
@@ -191,7 +191,7 @@ public class PEP {
      * 
      * @param URI the requested resource URI.
      * 
-     * @return a action Type whitch is a part of XACML request.
+     * @return a action Type which is a part of XACML request.
      */
     protected ActionType createAction(String action)  {
         

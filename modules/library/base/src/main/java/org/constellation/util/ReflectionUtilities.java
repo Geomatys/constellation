@@ -313,7 +313,7 @@ public final class ReflectionUtilities {
      *
      * @param propertyName The attribute name.
      * @param classe       The attribute type.
-     * @param rootClass    The class whitch owe this attribute
+     * @param rootClass    The class which owe this attribute
      *
      * @return a setter to this attribute or {@code null}.
      */
@@ -338,7 +338,7 @@ public final class ReflectionUtilities {
      *
      * @param propertyName The attribute name.
      * @param classe       The attribute type.
-     * @param rootClass    The class whitch owe this attribute
+     * @param rootClass    The class which owe this attribute
      *
      * @return a setter to this attribute or {@code null}.
      */
@@ -362,7 +362,7 @@ public final class ReflectionUtilities {
      *
      * @param propertyName The attribute name.
      * @param classe       The attribute type.
-     * @param rootClass    The class whitch owe this attribute
+     * @param rootClass    The class which owe this attribute
      *
      * @return a setter to this attribute or {@code null}.
      */
@@ -385,7 +385,7 @@ public final class ReflectionUtilities {
      * Return a getter Method for the specified attribute (propertyName)
      *
      * @param propertyName The attribute name.
-     * @param rootClass    The class whitch owe this attribute
+     * @param rootClass    The class which owe this attribute
      *
      * @return a setter to this attribute or {@code null}.
      */
@@ -507,7 +507,7 @@ public final class ReflectionUtilities {
      *
      * @param propertyName The attribute name.
      * @param classe       The attribute type.
-     * @param rootClass    The class whitch owe this attribute
+     * @param rootClass    The class which owe this attribute
      *
      * @return a setter to this attribute or {@code null}.
      */

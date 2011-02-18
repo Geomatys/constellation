@@ -751,7 +751,7 @@ public class SOSworker extends AbstractWorker {
     }
     
     /**
-     * Web service operation whitch return an sml description of the specified sensor.
+     * Web service operation which return an sml description of the specified sensor.
      * 
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
@@ -798,7 +798,7 @@ public class SOSworker extends AbstractWorker {
     }
     
     /**
-     * Web service operation whitch respond a collection of observation satisfying 
+     * Web service operation which respond a collection of observation satisfying
      * the restriction specified in the query.
      * 
      * @param requestObservation a document specifying the parameter of the request.
@@ -1646,7 +1646,7 @@ public class SOSworker extends AbstractWorker {
     }
 
     /**
-     * Web service operation whitch register a Sensor in the SensorML database, 
+     * Web service operation which register a Sensor in the SensorML database,
      * and initialize its observation by adding an observation template in the O&M database.
      *
      * @param requestRegSensor A request containing a SensorML File describing a Sensor,
@@ -1751,7 +1751,7 @@ public class SOSworker extends AbstractWorker {
     }
     
     /**
-     * Web service operation whitch insert a new Observation for the specified sensor
+     * Web service operation which insert a new Observation for the specified sensor
      * in the O&M database.
      * 
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.

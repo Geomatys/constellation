@@ -258,7 +258,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             final String position    = getTimeValue(ti.getTimePosition());
             sqlRequest.append("AND (");
 
-            // the single and multpile observations whitch begin after the bound
+            // the single and multpile observations which begin after the bound
             sqlRequest.append("(\"sampling_time_begin\"<='").append(position).append("'))");
 
         } else {
@@ -278,7 +278,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             final String position    = getTimeValue(ti.getTimePosition());
             sqlRequest.append("AND (");
 
-            // the single and multpile observations whitch begin after the bound
+            // the single and multpile observations which begin after the bound
             sqlRequest.append("(\"sampling_time_begin\">='").append(position).append("')");
             sqlRequest.append(" OR ");
             // the multiple observations overlapping the bound
@@ -308,13 +308,13 @@ public class DefaultObservationFilter implements ObservationFilter {
             // the single observations included in the period
             sqlRequest.append(" (\"sampling_time_begin\">='").append(begin).append("' AND \"sampling_time_begin\"<='").append(end).append("' AND \"sampling_time_end\" IS NULL)");
             sqlRequest.append(" OR ");
-            // the multiple observations whitch overlaps the first bound
+            // the multiple observations which overlaps the first bound
             sqlRequest.append(" (\"sampling_time_begin\"<='").append(begin).append("' AND \"sampling_time_end\"<= '").append(end).append("' AND \"sampling_time_end\">='").append(begin).append("')");
             sqlRequest.append(" OR ");
-            // the multiple observations whitch overlaps the second bound
+            // the multiple observations which overlaps the second bound
             sqlRequest.append(" (\"sampling_time_begin\">='").append(begin).append("' AND \"sampling_time_end\">= '").append(end).append("' AND \"sampling_time_begin\"<='").append(end).append("')");
             sqlRequest.append(" OR ");
-            // the multiple observations whitch overlaps the whole period
+            // the multiple observations which overlaps the whole period
             sqlRequest.append(" (\"sampling_time_begin\"<='").append(begin).append("' AND \"sampling_time_end\">= '").append(end).append("'))");
 
 
