@@ -23,9 +23,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,6 +80,7 @@ import org.geotoolkit.referencing.datum.DefaultVerticalDatum;
 import org.geotoolkit.temporal.object.DefaultInstant;
 import org.geotoolkit.temporal.object.DefaultPeriod;
 import org.geotoolkit.temporal.object.DefaultPosition;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.SimpleInternationalString;
 
 // GeoAPI dependencies
@@ -121,8 +120,6 @@ public class MetadataUnmarshallTest {
     private static MarshallerPool testPool;
     private static Unmarshaller unmarshaller;
     private static Marshaller marshaller;
-
-    private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     @BeforeClass
     public static void setUp() throws JAXBException, URISyntaxException {
@@ -206,7 +203,7 @@ public class MetadataUnmarshallTest {
         /*
          * creation date
          */
-        expResult.setDateStamp(df.parse("2009-01-01T06:00:00+0100"));
+        expResult.setDateStamp(TemporalUtilities.parseDate("2009-01-01T06:00:00+0100"));
 
         /*
          * Spatial representation info
@@ -297,7 +294,7 @@ public class MetadataUnmarshallTest {
 
         DefaultCitationDate revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.REVISION);
-        Date d = df.parse("1990-06-05T00:00:00+0200");
+        Date d = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
         revisionDate.setDate(d);
         set = new HashSet();
         set.add(revisionDate);
@@ -434,7 +431,7 @@ public class MetadataUnmarshallTest {
         citation.setAlternateTitles(set);
         revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.REVISION);
-        d = df.parse("1990-06-05T00:00:00+0200");
+        d = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
         revisionDate.setDate(d);
         set = new HashSet();
         set.add(revisionDate);
@@ -453,7 +450,7 @@ public class MetadataUnmarshallTest {
         citation.setAlternateTitles(set);
         revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.REVISION);
-        d = df.parse("1990-06-09T00:00:00+0200");
+        d = TemporalUtilities.parseDate("1990-06-09T00:00:00+0200");
         revisionDate.setDate(d);
         set = new HashSet();
         set.add(revisionDate);
@@ -500,8 +497,8 @@ public class MetadataUnmarshallTest {
         //temporal extent
         DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
 
-        Date start = df.parse("1990-06-05T00:00:00+0200");
-        Date stop  = df.parse("1990-07-02T00:00:00+0200");
+        Date start = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
+        Date stop  = TemporalUtilities.parseDate("1990-07-02T00:00:00+0200");
 
         DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
         DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));
@@ -926,7 +923,7 @@ public class MetadataUnmarshallTest {
         citation.setAlternateTitles(set);
         DefaultCitationDate revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.REVISION);
-        Date d = df.parse(date);
+        Date d = TemporalUtilities.parseDate(date);
         revisionDate.setDate(d);
 
         set = new HashSet();
@@ -1026,7 +1023,7 @@ public class MetadataUnmarshallTest {
         /*
          * creation date
          */
-        metadata.setDateStamp(df.parse("2009-01-01T06:00:00+0100"));
+        metadata.setDateStamp(TemporalUtilities.parseDate("2009-01-01T06:00:00+0100"));
 
         /*
          * Spatial representation info
@@ -1117,7 +1114,7 @@ public class MetadataUnmarshallTest {
 
         DefaultCitationDate revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.REVISION);
-        Date d = df.parse("1990-06-05T00:00:00+0200");
+        Date d = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
         revisionDate.setDate(d);
         set = new HashSet();
         set.add(revisionDate);
@@ -1254,7 +1251,7 @@ public class MetadataUnmarshallTest {
         citation.setAlternateTitles(set);
         revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.REVISION);
-        d = df.parse("1990-06-05T00:00:00+0200");
+        d = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
         revisionDate.setDate(d);
         set = new HashSet();
         set.add(revisionDate);
@@ -1273,7 +1270,7 @@ public class MetadataUnmarshallTest {
         citation.setAlternateTitles(set);
         revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.REVISION);
-        d = df.parse("1990-06-09T00:00:00");
+        d = TemporalUtilities.parseDate("1990-06-09T00:00:00");
         revisionDate.setDate(d);
         set = new HashSet();
         set.add(revisionDate);
@@ -1320,8 +1317,8 @@ public class MetadataUnmarshallTest {
         //temporal extent
         DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
 
-        Date start = df.parse("1990-06-05T00:00:00+0200");
-        Date stop  = df.parse("1990-07-02T00:00:00+0200");
+        Date start = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
+        Date stop  = TemporalUtilities.parseDate("1990-07-02T00:00:00+0200");
 
         DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
         DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));
@@ -1493,8 +1490,8 @@ public class MetadataUnmarshallTest {
         String resd1 =    result2.substring(   result2.indexOf('>') + 1,    result2.lastIndexOf('<') -3) + "00";
 
 
-        Date expDate1 = df.parse(expd1);
-        Date resDate1 = df.parse(resd1);
+        Date expDate1 = TemporalUtilities.parseDate(expd1);
+        Date resDate1 = TemporalUtilities.parseDate(resd1);
         assertEquals(expDate1, resDate1);
         //assertEquals(expResult2, result2);
 

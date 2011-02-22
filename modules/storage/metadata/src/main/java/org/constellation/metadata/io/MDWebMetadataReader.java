@@ -70,6 +70,7 @@ import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.naming.DefaultLocalName;
 import org.geotoolkit.naming.DefaultNameFactory;
+import org.geotoolkit.naming.DefaultTypeName;
 import org.geotoolkit.resources.Locales;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.DefaultInternationalString;
@@ -79,6 +80,7 @@ import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
+import org.opengis.util.TypeName;
 import org.opengis.util.UnlimitedInteger;
 
 
@@ -575,25 +577,33 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     return null;
                 }
 
-            /*  WAIT FOR GEOTK PATCH
+            
                
              }  else if ("DefaultMemberName".equals(className)) {
                 TextValue child = null;
-
-                //We search the child of the TypeName
+                Value typeChild = null;
+                //We search the children of the MemberName (one String value, and one TypeName)
                 for (Value childValue : value.getChildren()) {
                     if (childValue instanceof TextValue) {
                         child = (TextValue) childValue;
-                        break;
+                    } else {
+                        typeChild = childValue;
                     }
                 }
                 if (child != null) {
                     final CharSequence cs = child.getValue();
-                    return new DefaultMemberName(null, cs, null);
+                    final DefaultNameFactory facto = new DefaultNameFactory();
+                    if (typeChild != null) {
+                        final TypeName tn = (TypeName) getObjectFromValue(typeChild, mode);
+                        return facto.createMemberName(null, cs, tn);
+                    } else {
+                        LOGGER.warning("The memberName is mal-formed (no attributeType value)");
+                        return null;
+                    }
                 } else {
-                    LOGGER.severe("The typeName is mal-formed");
+                    LOGGER.warning("The memberName is mal-formed (no aName value)");
                     return null;
-                }*/
+                }
 
             /**
              * Again another special case QNAME does not have a empty constructor.

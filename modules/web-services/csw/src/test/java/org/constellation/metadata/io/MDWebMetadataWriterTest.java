@@ -406,7 +406,7 @@ public class MDWebMetadataWriterTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     public void writeMetadata191152Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();

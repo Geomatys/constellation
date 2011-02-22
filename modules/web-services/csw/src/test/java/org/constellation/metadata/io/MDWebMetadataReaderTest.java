@@ -317,7 +317,7 @@ public class MDWebMetadataReaderTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     public void getMetadataISO191152Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
