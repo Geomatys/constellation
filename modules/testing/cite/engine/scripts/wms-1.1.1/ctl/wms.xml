@@ -6742,6 +6742,8 @@ longitude</td>
          <xsl:for-each select="$request1">
             <xsl:variable name="expression">not(count(/image_stats/model/subimage[count = 2500]) = 2)</xsl:variable>
             <xsl:if test="saxon:evaluate($expression)">
+               <message>Test fail response was: <xsl:value-of select="$request1"/>
+               </message>
                <fail/>
             </xsl:if>
          </xsl:for-each>
@@ -6843,6 +6845,8 @@ longitude</td>
          <xsl:for-each select="$request1">
             <xsl:variable name="expression">not(count(/image_stats/model/subimage[count = 2500]) = 2)</xsl:variable>
             <xsl:if test="saxon:evaluate($expression)">
+               <message>Test fail response was: <xsl:value-of select="$request1"/>
+               </message>
                <fail/>
             </xsl:if>
          </xsl:for-each>

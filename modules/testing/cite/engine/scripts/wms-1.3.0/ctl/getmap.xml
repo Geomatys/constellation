@@ -976,6 +976,9 @@
             </ctl:request>
          </xsl:variable>
          <xsl:if test="not(count($response/parsers:ImageParser/parsers:model/parsers:subimage[parsers:count = 2500]) = 2)">
+             <ctl:message>Test fail response was: <xsl:value-of xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                          select="$response"/>
+             </ctl:message>
             <ctl:fail/>
          </xsl:if>
       </ctl:code>

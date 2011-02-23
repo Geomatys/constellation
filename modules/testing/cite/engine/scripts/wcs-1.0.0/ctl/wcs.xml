@@ -10657,6 +10657,9 @@ offering. Enter the grid resolutions below.</p>
                   </ctl:request>
                </xsl:variable>
                <xsl:if test="not(normalize-space(substring-before(concat($request2/headers/header[translate(name, 'CONTYPE', 'contype') = 'content-type']/value, ';'), ';'))=$VAR_WCS_FORMAT_1_HEADER)">
+                  <ctl:message>Test fail response was: <xsl:value-of xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                          select="$request2"/>
+                  </ctl:message>
                   <ctl:fail/>
                </xsl:if>
             </xsl:for-each>
