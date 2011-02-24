@@ -1212,7 +1212,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final RecordSet recordSet = mdWriter.getRecordSet(recordSetCode);
             final FormInfo f          = mdWriter.getFormInfo(recordSet, id);
             if (f != null) {
-                mdWriter.deleteForm(id);
+                mdWriter.deleteForm(f);
             } else {
                 LOGGER.log(logLevel, "The sensor is not registered, nothing to delete");
                 return false;
