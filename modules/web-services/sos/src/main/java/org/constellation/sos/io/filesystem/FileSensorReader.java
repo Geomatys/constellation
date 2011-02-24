@@ -118,7 +118,7 @@ public class FileSensorReader implements SensorReader {
      */
     @Override
     public String getInfos() {
-        return "Constellation Filesystem Sensor Reader 0.6";
+        return "Constellation Filesystem Sensor Reader 0.7";
     }
 
     /**

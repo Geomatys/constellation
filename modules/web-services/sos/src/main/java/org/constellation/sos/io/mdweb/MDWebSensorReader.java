@@ -133,7 +133,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
      */
     @Override
     public String getInfos() {
-        return "Constellation MDweb Sensor Reader 0.6";
+        return "Constellation MDweb Sensor Reader 0.7";
     }
 
     /**
