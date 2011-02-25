@@ -672,7 +672,7 @@
 					</ctl:param>
 		            <parsers:HTTPParser>
 		               <parsers:parse>
-		                  <parsers:NullParser/>
+		                  <parsers:HTTPParser/>
 		               </parsers:parse>
 		            </parsers:HTTPParser>
 				</ctl:request>
