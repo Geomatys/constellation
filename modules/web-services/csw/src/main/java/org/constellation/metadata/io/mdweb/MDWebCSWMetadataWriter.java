@@ -63,7 +63,6 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
     public MDWebCSWMetadataWriter(final Automatic configuration, final AbstractIndexer index) throws MetadataIoException {
         super(configuration);
         this.indexer = index;
-        mdWriter.setProperty("skipSameTitle", false);
     }
 
     /**

@@ -19,6 +19,7 @@
 package org.constellation.metadata.io;
 
 
+import org.constellation.metadata.utils.Utils;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
@@ -120,7 +121,7 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for SML data
+     * Tests the storeMetadata method for SensorML data
      *
      * @throws java.lang.Exception
      */
@@ -146,7 +147,7 @@ public class MDWebMetadataWriterTest {
     }
     
     /**
-     * Tests the storeMetadata method for SML data
+     * Tests the storeMetadata method for SensorML data
      *
      * @throws java.lang.Exception
      */
@@ -188,7 +189,7 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for SML data
+     * Tests the storeMetadata method for ISO 19139 data
      *
      * @throws java.lang.Exception
      */
@@ -302,7 +303,7 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for SML data
+     * Tests the storeMetadata method for ISO 19110 data
      *
      * @throws java.lang.Exception
      */
@@ -324,7 +325,7 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for SML data
+     * Tests the storeMetadata method for ISO 19139 data
      *
      * @throws java.lang.Exception
      */
@@ -346,7 +347,7 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for SML data
+     * Tests the storeMetadata method for nature-SDI data
      *
      * @throws java.lang.Exception
      */
@@ -368,7 +369,7 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for SML data
+     * Tests the storeMetadata method for geonetcab data
      *
      * @throws java.lang.Exception
      */
@@ -402,7 +403,7 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for SML data
+     * Tests the storeMetadata method for ISO 19115-2 data
      *
      * @throws java.lang.Exception
      */
@@ -421,5 +422,33 @@ public class MDWebMetadataWriterTest {
 
         pool.release(unmarshaller);
         metadataEquals(expResult,result);
+    }
+
+    /**
+     * Tests the storeMetadata method for ISO 19115-2 data
+     * The purpose of  this test is to write a second time the same file.
+     *
+     * @todo the result is another metadata stored with title(2) in the Records table but not in the metadata.
+     * @todo what about the identifier ?
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void writeMetadata191152Again() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
+        writer.storeMetadata(absExpResult);
+
+        Object absResult = reader.getMetadata("21:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        DefaultMetadata result = (DefaultMetadata) absResult;
+
+        // may be final String expTitle = "Sea surface temperature and history derived from an analysis of MODIS Level 3 data for the Gulf of Mexico(2)";
+        final String expTitle = "Sea surface temperature and history derived from an analysis of MODIS Level 3 data for the Gulf of Mexico";
+        final String title = Utils.findTitle(result);
+        assertEquals(expTitle, title);
+        pool.release(unmarshaller);
     }
 }
