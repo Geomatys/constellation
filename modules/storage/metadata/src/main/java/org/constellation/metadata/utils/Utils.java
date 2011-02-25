@@ -65,7 +65,9 @@ public final class Utils {
 
         final List<String> paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
+        paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
         paths.add("Catalog Web Service:Record:title:content");
         paths.add("Catalog Web Service:Record:identifier:content");
         paths.add("Ebrim v3.0:RegistryObject:name:localizedString:value");

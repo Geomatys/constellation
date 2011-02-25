@@ -382,6 +382,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final String className  = object.getClass().getSimpleName();
             // ISO 19115 types
             if ("DefaultMetadata".equals(className)      ||
+
+           // ISO 19115-2 types
+                "MI_Metadata".equals(className)          ||
             
             // ISO 19110 types        
                 "FeatureCatalogueImpl".equals(className) ||

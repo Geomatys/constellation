@@ -288,7 +288,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                                "org.geotoolkit.ogc.xml");
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
-        this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.metadata.imagery", "org.geotoolkit.metadata.iso.acquisition",
+        this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.internal.jaxb.gmi", "org.geotoolkit.metadata.iso.acquisition",
                                                                       "org.geotoolkit.metadata.iso.quality", "org.geotoolkit.metadata.iso.spatial",
                                                                       "org.geotoolkit.metadata.iso.lineage", "org.geotoolkit.metadata.iso.content",
                                                                       "org.opengis.metadata.acquisition", "org.opengis.metadata.content");

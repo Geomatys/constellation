@@ -31,7 +31,7 @@ import org.geotoolkit.ebrim.xml.v300.RegistryObjectType;
 import org.geotoolkit.ebrim.xml.v300.LocalizedStringType;
 import org.geotoolkit.ebrim.xml.v300.InternationalStringType;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
-
+import org.geotoolkit.internal.jaxb.gmi.MI_Metadata;
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -265,6 +265,18 @@ public class UtilsTest {
 
         expResult = "titleMeta";
         result = Utils.findTitle(metadata);
+
+        assertEquals(expResult, result);
+        
+        MI_Metadata metadataMI = new MI_Metadata();
+        DefaultDataIdentification identificationMI = new DefaultDataIdentification();
+        DefaultCitation citationMI = new DefaultCitation();
+        citationMI.setTitle(new DefaultInternationalString("titleMetaMI"));
+        identificationMI.setCitation(citationMI);
+        metadataMI.setIdentificationInfo(Arrays.asList(identificationMI));
+
+        expResult = "titleMetaMI";
+        result = Utils.findTitle(metadataMI);
 
         assertEquals(expResult, result);
     }
