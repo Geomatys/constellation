@@ -104,12 +104,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     private Standard mainStandard;
     
     /**
-     * A map recording the binding between java Class and MDWeb classe 
+     * A map recording the binding between java Class and MDWeb {@link classe}
      */
     private Map<String, Classe> classBinding;
     
     /**
-     * A List of the already see object for the current metadata readed
+     * A List of the already see object for the current metadata read
      * (in order to avoid infinite loop)
      */
     private Map<Object, Value> alreadyWrite;
@@ -341,10 +341,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     /**
-     * Return an MDWeb formular from an object.
+     * Return an MDWeb {@link Form} from an object.
      *
      * @param object The object to transform in form.
-     * @return an MDWeb form representing the metadata object.
+     * @return an MDWeb {@link Form} representing the metadata object.
      */
     protected Form getFormFromObject(final Object object) throws MD_IOException {
         final String title = Utils.findTitle(object);
@@ -352,10 +352,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     /**
-     * Return an MDWeb formular from an object.
+     * Return an MDWeb {@link Form} from an object.
      *
      * @param object The object to transform in form.
-     * @return an MDWeb form representing the metadata object.
+     * @return an MDWeb {@link Form} representing the metadata object.
      */
     protected Form getFormFromObject(final Object object, String title) throws MD_IOException {
         if (title == null) {
@@ -365,10 +365,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     /**
-     * Return an MDWeb formular from an object.
+     * Return an MDWeb {@link Form} from an object.
      * 
      * @param object The object to transform in form.
-     * @return an MDWeb form representing the metadata object.
+     * @return an MDWeb {@link Form} representing the metadata object.
      */
     protected Form getFormFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
         
@@ -749,7 +749,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     /**
-     * Return an MDWeb classe object for the specified java object.
+     * Return an MDWeb {@link Classe} object for the specified java object.
      * 
      * @param object the object to identify
      *
@@ -781,53 +781,16 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             return result;
         }
 
-        /*
-         * work around :
-         * here we can find the classe by using the annotation from GeoAPI.
-         * This allow to supress some of the special case directly after that comment.
-         * But there is some problem with ISO 19115-2 which is annoted with ISO 19115 value
-         * AND with multiple TimePeriod implementation
-         *
-         * code :
-        
-            result = getClasseFromAnnotation(object);
-            if (result != null) {
-                classBinding.put(object.getClass().getName(), result);
-                return result;
-            }
-        */
         final String annotationName = getNameFromAnnotation(object);
         if (annotationName != null) {
             className =  annotationName;
         }
-
-
-        /*if ("CitationDate".equals(className) || "DefaultCitationDate".equals(className)) {
-            className = "CI_Date";
-        } else if ("DefaultScope".equals(className)) {
-            className = "DQ_Scope";
-        } else if ("ReferenceSystemMetadata".equals(className)) {
-            className = "ReferenceSystem";
-        } else if ("DefaultReferenceIdentifier".equals(className)) {
-            className = "RS_Identifier";
-        }*/
-        
-        /*we remove the Impl suffix
-        final int i = className.indexOf("Impl");
-        if (i != -1) {
-            className = className.substring(0, i);
-        }*/
 
         //we remove the Default prefix
         if (className.startsWith("Default")) {
             className = className.substring(7, className.length());
         }
 
-        /*we remove the Abstract prefix
-        if (className.startsWith("Abstract") && packageName.startsWith("org.geotoolkit.metadata.iso")) {
-            className = className.substring(8, className.length());
-        }*/
-        
         //we remove the Type suffix
         if (className.endsWith("Type") && !"CouplingType".equals(className)
                                        && !"OperationType".equals(className)
@@ -864,18 +827,14 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             /* to avoid some confusion between to classes with the same name
              * we affect the standard in some special case
              */
-            if ("org.geotoolkit.service".equals(packageName)) {
-                standard = Standard.ISO_19119;
-            } else if (packageName.startsWith("org.geotoolkit.sml.xml")) {
+            if (packageName.startsWith("org.geotoolkit.sml.xml")) {
                 standard = Standard.SENSORML;
             } else if (packageName.startsWith("org.geotoolkit.swe.xml")) {
                 standard = Standard.SENSOR_WEB_ENABLEMENT;
             } else if ("org.geotoolkit.gml.xml.v311".equals(packageName)) {
                 standard = Standard.ISO_19108;
-            } /*else if ("org.geotoolkit.metadata.imagery".equals(packageName)) {
-                standard = Standard.ISO_19115_2;
-            }*/
-                
+            }
+
             String name = className;
             int nameType = 0;
             final String codeSuffix = "Code";
@@ -1001,13 +960,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     /**
-     * Find an MDWeb {@link Classe} by extracting the GeoAPI UML annotation. (hope i can use this later)
+     * Find The class name by extracting the XmlElementRoot annotation.
      * 
      * @param object
-     * @return
-     * @throws MD_IOException
+     * @return the name parameter in the XmlElementRoot annotation if there is one on the class of the specified object.
+     *
      */
-    private String getNameFromAnnotation(final Object object) throws MD_IOException {
+    private String getNameFromAnnotation(final Object object) {
         
         XmlRootElement a = (XmlRootElement) object.getClass().getAnnotation(XmlRootElement.class);
         if (a != null) {
