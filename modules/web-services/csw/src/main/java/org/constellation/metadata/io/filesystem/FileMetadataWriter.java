@@ -568,6 +568,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      *
      * @throws MetadataIoException if the string can not be parsed.
      */
+    @Deprecated
     private Date parseDate(String dateValue) throws MetadataIoException {
         // in the case of a timezone expressed like this +01:00 we must transform it in +0100
         if (dateValue.indexOf('.') != -1) {

@@ -57,7 +57,7 @@
         </gmd:CI_ResponsibleParty>
     </gmd:contact>
     <gmd:dateStamp>
-        <gco:DateTime>2009-07-01T00:00:00+02:00</gco:DateTime>
+        <gco:DateTime>2009-07-01T00:00:00+01:00</gco:DateTime>
     </gmd:dateStamp>
     <gmd:identificationInfo>
         <srv:SV_ServiceIdentification>
@@ -158,7 +158,7 @@
                         <gco:CharacterString>non communiquée</gco:CharacterString>
                     </gmd:useLimitation>
                     <gmd:accessConstraints>
-                        <gmd:MD_RestrictionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#intellectualPropertyRight" codeListValue="intellectualPropertyRight"/>
+                        <gmd:MD_RestrictionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#intellectualPropertyRights" codeListValue="intellectualPropertyRights"/>
                     </gmd:accessConstraints>
                     <gmd:otherConstraints>
                         <gco:CharacterString>aucune contraintes supplémentaires connues</gco:CharacterString>

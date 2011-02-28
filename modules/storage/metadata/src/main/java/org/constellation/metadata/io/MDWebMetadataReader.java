@@ -521,12 +521,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
 
             } else if (classe.equals(Locale.class)) {
-                for (Locale candidate : Locale.getAvailableLocales()) {
-                    if (candidate.getISO3Language().equalsIgnoreCase(textValue)) {
-                        return candidate;
-                    }
-                }
-                 return new Locale(textValue);
+                return Locales.parse(textValue);
 
             // Patch for LocalName Class
             } else if (classe.equals(DefaultLocalName.class)) {

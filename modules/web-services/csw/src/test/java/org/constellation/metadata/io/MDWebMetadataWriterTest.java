@@ -95,9 +95,6 @@ public class MDWebMetadataWriterTest {
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
         configuration = new Automatic("mdweb", bdd);
 
-        reader = new MDWebMetadataReader(configuration);
-        writer = new MDWebMetadataWriter(configuration);
-
     }
 
     @AfterClass
@@ -112,12 +109,16 @@ public class MDWebMetadataWriterTest {
 
     @Before
     public void setUp() throws Exception {
+        reader = new MDWebMetadataReader(configuration);
+        writer = new MDWebMetadataWriter(configuration);
 
     }
 
     @After
     public void tearDown() throws Exception {
-        
+        if (reader != null) {
+            reader.destroy();
+        }
     }
 
     /**
@@ -450,5 +451,27 @@ public class MDWebMetadataWriterTest {
         final String title = Utils.findTitle(result);
         assertEquals(expTitle, title);
         pool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the storeMetadata method for ISO 19110 data
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void writeMetadata19119Test() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-19119.xml"));
+        writer.storeMetadata(absExpResult);
+
+        Object absResult = reader.getMetadata("22:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        DefaultMetadata result = (DefaultMetadata) absResult;
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-19119.xml"));
+
+        pool.release(unmarshaller);
+        metadataEquals(expResult, result);
     }
 }

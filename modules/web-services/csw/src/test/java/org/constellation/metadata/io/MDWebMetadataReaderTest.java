@@ -87,6 +87,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-3.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-5.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-6.sql"));
         
@@ -128,7 +129,7 @@ public class MDWebMetadataReaderTest {
     }
 
     /**
-     * Tests the getMetadata method for ISO 19119 data
+     * Tests the getMetadata method for ISO 19139 data
      *
      * @throws java.lang.Exception
      */
@@ -154,7 +155,7 @@ public class MDWebMetadataReaderTest {
     }
 
     /**
-     * Tests the getMetadata method for ISO 19119 data
+     * Tests the getMetadata method for ISO 19139 data
      *
      * @throws java.lang.Exception
      */
@@ -174,7 +175,7 @@ public class MDWebMetadataReaderTest {
     }
 
      /**
-     * Tests the getMetadata method for ISO 19119 data
+     * Tests the getMetadata method for ISO 19139 data
      *
      * @throws java.lang.Exception
      */
@@ -308,6 +309,25 @@ public class MDWebMetadataReaderTest {
 
         assertTrue(result instanceof FeatureCatalogueImpl);
         catalogueEquals(expResult, (FeatureCatalogueImpl)result);
+
+        pool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the getMetadata method for ISO 19119 data
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getMetadataISO19119Test() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("9:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-19119.xml"));
+
+        assertTrue(result instanceof DefaultMetadata);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
         pool.release(unmarshaller);
     }

@@ -5,6 +5,7 @@
 
 package org.constellation.metadata;
 
+import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.lineage.Algorithm;
 import org.opengis.metadata.acquisition.Operation;
 import org.opengis.metadata.acquisition.AcquisitionInformation;
@@ -27,6 +28,8 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.naturesdi.NATSDI_DataIdentification;
 import org.geotoolkit.naturesdi.NATSDI_SpeciesInformation;
+import org.geotoolkit.service.ServiceIdentificationImpl;
+import org.geotoolkit.service.ServiceImpl;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
 import org.opengis.metadata.content.CoverageDescription;
@@ -249,118 +252,181 @@ public class CSWTestUtils {
         if (expResult.getIdentificationInfo() != null && result.getIdentificationInfo() != null) {
             assertEquals(expResult.getIdentificationInfo().size(), result.getIdentificationInfo().size());
             for (int i = 0; i < expResult.getIdentificationInfo().size(); i++) {
-                DefaultDataIdentification idExpResult = (DefaultDataIdentification) expResult.getIdentificationInfo().iterator().next();
-                DefaultDataIdentification idResult    = (DefaultDataIdentification) result.getIdentificationInfo().iterator().next();
-                assertEquals(idExpResult.getCharacterSets(), idResult.getCharacterSets());
-                assertEquals(idExpResult.getAbstract(), idResult.getAbstract());
-                assertEquals(idExpResult.getCitation(), idResult.getCitation());
-                assertEquals(idExpResult.getAggregationInfo(), idResult.getAggregationInfo());
-                assertEquals(idExpResult.getCredits(), idResult.getCredits());
-                if (idResult.getDescriptiveKeywords().iterator().hasNext()) {
-                    assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getKeywords(), idResult.getDescriptiveKeywords().iterator().next().getKeywords());
-                    if (idResult.getDescriptiveKeywords().iterator().next().getThesaurusName() != null) {
-                        if (idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().hasNext()) {
-                            assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass());
-                            assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode());
-                            assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next());
-                        }
-                        assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers());
-                        citationEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName());
-                    }
-                    assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName());
-                    assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getType(), idResult.getDescriptiveKeywords().iterator().next().getType());
-                    assertEquals(idExpResult.getDescriptiveKeywords().iterator().next(), idResult.getDescriptiveKeywords().iterator().next());
-                }
-                assertEquals(idExpResult.getDescriptiveKeywords(), idResult.getDescriptiveKeywords());
-                assertEquals(idExpResult.getEnvironmentDescription(), idResult.getEnvironmentDescription());
-                assertEquals(idExpResult.getExtents().size(), idResult.getExtents().size());
-
-                Iterator<Extent> expIt = idExpResult.getExtents().iterator();
-                Iterator<Extent> resIt = idResult.getExtents().iterator();
-
-                while (expIt.hasNext() && resIt.hasNext()) {
-                    Extent expEx = expIt.next();
-                    Extent resEx = resIt.next();
-                    assertEquals(expEx.getGeographicElements().size(), resEx.getGeographicElements().size());
-                    Iterator<? extends GeographicExtent> expGeExIt = expEx.getGeographicElements().iterator();
-                    Iterator<? extends GeographicExtent> resGeExIt = resEx.getGeographicElements().iterator();
-                    while (expGeExIt.hasNext() && resGeExIt.hasNext()) {
-                        GeographicExtent expGeEx = expGeExIt.next();
-                        GeographicExtent resGeEx = resGeExIt.next();
-
-                        //assertEquals(expGeEx.getInclusion(), resGeEx.getInclusion());
-                        assertEquals(expGeEx, resGeEx);
-                    }
-                    assertEquals(expEx.getGeographicElements(), resEx.getGeographicElements());
-                    assertEquals(expEx.getVerticalElements().size(),   resEx.getVerticalElements().size());
-                    Iterator<? extends VerticalExtent> expVIt = expEx.getVerticalElements().iterator();
-                    Iterator<? extends VerticalExtent> resVIt = resEx.getVerticalElements().iterator();
-                    while (expVIt.hasNext() && resVIt.hasNext()) {
-                        VerticalExtent expVEx = expVIt.next();
-                        VerticalExtent resVEx = resVIt.next();
-                        if (expVEx != null && resVEx != null) {
-                            if (expVEx.getVerticalCRS() != null && resVEx.getVerticalCRS() != null) {
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getDimension(), resVEx.getVerticalCRS().getCoordinateSystem().getDimension());
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
-                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
-                                assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
-                                assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
+                Identification expId = expResult.getIdentificationInfo().iterator().next();
+                Identification resId = result.getIdentificationInfo().iterator().next();
+                assertEquals(expId.getAbstract(), resId.getAbstract());
+                assertEquals(expId.getAggregationInfo(), resId.getAggregationInfo());
+                assertEquals(expId.getCitation(), resId.getCitation());
+                assertEquals(expId.getCredits(), resId.getCredits());
+                if (resId.getDescriptiveKeywords().iterator().hasNext()) {
+                        assertEquals(expId.getDescriptiveKeywords().iterator().next().getKeywords(), resId.getDescriptiveKeywords().iterator().next().getKeywords());
+                        if (resId.getDescriptiveKeywords().iterator().next().getThesaurusName() != null) {
+                            if (resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().hasNext()) {
+                                assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass());
+                                assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode());
+                                assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next());
                             }
+                            assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers());
+                            citationEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName());
                         }
-                        assertEquals(expVEx, resVEx);
+                        assertEquals(expId.getDescriptiveKeywords().iterator().next().getThesaurusName(), resId.getDescriptiveKeywords().iterator().next().getThesaurusName());
+                        assertEquals(expId.getDescriptiveKeywords().iterator().next().getType(), resId.getDescriptiveKeywords().iterator().next().getType());
+                        assertEquals(expId.getDescriptiveKeywords().iterator().next(), resId.getDescriptiveKeywords().iterator().next());
                     }
-                    assertEquals(expEx.getTemporalElements(),   resEx.getTemporalElements());
-                }
-
-                assertEquals(idExpResult.getExtents(), idResult.getExtents());
-                assertEquals(idExpResult.getGraphicOverviews(), idResult.getGraphicOverviews());
-                assertEquals(idExpResult.getInterface(), idResult.getInterface());
-                assertEquals(idExpResult.getLanguages(), idResult.getLanguages());
-                assertEquals(idExpResult.getPointOfContacts(), idResult.getPointOfContacts());
-                assertEquals(idExpResult.getPurpose(), idResult.getPurpose());
-                assertEquals(idExpResult.getResourceConstraints().size(), idResult.getResourceConstraints().size());
-                if (idExpResult.getResourceConstraints().size() > 0) {
-                    Constraints expConst = idExpResult.getResourceConstraints().iterator().next();
-                    Constraints resConst = idResult.getResourceConstraints().iterator().next();
-                    assertEquals(expConst.getUseLimitations(), resConst.getUseLimitations());
-                    assertEquals(expConst, resConst);
-                }
-                assertEquals(idExpResult.getResourceConstraints(), idResult.getResourceConstraints());
-                assertEquals(idExpResult.getResourceFormats(), idResult.getResourceFormats());
-                assertEquals(idExpResult.getResourceMaintenances(), idResult.getResourceMaintenances());
-                assertEquals(idExpResult.getResourceSpecificUsages(), idResult.getResourceSpecificUsages());
-                assertEquals(idExpResult.getSpatialRepresentationTypes(), idResult.getSpatialRepresentationTypes());
-                assertEquals(idExpResult.getStandard(), idResult.getStandard());
-                assertEquals(idExpResult.getStatus(), idResult.getStatus());
-                assertEquals(idExpResult.getSupplementalInformation(), idResult.getSupplementalInformation());
-                assertEquals(idExpResult.getTopicCategories(), idResult.getTopicCategories());
-                if (idExpResult instanceof NATSDI_DataIdentification) {
-                    NATSDI_DataIdentification idExpNSDIResult = (NATSDI_DataIdentification) idExpResult;
-                    NATSDI_DataIdentification idNSDIResult    = (NATSDI_DataIdentification) idResult;
-                    assertEquals(idExpNSDIResult.getSpeciesInformation().size(), idNSDIResult.getSpeciesInformation().size());
-
-                    Iterator<NATSDI_SpeciesInformation> expNSDIit = idExpNSDIResult.getSpeciesInformation().iterator();
-                    Iterator<NATSDI_SpeciesInformation> resNSDIit = idNSDIResult.getSpeciesInformation().iterator();
-                    while (expNSDIit.hasNext()) {
-                        NATSDI_SpeciesInformation expSpecies = expNSDIit.next();
-                        NATSDI_SpeciesInformation resSpecies = resNSDIit.next();
-                        assertEquals(expSpecies.getAuthorCitation(), resSpecies.getAuthorCitation());
-                        assertEquals(expSpecies.getClassificationSystemAuthority(), resSpecies.getClassificationSystemAuthority());
-                        assertEquals(expSpecies.getSpeciesVernacularName(), resSpecies.getSpeciesVernacularName());
-                        assertEquals(expSpecies.getTaxonomicClassification(), resSpecies.getTaxonomicClassification());
+                    assertEquals(expId.getDescriptiveKeywords(), resId.getDescriptiveKeywords());
+                    assertEquals(expId.getGraphicOverviews(), resId.getGraphicOverviews());
+                    assertEquals(expId.getPointOfContacts(), resId.getPointOfContacts());
+                    assertEquals(expId.getPurpose(), resId.getPurpose());
+                    assertEquals(expId.getResourceConstraints().size(), resId.getResourceConstraints().size());
+                    if (expId.getResourceConstraints().size() > 0) {
+                        Constraints expConst = expId.getResourceConstraints().iterator().next();
+                        Constraints resConst = resId.getResourceConstraints().iterator().next();
+                        assertEquals(expConst.getUseLimitations(), resConst.getUseLimitations());
+                        assertEquals(expConst, resConst);
                     }
-                    assertEquals(idExpNSDIResult.getSpeciesInformation(), idNSDIResult.getSpeciesInformation());
-                    
+                    assertEquals(expId.getResourceConstraints(), resId.getResourceConstraints());
+                    assertEquals(expId.getResourceFormats(), expId.getResourceFormats());
+                    assertEquals(expId.getResourceMaintenances(), expId.getResourceMaintenances());
+                    assertEquals(expId.getResourceSpecificUsages(), expId.getResourceSpecificUsages());
+                    assertEquals(expId.getStatus(), resId.getStatus());
+
+                if (expId instanceof DefaultDataIdentification) {
+                    DefaultDataIdentification idExpResult = (DefaultDataIdentification) expId;
+                    DefaultDataIdentification idResult    = (DefaultDataIdentification) result.getIdentificationInfo().iterator().next();
+                    assertEquals(idExpResult.getCharacterSets(), idResult.getCharacterSets());
+                    assertEquals(idExpResult.getEnvironmentDescription(), idResult.getEnvironmentDescription());
+                    assertEquals(idExpResult.getExtents().size(), idResult.getExtents().size());
+
+                    Iterator<Extent> expIt = idExpResult.getExtents().iterator();
+                    Iterator<Extent> resIt = idResult.getExtents().iterator();
+
+                    while (expIt.hasNext() && resIt.hasNext()) {
+                        Extent expEx = expIt.next();
+                        Extent resEx = resIt.next();
+                        assertEquals(expEx.getGeographicElements().size(), resEx.getGeographicElements().size());
+                        Iterator<? extends GeographicExtent> expGeExIt = expEx.getGeographicElements().iterator();
+                        Iterator<? extends GeographicExtent> resGeExIt = resEx.getGeographicElements().iterator();
+                        while (expGeExIt.hasNext() && resGeExIt.hasNext()) {
+                            GeographicExtent expGeEx = expGeExIt.next();
+                            GeographicExtent resGeEx = resGeExIt.next();
+
+                            //assertEquals(expGeEx.getInclusion(), resGeEx.getInclusion());
+                            assertEquals(expGeEx, resGeEx);
+                        }
+                        assertEquals(expEx.getGeographicElements(), resEx.getGeographicElements());
+                        assertEquals(expEx.getVerticalElements().size(),   resEx.getVerticalElements().size());
+                        Iterator<? extends VerticalExtent> expVIt = expEx.getVerticalElements().iterator();
+                        Iterator<? extends VerticalExtent> resVIt = resEx.getVerticalElements().iterator();
+                        while (expVIt.hasNext() && resVIt.hasNext()) {
+                            VerticalExtent expVEx = expVIt.next();
+                            VerticalExtent resVEx = resVIt.next();
+                            if (expVEx != null && resVEx != null) {
+                                if (expVEx.getVerticalCRS() != null && resVEx.getVerticalCRS() != null) {
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getDimension(), resVEx.getVerticalCRS().getCoordinateSystem().getDimension());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
+                                    assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
+                                    assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
+                                }
+                            }
+                            assertEquals(expVEx, resVEx);
+                        }
+                        assertEquals(expEx.getTemporalElements(),   resEx.getTemporalElements());
+                    }
+
+                    assertEquals(idExpResult.getExtents(), idResult.getExtents());
+                    assertEquals(idExpResult.getInterface(), idResult.getInterface());
+                    assertEquals(idExpResult.getLanguages(), idResult.getLanguages());
+                    assertEquals(idExpResult.getSpatialRepresentationTypes(), idResult.getSpatialRepresentationTypes());
+                    assertEquals(idExpResult.getStandard(), idResult.getStandard());
+                    assertEquals(idExpResult.getSupplementalInformation(), idResult.getSupplementalInformation());
+                    assertEquals(idExpResult.getTopicCategories(), idResult.getTopicCategories());
+                    if (idExpResult instanceof NATSDI_DataIdentification) {
+                        NATSDI_DataIdentification idExpNSDIResult = (NATSDI_DataIdentification) idExpResult;
+                        NATSDI_DataIdentification idNSDIResult    = (NATSDI_DataIdentification) idResult;
+                        assertEquals(idExpNSDIResult.getSpeciesInformation().size(), idNSDIResult.getSpeciesInformation().size());
+
+                        Iterator<NATSDI_SpeciesInformation> expNSDIit = idExpNSDIResult.getSpeciesInformation().iterator();
+                        Iterator<NATSDI_SpeciesInformation> resNSDIit = idNSDIResult.getSpeciesInformation().iterator();
+                        while (expNSDIit.hasNext()) {
+                            NATSDI_SpeciesInformation expSpecies = expNSDIit.next();
+                            NATSDI_SpeciesInformation resSpecies = resNSDIit.next();
+                            assertEquals(expSpecies.getAuthorCitation(), resSpecies.getAuthorCitation());
+                            assertEquals(expSpecies.getClassificationSystemAuthority(), resSpecies.getClassificationSystemAuthority());
+                            assertEquals(expSpecies.getSpeciesVernacularName(), resSpecies.getSpeciesVernacularName());
+                            assertEquals(expSpecies.getTaxonomicClassification(), resSpecies.getTaxonomicClassification());
+                        }
+                        assertEquals(idExpNSDIResult.getSpeciesInformation(), idNSDIResult.getSpeciesInformation());
+
+                    }
+                    assertEquals(idExpResult, idResult);
+                } else if (expId instanceof ServiceIdentificationImpl) {
+                    ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;
+                    ServiceIdentificationImpl resService = (ServiceIdentificationImpl) result.getIdentificationInfo().iterator().next();
+                    assertEquals(expService.getAccessProperties(), resService.getAccessProperties());
+                    assertEquals(expService.getContainsOperations(), resService.getContainsOperations());
+                    assertEquals(expService.getCoupledResource(), resService.getCoupledResource());
+                    assertEquals(expService.getCouplingType(), resService.getCouplingType());
+
+                    Iterator<Extent> expIt = expService.getExtent().iterator();
+                    Iterator<Extent> resIt = resService.getExtent().iterator();
+
+                    while (expIt.hasNext() && resIt.hasNext()) {
+                        Extent expEx = expIt.next();
+                        Extent resEx = resIt.next();
+                        assertEquals(expEx.getGeographicElements().size(), resEx.getGeographicElements().size());
+                        Iterator<? extends GeographicExtent> expGeExIt = expEx.getGeographicElements().iterator();
+                        Iterator<? extends GeographicExtent> resGeExIt = resEx.getGeographicElements().iterator();
+                        while (expGeExIt.hasNext() && resGeExIt.hasNext()) {
+                            GeographicExtent expGeEx = expGeExIt.next();
+                            GeographicExtent resGeEx = resGeExIt.next();
+
+                            //assertEquals(expGeEx.getInclusion(), resGeEx.getInclusion());
+                            assertEquals(expGeEx, resGeEx);
+                        }
+                        assertEquals(expEx.getGeographicElements(), resEx.getGeographicElements());
+                        assertEquals(expEx.getVerticalElements().size(),   resEx.getVerticalElements().size());
+                        Iterator<? extends VerticalExtent> expVIt = expEx.getVerticalElements().iterator();
+                        Iterator<? extends VerticalExtent> resVIt = resEx.getVerticalElements().iterator();
+                        while (expVIt.hasNext() && resVIt.hasNext()) {
+                            VerticalExtent expVEx = expVIt.next();
+                            VerticalExtent resVEx = resVIt.next();
+                            if (expVEx != null && resVEx != null) {
+                                if (expVEx.getVerticalCRS() != null && resVEx.getVerticalCRS() != null) {
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getDimension(), resVEx.getVerticalCRS().getCoordinateSystem().getDimension());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
+                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
+                                    assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
+                                    assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
+                                }
+                            }
+                            assertEquals(expVEx, resVEx);
+                        }
+                        assertEquals(expEx.getTemporalElements(),   resEx.getTemporalElements());
+                    }
+                    assertEquals(expService.getExtent(), resService.getExtent());
+                    assertEquals(expService.getOperatesOn(), resService.getOperatesOn());
+                    assertEquals(expService.getRestrictions(), resService.getRestrictions());
+                    assertEquals(expService.getServiceType(), resService.getServiceType());
+                    assertEquals(expService.getServiceTypeVersion(), resService.getServiceTypeVersion());
+                    assertEquals(expService, resService);
                 }
-                assertEquals(idExpResult, idResult);
             }
             assertEquals(expResult.getIdentificationInfo(), result.getIdentificationInfo());
         }
@@ -410,7 +476,6 @@ public class CSWTestUtils {
                 assertEquals(expSpa, resSpa);
             }
         }
-        assertEquals(expResult.getSpatialRepresentationInfo(), result.getSpatialRepresentationInfo());
         assertEquals(expResult.getSpatialRepresentationInfo(), result.getSpatialRepresentationInfo());
         assertEquals(expResult, result);
     }

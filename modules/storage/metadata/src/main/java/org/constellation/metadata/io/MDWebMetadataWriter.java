@@ -43,6 +43,7 @@ import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 
 // constellation dependencies
+import javax.xml.bind.annotation.XmlRootElement;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.utils.Utils;
@@ -74,7 +75,6 @@ import org.mdweb.io.Writer;
 import org.mdweb.io.sql.v21.Writer21;
 import org.mdweb.model.storage.FormInfo;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
-import org.opengis.annotation.UML;
 import org.opengis.metadata.Metadata;
 
 /**
@@ -789,17 +789,20 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
          * AND with multiple TimePeriod implementation
          *
          * code :
-
+        
             result = getClasseFromAnnotation(object);
             if (result != null) {
                 classBinding.put(object.getClass().getName(), result);
                 return result;
             }
+        */
+        final String annotationName = getNameFromAnnotation(object);
+        if (annotationName != null) {
+            className =  annotationName;
+        }
 
-         */
 
-
-        if ("CitationDate".equals(className) || "DefaultCitationDate".equals(className)) {
+        /*if ("CitationDate".equals(className) || "DefaultCitationDate".equals(className)) {
             className = "CI_Date";
         } else if ("DefaultScope".equals(className)) {
             className = "DQ_Scope";
@@ -807,23 +810,23 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             className = "ReferenceSystem";
         } else if ("DefaultReferenceIdentifier".equals(className)) {
             className = "RS_Identifier";
-        } 
+        }*/
         
-        //we remove the Impl suffix
+        /*we remove the Impl suffix
         final int i = className.indexOf("Impl");
         if (i != -1) {
             className = className.substring(0, i);
-        }
+        }*/
 
         //we remove the Default prefix
         if (className.startsWith("Default")) {
             className = className.substring(7, className.length());
         }
 
-        //we remove the Abstract prefix
+        /*we remove the Abstract prefix
         if (className.startsWith("Abstract") && packageName.startsWith("org.geotoolkit.metadata.iso")) {
             className = className.substring(8, className.length());
-        }
+        }*/
         
         //we remove the Type suffix
         if (className.endsWith("Type") && !"CouplingType".equals(className)
@@ -832,7 +835,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                        && !"ObjectiveType".equals(className)
                                        && !"DateType".equals(className)
                                        && !"KeywordType".equals(className)
-                                       && !"FeatureType".equals(className)
+                                       && !"FC_FeatureType".equals(className)
                                        && !"GeometricObjectType".equals(className)
                                        && !"SpatialRepresentationType".equals(className)
                                        && !"AssociationType".equals(className)
@@ -869,9 +872,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 standard = Standard.SENSOR_WEB_ENABLEMENT;
             } else if ("org.geotoolkit.gml.xml.v311".equals(packageName)) {
                 standard = Standard.ISO_19108;
-            } else if ("org.geotoolkit.metadata.imagery".equals(packageName)) {
+            } /*else if ("org.geotoolkit.metadata.imagery".equals(packageName)) {
                 standard = Standard.ISO_19115_2;
-            }
+            }*/
                 
             String name = className;
             int nameType = 0;
@@ -998,34 +1001,23 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     /**
-     * Find an MDWeb Classe by extracting the GeoAPI UML annotation. (hope i can use this later)
+     * Find an MDWeb {@link Classe} by extracting the GeoAPI UML annotation. (hope i can use this later)
      * 
      * @param object
      * @return
      * @throws MD_IOException
      */
-    private Classe getClasseFromAnnotation(final Object object) throws MD_IOException {
-        Class[] interfaces = object.getClass().getInterfaces();
-        for (Class interf : interfaces) {
-            if (interf.getName().startsWith("org.opengis")) {
-                UML a = (UML) interf.getAnnotation(UML.class);
-                if (a != null) {
-                    Standard stan = Standard.getStandardFromUMLSpecification(a.specification());
-                    if (stan != null) {
-                        final Classe result = mdWriter.getClasse(a.identifier(), stan);
-                        if (result != null) {
-                            LOGGER.finer("found thank to Annotation: " + a.identifier() + "-" + a.specification() + " for classe :" + object.getClass().getName());
-                        }
-                        return result;
-                    }
-                }
-            }
+    private String getNameFromAnnotation(final Object object) throws MD_IOException {
+        
+        XmlRootElement a = (XmlRootElement) object.getClass().getAnnotation(XmlRootElement.class);
+        if (a != null) {
+            return a.name();
         }
         return null;
     }
     
     /**
-     * Return a class (java primitive type) from a class name.
+     * Return a {@link Classe} (java primitive type) from a class name.
      * 
      * @param className the standard name of a class. 
      * @return a primitive class.
