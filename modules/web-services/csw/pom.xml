@@ -135,11 +135,6 @@
     <!-- Optionnal dependencies -->
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-natSDI</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-geonetcab</artifactId>
       <scope>test</scope>
     </dependency>

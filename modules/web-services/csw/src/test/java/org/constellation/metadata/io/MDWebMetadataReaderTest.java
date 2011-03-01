@@ -79,7 +79,6 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115-2.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/Classe_Nature_SDI.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/Classe_GEONETCAB.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
@@ -378,25 +377,6 @@ public class MDWebMetadataReaderTest {
     }
 
     
-    /**
-     * Tests the getMetadata method for NATURE SDI data
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void getMetadataNatSDITest() throws Exception {
-
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("26:CSWCat", AbstractMetadataReader.ISO_19115, null);
-
-        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/nsdiMetadata.xml"));
-
-        assertTrue(result instanceof DefaultMetadata);
-        metadataEquals(expResult, (DefaultMetadata)result);
-
-        pool.release(unmarshaller);
-    }
-
     /**
      * Tests the getMetadata method for SML data
      *

@@ -26,10 +26,7 @@ import org.geotoolkit.feature.catalog.FeatureAttributeImpl;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
-import org.geotoolkit.naturesdi.NATSDI_DataIdentification;
-import org.geotoolkit.naturesdi.NATSDI_SpeciesInformation;
 import org.geotoolkit.service.ServiceIdentificationImpl;
-import org.geotoolkit.service.ServiceImpl;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
 import org.opengis.metadata.content.CoverageDescription;
@@ -349,24 +346,6 @@ public class CSWTestUtils {
                     assertEquals(idExpResult.getStandard(), idResult.getStandard());
                     assertEquals(idExpResult.getSupplementalInformation(), idResult.getSupplementalInformation());
                     assertEquals(idExpResult.getTopicCategories(), idResult.getTopicCategories());
-                    if (idExpResult instanceof NATSDI_DataIdentification) {
-                        NATSDI_DataIdentification idExpNSDIResult = (NATSDI_DataIdentification) idExpResult;
-                        NATSDI_DataIdentification idNSDIResult    = (NATSDI_DataIdentification) idResult;
-                        assertEquals(idExpNSDIResult.getSpeciesInformation().size(), idNSDIResult.getSpeciesInformation().size());
-
-                        Iterator<NATSDI_SpeciesInformation> expNSDIit = idExpNSDIResult.getSpeciesInformation().iterator();
-                        Iterator<NATSDI_SpeciesInformation> resNSDIit = idNSDIResult.getSpeciesInformation().iterator();
-                        while (expNSDIit.hasNext()) {
-                            NATSDI_SpeciesInformation expSpecies = expNSDIit.next();
-                            NATSDI_SpeciesInformation resSpecies = resNSDIit.next();
-                            assertEquals(expSpecies.getAuthorCitation(), resSpecies.getAuthorCitation());
-                            assertEquals(expSpecies.getClassificationSystemAuthority(), resSpecies.getClassificationSystemAuthority());
-                            assertEquals(expSpecies.getSpeciesVernacularName(), resSpecies.getSpeciesVernacularName());
-                            assertEquals(expSpecies.getTaxonomicClassification(), resSpecies.getTaxonomicClassification());
-                        }
-                        assertEquals(idExpNSDIResult.getSpeciesInformation(), idNSDIResult.getSpeciesInformation());
-
-                    }
                     assertEquals(idExpResult, idResult);
                 } else if (expId instanceof ServiceIdentificationImpl) {
                     ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;
