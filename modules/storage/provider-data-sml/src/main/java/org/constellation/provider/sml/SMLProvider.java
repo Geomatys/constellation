@@ -23,28 +23,22 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.logging.Level;
 import java.util.Map;
-import java.util.Set;
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.LayerDetails;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.provider.AbstractDataStoreProvider;
 import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreFinder;
-import org.geotoolkit.data.sml.SMLDataStoreFactory;
 import org.geotoolkit.storage.DataStoreException;
 import org.opengis.feature.type.Name;
 import org.xml.sax.SAXException;
+
+import static org.geotoolkit.data.sml.SMLDataStoreFactory.*;
 
 
 
@@ -57,26 +51,27 @@ import org.xml.sax.SAXException;
  * @author Cédric Briançon (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
-public class SMLProvider extends AbstractLayerProvider {
+public class SMLProvider extends AbstractDataStoreProvider {
 
     private static final String KEY_SML_CONFIG = "sml_config";
-    public  static final String KEY_DBTYPE     = SMLDataStoreFactory.DBTYPE.getName().toString();
-    public  static final String KEY_SGBDTYPE   = SMLDataStoreFactory.SGBDTYPE.getName().toString();
-    public  static final String KEY_DERBYURL   = SMLDataStoreFactory.DERBYURL.getName().toString();
-    public  static final String KEY_HOST       = SMLDataStoreFactory.HOST.getName().toString();
-    public  static final String KEY_PORT       = SMLDataStoreFactory.PORT.getName().toString();
-    public  static final String KEY_DATABASE   = SMLDataStoreFactory.DATABASE.getName().toString();
-    public  static final String KEY_USER       = SMLDataStoreFactory.USER.getName().toString();
-    public  static final String KEY_PASSWD     = SMLDataStoreFactory.PASSWD.getName().toString();
-    public  static final String KEY_NAMESPACE  = SMLDataStoreFactory.NAMESPACE.getName().toString();
-
-    private final Map<String,Serializable> params = new HashMap<String,Serializable>();
-    private final Set<Name> index = new LinkedHashSet<Name>();
-    private final DataStore store;
-
+    public  static final String KEY_DBTYPE     = DBTYPE.getName().getCode();
+    public  static final String KEY_SGBDTYPE   = SGBDTYPE.getName().getCode();
+    public  static final String KEY_DERBYURL   = DERBYURL.getName().getCode();
+    public  static final String KEY_HOST       = HOST.getName().getCode();
+    public  static final String KEY_PORT       = PORT.getName().getCode();
+    public  static final String KEY_DATABASE   = DATABASE.getName().getCode();
+    public  static final String KEY_USER       = USER.getName().getCode();
+    public  static final String KEY_PASSWD     = PASSWD.getName().getCode();
+    public  static final String KEY_NAMESPACE  = NAMESPACE.getName().getCode();
 
     protected SMLProvider(ProviderSource source) throws DataStoreException {
         super(source);
+    }
+
+
+    @Override
+    public Map<String, Serializable> prepareParameters(final Map<String, String> original) {
+        final Map<String,Serializable> params = new HashMap<String, Serializable>();
         params.put(KEY_DBTYPE, "SML");
 
         final String sgbdType = source.parameters.get(KEY_SGBDTYPE);
@@ -116,100 +111,8 @@ public class SMLProvider extends AbstractLayerProvider {
             params.put(KEY_USER, user);
             params.put(KEY_PASSWD, passwd);
         }
-        
-        store = DataStoreFinder.getDataStore(params);
-        if (store == null) {
-            final StringBuilder sb = new StringBuilder("Could not connect to SML : \n");
-            for(final Map.Entry<String,Serializable> entry : params.entrySet()){
-                if (entry.getKey().equals(KEY_PASSWD)) {
-                    sb.append(entry.getKey()).append(" : *******");
-                } else {
-                    sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
-                }
-            }
-            throw new DataStoreException(sb.toString());
-        } else {
-            visit();
-        }
 
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<Name> getKeys() {
-        return Collections.unmodifiableSet(index);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public LayerDetails get(final Name key) {
-        if (!index.contains(key)) {
-            return null;
-        }
-
-        final List<String> styles;
-        final String dateStartField;
-        final String dateEndField;
-        final String elevationStartField;
-        final String elevationEndField;
-        final ProviderLayer layer = source.getLayer(key.getLocalPart());
-        if (layer != null) {
-            styles              = layer.styles;
-            dateStartField      = layer.dateStartField;
-            dateEndField        = layer.dateEndField;
-            elevationStartField = layer.elevationStartField;
-            elevationEndField   = layer.elevationEndField;
-        } else {
-            styles              = new ArrayList<String>();
-            dateStartField      = null;
-            dateEndField        = null;
-            elevationStartField = null;
-            elevationEndField   = null;
-        }
-        return new SMLLayerDetails(key, store, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
-        
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void reload() {
-        synchronized(this){
-            index.clear();
-            visit();
-        }
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void dispose() {
-        synchronized(this){
-            index.clear();
-            params.clear();
-            source.layers.clear();
-            source.parameters.clear();
-        }
-    }
-
-    @Override
-    protected void visit() {
-        try {
-            for (final Name name : store.getNames()) {
-                index.add(name);
-            }
-        } catch (DataStoreException ex) {
-            //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
-            //won't be able to find thoses layers.
-            getLogger().log(Level.SEVERE, null, ex);
-        }
-        super.visit();
+        return params;
     }
 
     public static Collection<SMLProvider> loadProviders(){

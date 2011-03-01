@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2010, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.constellation.provider.AbstractLayerProvider;
+import org.constellation.provider.DefaultDataStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
@@ -144,11 +145,11 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         if (store != null) {
             final ProviderLayer layer = source.getLayer(key.getLocalPart());
             if (layer == null) {
-                return new ShapeFileLayerDetails(key, store, null, null, null, null, null);
+                return new DefaultDataStoreLayerDetails(key, store, null, null, null, null, null);
                 
             } else {
                 final List<String> styles = layer.styles;
-                return new ShapeFileLayerDetails(key, store, styles,
+                return new DefaultDataStoreLayerDetails(key, store, styles,
                         layer.dateStartField, layer.dateEndField,
                         layer.elevationStartField, layer.elevationEndField);
             }

@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2010, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,34 +23,26 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.LayerDetails;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.provider.AbstractDataStoreProvider;
 import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotoolkit.data.DataStore;
 import org.geotoolkit.storage.DataStoreException;
-import org.geotoolkit.data.DataStoreFinder;
-import org.geotoolkit.data.om.OMDataStoreFactory;
 
 import org.opengis.feature.type.Name;
 import org.xml.sax.SAXException;
 
-
+import static org.geotoolkit.data.om.OMDataStoreFactory.*;
 
 /**
- * Observation and Measurmement Data provider. index and cache Datastores for the specified database.
+ * Observation and measurement Data provider. index and cache Datastores for the specified database.
  *
  * @version $Id:
  *
@@ -58,26 +50,27 @@ import org.xml.sax.SAXException;
  * @author Cédric Briançon (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
-public class OMProvider extends AbstractLayerProvider {
+public class OMProvider extends AbstractDataStoreProvider {
 
     private static final String KEY_OM_CONFIG  = "om_config";
-    public  static final String KEY_DBTYPE     = OMDataStoreFactory.DBTYPE.getName().toString();
-    public  static final String KEY_SGBDTYPE   = OMDataStoreFactory.SGBDTYPE.getName().toString();
-    public  static final String KEY_DERBYURL   = OMDataStoreFactory.DERBYURL.getName().toString();
-    public  static final String KEY_HOST       = OMDataStoreFactory.HOST.getName().toString();
-    public  static final String KEY_PORT       = OMDataStoreFactory.PORT.getName().toString();
-    public  static final String KEY_DATABASE   = OMDataStoreFactory.DATABASE.getName().toString();
-    public  static final String KEY_USER       = OMDataStoreFactory.USER.getName().toString();
-    public  static final String KEY_PASSWD     = OMDataStoreFactory.PASSWD.getName().toString();
-    public  static final String KEY_NAMESPACE  = OMDataStoreFactory.NAMESPACE.getName().toString();
+    public  static final String KEY_DBTYPE     = DBTYPE.getName().getCode();
+    public  static final String KEY_SGBDTYPE   = SGBDTYPE.getName().getCode();
+    public  static final String KEY_DERBYURL   = DERBYURL.getName().getCode();
+    public  static final String KEY_HOST       = HOST.getName().getCode();
+    public  static final String KEY_PORT       = PORT.getName().getCode();
+    public  static final String KEY_DATABASE   = DATABASE.getName().getCode();
+    public  static final String KEY_USER       = USER.getName().getCode();
+    public  static final String KEY_PASSWD     = PASSWD.getName().getCode();
+    public  static final String KEY_NAMESPACE  = NAMESPACE.getName().getCode();
 
-    private final Map<String,Serializable> params = new HashMap<String,Serializable>();
-    private final Set<Name> index = new LinkedHashSet<Name>();
-    private final DataStore store;
-
-
-    protected OMProvider(ProviderSource source) throws DataStoreException {
+    protected OMProvider(final ProviderSource source) throws DataStoreException {
         super(source);
+    }
+
+
+    @Override
+    public Map<String, Serializable> prepareParameters(final Map<String, String> original) {
+        final Map<String,Serializable> params = new HashMap<String, Serializable>();
         params.put(KEY_DBTYPE, "OM");
 
         final String sgbdType = source.parameters.get(KEY_SGBDTYPE);
@@ -115,99 +108,7 @@ public class OMProvider extends AbstractLayerProvider {
             params.put(KEY_PASSWD, passwd);
         }
 
-        store = DataStoreFinder.getDataStore(params);
-        if (store == null) {
-            final StringBuilder sb = new StringBuilder("Could not connect to O&M : \n");
-            for(final Map.Entry<String,Serializable> entry : params.entrySet()){
-                if (entry.getKey().equals(KEY_PASSWD)) {
-                    sb.append(entry.getKey()).append(" : *******").append(entry.getValue()).append("*").append('\n');
-                } else {
-                    sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
-                }
-            }
-            throw new DataStoreException(sb.toString());
-        } else {
-            visit();
-        }
-
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<Name> getKeys() {
-        return Collections.unmodifiableSet(index);
-    }
-    
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public LayerDetails get(final Name key) {
-        if (!index.contains(key)) {
-            return null;
-        }
-
-        final List<String> styles;
-        final String dateStartField;
-        final String dateEndField;
-        final String elevationStartField;
-        final String elevationEndField;
-        final ProviderLayer layer = source.getLayer(key.getLocalPart());
-        if (layer != null) {
-            styles              = layer.styles;
-            dateStartField      = layer.dateStartField;
-            dateEndField        = layer.dateEndField;
-            elevationStartField = layer.elevationStartField;
-            elevationEndField   = layer.elevationEndField;
-        } else {
-            styles              = new ArrayList<String>();
-            dateStartField      = null;
-            dateEndField        = null;
-            elevationStartField = null;
-            elevationEndField   = null;
-        }
-        return new OMLayerDetails(key, store, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
-        
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void reload() {
-        synchronized(this){
-            index.clear();
-            visit();
-        }
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void dispose() {
-        synchronized(this){
-            index.clear();
-            params.clear();
-            source.layers.clear();
-            source.parameters.clear();
-        }
-    }
-
-    @Override
-    protected void visit() {
-        try {
-            for (final Name name : store.getNames()) {
-                index.add(name);
-            }
-        } catch (DataStoreException ex) {
-            //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
-            //won't be able to find thoses layers.
-            getLogger().log(Level.SEVERE, null, ex);
-        }
-        super.visit();
+        return params;
     }
 
     public static Collection<OMProvider> loadProviders(){

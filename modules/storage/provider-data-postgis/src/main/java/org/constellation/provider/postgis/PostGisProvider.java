@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,67 +23,52 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.LayerDetails;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.provider.AbstractDataStoreProvider;
 import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreFinder;
-import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
-import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.storage.DataStoreException;
-
 import org.opengis.feature.type.Name;
-
 import org.xml.sax.SAXException;
 
+import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 
 /**
- * Shapefile Data provider. index and cache Datastores for the shapefiles
- * whithin the given folder.
+ * PostGIS Data provider.
  *
  * @version $Id$
- *
  * @author Johann Sorel (Geomatys)
  */
-public class PostGisProvider extends AbstractLayerProvider{
+public class PostGisProvider extends AbstractDataStoreProvider{
 
     private static final String KEY_POSTGIS_CONFIG  = "postgis_config";
-    public static final String KEY_DBTYPE          = PostgisNGDataStoreFactory.DBTYPE.getName().toString();
-    public static final String KEY_HOST            = PostgisNGDataStoreFactory.HOST.getName().toString();
-    public static final String KEY_PORT            = PostgisNGDataStoreFactory.PORT.getName().toString();
-    public static final String KEY_SCHEMA          = PostgisNGDataStoreFactory.SCHEMA.getName().toString();
-    public static final String KEY_DATABASE        = PostgisNGDataStoreFactory.DATABASE.getName().toString();
-    public static final String KEY_USER            = PostgisNGDataStoreFactory.USER.getName().toString();
-    public static final String KEY_PASSWD          = PostgisNGDataStoreFactory.PASSWD.getName().toString();
-    public static final String KEY_MAXCONN         = PostgisNGDataStoreFactory.MAXCONN.getName().toString();
-    public static final String KEY_MINCONN         = PostgisNGDataStoreFactory.MINCONN.getName().toString();
-    public static final String KEY_NAMESPACE       = PostgisNGDataStoreFactory.NAMESPACE.getName().toString();
-    public static final String KEY_VALIDATECONN    = PostgisNGDataStoreFactory.VALIDATECONN.getName().toString();
-//    public static final String KEY_ESTIMATEDEXTENT = PostgisNGDataStoreFactory.ESTIMATEDEXTENT.key;
-    public static final String KEY_LOOSEBBOX       = PostgisNGDataStoreFactory.LOOSEBBOX.getName().toString();
-//    public static final String KEY_WKBENABLED      = PostgisNGDataStoreFactory.WKBENABLED.key;
+    public static final String KEY_DBTYPE          = DBTYPE.getName().getCode();
+    public static final String KEY_HOST            = HOST.getName().getCode();
+    public static final String KEY_PORT            = PORT.getName().getCode();
+    public static final String KEY_SCHEMA          = SCHEMA.getName().getCode();
+    public static final String KEY_DATABASE        = DATABASE.getName().getCode();
+    public static final String KEY_USER            = USER.getName().getCode();
+    public static final String KEY_PASSWD          = PASSWD.getName().getCode();
+    public static final String KEY_MAXCONN         = MAXCONN.getName().getCode();
+    public static final String KEY_MINCONN         = MINCONN.getName().getCode();
+    public static final String KEY_NAMESPACE       = NAMESPACE.getName().getCode();
+    public static final String KEY_VALIDATECONN    = VALIDATECONN.getName().getCode();
+    public static final String KEY_LOOSEBBOX       = LOOSEBBOX.getName().getCode();
 
-    private final Map<String,Serializable> params = new HashMap<String,Serializable>();
-    private final Set<Name> index = new LinkedHashSet<Name>();
-    private final DataStore store;
-
-
-    protected PostGisProvider(ProviderSource source) throws DataStoreException {
+    protected PostGisProvider(final ProviderSource source) throws DataStoreException {
         super(source);
+    }
+
+    @Override
+    public Map<String, Serializable> prepareParameters(final Map<String, String> originals) {
+        final Map<String,Serializable> params = new HashMap<String, Serializable>();
         params.put(KEY_DBTYPE, "postgisng");
 
         // HOST ----------------------------------------------------------------
@@ -121,93 +106,7 @@ public class PostGisProvider extends AbstractLayerProvider{
         final Boolean validate = Boolean.valueOf(validateConnec);
         params.put(KEY_VALIDATECONN, validate);
 
-        store = DataStoreFinder.getDataStore(params);
-
-        if (store == null) {
-            final StringBuilder sb = new StringBuilder("Could not connect to PostGIS : \n");
-            for (final Map.Entry<String,Serializable> entry : params.entrySet()){
-                if (entry.getKey().equals(KEY_PASSWD)){
-                    sb.append(entry.getKey()).append(" : *******").append('\n');
-                } else {
-                    sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
-                }
-            }
-            throw new DataStoreException(sb.toString());
-        } else {
-            visit();
-        }
-        
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<Name> getKeys() {
-        return Collections.unmodifiableSet(index);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public LayerDetails get(Name key) {
-        if (!index.contains(key)) {
-            key = containsOnlyLocalPart(index, key);
-            if (key == null) {
-                return null;
-            }
-        }
-        final ProviderLayer layer = source.getLayer(key.getLocalPart());
-        if (layer == null) {
-            return new PostGisLayerDetails(key, store, null, null, null, null, null);
-
-        } else {
-            final List<String> styles = layer.styles;
-            return new PostGisLayerDetails(key, store, styles,
-                    layer.dateStartField, layer.dateEndField,
-                    layer.elevationStartField, layer.elevationEndField);
-        }
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void reload() {
-        synchronized(this){
-            index.clear();
-            visit();
-        }
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public void dispose() {
-        synchronized(this){
-            index.clear();
-            params.clear();
-            source.layers.clear();
-            source.parameters.clear();
-        }
-    }
-
-    @Override
-    protected void visit() {
-        try {
-            for (final Name name : store.getNames()) {
-                if (source.loadAll || source.containsLayer(name.getLocalPart())) {
-                    index.add(name);
-                }
-            }
-        } catch (DataStoreException ex) {
-            //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
-            //won't be able to find thoses layers.
-            getLogger().log(Level.SEVERE, null, ex);
-        }
-        super.visit();
+        return params;
     }
 
     public static Collection<PostGisProvider> loadProviders(){
@@ -267,11 +166,6 @@ public class PostGisProvider extends AbstractLayerProvider{
         }
 
         return ProviderConfig.read(new File(configFile.trim()));
-    }
-
-    @Override
-    public ElevationModel getElevationModel(Name name) {
-        return null;
     }
 
 }
