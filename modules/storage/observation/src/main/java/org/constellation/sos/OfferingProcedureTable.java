@@ -24,17 +24,17 @@ import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.ReferenceTable;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
-import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
+import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
 import org.geotoolkit.util.Utilities;
 
 /**
  *
  * @author Guilhem Legal
  */
-public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntry>{
+public class OfferingProcedureTable extends SingletonTable<OfferingProcedureType>{
 
         
     /**
@@ -81,15 +81,15 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
 
     
     @Override
-    protected OfferingProcedureEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected OfferingProcedureType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingProcedureQuery query = (OfferingProcedureQuery) super.query;
         
         if (process == null) {
             process = getDatabase().getTable(ReferenceTable.class);
         }
-        final ReferenceEntry procedure = process.getEntry(results.getString(indexOf(query.procedure)));
+        final ReferenceType procedure = process.getEntry(results.getString(indexOf(query.procedure)));
         
-        return new OfferingProcedureEntry(results.getString(indexOf(query.idOffering)), procedure);
+        return new OfferingProcedureType(results.getString(indexOf(query.idOffering)), procedure);
     }
     
     /**
@@ -121,7 +121,7 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *
      */
-    public void getIdentifier(OfferingProcedureEntry offProc) throws SQLException, CatalogException {
+    public void getIdentifier(OfferingProcedureType offProc) throws SQLException, CatalogException {
         final OfferingProcedureQuery query  = (OfferingProcedureQuery) super.query;
         String idProc = "";
         boolean success = false;

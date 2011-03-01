@@ -26,8 +26,8 @@ import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.swe.xml.v101.ComponentEntry;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.ComponentType;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.util.Utilities;
 
 /**
@@ -35,7 +35,7 @@ import org.geotoolkit.util.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class ComponentTable extends SingletonTable<ComponentEntry>{
+public class ComponentTable extends SingletonTable<ComponentType>{
     
     /**
      * identifiant secondaire de la table.
@@ -81,15 +81,15 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
     
     
     @Override
-    protected ComponentEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected ComponentType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final ComponentQuery query = (ComponentQuery) super.query;
         
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
-        final PhenomenonEntry component = (PhenomenonEntry)phenomenons.getEntry(results.getString(indexOf(query.idComponent)));
+        final PhenomenonType component = (PhenomenonType)phenomenons.getEntry(results.getString(indexOf(query.idComponent)));
         
-        return new ComponentEntry(results.getString(indexOf(query.idCompositePhenomenon)), component);
+        return new ComponentType(results.getString(indexOf(query.idCompositePhenomenon)), component);
     }
     
     /**
@@ -121,7 +121,7 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
      *Insere un nouveau composant d'une phenomene composé dans la base de donnée.
      *
      */
-    public void getIdentifier(String idComposite, PhenomenonEntry pheno) throws SQLException, CatalogException {
+    public void getIdentifier(String idComposite, PhenomenonType pheno) throws SQLException, CatalogException {
         final ComponentQuery query  = (ComponentQuery) super.query;
         boolean success = false;
         final LocalCache lc = getLocalCache();

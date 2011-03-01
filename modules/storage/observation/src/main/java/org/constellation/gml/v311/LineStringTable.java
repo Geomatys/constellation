@@ -64,9 +64,9 @@ public class LineStringTable extends Table {
         return new LineStringTable(this);
     }
 
-    public List<DirectPositionEntry> getEntries(final String idLineString) throws CatalogException, SQLException {
+    public List<org.constellation.gml.v311.DirectPositionType> getEntries(final String idLineString) throws CatalogException, SQLException {
         final LineStringQuery query = (LineStringQuery) this.query;
-        final List<DirectPositionEntry> positions = new ArrayList<DirectPositionEntry>();
+        final List<org.constellation.gml.v311.DirectPositionType> positions = new ArrayList<org.constellation.gml.v311.DirectPositionType>();
         final LocalCache lc = getLocalCache();
         synchronized (lc) {
             final LocalCache.Stmt ce = getStatement(lc, QueryType.LIST);
@@ -88,7 +88,7 @@ public class LineStringTable extends Table {
                     pos = new DirectPositionType(x, y, z);
                 }
                 final String name = results.getString(idIndex) + '/' + x + '/' + y + '/' + z;
-                positions.add(new DirectPositionEntry(name, pos));
+                positions.add(new org.constellation.gml.v311.DirectPositionType(name, pos));
             }
             results.close();
             release(lc, ce);

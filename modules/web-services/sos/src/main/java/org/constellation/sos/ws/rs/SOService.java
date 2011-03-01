@@ -47,7 +47,7 @@ import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.SOSResponseWrapper;
@@ -116,8 +116,8 @@ public class SOService extends OGCWebService<SOSworker> {
                     }
                 }
                 Object marshalled;
-                if (response instanceof ObservationCollectionEntry) {
-                    marshalled = new SOSResponseWrapper((ObservationCollectionEntry) response);
+                if (response instanceof ObservationCollectionType) {
+                    marshalled = new SOSResponseWrapper((ObservationCollectionType) response);
                 } else if (response instanceof String) {
                     marshalled = (String) response;
                 } else {

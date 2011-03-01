@@ -30,9 +30,9 @@ import javax.xml.namespace.QName;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
+import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -43,9 +43,9 @@ import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.observation.xml.v100.MeasurementEntry;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.observation.xml.v100.MeasurementType;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
+import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
@@ -68,9 +68,9 @@ import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.v100.DataRecordType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
-import org.geotoolkit.swe.xml.v101.DataArrayEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.sos.ws.SOSConstants.*;
@@ -912,15 +912,15 @@ public class SOSWorkerTest {
                                       null,
                                       ResponseModeType.INLINE,
                                       null);
-        ObservationCollectionEntry result = (ObservationCollectionEntry) worker.getObservation(request);
+        ObservationCollectionType result = (ObservationCollectionType) worker.getObservation(request);
 
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
 
-        ObservationEntry expResult = (ObservationEntry)obj.getValue();
+        ObservationType expResult = (ObservationType)obj.getValue();
 
         assertEquals(result.getMember().size(), 1);
 
-        ObservationEntry obsResult = (ObservationEntry) result.getMember().iterator().next();
+        ObservationType obsResult = (ObservationType) result.getMember().iterator().next();
 
 
         assertTrue(obsResult != null);
@@ -934,9 +934,9 @@ public class SOSWorkerTest {
         DataArrayPropertyType expR = (DataArrayPropertyType) expResult.getResult();
         DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
 
-        assertTrue(obsR.getDataArray().getElementType() instanceof SimpleDataRecordEntry);
-        SimpleDataRecordEntry expSdr = (SimpleDataRecordEntry) expR.getDataArray().getElementType();
-        SimpleDataRecordEntry obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
+        assertTrue(obsR.getDataArray().getElementType() instanceof SimpleDataRecordType);
+        SimpleDataRecordType expSdr = (SimpleDataRecordType) expR.getDataArray().getElementType();
+        SimpleDataRecordType obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
         obsSdr.setBlockId(null);
 
         Iterator<AnyScalarPropertyType> i1 = expSdr.getField().iterator();
@@ -984,15 +984,15 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       null,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
 
         assertTrue(obsResult != null);
         assertEquals(expResult.getName(), obsResult.getName());
@@ -1018,15 +1018,15 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
 
 
         assertTrue(obsResult != null);
@@ -1052,10 +1052,10 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         assertEquals(result.getMember().size(), 1);
-        obsResult =  (ObservationEntry) result.getMember().iterator().next();
+        obsResult =  (ObservationType) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
         assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 15.0);
@@ -1080,7 +1080,7 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         assertEquals(result.getMember().size(), 1);
 
@@ -1104,11 +1104,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult =  (ObservationEntry) result.getMember().iterator().next();
+        obsResult =  (ObservationType) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
         assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 15);
@@ -1133,11 +1133,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult =  (ObservationEntry) result.getMember().iterator().next();
+        obsResult =  (ObservationType) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
         assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 10);
@@ -1162,11 +1162,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult =  (ObservationEntry) result.getMember().iterator().next();
+        obsResult =  (ObservationType) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
         assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 5);
@@ -1187,11 +1187,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
         period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
@@ -1199,7 +1199,7 @@ public class SOSWorkerTest {
 
         // and we empty the result object
         DataArrayPropertyType arrayP = (DataArrayPropertyType) expResult.getResult();
-        DataArrayEntry array = arrayP.getDataArray();
+        DataArrayType array = arrayP.getDataArray();
         array.setElementCount(0);
         array.setValues("");
 
@@ -1207,7 +1207,7 @@ public class SOSWorkerTest {
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
 
         assertTrue(obsResult != null);
         assertEquals(expResult.getName(), obsResult.getName());
@@ -1239,11 +1239,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
         expResult.setSamplingTime(period);
@@ -1258,7 +1258,7 @@ public class SOSWorkerTest {
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
 
 
         assertEquals(expResult.getName(), obsResult.getName());
@@ -1290,11 +1290,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
         period = new TimePeriodType(instant.getTimePosition());
@@ -1310,7 +1310,7 @@ public class SOSWorkerTest {
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
 
 
         assertEquals(expResult.getName(), obsResult.getName());
@@ -1342,11 +1342,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
         period = new TimePeriodType(TimeIndeterminateValueType.BEFORE, instant.getTimePosition());
@@ -1362,7 +1362,7 @@ public class SOSWorkerTest {
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
 
 
         assertEquals(expResult.getName(), obsResult.getName());
@@ -1388,15 +1388,15 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
         assertEquals(result.getMember().size(), 1);
 
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
         assertTrue(obsResult != null);
 
         assertEquals(expResult.getName(), obsResult.getName());
@@ -1422,15 +1422,15 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation5.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
         assertEquals(result.getMember().size(), 1);
 
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
         assertTrue(obsResult != null);
 
         assertEquals(expResult.getName(), obsResult.getName());
@@ -1457,15 +1457,15 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation5.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
         assertEquals(result.getMember().size(), 1);
 
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
         assertTrue(obsResult != null);
 
         assertEquals(expResult.getName(), obsResult.getName());
@@ -1492,10 +1492,10 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
 
-        ObservationCollectionEntry collExpResult = new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
+        ObservationCollectionType collExpResult = new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");
         assertEquals(collExpResult, result);
 
         /**
@@ -1514,16 +1514,16 @@ public class SOSWorkerTest {
                                       MEASUREMENT_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
-        assertTrue(result.getMember().iterator().next() instanceof MeasurementEntry);
+        assertTrue(result.getMember().iterator().next() instanceof MeasurementType);
         
-        MeasurementEntry measResult =  (MeasurementEntry) result.getMember().iterator().next();
+        MeasurementType measResult =  (MeasurementType) result.getMember().iterator().next();
         assertTrue(measResult != null);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-7.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
         expResult.setSamplingTime(period);
@@ -1548,15 +1548,15 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
 
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         assertEquals(result.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        obsResult = (ObservationType) result.getMember().iterator().next();
 
 
         assertTrue(obsResult != null);
@@ -1582,9 +1582,9 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
+        result = (ObservationCollectionType) worker.getObservation(request);
 
-        collExpResult = new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
+        collExpResult = new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");
         assertEquals(collExpResult, result);
 
         
@@ -1615,11 +1615,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
-        ObservationCollectionEntry result = (ObservationCollectionEntry) worker.getObservation(request);
+        ObservationCollectionType result = (ObservationCollectionType) worker.getObservation(request);
 
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-8.xml"));
 
-        ObservationEntry expResult = (ObservationEntry)obj.getValue();
+        ObservationType expResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
         TimePeriodType period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
@@ -1627,7 +1627,7 @@ public class SOSWorkerTest {
 
         // and we empty the result object
         DataArrayPropertyType arrayP = (DataArrayPropertyType) expResult.getResult();
-        DataArrayEntry array = arrayP.getDataArray();
+        DataArrayType array = arrayP.getDataArray();
         array.setElementCount(0);
         array.setValues("");
 
@@ -1635,7 +1635,7 @@ public class SOSWorkerTest {
 
         assertEquals(result.getMember().size(), 1);
 
-        ObservationEntry obsResult = (ObservationEntry) result.getMember().iterator().next();
+        ObservationType obsResult = (ObservationType) result.getMember().iterator().next();
 
         assertTrue(obsResult != null);
         assertEquals(expResult.getName(), obsResult.getName());
@@ -1678,11 +1678,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        result = (ObservationCollectionType) worker.getObservation(request);
+        obsResult = (ObservationType) result.getMember().iterator().next();
         
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation6.xml"));
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
@@ -1706,11 +1706,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
-        result = (ObservationCollectionEntry) worker.getObservation(request);
-        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        result = (ObservationCollectionType) worker.getObservation(request);
+        obsResult = (ObservationType) result.getMember().iterator().next();
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation6.xml"));
-        expResult = (ObservationEntry)obj.getValue();
+        expResult = (ObservationType)obj.getValue();
 
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
@@ -1800,11 +1800,11 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
-        ObservationCollectionEntry obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
+        ObservationCollectionType obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
 
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
 
-        ObservationEntry templateExpResult = (ObservationEntry)obj.getValue();
+        ObservationType templateExpResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
         TimePeriodType period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
@@ -1812,7 +1812,7 @@ public class SOSWorkerTest {
 
         // and we empty the result object
         DataArrayPropertyType arrayP = (DataArrayPropertyType) templateExpResult.getResult();
-        DataArrayEntry array = arrayP.getDataArray();
+        DataArrayType array = arrayP.getDataArray();
         array.setElementCount(0);
         array.setValues("");
 
@@ -1820,12 +1820,12 @@ public class SOSWorkerTest {
 
         assertEquals(obsCollResult.getMember().size(), 1);
 
-        ObservationEntry obsResult = (ObservationEntry) obsCollResult.getMember().iterator().next();
+        ObservationType obsResult = (ObservationType) obsCollResult.getMember().iterator().next();
 
         assertNotNull(obsResult);
 
         DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
-        SimpleDataRecordEntry obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
+        SimpleDataRecordType obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
         obsSdr.setBlockId(null);
 
         assertTrue(obsResult != null);
@@ -1877,11 +1877,11 @@ public class SOSWorkerTest {
                                         OBSERVATION_QNAME,
                                         ResponseModeType.RESULT_TEMPLATE,
                                         null);
-        obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
+        obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
 
-        templateExpResult = (ObservationEntry)obj.getValue();
+        templateExpResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
         period = new TimePeriodType(TimeIndeterminateValueType.BEFORE, new TimePositionType("2007-05-01T05:00:00.0"));
@@ -1897,10 +1897,10 @@ public class SOSWorkerTest {
 
         assertEquals(obsCollResult.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) obsCollResult.getMember().iterator().next();
+        obsResult = (ObservationType) obsCollResult.getMember().iterator().next();
 
         obsR = (DataArrayPropertyType) obsResult.getResult();
-        obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
+        obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
         obsSdr.setBlockId(null);
 
         assertTrue(obsResult != null);
@@ -2032,11 +2032,11 @@ public class SOSWorkerTest {
                                         OBSERVATION_QNAME,
                                         ResponseModeType.RESULT_TEMPLATE,
                                         null);
-        obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
+        obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
 
-        templateExpResult = (ObservationEntry)obj.getValue();
+        templateExpResult = (ObservationType)obj.getValue();
 
         //for template the sampling time is 1970 to now
         period = new TimePeriodType(new TimePositionType("2007-05-01T19:00:00.0"));
@@ -2052,10 +2052,10 @@ public class SOSWorkerTest {
 
         assertEquals(obsCollResult.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) obsCollResult.getMember().iterator().next();
+        obsResult = (ObservationType) obsCollResult.getMember().iterator().next();
 
         obsR = (DataArrayPropertyType) obsResult.getResult();
-        obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
+        obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
         obsSdr.setBlockId(null);
 
         assertTrue(obsResult != null);
@@ -2103,11 +2103,11 @@ public class SOSWorkerTest {
                                         OBSERVATION_QNAME,
                                         ResponseModeType.RESULT_TEMPLATE,
                                         null);
-        obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
+        obsCollResult = (ObservationCollectionType) worker.getObservation(GOrequest);
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
 
-        templateExpResult = (ObservationEntry)obj.getValue();
+        templateExpResult = (ObservationType)obj.getValue();
 
         instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
         templateExpResult.setSamplingTime(instant);
@@ -2122,10 +2122,10 @@ public class SOSWorkerTest {
 
         assertEquals(obsCollResult.getMember().size(), 1);
 
-        obsResult = (ObservationEntry) obsCollResult.getMember().iterator().next();
+        obsResult = (ObservationType) obsCollResult.getMember().iterator().next();
 
         obsR = (DataArrayPropertyType) obsResult.getResult();
-        obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
+        obsSdr = (SimpleDataRecordType) obsR.getDataArray().getElementType();
         obsSdr.setBlockId(null);
 
         assertTrue(obsResult != null);
@@ -2166,14 +2166,14 @@ public class SOSWorkerTest {
 
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
 
-        ObservationEntry template = (ObservationEntry)obj.getValue();
+        ObservationType template = (ObservationType)obj.getValue();
 
         TimePeriodType period = new TimePeriodType(new TimePositionType("2007-06-01T01:00:00.0"), new TimePositionType("2007-06-01T03:00:00.0"));
         template.setSamplingTime(period);
 
         // and we fill the result object
         DataArrayPropertyType arrayP = (DataArrayPropertyType) template.getResult();
-        DataArrayEntry array = arrayP.getDataArray();
+        DataArrayType array = arrayP.getDataArray();
         array.setElementCount(3);
         array.setValues("2007-06-01T01:01:00,6.560@@2007-06-01T02:00:00,6.550@@2007-06-01T03:00:00,6.550@@");
 
@@ -2195,7 +2195,7 @@ public class SOSWorkerTest {
                                       OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
-        ObservationCollectionEntry obsColl = (ObservationCollectionEntry) worker.getObservation(GOrequest);
+        ObservationCollectionType obsColl = (ObservationCollectionType) worker.getObservation(GOrequest);
 
 
 
@@ -2246,7 +2246,7 @@ public class SOSWorkerTest {
          * Test 2 we register a system sensor with an imcomplete Observation template
          */
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-6.xml"));
-        ObservationEntry obsTemplate = (ObservationEntry)obj.getValue();
+        ObservationType obsTemplate = (ObservationType)obj.getValue();
 
         obsTemplate.setProcedure(null);
         request = new RegisterSensor("1.0.0", sensorDescription, new ObservationTemplate(obsTemplate));
@@ -2279,7 +2279,7 @@ public class SOSWorkerTest {
         
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-6.xml"));
 
-        ObservationEntry obsTemplate = (ObservationEntry)obj.getValue();
+        ObservationType obsTemplate = (ObservationType)obj.getValue();
 
         RegisterSensor request = new RegisterSensor("1.0.0", sensorDescription, new ObservationTemplate(obsTemplate));
 
@@ -2322,7 +2322,7 @@ public class SOSWorkerTest {
         /*
          * TODO fix this issue for mdweb redaer/writer
          */
-        EnvelopeEntry nullEnv = null;
+        EnvelopeType nullEnv = null;
         resProcess.setBoundedBy(nullEnv);
         expProcess.setBoundedBy(nullEnv);
         assertEquals(expProcess.getBoundedBy(), resProcess.getBoundedBy());
@@ -2479,7 +2479,7 @@ public class SOSWorkerTest {
          
         GetFeatureOfInterest request = new GetFeatureOfInterest("1.0.0", "SOS", "station-001");
 
-        AbstractFeatureEntry result = worker.getFeatureOfInterest(request);
+        AbstractFeatureType result = worker.getFeatureOfInterest(request);
         
         assertTrue (result instanceof SamplingPoint);
 

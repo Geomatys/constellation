@@ -25,7 +25,7 @@ import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.swe.xml.v101.TextBlockEntry;
+import org.geotoolkit.swe.xml.v101.TextBlockType;
 
 /**
  *  Connexion vers la table des {@linkplain TextBlock textBlock}.
@@ -33,7 +33,7 @@ import org.geotoolkit.swe.xml.v101.TextBlockEntry;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class TextBlockTable extends SingletonTable<TextBlockEntry>{
+public class TextBlockTable extends SingletonTable<TextBlockType>{
     
     /**
      * Construit une table des text Block encodage.
@@ -73,9 +73,9 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
      * @param results un resultSet contenant un tuple de la table de encodage textuel.
      */
     @Override
-    protected TextBlockEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected TextBlockType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final TextBlockQuery localQuery = (TextBlockQuery) super.query;
-        return new TextBlockEntry(results.getString(indexOf(localQuery.id )),
+        return new TextBlockType(results.getString(indexOf(localQuery.id )),
                                   results.getString(indexOf(localQuery.tokenSeparator )),
                                   results.getString(indexOf(localQuery.blockSeparator )),
                                   results.getString(indexOf(localQuery.decimalSeparator)));
@@ -87,7 +87,7 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
      *
      * @param databloc le datablockDefinition a inserer dans la base de donnée.
      */
-    public String getIdentifier(final TextBlockEntry textbloc) throws SQLException, CatalogException {
+    public String getIdentifier(final TextBlockType textbloc) throws SQLException, CatalogException {
         final TextBlockQuery localQuery  = (TextBlockQuery) super.query;
         String id;
         boolean success = false;

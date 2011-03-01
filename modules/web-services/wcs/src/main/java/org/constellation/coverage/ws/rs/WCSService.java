@@ -45,7 +45,7 @@ import static org.constellation.query.wcs.WCSQuery.*;
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.CodeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.GridLimitsType;
 import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -464,7 +464,7 @@ public class WCSService extends GridWebService<WCSWorker> {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
         }
-        final EnvelopeEntry envelope = new EnvelopeEntry(pos, getParameter(KEY_CRS, true));
+        final EnvelopeType envelope = new EnvelopeType(pos, getParameter(KEY_CRS, true));
 
         if ((width == null || height == null) && (resx == null || resy == null)) {
             throw new CstlServiceException("You should specify either width/height or resx/resy.",

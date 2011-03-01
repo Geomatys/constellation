@@ -22,10 +22,10 @@ import org.constellation.ws.CstlServiceException;
 
 // GeoAPI dependencies
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
-import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
-import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
-import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
+import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
+import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
+import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Observation;
 
@@ -64,7 +64,7 @@ public interface ObservationWriter {
      * @return
      * @throws CstlServiceException
      */
-    String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException;
+    String writeOffering(ObservationOfferingType offering) throws CstlServiceException;
 
     /**
      * Update an offering after the add of a new Observation.
@@ -76,8 +76,8 @@ public interface ObservationWriter {
      *
      * @throws CstlServiceException
      */
-    void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno,
-            OfferingSamplingFeatureEntry offSF) throws CstlServiceException;
+    void updateOffering(OfferingProcedureType offProc, OfferingPhenomenonType offPheno,
+            OfferingSamplingFeatureType offSF) throws CstlServiceException;
 
     /**
      * Refresh the cached offerings.

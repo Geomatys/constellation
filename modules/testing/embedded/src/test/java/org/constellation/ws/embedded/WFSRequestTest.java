@@ -31,7 +31,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
-import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.InsertResultsType;
@@ -128,8 +128,8 @@ public class WFSRequestTest extends AbstractTestRequest {
         assertEquals(1, feat.getFeatureMember().size());
 
         assertTrue("expected samplingPoint but was:" +  feat.getFeatureMember().get(0),
-                feat.getFeatureMember().get(0).getAbstractFeature() instanceof SamplingPointEntry);
-        SamplingPointEntry sp = (SamplingPointEntry) feat.getFeatureMember().get(0).getAbstractFeature();
+                feat.getFeatureMember().get(0).getAbstractFeature() instanceof SamplingPointType);
+        SamplingPointType sp = (SamplingPointType) feat.getFeatureMember().get(0).getAbstractFeature();
 
         assertEquals("10972X0137-PONT", sp.getName());
     }

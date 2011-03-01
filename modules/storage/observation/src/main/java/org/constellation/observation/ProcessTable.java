@@ -25,7 +25,7 @@ import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.geotoolkit.observation.xml.v100.ProcessType;
 
 
 /**
@@ -36,7 +36,7 @@ import org.geotoolkit.observation.xml.v100.ProcessEntry;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class ProcessTable extends SingletonTable<ProcessEntry> {
+public class ProcessTable extends SingletonTable<ProcessType> {
     
     /**
      * Construit une table des procédures.
@@ -74,9 +74,9 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
      * Construit une procédure pour l'enregistrement courant.
      */
     @Override
-    protected ProcessEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException {
+    protected ProcessType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException {
         final ProcessQuery query = (ProcessQuery) super.query;
-        return new ProcessEntry(results.getString(indexOf(query.name)));
+        return new ProcessType(results.getString(indexOf(query.name)));
     }
     
     /**
@@ -85,7 +85,7 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
      *
      * @param proc le capteur a inserer dans la base de donnée.
      */
-    public String getIdentifier(final ProcessEntry proc) throws SQLException, CatalogException {
+    public String getIdentifier(final ProcessType proc) throws SQLException, CatalogException {
         final ProcessQuery query  = (ProcessQuery) super.query;
         String id;
         boolean success = false;

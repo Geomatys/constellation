@@ -24,7 +24,7 @@ import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
@@ -37,11 +37,11 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
+public class SamplingFeatureTable extends SingletonTable<SamplingFeatureType> {
    
        
     /**
-     * {@code true} si l'on autorise cette classe à construire des objets {@link StationEntry}
+     * {@code true} si l'on autorise cette classe à construire des objets {@link StationType}
      * qui contiennent moins d'informations, afin de réduire le nombre de requêtes SQL. Utile
      * si l'on souhaite obtenir une {@linkplain #getEntries liste de nombreuses stations}.
      */
@@ -114,10 +114,10 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
     @Override
-    protected SamplingFeatureEntry createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected SamplingFeatureType createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final SamplingFeatureQuery query = (SamplingFeatureQuery) super.query;
         // TODO result.getString(indexOf(query.sampledFeature))
-        return new SamplingFeatureEntry(result.getString(indexOf(query.identifier)),
+        return new SamplingFeatureType(result.getString(indexOf(query.identifier)),
                                         result.getString(indexOf(query.name)),
                                         result.getString(indexOf(query.description)),
                                         new FeaturePropertyType(result.getString(indexOf(query.sampledFeature))));
@@ -134,7 +134,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      * cette méthode va l'accepter comme approche conservative.
      
     @Override
-    protected boolean accept(final SamplingFeatureEntry entry) throws CatalogException, SQLException {
+    protected boolean accept(final SamplingFeatureType entry) throws CatalogException, SQLException {
         
         return super.accept(entry);
     }*/
@@ -145,7 +145,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      *
      * @param result le resultat a inserer dans la base de donnée.
      */
-    public String getIdentifier(final SamplingFeatureEntry station) throws SQLException, CatalogException {
+    public String getIdentifier(final SamplingFeatureType station) throws SQLException, CatalogException {
         final SamplingFeatureQuery query  = (SamplingFeatureQuery) super.query;
         String id;
         boolean success = false;

@@ -34,11 +34,11 @@ import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.observation.xml.v100.MeasurementEntry;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
-import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
-import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
-import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
+import org.geotoolkit.observation.xml.v100.MeasurementType;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
+import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
+import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
+import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
@@ -124,7 +124,7 @@ public class DefaultObservationWriter implements ObservationWriter {
     @Override
     public String writeObservation(Observation observation) throws CstlServiceException {
         try {
-            if (observation instanceof MeasurementEntry && measTable != null) {
+            if (observation instanceof MeasurementType && measTable != null) {
                 return measTable.getIdentifier((Measurement) observation);
             } else if (obsTable != null) {
                 return obsTable.getIdentifier(observation);
@@ -158,7 +158,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException {
+    public String writeOffering(ObservationOfferingType offering) throws CstlServiceException {
         try {
             return offTable.getIdentifier(offering);
 
@@ -174,7 +174,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno, OfferingSamplingFeatureEntry offSF) throws CstlServiceException {
+    public void updateOffering(OfferingProcedureType offProc, OfferingPhenomenonType offPheno, OfferingSamplingFeatureType offSF) throws CstlServiceException {
         try {
             if (offProc != null)
                 offTable.getProcedures().getIdentifier(offProc);

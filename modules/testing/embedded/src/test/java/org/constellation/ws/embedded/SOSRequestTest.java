@@ -30,9 +30,9 @@ import java.net.URL;
 import java.io.File;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import javax.xml.bind.JAXBException;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
 import org.junit.*;
@@ -170,7 +170,7 @@ public class SOSRequestTest extends AbstractTestRequest {
         if (obj != null) {
             type = obj.getClass().getName();
         }
-        assertTrue("expecting ObservationCollectionEntry but was: " + type, obj instanceof ObservationCollectionEntry);
+        assertTrue("expecting ObservationCollectionType but was: " + type, obj instanceof ObservationCollectionType);
     }
 
     @Test
@@ -190,6 +190,6 @@ public class SOSRequestTest extends AbstractTestRequest {
         if (obj != null) {
             type = obj.getClass().getName();
         }
-        assertTrue("expecting SamplingPointEntry but was: " + type, obj instanceof SamplingPointEntry);
+        assertTrue("expecting SamplingPointType but was: " + type, obj instanceof SamplingPointType);
     }
 }

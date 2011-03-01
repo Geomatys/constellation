@@ -27,16 +27,16 @@ import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonTable;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
-import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
-import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.util.Utilities;
 
 /**
  *
  * @author Guilhem Legal
  */
-public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEntry>{
+public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonType>{
 
     /**
      * identifier secondary of the table.
@@ -86,22 +86,22 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
     
     
     @Override
-    protected OfferingPhenomenonEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected OfferingPhenomenonType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingPhenomenonQuery query = (OfferingPhenomenonQuery) super.query;
-        PhenomenonEntry phenomenon;
+        PhenomenonType phenomenon;
         
         if (!results.getString(indexOf(query.phenomenon)).isEmpty()) {
             if (phenomenons == null) {
                 phenomenons = getDatabase().getTable(PhenomenonTable.class);
             }
-            phenomenon = (PhenomenonEntry)phenomenons.getEntry(results.getString(indexOf(query.phenomenon)));
+            phenomenon = (PhenomenonType)phenomenons.getEntry(results.getString(indexOf(query.phenomenon)));
         } else {
             if (compositePhenomenons == null) {
                 compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
         } 
             phenomenon = compositePhenomenons.getEntry(results.getString(indexOf(query.compositePhenomenon)));
         }
-        return new OfferingPhenomenonEntry(results.getString(indexOf(query.idOffering)), phenomenon);
+        return new OfferingPhenomenonType(results.getString(indexOf(query.idOffering)), phenomenon);
     }
     
     /**
@@ -133,7 +133,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *
      */
-    public void getIdentifier(OfferingPhenomenonEntry offPheno) throws SQLException, CatalogException {
+    public void getIdentifier(OfferingPhenomenonType offPheno) throws SQLException, CatalogException {
         final OfferingPhenomenonQuery query  = (OfferingPhenomenonQuery) super.query;
         String idPheno = "";
         boolean success = false;
@@ -146,11 +146,11 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 statement.statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
 
 
-                if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
+                if (offPheno.getComponent() instanceof CompositePhenomenonType) {
                     if (compositePhenomenons == null) {
                         compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
                     }
-                    idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
+                    idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonType)offPheno.getComponent());
                     statement.statement.setString(indexOf(query.compositePhenomenon), idPheno);
                     statement.statement.setString(indexOf(query.phenomenon), "");
 
@@ -175,11 +175,11 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
 
                 final Stmt insert    = getStatement(lc, QueryType.INSERT);
                 insert.statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
-                if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
+                if (offPheno.getComponent() instanceof CompositePhenomenonType) {
                     if (compositePhenomenons == null) {
                         compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
                     }
-                    idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
+                    idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonType)offPheno.getComponent());
                     insert.statement.setString(indexOf(query.compositePhenomenon), idPheno);
                     insert.statement.setString(indexOf(query.phenomenon), "");
                 } else {

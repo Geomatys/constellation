@@ -25,19 +25,19 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
-import org.geotoolkit.observation.xml.v100.MeasureEntry;
-import org.geotoolkit.observation.xml.v100.MeasurementEntry;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
-import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.geotoolkit.observation.xml.v100.MeasureType;
+import org.geotoolkit.observation.xml.v100.MeasurementType;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
+import org.geotoolkit.observation.xml.v100.ObservationType;
+import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.sos.xml.v100.Capabilities;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.swe.xml.AbstractEncodingProperty;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swe.xml.DataComponentProperty;
-import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
-import org.geotoolkit.swe.xml.v101.DataArrayEntry;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
+import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
 import org.opengis.observation.Observation;
@@ -64,13 +64,13 @@ public final class Normalizer {
     public static Capabilities normalizeDocument(Capabilities capa){
         final List<PhenomenonPropertyType> alreadySee = new ArrayList<PhenomenonPropertyType>();
         if (capa.getContents() != null) {
-            for (ObservationOfferingEntry off: capa.getContents().getObservationOfferingList().getObservationOffering()) {
+            for (ObservationOfferingType off: capa.getContents().getObservationOfferingList().getObservationOffering()) {
                 for (PhenomenonPropertyType pheno: off.getRealObservedProperty()) {
                     if (alreadySee.contains(pheno)) {
                         pheno.setToHref();
                     } else {
-                        if (pheno.getPhenomenon() instanceof CompositePhenomenonEntry) {
-                            final CompositePhenomenonEntry compo = (CompositePhenomenonEntry) pheno.getPhenomenon();
+                        if (pheno.getPhenomenon() instanceof CompositePhenomenonType) {
+                            final CompositePhenomenonType compo = (CompositePhenomenonType) pheno.getPhenomenon();
                             for (PhenomenonPropertyType pheno2: compo.getRealComponent()) {
                                 if (alreadySee.contains(pheno2)) {
                                     pheno2.setToHref();
@@ -94,20 +94,20 @@ public final class Normalizer {
      *
      * @return a collection
      */
-    public static ObservationCollectionEntry regroupObservation(ObservationCollectionEntry collection){
+    public static ObservationCollectionType regroupObservation(ObservationCollectionType collection){
         final List<Observation> members = collection.getMember();
-        final Map<String, ObservationEntry> merged = new HashMap<String, ObservationEntry>();
+        final Map<String, ObservationType> merged = new HashMap<String, ObservationType>();
         for (Observation obs : members) {
-            final ProcessEntry process = (ProcessEntry) obs.getProcedure();
+            final ProcessType process = (ProcessType) obs.getProcedure();
             if (merged.containsKey(process.getHref())) {
-                final ObservationEntry uniqueObs         = merged.get(process.getHref());
+                final ObservationType uniqueObs         = merged.get(process.getHref());
                 if (uniqueObs.getResult() instanceof DataArrayPropertyType) {
                     final DataArrayPropertyType mergedArrayP = (DataArrayPropertyType) uniqueObs.getResult();
-                    final DataArrayEntry mergedArray         = mergedArrayP.getDataArray();
+                    final DataArrayType mergedArray         = mergedArrayP.getDataArray();
 
                     if (obs.getResult() instanceof DataArrayPropertyType) {
                         final DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
-                        final DataArrayEntry array         = arrayP.getDataArray();
+                        final DataArrayType array         = arrayP.getDataArray();
 
                         //we merge this observation with the map one
                         mergedArray.setElementCount(mergedArray.getElementCount().getCount().getValue() + array.getElementCount().getCount().getValue());
@@ -115,18 +115,18 @@ public final class Normalizer {
                     } 
                 }
             } else {
-                final ObservationEntry clone;
-                if (obs instanceof MeasurementEntry) {
-                    clone = (MeasurementEntry) obs;
+                final ObservationType clone;
+                if (obs instanceof MeasurementType) {
+                    clone = (MeasurementType) obs;
                 } else {
-                    clone = new ObservationEntry((ObservationEntry) obs);
+                    clone = new ObservationType((ObservationType) obs);
                 }
                 merged.put(process.getHref(), clone);
             }
         }
 
-        final ObservationCollectionEntry result = new ObservationCollectionEntry();
-        for (ObservationEntry entry: merged.values()) {
+        final ObservationCollectionType result = new ObservationCollectionType();
+        for (ObservationType entry: merged.values()) {
             result.add(entry);
         }
         return result;
@@ -139,10 +139,10 @@ public final class Normalizer {
      *
      * @return a normalized document
      */
-    public static ObservationCollectionEntry normalizeDocument(ObservationCollectionEntry collection) {
+    public static ObservationCollectionType normalizeDocument(ObservationCollectionType collection) {
         //first if the collection is empty
         if (collection.getMember().isEmpty()) {
-            return new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
+            return new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");
         }
 
         final List<FeaturePropertyType>      foiAlreadySee   = new ArrayList<FeaturePropertyType> ();
@@ -151,19 +151,19 @@ public final class Normalizer {
         final List<DataComponentProperty>    dataAlreadySee  = new ArrayList<DataComponentProperty>();
         for (Observation observation: collection.getMember()) {
             //we do this for the feature of interest
-            final FeaturePropertyType foi = ((ObservationEntry)observation).getPropertyFeatureOfInterest();
+            final FeaturePropertyType foi = ((ObservationType)observation).getPropertyFeatureOfInterest();
             if (foiAlreadySee.contains(foi)){
                 foi.setToHref();
             } else {
                 foiAlreadySee.add(foi);
             }
             //for the phenomenon
-            final PhenomenonPropertyType phenomenon = ((ObservationEntry)observation).getPropertyObservedProperty();
+            final PhenomenonPropertyType phenomenon = ((ObservationType)observation).getPropertyObservedProperty();
             if (phenoAlreadySee.contains(phenomenon)){
                 phenomenon.setToHref();
             } else {
-                if (phenomenon.getPhenomenon() instanceof CompositePhenomenonEntry) {
-                    final CompositePhenomenonEntry compo = (CompositePhenomenonEntry) phenomenon.getPhenomenon();
+                if (phenomenon.getPhenomenon() instanceof CompositePhenomenonType) {
+                    final CompositePhenomenonType compo = (CompositePhenomenonType) phenomenon.getPhenomenon();
                     for (PhenomenonPropertyType pheno2: compo.getRealComponent()) {
                         if (phenoAlreadySee.contains(pheno2)) {
                                     pheno2.setToHref();
@@ -194,7 +194,7 @@ public final class Normalizer {
                 } else {
                     encAlreadySee.add(encoding);
                 }
-            } else if (observation.getResult() instanceof MeasureEntry) {
+            } else if (observation.getResult() instanceof MeasureType) {
                 // do nothing
             } else {
                 if (observation.getResult() != null)

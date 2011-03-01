@@ -56,7 +56,7 @@ import org.geotoolkit.factory.HintsPending;
 import org.geotoolkit.feature.FeatureTypeUtilities;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.Utils;
-import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
+import org.geotoolkit.gml.xml.v311.AbstractGMLType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ows.xml.v100.WGS84BoundingBoxType;
@@ -589,7 +589,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public AbstractGMLEntry getGMLObject(GetGmlObjectType grbi) throws CstlServiceException {
+    public AbstractGMLType getGMLObject(GetGmlObjectType grbi) throws CstlServiceException {
         throw new CstlServiceException("WFS get GML Object is not supported on this Constellation version.");
     }
 

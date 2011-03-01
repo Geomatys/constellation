@@ -48,9 +48,9 @@ import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.InsertObservationResponse;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
-import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
+import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 
@@ -132,12 +132,12 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="getObservation")
-    public ObservationCollectionEntry getObservation(@WebParam(name = "GetObservation") GetObservation requestObservation) throws SOServiceException {
+    public ObservationCollectionType getObservation(@WebParam(name = "GetObservation") GetObservation requestObservation) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getObservation request");
             final SOSworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return (ObservationCollectionEntry) worker.getObservation(requestObservation);
+            return (ObservationCollectionType) worker.getObservation(requestObservation);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
@@ -152,7 +152,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="getFeatureOfInterest")
-    public AbstractFeatureEntry getFeatureOfInterest(@WebParam(name = "GetFeatureOfInterest") GetFeatureOfInterest requestfeatureOfInterest) throws SOServiceException {
+    public AbstractFeatureType getFeatureOfInterest(@WebParam(name = "GetFeatureOfInterest") GetFeatureOfInterest requestfeatureOfInterest) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getfeatureOfInterest request");
             final SOSworker worker = getCurrentWorker();

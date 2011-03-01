@@ -27,7 +27,7 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 
 // OpenGis dependencies
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 
 
 /**
@@ -37,7 +37,7 @@ import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
+public class PhenomenonTable extends SingletonTable<PhenomenonType> {
    
     /**
      * Construit une table des phénomènes.
@@ -74,9 +74,9 @@ public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
      * Construit un phénomène pour l'enregistrement courant.
      */
     @Override
-    protected PhenomenonEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
+    protected PhenomenonType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final PhenomenonQuery localQuery = (PhenomenonQuery) super.query;
-        return new PhenomenonEntry(results.getString(indexOf(localQuery.identifier)),
+        return new PhenomenonType(results.getString(indexOf(localQuery.identifier)),
                                    results.getString(indexOf(localQuery.name)),
                                    results.getString(indexOf(localQuery.remarks)));
     }
@@ -87,7 +87,7 @@ public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
      *
      * @param result le resultat a inserer dans la base de donnée.
      */
-    public String getIdentifier(final PhenomenonEntry pheno) throws SQLException, CatalogException {
+    public String getIdentifier(final PhenomenonType pheno) throws SQLException, CatalogException {
         final PhenomenonQuery localQuery  = (PhenomenonQuery) super.query;
         String id;
         boolean success = false;

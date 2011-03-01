@@ -1029,7 +1029,7 @@ public class MetadataUnmarshallTest {
          * Spatial representation info
          */
         DefaultVectorSpatialRepresentation spatialRep = new DefaultVectorSpatialRepresentation();
-        DefaultGeometricObjects geoObj = new DefaultGeometricObjects(GeometricObjectType.valueOf("point"));
+        DefaultGeometricObjects geoObj = new DefaultGeometricObjects(GeometricObjectType.POINT);
         set = new HashSet();
         set.add(geoObj);
         spatialRep.setGeometricObjects(set);

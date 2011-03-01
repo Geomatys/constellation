@@ -27,14 +27,14 @@ import org.constellation.gml.v311.UnitOfMeasureTable;
 import org.geotoolkit.gml.xml.v311.UnitOfMeasureEntry;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
-import org.geotoolkit.observation.xml.v100.MeasureEntry;
+import org.geotoolkit.observation.xml.v100.MeasureType;
 
 /**
  *
  * @version $Id:
  * @author Guilhem Legal
  */
-public class MeasureTable extends SingletonTable<MeasureEntry> {
+public class MeasureTable extends SingletonTable<MeasureType> {
     
     /**
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
@@ -79,13 +79,13 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
      * Construit un resultat de mesure pour l'enregistrement courant.
      */
     @Override
-    protected MeasureEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
+    protected MeasureType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final MeasureQuery query = (MeasureQuery) super.query;
         if(uoms == null) {
             uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
         }
         final UnitOfMeasureEntry uom = uoms.getEntry(results.getString(indexOf(query.uom)));
-        return new MeasureEntry(results.getString(indexOf(query.name   )),
+        return new MeasureType(results.getString(indexOf(query.name   )),
                                 uom,
                                 results.getFloat(indexOf(query.value)));
     }
@@ -96,7 +96,7 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
      *
      * @param meas le resultat de mesure a inserer dans la base de donnée.
      */
-    public String getIdentifier(final MeasureEntry meas) throws SQLException, CatalogException {
+    public String getIdentifier(final MeasureType meas) throws SQLException, CatalogException {
         final MeasureQuery query  = (MeasureQuery) super.query;
         String id;
         boolean success = false;

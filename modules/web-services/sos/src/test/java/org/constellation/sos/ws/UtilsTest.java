@@ -29,13 +29,13 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
-import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
+import org.geotoolkit.observation.xml.v100.ObservationType;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.Test;
 import org.junit.After;
@@ -265,46 +265,46 @@ public class UtilsTest {
     @Test
     public void getCollectionBoundTest() throws Exception {
 
-        PhenomenonEntry pheno = new PhenomenonEntry("test", "test");
+        PhenomenonType pheno = new PhenomenonType("test", "test");
 
-        ObservationCollectionEntry collection = new ObservationCollectionEntry();
+        ObservationCollectionType collection = new ObservationCollectionType();
 
-        ObservationEntry obs1 = new ObservationEntry();
-        ObservationEntry obs2 = new ObservationEntry();
-        ObservationEntry obs3 = new ObservationEntry();
+        ObservationType obs1 = new ObservationType();
+        ObservationType obs2 = new ObservationType();
+        ObservationType obs3 = new ObservationType();
 
         collection.add(obs1);
         collection.add(obs2);
         collection.add(obs3);
 
-        EnvelopeEntry result = Utils.getCollectionBound(collection, "urn:ogc:def:crs:EPSG::4326");
+        EnvelopeType result = Utils.getCollectionBound(collection, "urn:ogc:def:crs:EPSG::4326");
 
-        EnvelopeEntry expResult = new EnvelopeEntry(null, new DirectPositionType(-180.0, -90.0), new DirectPositionType(180.0, 90.0), "urn:ogc:def:crs:EPSG::4326");
+        EnvelopeType expResult = new EnvelopeType(null, new DirectPositionType(-180.0, -90.0), new DirectPositionType(180.0, 90.0), "urn:ogc:def:crs:EPSG::4326");
         expResult.setSrsDimension(2);
         expResult.setAxisLabels("Y X");
         assertEquals(expResult, result);
 
 
-        SamplingPointEntry sp1 = new SamplingPointEntry(null, null, null, null, null);
-        sp1.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(10.0, 10.0), "urn:ogc:def:crs:EPSG::4326"));
-        obs1 = new ObservationEntry(null, null, sp1, pheno, null, this, null);
+        SamplingPointType sp1 = new SamplingPointType(null, null, null, null, null);
+        sp1.setBoundedBy(new EnvelopeType(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(10.0, 10.0), "urn:ogc:def:crs:EPSG::4326"));
+        obs1 = new ObservationType(null, null, sp1, pheno, null, this, null);
 
-        SamplingPointEntry sp2 = new SamplingPointEntry(null, null, null, null, null);
-        sp2.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(-5.0, -5.0), new DirectPositionType(15.0, 15.0), "urn:ogc:def:crs:EPSG::4326"));
-        obs2 = new ObservationEntry(null, null, sp2, pheno, null, this, null);
+        SamplingPointType sp2 = new SamplingPointType(null, null, null, null, null);
+        sp2.setBoundedBy(new EnvelopeType(null, new DirectPositionType(-5.0, -5.0), new DirectPositionType(15.0, 15.0), "urn:ogc:def:crs:EPSG::4326"));
+        obs2 = new ObservationType(null, null, sp2, pheno, null, this, null);
 
-        SamplingPointEntry sp3 = new SamplingPointEntry(null, null, null, null, null);
-        sp3.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(0.0, -8.0), new DirectPositionType(20.0, 10.0), "urn:ogc:def:crs:EPSG::4326"));
-        obs3 = new ObservationEntry(null, null, sp3, pheno, null, this, null);
+        SamplingPointType sp3 = new SamplingPointType(null, null, null, null, null);
+        sp3.setBoundedBy(new EnvelopeType(null, new DirectPositionType(0.0, -8.0), new DirectPositionType(20.0, 10.0), "urn:ogc:def:crs:EPSG::4326"));
+        obs3 = new ObservationType(null, null, sp3, pheno, null, this, null);
 
-        collection = new ObservationCollectionEntry();
+        collection = new ObservationCollectionType();
         collection.add(obs1);
         collection.add(obs2);
         collection.add(obs3);
 
         result = Utils.getCollectionBound(collection, "urn:ogc:def:crs:EPSG::4326");
 
-        expResult = new EnvelopeEntry(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(20.0, 15.0), "urn:ogc:def:crs:EPSG::4326");
+        expResult = new EnvelopeType(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(20.0, 15.0), "urn:ogc:def:crs:EPSG::4326");
         expResult.setSrsDimension(2);
         expResult.setAxisLabels("Y X");
         

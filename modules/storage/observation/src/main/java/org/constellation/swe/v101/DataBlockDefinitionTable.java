@@ -27,9 +27,9 @@ import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.swe.xml.v101.DataBlockDefinitionEntry;
-import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
-import org.geotoolkit.swe.xml.v101.TextBlockEntry;
+import org.geotoolkit.swe.xml.v101.DataBlockDefinitionType;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
+import org.geotoolkit.swe.xml.v101.TextBlockType;
 import org.geotoolkit.swe.xml.v101.AbstractEncodingPropertyType;
 
 /**
@@ -38,7 +38,7 @@ import org.geotoolkit.swe.xml.v101.AbstractEncodingPropertyType;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinitionEntry>{
+public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinitionType>{
     
     /**
      * Connexion vers la table des {@linkplain TextBlock text block encoding}.
@@ -89,7 +89,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected DataBlockDefinitionEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
+    protected DataBlockDefinitionType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final DataBlockDefinitionQuery query = (DataBlockDefinitionQuery) super.query;
         final String idDataBlock = results.getString(indexOf(query.id));
         
@@ -97,15 +97,15 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
             dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
         }
         dataRecords.setIdDataBlock(idDataBlock);
-        final Collection<SimpleDataRecordEntry> entries = dataRecords.getEntries();
+        final Collection<SimpleDataRecordType> entries = dataRecords.getEntries();
         
         if (textBlockEncodings == null) {
             textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
         }
         
-        final TextBlockEntry encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
+        final TextBlockType encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
         
-        return new DataBlockDefinitionEntry(idDataBlock, entries, encoding);
+        return new DataBlockDefinitionType(idDataBlock, entries, encoding);
     }
     
     /**
@@ -114,7 +114,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
      *
      * @param databloc le datablockDefinition a inserer dans la base de donnée.
      */
-    public String getIdentifier(final DataBlockDefinitionEntry databloc) throws SQLException, CatalogException {
+    public String getIdentifier(final DataBlockDefinitionType databloc) throws SQLException, CatalogException {
         final DataBlockDefinitionQuery query  = (DataBlockDefinitionQuery) super.query;
         String id;
         boolean success = false;
@@ -146,7 +146,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
                     textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
                 }
                 final AbstractEncodingPropertyType encProp = databloc.getEncoding();
-                statement.statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry) encProp.getEncoding()));
+                statement.statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockType) encProp.getEncoding()));
                 updateSingleton(statement.statement);
                 release(lc, statement);
                 
@@ -158,7 +158,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
                 }
                 final Iterator i = databloc.getComponents().iterator();
                 while (i.hasNext()) {
-                    dataRecords.getIdentifier((SimpleDataRecordEntry) i.next(), id);
+                    dataRecords.getIdentifier((SimpleDataRecordType) i.next(), id);
                 }
                 success = true;
             } finally {

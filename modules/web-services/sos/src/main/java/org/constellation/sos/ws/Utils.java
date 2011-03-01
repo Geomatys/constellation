@@ -17,21 +17,21 @@
 
 package org.constellation.sos.ws;
 
-import org.geotoolkit.swe.xml.v101.TextBlockEntry;
+import org.geotoolkit.swe.xml.v101.TextBlockType;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
-import org.geotoolkit.gml.xml.v311.BoundingShapeEntry;
+import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
+import org.geotoolkit.gml.xml.v311.BoundingShapeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
+import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
 import org.geotoolkit.sml.xml.AbstractDerivableComponent;
@@ -226,19 +226,19 @@ public final class Utils {
      * @param collection
      * @return
      */
-    public static EnvelopeEntry getCollectionBound(final ObservationCollectionEntry collection, String srsName) {
+    public static EnvelopeType getCollectionBound(final ObservationCollectionType collection, String srsName) {
         double minx = Double.MAX_VALUE;
         double miny = Double.MAX_VALUE;
         double maxx = -Double.MAX_VALUE;
         double maxy = -Double.MAX_VALUE;
 
         for (Observation observation: collection.getMember()) {
-            final FeaturePropertyType featureProp = ((ObservationEntry)observation).getPropertyFeatureOfInterest();
+            final FeaturePropertyType featureProp = ((ObservationType)observation).getPropertyFeatureOfInterest();
 
             if (featureProp != null && featureProp.getAbstractFeature() != null) {
-                final AbstractFeatureEntry feature = featureProp.getAbstractFeature();
+                final AbstractFeatureType feature = featureProp.getAbstractFeature();
                 if (feature.getBoundedBy() != null) {
-                    final BoundingShapeEntry bound = feature.getBoundedBy();
+                    final BoundingShapeType bound = feature.getBoundedBy();
                     if (bound.getEnvelope() != null) {
                         if (bound.getEnvelope().getLowerCorner() != null
                             && bound.getEnvelope().getLowerCorner().getValue() != null
@@ -280,7 +280,7 @@ public final class Utils {
             maxy = 90.0;
         }
 
-        final EnvelopeEntry env =  new EnvelopeEntry(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), srsName);
+        final EnvelopeType env =  new EnvelopeType(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), srsName);
         env.setSrsDimension(2);
         env.setAxisLabels("Y X");
         return env;
@@ -308,7 +308,7 @@ public final class Utils {
      * @param value the datablock builder.
      * @param phenomenonIndex the current phenomenon index.
      */
-    public static void fillEndingDataHoles(Appendable value, int phenomenonIndex, List<String> fieldList, TextBlockEntry encoding) throws IOException {
+    public static void fillEndingDataHoles(Appendable value, int phenomenonIndex, List<String> fieldList, TextBlockType encoding) throws IOException {
         while (phenomenonIndex < fieldList.size()) {
             value.append(encoding.getTokenSeparator());
             phenomenonIndex++;
@@ -327,7 +327,7 @@ public final class Utils {
      *
      * @return the updated phenomenon index.
      */
-    public static int fillDataHoles(Appendable value, int currentIndex, String searchedField, List<String> fieldList, TextBlockEntry encoding, int nbBlockByHole) throws IOException {
+    public static int fillDataHoles(Appendable value, int currentIndex, String searchedField, List<String> fieldList, TextBlockType encoding, int nbBlockByHole) throws IOException {
         while (currentIndex < fieldList.size() && !fieldList.get(currentIndex).equals(searchedField)) {
             if (value != null) {
                 for (int i = 0; i < nbBlockByHole; i++) {

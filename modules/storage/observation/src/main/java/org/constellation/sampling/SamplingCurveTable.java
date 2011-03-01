@@ -27,12 +27,11 @@ import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.NoSuchTableException;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.constellation.gml.v311.DirectPositionEntry;
 import org.constellation.gml.v311.EnvelopeTable;
 import org.constellation.gml.v311.LineStringTable;
 import org.geotoolkit.gml.xml.v311.CurvePropertyType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.LineStringType;
 import org.geotoolkit.gml.xml.v311.MeasureType;
@@ -101,9 +100,9 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
 
         linestrings = getLineStringTable();
 
-        final Collection<DirectPositionEntry> entries = linestrings.getEntries(curveId);
+        final Collection<org.constellation.gml.v311.DirectPositionType> entries = linestrings.getEntries(curveId);
         final Collection<DirectPositionType> positions = new ArrayList<DirectPositionType>();
-        for (DirectPositionEntry entry : entries) {
+        for (org.constellation.gml.v311.DirectPositionType entry : entries) {
             positions.add(entry.getPosition());
         }
                 
@@ -123,7 +122,7 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
         if (envelopes == null) {
             envelopes = getDatabase().getTable(EnvelopeTable.class);
         }
-        final EnvelopeEntry env = envelopes.getEntry(result.getString(indexOf(query.boundedby)));
+        final EnvelopeType env = envelopes.getEntry(result.getString(indexOf(query.boundedby)));
         entry.setBoundedBy(env);
         return entry;
     }

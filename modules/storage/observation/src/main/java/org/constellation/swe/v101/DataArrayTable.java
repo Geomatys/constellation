@@ -26,10 +26,10 @@ import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.swe.xml.v101.AbstractEncodingEntry;
-import org.geotoolkit.swe.xml.v101.DataArrayEntry;
-import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
-import org.geotoolkit.swe.xml.v101.TextBlockEntry;
+import org.geotoolkit.swe.xml.v101.AbstractEncodingType;
+import org.geotoolkit.swe.xml.v101.DataArrayType;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
+import org.geotoolkit.swe.xml.v101.TextBlockType;
 
 /**
  * Connexion vers la table des {@linkplain DataArray dataArray}.
@@ -37,7 +37,7 @@ import org.geotoolkit.swe.xml.v101.TextBlockEntry;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class DataArrayTable extends SingletonTable<DataArrayEntry>{
+public class DataArrayTable extends SingletonTable<DataArrayType>{
     
     /**
      * Connexion vers la table des {@linkplain TextBlock text block encoding}.
@@ -88,7 +88,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected DataArrayEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
+    protected DataArrayType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final DataArrayQuery query = (DataArrayQuery) super.query;
         final String idArray = results.getString(indexOf(query.idArray));
         if (dataRecords == null) {
@@ -96,8 +96,8 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
         }
         dataRecords.setIdDataBlock(idArray);
         //for data array there is only one data record
-        final Iterator<SimpleDataRecordEntry> it = dataRecords.getEntries().iterator();
-        SimpleDataRecordEntry entry = null;
+        final Iterator<SimpleDataRecordType> it = dataRecords.getEntries().iterator();
+        SimpleDataRecordType entry = null;
         if (it.hasNext()) {
             entry = it.next();
         }
@@ -106,9 +106,9 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
             textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
         }
         
-        final AbstractEncodingEntry encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
+        final AbstractEncodingType encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
         
-        return new DataArrayEntry(idArray,
+        return new DataArrayType(idArray,
                                   results.getInt(indexOf(query.elementCount)),
                                   entry, encoding, null);
     }
@@ -119,7 +119,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
      *
      * @param databloc le dataArray a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final DataArrayEntry array) throws SQLException, CatalogException {
+    public synchronized String getIdentifier(final DataArrayType array) throws SQLException, CatalogException {
         final DataArrayQuery query  = (DataArrayQuery) super.query;
         String id;
         boolean success = false;
@@ -135,7 +135,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
             if (textBlockEncodings == null) {
                     textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
             }
-            final String textBlockIdentifier = textBlockEncodings.getIdentifier((TextBlockEntry)array.getEncoding());
+            final String textBlockIdentifier = textBlockEncodings.getIdentifier((TextBlockType)array.getEncoding());
 
             try {
                 if (array.getId() != null) {
@@ -166,7 +166,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
                     dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
                 }
                 dataRecords.setIdDataBlock(id);
-                statement.statement.setString(indexOf(query.elementType), dataRecords.getIdentifier((SimpleDataRecordEntry)array.getElementType(), id));
+                statement.statement.setString(indexOf(query.elementType), dataRecords.getIdentifier((SimpleDataRecordType)array.getElementType(), id));
 
                 updateSingleton(statement.statement);
                 release(lc, statement);

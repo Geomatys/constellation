@@ -34,15 +34,15 @@ import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
+import org.geotoolkit.observation.xml.v100.ObservationType;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.AnyResult;
-import org.geotoolkit.swe.xml.v101.AnyResultEntry;
+import org.geotoolkit.swe.xml.v101.AnyResultType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -120,15 +120,15 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
+    public ObservationOfferingType getObservationOffering(String offeringName) throws CstlServiceException {
         final File offeringFile = new File(offeringDirectory, offeringName + FILE_EXTENSION);
         if (offeringFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                 final Object obj = unmarshaller.unmarshal(offeringFile);
-                if (obj instanceof ObservationOfferingEntry) {
-                    return (ObservationOfferingEntry) obj;
+                if (obj instanceof ObservationOfferingType) {
+                    return (ObservationOfferingType) obj;
                 }
                 throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
@@ -146,16 +146,16 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
-        final List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
+    public List<ObservationOfferingType> getObservationOfferings() throws CstlServiceException {
+        final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
         if (offeringDirectory.exists()) {
             for (File offeringFile: offeringDirectory.listFiles()) {
                 Unmarshaller unmarshaller = null;
                 try {
                     unmarshaller = MARSHALLER_POOL.acquireUnmarshaller();
                     final Object obj = unmarshaller.unmarshal(offeringFile);
-                    if (obj instanceof ObservationOfferingEntry) {
-                        offerings.add((ObservationOfferingEntry) obj);
+                    if (obj instanceof ObservationOfferingType) {
+                        offerings.add((ObservationOfferingType) obj);
                     } else {
                         throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
                     }
@@ -211,7 +211,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
+    public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
         final File phenomenonFile = new File(phenomenonDirectory, phenomenonName + FILE_EXTENSION);
         if (phenomenonFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -221,8 +221,8 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof PhenomenonEntry) {
-                    return (PhenomenonEntry) obj;
+                if (obj instanceof PhenomenonType) {
+                    return (PhenomenonType) obj;
                 }
                 throw new CstlServiceException("The file " + phenomenonFile + " does not contains an phenomenon Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
@@ -256,7 +256,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
+    public SamplingFeatureType getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
         final File samplingFeatureFile = new File(foiDirectory, samplingFeatureName + FILE_EXTENSION);
         if (samplingFeatureFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -266,8 +266,8 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof SamplingFeatureEntry) {
-                    return (SamplingFeatureEntry) obj;
+                if (obj instanceof SamplingFeatureType) {
+                    return (SamplingFeatureType) obj;
                 }
                 throw new CstlServiceException("The file " + samplingFeatureFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
@@ -285,7 +285,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
+    public ObservationType getObservation(String identifier, QName resultModel) throws CstlServiceException {
         File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (!observationFile.exists()) {
             observationFile = new File(observationTemplateDirectory, identifier + FILE_EXTENSION);
@@ -298,8 +298,8 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof ObservationEntry) {
-                    return (ObservationEntry) obj;
+                if (obj instanceof ObservationType) {
+                    return (ObservationType) obj;
                 }
                 throw new CstlServiceException("The file " + observationFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
@@ -327,10 +327,10 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
                 }
-                if (obj instanceof ObservationEntry) {
-                    final ObservationEntry obs = (ObservationEntry) obj;
+                if (obj instanceof ObservationType) {
+                    final ObservationType obs = (ObservationType) obj;
                     final DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
-                    return new AnyResultEntry(null, arrayP.getDataArray());
+                    return new AnyResultType(null, arrayP.getDataArray());
                 }
                 throw new CstlServiceException("The file " + anyResultFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
@@ -348,8 +348,8 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ReferenceEntry getReference(String href) throws CstlServiceException {
-        return new ReferenceEntry(null, href);
+    public ReferenceType getReference(String href) throws CstlServiceException {
+        return new ReferenceType(null, href);
     }
 
     /**

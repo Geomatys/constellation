@@ -35,8 +35,8 @@ import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
+import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.v100.Capabilities;
@@ -45,11 +45,11 @@ import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import org.geotoolkit.swe.xml.v101.DataArrayEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.xml.MarshallerPool;
 
 // Junit dependencies
@@ -145,12 +145,12 @@ public class SosIOTest {
             marshaller.marshal(expResult, new File("expectedCapabilities.xml"));
             marshaller.marshal(result, new File("resultCapabilities.xml"));
 
-            List<ObservationOfferingEntry> expOfferingList = expResult.getContents().getObservationOfferingList().getObservationOffering();
-            List<ObservationOfferingEntry> resOfferingList = result.getContents().getObservationOfferingList().getObservationOffering();
+            List<ObservationOfferingType> expOfferingList = expResult.getContents().getObservationOfferingList().getObservationOffering();
+            List<ObservationOfferingType> resOfferingList = result.getContents().getObservationOfferingList().getObservationOffering();
             assertEquals(expOfferingList.size(), resOfferingList.size());
             for (int i = 0; i <expOfferingList.size(); i++) {
-                ObservationOfferingEntry expOffering = expOfferingList.get(i);
-                ObservationOfferingEntry resOffering = resOfferingList.get(i);
+                ObservationOfferingType expOffering = expOfferingList.get(i);
+                ObservationOfferingType resOffering = resOfferingList.get(i);
 
                 assertEquals(expOffering.getObservedProperty().size(),  resOffering.getObservedProperty().size());
                 assertEquals(expOffering.getObservedProperty(),  resOffering.getObservedProperty());
@@ -192,12 +192,12 @@ public class SosIOTest {
 
             GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
 
-            ObservationCollectionEntry expResult = (ObservationCollectionEntry) defaultWorker.getObservation(request);
-            ObservationCollectionEntry result    = (ObservationCollectionEntry) genericWorker.getObservation(request);
+            ObservationCollectionType expResult = (ObservationCollectionType) defaultWorker.getObservation(request);
+            ObservationCollectionType result    = (ObservationCollectionType) genericWorker.getObservation(request);
 
             assertEquals(expResult.getMember().size(), result.getMember().size());
-            ObservationEntry expObs = (ObservationEntry) expResult.getMember().iterator().next();
-            ObservationEntry obs    = (ObservationEntry) result.getMember().iterator().next();
+            ObservationType expObs = (ObservationType) expResult.getMember().iterator().next();
+            ObservationType obs    = (ObservationType) result.getMember().iterator().next();
             assertEquals(expObs.getDefinition(), obs.getDefinition());
             assertEquals(expObs.getFeatureOfInterest(), obs.getFeatureOfInterest());
             assertEquals(expObs.getName(), obs.getName());
@@ -208,15 +208,15 @@ public class SosIOTest {
             assertEquals(expObs.getPropertyFeatureOfInterest(), obs.getPropertyFeatureOfInterest());
             assertEquals(expObs.getPropertyObservedProperty(), obs.getPropertyObservedProperty());
             assertEquals(expObs.getQuality(), obs.getQuality());
-            DataArrayEntry expRes = ((DataArrayPropertyType)expObs.getResult()).getDataArray();
-            DataArrayEntry res    = ((DataArrayPropertyType)obs.getResult()).getDataArray();
+            DataArrayType expRes = ((DataArrayPropertyType)expObs.getResult()).getDataArray();
+            DataArrayType res    = ((DataArrayPropertyType)obs.getResult()).getDataArray();
             assertEquals(expRes.getEncoding(), res.getEncoding());
             assertEquals(expRes.getValues(), res.getValues());
 
-            assertTrue(expRes.getElementType() instanceof SimpleDataRecordEntry);
-            assertTrue(res.getElementType()    instanceof SimpleDataRecordEntry);
-            SimpleDataRecordEntry expElementType = (SimpleDataRecordEntry) expRes.getElementType();
-            SimpleDataRecordEntry resElementType = (SimpleDataRecordEntry) res.getElementType();
+            assertTrue(expRes.getElementType() instanceof SimpleDataRecordType);
+            assertTrue(res.getElementType()    instanceof SimpleDataRecordType);
+            SimpleDataRecordType expElementType = (SimpleDataRecordType) expRes.getElementType();
+            SimpleDataRecordType resElementType = (SimpleDataRecordType) res.getElementType();
 
             assertEquals(expElementType.getBlockId(), resElementType.getBlockId());
             assertEquals(expElementType.getDefinition(), resElementType.getDefinition());
@@ -238,15 +238,15 @@ public class SosIOTest {
 
             GetObservation request2 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
 
-            ObservationCollectionEntry expResult2 = (ObservationCollectionEntry) defaultWorker.getObservation(request2);
-            ObservationCollectionEntry result2    = (ObservationCollectionEntry) genericWorker.getObservation(request2);
+            ObservationCollectionType expResult2 = (ObservationCollectionType) defaultWorker.getObservation(request2);
+            ObservationCollectionType result2    = (ObservationCollectionType) genericWorker.getObservation(request2);
 
             assertEquals(expResult2, result2);
 
             GetObservation request3 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.INLINE, null);
 
-            ObservationCollectionEntry expResult3 = (ObservationCollectionEntry) defaultWorker.getObservation(request3);
-            ObservationCollectionEntry result3    = (ObservationCollectionEntry) genericWorker.getObservation(request3);
+            ObservationCollectionType expResult3 = (ObservationCollectionType) defaultWorker.getObservation(request3);
+            ObservationCollectionType result3    = (ObservationCollectionType) genericWorker.getObservation(request3);
 
             assertEquals(expResult3, result3);
 
@@ -258,8 +258,8 @@ public class SosIOTest {
             timeFilter = new EventTime(tafter, null, null);
             GetObservation request4 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3", "urn:ogc:object:sensor:BRGM:4"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.INLINE, null);
 
-            ObservationCollectionEntry expResult4 = (ObservationCollectionEntry) defaultWorker.getObservation(request4);
-            ObservationCollectionEntry result4    = (ObservationCollectionEntry) genericWorker.getObservation(request4);
+            ObservationCollectionType expResult4 = (ObservationCollectionType) defaultWorker.getObservation(request4);
+            ObservationCollectionType result4    = (ObservationCollectionType) genericWorker.getObservation(request4);
 
             assertEquals(expResult4, result4);
 
@@ -285,8 +285,8 @@ public class SosIOTest {
 
             GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
 
-            ObservationCollectionEntry expResult1 = (ObservationCollectionEntry) defaultWorker.getObservation(request);
-            ObservationCollectionEntry result1    = (ObservationCollectionEntry) genericWorker.getObservation(request);
+            ObservationCollectionType expResult1 = (ObservationCollectionType) defaultWorker.getObservation(request);
+            ObservationCollectionType result1    = (ObservationCollectionType) genericWorker.getObservation(request);
 
             assertEquals(expResult1, result1);
             System.out.println("default template ID:" + expResult1.getMember().iterator().next().getName());

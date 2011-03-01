@@ -23,7 +23,7 @@ import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.observation.xml.v100.SurveyProcedureEntry;
+import org.geotoolkit.observation.xml.v100.SurveyProcedureType;
 import org.opengis.observation.sampling.SurveyProcedure;
 
 /**
@@ -34,7 +34,7 @@ import org.opengis.observation.sampling.SurveyProcedure;
  *
  * @author Guilhem Legal
  */
-public class SurveyProcedureTable extends SingletonTable<SurveyProcedureEntry>{
+public class SurveyProcedureTable extends SingletonTable<SurveyProcedureType>{
     
    /**
     * Construit une table des survey procedures.
@@ -72,9 +72,9 @@ public class SurveyProcedureTable extends SingletonTable<SurveyProcedureEntry>{
      * Construit une survey procedure pour l'enregistrement courant.
      */
     @Override
-    protected SurveyProcedureEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected SurveyProcedureType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
          //final SurveyProcedureQuery localQuery = (SurveyProcedureQuery) super.query;
-         return null;/* new SurveyProcedureEntry(results.getString(indexOf(query.name   )),
+         return null;/* new SurveyProcedureType(results.getString(indexOf(query.name   )),
                                          results.getString(indexOf(query.operator)),
                                          results.getString(indexOf(query.elevationAccuracy)),
                                          results.getString(indexOf(query.elevationDatum)),

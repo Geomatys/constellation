@@ -44,21 +44,21 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.util.Utilities;
 import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
-import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.geotoolkit.observation.xml.v100.ObservationType;
+import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
-import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
-import org.geotoolkit.swe.xml.v101.AnyResultEntry;
-import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
+import org.geotoolkit.swe.xml.v101.AnyResultType;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 
 
 /**
@@ -83,13 +83,13 @@ import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
  * @author Antoine Hnawia
  * @author Guilhem Legal
  */
-public class ObservationTable extends SingletonTable<ObservationEntry> {
+public class ObservationTable extends SingletonTable<ObservationType> {
     
     /**
      * Connexion vers la table des stations.
      * <p>
      * <strong>NOTE:</strong> {@link StationTable} garde elle-même une référence vers cette instance
-     * de {@code ObservationTable}, mais seule {@link StationEntry} l'utilise. L'ordre d'acquisition
+     * de {@code ObservationTable}, mais seule {@link StationType} l'utilise. L'ordre d'acquisition
      * des verrous devrait toujours être {@code ObservationTable} d'abord, et {@code StationTable}
      * ensuite.
      */
@@ -99,7 +99,7 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
      * Connexion vers la table des stations.
      * <p>
      * <strong>NOTE:</strong> {@link StationTable} garde elle-même une référence vers cette instance
-     * de {@code ObservationTable}, mais seule {@link StationEntry} l'utilise. L'ordre d'acquisition
+     * de {@code ObservationTable}, mais seule {@link StationType} l'utilise. L'ordre d'acquisition
      * des verrous devrait toujours être {@code ObservationTable} d'abord, et {@code StationTable}
      * ensuite.
      */
@@ -109,7 +109,7 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
      * Connexion vers la table des stations.
      * <p>
      * <strong>NOTE:</strong> {@link StationTable} garde elle-même une référence vers cette instance
-     * de {@code ObservationTable}, mais seule {@link StationEntry} l'utilise. L'ordre d'acquisition
+     * de {@code ObservationTable}, mais seule {@link StationType} l'utilise. L'ordre d'acquisition
      * des verrous devrait toujours être {@code ObservationTable} d'abord, et {@code StationTable}
      * ensuite.
      */
@@ -226,28 +226,28 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
      * Construit une observation pour l'enregistrement courant.
      */
     @Override
-    public ObservationEntry createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
+    public ObservationType createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final ObservationQuery query = (ObservationQuery) super.query;
         
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
-        PhenomenonEntry pheno = (PhenomenonEntry)phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
+        PhenomenonType pheno = (PhenomenonType)phenomenons.getEntry(result.getString(indexOf(query.observedProperty)));
         
         if (compositePhenomenons == null) {
             compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
         }
-        final CompositePhenomenonEntry compoPheno = compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
+        final CompositePhenomenonType compoPheno = compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
         
         if (stations == null) {
             stations = getDatabase().getTable(SamplingFeatureTable.class);
         }
-        SamplingFeatureEntry station = stations.getEntry(result.getString(indexOf(query.featureOfInterest)));
+        SamplingFeatureType station = stations.getEntry(result.getString(indexOf(query.featureOfInterest)));
         
         if (stationPoints == null) {
             stationPoints = getDatabase().getTable(SamplingPointTable.class);
         }
-        final SamplingPointEntry stationPoint = stationPoints.getEntry(result.getString(indexOf(query.featureOfInterestPoint)));
+        final SamplingPointType stationPoint = stationPoints.getEntry(result.getString(indexOf(query.featureOfInterestPoint)));
 
         if (stationCurves == null) {
             stationCurves = getDatabase().getTable(SamplingCurveTable.class);
@@ -257,12 +257,12 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
         if (procedures == null) {
             procedures = getDatabase().getTable(ProcessTable.class);
         }
-        final ProcessEntry procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
+        final ProcessType procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
         
         if (results == null) {
             results = getDatabase().getTable(AnyResultTable.class);
         }
-        final AnyResultEntry any = results.getEntry(result.getInt(indexOf(query.result)));
+        final AnyResultType any = results.getEntry(result.getInt(indexOf(query.result)));
         Object resultat = null;
         if (any != null) {
             if (any.getReference() == null && any.getArray() != null) {
@@ -309,7 +309,7 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
             samplingTime.setId("samplingTime-" + id);
         }
         
-        return new ObservationEntry(name,
+        return new ObservationType(name,
                                     result.getString(indexOf(query.description)),
                                     station,
                                     pheno,
@@ -362,8 +362,8 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
 
 
                 // on insere la station qui a effectué cette observation
-                if (obs.getFeatureOfInterest() instanceof SamplingPointEntry){
-                    final SamplingPointEntry station = (SamplingPointEntry)obs.getFeatureOfInterest();
+                if (obs.getFeatureOfInterest() instanceof SamplingPointType){
+                    final SamplingPointType station = (SamplingPointType)obs.getFeatureOfInterest();
                     if (stationPoints == null) {
                         stationPoints = getDatabase().getTable(SamplingPointTable.class);
                     }
@@ -379,8 +379,8 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
                     statement.statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
                     statement.statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
 
-                } else if (obs.getFeatureOfInterest() instanceof SamplingFeatureEntry){
-                    final SamplingFeatureEntry station = (SamplingFeatureEntry)obs.getFeatureOfInterest();
+                } else if (obs.getFeatureOfInterest() instanceof SamplingFeatureType){
+                    final SamplingFeatureType station = (SamplingFeatureType)obs.getFeatureOfInterest();
                     if (stations == null) {
                         stations = getDatabase().getTable(SamplingFeatureTable.class);
                     }
@@ -394,16 +394,16 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
                 }
 
                 // on insere le phenomene observé
-                if(obs.getObservedProperty() instanceof CompositePhenomenonEntry){
-                    final CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)obs.getObservedProperty();
+                if(obs.getObservedProperty() instanceof CompositePhenomenonType){
+                    final CompositePhenomenonType pheno = (CompositePhenomenonType)obs.getObservedProperty();
                     if (compositePhenomenons == null) {
                         compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
                     }
                     statement.statement.setString(indexOf(query.observedPropertyComposite), compositePhenomenons.getIdentifier(pheno));
                     statement.statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
 
-                } else if(obs.getObservedProperty() instanceof PhenomenonEntry){
-                    final PhenomenonEntry pheno = (PhenomenonEntry)obs.getObservedProperty();
+                } else if(obs.getObservedProperty() instanceof PhenomenonType){
+                    final PhenomenonType pheno = (PhenomenonType)obs.getObservedProperty();
                     if (phenomenons == null) {
                         phenomenons = getDatabase().getTable(PhenomenonTable.class);
                     }
@@ -417,7 +417,7 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
 
                 //on insere le capteur
                 if (obs.getProcedure() != null) {
-                    final ProcessEntry process = (ProcessEntry)obs.getProcedure();
+                    final ProcessType process = (ProcessType)obs.getProcedure();
                     if (procedures == null) {
                         procedures = getDatabase().getTable(ProcessTable.class);
                     }
@@ -427,7 +427,7 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
                 }
 
                 // on insere le resultat
-                if (obs.getResult() instanceof ReferenceEntry || obs.getResult() instanceof AnyResultEntry || obs.getResult() instanceof DataArrayPropertyType){
+                if (obs.getResult() instanceof ReferenceType || obs.getResult() instanceof AnyResultType || obs.getResult() instanceof DataArrayPropertyType){
                     if (results == null) {
                         results = getDatabase().getTable(AnyResultTable.class);
                     }

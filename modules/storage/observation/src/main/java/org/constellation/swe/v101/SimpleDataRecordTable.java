@@ -29,7 +29,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
-import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.util.Utilities;
 
 /**
@@ -38,7 +38,7 @@ import org.geotoolkit.util.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>{
+public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType>{
     
     /**
      * identifiant secondaire de la table
@@ -109,7 +109,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      * Construit un data record pour l'enregistrement courant.
      */
     @Override
-    protected SimpleDataRecordEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected SimpleDataRecordType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         final String idDataBlock = results.getString(indexOf(query.idBlock));
         final String idDataRecord = results.getString(indexOf(query.idDataRecord));
@@ -122,7 +122,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
         fields.setIdDataRecord(idDataRecord);
         final Collection<AnyScalarPropertyType> scalars = fields.getEntries();
         
-        return new SimpleDataRecordEntry(idDataBlock, idDataRecord,
+        return new SimpleDataRecordType(idDataBlock, idDataRecord,
                 results.getString(indexOf(query.definition)),
                 results.getBoolean(indexOf(query.fixed)), 
                 scalars);
@@ -147,7 +147,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      *
      * @param datarecord le data record a inserer dans la base de donnée.
      */
-    public String getIdentifier(final SimpleDataRecordEntry datarecord, String dataBlockId) throws SQLException, CatalogException {
+    public String getIdentifier(final SimpleDataRecordType datarecord, String dataBlockId) throws SQLException, CatalogException {
         final SimpleDataRecordQuery query  = (SimpleDataRecordQuery) super.query;
         String id;
         boolean success = false;

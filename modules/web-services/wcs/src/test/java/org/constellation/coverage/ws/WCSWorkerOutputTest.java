@@ -25,7 +25,7 @@ import javax.xml.bind.JAXBException;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.GridLimitsType;
 import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -125,7 +125,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
                     final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
                     pos.add(new DirectPositionType(-180.0, -90.0));
                     pos.add(new DirectPositionType(180.0, 90.0));
-                    final EnvelopeEntry expectedEnvelope = new EnvelopeEntry(pos, "EPSG:4326");
+                    final EnvelopeType expectedEnvelope = new EnvelopeType(pos, "EPSG:4326");
                     // Builds expected temporal domain
                     final List<TimePositionType> expectedTimes =
                             Collections.singletonList(new TimePositionType("2003-05-16T00:00:00Z"));
@@ -168,7 +168,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
         pos.add(new DirectPositionType(-180.0, -90.0));
         pos.add(new DirectPositionType(180.0, 90.0));
-        final EnvelopeEntry envelope = new EnvelopeEntry(pos, "CRS:84");
+        final EnvelopeType envelope = new EnvelopeType(pos, "CRS:84");
         final DomainSubsetType domain = new DomainSubsetType(null, new SpatialSubsetType(envelope, grid));
         final GetCoverage request = new GetCoverageType(
                 LAYER_TEST, domain, null, null, new OutputType(MimeType.IMAGE_PNG, "CRS:84"));

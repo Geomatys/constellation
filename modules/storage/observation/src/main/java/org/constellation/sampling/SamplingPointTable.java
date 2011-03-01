@@ -32,14 +32,14 @@ import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
-import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 
 /**
  *SamplingPointTable.java
  *
  * @author Guilhem Legal
  */
-public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
+public class SamplingPointTable extends SingletonTable<SamplingPointType> {
     
     /** Creates a new instance of SamplingPointTable */
     public SamplingPointTable(final Database database) {
@@ -77,7 +77,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
     @Override
-    protected SamplingPointEntry createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected SamplingPointType createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final SamplingPointQuery query = (SamplingPointQuery) super.query;
         
         final List<Double> value = new ArrayList<Double>();
@@ -89,7 +89,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
                                           result.getInt(indexOf(query.srsDimension)),
                                           value));
         // TODO result.getString(indexOf(query.sampledFeature)
-        return new SamplingPointEntry( result.getString(indexOf(query.identifier)),
+        return new SamplingPointType( result.getString(indexOf(query.identifier)),
                                        result.getString(indexOf(query.name)),
                                        result.getString(indexOf(query.description)),
                                        new FeaturePropertyType(result.getString(indexOf(query.sampledFeature))),
@@ -103,7 +103,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
      *
      * @param result le resultat a inserer dans la base de donnée.
      */
-    public String getIdentifier(final SamplingPointEntry station) throws SQLException, CatalogException {
+    public String getIdentifier(final SamplingPointType station) throws SQLException, CatalogException {
         final SamplingPointQuery query  = (SamplingPointQuery) super.query;
         String id;
         boolean success = false;

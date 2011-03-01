@@ -41,7 +41,7 @@ import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.geometry.jts.SRIDGenerator;
 import org.geotoolkit.geometry.jts.SRIDGenerator.Version;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.LineStringType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
@@ -455,7 +455,7 @@ public abstract class FilterParser {
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
 
-            //we transform the EnvelopeEntry in GeneralEnvelope
+            //we transform the EnvelopeType in GeneralEnvelope
             spatialfilter = wrap(FF.bbox(GEOMETRY_PROPERTY, bbox.getMinX(), bbox.getMinY(),bbox.getMaxX(),bbox.getMaxY(),crsName));
 
         } else if (spatialOps instanceof DistanceBufferType) {
@@ -497,8 +497,8 @@ public abstract class FilterParser {
                     crsName  = gmlLine.getSrsName();
                     geometry = GeometrytoJTS.toJTS(gmlLine);
 
-                } else if (gml instanceof EnvelopeEntry) {
-                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry) gml;
+                } else if (gml instanceof EnvelopeType) {
+                    final EnvelopeType gmlEnvelope = (EnvelopeType) gml;
                     crsName  = gmlEnvelope.getSrsName();
                     geometry = GeometrytoJTS.toJTS(gmlEnvelope);
                 }
@@ -584,10 +584,10 @@ public abstract class FilterParser {
             String crsName = "undefined CRS";
             try {
                 Geometry filterGeometry = null;
-                if (gmlGeometry instanceof EnvelopeEntry) {
+                if (gmlGeometry instanceof EnvelopeType) {
 
-                    //we transform the EnvelopeEntry in GeneralEnvelope
-                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry)gmlGeometry;
+                    //we transform the EnvelopeType in GeneralEnvelope
+                    final EnvelopeType gmlEnvelope = (EnvelopeType)gmlGeometry;
                     crsName                   = gmlEnvelope.getSrsName();
                     filterGeometry            = GeometrytoJTS.toJTS(gmlEnvelope);
 

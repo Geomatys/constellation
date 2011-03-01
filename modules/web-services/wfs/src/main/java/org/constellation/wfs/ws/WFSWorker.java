@@ -27,7 +27,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
-import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
+import org.geotoolkit.gml.xml.v311.AbstractGMLType;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
@@ -85,7 +85,7 @@ public interface WFSWorker extends Worker {
      * @return A GML representation of a fature instance or element.
      * @throws CstlServiceException
      */
-    AbstractGMLEntry getGMLObject(GetGmlObjectType grbi) throws CstlServiceException;
+    AbstractGMLType getGMLObject(GetGmlObjectType grbi) throws CstlServiceException;
 
     /**
      * lock request on one or more instancesof a feature type for the duration of a transaction

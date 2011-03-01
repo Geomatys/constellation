@@ -36,15 +36,15 @@ import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.observation.xml.v100.ProcessEntry;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.observation.xml.v100.ProcessType;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -104,7 +104,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterGetResult(Observation template, QName resultModel) {
-        final ProcessEntry process = (ProcessEntry) template.getProcedure();
+        final ProcessType process = (ProcessType) template.getProcedure();
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             luceneRequest = new StringBuilder("type:measurement AND procedure:\"" + process.getHref() + "\" ");
         } else {
@@ -116,7 +116,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
+    public void setProcedure(List<String> procedures, ObservationOfferingType off) {
         luceneRequest.append(" ( ");
         if (!procedures.isEmpty()) {
 
@@ -131,7 +131,7 @@ public class LuceneObservationFilter implements ObservationFilter {
             }
         } else {
             //if is not specified we use all the process of the offering
-            for (ReferenceEntry proc : off.getProcedure()) {
+            for (ReferenceType proc : off.getProcedure()) {
                 luceneRequest.append(" procedure:\"").append(proc.getHref()).append("\" OR ");
             }
         }
@@ -327,7 +327,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
+    public void setBoundingBox(EnvelopeType e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 

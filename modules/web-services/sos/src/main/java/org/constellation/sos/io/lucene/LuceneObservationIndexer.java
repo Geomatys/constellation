@@ -40,18 +40,18 @@ import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.observation.xml.v100.MeasurementEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
-import org.geotoolkit.observation.xml.v100.ProcessEntry;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.observation.xml.v100.MeasurementType;
+import org.geotoolkit.observation.xml.v100.ObservationType;
+import org.geotoolkit.observation.xml.v100.ProcessType;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> {
+public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
 
     private File observationDirectory;
 
@@ -107,8 +107,8 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
                 if (observation instanceof JAXBElement) {
                     observation = ((JAXBElement)observation).getValue();
                 }
-                if (observation instanceof ObservationEntry) {
-                    indexDocument(writer, (ObservationEntry) observation);
+                if (observation instanceof ObservationType) {
+                    indexDocument(writer, (ObservationType) observation);
                     nbObservation++;
                 } else {
                      LOGGER.info("The observation file " + observationFile.getName() + " does not contains an observation:" + observation);
@@ -120,8 +120,8 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
                 if (observation instanceof JAXBElement) {
                     observation = ((JAXBElement)observation).getValue();
                 }
-                if (observation instanceof ObservationEntry) {
-                    indexDocument(writer, (ObservationEntry) observation);
+                if (observation instanceof ObservationType) {
+                    indexDocument(writer, (ObservationType) observation);
                     nbTemplate++;
                 } else {
                      LOGGER.info("The template observation file " + observationFile.getName() + " does not contains an observation:" + observation);
@@ -159,7 +159,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
      * {@inheritDoc}
      */
     @Override
-    public void createIndex(List<ObservationEntry> observations) throws IndexingException {
+    public void createIndex(List<ObservationType> observations) throws IndexingException {
         LOGGER.info("Creating lucene index for Filesystem observations please wait...");
 
         final long time = System.currentTimeMillis();
@@ -168,7 +168,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
         try {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
 
-            for (ObservationEntry observation : observations) {
+            for (ObservationType observation : observations) {
                 indexDocument(writer, observation);
             }
             writer.optimize();
@@ -192,21 +192,21 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
      * {@inheritDoc}
      */
     @Override
-    protected Document createDocument(ObservationEntry observation) {
+    protected Document createDocument(ObservationType observation) {
         // make a new, empty document
         final Document doc = new Document();
 
         doc.add(new Field("id",      observation.getName(),        Field.Store.YES, Field.Index.ANALYZED));
-        if (observation instanceof MeasurementEntry) {
+        if (observation instanceof MeasurementType) {
             doc.add(new Field("type",    "measurement" , Field.Store.YES, Field.Index.ANALYZED));
         } else {
             doc.add(new Field("type",    "observation" , Field.Store.YES, Field.Index.ANALYZED));
         }
-        doc.add(new Field("procedure",   ((ProcessEntry)observation.getProcedure()).getHref(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("procedure",   ((ProcessType)observation.getProcedure()).getHref(), Field.Store.YES, Field.Index.ANALYZED));
 
-        doc.add(new Field("observed_property",   ((PhenomenonEntry)observation.getObservedProperty()).getId(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("observed_property",   ((PhenomenonType)observation.getObservedProperty()).getId(), Field.Store.YES, Field.Index.ANALYZED));
 
-        doc.add(new Field("feature_of_interest",   ((SamplingFeatureEntry)observation.getFeatureOfInterest()).getId(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("feature_of_interest",   ((SamplingFeatureType)observation.getFeatureOfInterest()).getId(), Field.Store.YES, Field.Index.ANALYZED));
 
         try {
             final AbstractTimeGeometricPrimitiveType time = observation.getSamplingTime();
@@ -241,7 +241,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
      * {@inheritDoc}
      */
     @Override
-    protected String getIdentifier(ObservationEntry obj) {
+    protected String getIdentifier(ObservationType obj) {
         return obj.getName();
     }
 

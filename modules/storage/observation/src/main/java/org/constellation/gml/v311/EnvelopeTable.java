@@ -29,7 +29,7 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
@@ -37,7 +37,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
  *
  * @author legal
  */
-public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
+public class EnvelopeTable extends SingletonTable<EnvelopeType> {
 
     
     /**
@@ -86,7 +86,7 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
      * @throws java.sql.SQLException
      */
     @Override
-    protected EnvelopeEntry createEntry(final LocalCache loc, ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected EnvelopeType createEntry(final LocalCache loc, ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final EnvelopeQuery query = (EnvelopeQuery) super.query;
         //on lit le premier point
         List<Double> value = new ArrayList<Double>();
@@ -99,7 +99,7 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
         value.add(results.getDouble(indexOf(query.upperCornerX)));
         value.add(results.getDouble(indexOf(query.upperCornerY)));
         final DirectPositionType uc = new DirectPositionType(value);
-        return new EnvelopeEntry(results.getString(indexOf(query.id)),
+        return new EnvelopeType(results.getString(indexOf(query.id)),
                                  lc, uc,
                                  results.getString(indexOf(query.srsName)));
     }
@@ -113,7 +113,7 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
      *
      * @param off l'ofeering a inserer dans la base de donnée.
      */
-    public String getIdentifier(final EnvelopeEntry envelope) throws SQLException, CatalogException {
+    public String getIdentifier(final EnvelopeType envelope) throws SQLException, CatalogException {
         final EnvelopeQuery query = (EnvelopeQuery) super.query;
         String id;
         boolean success = false;

@@ -29,9 +29,9 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.NoSuchTableException;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.swe.xml.v101.ComponentEntry;
-import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.ComponentType;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 
 /**
  * Connexion vers la table des {@linkplain CompositePhenomenon phénoménes composé}.
@@ -39,7 +39,7 @@ import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenonEntry> {
+public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenonType> {
     
     /**
      * Connexion vers la table des {@linkplain ComponentTable composants}.
@@ -92,24 +92,24 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
      * Construit un phénoméne pour l'enregistrement courant.
      */
     @Override
-    protected CompositePhenomenonEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException{
+    protected CompositePhenomenonType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException{
         final CompositePhenomenonQuery query = (CompositePhenomenonQuery) super.query;
         
         final String idCompositePhenomenon = results.getString(indexOf(query.identifier));
         
         components = getComponentTable();
         components.setIdCompositePhenomenon(idCompositePhenomenon);
-        final Collection<ComponentEntry> entries = components.getEntries();
+        final Collection<ComponentType> entries = components.getEntries();
         
-        final Collection<PhenomenonEntry> compos = new HashSet<PhenomenonEntry>();
+        final Collection<PhenomenonType> compos = new HashSet<PhenomenonType>();
         
         final Iterator i = entries.iterator();
         while(i.hasNext()) {
-            final ComponentEntry c =(ComponentEntry) i.next();
+            final ComponentType c =(ComponentType) i.next();
             compos.add(c.getComponent());
         }
         
-        return new CompositePhenomenonEntry(idCompositePhenomenon,
+        return new CompositePhenomenonType(idCompositePhenomenon,
                                             results.getString(indexOf(query.name)),
                                             results.getString(indexOf(query.remarks)),
                                             null,
@@ -122,7 +122,7 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
      *
      * @param pheno le phenomene a inserer dans la base de donnée.
      */
-    public String getIdentifier(final CompositePhenomenonEntry pheno) throws SQLException, CatalogException {
+    public String getIdentifier(final CompositePhenomenonType pheno) throws SQLException, CatalogException {
         final CompositePhenomenonQuery query  = (CompositePhenomenonQuery) super.query;
         String id;
         boolean success = false;
@@ -157,10 +157,10 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
                 release(lc, statement);
 
                 components = getComponentTable();
-                final Iterator<PhenomenonEntry> i = pheno.getComponent().iterator();
+                final Iterator<PhenomenonType> i = pheno.getComponent().iterator();
 
                 while(i.hasNext()) {
-                    final PhenomenonEntry ph = i.next();
+                    final PhenomenonType ph = i.next();
                     components.getIdentifier(id, ph);
                 }
                 success = true;

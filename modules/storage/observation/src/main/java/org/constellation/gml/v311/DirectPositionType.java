@@ -16,7 +16,6 @@
  */
 package org.constellation.gml.v311;
 
-import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.internal.sql.table.Entry;
 import org.geotoolkit.util.Utilities;
 
@@ -24,13 +23,13 @@ import org.geotoolkit.util.Utilities;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class DirectPositionEntry implements Entry {
+public class DirectPositionType implements Entry {
 
-    private DirectPositionType position;
+    private org.geotoolkit.gml.xml.v311.DirectPositionType position;
 
     private String name;
 
-    public DirectPositionEntry(String name, DirectPositionType position) {
+    public DirectPositionType(String name, org.geotoolkit.gml.xml.v311.DirectPositionType position) {
         this.name     = name;
         this.position = position;
     }
@@ -38,14 +37,14 @@ public class DirectPositionEntry implements Entry {
     /**
      * @return the position
      */
-    public DirectPositionType getPosition() {
+    public org.geotoolkit.gml.xml.v311.DirectPositionType getPosition() {
         return position;
     }
 
     /**
      * @param position the position to set
      */
-    public void setPosition(DirectPositionType position) {
+    public void setPosition(org.geotoolkit.gml.xml.v311.DirectPositionType position) {
         this.position = position;
     }
 
@@ -73,7 +72,7 @@ public class DirectPositionEntry implements Entry {
      */
     @Override
     public String toString() {
-        final StringBuilder s = new StringBuilder("[DirectPositionEntry]:");
+        final StringBuilder s = new StringBuilder("[DirectPositionType]:");
         if (name != null) {
             s.append("Name = ").append(name).append('\n');
         }
@@ -91,8 +90,8 @@ public class DirectPositionEntry implements Entry {
         if (object == this) {
             return true;
         }
-        if (object instanceof DirectPositionEntry) {
-            final DirectPositionEntry that = (DirectPositionEntry) object;
+        if (object instanceof DirectPositionType) {
+            final DirectPositionType that = (DirectPositionType) object;
             return  Utilities.equals(this.name, that.name)     &&
                     Utilities.equals(this.position, that.position);
         }

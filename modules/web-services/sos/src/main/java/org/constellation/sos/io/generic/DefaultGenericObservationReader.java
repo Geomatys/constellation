@@ -37,31 +37,31 @@ import org.constellation.ws.MimeType;
 import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import org.geotoolkit.swe.xml.v101.AbstractDataComponentEntry;
-import org.geotoolkit.swe.xml.v101.AnyResultEntry;
+import org.geotoolkit.swe.xml.v101.AbstractDataComponentType;
+import org.geotoolkit.swe.xml.v101.AnyResultType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.BooleanType;
-import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
-import org.geotoolkit.swe.xml.v101.DataArrayEntry;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
+import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
 import org.geotoolkit.swe.xml.v101.QuantityType;
-import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
-import org.geotoolkit.swe.xml.v101.TextBlockEntry;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
+import org.geotoolkit.swe.xml.v101.TextBlockType;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
-import org.geotoolkit.observation.xml.v100.ProcessEntry;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
-import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
+import org.geotoolkit.observation.xml.v100.ObservationType;
+import org.geotoolkit.observation.xml.v100.ProcessType;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 
@@ -174,7 +174,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
+    public ObservationOfferingType getObservationOffering(String offeringName) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringName);
 
@@ -200,9 +200,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
 
 
             // procedure
-            final List<ReferenceEntry> procedures = new ArrayList<ReferenceEntry>();
+            final List<ReferenceType> procedures = new ArrayList<ReferenceType>();
             for (String procedureName : values.getVariables("var10")) {
-                procedures.add(new ReferenceEntry(null, procedureName));
+                procedures.add(new ReferenceType(null, procedureName));
             }
 
             // phenomenon
@@ -210,12 +210,12 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             for (String phenomenonId : values.getVariables("var12")) {
                 if (phenomenonId!= null && !phenomenonId.isEmpty()) {
                     Values compositeValues = loadData(Arrays.asList("var17"), phenomenonId);
-                    final List<PhenomenonEntry> components = new ArrayList<PhenomenonEntry>();
+                    final List<PhenomenonType> components = new ArrayList<PhenomenonType>();
                     for (String componentID : compositeValues.getVariables("var17")) {
                         components.add(getPhenomenon(componentID));
                     }
                     compositeValues = loadData(Arrays.asList("var15", "var16"), phenomenonId);
-                    final CompositePhenomenonEntry phenomenon = new CompositePhenomenonEntry(phenomenonId,
+                    final CompositePhenomenonType phenomenon = new CompositePhenomenonType(phenomenonId,
                                                                                        compositeValues.getVariable("var15"),
                                                                                        compositeValues.getVariable("var16"),
                                                                                        null,
@@ -225,22 +225,22 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
             for (String phenomenonId : values.getVariables("var11")) {
                 if (phenomenonId != null && !phenomenonId.isEmpty()) {
-                    final PhenomenonEntry phenomenon = getPhenomenon(phenomenonId);
+                    final PhenomenonType phenomenon = getPhenomenon(phenomenonId);
                     observedProperties.add(new PhenomenonPropertyType(phenomenon));
                 }
             }
 
             // feature of interest
-            final List<ReferenceEntry> fois = new ArrayList<ReferenceEntry>();
+            final List<ReferenceType> fois = new ArrayList<ReferenceType>();
             for (String foiID : values.getVariables("var18")) {
-                fois.add(new ReferenceEntry(null, foiID));
+                fois.add(new ReferenceType(null, foiID));
             }
 
             //static part
             final List<String> responseFormat = Arrays.asList(MimeType.APPLICATION_XML);
             final List<QName> resultModel     = Arrays.asList(OBSERVATION_QNAME);
             final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
-            return new ObservationOfferingEntry(offeringName,
+            return new ObservationOfferingType(offeringName,
                                                 offeringName,
                                                 null,
                                                 null,
@@ -262,10 +262,10 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
+    public List<ObservationOfferingType> getObservationOfferings() throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList(VAR01));
-            final List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
+            final List<ObservationOfferingType> offerings = new ArrayList<ObservationOfferingType>();
             final List<String> offeringNames = values.getVariables(VAR01);
             for (String offeringName : offeringNames) {
                 offerings.add(getObservationOffering(offeringName));
@@ -280,7 +280,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
+    public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
         // TODO return composite phenomenon
         try {
             final Values values = loadData(Arrays.asList("var13", "var14", "var47"), phenomenonName);
@@ -288,7 +288,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             if (!exist) {
                 return null;
             }
-            return new PhenomenonEntry(phenomenonName, values.getVariable("var13"), values.getVariable("var14"));
+            return new PhenomenonType(phenomenonName, values.getVariable("var13"), values.getVariable("var14"));
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -298,7 +298,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureId) throws CstlServiceException {
+    public SamplingFeatureType getFeatureOfInterest(String samplingFeatureId) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24", "var48"), samplingFeatureId);
 
@@ -331,7 +331,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             } else {
                 sampleFeatureProperty = null;
             }
-            return  new SamplingPointEntry(samplingFeatureId, name, description, sampleFeatureProperty, new PointPropertyType(location));
+            return  new SamplingPointType(samplingFeatureId, name, description, sampleFeatureProperty, new PointPropertyType(location));
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -367,12 +367,12 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
+    public ObservationType getObservation(String identifier, QName resultModel) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var26", "var27", "var28", "var29", "var30", "var31"), identifier);
-            final SamplingFeatureEntry featureOfInterest = getFeatureOfInterest(values.getVariable("var26"));
-            final PhenomenonEntry observedProperty = getPhenomenon(values.getVariable("var27"));
-            final ProcessEntry procedure = new ProcessEntry(values.getVariable("var28"));
+            final SamplingFeatureType featureOfInterest = getFeatureOfInterest(values.getVariable("var26"));
+            final PhenomenonType observedProperty = getPhenomenon(values.getVariable("var27"));
+            final ProcessType procedure = new ProcessType(values.getVariable("var28"));
 
             String begin = values.getVariable("var29");
             if (begin != null) {
@@ -383,10 +383,10 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 end = end.replace(' ', 'T');
             }
             final TimePeriodType samplingTime = new TimePeriodType(begin, end);
-            final AnyResultEntry anyResult = getResult(values.getVariable("var31"), resultModel);
-            final DataArrayEntry dataArray = anyResult.getArray();
+            final AnyResultType anyResult = getResult(values.getVariable("var31"), resultModel);
+            final DataArrayType dataArray = anyResult.getArray();
             final DataArrayPropertyType result = new DataArrayPropertyType(dataArray);
-            return new ObservationEntry(identifier,
+            return new ObservationType(identifier,
                                         null,
                                         featureOfInterest,
                                         observedProperty,
@@ -402,7 +402,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public AnyResultEntry getResult(String identifier, QName resutModel) throws CstlServiceException {
+    public AnyResultType getResult(String identifier, QName resutModel) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var32", "var33", "var34", "var35", "var36", "var37", "var38", "var39",
                     "var40", "var41", "var42", "var43"), identifier);
@@ -413,7 +413,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             final String tokenSeparator   = values.getVariable("var35");
             final String decimalSeparator = values.getVariable("var36");
             final String blockSeparator   = values.getVariable("var37");
-            final TextBlockEntry encoding = new TextBlockEntry(encodingID, tokenSeparator, blockSeparator, decimalSeparator);
+            final TextBlockType encoding = new TextBlockType(encodingID, tokenSeparator, blockSeparator, decimalSeparator);
 
             //data block description
             final String blockId          = values.getVariable("var38");
@@ -424,7 +424,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             final List<String> type       = values.getVariables("var42");
             final List<String> uomCodes   = values.getVariables("var43");
             for(int i = 0; i < fieldNames.size(); i++) {
-                AbstractDataComponentEntry component = null;
+                AbstractDataComponentType component = null;
                 final String typeName   = type.get(i);
                 final String fieldName  = fieldNames.get(i);
                 final String definition = fieldDef.get(i);
@@ -444,11 +444,11 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 fields.add(field);
             }
 
-            final SimpleDataRecordEntry elementType = new SimpleDataRecordEntry(blockId, dataRecordId, null, false, fields);
+            final SimpleDataRecordType elementType = new SimpleDataRecordType(blockId, dataRecordId, null, false, fields);
 
             final String dataValues     = values.getVariable("var33");
-            final DataArrayEntry result = new DataArrayEntry(blockId, count, elementType, encoding, dataValues);
-            return new AnyResultEntry(identifier, result);
+            final DataArrayType result = new DataArrayType(blockId, count, elementType, encoding, dataValues);
+            return new AnyResultType(identifier, result);
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -466,9 +466,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ReferenceEntry getReference(String href) throws CstlServiceException {
+    public ReferenceType getReference(String href) throws CstlServiceException {
         //TODO
-        return new ReferenceEntry(null, href);
+        return new ReferenceType(null, href);
     }
 
     /**

@@ -26,7 +26,7 @@ import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.swe.xml.v101.AbstractDataComponentEntry;
+import org.geotoolkit.swe.xml.v101.AbstractDataComponentType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.BooleanType;
 import org.geotoolkit.swe.xml.v101.QuantityType;
@@ -34,7 +34,7 @@ import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.util.Utilities;
 
 /**
- * Connexion vers la table des {@linkplain AnyScalarEntry dataRecord field}.
+ * Connexion vers la table des {@linkplain AnyScalarType dataRecord field}.
  * 
  * 
  * @author Guilhem Legal
@@ -129,7 +129,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
     @Override
     protected AnyScalarPropertyType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException {
         final AnyScalarQuery query = (AnyScalarQuery) super.query;
-        AbstractDataComponentEntry component = null;
+        AbstractDataComponentType component = null;
         if (results.getString(indexOf(query.type)).equals("Quantity")) {
             component = new QuantityType(results.getString(indexOf(query.definition )), 
                                               results.getString(indexOf(query.uomCode)),

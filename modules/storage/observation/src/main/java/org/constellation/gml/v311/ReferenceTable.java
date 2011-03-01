@@ -22,7 +22,7 @@ import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
@@ -31,7 +31,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class ReferenceTable extends SingletonTable<ReferenceEntry>{
+public class ReferenceTable extends SingletonTable<ReferenceType>{
     
     /**
      * Construit une table des reference.
@@ -69,9 +69,9 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
      * Construit une reference pour l'enregistrement courant.
      */
     @Override
-    protected ReferenceEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected ReferenceType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final ReferenceQuery query = (ReferenceQuery) super.query;
-        return new ReferenceEntry(results.getString(indexOf(query.idReference)),
+        return new ReferenceType(results.getString(indexOf(query.idReference)),
                                   results.getString(indexOf(query.href)));
     }
     
@@ -81,7 +81,7 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
      *
      * @param result le resultat a inserer dans la base de donnée.
      */
-    public String getIdentifier(final ReferenceEntry ref) throws SQLException, CatalogException {
+    public String getIdentifier(final ReferenceType ref) throws SQLException, CatalogException {
         final ReferenceQuery query  = (ReferenceQuery) super.query;
         String id;
         boolean success = false;

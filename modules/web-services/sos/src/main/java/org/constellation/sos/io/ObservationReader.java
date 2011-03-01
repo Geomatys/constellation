@@ -27,8 +27,8 @@ import org.constellation.ws.CstlServiceException;
 
 // GeoAPI
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.opengis.observation.Observation;
 import org.opengis.observation.Phenomenon;
@@ -54,14 +54,14 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException;
+    ObservationOfferingType getObservationOffering(String offeringName) throws CstlServiceException;
 
     /**
      * Return a list of all the offerings.
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException;
+    List<ObservationOfferingType> getObservationOfferings() throws CstlServiceException;
 
     /**
      * Return a list of the sensor identifiers.
@@ -137,7 +137,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    ReferenceEntry getReference(String href) throws CstlServiceException;
+    ReferenceType getReference(String href) throws CstlServiceException;
     
     /**
      * Create a new identifier for an observation.

@@ -30,22 +30,22 @@ import org.geotoolkit.internal.sql.table.NoSuchTableException;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.EnvelopeTable;
-import org.geotoolkit.gml.xml.v311.BoundingShapeEntry;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.BoundingShapeType;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
-import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
-import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
-import org.geotoolkit.sos.xml.v100.OfferingResponseModeEntry;
-import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
+import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
+import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
+import org.geotoolkit.sos.xml.v100.OfferingResponseModeType;
+import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
 import org.geotoolkit.xml.Namespaces;
 
@@ -53,7 +53,7 @@ import org.geotoolkit.xml.Namespaces;
  *
  * @author Guilhem Legal
  */
-public class ObservationOfferingTable extends SingletonTable<ObservationOfferingEntry>{
+public class ObservationOfferingTable extends SingletonTable<ObservationOfferingType>{
 
     /**
      * a link to the offering procedure.
@@ -160,47 +160,47 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
      * @throws java.sql.SQLException
      */
     @Override
-    protected ObservationOfferingEntry createEntry(final LocalCache lc, ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected ObservationOfferingType createEntry(final LocalCache lc, ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
          final ObservationOfferingQuery query = (ObservationOfferingQuery) super.query;
          final String idOffering              = results.getString(indexOf(query.id));
 
          if (envelopes == null) {
              envelopes = getDatabase().getTable(EnvelopeTable.class);
          }
-         final EnvelopeEntry envelope       = envelopes.getEntry(results.getString(indexOf(query.boundedBy)));
-         final BoundingShapeEntry boundedBy = new  BoundingShapeEntry(envelope);
+         final EnvelopeType envelope       = envelopes.getEntry(results.getString(indexOf(query.boundedBy)));
+         final BoundingShapeType boundedBy = new  BoundingShapeType(envelope);
 
          getPhenomenons().setIdOffering(idOffering);
          
-         final Collection<OfferingPhenomenonEntry> entries1 = getPhenomenons().getEntries();
+         final Collection<OfferingPhenomenonType> entries1 = getPhenomenons().getEntries();
 
          final List<PhenomenonPropertyType> phenos = new ArrayList<PhenomenonPropertyType>();
 
          Iterator i = entries1.iterator();
          while(i.hasNext()) {
-            final OfferingPhenomenonEntry c =(OfferingPhenomenonEntry) i.next();
+            final OfferingPhenomenonType c =(OfferingPhenomenonType) i.next();
             phenos.add(new PhenomenonPropertyType(c.getComponent()));
          }
 
          getProcedures().setIdOffering(idOffering);
-         final Collection<OfferingProcedureEntry> entries2 = getProcedures().getEntries();
+         final Collection<OfferingProcedureType> entries2 = getProcedures().getEntries();
 
-         final List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
+         final List<ReferenceType> process = new ArrayList<ReferenceType>();
 
          i = entries2.iterator();
          while(i.hasNext()) {
-            final OfferingProcedureEntry c =(OfferingProcedureEntry) i.next();
+            final OfferingProcedureType c =(OfferingProcedureType) i.next();
             process.add(c.getComponent());
          }
 
          getStations().setIdOffering(idOffering);
-         final Collection<OfferingSamplingFeatureEntry> entries3 = stations.getEntries();
+         final Collection<OfferingSamplingFeatureType> entries3 = stations.getEntries();
 
-         final List<ReferenceEntry> sampling = new ArrayList<ReferenceEntry>();
+         final List<ReferenceType> sampling = new ArrayList<ReferenceType>();
 
          i = entries3.iterator();
          while(i.hasNext()) {
-            final OfferingSamplingFeatureEntry c =(OfferingSamplingFeatureEntry) i.next();
+            final OfferingSamplingFeatureType c =(OfferingSamplingFeatureType) i.next();
             sampling.add(c.getComponent());
          }
          TimePositionType beginPosition = null;
@@ -232,12 +232,12 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          eventTime.setId("time-" + idOffering);
 
          getResponseModes().setIdOffering(idOffering);
-         final Collection<OfferingResponseModeEntry> entries4 = getResponseModes().getEntries();
+         final Collection<OfferingResponseModeType> entries4 = getResponseModes().getEntries();
          final List<ResponseModeType> modes = new ArrayList<ResponseModeType>();
          i = entries4.iterator();
 
          while(i.hasNext()) {
-            final OfferingResponseModeEntry c =(OfferingResponseModeEntry) i.next();
+            final OfferingResponseModeType c =(OfferingResponseModeType) i.next();
             modes.add(c.getMode());
          }
          final List<String> responseFormat = new ArrayList<String>();
@@ -257,7 +257,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          final List<String> srsName = new ArrayList<String>();
          srsName.add(results.getString(indexOf(query.srsName)));
 
-         return new ObservationOfferingEntry(idOffering,
+         return new ObservationOfferingType(idOffering,
                                              results.getString(indexOf(query.name)),
                                              results.getString(indexOf(query.description)),
                                              null,
@@ -279,7 +279,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
      *
      * @param off l'ofeering a inserer dans la base de donnée.
      */
-    public String getIdentifier(final ObservationOfferingEntry off) throws SQLException, CatalogException {
+    public String getIdentifier(final ObservationOfferingType off) throws SQLException, CatalogException {
         final ObservationOfferingQuery query = (ObservationOfferingQuery) super.query;
         String id;
         boolean success = false;
@@ -370,27 +370,27 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                 // we insert the response mode
                 if (off.getResponseMode() != null && off.getResponseMode().size() != 0){
                     for (ResponseModeType mode:off.getResponseMode()) {
-                        getResponseModes().getIdentifier(new OfferingResponseModeEntry(off.getId(), mode));
+                        getResponseModes().getIdentifier(new OfferingResponseModeType(off.getId(), mode));
                     }
                 }
                 // on insere la liste de station qui a effectué cette observation
                 if (off.getFeatureOfInterest() != null && off.getFeatureOfInterest().size() != 0) {
-                    for (ReferenceEntry station:off.getFeatureOfInterest()) {
-                        getStations().getIdentifier(new OfferingSamplingFeatureEntry(off.getId(), station));
+                    for (ReferenceType station:off.getFeatureOfInterest()) {
+                        getStations().getIdentifier(new OfferingSamplingFeatureType(off.getId(), station));
                     }
                 }
 
                 // on insere les phenomene observé
                 if(off.getObservedProperty() != null && off.getObservedProperty().size() != 0){
-                    for (PhenomenonEntry pheno: off.getObservedProperty()){
-                        getPhenomenons().getIdentifier(new OfferingPhenomenonEntry(off.getId(), pheno));
+                    for (PhenomenonType pheno: off.getObservedProperty()){
+                        getPhenomenons().getIdentifier(new OfferingPhenomenonType(off.getId(), pheno));
                     }
                 }
 
                 //on insere les capteur
                 if (off.getProcedure() != null) {
-                    for (ReferenceEntry process:off.getProcedure()){
-                        getProcedures().getIdentifier(new OfferingProcedureEntry(off.getId(), process));
+                    for (ReferenceType process:off.getProcedure()){
+                        getProcedures().getIdentifier(new OfferingProcedureType(off.getId(), process));
                     }
                 }
                 success = true;

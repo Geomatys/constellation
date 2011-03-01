@@ -37,12 +37,12 @@ import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.observation.xml.v100.ProcessEntry;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.observation.xml.v100.ProcessType;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.opengis.observation.Observation;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
@@ -145,7 +145,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterGetResult(Observation template, QName resultModel) {
-        final ProcessEntry process = (ProcessEntry) template.getProcedure();
+        final ProcessType process = (ProcessType) template.getProcedure();
         
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"measurements\" WHERE ");
@@ -160,7 +160,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
+    public void setProcedure(List<String> procedures, ObservationOfferingType off) {
         sqlRequest.append(" ( ");
         if (!procedures.isEmpty()) {
 
@@ -175,7 +175,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             }
         } else {
             //if is not specified we use all the process of the offering
-            for (ReferenceEntry proc : off.getProcedure()) {
+            for (ReferenceType proc : off.getProcedure()) {
                 sqlRequest.append(" \"procedure\"='").append(proc.getHref()).append("' OR ");
             }
         }
@@ -411,7 +411,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
+    public void setBoundingBox(EnvelopeType e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 

@@ -38,14 +38,14 @@ import org.constellation.generic.database.FilterQuery;
 import org.constellation.generic.database.FilterSelect;
 import org.constellation.generic.database.Where;
 import org.constellation.sos.io.ObservationResult;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.opengis.observation.Observation;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -117,7 +117,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         final From from           = configurationQuery.getFrom("observations");
         final Where where         = configurationQuery.getWhere(PROCEDURE);
 
-        final ProcessEntry process = (ProcessEntry) template.getProcedure();
+        final ProcessType process = (ProcessType) template.getProcedure();
         where.replaceVariable(PROCEDURE, process.getHref(), true);
         currentQuery.addSelect(select);
         currentQuery.addFrom(from);
@@ -128,7 +128,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
+    public void setProcedure(List<String> procedures, ObservationOfferingType off) {
         if (!procedures.isEmpty()) {
             for (String s : procedures) {
                 if (s != null) {
@@ -143,7 +143,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             }
         } else {
             //if is not specified we use all the process of the offering
-            for (ReferenceEntry proc : off.getProcedure()) {
+            for (ReferenceType proc : off.getProcedure()) {
                  final Where where = configurationQuery.getWhere(PROCEDURE);
                  where.replaceVariable(PROCEDURE, proc.getHref(), true);
                  currentQuery.addWhere(where);
@@ -345,7 +345,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
+    public void setBoundingBox(EnvelopeType e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 

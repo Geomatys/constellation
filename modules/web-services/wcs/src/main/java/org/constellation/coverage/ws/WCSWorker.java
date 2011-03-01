@@ -121,7 +121,7 @@ import org.geotoolkit.gml.xml.v311.RectifiedGridType;
 import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.ows.xml.v110.MetadataType;
 import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -302,7 +302,7 @@ public final class WCSWorker extends LayerWorker {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
             final LonLatEnvelopeType llenvelope;
-            final EnvelopeEntry envelope;
+            final EnvelopeType envelope;
             if (inputGeoBox != null) {
                 final SortedSet<Number> elevations;
                 try {
@@ -313,7 +313,7 @@ public final class WCSWorker extends LayerWorker {
 
                 final List<DirectPositionType> pos = buildPositions(inputGeoBox, elevations);
                 llenvelope = new LonLatEnvelopeType(pos, "urn:ogc:def:crs:OGC:1.3:CRS84");
-                envelope   = new EnvelopeEntry(pos, "EPSG:4326");
+                envelope   = new EnvelopeType(pos, "EPSG:4326");
             } else {
                 throw new CstlServiceException("The geographic bbox for the layer is null !",
                         NO_APPLICABLE_CODE);
@@ -323,9 +323,9 @@ public final class WCSWorker extends LayerWorker {
             /*
              * Spatial metadata
              */
-            final EnvelopeEntry nativeEnvelope;
+            final EnvelopeType nativeEnvelope;
             try {
-                nativeEnvelope = new EnvelopeEntry(coverageRef.getEnvelope());
+                nativeEnvelope = new EnvelopeType(coverageRef.getEnvelope());
             } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }

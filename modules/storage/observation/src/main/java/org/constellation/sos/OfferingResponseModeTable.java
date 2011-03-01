@@ -25,7 +25,7 @@ import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
-import org.geotoolkit.sos.xml.v100.OfferingResponseModeEntry;
+import org.geotoolkit.sos.xml.v100.OfferingResponseModeType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.util.Utilities;
 
@@ -33,7 +33,7 @@ import org.geotoolkit.util.Utilities;
  *
  * @author Guilhem Legal
  */
-public class OfferingResponseModeTable extends SingletonTable<OfferingResponseModeEntry>{
+public class OfferingResponseModeTable extends SingletonTable<OfferingResponseModeType>{
 
         
     /**
@@ -75,12 +75,12 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
     }
 
     @Override
-    protected OfferingResponseModeEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected OfferingResponseModeType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingResponseModeQuery query = (OfferingResponseModeQuery) super.query;
         
         
         final ResponseModeType mode = ResponseModeType.valueOf(results.getString(indexOf(query.mode)));
-        return new OfferingResponseModeEntry(results.getString(indexOf(query.idOffering)),
+        return new OfferingResponseModeType(results.getString(indexOf(query.idOffering)),
                                           mode);
     }
     
@@ -113,7 +113,7 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *
      */
-    public void getIdentifier(OfferingResponseModeEntry offres) throws SQLException, CatalogException {
+    public void getIdentifier(OfferingResponseModeType offres) throws SQLException, CatalogException {
         final OfferingResponseModeQuery query  = (OfferingResponseModeQuery) super.query;
         boolean success = false;
         final LocalCache lc = getLocalCache();

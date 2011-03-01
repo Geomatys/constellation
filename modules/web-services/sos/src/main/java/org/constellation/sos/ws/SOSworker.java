@@ -117,32 +117,32 @@ import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.geotoolkit.sos.xml.v100.RequestBaseType;
 import org.geotoolkit.sos.xml.v100.FilterCapabilities;
-import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
+import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ObservationTemplate;
-import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
-import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
-import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
+import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
+import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
+import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
-import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
+import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.FeatureCollectionType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
-import org.geotoolkit.gml.xml.v311.ReferenceEntry;
-import org.geotoolkit.observation.xml.v100.MeasurementEntry;
-import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
-import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceType;
+import org.geotoolkit.observation.xml.v100.MeasurementType;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
+import org.geotoolkit.observation.xml.v100.ObservationType;
+import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.sampling.xml.v100.ObjectFactory;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
-import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sampling.xml.v100.SamplingSolidType;
 import org.geotoolkit.sampling.xml.v100.SamplingSurfaceType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -152,7 +152,7 @@ import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
-import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -171,7 +171,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * A list of temporary ObservationTemplate
      */
-    private final Map<String, ObservationEntry> templates = new HashMap<String, ObservationEntry>();
+    private final Map<String, ObservationType> templates = new HashMap<String, ObservationType>();
     
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
@@ -885,7 +885,7 @@ public class SOSworker extends AbstractWorker {
                                              OPERATION_NOT_SUPPORTED, RESPONSE_MODE);
         }
 
-        ObservationOfferingEntry off;
+        ObservationOfferingType off;
         //we verify that there is an offering
         if (requestObservation.getOffering() == null) {
             throw new CstlServiceException("Offering must be specify!",
@@ -933,7 +933,7 @@ public class SOSworker extends AbstractWorker {
                     dbId = s;
                 }
                 LOGGER.log(logLevel, "process ID: {0}", dbId);
-                final ReferenceEntry proc = omReader.getReference(dbId);
+                final ReferenceType proc = omReader.getReference(dbId);
                 if (proc == null) {
                     throw new CstlServiceException(" this process is not registred in the table",
                             INVALID_PARAMETER_VALUE, PROCEDURE);
@@ -1011,7 +1011,7 @@ public class SOSworker extends AbstractWorker {
             } else {
                 // for a BBOX Spatial ops
                 if (foiRequest.getBBOX() != null) {
-                    final EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
+                    final EnvelopeType e = foiRequest.getBBOX().getEnvelope();
 
                     if (e != null && e.isCompleteEnvelope2D()) {
                         boolean add = false;
@@ -1019,13 +1019,13 @@ public class SOSworker extends AbstractWorker {
                         if (localOmFilter.isBoundedObservation()) {
                             localOmFilter.setBoundingBox(e);
                         } else {
-                            for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
+                            for (ReferenceType refStation : off.getFeatureOfInterest()) {
                                 final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
                                 if (station == null)
                                     throw new CstlServiceException("the feature of interest is not registered",
                                             INVALID_PARAMETER_VALUE);
-                                if (station instanceof SamplingPointEntry) {
-                                    final SamplingPointEntry sp = (SamplingPointEntry) station;
+                                if (station instanceof SamplingPointType) {
+                                    final SamplingPointType sp = (SamplingPointType) station;
                                     if (samplingPointMatchEnvelope(sp, e)) {
                                         matchingFeatureOfInterest.add(sp.getId());
                                         add = true;
@@ -1068,7 +1068,7 @@ public class SOSworker extends AbstractWorker {
                                 localOmFilter.setFeatureOfInterest(matchingFeatureOfInterest);
                             // if there is no matching FOI we must return an empty result
                             } else {
-                                return new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
+                                return new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");
                             }
                         }
                         
@@ -1145,7 +1145,7 @@ public class SOSworker extends AbstractWorker {
         Object response;
         if (!outOfBand) {
 
-            ObservationCollectionEntry ocResponse = new ObservationCollectionEntry();
+            ObservationCollectionType ocResponse = new ObservationCollectionType();
             
             /*
              * here we can have 2 different behaviour :
@@ -1181,7 +1181,7 @@ public class SOSworker extends AbstractWorker {
                 if (template) {
 
                     final String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
-                    final ObservationEntry temporaryTemplate = ((ObservationEntry) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
+                    final ObservationType temporaryTemplate = ((ObservationType) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
                     templates.put(temporaryTemplateId, temporaryTemplate);
 
                     // we launch a timer which will destroy the template in one hours
@@ -1194,7 +1194,7 @@ public class SOSworker extends AbstractWorker {
 
                     ocResponse.add(temporaryTemplate);
                 } else {
-                    ocResponse.add((ObservationEntry) o);
+                    ocResponse.add((ObservationType) o);
                 }
             }
             ocResponse = regroupObservation(ocResponse);
@@ -1227,7 +1227,7 @@ public class SOSworker extends AbstractWorker {
      * @param e An envelope (2D).
      * @return True if the sampling point is strictly inside the specified envelope.
      */
-    private boolean samplingPointMatchEnvelope(final SamplingPointEntry sp, final EnvelopeEntry e) {
+    private boolean samplingPointMatchEnvelope(final SamplingPointType sp, final EnvelopeType e) {
         if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
 
             final double stationX = sp.getPosition().getPos().getValue().get(0);
@@ -1257,7 +1257,7 @@ public class SOSworker extends AbstractWorker {
         // we clone the filter for this request
         final ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
         
-        ObservationEntry template = null;
+        ObservationType template = null;
         if (requestResult.getObservationTemplateId() != null) {
             final String id = requestResult.getObservationTemplateId();
             template = templates.get(id);
@@ -1271,7 +1271,7 @@ public class SOSworker extends AbstractWorker {
         }
         
         final QName resultModel;
-        if (template instanceof MeasurementEntry) {
+        if (template instanceof MeasurementType) {
             resultModel = MEASUREMENT_QNAME;
         } else {
             resultModel = OBSERVATION_QNAME;
@@ -1502,7 +1502,7 @@ public class SOSworker extends AbstractWorker {
         return values;
     }
 
-    public AbstractFeatureEntry getFeatureOfInterest(final GetFeatureOfInterest request) throws CstlServiceException {
+    public AbstractFeatureType getFeatureOfInterest(final GetFeatureOfInterest request) throws CstlServiceException {
         verifyBaseRequest(request);
         LOGGER.log(logLevel, "GetFeatureOfInterest request processing\n");
         final long start = System.currentTimeMillis();
@@ -1523,7 +1523,7 @@ public class SOSworker extends AbstractWorker {
             if (singleResult == null) {
                 throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
             } else {
-                return (SamplingFeatureEntry)singleResult;
+                return (SamplingFeatureType)singleResult;
             }
 
         // we return a featureCollection
@@ -1547,7 +1547,7 @@ public class SOSworker extends AbstractWorker {
                 
                 // we return a single result
                 if (result.size() == 1) {
-                    return (AbstractFeatureEntry) result.get(0);
+                    return (AbstractFeatureType) result.get(0);
 
                 // we return a feature collection
                 } else if (result.size() > 1) {
@@ -1600,8 +1600,8 @@ public class SOSworker extends AbstractWorker {
      */
     private FeaturePropertyType buildFeatureProperty(final SamplingFeature feature) {
         final ObjectFactory samplingFactory = new ObjectFactory();
-        if (feature instanceof SamplingPointEntry) {
-            return new FeaturePropertyType(samplingFactory.createSamplingPoint((SamplingPointEntry)feature));
+        if (feature instanceof SamplingPointType) {
+            return new FeaturePropertyType(samplingFactory.createSamplingPoint((SamplingPointType)feature));
         } else if (feature instanceof SamplingCurveType) {
             return new FeaturePropertyType(samplingFactory.createSamplingCurve((SamplingCurveType)feature));
         } else if (feature instanceof SamplingSolidType) {
@@ -1615,20 +1615,20 @@ public class SOSworker extends AbstractWorker {
     }
 
     private List<SamplingFeature> spatialFiltering(final BBOXType bbox) throws CstlServiceException {
-        final EnvelopeEntry e = bbox.getEnvelope();
+        final EnvelopeType e = bbox.getEnvelope();
         if (e != null && e.isCompleteEnvelope2D()) {
 
             final List<SamplingFeature> matchingFeatureOfInterest = new ArrayList<SamplingFeature>();
-            final List<ObservationOfferingEntry> offerings        = omReader.getObservationOfferings();
-            for (ObservationOfferingEntry off : offerings) {
-                for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
+            final List<ObservationOfferingType> offerings        = omReader.getObservationOfferings();
+            for (ObservationOfferingType off : offerings) {
+                for (ReferenceType refStation : off.getFeatureOfInterest()) {
                     final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
                     if (station == null) {
                         LOGGER.log(Level.WARNING, "the feature of interest is not registered:{0}", refStation.getHref());
                         continue;
                     }
-                    if (station instanceof SamplingPointEntry) {
-                        final SamplingPointEntry sp = (SamplingPointEntry) station;
+                    if (station instanceof SamplingPointType) {
+                        final SamplingPointType sp = (SamplingPointType) station;
                         if (samplingPointMatchEnvelope(sp, e)) {
                             matchingFeatureOfInterest.add(sp);
                         } else {
@@ -1683,7 +1683,7 @@ public class SOSworker extends AbstractWorker {
             
             //we get the observation template provided with the sensor description.
             final ObservationTemplate temp = requestRegSensor.getObservationTemplate();
-            ObservationEntry obs           = null;
+            ObservationType obs           = null;
             if (temp != null) {
                 obs = temp.getObservation();
             }
@@ -1699,8 +1699,8 @@ public class SOSworker extends AbstractWorker {
             
             //we create a new Identifier from the SensorML database
             String num = "";
-            if (obs.getProcedure() instanceof ProcessEntry) {
-                final ProcessEntry pentry = (ProcessEntry) obs.getProcedure();
+            if (obs.getProcedure() instanceof ProcessType) {
+                final ProcessType pentry = (ProcessType) obs.getProcedure();
                 if (pentry.getHref() != null && pentry.getHref().startsWith(sensorIdBase)) {
                     id  = pentry.getHref();
                     num = id.substring(sensorIdBase.length());
@@ -1726,7 +1726,7 @@ public class SOSworker extends AbstractWorker {
             omWriter.recordProcedureLocation(phyId, position);
                                     
             //we assign the new capteur id to the observation template
-            final ProcessEntry p = new ProcessEntry(id);
+            final ProcessType p = new ProcessType(id);
             obs.setProcedure(p);
             obs.setName(observationTemplateIdBase + num);
             LOGGER.finer(obs.toString());
@@ -1777,10 +1777,10 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The sensor identifier is not valid it must start with " + sensorIdBase,
                                          INVALID_PARAMETER_VALUE, "assignedSensorId");
         }
-        final ProcessEntry proc = new ProcessEntry(sensorId);
+        final ProcessType proc = new ProcessType(sensorId);
 
         //we get the observation and we assign to it the sensor
-        final ObservationEntry obs = requestInsObs.getObservation();
+        final ObservationType obs = requestInsObs.getObservation();
         if (obs != null) {
             obs.setProcedure(proc);
             obs.setName(omReader.getNewObservationId());
@@ -1806,18 +1806,18 @@ public class SOSworker extends AbstractWorker {
         }
 
         //we record the observation in the O&M database
-       if (obs instanceof MeasurementEntry) {
-           id = omWriter.writeMeasurement((MeasurementEntry)obs);
-           LOGGER.log(logLevel, "new Measurement inserted: id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
+       if (obs instanceof MeasurementType) {
+           id = omWriter.writeMeasurement((MeasurementType)obs);
+           LOGGER.log(logLevel, "new Measurement inserted: id = " + id + " for the sensor " + ((ProcessType)obs.getProcedure()).getName());
         } else {
 
             //in first we verify that the observation is conform to the template
-            final ObservationEntry template = (ObservationEntry) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME);
+            final ObservationType template = (ObservationType) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME);
             //if the observation to insert match the template we can insert it in the OM db
             if (obs.matchTemplate(template)) {
                 if (obs.getSamplingTime() != null && obs.getResult() != null) {
                     id = omWriter.writeObservation(obs);
-                    LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
+                    LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + ((ProcessType)obs.getProcedure()).getName());
                 } else {
                     throw new CstlServiceException("The observation sampling time and the result must be specify",
                                                   MISSING_PARAMETER_VALUE, "samplingTime");
@@ -2000,7 +2000,7 @@ public class SOSworker extends AbstractWorker {
         // for each network we create (or update) an offering
         for (String networkName : networkNames) {
             final String offeringName               = "offering-" + networkName;
-            final ObservationOfferingEntry offering = omReader.getObservationOffering(offeringName);
+            final ObservationOfferingType offering = omReader.getObservationOffering(offeringName);
             
             if (offering != null) {
                 updateOffering(offering, template);
@@ -2012,7 +2012,7 @@ public class SOSworker extends AbstractWorker {
         /*
          * then  we add the sensor to the global offering containing all the sensor
          */
-        final ObservationOfferingEntry offering = omReader.getObservationOffering("offering-allSensor");
+        final ObservationOfferingType offering = omReader.getObservationOffering("offering-allSensor");
         if (offering != null) {
             updateOffering(offering, template);
         } else {
@@ -2028,33 +2028,33 @@ public class SOSworker extends AbstractWorker {
      * 
      * @throws CstlServiceException If the service does not succeed to update the offering in the datasource.
      */
-    private void updateOffering(final ObservationOfferingEntry offering, final Observation template) throws CstlServiceException {
+    private void updateOffering(final ObservationOfferingType offering, final Observation template) throws CstlServiceException {
 
         //we add the new sensor to the offering
-        OfferingProcedureEntry offProc = null;
-        ReferenceEntry ref = omReader.getReference(((ProcessEntry) template.getProcedure()).getHref());
+        OfferingProcedureType offProc = null;
+        ReferenceType ref = omReader.getReference(((ProcessType) template.getProcedure()).getHref());
         if (!offering.getProcedure().contains(ref)) {
             if (ref == null) {
-                ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
+                ref = new ReferenceType(null, ((ProcessType) template.getProcedure()).getHref());
             }
-            offProc = new OfferingProcedureEntry(offering.getId(), ref);
+            offProc = new OfferingProcedureType(offering.getId(), ref);
         }
 
         //we add the phenomenon to the offering
-        OfferingPhenomenonEntry offPheno = null;
+        OfferingPhenomenonType offPheno = null;
         if (template.getObservedProperty() != null && !offering.getObservedProperty().contains(template.getObservedProperty())) {
-            offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
+            offPheno = new OfferingPhenomenonType(offering.getId(), (PhenomenonType) template.getObservedProperty());
         }
 
         // we add the feature of interest (station) to the offering
-        OfferingSamplingFeatureEntry offSF = null;
+        OfferingSamplingFeatureType offSF = null;
         if (template.getFeatureOfInterest() != null) {
-            ref = omReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+            ref = omReader.getReference(((SamplingFeatureType) template.getFeatureOfInterest()).getId());
             if (!offering.getFeatureOfInterest().contains(ref)) {
                 if (ref == null) {
-                    ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                    ref = new ReferenceType(null, ((SamplingFeatureType) template.getFeatureOfInterest()).getId());
                 }
-                offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
+                offSF = new OfferingSamplingFeatureType(offering.getId(), ref);
             }
         }
         omWriter.updateOffering(offProc, offPheno, offSF);
@@ -2079,15 +2079,15 @@ public class SOSworker extends AbstractWorker {
         final TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
 
         //we add the template process
-        final ReferenceEntry process = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
+        final ReferenceType process = new ReferenceType(null, ((ProcessType) template.getProcedure()).getHref());
 
         //we add the template phenomenon
-        final PhenomenonEntry phenomenon = (PhenomenonEntry) template.getObservedProperty();
+        final PhenomenonType phenomenon = (PhenomenonType) template.getObservedProperty();
 
         //we add the template feature of interest
-        final ReferenceEntry station;
+        final ReferenceType station;
         if (template.getFeatureOfInterest() != null) {
-            station = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+            station = new ReferenceType(null, ((SamplingFeatureType) template.getFeatureOfInterest()).getId());
         } else {
             station = null;
         }
@@ -2103,7 +2103,7 @@ public class SOSworker extends AbstractWorker {
             description = "Base offering containing all the sensors.";
         }
         // we create a the new Offering
-        omWriter.writeOffering(new ObservationOfferingEntry(
+        omWriter.writeOffering(new ObservationOfferingType(
                                             OFFERING_ID_BASE + offeringName,
                                             OFFERING_ID_BASE + offeringName,
                                             description,
