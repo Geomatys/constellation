@@ -45,6 +45,7 @@ public class ProviderSource {
     public final Map<String,String> parameters = new HashMap<String, String>();
     
     public final List<ProviderLayer> layers = new ArrayList<ProviderLayer>();
+    public final List<ProviderLayer> querylayers = new ArrayList<ProviderLayer>();
 
     public ProviderLayer getLayer(final String key){
         for (final ProviderLayer layer : layers) {
@@ -66,6 +67,11 @@ public class ProviderSource {
     
     public boolean containsLayer(String key){
         for(final ProviderLayer layer : layers){
+            if(layer.name.equals(key)){
+                return true;
+            }
+        }
+        for(final ProviderLayer layer : querylayers){
             if(layer.name.equals(key)){
                 return true;
             }

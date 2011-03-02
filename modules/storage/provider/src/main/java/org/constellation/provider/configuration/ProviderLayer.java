@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -35,11 +35,22 @@ public class ProviderLayer {
     public final String elevationEndField;
     public final String elevationModel;
     public final boolean isElevationModel;
+    public final String language;
+    public final String statement;
     
     public ProviderLayer(final String name,final List<String> styles,
                          final String startDate, final String endDate,
                          final String startElevation, final String endElevation,
                          final boolean isElevationModel, final String elevationModel){
+        this(name,styles,startDate,endDate,startElevation,
+             endElevation,isElevationModel,elevationModel,null,null);
+    }
+
+    public ProviderLayer(final String name,final List<String> styles,
+                         final String startDate, final String endDate,
+                         final String startElevation, final String endElevation,
+                         final boolean isElevationModel, final String elevationModel,
+                         final String language, final String statement){
         if(name == null || styles == null){
             throw new IllegalArgumentException("Name and style list must not be null");
         }
@@ -51,8 +62,8 @@ public class ProviderLayer {
         this.elevationEndField = endElevation;
         this.isElevationModel = isElevationModel;
         this.elevationModel = elevationModel;
+        this.language = language;
+        this.statement = statement;
     }
-    
-    
     
 }

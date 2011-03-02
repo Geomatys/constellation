@@ -26,9 +26,13 @@ import java.util.Set;
 import java.util.logging.Level;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
+import org.geotoolkit.data.AbstractDataStoreFactory;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.memory.ExtendedDataStore;
+import org.geotoolkit.data.query.Query;
+import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.storage.DataStoreException;
 import org.opengis.feature.type.Name;
 
@@ -49,6 +53,8 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
 
         params = prepareParameters(config.parameters);
 
+        final String namespace = (String) params.get(AbstractDataStoreFactory.NAMESPACE.getName().getCode());
+
         final DataStore candidate = DataStoreFinder.getDataStore(params);
 
         if (candidate == null) {
@@ -61,11 +67,18 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
                 }
             }
             throw new DataStoreException(sb.toString());
-        } else {
-            store = new ExtendedDataStore(candidate);
-            visit();
         }
-        
+
+
+        store = new ExtendedDataStore(candidate);
+
+        for(final ProviderLayer layer : config.querylayers){
+            final Query query = QueryBuilder.language(layer.language, layer.statement);
+            final Name name = new DefaultName(namespace, layer.name);
+            store.addQuery(query, name);
+        }
+
+        visit();
     }
 
     public abstract Map<String,Serializable> prepareParameters(Map<String,String> params);

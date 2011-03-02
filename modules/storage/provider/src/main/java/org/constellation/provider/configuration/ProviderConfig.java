@@ -54,10 +54,12 @@ public class ProviderConfig {
     private static final String PARAM_IS_ELEVATION_MODEL  = "is_elevation_model";
     private static final String PARAM_LOAD_ALL            = "load_all";
     private static final String PARAM_ID                  = "id";
+    private static final String PARAM_LANGUAGE            = "language";
+    private static final String PARAM_STATEMENT           = "statement";
     
     public final List<ProviderSource> sources = new ArrayList<ProviderSource>();
     
-    public static final synchronized ProviderConfig read(final File configFile) 
+    public static synchronized ProviderConfig read(final File configFile) 
             throws ParserConfigurationException, SAXException, IOException{
 
         if(configFile == null || !configFile.exists()){
@@ -78,12 +80,11 @@ public class ProviderConfig {
         return config;
     }
     
-    private static final ProviderSource parseSource(final Element element){
+    private static ProviderSource parseSource(final Element element){
         final ProviderSource source = new ProviderSource();
         
         final NodeList paramNodes = element.getElementsByTagName(TAG_PARAMETER);
         final NodeList layerNodes = element.getElementsByTagName(TAG_LAYER);
-
 
         // parse properties
         final String loadAll = element.getAttribute(PARAM_LOAD_ALL);
@@ -111,14 +112,20 @@ public class ProviderConfig {
         for(int i=0, n=layerNodes.getLength(); i<n; i++){
             final Element layerNode = (Element)layerNodes.item(i);
             if(layerNode.hasAttribute(ATT_NAME)){
-                source.layers.add(parseLayer(layerNode));
+                final ProviderLayer layer = parseLayer(layerNode);
+
+                if(layer.language!=null && layer.statement!=null){
+                    source.querylayers.add(layer);
+                }else{
+                    source.layers.add(layer);
+                }
             }
         }
         
         return source;
     }
     
-    private static final ProviderLayer parseLayer(final Element element){
+    private static ProviderLayer parseLayer(final Element element){
         final String layerName = element.getAttribute(ATT_NAME);
         final List<String> layerStyles = new ArrayList<String>();
         String startDate = null;
@@ -126,6 +133,8 @@ public class ProviderConfig {
         String startElevation = null;
         String endElevation = null;
         String elevationModel = null;
+        String language = null;
+        String statement = null;
         boolean isElevationModel = false;
         
         final NodeList paramNodes = element.getElementsByTagName(TAG_PARAMETER);
@@ -149,15 +158,19 @@ public class ProviderConfig {
                 isElevationModel = Boolean.valueOf(text);
             }else if(PARAM_ELEVATION_MODEL.equalsIgnoreCase(name)){
                 elevationModel = text;
+            }else if(PARAM_LANGUAGE.equalsIgnoreCase(name)){
+                language = text;
+            }else if(PARAM_STATEMENT.equalsIgnoreCase(name)){
+                statement = text;
             }
-            
         }
         return new ProviderLayer(layerName, layerStyles, startDate, endDate, 
-                startElevation, endElevation,isElevationModel,elevationModel);
+                startElevation, endElevation, isElevationModel, elevationModel,
+                language, statement);
     }
     
     
-    private static final void parseStyles(String strStyles, List<String> styles) {
+    private static void parseStyles(String strStyles, List<String> styles) {
         if(strStyles == null || strStyles.trim().isEmpty()){
             return;
         }
