@@ -143,7 +143,7 @@ public abstract class WebService {
     }
 
     /**
-     * Automaticly set by Jersey.
+     * Automatically set by Jersey.
      *
      * Provides access to the URI used in the method call, for instance, to
      * obtain the Key-Value Pairs in the request. The field is injected, thanks
@@ -153,7 +153,7 @@ public abstract class WebService {
     private volatile UriInfo uriContext;
 
     /**
-     * Automaticly set by Jersey.
+     * Automatically set by Jersey.
      * 
      * Used to communicate with the servlet container, for example, to obtain
      * the MIME type of a file, to dispatch requests or to write to a log file.
@@ -163,7 +163,7 @@ public abstract class WebService {
     private volatile ServletContext servletContext;
 
     /**
-     * Automaticly set by Jersey.
+     * Automatically set by Jersey.
      * 
      * The HTTP context used to get information about the client which sent the
      * request. The field is injected, thanks to the annotation, when a request
@@ -184,7 +184,7 @@ public abstract class WebService {
     private boolean requestValidationActivated = false;
 
     /**
-     * if the flag requestValidationActivated is set to true this attribute muste contain the main xsd file.
+     * if the flag requestValidationActivated is set to true this attribute must contain the main xsd file.
      */
     private String mainXsdPath = null;
 
@@ -260,7 +260,7 @@ public abstract class WebService {
 
     /**
      * Provide the marshaller pool.
-     * Live it's instanciation to implementations.
+     * Live it's instantiation to implementations.
      */
     protected synchronized MarshallerPool getMarshallerPool() {
         return marshallerPool;
@@ -383,7 +383,7 @@ public abstract class WebService {
     @POST
     @Consumes("text/plain")
     public Response doPOSTPlain(InputStream is) {
-        LOGGER.severe("request POST plain sending Exception");
+        LOGGER.warning("request POST plain sending Exception");
         return launchException("The plain text content type is not allowed. Send " +
         		       "a message body with key=value pairs in the " +
         		       "application/x-www-form-urlencoded MIME type, or " +
