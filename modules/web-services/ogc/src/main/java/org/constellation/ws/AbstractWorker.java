@@ -28,11 +28,14 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.ServiceDef.Specification;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
 
+import org.constellation.ServiceDef.Specification;
+import org.constellation.ws.security.SimplePDP;
+
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+
 
 /**
  * Abstract definition of a {@code Web Map Service} worker called by a facade
@@ -46,7 +49,7 @@ import org.geotoolkit.xml.MarshallerPool;
  */
 public abstract class AbstractWorker implements Worker {
 
-     /**
+    /**
      * The default logger.
      */
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws");
@@ -81,7 +84,15 @@ public abstract class AbstractWorker implements Worker {
      */
     private final String id;
 
+    /**
+     * The specification for this worker.
+     */
     private final Specification specification;
+
+    /**
+     * A Policy Decision Point (PDP) if some security constraints have been defined.
+     */
+    protected SimplePDP pdp = null;
 
     public AbstractWorker(String id, File configurationDirectory, Specification specification) {
         this.id = id;
@@ -208,5 +219,21 @@ public abstract class AbstractWorker implements Worker {
         if (!isStarted) {
             throw new CstlServiceException("The service is not running!", OWSExceptionCode.NO_APPLICABLE_CODE);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAuthorized(String ip, String referer) {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecured() {
+        return false;
     }
 }

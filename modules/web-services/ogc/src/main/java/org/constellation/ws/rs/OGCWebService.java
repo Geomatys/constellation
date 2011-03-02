@@ -42,6 +42,8 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
 import org.opengis.util.CodeList;
+
+
 /**
  * Abstract parent REST facade for all OGC web services in Constellation.
  * <p>
@@ -67,7 +69,7 @@ import org.opengis.util.CodeList;
  * @since 0.3
  */
 public abstract class OGCWebService<W extends Worker> extends WebService {
-	
+
     /**
      * The supported supportedVersions supported by this web serviceType.
      * avoid modification after instantiation.
@@ -215,8 +217,19 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             // request is send to the specified worker
             if (serviceID != null && workersMap.containsKey(serviceID)) {
                 final W worker = workersMap.get(serviceID);
+                if (worker.isSecured()) {
+                    final String ip = getHttpServletRequest().getRemoteAddr();
+                    final String referer = getHttpContext().getRequest().getHeaderValue("referer");
+                    System.out.println("IP :"+ ip);
+                    System.out.println("referer :"+ referer);
+                    if (!worker.isAuthorized(ip, referer)) {
+                        LOGGER.log(Level.INFO, "Received a request from unauthorized ip:{0} or referer:{1}", 
+                                new String[]{ip, referer});
+                        return Response.status(Response.Status.UNAUTHORIZED).build();
+                    }
+                }
                 return treatIncomingRequest(objectRequest, worker);
-                
+
             // administration a the instance
             } else if ("admin".equals(serviceID)){
                 return treatAdminRequest(objectRequest);

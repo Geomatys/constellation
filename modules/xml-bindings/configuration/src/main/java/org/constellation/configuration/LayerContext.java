@@ -34,12 +34,19 @@ public class LayerContext {
 
     private Layers layers;
 
+    private String security;
+
     public LayerContext() {
 
     }
 
     public LayerContext(Layers layers) {
         this.layers = layers;
+    }
+
+    public LayerContext(Layers layers, String security) {
+        this.layers = layers;
+        this.security = security;
     }
 
     /**
@@ -74,10 +81,29 @@ public class LayerContext {
         }
     }
 
+    /**
+     * @return the security constraint, or {@code null} if none.
+     */
+    public String getSecurity() {
+        return security;
+    }
+
+    /**
+     * Sets the security value.
+     *
+     * @param security the security value.
+     */
+    public void setSecurity(String security) {
+        this.security = security;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("LayerContext");
         sb.append(StringUtilities.toStringTree(getLayers()));
+        if (security != null && !security.isEmpty()) {
+            sb.append("Security=").append(security);
+        }
         return sb.toString();
     }
 

@@ -47,4 +47,19 @@ public interface Worker {
      * @return
      */
     String getId();
+
+    /**
+     * Returns {@code true} if the worker is secured, {@code false} otherwise.
+     */
+    boolean isSecured();
+
+    /**
+     * Verifies if the ip or referrer is authorized to request the service or not.
+     * Should delegate the verification to the Policy Desicion Point (PDP).
+     *
+     * @param ip The IP address of the requestor.
+     * @param referer The referrer identifier of the requestor.
+     * @return {@code True} if the requestor is authorized, {@code false} otherwise.
+     */
+    boolean isAuthorized(String ip, String referer);
 }

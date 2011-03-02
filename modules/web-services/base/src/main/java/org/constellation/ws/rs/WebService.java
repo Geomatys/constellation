@@ -22,7 +22,6 @@ import java.io.StringReader;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.ServletContext;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
@@ -31,6 +30,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -173,6 +174,16 @@ public abstract class WebService {
     private volatile HttpContext httpContext;
 
     /**
+     * Automatically set by Jersey.
+     *
+     * The HTTP servlet request used to get information about the client which
+     * sent the request. The field is injected, thanks to the annotation, when a
+     * request arrives.
+     */
+    @Context
+    private volatile HttpServletRequest httpServletRequest;
+
+    /**
      * If this flag is set the method logParameters() will write the entire request in the logs
      * instead of the parameters map.
      */
@@ -211,6 +222,16 @@ public abstract class WebService {
      */
     protected final ServletContext getServletContext(){
         return servletContext;
+    }
+
+    /**
+     * The HTTP servlet request used to get information about the client which 
+     * sent the request.
+     *
+     * @return
+     */
+    protected final HttpServletRequest getHttpServletRequest(){
+        return httpServletRequest;
     }
 
     /**
@@ -294,7 +315,8 @@ public abstract class WebService {
     @Consumes("application/x-www-form-urlencoded")
     public Response doPOSTKvp(String request){
         final StringTokenizer tokens = new StringTokenizer(request, "&");
-        final StringBuilder log = new StringBuilder();
+        final StringBuilder log = new StringBuilder("request POST kvp: ");
+        log.append(request).append('\n');
         while (tokens.hasMoreTokens()) {
             final String token      = tokens.nextToken().trim();
             final int equalsIndex   = token.indexOf('=');
@@ -303,7 +325,7 @@ public abstract class WebService {
             log.append("put: ").append(paramName).append("=").append(paramValue).append('\n');
             getUriContext().getQueryParameters().add(paramName, paramValue);
         }
-        LOGGER.info("request POST kvp: " + request + '\n' + log.toString());
+        LOGGER.info(log.toString());
         return treatIncomingRequest(null);
     }
 

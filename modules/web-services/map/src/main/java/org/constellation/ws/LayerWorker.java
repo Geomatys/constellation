@@ -16,6 +16,7 @@
  */
 package org.constellation.ws;
 
+import org.constellation.ws.security.SimplePDP;
 import org.constellation.ServiceDef.Specification;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,11 @@ public abstract class LayerWorker extends AbstractWorker {
                     Object obj   = unmarshaller.unmarshal(lcFile);
                     if (obj instanceof LayerContext) {
                         candidate = (LayerContext) obj;
+                        final String sec = candidate.getSecurity();
+                        // Instantiaties the PDP only if a rule has been discovered.
+                        if (sec != null && !sec.isEmpty()) {
+                            pdp = new SimplePDP(sec);
+                        }
                     } else {
                         isStarted = false;
                         LOGGER.log(Level.WARNING, "The layer context File does not contain a layerContext object");
@@ -88,6 +94,9 @@ public abstract class LayerWorker extends AbstractWorker {
      * @return map of additional informations for each layer declared in the layer context.
      */
     protected Map<Name, Layer> getLayers(){
+        if (layerContext == null) {
+            return null;
+        }
         final LayerProviderProxy namedProxy  = LayerProviderProxy.getInstance();
         final Map<Name, Layer> layers = new HashMap<Name, Layer>();
         /*
@@ -158,6 +167,9 @@ public abstract class LayerWorker extends AbstractWorker {
         }
 
         final Map<Name,Layer> layers = getLayers();
+        if (layers == null) {
+            return null;
+        }
 
         if (!layers.containsKey(name)) {
             for (Name layerName: layers.keySet()) {
@@ -171,6 +183,25 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     public Layer getMainLayer() {
+        if (layerContext == null) {
+            return null;
+        }
         return layerContext.getMainLayer();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAuthorized(String ip, String referer) {
+        return pdp.isAuthorized(ip, referer);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSecured() {
+        return (pdp != null);
     }
 }
