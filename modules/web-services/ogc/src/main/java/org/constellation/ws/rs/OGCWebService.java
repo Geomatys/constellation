@@ -220,8 +220,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 if (worker.isSecured()) {
                     final String ip = getHttpServletRequest().getRemoteAddr();
                     final String referer = getHttpContext().getRequest().getHeaderValue("referer");
-                    System.out.println("IP :"+ ip);
-                    System.out.println("referer :"+ referer);
                     if (!worker.isAuthorized(ip, referer)) {
                         LOGGER.log(Level.INFO, "Received a request from unauthorized ip:{0} or referer:{1}", 
                                 new String[]{ip, referer});

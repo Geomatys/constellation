@@ -73,7 +73,6 @@ public final class SimplePDP {
      */
     public boolean isAuthorized(final String ip, final String referer) {
         final String toEvaluate = replaceVariablesInRule(ip, referer);
-        System.out.println("ToEvaluate :"+ toEvaluate);
         boolean result = false;
         try {
             result = (Boolean)SCRIPT_ENGINE.eval(toEvaluate);
