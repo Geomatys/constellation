@@ -132,12 +132,6 @@
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
     </dependency>
-    <!-- Optionnal dependencies -->
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-geonetcab</artifactId>
-      <scope>test</scope>
-    </dependency>
 
     <!-- Test dependencies -->
     <dependency>

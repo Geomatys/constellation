@@ -190,7 +190,7 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for ISO 19139 data
+     * Tests the storeMetadata method for ISO 19139 data with GML geometries
      *
      * @throws java.lang.Exception
      */
@@ -348,40 +348,6 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for geonetcab data
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void writeMetadataGncTest() throws Exception {
-
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-
-        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata.xml"));
-        writer.storeMetadata(absExpResult);
-        Object absResult = reader.getMetadata("17:CSWCat", AbstractMetadataReader.ISO_19115,  null);
-        assertTrue(absResult != null);
-        assertTrue(absResult instanceof DefaultMetadata);
-        DefaultMetadata result = (DefaultMetadata) absResult;
-        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata.xml"));
-
-        metadataEquals(expResult,result);
-
-        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata2.xml"));
-        writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("18:CSWCat", AbstractMetadataReader.ISO_19115,  null);
-        assertTrue(absResult != null);
-        assertTrue(absResult instanceof DefaultMetadata);
-        result = (DefaultMetadata) absResult;
-        expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata2.xml"));
-
-        metadataEquals(expResult,result);
-
-        pool.release(unmarshaller);
-        
-    }
-
-    /**
      * Tests the storeMetadata method for ISO 19115-2 data
      *
      * @throws java.lang.Exception
@@ -393,7 +359,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("19:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("17:CSWCat", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
@@ -419,7 +385,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("20:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("18:CSWCat", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
@@ -432,7 +398,7 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
-     * Tests the storeMetadata method for ISO 19110 data
+     * Tests the storeMetadata method for ISO 19119 data
      *
      * @throws java.lang.Exception
      */
@@ -443,7 +409,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-19119.xml"));
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("21:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("19:CSWCat", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;

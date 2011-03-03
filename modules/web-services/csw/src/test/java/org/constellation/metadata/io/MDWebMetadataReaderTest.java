@@ -154,7 +154,7 @@ public class MDWebMetadataReaderTest {
     }
 
     /**
-     * Tests the getMetadata method for ISO 19139 data
+     * Tests the getMetadata method for ISO 19115 French profile data
      *
      * @throws java.lang.Exception
      */
@@ -174,7 +174,7 @@ public class MDWebMetadataReaderTest {
     }
 
      /**
-     * Tests the getMetadata method for ISO 19139 data
+     * Tests the getMetadata method for ISO 19139 data with GML geometries
      *
      * @throws java.lang.Exception
      */
@@ -350,33 +350,6 @@ public class MDWebMetadataReaderTest {
         pool.release(unmarshaller);
     }
 
-    /**
-     * Tests the getMetadata method for NATURE SDI data
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void getMetadataGncTest() throws Exception {
-
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("25:CSWCat", AbstractMetadataReader.ISO_19115, null);
-
-        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata.xml"));
-
-        assertTrue(result instanceof DefaultMetadata);
-        metadataEquals(expResult, (DefaultMetadata)result);
-
-        result = reader.getMetadata("31:CSWCat", AbstractMetadataReader.ISO_19115, null);
-
-        expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/gncMetadata2.xml"));
-
-        assertTrue(result instanceof DefaultMetadata);
-        metadataEquals(expResult, (DefaultMetadata)result);
-
-        pool.release(unmarshaller);
-    }
-
-    
     /**
      * Tests the getMetadata method for SML data
      *
