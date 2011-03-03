@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.utils;
+package org.constellation.util;
 
 // JUnit dependencies
 import org.geotoolkit.metadata.iso.extent.DefaultExtent;
