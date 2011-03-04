@@ -91,8 +91,8 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
     @Override
     public void visit(ProjectedFeature graphic, RenderingContext2D context, SearchAreaJ2D queryArea) {
         index++;
-        final FeatureMapLayer layer = graphic.getFeatureLayer();
-        final Feature feature = graphic.getFeature();
+        final FeatureMapLayer layer = graphic.getLayer();
+        final Feature feature = graphic.getCandidate();
         final String layerName = layer.getName();
         List<Feature> feat = features.get(layerName);
         if (feat == null) {
@@ -114,7 +114,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
             return;
         }
 
-        final String layerName = coverage.getCoverageLayer().getCoverageName().getLocalPart();
+        final String layerName = coverage.getLayer().getCoverageName().getLocalPart();
         List<String> strs = coverages.get(layerName);
         if (strs == null) {
             strs = new ArrayList<String>();

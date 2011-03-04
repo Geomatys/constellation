@@ -76,8 +76,8 @@ public abstract class TextGraphicVisitor extends AbstractGraphicVisitor {
     @Override
     public void visit(ProjectedFeature graphic,  RenderingContext2D context, SearchAreaJ2D queryArea) {
         final StringBuilder builder = new StringBuilder();
-        final FeatureMapLayer layer = graphic.getFeatureLayer();
-        final Feature feature = graphic.getFeature();
+        final FeatureMapLayer layer = graphic.getLayer();
+        final Feature feature = graphic.getCandidate();
 
         for (final Property prop : feature.getProperties()) {
             if (prop == null) {

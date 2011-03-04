@@ -135,8 +135,8 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
 
             //TODO handle features as real GML features here
             final StringBuilder builder   = new StringBuilder();
-            final FeatureMapLayer layer   = graphic.getFeatureLayer();
-            final Feature feature         = graphic.getFeature();
+            final FeatureMapLayer layer   = graphic.getLayer();
+            final Feature feature         = graphic.getCandidate();
             final FeatureType featureType = feature.getType();
             String margin                 = "\t";
 
@@ -247,7 +247,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             return;
         }
 
-        final Name fullLayerName = coverage.getCoverageLayer().getCoverageName();
+        final Name fullLayerName = coverage.getLayer().getCoverageName();
         String layerName = fullLayerName.getLocalPart();
 
         List<String> strs = values.get(layerName);
