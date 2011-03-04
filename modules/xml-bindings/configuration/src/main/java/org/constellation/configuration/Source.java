@@ -122,13 +122,23 @@ public class Source {
     }
 
     /**
-     * Return true idf the specified layer is excluded from the source.
+     * Return true if the specified layer is excluded from the source.
      * @param name
      * @return
      */
     public boolean isExcludedLayer(QName name) {
         for (Layer layer : getExclude()) {
-            if (layer.getName().equals(name)) {
+            final QName layerName = layer.getName();
+            /*
+             * fix an xml bug with QName
+             * when xmlns is set to "http://www.constellation.org/config" in the layer context,
+             * the layer take this as a namespace
+             */
+            if (layerName != null && layerName.getNamespaceURI() != null && layerName.getNamespaceURI().equals("http://www.constellation.org/config")) {
+                if (layerName.getLocalPart().equals(name.getLocalPart())) {
+                    return true;
+                }
+            } else if (layerName.equals(name)) {
                 return true;
             }
         }
@@ -144,7 +154,17 @@ public class Source {
      */
     public Layer isIncludedLayer(QName name) {
         for (Layer layer : getInclude()) {
-            if (layer.getName().equals(name)) {
+            final QName layerName = layer.getName();
+            /*
+             * fix an xml bug with QName
+             * when xmlns is set to "http://www.constellation.org/config" in the layer context,
+             * the layer take this as a namespace
+             */
+            if (layerName != null && layerName.getNamespaceURI() != null && layerName.getNamespaceURI().equals("http://www.constellation.org/config")) {
+                if (layerName.getLocalPart().equals(name.getLocalPart())) {
+                    return layer;
+                }
+            } else if (layerName.equals(name)) {
                 return layer;
             }
         }
