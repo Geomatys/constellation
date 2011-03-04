@@ -37,10 +37,11 @@ public class SOServiceException extends WebServiceException {
     /**
      * An OGC Web ServiceType exception report
      */
-    private ExceptionReport exception;
+    private final ExceptionReport exception;
     
     SOServiceException() {
         super();
+        exception = null;
     }
             
     public SOServiceException(String message, String code, String v) {

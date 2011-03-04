@@ -70,7 +70,6 @@ import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.naming.DefaultLocalName;
 import org.geotoolkit.naming.DefaultNameFactory;
-import org.geotoolkit.naming.DefaultTypeName;
 import org.geotoolkit.resources.Locales;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.DefaultInternationalString;
@@ -87,7 +86,7 @@ import org.opengis.util.UnlimitedInteger;
 /**
  * A database Reader designed for an MDweb database.
  * 
- * It read The mdweb forms into the database and instanciate them into geotoolkit object.
+ * It read The MDweb forms into the database and instantiate them into GeotoolKit object.
  * When an object have been read it is stored in cache.
  * 
  * @author Guilhem legal
@@ -100,7 +99,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     protected Reader mdReader;
     
     /**
-     * A map containing the mapping beetween the MDWeb className and java typeName
+     * A map containing the mapping between the MDWeb className and java typeName
      */
     private final Map<String, Class> classBinding;
     
@@ -131,7 +130,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
 
     /**
-     * A map of standardName / List of package axtract from a properties file
+     * A map of standardName / List of package extract from a properties file
      */
     private final Map<String, List<String>> extraPackage = new HashMap<String, List<String>>();
 
@@ -156,13 +155,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     private List<String> ebrimV25Package;
     
     /**
-     * A List of the already see object for the current metadata readed
+     * A List of the already see object for the current metadata read
      * (in order to avoid infinite loop)
      */
     protected Map<Value, Object> alreadyRead;
     
     /**
-     * A List of the already logged missing MDWeb Classe.
+     * A List of the already logged missing MDWeb {@link Classe}.
      */
     private final List<String> classeNotFound = new ArrayList<String>();
 
@@ -410,7 +409,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @param type An elementSet : BRIEF, SUMMARY, FULL. (default is FULL);
      * @param mode
      * 
-     * @return a geotoolkit/constellation object representing the metadata.
+     * @return a GeotoolKit/constellation object representing the metadata.
      */
     protected Object getObjectFromForm(final String identifier, final Form form, final int mode) {
 
@@ -438,13 +437,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     }
     
     /**
-     * Return an geotoolkit object from a MDWeb value (this value can be see as a tree).
-     * This method build the value and all is attribute recursivly.
+     * Return a GeotoolKit object from a MDWeb value (this value can be see as a tree).
+     * This method build the value and all is attribute recursively.
      * 
-     * @param form the MDWeb formular containg this value.
+     * @param form the MDWeb formular containing this value.
      * @param value The value to build.
      * 
-     * @return a geotoolkit metadat object.
+     * @return a GeotoolKit metadata object.
      */
     private Object getObjectFromValue(final Value value, final int mode) {
         Class classe = null;
@@ -629,7 +628,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
              * Again another special case UnlimitedInteger does not have a empty constructor.
              * and no setters so we must call the normal constructor.
              */
-            } else if (className.equals("UnlimitedInteger")) {
+            } else if ("UnlimitedInteger".equals(className)) {
                 String intValue    = null;
                 String isInfinite  = null;
 
@@ -919,7 +918,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     }
 
     /**
-     * Return a set of package to explore in function on the standard of the mdweb Classe and the mode.
+     * Return a set of package to explore in function of the standard of the MDweb {@link Classe} and the mode.
      *
      * @param standardName
      * @param className
@@ -1115,6 +1114,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         return null;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void destroy() {
         try {
@@ -1154,6 +1156,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<? extends Object> getAllEntries() throws MetadataIoException {
         final List<Object> results = new ArrayList<Object>();
@@ -1169,6 +1174,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         return results;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
         throw new UnsupportedOperationException("Not supported yet.");

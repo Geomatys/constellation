@@ -92,7 +92,7 @@ public abstract class GenericReader  {
     /**
      * The database informations.
      */
-    private Automatic configuration;
+    private final Automatic configuration;
 
      /**
      * A connection to the database.
@@ -112,7 +112,7 @@ public abstract class GenericReader  {
      *                      and all the SQL queries.
      * @throws CstlServiceException
      */
-    public GenericReader(Automatic configuration) throws MetadataIoException {
+    public GenericReader(final Automatic configuration) throws MetadataIoException {
         this.configuration = configuration;
         advancedJdbcDriver = true;
         try {
@@ -131,15 +131,16 @@ public abstract class GenericReader  {
     }
 
     /**
-     * A Junit test constructor.
+     * A JUnit test constructor.
      * 
      * @param debugValues
      * @param staticParameters
      * @throws CstlServiceException
      */
-    protected GenericReader(Map<List<String>, Values> debugValues, HashMap<String, String> staticParameters) throws MetadataIoException {
+    protected GenericReader(final Map<List<String>, Values> debugValues, final HashMap<String, String> staticParameters) throws MetadataIoException {
         advancedJdbcDriver = true;
         debugMode          = true;
+        configuration      = null;
         this.debugValues   = debugValues;
         if (staticParameters != null) {
             this.staticParameters = staticParameters;
@@ -233,7 +234,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable) throws MetadataIoException {
+    protected Values loadData(final String variable) throws MetadataIoException {
         return loadData(Arrays.asList(variable), new ArrayList<String>());
     }
 
@@ -241,7 +242,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable, String parameter) throws MetadataIoException {
+    protected Values loadData(final String variable, final String parameter) throws MetadataIoException {
         return loadData(Arrays.asList(variable), Arrays.asList(parameter));
     }
 
@@ -249,7 +250,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(List<String> variables, String parameter) throws MetadataIoException {
+    protected Values loadData(final List<String> variables, final String parameter) throws MetadataIoException {
         return loadData(variables, Arrays.asList(parameter));
     }
 
@@ -257,7 +258,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable, List<String> parameter) throws MetadataIoException {
+    protected Values loadData(final String variable, final List<String> parameter) throws MetadataIoException {
         return loadData(Arrays.asList(variable), parameter);
     }
 
@@ -265,7 +266,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(List<String> variables) throws MetadataIoException {
+    protected Values loadData(final List<String> variables) throws MetadataIoException {
         return loadData(variables, new ArrayList<String>());
     }
 
@@ -274,7 +275,7 @@ public abstract class GenericReader  {
      *
      * @param identifier
      */
-    protected Values loadData(List<String> variables, List<String> parameters) throws MetadataIoException {
+    protected Values loadData(final List<String> variables, final List<String> parameters) throws MetadataIoException {
 
         final Set<LockedPreparedStatement> subStmts = new HashSet<LockedPreparedStatement>();
         final Values staticValues = new Values();
@@ -315,10 +316,10 @@ public abstract class GenericReader  {
 
 
     /**
-     * Load the data in debug mode without queying the database .
+     * Load the data in debug mode without querying the database .
      *
      */
-    private Values debugLoading(List<String> parameters) {
+    private Values debugLoading(final List<String> parameters) {
         if (debugValues != null) {
             return debugValues.get(parameters);
         }
@@ -332,7 +333,7 @@ public abstract class GenericReader  {
      * @param subSingleStmts
      * @param subMultiStmts
      */
-    private Values loading(List<String> parameters, Set<LockedPreparedStatement> subStmts) throws MetadataIoException {
+    private Values loading(final List<String> parameters, final Set<LockedPreparedStatement> subStmts) throws MetadataIoException {
         final Values values = new Values();
         
         //we extract the single values
@@ -365,7 +366,7 @@ public abstract class GenericReader  {
      * @param stmt
      * @param parameters
      */
-    private void fillStatement(LockedPreparedStatement stmt, List<String> parameters) throws SQLException {
+    private void fillStatement(final LockedPreparedStatement stmt, List<String> parameters) throws SQLException {
         if (parameters == null) {
             parameters = new ArrayList<String>();
         }
@@ -419,7 +420,7 @@ public abstract class GenericReader  {
      * @param values
      * @throws SQLException
      */
-    private void fillValues(LockedPreparedStatement stmt, List<String> varNames, Values values) throws SQLException {
+    private void fillValues(final LockedPreparedStatement stmt, final List<String> varNames, final Values values) throws SQLException {
 
         final ResultSet result = stmt.executeQuery();
         while (result.next()) {
@@ -431,12 +432,12 @@ public abstract class GenericReader  {
     }
 
     /**
-     * Return the correspounding statement for the specified variable name.
+     * Return the corresponding statement for the specified variable name.
      *
      * @param varName
      * @return
      */
-    private LockedPreparedStatement getStatementFromVar(String varName) {
+    private LockedPreparedStatement getStatementFromVar(final String varName) {
         for (LockedPreparedStatement stmt : statements.keySet()) {
             final List<String> vars = statements.get(stmt);
             if (vars.contains(varName)) {
@@ -453,7 +454,7 @@ public abstract class GenericReader  {
      * @param varList a list of variable.
      * @param ex
      */
-    private void logError(List<String> varList, Exception ex, String sql) {
+    private void logError(final List<String> varList, final Exception ex, final String sql) {
         final StringBuilder varlist = new StringBuilder();
         final String value;
         final int code;

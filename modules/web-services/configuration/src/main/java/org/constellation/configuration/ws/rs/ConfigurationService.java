@@ -103,7 +103,7 @@ public final class ConfigurationService extends WebService  {
     private boolean cswFunctionEnabled;
 
     /**
-     * A flag indicatng if an indexation is going on.
+     * A flag indicating if an indexation is going on.
      */
     private static boolean indexing;
 
@@ -141,7 +141,7 @@ public final class ConfigurationService extends WebService  {
      * Handle the various types of requests made to the service.
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) {
+    public Response treatIncomingRequest(final Object objectRequest) {
         Marshaller marshaller = null;
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
@@ -287,15 +287,15 @@ public final class ConfigurationService extends WebService  {
      * @param id
      * @return
      */
-    private boolean isIndexing(String id) {
-        return indexing & SERVICE_INDEXING.contains(id);
+    private boolean isIndexing(final String id) {
+        return indexing && SERVICE_INDEXING.contains(id);
     }
 
     /**
      * Add the specified service to the indexing service list.
      * @param id
      */
-    private void startIndexation(String id) {
+    private void startIndexation(final String id) {
         indexing  = true;
         if (id != null) {
             SERVICE_INDEXING.add(id);
@@ -306,7 +306,7 @@ public final class ConfigurationService extends WebService  {
      * remove the selected service from the indexing service list.
      * @param id
      */
-    private void endIndexation(String id) {
+    private void endIndexation(final String id) {
         indexing = false;
         if (id != null) {
             SERVICE_INDEXING.remove(id);
@@ -336,7 +336,7 @@ public final class ConfigurationService extends WebService  {
      * 
      * @return an Acknowlegement if the restart succeed.
      */
-    private AcknowlegementType restartService(boolean forced) {
+    private AcknowlegementType restartService(final boolean forced) {
         LOGGER.info("\n restart requested \n");
         // clear cache
         StyleProviderProxy.getInstance().dispose();
@@ -364,7 +364,7 @@ public final class ConfigurationService extends WebService  {
      *
      * @return an Acknowlegement.
      */
-    private AcknowlegementType stopIndexation(String id) {
+    private AcknowlegementType stopIndexation(final String id) {
         LOGGER.info("\n stop indexation requested \n");
         if (!isIndexing(id)) {
             return new AcknowlegementType("Success", "There is no indexation to stop");
@@ -384,7 +384,7 @@ public final class ConfigurationService extends WebService  {
      *       download action for some users. Will probably be removed in a future version.
      */
     @PUT
-    public AcknowlegementType uploadFile(InputStream in) {
+    public AcknowlegementType uploadFile(final InputStream in) {
         LOGGER.info("uploading");
         try  {
             final String layer = getParameter("layer", false);

@@ -287,7 +287,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     for (String standardName : standardList) {
                         Standard standard = mdWriter.getStandard(standardName);
                         if (standard == null) {
-                            LOGGER.log(Level.WARNING, "Unable to find the extra standard:{0}", standardName);
+                            LOGGER.log(Level.FINER, "Unable to find the extra standard:{0}", standardName);
                         } else {
                             standards.add(standard);
                         }
