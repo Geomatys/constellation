@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io.mdweb;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
      * @param map
      * @throws org.constellation.ws.CstlServiceException
      */
-    public MDWebSensorReader(Automatic configuration, Map<String, Object> properties) throws MetadataIoException  {
+    public MDWebSensorReader(final Automatic configuration, final Map<String, Object> properties) throws MetadataIoException  {
         super(configuration);
         if (configuration == null) {
             throw new MetadataIoException("The configuration object is null", NO_APPLICABLE_CODE);
@@ -87,40 +88,29 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
      *
      * @return the specified sensor description from the specified ID.
      * 
-     * @throws CstlServiceException If the sensor is not registred in the database,
+     * @throws CstlServiceException If the sensor is not registered in the database,
      *                              if the specified record in the database is not a sensorML object,
      *                              or if an IO Exception occurs.
      */
     @Override
-    public AbstractSensorML getSensor(String sensorId) throws CstlServiceException {
+    public AbstractSensorML getSensor(final String sensorId) throws CstlServiceException {
         try {
             String dbId = map.getProperty(sensorId);
             if (dbId == null) {
                 dbId = sensorId;
             }
-            // we find the form id describing the sensor.
-            final int id = ((AbstractReader)mdReader).getIdFromTitleForm(dbId);
-            LOGGER.log(logLevel, "describesensor id: {0}", dbId);
-            //LOGGER.log(logLevel, "describesensor mdweb id: " + id);
-
-            final String identifier = id + ":SMLC";
-            final Object metadata   = getMetadata(identifier, AbstractMetadataReader.SENSORML, null);
-            
+            final Object metadata   = getMetadata(dbId, AbstractMetadataReader.SENSORML, null);
             
             if (metadata instanceof AbstractSensorML) {
                return (AbstractSensorML) metadata;
             
             } else if (metadata == null) {
-                throw new CstlServiceException("this sensor is not registered in the database!",
+                throw new CstlServiceException("this sensor is not registered in the database (id:" + sensorId + ")!",
                         INVALID_PARAMETER_VALUE, "procedure");
             } else {
                 throw new CstlServiceException("The form metadata is not a sensor", NO_APPLICABLE_CODE);
             }
 
-        } catch (MD_IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("the service has throw a MD_IO Exception:" + ex.getMessage(),
-                                         NO_APPLICABLE_CODE);
         } catch (MetadataIoException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Metadata IO Exception:" + ex.getMessage(),
@@ -144,7 +134,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
         try {
             final RecordSet smlCat = mdReader.getRecordSet("SMLC");
             if (smlCat != null) {
-                return mdReader.getFormsTitle(smlCat);
+                return mdReader.getAllIdentifiers(Arrays.asList(smlCat), false);
             }
             return new ArrayList<String>();
         } catch (MD_IOException ex) {

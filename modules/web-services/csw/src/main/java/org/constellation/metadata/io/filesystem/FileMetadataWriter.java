@@ -154,7 +154,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteMetadata(String metadataID) throws MetadataIoException {
+    public boolean deleteMetadata(final String metadataID) throws MetadataIoException {
         final File metadataFile = new File (dataDirectory,  metadataID + ".xml");
         if (metadataFile.exists()) {
            final boolean suceed =  metadataFile.delete();
@@ -173,7 +173,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException {
+    public boolean replaceMetadata(final String metadataID, final Object any) throws MetadataIoException {
         final boolean succeed = deleteMetadata(metadataID);
         if (!succeed)
             return false;
@@ -184,7 +184,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException {
+    public boolean updateMetadata(final String metadataID, final List<RecordPropertyType> properties) throws MetadataIoException {
         final Object metadata = getObjectFromFile(metadataID);
         for (RecordPropertyType property : properties) {
             String xpath = property.getName();

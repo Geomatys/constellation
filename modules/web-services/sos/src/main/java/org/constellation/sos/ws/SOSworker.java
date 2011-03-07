@@ -1712,7 +1712,18 @@ public class SOSworker extends AbstractWorker {
                 num = Integer.toString(smlWriter.getNewSensorId());
                 id  = sensorIdBase + num;
             }
-            
+
+            /* 
+             * @TODO
+             * 
+             * here we affect the new Sensor id to the metatadata
+             * does we have to keep the one of the metadata instead of generating one?
+             */
+            if (process.getMember().size() == 1) {
+                process.getMember().get(0).getRealProcess().setId(id);
+            } else {
+                LOGGER.warning("multiple SensorML member");
+            }
             //and we write it in the sensorML Database
             smlWriter.writeSensor(id, process);
 

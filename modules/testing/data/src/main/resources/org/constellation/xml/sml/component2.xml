@@ -1,6 +1,6 @@
 <SensorML xmlns="http://www.opengis.net/sensorML/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:swe="http://www.opengis.net/swe/1.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.opengis.net/sensorML/1.0 http://schemas.opengis.net/sensorML/1.0.0/base.xsd" version="1.0">
     <member xlink:role="urn:x-ogx:def:sensor:OGC:detector">
-        <Component>
+        <Component gml:id="component2">
             <gml:name>Capteur Profondeur de ARGELES</gml:name>
             <gml:boundedBy>
                 <gml:Envelope srsName="urn:ogc:crs:espg:4326">

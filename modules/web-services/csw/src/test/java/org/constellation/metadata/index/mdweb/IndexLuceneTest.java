@@ -23,7 +23,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -159,7 +158,7 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SimpleSearch 1:\n{0}", resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("1:CATEST");
+        expectedResult.add("2345-aa453-ade456");
         
         assertEquals(expectedResult, result);
         
@@ -176,10 +175,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SimpleSearch 2:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("1:CATEST");
-        expectedResult.add("2:CATEST");
-        expectedResult.add("3:CATEST");
-        expectedResult.add("4:CATEST");
+        expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         
         assertEquals(expectedResult, result);
         
@@ -196,9 +195,9 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"SimpleSearch 3:\n" + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CATEST");
-        expectedResult.add("3:CATEST");
-        expectedResult.add("4:CATEST");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         
         assertEquals(expectedResult, result);
 
@@ -217,9 +216,9 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SimpleSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("1:CATEST");
-        expectedResult.add("2:CATEST");
-        expectedResult.add("3:CATEST");
+        expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         
 
         assertEquals(expectedResult, result);
@@ -239,8 +238,8 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SimpleSearch 5:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("1:CATEST");
-        expectedResult.add("2:CATEST");
+        expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
 
         /**
          * Test 5 simple search: (identifier = 2345-aa453-ade456 OR title = title2 ) AND (NOT type=xirces)
@@ -257,7 +256,7 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SimpleSearch 5:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CATEST");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
 
 
         assertEquals(expectedResult, result);
@@ -280,8 +279,8 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SimpleSearch 6:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("3:CATEST");
-        expectedResult.add("4:CATEST");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
 
 
         assertEquals(expectedResult, result);
@@ -304,10 +303,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SimpleSearch 7:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CATEST");
-        expectedResult.add("3:CATEST");
-        expectedResult.add("4:CATEST");
-        expectedResult.add("1:CATEST");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        expectedResult.add("2345-aa453-ade456");
 
 
 
@@ -331,9 +330,9 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SimpleSearch 8:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CATEST");
-        expectedResult.add("3:CATEST");
-        expectedResult.add("4:CATEST");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
 
 
 
@@ -367,10 +366,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SortedSearch 1:\n{0}", resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("3:CATEST");
-        expectedResult.add("2:CATEST");
-        expectedResult.add("1:CATEST");
-        expectedResult.add("4:CATEST");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         
         assertEquals(expectedResult, result);
         
@@ -390,10 +389,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SortedSearch 2:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("4:CATEST");
-        expectedResult.add("1:CATEST");
-        expectedResult.add("2:CATEST");
-        expectedResult.add("3:CATEST");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         
         assertEquals(expectedResult, result);
         
@@ -413,10 +412,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SortedSearch 3:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CATEST");
-        expectedResult.add("3:CATEST");
-        expectedResult.add("1:CATEST");
-        expectedResult.add("4:CATEST");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         
         assertEquals(expectedResult, result);
         
@@ -436,10 +435,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "SortedSearch 4:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("4:CATEST");
-        expectedResult.add("1:CATEST");
-        expectedResult.add("3:CATEST");
-        expectedResult.add("2:CATEST");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         
         assertEquals(expectedResult, result);
     }
@@ -468,9 +467,9 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "spatialSearch 1:\n{0}", resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CATEST");
-        expectedResult.add("3:CATEST");
-        expectedResult.add("4:CATEST");
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         
         assertEquals(expectedResult, result);
         
@@ -493,7 +492,7 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL, "spatialSearch 2:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("1:CATEST");
+        expectedResult.add("2345-aa453-ade456");
         
         assertEquals(expectedResult, result);
     }
@@ -569,7 +568,7 @@ public class IndexLuceneTest {
         User inputUser = new User("admin", "adminadmin", null, d, d);
         writer.writeUser(inputUser);
         
-        Form f1 = new Form(1, UUID.randomUUID(), cat, "title1", inputUser, null, null, d, d, null, true, true, Form.TYPE.NORMALFORM);
+        Form f1 = new Form(1, "2345-aa453-ade456", cat, "title1", inputUser, null, null, d, d, null, true, true, Form.TYPE.NORMALFORM);
         Value f1_rootValue    = new Value(recordPath, f1, 1, recordClass, null);
         Value f1_ident        = new Value(identifierPath, f1, 1, sLiteralClass, f1_rootValue);
         TextValue f1_idValue  = new TextValue(idenContentPath, f1, 1, "2345-aa453-ade456", PrimitiveType.STRING, f1_ident);
@@ -583,7 +582,7 @@ public class IndexLuceneTest {
         TextValue f1_ucxValue = new TextValue(upperCornPath, f1, 1, "50", PrimitiveType.STRING, f1_bbox);
         TextValue f1_ucyValue = new TextValue(upperCornPath, f1, 2, "15", PrimitiveType.STRING, f1_bbox);
         
-        Form f2 = new Form(2, UUID.randomUUID(), cat, "title2", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+        Form f2 = new Form(2, "00180e67-b7cf-40a3-861d-b3a09337b195", cat, "title2", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
         Value f2_rootValue    = new Value(recordPath, f2, 1, recordClass, null);
         Value f2_ident        = new Value(identifierPath, f2, 1, sLiteralClass, f2_rootValue);
         TextValue f2_idValue  = new TextValue(idenContentPath, f2, 1, "00180e67-b7cf-40a3-861d-b3a09337b195", PrimitiveType.STRING, f2_ident);
@@ -597,7 +596,7 @@ public class IndexLuceneTest {
         TextValue f2_ucxValue = new TextValue(upperCornPath, f2, 1, "-15", PrimitiveType.STRING, f2_bbox);
         TextValue f2_ucyValue = new TextValue(upperCornPath, f2, 2, "10", PrimitiveType.STRING, f2_bbox);
         
-        Form f3 = new Form(3, UUID.randomUUID(), cat, "title3", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+        Form f3 = new Form(3, "09844e51-e5cd-52c3-737d-b3a61366d028", cat, "title3", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
         Value f3_rootValue    = new Value(recordPath, f3, 1, recordClass, null);
         Value f3_ident        = new Value(identifierPath, f3, 1, sLiteralClass, f3_rootValue);
         TextValue f3_idValue  = new TextValue(idenContentPath, f3, 1, "09844e51-e5cd-52c3-737d-b3a61366d028", PrimitiveType.STRING, f3_ident);
@@ -611,7 +610,7 @@ public class IndexLuceneTest {
         TextValue f3_ucxValue = new TextValue(upperCornPath, f3, 1, "10", PrimitiveType.STRING, f3_bbox);
         TextValue f3_ucyValue = new TextValue(upperCornPath, f3, 2, "15", PrimitiveType.STRING, f3_bbox);
         
-        Form f4 = new Form(4, UUID.randomUUID(), cat, "title4", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+        Form f4 = new Form(4, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", cat, "title4", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
         Value f4_rootValue    = new Value(recordPath, f4, 1, recordClass, null);
         Value f4_ident        = new Value(identifierPath, f4, 1, sLiteralClass, f4_rootValue);
         TextValue f4_idValue  = new TextValue(idenContentPath, f4, 1, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", PrimitiveType.STRING, f4_ident);

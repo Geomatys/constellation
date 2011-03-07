@@ -17,6 +17,7 @@
 package org.constellation.metadata.utils;
 
 // J2SE dependencies
+import org.geotoolkit.sml.xml.v100.ComponentType;
 import java.util.Arrays;
 
 // geotoolkit dependencies
@@ -30,8 +31,12 @@ import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.v300.RegistryObjectType;
 import org.geotoolkit.ebrim.xml.v300.LocalizedStringType;
 import org.geotoolkit.ebrim.xml.v300.InternationalStringType;
+import org.geotoolkit.sml.xml.v100.Member;
+import org.geotoolkit.sml.xml.v100.SensorML;
+import org.geotoolkit.sml.xml.v100.SystemType;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.internal.jaxb.gmi.MI_Metadata;
+
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -67,7 +72,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void FindIdentifierTestDC() throws Exception {
+    public void FindIdentifierDCTest() throws Exception {
 
         /*
          * DublinCore Record v202 with identifier
@@ -145,7 +150,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void FindIdentifierTestISO() throws Exception {
+    public void FindIdentifierISOTest() throws Exception {
         /*
          * ISO 19139 Metadata
          */
@@ -178,7 +183,7 @@ public class UtilsTest {
 
     
     @Test
-    public void FindIdentifierTestISO19110() throws Exception {
+    public void FindIdentifierISO19110Test() throws Exception {
         FeatureCatalogueImpl catalogue = new FeatureCatalogueImpl();
         catalogue.setId("someid");
 
@@ -200,7 +205,7 @@ public class UtilsTest {
 
 
     @Test
-    public void FindIdentifierTestEbrim() throws Exception {
+    public void FindIdentifierEbrimTest() throws Exception {
         /*
          * Ebrim v 3.0
          */
@@ -224,6 +229,60 @@ public class UtilsTest {
 
         assertEquals(expResult, result);
     }
+
+    @Test
+    public void FindIdentifierSensorMLTest() throws Exception {
+        /*
+         * SensorML 1.0.0
+         */
+        SystemType system = new SystemType();
+        system.setId("sml-id-1");
+        Member member = new Member(system);
+        SensorML sml = new SensorML("1.0", Arrays.asList(member));
+
+        String expResult = "sml-id-1";
+        String result = Utils.findIdentifier(sml);
+
+        assertEquals(expResult, result);
+
+        ComponentType component = new ComponentType();
+        component.setId("sml-id-1-compo");
+        Member memberC = new Member(component);
+        SensorML smlC = new SensorML("1.0", Arrays.asList(memberC));
+
+        expResult = "sml-id-1-compo";
+        result = Utils.findIdentifier(smlC);
+
+        assertEquals(expResult, result);
+
+
+        /*
+         * SensorML 1.0.1
+         */
+        org.geotoolkit.sml.xml.v101.SystemType system1 = new org.geotoolkit.sml.xml.v101.SystemType();
+        system1.setId("sml-id-101");
+        org.geotoolkit.sml.xml.v101.SensorML.Member member1 = new org.geotoolkit.sml.xml.v101.SensorML.Member(system1);
+        org.geotoolkit.sml.xml.v101.SensorML sml1 = new org.geotoolkit.sml.xml.v101.SensorML("1.0.1", Arrays.asList(member1));
+
+        expResult = "sml-id-101";
+        result = Utils.findIdentifier(sml1);
+
+        assertEquals(expResult, result);
+
+        /*
+         * SensorML 1.0.1
+         */
+        org.geotoolkit.sml.xml.v101.ComponentType component1 = new org.geotoolkit.sml.xml.v101.ComponentType();
+        component1.setId("sml-id-101-compo");
+        org.geotoolkit.sml.xml.v101.SensorML.Member memberC1 = new org.geotoolkit.sml.xml.v101.SensorML.Member(component1);
+        org.geotoolkit.sml.xml.v101.SensorML smlC1 = new org.geotoolkit.sml.xml.v101.SensorML("1.0.1", Arrays.asList(memberC1));
+
+        expResult = "sml-id-101-compo";
+        result = Utils.findIdentifier(smlC1);
+
+        assertEquals(expResult, result);
+    }
+
 
     /**
      * Tests the storeMetadata method for SML data

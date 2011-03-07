@@ -37,7 +37,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.PrimitiveType;
-import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
@@ -79,12 +78,9 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteMetadata(String identifier) throws MetadataIoException {
+    public boolean deleteMetadata(final String identifier) throws MetadataIoException {
          final boolean success = super.deleteMetadata(identifier);
          if (success) {
-             if (identifier.indexOf(':') != -1) {
-                identifier = identifier.substring(0, identifier.indexOf(':'));
-             }
              indexer.removeDocument(identifier);
          }
          return success;
@@ -95,28 +91,12 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public boolean updateMetadata(String metadataID, final List<RecordPropertyType> properties) throws MetadataIoException {
+    public boolean updateMetadata(final String metadataID, final List<RecordPropertyType> properties) throws MetadataIoException {
         LOGGER.log(logLevel, "metadataID: {0}", metadataID);
-        int id;
-        final String recordSetCode;
-        //we parse the identifier (Form_ID:RecordSet_Code)
-        try  {
-            if (metadataID != null && metadataID.indexOf(':') != -1) {
-                recordSetCode = metadataID.substring(metadataID.indexOf(':') + 1, metadataID.length());
-                metadataID    = metadataID.substring(0, metadataID.indexOf(':'));
-                id            = Integer.parseInt(metadataID);
-            } else {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-             throw new MetadataIoException("Unable to parse: " + metadataID, NO_APPLICABLE_CODE, "id");
-        }
 
         Form f = null;
         try {
-            final RecordSet recordSet = mdWriter.getRecordSet(recordSetCode);
-            f                     = mdWriter.getForm(recordSet, id);
-
+            f  = mdWriter.getForm(metadataID);
         } catch (MD_IOException ex) {
             throw new MetadataIoException("The service has throw an SQLException while updating the metadata: " + ex.getMessage(),
                         NO_APPLICABLE_CODE);

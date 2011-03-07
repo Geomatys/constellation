@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 
 // JAXB dependencies
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -47,7 +48,6 @@ import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.AbstractReader;
-import org.mdweb.io.sql.v20.Writer20;
 
 /**
  *
@@ -65,7 +65,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     private Savepoint currentSavePoint;
 
     /**
-     * An SQL satetement finding the last sensor ID recorded
+     * An SQL statement finding the last sensor ID recorded
      */
     private final PreparedStatement newSensorIdStmt;
 
@@ -104,7 +104,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      * {@inheritDoc}
      */
     @Override
-    public RecordSet getRecordSet(String recordSet) throws MD_IOException {
+    public RecordSet getRecordSet(final String recordSet) throws MD_IOException {
         RecordSet cat = mdWriter.getRecordSet("SMLC");
         if (cat == null) {
             cat = new RecordSet("SMLC", "SensorML RecordSet", null, null, EXPOSURE.EXTERNAL, 0, new Date(System.currentTimeMillis()), true);
@@ -117,7 +117,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      * {@inheritDoc}
      */
     @Override
-    public boolean writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
+    public boolean writeSensor(final String id, final AbstractSensorML process) throws CstlServiceException {
        
         try {
             return super.storeMetadata(process, id);
@@ -133,7 +133,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      * {@inheritDoc}
      */
     @Override
-    public int replaceSensor(String sensorid, AbstractSensorML process) throws CstlServiceException {
+    public int replaceSensor(final String sensorid, final AbstractSensorML process) throws CstlServiceException {
         final boolean deleted = deleteSensor(sensorid);
         int result;
         if (deleted) {
@@ -149,23 +149,13 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteSensor(String sensorId) throws CstlServiceException {
+    public boolean deleteSensor(final String sensorId) throws CstlServiceException {
         try {
             String dbId = map.getProperty(sensorId);
             if (dbId == null) {
                 dbId = sensorId;
             }
-            // we find the form id describing the sensor.
-            final int id = ((Writer20)mdWriter).getIdFromTitleForm(dbId);
-            LOGGER.log(Level.FINER, "describesensor id: {0}", dbId);
-            LOGGER.log(Level.FINER, "describesensor mdweb id: {0}", id);
-
-            return super.deleteMetadata(id + ":SMLC");
-
-        } catch (MD_IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("the service has throw a MD_IO Exception:" + ex.getMessage(),
-                                         NO_APPLICABLE_CODE);
+            return super.deleteMetadata(dbId);
         } catch (MetadataIoException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Metadata IO Exception:" + ex.getMessage(),
@@ -182,17 +172,13 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      */
     public void deleteAllSensor() throws CstlServiceException {
         try {
-            
+
             final RecordSet smlCat      = mdWriter.getRecordSet("SMLC");
-            final List<String> allTitle = mdWriter.getFormsTitle(smlCat);
+            final List<String> allIdentifier = mdWriter.getAllIdentifiers(Arrays.asList(smlCat), false);
 
-            for (String title : allTitle) {
-                // we find the form id describing the sensor.
-                final int id = ((Writer20)mdWriter).getIdFromTitleForm(title);
-                LOGGER.log(Level.FINER, "describesensor id: {0}", title);
-                LOGGER.log(Level.FINER, "describesensor mdweb id: {0}", id);
-
-                super.deleteMetadata(id + ":SMLC");
+            for (String identifier : allIdentifier) {
+                LOGGER.log(Level.FINER, "sensor id: {0}", identifier);
+                super.deleteMetadata(identifier);
             }
 
         } catch (MD_IOException ex) {

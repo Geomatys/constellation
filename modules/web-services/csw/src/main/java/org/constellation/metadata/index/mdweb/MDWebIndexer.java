@@ -176,10 +176,10 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                 }
             }
             nbRecordSets = cats.size();
-            final Set<Entry<Integer, RecordSet>> results = mdWebReader.getAllIdentifiers(catToIndex, indexOnlyPusblishedMetadata);
+            final List<String> results = mdWebReader.getAllIdentifiers(catToIndex, indexOnlyPusblishedMetadata);
             LOGGER.log(logLevel, "{0} forms to read.", results.size());
-            for (Entry<Integer, RecordSet> entry : results) {
-                final Form form = mdWebReader.getForm(entry.getValue(), entry.getKey());
+            for (String entry : results) {
+                final Form form = mdWebReader.getForm(entry);
                 indexDocument(writer, form);
                 nbForms++;
             }
@@ -247,8 +247,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             throw new IndexingException("unable to index form:" + metadata.getId() + " top value type is null");
         }
 
-        final String identifier = Integer.toString(metadata.getId()) + ':' + metadata.getRecordSet().getCode();
-        doc.add(new Field("id",        identifier,           Field.Store.YES, Field.Index.ANALYZED));
+        final String identifier = metadata.getIdentifier();
+        doc.add(new Field("id",        identifier,           Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field("Title",     metadata.getTitle(),  Field.Store.YES, Field.Index.ANALYZED));
     }
 
@@ -439,9 +439,9 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     }
 
     /**
-     * Return the text associed with a codeList textValue.
+     * Return the text associated with a codeList textValue.
      * 
-     * @param tv A TextValue with a type instanceof CodeList.
+     * @param tv A TextValue with a type instance of CodeList.
      *
      * @return A text description of the codeList element.
      */
@@ -475,6 +475,9 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         super.destroy();

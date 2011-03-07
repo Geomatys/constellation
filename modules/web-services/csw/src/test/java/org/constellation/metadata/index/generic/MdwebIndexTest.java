@@ -108,8 +108,8 @@ public class MdwebIndexTest {
         configuration.setConfigurationDirectory(configDirectory);
         indexer                 = new MDWebIndexer(configuration, "");
         indexSearcher           = new MDWebIndexSearcher(configDirectory, "");
-        indexer.setLogLevel(Level.FINER);
-        indexSearcher.setLogLevel(Level.FINER);
+        indexer.setLogLevel(Level.INFO);
+        indexSearcher.setLogLevel(Level.INFO);
 
     }
 
@@ -151,8 +151,8 @@ public class MdwebIndexTest {
         logger.finer("SimpleSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CSWCat");
-        //expectedResult.add("3:CSWCat");
+        expectedResult.add("42292_5p_19900609195600");
+        //expectedResult.add("42292_9s_19900610041000");
 
         assertEquals(expectedResult, result);
 
@@ -170,12 +170,12 @@ public class MdwebIndexTest {
         logger.finer("SimpleSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CSWCat");
-        expectedResult.add("3:CSWCat");
-        expectedResult.add("4:CSWCat");
-        expectedResult.add("5:CSWCat");
-        expectedResult.add("7:CSWCat");
-        expectedResult.add("8:CSWCat");
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("CTDF02");
 
 
         assertEquals(expectedResult, result);
@@ -193,7 +193,7 @@ public class MdwebIndexTest {
         logger.finer("simpleSearch 3:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CSWCat");
+        expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
     }
@@ -220,8 +220,8 @@ public class MdwebIndexTest {
         logger.finer("wildCharSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CSWCat");
-        expectedResult.add("3:CSWCat");
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
         
 
         assertEquals(expectedResult, result);
@@ -239,7 +239,7 @@ public class MdwebIndexTest {
         logger.finer("wildCharSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CSWCat");
+        expectedResult.add("42292_5p_19900609195600");
 
 
         assertEquals(expectedResult, result);
@@ -256,10 +256,10 @@ public class MdwebIndexTest {
 
         logger.finer("wilCharSearch 3:\n" + resultReport);
 
-        assertTrue(result.contains("2:CSWCat"));
-        assertTrue(result.contains("3:CSWCat"));
-        assertTrue(result.contains("4:CSWCat"));
-        assertTrue(result.contains("6:CSWCat"));
+        assertTrue(result.contains("42292_5p_19900609195600"));
+        assertTrue(result.contains("42292_9s_19900610041000"));
+        assertTrue(result.contains("39727_22_19750113062500"));
+        assertTrue(result.contains("40510_145_19930221211500"));
         
 
          /**
@@ -275,7 +275,7 @@ public class MdwebIndexTest {
         logger.finer("wildCharSearch 4:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CSWCat");
+        expectedResult.add("42292_5p_19900609195600");
 
         //issues here it found
         assertEquals(expectedResult, result);
@@ -304,11 +304,11 @@ public class MdwebIndexTest {
         logger.finer("DateSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("3:CSWCat");
-        expectedResult.add("4:CSWCat");
-        expectedResult.add("5:CSWCat");
-        expectedResult.add("6:CSWCat");
-        expectedResult.add("8:CSWCat");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
 
@@ -324,9 +324,9 @@ public class MdwebIndexTest {
         logger.finer("DateSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("4:CSWCat");
-        expectedResult.add("5:CSWCat");
-        expectedResult.add("8:CSWCat");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
 
@@ -342,8 +342,8 @@ public class MdwebIndexTest {
         logger.finer("DateSearch 3:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("6:CSWCat");
-        expectedResult.add("8:CSWCat");
+        expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
 
@@ -376,13 +376,13 @@ public class MdwebIndexTest {
         logger.finer("SortedSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("5:CSWCat");
-        expectedResult.add("4:CSWCat");
-        expectedResult.add("6:CSWCat");
-        expectedResult.add("2:CSWCat");
-        expectedResult.add("3:CSWCat");
-        expectedResult.add("8:CSWCat");
-        expectedResult.add("7:CSWCat");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("CTDF02");
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         assertEquals(expectedResult, result);
 
         /**
@@ -401,13 +401,13 @@ public class MdwebIndexTest {
         logger.finer("SortedSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("7:CSWCat");
-        expectedResult.add("8:CSWCat");
-        expectedResult.add("3:CSWCat");
-        expectedResult.add("2:CSWCat");
-        expectedResult.add("6:CSWCat");
-        expectedResult.add("4:CSWCat");
-        expectedResult.add("5:CSWCat");
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("CTDF02");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
 
         assertEquals(expectedResult, result);
 
@@ -427,13 +427,13 @@ public class MdwebIndexTest {
         logger.finer("SortedSearch 3:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("7:CSWCat");
-        expectedResult.add("8:CSWCat");
-        expectedResult.add("5:CSWCat");
-        expectedResult.add("4:CSWCat");
-        expectedResult.add("6:CSWCat");
-        expectedResult.add("3:CSWCat");
-        expectedResult.add("2:CSWCat");
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("CTDF02");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
 
@@ -453,13 +453,13 @@ public class MdwebIndexTest {
         logger.finer("SortedSearch 4:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CSWCat");
-        expectedResult.add("3:CSWCat");
-        expectedResult.add("6:CSWCat");
-        expectedResult.add("4:CSWCat");
-        expectedResult.add("5:CSWCat");
-        expectedResult.add("8:CSWCat");
-        expectedResult.add("7:CSWCat");
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("CTDF02");
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals(expectedResult, result);
     }
@@ -494,9 +494,9 @@ public class MdwebIndexTest {
         logger.finer("spatialSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("4:CSWCat");
-        expectedResult.add("5:CSWCat");
-        expectedResult.add("8:CSWCat");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
 
@@ -521,10 +521,10 @@ public class MdwebIndexTest {
         logger.finer("spatialSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:CSWCat");
-        expectedResult.add("3:CSWCat");
-        expectedResult.add("6:CSWCat");
-        expectedResult.add("7:CSWCat");
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals("CRS URN are not working", expectedResult, result);
     }
@@ -547,7 +547,7 @@ public class MdwebIndexTest {
 
         logger.finer("identifier query 1:\n" + result);
 
-        String expectedResult = "4:CSWCat";
+        String expectedResult = "39727_22_19750113062500";
 
         assertEquals(expectedResult, result);
 
@@ -560,7 +560,7 @@ public class MdwebIndexTest {
 
         logger.finer("identifier query 2:\n" + result);
 
-        expectedResult = "8:CSWCat";
+        expectedResult = "CTDF02";
 
         assertEquals(expectedResult, result);
 
@@ -573,7 +573,7 @@ public class MdwebIndexTest {
 
         logger.finer("identifier query 3:\n" + result);
 
-        expectedResult = "7:CSWCat";
+        expectedResult = "urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd";
 
         assertEquals(expectedResult, result);
     }
@@ -586,7 +586,7 @@ public class MdwebIndexTest {
      */
     @Test
     public void DeleteDocumentTest() throws Exception {
-        indexer.removeDocument("8");
+        indexer.removeDocument("CTDF02");
 
         indexSearcher.refresh();
 
@@ -599,7 +599,7 @@ public class MdwebIndexTest {
 
         logger.finer("identifier query 1:\n" + result);
 
-        String expectedResult = "4:CSWCat";
+        String expectedResult = "39727_22_19750113062500";
 
         assertEquals(expectedResult, result);
 

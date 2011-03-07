@@ -350,38 +350,18 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * Return a metadata object from the specified identifier.
      * if is not already in cache it read it from the MDWeb database.
      * 
-     * @param identifier The form identifier with the pattern : "Form_ID:RecordSet_Code"
+     * @param identifier The metadata identifier.
      * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
      * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
-     * @return A metadata Object (dublin core Record / geotoolkit metadata / ebrim registry object)
+     * @return A metadata Object (Dublin core Record / GeotoolKit metadata / EBrim registry object)
      * 
      * @throws java.sql.MetadataIoException
      */
     @Override
     public Object getMetadata(String identifier, final int mode, final List<QName> elementName) throws MetadataIoException {
-        int id;
-        String recordSetCode = "";
-        
-        //we parse the identifier (Form_ID:RecordSet_Code)
-        try  {
-            final int semiColonIndex = identifier.indexOf(':');
-            if (semiColonIndex != -1) {
-
-                recordSetCode = identifier.substring(semiColonIndex + 1);
-                identifier    = identifier.substring(0, semiColonIndex);
-                id            = Integer.parseInt(identifier);
-            } else {
-                throw new NumberFormatException("The identifer must follow the pattern Form_ID:RecordSet_Code");
-            }
-            
-        } catch (NumberFormatException e) {
-             throw new MetadataIoException("Unable to parse: " + identifier, null, "id");
-        }
-
         try {
             alreadyRead.clear();
-            final RecordSet recordSet = mdReader.getRecordSet(recordSetCode);
 
             //we look for cached object
             Object result = null;
@@ -390,7 +370,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             }
 
             if (result == null) {
-                final Form f = mdReader.getForm(recordSet, id);
+                final Form f = mdReader.getForm(identifier);
                 result       = getObjectFromForm(identifier, f, mode);
             } else {
                 LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
@@ -403,9 +383,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     }
     
     /**
-     * Return an object from a MDWeb formular.
+     * Return an object from a MDWeb record.
      * 
-     * @param form the MDWeb formular.
+     * @param form the MDWeb record.
      * @param type An elementSet : BRIEF, SUMMARY, FULL. (default is FULL);
      * @param mode
      * 
@@ -440,7 +420,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * Return a GeotoolKit object from a MDWeb value (this value can be see as a tree).
      * This method build the value and all is attribute recursively.
      * 
-     * @param form the MDWeb formular containing this value.
+     * @param form the MDWeb record containing this value.
      * @param value The value to build.
      * 
      * @return a GeotoolKit metadata object.
@@ -1190,28 +1170,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     @Override
     public void removeFromCache(String identifier) {
         if (super.isCacheEnabled()) {
-            int id;
-            String recordSetCode = "";
-
-            //we parse the identifier (Form_ID:RecordSet_Code)
             try {
-                if (identifier.indexOf(':') != -1) {
-                    recordSetCode = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
-                    identifier  = identifier.substring(0, identifier.indexOf(':'));
-                    id = Integer.parseInt(identifier);
-                } else {
-                    throw new NumberFormatException();
-                }
-
-                final RecordSet recordSet = mdReader.getRecordSet(recordSetCode);
-
-                mdReader.removeFormFromCache(recordSet, id);
-
+                mdReader.removeFormFromCache(identifier);
             } catch (MD_IOException ex) {
                 LOGGER.log(Level.SEVERE, "SQLException while removing {0} from the cache", identifier);
-                return;
-            } catch (NumberFormatException e) {
-                LOGGER.log(Level.SEVERE, "NumberFormat while removing {0} from the cache", identifier);
                 return;
             }
             super.removeFromCache(identifier);

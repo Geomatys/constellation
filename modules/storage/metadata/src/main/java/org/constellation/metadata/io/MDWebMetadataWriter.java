@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.logging.Level;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
@@ -422,7 +421,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     profile = mdWriter.getProfile("ISO_19115");
                 }
             }
-            final UUID identifier = UUID.randomUUID();
+            final String identifier = Utils.findIdentifier(object);
+            if (mdWriter.isAlreadyUsedIdentifier(identifier)) {
+                throw new MD_IOException("The identifier " + identifier + " is already used");
+            }
             final Form form = new Form(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, Form.TYPE.NORMALFORM);
             
             final Classe rootClasse = getClasseFromObject(object);
@@ -1067,7 +1069,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
              throw new MetadataIoException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
                                            "cause: " + e.getMessage(), e, null);
         } catch (MD_IOException e) {
-             throw new MetadataIoException("The service has throw an SQLException while transforming the metadata to a MDWeb object: " + e.getMessage(), e, null);
+             throw new MetadataIoException("The service has throw an MD_IOException while transforming the metadata to a MDWeb object: " + e.getMessage(), e, null);
         }
         
         // and we store it in the database
@@ -1150,32 +1152,17 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (identifier == null) {
             return false;
         }
-        final int id;
-        final String recordSetCode;
-        //we parse the identifier (Form_ID:RecordSet_Code)
-        try  {
-            if (identifier.indexOf(':') != -1) {
-                recordSetCode = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
-                String formID = identifier.substring(0, identifier.indexOf(':'));
-                id            = Integer.parseInt(formID);
-            } else {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-             throw new MetadataIoException("Unable to parse: " + identifier, null, "id");
-        }
         try {
             // TODO is a way more fast to know that the form exist? method  isAlreadyRecordedForm(int id) writer20
-            final RecordSet recordSet = mdWriter.getRecordSet(recordSetCode);
-            final FormInfo f          = mdWriter.getFormInfo(recordSet, id);
+            final FormInfo f          = mdWriter.getFormInfo(identifier);
             if (f != null) {
                 mdWriter.deleteForm(f);
             } else {
-                LOGGER.log(logLevel, "The sensor is not registered, nothing to delete");
+                LOGGER.log(logLevel, "The metadata is not registered, nothing to delete");
                 return false;
             }
         } catch (MD_IOException ex) {
-            throw new MetadataIoException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage());
+            throw new MetadataIoException("The service has throw an MD_IOException while deleting the metadata: " + ex.getMessage());
         }
         return true;
     }

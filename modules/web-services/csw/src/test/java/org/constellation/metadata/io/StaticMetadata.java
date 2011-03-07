@@ -24,7 +24,10 @@ package org.constellation.metadata.io;
 public class StaticMetadata {
 
     public static final String META_11 =
-        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>af24f70a-818c-4da1-9afb-1fc1e0058760</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
         "   <gmd:identificationInfo>" + '\n' +
         "       <gmd:MD_DataIdentification>" + '\n' +
         "           <gmd:extent>" + '\n' +
@@ -45,7 +48,10 @@ public class StaticMetadata {
         "</gmd:MD_Metadata>";
 
      public static final String META_12 =
-        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>1c7d52ac-66c5-449b-a88b-8a0feeccb5fa</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
         "   <gmd:identificationInfo>" + '\n' +
         "       <gmd:MD_DataIdentification>" + '\n' +
         "           <gmd:extent>" + '\n' +
@@ -66,7 +72,10 @@ public class StaticMetadata {
         "</gmd:MD_Metadata>";
 
       public static final String META_13 =
-        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>4c017cc5-3e0e-49d5-9f68-549943247e7e</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
         "   <gmd:identificationInfo>" + '\n' +
         "       <gmd:MD_DataIdentification>" + '\n' +
         "           <gmd:extent>" + '\n' +
@@ -91,7 +100,10 @@ public class StaticMetadata {
         "</gmd:MD_Metadata>";
 
       public static final String META_14 =
-        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>4c017cc5-3e0e-49d5-9f68-549943247e89</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
         "   <gmd:identificationInfo>" + '\n' +
         "       <gmd:MD_DataIdentification>" + '\n' +
         "           <gmd:extent>" + '\n' +
@@ -112,7 +124,10 @@ public class StaticMetadata {
         "</gmd:MD_Metadata>";
       
       public static final String META_15 =
-        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>484fc4d9-8d11-48a5-a386-65c19398f7c3</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
         "   <gmd:identificationInfo>" + '\n' +
         "       <gmd:MD_DataIdentification>" + '\n' +
         "           <gmd:extent>" + '\n' +
@@ -142,7 +157,10 @@ public class StaticMetadata {
         "</gmd:MD_Metadata>";
 
        public static final String META_16 =
-        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>484fc4d9-8d11-48a5-a386-65c19398f7k7</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
         "   <gmd:identificationInfo>" + '\n' +
         "       <gmd:MD_DataIdentification>" + '\n' +
         "           <gmd:extent>" + '\n' +
@@ -173,6 +191,9 @@ public class StaticMetadata {
 
         public static final String META_17 =
         "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "<gmd:fileIdentifier>" + '\n' +
+        "    <gco:CharacterString>81a25c84-2bb0-4727-8f36-4a296e1e7b57</gco:CharacterString>" + '\n' +
+        "</gmd:fileIdentifier>" + '\n' +
         "<gmd:spatialRepresentationInfo>" + '\n' +
         "<gmd:MD_Georectified>" + '\n' +
         "    <gmd:numberOfDimensions>" + '\n' +
@@ -216,7 +237,10 @@ public class StaticMetadata {
 
 
         public static final String META_18 =
-        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>28644bf0-5d9d-4ebd-bef0-f2b0b2067b26</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
         "   <gmd:identificationInfo>" + '\n' +
         "       <gmd:MD_DataIdentification>" + '\n' +
         "           <gmd:extent>" + '\n' +
@@ -266,7 +290,10 @@ public class StaticMetadata {
         "</gmd:MD_Metadata>";
 
         public static final String META_19 =
-        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>937491cd-4bc4-43e4-9509-f6cc606f906e</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
         "   <gmd:identificationInfo>" + '\n' +
         "       <gmd:MD_DataIdentification>" + '\n' +
         "           <gmd:extent>" + '\n' +

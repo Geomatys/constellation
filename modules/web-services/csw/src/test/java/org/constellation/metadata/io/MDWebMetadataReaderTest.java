@@ -136,14 +136,14 @@ public class MDWebMetadataReaderTest {
     public void getMetadataISOTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("2:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        Object result = reader.getMetadata("42292_5p_19900609195600", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
 
-        result = reader.getMetadata("15:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        result = reader.getMetadata("identifier-test", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta9.xml"));
 
@@ -162,7 +162,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataISOFRATest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("16:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        Object result = reader.getMetadata("MDweb-2064d5c7-80b5-4840-ba3d-4fa4e23be750", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-fra1.xml"));
 
@@ -182,7 +182,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataISOGMLTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("17:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        Object result = reader.getMetadata("IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.xml", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
 
@@ -192,7 +192,7 @@ public class MDWebMetadataReaderTest {
         /*
          * Point coordinates
          */
-        result = reader.getMetadata("18:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        result = reader.getMetadata("af24f70a-818c-4da1-9afb-1fc1e0058760", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_11));
 
@@ -202,7 +202,7 @@ public class MDWebMetadataReaderTest {
         /*
          * Point pos
          */
-        result = reader.getMetadata("19:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        result = reader.getMetadata("1c7d52ac-66c5-449b-a88b-8a0feeccb5fa", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_12));
 
@@ -212,7 +212,7 @@ public class MDWebMetadataReaderTest {
         /*
          * Curve posList
          */
-        result = reader.getMetadata("20:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        result = reader.getMetadata("4c017cc5-3e0e-49d5-9f68-549943247e7e", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_13));
 
@@ -223,7 +223,7 @@ public class MDWebMetadataReaderTest {
         /*
          * LineString coordinates
          */
-        result = reader.getMetadata("21:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        result = reader.getMetadata("4c017cc5-3e0e-49d5-9f68-549943247e89", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_14));
 
@@ -233,7 +233,7 @@ public class MDWebMetadataReaderTest {
         /*
          * MultiLineString
          */
-        result = reader.getMetadata("28:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        result = reader.getMetadata("484fc4d9-8d11-48a5-a386-65c19398f7c3", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_15));
 
@@ -243,7 +243,7 @@ public class MDWebMetadataReaderTest {
          /*
          * MultiPoint
          */
-        result = reader.getMetadata("29:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        result = reader.getMetadata("484fc4d9-8d11-48a5-a386-65c19398f7k7", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_16));
 
@@ -254,7 +254,7 @@ public class MDWebMetadataReaderTest {
         /*
          * Surface
          */
-        result = reader.getMetadata("27:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        result = reader.getMetadata("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_18));
 
@@ -264,7 +264,7 @@ public class MDWebMetadataReaderTest {
         /*
          * Polygon
          */
-        result = reader.getMetadata("30:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        result = reader.getMetadata("937491cd-4bc4-43e4-9509-f6cc606f906e", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_19));
 
@@ -283,7 +283,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataISOGeoRectifiedTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("22:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        Object result = reader.getMetadata("81a25c84-2bb0-4727-8f36-4a296e1e7b57", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_17));
 
@@ -302,7 +302,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataISO19110Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("23:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        Object result = reader.getMetadata("cat-1", AbstractMetadataReader.ISO_19115, null);
 
         FeatureCatalogueImpl expResult = (FeatureCatalogueImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/featcatalog1.xml"));
 
@@ -321,7 +321,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataISO19119Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("9:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        Object result = reader.getMetadata("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-19119.xml"));
 
@@ -340,7 +340,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataISO191152Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("24:CSWCat", AbstractMetadataReader.ISO_19115, null);
+        Object result = reader.getMetadata("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
 
@@ -359,7 +359,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataSystemSMLTest() throws Exception {
 
         
-        Object absResult = reader.getMetadata("12:SMLC", AbstractMetadataReader.SENSORML, null);
+        Object absResult = reader.getMetadata("urn:ogc:object:sensor:GEOM:1", AbstractMetadataReader.SENSORML, null);
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
@@ -374,7 +374,7 @@ public class MDWebMetadataReaderTest {
         SystemSMLEquals(expResult, result);
 
 
-        absResult = reader.getMetadata("14:SMLC", AbstractMetadataReader.SENSORML, null);
+        absResult = reader.getMetadata("urn:ogc:object:sensor:GEOM:3", AbstractMetadataReader.SENSORML, null);
 
         absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system2.xml"));
 
@@ -400,7 +400,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataComponentSMLTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object absResult = reader.getMetadata("13:SMLC", AbstractMetadataReader.SENSORML, null);
+        Object absResult = reader.getMetadata("urn:ogc:object:sensor:GEOM:2", AbstractMetadataReader.SENSORML, null);
 
         AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
         

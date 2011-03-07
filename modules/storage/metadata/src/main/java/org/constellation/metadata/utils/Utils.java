@@ -16,12 +16,10 @@
  */
 package org.constellation.metadata.utils;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.util.ReflectionUtilities;
 
@@ -76,6 +74,7 @@ public final class Utils {
         paths.add("Ebrim v3.0:RegistryPackage:id");
         paths.add("Ebrim v2.5:RegistryObject:name:localizedString:value");
         paths.add("Ebrim v2.5:RegistryObject:id");
+        paths.add("SensorML:SensorML:member:process:id");
 
         for (String path : paths) {
             Object value = ReflectionUtilities.getValuesFromPath(path, obj);
@@ -137,65 +136,47 @@ public final class Utils {
      * This method try to find an Identifier for this object.
      *  we try to find a getId(), getIdentifier() or getFileIdentifier() method.
      *
-     * @param obj the object for wich we want a identifier.
+     * @param obj the object for which we want a identifier.
      *
      * @return the founded identifier or UNKNOW_IDENTIFIER
      */
-    public static String findIdentifier(Object obj) {
+    public static String findIdentifier(final Object obj) {
 
-        /*
-         * we try to find one of the thre method named :
-         *  - getId()
-         *  - getIdentifier()
-         *  - getFileIdentifier()
-         */
+        String identifier = UNKNOW_IDENTIFIER;
+        
+        final List<String> paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:fileIdentifier");
+        paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
+        paths.add("Catalog Web Service:Record:identifier:content");
+        paths.add("Ebrim v3.0:RegistryObject:id");
+        paths.add("Ebrim v3.0:RegistryPackage:id");
+        paths.add("Ebrim v2.5:RegistryObject:id");
+        paths.add("ISO 19110:FC_FeatureCatalogue:id");
+        paths.add("SensorML:SensorML:member:process:id");
 
-        Method nameGetter = null;
-        String methodName = "";
-        int i = 0;
-        while (i < 3) {
-            try {
-                switch (i) {
-                    case 0: methodName = "getId";
-                            nameGetter = obj.getClass().getMethod(methodName);
-                            break;
-
-                    case 1: methodName = "getIdentifier";
-                            nameGetter = obj.getClass().getMethod(methodName);
-                            break;
-
-                    case 2: methodName = "getFileIdentifier";
-                            nameGetter = obj.getClass().getMethod(methodName);
-                            break;
-                    default: break;
+        for (String path : paths) {
+            Object value = ReflectionUtilities.getValuesFromPath(path, obj);
+            if (value instanceof String) {
+                identifier = (String) value;
+                // we stop when we have found a response
+                break;
+            } else if (value instanceof Collection) {
+                Collection c = (Collection) value;
+                Iterator it = c.iterator();
+                if (it.hasNext()) {
+                    Object cValue = it.next();
+                    if (cValue instanceof String) {
+                        identifier = (String) cValue;
+                         break;
+                    } else if (cValue != null) {
+                        identifier = cValue.toString();
+                         break;
+                    }
                 }
-
-
-            } catch (NoSuchMethodException ex) {
-                LOGGER.finer("there is no " + methodName + " method in " + obj.getClass().getSimpleName());
-            } catch (SecurityException ex) {
-                LOGGER.warning(" security exception while getting the identifier of the object.");
-            }
-
-            // if we have find a method we exit the loop.
-            if (nameGetter != null) {
-                i = 3;
-            } else {
-                i++;
+            } else if (value != null) {
+                LOGGER.finer("FIND IDENTIFIER => unexpected String type: " + value.getClass().getName() + "\ncurrentPath:" + path);
             }
         }
-
-        if (nameGetter != null) {
-            final Object objT = ReflectionUtilities.invokeMethod(obj, nameGetter);
-            if (objT instanceof String) {
-                return (String) objT;
-
-            } else if (objT != null) {
-                return objT.toString();
-            }
-        }
-
-        LOGGER.log(Level.WARNING, "unable to find an identifier in object of type class {0}, using default then.", obj.getClass().getName());
-        return UNKNOW_IDENTIFIER;
+        return identifier;
     }
 }

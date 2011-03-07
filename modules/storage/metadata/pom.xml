@@ -66,9 +66,15 @@
        <groupId>org.geotoolkit.pending</groupId>
        <artifactId>geotk-temporal</artifactId>
     </dependency>
+    <!-- Test dependencies -->
     <dependency>
        <groupId>org.geotoolkit.pending</groupId>
        <artifactId>geotk-xml-ebrim</artifactId>
+       <scope>test</scope>
+    </dependency>
+        <dependency>
+       <groupId>org.geotoolkit.pending</groupId>
+       <artifactId>geotk-xml-sensorML</artifactId>
        <scope>test</scope>
     </dependency>
   </dependencies>

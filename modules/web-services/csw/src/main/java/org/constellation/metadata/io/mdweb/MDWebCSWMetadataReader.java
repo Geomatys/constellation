@@ -119,7 +119,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     private final Map<String, URI> conceptMap = new HashMap<String, URI>();
 
     
-    public MDWebCSWMetadataReader(Automatic configuration) throws MetadataIoException {
+    public MDWebCSWMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(configuration);
 
         final List<BDD> thesaurusDBs = configuration.getThesaurus();
@@ -130,7 +130,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 final LocalReaderThesaurus tReader = new LocalReaderThesaurus(tConnection);
                 final List<Word> words             = tReader.getWords();
                 tReader.close();
-                for (Word word : words) {
+                for (final Word word : words) {
                     try {
                         final URI uri = new URI(word.getUriConcept());
                         conceptMap.put(word.getLabel(), uri);
@@ -147,7 +147,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     }
 
     @Override
-    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException {
+    public List<DomainValues> getFieldDomainofValues(final String propertyNames) throws MetadataIoException {
         final List<DomainValues> responseList = new ArrayList<DomainValues>();
         final StringTokenizer tokens          = new StringTokenizer(propertyNames, ",");
 
@@ -194,43 +194,26 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * Return a metadata object from the specified identifier.
      * if is not already in cache it read it from the MDWeb database.
      *
-     * @param identifier The form identifier with the pattern : "Form_ID:RecordSet_Code"
+     * @param identifier The metadata identifier.
      * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
      * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
-     * @return A metadata Object (dublin core Record / geotoolkit metadata / ebrim registry object)
+     * @return A metadata Object (Dublin core Record / GeotoolKit metadata / EBrim registry object)
      *
      * @throws java.sql.MetadataIoException
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
-        int id;
-        String recordSetCode = "";
-
-        //we parse the identifier (Form_ID:RecordSet_Code)
-        try  {
-            if (identifier.indexOf(':') != -1) {
-                recordSetCode  = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
-                identifier     = identifier.substring(0, identifier.indexOf(':'));
-                id             = Integer.parseInt(identifier);
-            } else {
-                throw new NumberFormatException();
-            }
-
-        } catch (NumberFormatException e) {
-             throw new MetadataIoException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
-        }
+    public Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
 
         try {
             alreadyRead.clear();
-            final RecordSet recordSet = mdReader.getRecordSet(recordSetCode);
 
             //we look for cached object
             Object result = getFromCache(identifier);
             if (mode == ISO_19115 || mode == EBRIM || mode == SENSORML) {
 
                 if (result == null) {
-                    final Form f = mdReader.getForm(recordSet, id);
+                    final Form f = mdReader.getForm(identifier);
                     result = getObjectFromForm(identifier, f, mode);
                 } else {
                     LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
@@ -251,7 +234,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
             } else if (mode == DUBLINCORE) {
 
-                final Form form                   = mdReader.getForm(recordSet, id);
+                final Form form                   = mdReader.getForm(identifier);
                 if (form != null) {
                     final Value top               = form.getRoot();
                     final Standard recordStandard = top.getType().getStandard();
@@ -285,7 +268,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
     }
 
-    private Object applyElementSet(Object result, ElementSetType type, List<QName> elementName) {
+    private Object applyElementSet(final Object result, ElementSetType type, final List<QName> elementName) {
 
          if (type == null)
             type = ElementSetType.FULL;
@@ -321,7 +304,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             final Class recordClass    = result.getClass();
             final Object filtredResult = ReflectionUtilities.newInstance(recordClass);
 
-            for (QName qn : elementName) {
+            for (final QName qn : elementName) {
                 String currentMethodType = "";
                 try {
                     currentMethodType   = "get";
@@ -354,12 +337,12 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     }
 
     /**
-     * Return a dublinCore record from a MDWeb formular
+     * Return a dublinCore record from a MDWeb record.
      *
-     * @param form the MDWeb formular.
+     * @param form the MDWeb record.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromForm(String identifier, Form form, ElementSetType type, List<QName> elementName) throws MD_IOException {
+    private AbstractRecordType getRecordFromForm(final String identifier, final Form form, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
         final Value top                   = form.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
 
@@ -383,12 +366,14 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     }
 
     /**
-     * Return a dublinCore record from a ISO 19115 MDWeb formular
+     * Return a dublinCore record from a ISO 19115 MDWeb record
      *
-     * @param form the MDWeb formular.
+     * @Todo (improvement) return Brief, Summary record before getting all the property.
+     * 
+     * @param form the MDWeb record.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType transformMDFormInRecord(Form form, ElementSetType type, List<QName> elementName) throws MD_IOException {
+    private AbstractRecordType transformMDFormInRecord(final Form form, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
         
         final Value top                   = form.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
@@ -622,7 +607,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     /**
      * Create a bounding box from a geographiqueElement Value
      */
-    private BoundingBoxType createBoundingBoxFromValue(int ordinal, Form f) throws MD_IOException {
+    private BoundingBoxType createBoundingBoxFromValue(final int ordinal, final Form f) throws MD_IOException {
         Double  southValue  = null;
         Double eastValue    = null;
         Double  westValue   = null;
@@ -689,11 +674,17 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Integer> getSupportedDataTypes() {
         return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM, SENSORML);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<QName> getAdditionalQueryableQName() {
         return Arrays.asList(DEGREE_QNAME,
@@ -708,18 +699,27 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                             SPECIFICATION_DATETYPE_QNAME);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
         return INSPIRE_QUERYABLE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, URI> getConceptMap() {
         return conceptMap;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
+    public List<String> executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException {
         try {
             return mdReader.executeFilterQuery(sqlQuery);
         } catch (MD_IOException ex) {

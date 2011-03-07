@@ -720,12 +720,14 @@ public final class ReflectionUtilities {
     public static boolean pathMatchObjectType(Object metadata, String pathID) {
         if (metadata == null) return false;
 
-        return (pathID.startsWith("ISO 19115:MD_Metadata")      && "DefaultMetadata".equals(metadata.getClass().getSimpleName())) ||
-               (pathID.startsWith("ISO 19115-2:MI_Metadata")    && "MI_Metadata".equals(metadata.getClass().getSimpleName())) ||
-               (pathID.startsWith("Catalog Web Service:Record") && "RecordType".equals(metadata.getClass().getSimpleName())) ||
-               (pathID.startsWith("Ebrim v2.5:ExtrinsicObject") && "org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType".equals(metadata.getClass().getName())||
-               (pathID.startsWith("Ebrim v2.5:RegistryObject")  && "org.geotoolkit.ebrim.xml.v250.RegistryObjectType".equals(metadata.getClass().getName()))||
-               (pathID.startsWith("Ebrim v3.0:RegistryObject")  && "org.geotoolkit.ebrim.xml.v300.RegistryObjectType".equals(metadata.getClass().getName())));
+        return (pathID.startsWith("ISO 19115:MD_Metadata")         && "DefaultMetadata".equals(metadata.getClass().getSimpleName())) ||
+               (pathID.startsWith("ISO 19115-2:MI_Metadata")       && "MI_Metadata".equals(metadata.getClass().getSimpleName())) ||
+               (pathID.startsWith("Catalog Web Service:Record")    && "RecordType".equals(metadata.getClass().getSimpleName())) ||
+               (pathID.startsWith("ISO 19110:FC_FeatureCatalogue") && "FeatureCatalogueImpl".equals(metadata.getClass().getSimpleName())) ||
+               (pathID.startsWith("SensorML:SensorML")             && "SensorML".equals(metadata.getClass().getSimpleName())) ||
+               (pathID.startsWith("Ebrim v2.5:ExtrinsicObject")    && "org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType".equals(metadata.getClass().getName())||
+               (pathID.startsWith("Ebrim v2.5:RegistryObject")     && "org.geotoolkit.ebrim.xml.v250.RegistryObjectType".equals(metadata.getClass().getName()))||
+               (pathID.startsWith("Ebrim v3.0:RegistryObject")     && "org.geotoolkit.ebrim.xml.v300.RegistryObjectType".equals(metadata.getClass().getName())));
     }
 
      /**

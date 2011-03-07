@@ -277,7 +277,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
     @Test
     @Override
     public void RegisterSensorErrorTest() throws Exception {
-        super.RegisterSensorTest();
+        super.RegisterSensorErrorTest();
     }
 
     /**
