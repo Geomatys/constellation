@@ -36,6 +36,8 @@ public class LayerContext {
 
     private String security;
 
+    private Languages supportedLanguages;
+
     public LayerContext() {
 
     }
@@ -97,12 +99,29 @@ public class LayerContext {
         this.security = security;
     }
 
+    /**
+     * @return the supportedLanguages
+     */
+    public Languages getSupportedLanguages() {
+        return supportedLanguages;
+    }
+
+    /**
+     * @param supportedLanguages the supportedLanguages to set
+     */
+    public void setSupportedLanguages(Languages supportedLanguages) {
+        this.supportedLanguages = supportedLanguages;
+    }
+    
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("LayerContext");
         sb.append(StringUtilities.toStringTree(getLayers()));
         if (security != null && !security.isEmpty()) {
             sb.append("Security=").append(security);
+        }
+        if (supportedLanguages != null) {
+            sb.append("Supported languages:\n").append(supportedLanguages);
         }
         return sb.toString();
     }

@@ -137,13 +137,14 @@ import static org.constellation.query.wms.WMSQuery.*;
  * processed the requests sufficiently to ensure that all the information
  * conveyed by the HTTP request is either in the method call parameters or is
  * in one of the fields of the parent class which holds instances of the
- * injectible interface {@code Context} objects created by the JEE container.
+ * injectable interface {@code Context} objects created by the JEE container.
  * </p>
  *
  * @version $Id$
  *
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
+ * @author Guilhem Legall (Geomatys)
  * @since 0.3
  */
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
@@ -167,15 +168,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      */
     private final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE =
             Collections.synchronizedMap(new HashMap<String,AbstractWMSCapabilities>());
-
-    private static final Map<String, LanguageType> SUPPORTED_LANGUAGES = 
-              new HashMap<String, LanguageType>();
-    static {
-        LanguageType language = new LanguageType("eng", true);
-        SUPPORTED_LANGUAGES.put("eng", language);
-        language = new LanguageType("fre");
-        SUPPORTED_LANGUAGES.put("fre", language);
-    }
 
     private final WMSMapDecoration mapDecoration;
 
@@ -238,20 +230,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         isWorking();
         final String queryVersion = getCapab.getVersion().toString();
 
+        final String requestedLanguage = getCapab.getLanguage();
+
         // we get the request language, if its not set we get the default "eng"
         final String currentLanguage;
-        if (getCapab.getLanguage() != null) {
-            if (SUPPORTED_LANGUAGES.containsKey(getCapab.getLanguage())) {
-                currentLanguage = getCapab.getLanguage();
-            } else {
-                currentLanguage = "eng";
-            }
-        } else if ("1.1.1".equals(queryVersion)){
-            currentLanguage = null;
+        if (requestedLanguage != null && supportedLanguages.contains(requestedLanguage) && !requestedLanguage.equals(defaultLanguage)) {
+            currentLanguage = requestedLanguage;
         } else {
-            currentLanguage = "eng";
+            currentLanguage = null;
         }
-
 
         final String keyCache = getId() + queryVersion + '-' + currentLanguage;
         if (CAPS_RESPONSE.containsKey(keyCache)) {
@@ -582,12 +569,17 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 inspireExtension.setMetadataDate(new Date(System.currentTimeMillis()));
 
                 List<LanguageType> languageList = new ArrayList<LanguageType>();
-                for (LanguageType language : SUPPORTED_LANGUAGES.values()) {
-                    languageList.add(language);
+                for (String language : supportedLanguages) {
+                    boolean isDefault = language.equals(defaultLanguage);
+                    languageList.add(new LanguageType(language, isDefault));
                 }
                 LanguagesType languages = new LanguagesType(languageList);
                 inspireExtension.setLanguages(languages);
-                inspireExtension.setCurrentLanguage(currentLanguage);
+                if (currentLanguage == null) {
+                    inspireExtension.setCurrentLanguage(defaultLanguage);
+                } else {
+                    inspireExtension.setCurrentLanguage(currentLanguage);
+                }
             }
 
         } 

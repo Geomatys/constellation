@@ -16,6 +16,7 @@
  */
 package org.constellation.ws;
 
+import org.constellation.configuration.Language;
 import org.constellation.ws.security.SimplePDP;
 import org.constellation.ServiceDef.Specification;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import org.constellation.configuration.Languages;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
@@ -46,11 +48,17 @@ public abstract class LayerWorker extends AbstractWorker {
 
     private final LayerContext layerContext;
 
+    protected final List<String> supportedLanguages = new ArrayList<String>();
+
+    protected final String defaultLanguage;
+
+
     public LayerWorker(String id, File configurationDirectory, Specification specification) {
         super(id, configurationDirectory, specification);
         isStarted = true;
 
-        LayerContext candidate = null;
+        String defaultLanguageCandidate = null;
+        LayerContext candidate          = null;
         if (configurationDirectory != null) {
             final File lcFile = new File(configurationDirectory, "layerContext.xml");
             if (lcFile.exists()) {
@@ -64,6 +72,15 @@ public abstract class LayerWorker extends AbstractWorker {
                         // Instantiaties the PDP only if a rule has been discovered.
                         if (sec != null && !sec.isEmpty()) {
                             pdp = new SimplePDP(sec);
+                        }
+                        final Languages languages = candidate.getSupportedLanguages();
+                        if (languages != null) {
+                            for (Language language : languages.getLanguages()) {
+                                supportedLanguages.add(language.getLanguageCode());
+                                if (language.getDefault()) {
+                                    defaultLanguageCandidate = language.getLanguageCode();
+                                }
+                            }
                         }
                     } else {
                         isStarted = false;
@@ -86,7 +103,8 @@ public abstract class LayerWorker extends AbstractWorker {
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: The configuration directory has not been found", id);
         }
 
-        layerContext = candidate;
+        layerContext    = candidate;
+        defaultLanguage = defaultLanguageCandidate;
     }
 
     /**
