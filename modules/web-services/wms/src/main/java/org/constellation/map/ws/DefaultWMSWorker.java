@@ -578,15 +578,17 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             Capability capa = (Capability) inCapabilities.getCapability();
             ExtendedCapabilitiesType inspireExtension =  capa.getInspireExtendedCapabilities();
 
-            inspireExtension.setMetadataDate(new Date(System.currentTimeMillis()));
-            
-            List<LanguageType> languageList = new ArrayList<LanguageType>();
-            for (LanguageType language : SUPPORTED_LANGUAGES.values()) {
-                languageList.add(language);
+            if (inspireExtension != null) {
+                inspireExtension.setMetadataDate(new Date(System.currentTimeMillis()));
+
+                List<LanguageType> languageList = new ArrayList<LanguageType>();
+                for (LanguageType language : SUPPORTED_LANGUAGES.values()) {
+                    languageList.add(language);
+                }
+                LanguagesType languages = new LanguagesType(languageList);
+                inspireExtension.setLanguages(languages);
+                inspireExtension.setCurrentLanguage(currentLanguage);
             }
-            LanguagesType languages = new LanguagesType(languageList);
-            inspireExtension.setLanguages(languages);
-            inspireExtension.setCurrentLanguage(currentLanguage);
 
         } 
         CAPS_RESPONSE.put(keyCache, inCapabilities);
