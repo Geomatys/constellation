@@ -108,8 +108,8 @@ public class MdwebIndexTest {
         configuration.setConfigurationDirectory(configDirectory);
         indexer                 = new MDWebIndexer(configuration, "");
         indexSearcher           = new MDWebIndexSearcher(configDirectory, "");
-        indexer.setLogLevel(Level.INFO);
-        indexSearcher.setLogLevel(Level.INFO);
+        indexer.setLogLevel(Level.FINER);
+        indexSearcher.setLogLevel(Level.FINER);
 
     }
 
@@ -148,7 +148,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -157,7 +157,7 @@ public class MdwebIndexTest {
         assertEquals(expectedResult, result);
 
          /**
-         * Test 2 simple search: indentifier != 40510_145_19930221211500
+         * Test 2 simple search: identifier != 40510_145_19930221211500
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc NOT identifier:\"40510_145_19930221211500\"", nullFilter, SerialChainFilter.AND);
@@ -167,16 +167,15 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("42292_5p_19900609195600");
-        expectedResult.add("42292_9s_19900610041000");
-        expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("CTDF02");
-
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals(expectedResult, result);
 
@@ -190,7 +189,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("simpleSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -217,11 +216,11 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("42292_5p_19900609195600");
         
 
         assertEquals(expectedResult, result);
@@ -236,7 +235,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -254,7 +253,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wilCharSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "wilCharSearch 3:\n{0}", resultReport);
 
         assertTrue(result.contains("42292_5p_19900609195600"));
         assertTrue(result.contains("42292_9s_19900610041000"));
@@ -263,7 +262,7 @@ public class MdwebIndexTest {
         
 
          /**
-         * Test 4 wildCharSearch: anstract LIKE *onnees CTD NEDIPROD VI 120
+         * Test 4 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
          */
         spatialQuery = new SpatialQuery("abstract:(*onnees CTD NEDIPROD VI 120)", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
@@ -272,7 +271,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 4:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -301,12 +300,12 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("42292_9s_19900610041000");
-        expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");
 
@@ -321,11 +320,11 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "DateSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("39727_22_19750113062500");
         expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
@@ -339,7 +338,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "DateSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("40510_145_19930221211500");
@@ -373,7 +372,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -398,7 +397,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
@@ -424,7 +423,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
@@ -450,7 +449,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 4:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -491,11 +490,11 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("39727_22_19750113062500");
         expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
@@ -518,11 +517,11 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
@@ -545,7 +544,7 @@ public class MdwebIndexTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 1:\n" + result);
+        logger.log(Level.FINER, "identifier query 1:\n{0}", result);
 
         String expectedResult = "39727_22_19750113062500";
 
@@ -558,7 +557,7 @@ public class MdwebIndexTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 2:\n" + result);
+        logger.log(Level.FINER, "identifier query 2:\n{0}", result);
 
         expectedResult = "CTDF02";
 
@@ -571,7 +570,7 @@ public class MdwebIndexTest {
         identifier = "urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 3:\n" + result);
+        logger.log(Level.FINER, "identifier query 3:\n{0}", result);
 
         expectedResult = "urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd";
 
@@ -597,7 +596,7 @@ public class MdwebIndexTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 1:\n" + result);
+        logger.log(Level.FINER, "identifier query 1:\n{0}", result);
 
         String expectedResult = "39727_22_19750113062500";
 
@@ -610,7 +609,7 @@ public class MdwebIndexTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 2:\n" + result);
+        logger.log(Level.FINER, "identifier query 2:\n{0}", result);
 
         expectedResult = null;
 
