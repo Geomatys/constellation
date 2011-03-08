@@ -92,7 +92,6 @@ public class MDWebMetadataReaderTest {
         
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data-2_v2.sql"));
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
