@@ -178,28 +178,32 @@ public abstract class AbstractCSWConfigurer {
     private void refreshServiceConfiguration() throws ConfigurationException {
         serviceConfiguration    = new HashMap<String, Automatic>();
         final File cswConfigDir = getConfigurationDirectory();
-        try {
-            final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+        if (cswConfigDir != null && cswConfigDir.exists() && cswConfigDir.isDirectory()) {
+            try {
+                final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
 
-            for (File instanceDirectory : cswConfigDir.listFiles()) {
-                if (instanceDirectory.isDirectory()) {
-                    //we get the csw ID
-                    final String id = instanceDirectory.getName();
-                    final File configFile = new File(instanceDirectory, "config.xml");
-                    if (configFile.exists()) {
-                        // we get the CSW configuration file
-                        final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
-                        config.setConfigurationDirectory(instanceDirectory);
-                        serviceConfiguration.put(id, config);
+                for (File instanceDirectory : cswConfigDir.listFiles()) {
+                    if (instanceDirectory.isDirectory()) {
+                        //we get the csw ID
+                        final String id = instanceDirectory.getName();
+                        final File configFile = new File(instanceDirectory, "config.xml");
+                        if (configFile.exists()) {
+                            // we get the CSW configuration file
+                            final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
+                            config.setConfigurationDirectory(instanceDirectory);
+                            serviceConfiguration.put(id, config);
+                        }
                     }
                 }
-            }
-            GenericDatabaseMarshallerPool.getInstance().release(configUnmarshaller);
+                GenericDatabaseMarshallerPool.getInstance().release(configUnmarshaller);
 
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
+            } catch (JAXBException ex) {
+                throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());
+            } catch (IllegalArgumentException ex) {
+                throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
+            }
+        } else {
+            LOGGER.warning("No CSW configuration directory.");
         }
     }
     

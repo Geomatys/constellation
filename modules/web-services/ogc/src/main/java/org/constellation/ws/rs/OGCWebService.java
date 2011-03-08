@@ -170,7 +170,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     private void buildWorkerMap() {
         final File serviceDirectory = getServiceDirectory();
-        if (serviceDirectory != null) {
+        if (serviceDirectory != null && serviceDirectory.exists() && serviceDirectory.isDirectory()) {
             for (File instanceDirectory : serviceDirectory.listFiles()) {
                 /*
                  * For each sub-directory we build a new Worker.
@@ -180,6 +180,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     workersMap.put(instanceDirectory.getName(), newWorker);
                 }
             }
+        } else {
+            LOGGER.log(Level.WARNING, "no {0} directory.", supportedVersions.get(0).specification.name());
         }
     }
 
