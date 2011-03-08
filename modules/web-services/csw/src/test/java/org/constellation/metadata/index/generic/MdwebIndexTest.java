@@ -38,7 +38,6 @@ import org.apache.lucene.search.SortField;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.metadata.index.mdweb.MDWebIndexSearcher;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
@@ -107,7 +106,7 @@ public class MdwebIndexTest {
         Automatic configuration = new Automatic("mdweb", bdd);
         configuration.setConfigurationDirectory(configDirectory);
         indexer                 = new MDWebIndexer(configuration, "");
-        indexSearcher           = new MDWebIndexSearcher(configDirectory, "");
+        indexSearcher           = new AbstractIndexSearcher(configDirectory, "");
         indexer.setLogLevel(Level.FINER);
         indexSearcher.setLogLevel(Level.FINER);
 

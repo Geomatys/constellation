@@ -24,7 +24,6 @@ import java.io.File;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;
-import org.constellation.metadata.index.mdweb.MDWebIndexSearcher;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.filesystem.FileMetadataReader;
@@ -115,7 +114,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     public AbstractIndexSearcher getIndexSearcher(int dbType, File configDirectory, String serviceID) throws IndexingException {
         switch (dbType) {
             case MDWEB:
-                return new MDWebIndexSearcher(configDirectory, serviceID);
+                return new AbstractIndexSearcher(configDirectory, serviceID);
             case FILESYSTEM:
                 return new AbstractIndexSearcher(configDirectory, serviceID);
             default:

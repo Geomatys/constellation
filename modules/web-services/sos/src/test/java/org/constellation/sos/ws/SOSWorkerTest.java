@@ -2100,7 +2100,6 @@ public class SOSWorkerTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) sensorDescription;
 
-        assertEquals(expResult, result);
         SOSTestUtils.SystemSMLEquals(expResult, result);
 
 
