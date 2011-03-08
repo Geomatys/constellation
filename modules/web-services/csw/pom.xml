@@ -146,16 +146,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-       <groupId>org.mdweb.metamodel</groupId>
-       <artifactId>mdweb-metamodel-lib-sql-data-gnc</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-       <groupId>org.mdweb.metamodel</groupId>
-       <artifactId>mdweb-metamodel-lib-sql-data-natsdi</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-sensorML</artifactId>
       <scope>test</scope>

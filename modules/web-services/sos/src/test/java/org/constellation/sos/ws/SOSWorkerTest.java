@@ -17,7 +17,6 @@
 
 package org.constellation.sos.ws;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -26,13 +25,13 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import org.constellation.sos.utils.SOSTestUtils;
 
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -51,10 +50,7 @@ import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-import org.geotoolkit.sml.xml.v100.ComponentPropertyType;
-import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.sml.xml.v100.SensorML;
-import org.geotoolkit.sml.xml.v100.SystemType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.v100.EventTime;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
@@ -66,7 +62,6 @@ import org.geotoolkit.sos.xml.v100.ObservationTemplate;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import org.geotoolkit.swe.xml.v100.DataRecordType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
@@ -343,120 +338,7 @@ public class SOSWorkerTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) absExpResult;
 
-
-        assertEquals(expResult.getCapabilities(), result.getCapabilities());
-        assertEquals(expResult.getCharacteristics(), result.getCharacteristics());
-        assertEquals(expResult.getClassification(), result.getClassification());
-        assertEquals(expResult.getContact(), result.getContact());
-        assertEquals(expResult.getDocumentation(), result.getDocumentation());
-        assertEquals(expResult.getHistory(), result.getHistory());
-        assertEquals(expResult.getIdentification(), result.getIdentification());
-        assertEquals(expResult.getKeywords(), result.getKeywords());
-        assertEquals(expResult.getLegalConstraint(), result.getLegalConstraint());
-        assertEquals(expResult.getSecurityConstraint(), result.getSecurityConstraint());
-        assertEquals(expResult.getValidTime(), result.getValidTime());
-        assertEquals(expResult.getVersion(), result.getVersion());
-
-        assertEquals(expResult.getMember().size(), result.getMember().size());
-        assertEquals(expResult.getMember().size(), 1);
-        SystemType expProcess = (SystemType) expResult.getMember().iterator().next().getProcess().getValue();
-        assertTrue(result.getMember().iterator().next().getProcess().getValue() instanceof SystemType);
-        SystemType resProcess = (SystemType) result.getMember().iterator().next().getProcess().getValue();
-
-
-        assertEquals(expProcess.getBoundedBy(), resProcess.getBoundedBy());
-
-        if (expProcess.getCapabilities().size() > 0 && resProcess.getCapabilities().size() > 0) {
-            assertTrue(resProcess.getCapabilities().get(0).getAbstractDataRecord().getValue() instanceof DataRecordType);
-            DataRecordType expRecord = (DataRecordType) expProcess.getCapabilities().get(0).getAbstractDataRecord().getValue();
-            DataRecordType resRecord = (DataRecordType) resProcess.getCapabilities().get(0).getAbstractDataRecord().getValue();
-            assertEquals(expRecord.getField(), resRecord.getField());
-            assertEquals(expProcess.getCapabilities().get(0).getAbstractDataRecord().getValue(), resProcess.getCapabilities().get(0).getAbstractDataRecord().getValue());
-            assertEquals(expProcess.getCapabilities().get(0), resProcess.getCapabilities().get(0));
-        }
-        assertEquals(expProcess.getCapabilities(), resProcess.getCapabilities());
-
-        assertEquals(expProcess.getClassification().size(), resProcess.getClassification().size());
-        assertEquals(resProcess.getClassification().size(), 1);
-        assertEquals(expProcess.getClassification().get(0).getClassifierList().getClassifier().size(), resProcess.getClassification().get(0).getClassifierList().getClassifier().size());
-        for (int i = 0; i < 10; i++) {
-            assertEquals(expProcess.getClassification().get(0).getClassifierList().getClassifier().get(i), resProcess.getClassification().get(0).getClassifierList().getClassifier().get(i));
-        }
-        assertEquals(expProcess.getClassification().get(0).getClassifierList().getClassifier(), resProcess.getClassification().get(0).getClassifierList().getClassifier());
-        assertEquals(expProcess.getClassification().get(0).getClassifierList(), resProcess.getClassification().get(0).getClassifierList());
-        assertEquals(expProcess.getClassification().get(0), resProcess.getClassification().get(0));
-        assertEquals(expProcess.getClassification(), resProcess.getClassification());
-        assertEquals(expProcess.getConnections(), resProcess.getConnections());
-
-        /*assertEquals(expProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getAdministrativeArea(), resProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getAdministrativeArea());
-        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getCity(), resProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getCity());
-        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getCountry(), resProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getCountry());
-        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getDeliveryPoint(), resProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getDeliveryPoint());
-        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getElectronicMailAddress(), resProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getElectronicMailAddress());
-        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getPostalCode(), resProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getPostalCode());
-        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress(), resProcess.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress());
-        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty().getContactInfo(), resProcess.getContact().iterator().next().getResponsibleParty().getContactInfo());*/
-        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty(), resProcess.getContact().iterator().next().getResponsibleParty());
-        assertEquals(expProcess.getContact().iterator().next(), resProcess.getContact().iterator().next());
-        assertEquals(expProcess.getContact(), resProcess.getContact());
-        assertEquals(expProcess.getDescription(), resProcess.getDescription());
-        assertEquals(expProcess.getDescriptionReference(), resProcess.getDescriptionReference());
-        assertEquals(expProcess.getDocumentation(), resProcess.getDocumentation());
-        assertEquals(expProcess.getHistory(), resProcess.getHistory());
-        assertEquals(expProcess.getId(), resProcess.getId());
-        assertEquals(expProcess.getIdentification(), resProcess.getIdentification());
-        assertEquals(expProcess.getInputs(), resProcess.getInputs());
-        assertEquals(expProcess.getInterfaces(), resProcess.getInterfaces());
-        assertEquals(expProcess.getKeywords(), resProcess.getKeywords());
-        assertEquals(expProcess.getLegalConstraint(), resProcess.getLegalConstraint());
-        assertEquals(expProcess.getLocation(), resProcess.getLocation());
-        assertEquals(expProcess.getName(), resProcess.getName());
-        assertEquals(expProcess.getComponents(), resProcess.getComponents());
-        assertEquals(expProcess.getOutputs(), resProcess.getOutputs());
-        assertEquals(expProcess.getParameters(), resProcess.getParameters());
-        /*assertEquals(expProcess.getPosition().getVector(), resProcess.getPosition().getVector());
-        assertEquals(expProcess.getPosition().getPosition().getLocation().getVector().getCoordinate().get(0), resProcess.getPosition().getPosition().getLocation().getVector().getCoordinate().get(0));
-        assertEquals(expProcess.getPosition().getPosition().getLocation().getVector().getCoordinate(), resProcess.getPosition().getPosition().getLocation().getVector().getCoordinate());
-        assertEquals(expProcess.getPosition().getPosition().getLocation().getVector(), resProcess.getPosition().getPosition().getLocation().getVector());
-        assertEquals(expProcess.getPosition().getPosition().getLocation(), resProcess.getPosition().getPosition().getLocation());
-        assertEquals(expProcess.getPosition().getPosition().getOrientation(), resProcess.getPosition().getPosition().getOrientation());
-        assertEquals(expProcess.getPosition().getPosition(), resProcess.getPosition().getPosition());*/
-        assertEquals(expProcess.getPosition(), resProcess.getPosition());
-
-        /**
-         * TODO this issue will be corrected when sos core move to MDWEb metadataReader from CSW
-         */
-        URI s = null;
-        expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().setDefinition(s);
-        resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().setDefinition(s);
-
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getDefinition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getDefinition());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getCoordinate(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getCoordinate());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getVector());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getName(), resProcess.getPositions().getPositionList().getPosition().get(0).getName());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0), resProcess.getPositions().getPositionList().getPosition().get(0));
-        assertEquals(expProcess.getPositions().getPositionList().getPosition(), resProcess.getPositions().getPositionList().getPosition());
-        assertEquals(expProcess.getPositions().getPositionList(), resProcess.getPositions().getPositionList());
-        assertEquals(expProcess.getPositions(), resProcess.getPositions());
-        assertEquals(expProcess.getSMLLocation(), resProcess.getSMLLocation());
-        assertEquals(expProcess.getSpatialReferenceFrame(), resProcess.getSpatialReferenceFrame());
-        assertEquals(expProcess.getSrsName(), resProcess.getSrsName());
-        assertEquals(expProcess.getTemporalReferenceFrame(), resProcess.getTemporalReferenceFrame());
-        assertEquals(expProcess.getTimePosition(), resProcess.getTimePosition());
-        assertEquals(expProcess.getValidTime(), resProcess.getValidTime());
-
-
-
-
-        assertEquals(expResult.getMember().iterator().next().getArcrole(), result.getMember().iterator().next().getArcrole());
-        assertEquals(expResult.getMember().iterator().next(), result.getMember().iterator().next());
-        assertEquals(expResult.getMember(), result.getMember());
-
-
-        assertEquals(expResult, result);
+        SOSTestUtils.SystemSMLEquals(expResult, result);
 
         /**
          * Test 2 component sensor
@@ -471,88 +353,7 @@ public class SOSWorkerTest {
         result = (SensorML) absResult;
         expResult = (SensorML) absExpResult;
 
-        assertEquals(expResult.getCapabilities(), result.getCapabilities());
-        assertEquals(expResult.getCharacteristics(), result.getCharacteristics());
-        assertEquals(expResult.getClassification(), result.getClassification());
-        assertEquals(expResult.getContact(), result.getContact());
-        assertEquals(expResult.getDocumentation(), result.getDocumentation());
-        assertEquals(expResult.getHistory(), result.getHistory());
-        assertEquals(expResult.getIdentification(), result.getIdentification());
-        assertEquals(expResult.getKeywords(), result.getKeywords());
-        assertEquals(expResult.getLegalConstraint(), result.getLegalConstraint());
-        assertEquals(expResult.getSecurityConstraint(), result.getSecurityConstraint());
-        assertEquals(expResult.getValidTime(), result.getValidTime());
-        assertEquals(expResult.getVersion(), result.getVersion());
-
-        assertEquals(expResult.getMember().size(), result.getMember().size());
-        assertEquals(expResult.getMember().size(), 1);
-        ComponentType expCompo = (ComponentType) expResult.getMember().iterator().next().getProcess().getValue();
-        assertTrue(result.getMember().iterator().next().getProcess().getValue() instanceof ComponentType);
-        ComponentType resCompo = (ComponentType) result.getMember().iterator().next().getProcess().getValue();
-
-
-        assertEquals(expCompo.getBoundedBy(), resCompo.getBoundedBy());
-
-        assertEquals(expCompo.getCapabilities(), resCompo.getCapabilities());
-
-        assertEquals(expCompo.getClassification().size(), resCompo.getClassification().size());
-        assertEquals(resCompo.getClassification().size(), 1);
-        assertEquals(expCompo.getClassification().get(0).getClassifierList().getClassifier().size(), resCompo.getClassification().get(0).getClassifierList().getClassifier().size());
-        for (int i = 0; i < 2; i++) {
-            assertEquals(expCompo.getClassification().get(0).getClassifierList().getClassifier().get(i), resCompo.getClassification().get(0).getClassifierList().getClassifier().get(i));
-        }
-        assertEquals(expCompo.getClassification().get(0).getClassifierList().getClassifier(), resCompo.getClassification().get(0).getClassifierList().getClassifier());
-        assertEquals(expCompo.getClassification().get(0).getClassifierList(), resCompo.getClassification().get(0).getClassifierList());
-        assertEquals(expCompo.getClassification().get(0), resCompo.getClassification().get(0));
-        assertEquals(expCompo.getClassification(), resCompo.getClassification());
-
-        /*assertEquals(expCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getAdministrativeArea(), resCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getAdministrativeArea());
-        assertEquals(expCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getCity(), resCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getCity());
-        assertEquals(expCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getCountry(), resCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getCountry());
-        assertEquals(expCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getDeliveryPoint(), resCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getDeliveryPoint());
-        assertEquals(expCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getElectronicMailAddress(), resCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getElectronicMailAddress());
-        assertEquals(expCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getPostalCode(), resCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress().getPostalCode());
-        assertEquals(expCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress(), resCompo.getContact().iterator().next().getResponsibleParty().getContactInfo().getAddress());
-        assertEquals(expCompo.getContact().iterator().next().getResponsibleParty().getContactInfo(), resCompo.getContact().iterator().next().getResponsibleParty().getContactInfo());*/
-        assertEquals(expCompo.getContact().iterator().next().getResponsibleParty(), resCompo.getContact().iterator().next().getResponsibleParty());
-        assertEquals(expCompo.getContact().iterator().next(), resCompo.getContact().iterator().next());
-        assertEquals(expCompo.getContact(), resCompo.getContact());
-        assertEquals(expCompo.getDescription(), resCompo.getDescription());
-        assertEquals(expCompo.getDescriptionReference(), resCompo.getDescriptionReference());
-        assertEquals(expCompo.getDocumentation(), resCompo.getDocumentation());
-        assertEquals(expCompo.getHistory(), resCompo.getHistory());
-        assertEquals(expCompo.getId(), resCompo.getId());
-        assertEquals(expCompo.getIdentification(), resCompo.getIdentification());
-        assertEquals(expCompo.getInputs(), resCompo.getInputs());
-        assertEquals(expCompo.getInterfaces(), resCompo.getInterfaces());
-        assertEquals(expCompo.getKeywords(), resCompo.getKeywords());
-        assertEquals(expCompo.getLegalConstraint(), resCompo.getLegalConstraint());
-        assertEquals(expCompo.getLocation(), resCompo.getLocation());
-        assertEquals(expCompo.getName(), resCompo.getName());
-        assertEquals(expCompo.getOutputs(), resCompo.getOutputs());
-        assertEquals(expCompo.getParameters(), resCompo.getParameters());
-        /*assertEquals(expCompo.getPosition().getVector(), resCompo.getPosition().getVector());
-        assertEquals(expCompo.getPosition().getPosition().getLocation().getVector().getCoordinate().get(0), resCompo.getPosition().getPosition().getLocation().getVector().getCoordinate().get(0));
-        assertEquals(expCompo.getPosition().getPosition().getLocation().getVector().getCoordinate(), resCompo.getPosition().getPosition().getLocation().getVector().getCoordinate());
-        assertEquals(expCompo.getPosition().getPosition().getLocation().getVector(), resCompo.getPosition().getPosition().getLocation().getVector());
-        assertEquals(expCompo.getPosition().getPosition().getLocation(), resCompo.getPosition().getPosition().getLocation());
-        assertEquals(expCompo.getPosition().getPosition().getOrientation(), resCompo.getPosition().getPosition().getOrientation());
-        assertEquals(expCompo.getPosition().getPosition(), resCompo.getPosition().getPosition());*/
-        assertEquals(expCompo.getPosition(), resCompo.getPosition());
-        assertEquals(expCompo.getSMLLocation(), resCompo.getSMLLocation());
-        assertEquals(expCompo.getSpatialReferenceFrame(), resCompo.getSpatialReferenceFrame());
-        assertEquals(expCompo.getSrsName(), resCompo.getSrsName());
-        assertEquals(expCompo.getTemporalReferenceFrame(), resCompo.getTemporalReferenceFrame());
-        assertEquals(expCompo.getTimePosition(), resCompo.getTimePosition());
-        assertEquals(expCompo.getValidTime(), resCompo.getValidTime());
-
-
-
-
-        assertEquals(expResult.getMember().iterator().next().getArcrole(), result.getMember().iterator().next().getArcrole());
-        assertEquals(expResult.getMember().iterator().next(), result.getMember().iterator().next());
-        assertEquals(expResult.getMember(), result.getMember());
-        assertEquals(expResult, result);
+        SOSTestUtils.ComponentEquals(expResult, result);
 
         SensorMLMarshallerPool.getInstance().release(unmarshaller);
     }
@@ -1478,7 +1279,7 @@ public class SOSWorkerTest {
 
         /**
          *  Test 16: getObservation with procedure urn:ogc:object:sensor:GEOM:3
-         *           with observedproperties = urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon
+         *           with observedProperties = urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon
          *           => no error but no result
          */
         request  = new GetObservation("1.0.0",
@@ -2288,7 +2089,7 @@ public class SOSWorkerTest {
         assertEquals("urn:ogc:object:sensor:GEOM:6", response.getAssignedSensorId());
 
         /**
-         * we verify that the sensor is wel registred
+         * we verify that the sensor is well registered
          */
         DescribeSensor DSrequest  = new DescribeSensor("1.0.0","SOS","urn:ogc:object:sensor:GEOM:6", "text/xml;subtype=\"SensorML/1.0.0\"");
         AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(DSrequest);
@@ -2299,114 +2100,8 @@ public class SOSWorkerTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) sensorDescription;
 
-
-        assertEquals(expResult.getCapabilities(), result.getCapabilities());
-        assertEquals(expResult.getCharacteristics(), result.getCharacteristics());
-        assertEquals(expResult.getClassification(), result.getClassification());
-        assertEquals(expResult.getContact(), result.getContact());
-        assertEquals(expResult.getDocumentation(), result.getDocumentation());
-        assertEquals(expResult.getHistory(), result.getHistory());
-        assertEquals(expResult.getIdentification(), result.getIdentification());
-        assertEquals(expResult.getKeywords(), result.getKeywords());
-        assertEquals(expResult.getLegalConstraint(), result.getLegalConstraint());
-        assertEquals(expResult.getSecurityConstraint(), result.getSecurityConstraint());
-        assertEquals(expResult.getValidTime(), result.getValidTime());
-        assertEquals(expResult.getVersion(), result.getVersion());
-
-        assertEquals(expResult.getMember().size(), result.getMember().size());
-        assertEquals(expResult.getMember().size(), 1);
-        SystemType expProcess = (SystemType) expResult.getMember().iterator().next().getProcess().getValue();
-        assertTrue(result.getMember().iterator().next().getProcess().getValue() instanceof SystemType);
-        SystemType resProcess = (SystemType) result.getMember().iterator().next().getProcess().getValue();
-
-        /*
-         * TODO fix this issue for mdweb redaer/writer
-         */
-        EnvelopeType nullEnv = null;
-        resProcess.setBoundedBy(nullEnv);
-        expProcess.setBoundedBy(nullEnv);
-        assertEquals(expProcess.getBoundedBy(), resProcess.getBoundedBy());
-
-        assertEquals(expProcess.getCapabilities(), resProcess.getCapabilities());
-
-        assertEquals(expProcess.getClassification().size(), resProcess.getClassification().size());
-        assertEquals(resProcess.getClassification().size(), 1);
-        assertEquals(expProcess.getClassification().get(0).getClassifierList().getClassifier().size(), resProcess.getClassification().get(0).getClassifierList().getClassifier().size());
-        for (int i = 0; i < 10; i++) {
-            assertEquals(expProcess.getClassification().get(0).getClassifierList().getClassifier().get(i), resProcess.getClassification().get(0).getClassifierList().getClassifier().get(i));
-        }
-        assertEquals(expProcess.getClassification().get(0).getClassifierList().getClassifier(), resProcess.getClassification().get(0).getClassifierList().getClassifier());
-        assertEquals(expProcess.getClassification().get(0).getClassifierList(), resProcess.getClassification().get(0).getClassifierList());
-        assertEquals(expProcess.getClassification().get(0), resProcess.getClassification().get(0));
-        assertEquals(expProcess.getClassification(), resProcess.getClassification());
-        assertEquals(expProcess.getConnections(), resProcess.getConnections());
-
-        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty(), resProcess.getContact().iterator().next().getResponsibleParty());
-        assertEquals(expProcess.getContact().iterator().next(), resProcess.getContact().iterator().next());
-        assertEquals(expProcess.getContact(), resProcess.getContact());
-        assertEquals(expProcess.getDescription(), resProcess.getDescription());
-        assertEquals(expProcess.getDescriptionReference(), resProcess.getDescriptionReference());
-        assertEquals(expProcess.getDocumentation(), resProcess.getDocumentation());
-        assertEquals(expProcess.getHistory(), resProcess.getHistory());
-        assertEquals(expProcess.getId(), resProcess.getId());
-        assertEquals(expProcess.getIdentification(), resProcess.getIdentification());
-        assertEquals(expProcess.getInputs(), resProcess.getInputs());
-        assertEquals(expProcess.getInterfaces(), resProcess.getInterfaces());
-        assertEquals(expProcess.getKeywords(), resProcess.getKeywords());
-        assertEquals(expProcess.getLegalConstraint(), resProcess.getLegalConstraint());
-        assertEquals(expProcess.getLocation(), resProcess.getLocation());
-        assertEquals(expProcess.getName(), resProcess.getName());
-        for (int i = 0; i < expProcess.getComponents().getComponentList().getComponent().size(); i++) {
-            ComponentPropertyType expCompo = expProcess.getComponents().getComponentList().getComponent().get(i);
-            ComponentPropertyType resCompo = resProcess.getComponents().getComponentList().getComponent().get(i);
-            assertEquals(expCompo.getHref(), resCompo.getHref());
-            assertEquals(expCompo.getRole(), resCompo.getRole());
-            assertEquals(expCompo.getName(), resCompo.getName());
-            assertEquals(expCompo.getType(), resCompo.getType());
-            assertEquals(expCompo.getTitle(), resCompo.getTitle());
-            assertTrue(expCompo.getProcess() == null);
-            assertTrue(resCompo.getProcess() == null);
-            assertEquals(expCompo, resCompo);
-        }
-        assertEquals(expProcess.getComponents().getComponentList().getComponent(), resProcess.getComponents().getComponentList().getComponent());
-        assertEquals(expProcess.getComponents().getComponentList(), resProcess.getComponents().getComponentList());
-        assertEquals(expProcess.getComponents(), resProcess.getComponents());
-        assertEquals(expProcess.getOutputs(), resProcess.getOutputs());
-        assertEquals(expProcess.getParameters(), resProcess.getParameters());
-        assertEquals(expProcess.getPosition(), resProcess.getPosition());
-       
-        /**
-         * TODO this issue will be corrected when sos core move to MDWEb metadataReader from CSW
-         */
-        URI s = null;
-        expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().setDefinition(s);
-        resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().setDefinition(s);
-        
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getVector());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getName(), resProcess.getPositions().getPositionList().getPosition().get(0).getName());
-        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0), resProcess.getPositions().getPositionList().getPosition().get(0));
-        assertEquals(expProcess.getPositions().getPositionList().getPosition(), resProcess.getPositions().getPositionList().getPosition());
-        assertEquals(expProcess.getPositions().getPositionList(), resProcess.getPositions().getPositionList());
-        assertEquals(expProcess.getPositions(), resProcess.getPositions());
-        assertEquals(expProcess.getSMLLocation().getPoint().getUomLabels(), resProcess.getSMLLocation().getPoint().getUomLabels());
-        assertEquals(expProcess.getSMLLocation().getPoint().getAxisLabels(), resProcess.getSMLLocation().getPoint().getAxisLabels());
-        assertEquals(expProcess.getSMLLocation(), resProcess.getSMLLocation());
-        assertEquals(expProcess.getSpatialReferenceFrame(), resProcess.getSpatialReferenceFrame());
-        assertEquals(expProcess.getSrsName(), resProcess.getSrsName());
-        assertEquals(expProcess.getTemporalReferenceFrame(), resProcess.getTemporalReferenceFrame());
-        assertEquals(expProcess.getTimePosition(), resProcess.getTimePosition());
-        assertEquals(expProcess.getValidTime(), resProcess.getValidTime());
-
-
-
-
-        assertEquals(expResult.getMember().iterator().next().getArcrole(), result.getMember().iterator().next().getArcrole());
-        assertEquals(expResult.getMember().iterator().next(), result.getMember().iterator().next());
-        assertEquals(expResult.getMember(), result.getMember());
-
-
         assertEquals(expResult, result);
+        SOSTestUtils.SystemSMLEquals(expResult, result);
 
 
         marshallerPool.release(unmarshaller);
