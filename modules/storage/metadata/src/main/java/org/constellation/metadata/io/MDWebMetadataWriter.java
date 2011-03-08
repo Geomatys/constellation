@@ -23,11 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -69,9 +66,8 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
 import org.mdweb.io.MD_IOException;
-import org.mdweb.io.sql.v20.Writer20;
+import org.mdweb.io.MD_IOFactory;
 import org.mdweb.io.Writer;
-import org.mdweb.io.sql.v21.Writer21;
 import org.mdweb.model.storage.FormInfo;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
 import org.opengis.metadata.Metadata;
@@ -148,24 +144,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             final DataSource dataSource = db.getDataSource();
             final boolean isPostgres    = db.getClassName().equals("org.postgresql.Driver");
-            String version              = null;
-            final Connection mdCon      = dataSource.getConnection();
-            final Statement versionStmt = mdCon.createStatement();
-            final ResultSet result      = versionStmt.executeQuery("Select * FROM \"version\"");
-            if (result.next()) {
-                version = result.getString(1);
-            }
-            result.close();
-            versionStmt.close();
-            mdCon.close();
-            
-            if (version != null && version.startsWith("2.0")) {
-                mdWriter = new Writer20(dataSource, isPostgres);
-            } else if (version != null && (version.startsWith("2.1") || version.startsWith("2.2"))) {
-                mdWriter = new Writer21(dataSource, isPostgres);
-            } else {
-                throw new MetadataIoException("unexpected database version:" + version);
-            }
+            mdWriter                    = MD_IOFactory.getWriterInstance(dataSource, isPostgres);
            
             mdRecordSet = getRecordSet(configuration.getDefaultRecordSet());
             defaultUser = mdWriter.getUser("admin");

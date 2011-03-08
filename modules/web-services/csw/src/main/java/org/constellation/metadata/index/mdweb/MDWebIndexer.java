@@ -19,16 +19,12 @@ package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 import javax.sql.DataSource;
 
@@ -56,8 +52,7 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.io.Reader;
 import org.mdweb.io.MD_IOException;
-import org.mdweb.io.sql.v20.Reader20;
-import org.mdweb.io.sql.v21.Reader21;
+import org.mdweb.io.MD_IOFactory;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
 
 /**
@@ -104,26 +99,9 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             throw new IndexingException("The configuration file does not contains a BDD object");
         }
         try {
-            final DataSource dataSource   = db.getDataSource();
-            final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
-            String version                = null;
-            final Connection mdConnection = dataSource.getConnection();
-            final Statement versionStmt   = mdConnection.createStatement();
-            final ResultSet result        = versionStmt.executeQuery("Select * FROM \"version\"");
-            if (result.next()) {
-                version = result.getString(1);
-            }
-            result.close();
-            versionStmt.close();
-            mdConnection.close();
-
-            if (version != null && version.startsWith("2.0")) {
-                mdWebReader = new Reader20(dataSource, isPostgres);
-            } else if (version != null && (version.startsWith("2.1") || version.startsWith("2.2"))) {
-                mdWebReader = new Reader21(dataSource, isPostgres);
-            } else {
-                throw new IndexingException("unexpected database version:" + version);
-            }
+            final DataSource dataSource = db.getDataSource();
+            final boolean isPostgres    = db.getClassName().equals("org.postgresql.Driver");
+            mdWebReader                 = MD_IOFactory.getReaderInstance(dataSource, isPostgres);
             mdWebReader.setProperty("readProfile", false);
             initEbrimClasses();
             if (create) {

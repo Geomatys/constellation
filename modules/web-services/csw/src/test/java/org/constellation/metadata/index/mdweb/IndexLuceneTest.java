@@ -53,8 +53,8 @@ import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 // MDWeb dependencies
 import org.mdweb.io.MD_IOException;
+import org.mdweb.io.MD_IOFactory;
 import org.mdweb.io.Writer;
-import org.mdweb.io.sql.v21.Writer21;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.Obligation;
 import org.mdweb.model.schemas.Path;
@@ -108,14 +108,16 @@ public class IndexLuceneTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
 
-        Writer21 writer = new Writer21(ds, false);
+        Writer writer = MD_IOFactory.getWriterInstance(ds, false);
         fillTestData(writer);
+        writer.close();
 
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
         final Automatic configuration = new Automatic("mdweb", bdd);
         configuration.setConfigurationDirectory(configDirectory);
         
         final MDWebIndexer indexer    = new MDWebIndexer(configuration, "");
+        indexer.destroy();
         indexSearcher                   = new AbstractIndexSearcher(configDirectory, "");
         indexSearcher.setLogLevel(LOG_LEVEL);
     }

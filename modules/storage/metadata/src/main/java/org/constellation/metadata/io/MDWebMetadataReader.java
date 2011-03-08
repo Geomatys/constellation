@@ -27,10 +27,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,9 +57,8 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.io.MD_IOException;
-import org.mdweb.io.sql.v20.Reader20;
+import org.mdweb.io.MD_IOFactory;
 import org.mdweb.io.Reader;
-import org.mdweb.io.sql.v21.Reader21;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
@@ -185,30 +181,16 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         try {
             final DataSource dataSource   = db.getDataSource();
             final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
-            String version                = null;
             if (dataSource == null) {
                 throw new MetadataIoException("Unable to instanciate a dataSource.");
             }
-            final Connection mdConnection = dataSource.getConnection();
-            final Statement versionStmt   = mdConnection.createStatement();
-            final ResultSet result        = versionStmt.executeQuery("Select * FROM \"version\"");
-            if (result.next()) {
-                version = result.getString(1);
-            }
-            result.close();
-            versionStmt.close();
-            mdConnection.close();
-
-            if (version != null && version.startsWith("2.0")) {
-                mdReader = new Reader20(dataSource, isPostgres);
-            } else if (version != null && (version.startsWith("2.1") || version.startsWith("2.2"))) {
-                mdReader = new Reader21(dataSource, isPostgres);
-            } else {
-                throw new MetadataIoException("unexpected database version:" + version);
-            }
+            mdReader = MD_IOFactory.getReaderInstance(dataSource, isPostgres);
             mdReader.setProperty("readProfile", false);
         } catch (SQLException ex) {
             throw new MetadataIoException("SQLException while initializing the MDWeb reader:" +'\n'+
+                                           "cause:" + ex.getMessage());
+        } catch (MD_IOException ex) {
+            throw new MetadataIoException("MD_IOException while initializing the MDWeb reader:" +'\n'+
                                            "cause:" + ex.getMessage());
         }
 
@@ -239,19 +221,6 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         initPackage();
         this.classBinding       = initClassBinding(configuration.getConfigurationDirectory());
-        this.alreadyRead        = new HashMap<Value, Object>();
-    }
-
-    /**
-     * A constructor used in profile Test .
-     *
-     * @param MDReader a reader to the MDWeb database.
-     */
-    protected MDWebMetadataReader(final DataSource mdConnection) {
-        super(true, false);
-        this.mdReader           = new Reader20(mdConnection);
-        initPackage();
-        this.classBinding       = new HashMap<String, Class>();
         this.alreadyRead        = new HashMap<Value, Object>();
     }
 
