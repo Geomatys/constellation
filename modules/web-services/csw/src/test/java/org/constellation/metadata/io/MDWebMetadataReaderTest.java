@@ -84,10 +84,10 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-3.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-5.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-6.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-5.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
         
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));

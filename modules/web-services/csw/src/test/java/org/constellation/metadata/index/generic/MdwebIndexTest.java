@@ -98,8 +98,8 @@ public class MdwebIndexTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-2.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-2.sql"));
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
