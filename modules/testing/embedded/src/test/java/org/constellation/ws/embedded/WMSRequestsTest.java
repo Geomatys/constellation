@@ -17,6 +17,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import java.util.Arrays;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,6 +38,10 @@ import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v111.Layer;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
+import org.geotoolkit.wms.xml.v130.WMSCapabilities;
+import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
+import org.geotoolkit.inspire.xml.vs.LanguagesType;
+import org.geotoolkit.inspire.xml.vs.LanguageType;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.feature.DefaultName;
 
@@ -62,6 +67,15 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     private static final String WMS_GETCAPABILITIES =
             "http://localhost:9090/wms/default?request=GetCapabilities&service=WMS&version=1.1.1";
+
+    private static final String WMS_GETCAPABILITIES_WMS1 =
+            "http://localhost:9090/wms/wms1?request=GetCapabilities&service=WMS&version=1.3.0";
+
+    private static final String WMS_GETCAPABILITIES_WMS1_FRE =
+            "http://localhost:9090/wms/wms1?request=GetCapabilities&service=WMS&version=1.3.0&language=fre";
+
+    private static final String WMS_GETCAPABILITIES_WMS1_ENG =
+            "http://localhost:9090/wms/wms1?request=GetCapabilities&service=WMS&version=1.3.0&language=eng";
 
     private static final String WMS_FALSE_REQUEST =
             "http://localhost:9090/wms/default?request=SomethingElse";
@@ -251,12 +265,12 @@ public class WMSRequestsTest extends AbstractTestRequest {
 
     /**
      * Ensures that a valid GetCapabilities request returns indeed a valid GetCapabilities
-     * document representing the server capabilities in the WMS version 1.1.1 standard.
+     * document representing the server capabilities in the WMS version 1.1.1/ 1.3.0 standard.
      */
     @Test
     public void testWMSGetCapabilities() throws JAXBException, IOException {
-        // Creates a valid GetMap url.
-        final URL getCapsUrl;
+        // Creates a valid GetCapabilities url.
+        URL getCapsUrl;
         try {
             getCapsUrl = new URL(WMS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
@@ -266,11 +280,11 @@ public class WMSRequestsTest extends AbstractTestRequest {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
-        final Object obj = unmarshallResponse(getCapsUrl);
+        Object obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof WMT_MS_Capabilities);
 
-        final WMT_MS_Capabilities responseCaps = (WMT_MS_Capabilities)obj;
-        final Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());
+        WMT_MS_Capabilities responseCaps = (WMT_MS_Capabilities)obj;
+        Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());
 
         assertNotNull(layer);
         assertEquals("EPSG:4326", layer.getSRS().get(0));
@@ -279,11 +293,97 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertTrue(bboxGeo.getSouthBoundLatitude() ==  -90d);
         assertTrue(bboxGeo.getEastBoundLongitude() ==  180d);
         assertTrue(bboxGeo.getNorthBoundLatitude() ==   90d);
+
+        // Creates a valid GetCapabilities url.
+        try {
+            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WMSCapabilities);
+
+        WMSCapabilities responseCaps130 = (WMSCapabilities)obj;
+
+        // The layer test must be excluded
+        org.geotoolkit.wms.xml.v130.Layer layer130 = (org.geotoolkit.wms.xml.v130.Layer) responseCaps130.getLayerFromName(LAYER_TEST.getLocalPart());
+        assertNull(layer130);
+
+        // The layer lake must be included
+        layer130 = (org.geotoolkit.wms.xml.v130.Layer) responseCaps130.getLayerFromName("http://www.opengis.net/gml:Lakes");
+        assertNotNull(layer130);
+    }
+
+    @Test
+    public void testWMSGetCapabilitiesLanguage() throws JAXBException, IOException {
+         // Creates a valid GetMap url.
+        URL getCapsUrl;
+        try {
+            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        Object obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WMSCapabilities);
+
+        WMSCapabilities responseCaps130 = (WMSCapabilities)obj;
+        ExtendedCapabilitiesType  ext = responseCaps130.getCapability().getInspireExtendedCapabilities();
+        assertEquals("eng", ext.getCurrentLanguage());
+
+        LanguageType l1 = new LanguageType("fre", false);
+        LanguageType l2 = new LanguageType("eng", true);
+        LanguagesType languages = new LanguagesType(Arrays.asList(l1, l2));
+        assertEquals(ext.getLanguages(), languages);
+
+        assertEquals("this is the default english capabilities", responseCaps130.getService().getName());
+
+        try {
+            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1_ENG);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WMSCapabilities);
+
+        responseCaps130 = (WMSCapabilities)obj;
+        ext = responseCaps130.getCapability().getInspireExtendedCapabilities();
+        assertEquals("eng", ext.getCurrentLanguage());
+        assertEquals(ext.getLanguages(), languages);
+
+        assertEquals("this is the default english capabilities", responseCaps130.getService().getName());
+
+        try {
+            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1_FRE);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WMSCapabilities);
+
+        responseCaps130 = (WMSCapabilities)obj;
+        ext = responseCaps130.getCapability().getInspireExtendedCapabilities();
+        assertEquals("fre", ext.getCurrentLanguage());
+        assertEquals(ext.getLanguages(), languages);
+
+        assertEquals("Ceci est le document capabilities français", responseCaps130.getService().getName());
+
     }
 
     /**
      * Ensures that the {@code WMS GetFeatureInfo} request on a particular point of the
-     * testing layer produces the whished result.
+     * testing layer produces the wanted result.
      */
     @Test
     public void testWMSGetFeatureInfo() throws IOException {
