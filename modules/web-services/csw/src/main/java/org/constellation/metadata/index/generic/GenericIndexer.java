@@ -80,14 +80,14 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     private static final DateFormat LUCENE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
     /**
-     * Shared Thread Pool for parralele execution
+     * Shared Thread Pool for parallel execution
      */
     private final ExecutorService pool = Executors.newFixedThreadPool(6);
 
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
      * 
-     * @param reader A generic reader to request the metadata datasource.
+     * @param reader A generic reader to request the metadata dataSource.
      * @param configuration  A configuration object containing the directory where the index can write indexation file.
      * @param serviceID The identifier, if there is one, of the index/service.
      */
@@ -351,7 +351,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     /**
      * Extract the String values denoted by the specified paths
      * and return the values as a String values1,values2,....
-     * if there is no values correspounding to the paths the method return "null" (the string)
+     * if there is no values corresponding to the paths the method return "null" (the string)
      * 
      * @param metadata
      * @param paths
@@ -422,7 +422,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         } else if (obj instanceof LocalName) {
             final LocalName ln = (LocalName) obj;
             result = ln.toString();
-        } else if (obj instanceof Double) {
+        } else if (obj instanceof Double || obj instanceof Long) {
             result = obj.toString();
         } else if (obj instanceof java.util.Locale) {
             try {

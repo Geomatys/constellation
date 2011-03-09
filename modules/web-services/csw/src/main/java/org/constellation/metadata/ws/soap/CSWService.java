@@ -56,7 +56,31 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
  */
 @WebService(name = "CSWService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
-@XmlSeeAlso({org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
+@XmlSeeAlso({org.geotoolkit.metadata.iso.DefaultMetadata.class,
+             org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class,
+             org.geotoolkit.metadata.fra.FRA_Constraints.class,
+             org.geotoolkit.metadata.fra.FRA_DataIdentification.class,
+             org.geotoolkit.metadata.fra.FRA_DirectReferenceSystem.class,
+             org.geotoolkit.metadata.fra.FRA_IndirectReferenceSystem.class,
+             org.geotoolkit.metadata.fra.FRA_LegalConstraints.class,
+             org.geotoolkit.metadata.fra.FRA_SecurityConstraints.class,
+             org.geotoolkit.metadata.fra.FRA_DirectReferenceSystem.class,
+             org.geotoolkit.service.ServiceIdentificationImpl.class,
+             org.geotoolkit.feature.catalog.AssociationRoleImpl.class,
+             org.geotoolkit.feature.catalog.BindingImpl.class,
+             org.geotoolkit.feature.catalog.BoundFeatureAttributeImpl.class,
+             org.geotoolkit.feature.catalog.ConstraintImpl.class,
+             org.geotoolkit.feature.catalog.DefinitionReferenceImpl.class,
+             org.geotoolkit.feature.catalog.DefinitionSourceImpl.class,
+             org.geotoolkit.feature.catalog.FeatureAssociationImpl.class,
+             org.geotoolkit.feature.catalog.FeatureAttributeImpl.class,
+             org.geotoolkit.feature.catalog.FeatureCatalogueImpl.class,
+             org.geotoolkit.feature.catalog.FeatureOperationImpl.class,
+             org.geotoolkit.feature.catalog.FeatureTypeImpl.class,
+             org.geotoolkit.feature.catalog.InheritanceRelationImpl.class,
+             org.geotoolkit.feature.catalog.ListedValueImpl.class,
+             org.geotoolkit.feature.catalog.PropertyTypeImpl.class,
+             org.geotoolkit.util.Multiplicity.class})
 public class CSWService extends OGCWebService<CSWworker>{
     
     /**

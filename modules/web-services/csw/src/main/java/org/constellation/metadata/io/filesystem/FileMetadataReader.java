@@ -82,8 +82,8 @@ import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
 /**
- * A csw Metadata Reader. This reader does not require a database.
- * The csw records are stored XML file in a directory .
+ * A CSW Metadata Reader. This reader does not require a database.
+ * The CSW records are stored XML file in a directory .
  *
  * This reader can be used for test purpose or in case of small amount of record.
  *
@@ -94,7 +94,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     private static final String METAFILE_MSG = "The metadata file : ";
     
     /**
-     * A date formatter used to display the Date object for dublin core translation.
+     * A date formatter used to display the Date object for Dublin core translation.
      */
     private static final DateFormat FORMATTER;
     static {
@@ -122,7 +122,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * not contains an existing directory path in the configuration.dataDirectory field.
      * If the creation of a MarshallerPool throw a JAXBException.
      */
-    public FileMetadataReader(Automatic configuration) throws MetadataIoException {
+    public FileMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(true, false);
         File dataDir = configuration.getDataDirectory();
         if (dataDir == null || !dataDir.exists()) {
@@ -140,7 +140,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
+    public Object getMetadata(final String identifier, final int mode, final List<QName> elementName) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, elementName);
     }
 
@@ -148,7 +148,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
+    public Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         Object obj = getObjectFromFile(identifier);
         if (obj instanceof DefaultMetadata && mode == DUBLINCORE) {
             obj = translateISOtoDC((DefaultMetadata)obj, type, elementName);
@@ -165,7 +165,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * @param directory
      * @return
      */
-    private File getFileFromIdentifier(String identifier, File directory) {
+    private File getFileFromIdentifier(final String identifier, final File directory) {
         // 1) try to find the file in the current directory
         File metadataFile = new File (directory,  identifier + XML_EXT);
         // 2) trying without the extension
@@ -201,9 +201,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * @return A unmarshalled metadata object.
      * @throws org.constellation.ws.MetadataIoException
      */
-    private Object getObjectFromFile(String identifier) throws MetadataIoException {
+    private Object getObjectFromFile(final String identifier) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
-        if (metadataFile.exists()) {
+        if (metadataFile != null && metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
@@ -231,13 +231,13 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * Apply the elementSet (Brief, Summary or full) or the custom elementSetName on the specified record.
      * 
      * @param record A dublinCore record.
-     * @param type The ElementSetType to apply ont this record.
-     * @param elementName A list of QName correspunding to the requested attribute. this parameter is ignored if type is not null.
+     * @param type The ElementSetType to apply on this record.
+     * @param elementName A list of QName corresponding to the requested attribute. this parameter is ignored if type is not null.
      *
      * @return A record object.
      * @throws MetadataIoException If the type and the element name are null.
      */
-    private AbstractRecordType applyElementSet(RecordType record, ElementSetType type, List<QName> elementName) throws MetadataIoException {
+    private AbstractRecordType applyElementSet(final RecordType record, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         
         if (type != null) {
             if (type.equals(ElementSetType.SUMMARY)) {
@@ -290,7 +290,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * @param elementName
      * @return
      */
-    private AbstractRecordType translateISOtoDC(DefaultMetadata metadata, ElementSetType type, List<QName> elementName) {
+    private AbstractRecordType translateISOtoDC(final DefaultMetadata metadata, final ElementSetType type, final List<QName> elementName) {
         if (metadata != null) {
 
             final RecordType customRecord = new RecordType();
@@ -482,7 +482,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException {
+    public List<DomainValues> getFieldDomainofValues(final String propertyNames) throws MetadataIoException {
         final List<DomainValues> responseList = new ArrayList<DomainValues>();
         final StringTokenizer tokens          = new StringTokenizer(propertyNames, ",");
 
@@ -515,13 +515,13 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     }
 
     /**
-     * Return all the String values correspounding to the specified list of path through the metadata.
+     * Return all the String values corresponding to the specified list of path through the metadata.
      * 
      * @param paths
      * @return
      * @throws MetadataIoException
      */
-    private List<String> getAllValuesFromPaths(List<String> paths, File directory) throws MetadataIoException {
+    private List<String> getAllValuesFromPaths(final List<String> paths, final File directory) throws MetadataIoException {
         final List<String> result = new ArrayList<String>();
         Unmarshaller unmarshaller = null;
         try {
@@ -569,7 +569,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
+    public List<String> executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException {
         throw new MetadataIoException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 
@@ -584,7 +584,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     /**
      *
      */
-    public List<? extends Object> getAllEntries(File directory) throws MetadataIoException {
+    public List<? extends Object> getAllEntries(final File directory) throws MetadataIoException {
         final List<Object> results = new ArrayList<Object>();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
@@ -631,7 +631,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     /**
      * 
      */
-    public List<String> getAllIdentifiers(File directory) throws MetadataIoException {
+    public List<String> getAllIdentifiers(final File directory) throws MetadataIoException {
         final List<String> results = new ArrayList<String>();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
