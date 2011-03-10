@@ -466,7 +466,6 @@ public class CQLParserTest {
         assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
         BBOX spabbox = (BBOX) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
 
-        //System.out.println("spabbox:" + spabbox.getSRS());
         assertTrue(spabbox instanceof BBOX);
         
         /**

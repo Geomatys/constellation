@@ -94,7 +94,6 @@ public class GenericConfigurationXMLBindingTest {
         marshaller.marshal(config, sw);
 
         String result =  removeXmlns(sw.toString());
-        //System.out.println(result);
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                + '\n' +
         "<automatic format=\"MDWEB\" >" + '\n' +
@@ -167,7 +166,6 @@ public class GenericConfigurationXMLBindingTest {
         marshaller.marshal(sosConfig, sw);
 
         String result =  removeXmlns(sw.toString());
-        //System.out.println("result:" + result);
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
         "<ns2:SOSConfiguration >" + '\n' +

@@ -69,7 +69,6 @@ public class LayersBean {
      */
     public void performAction() throws MalformedURLException {
         if (getInputText() != null) {
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>><  inputText = " + getInputText());
             final WebMapServer webMapServer = new WebMapServer(new URL(getInputText()), "1.3.0");
             mapcontext = createContext(webMapServer.getCapabilities(), webMapServer);
         }
@@ -80,7 +79,6 @@ public class LayersBean {
      */
     public void performTreeTable() {
         if (getInputText() != null) {
-            System.out.println(">>>>>>>>>>>>>>>>>>>>>>><  inputText = " + getInputText());
             final String separator = getInputText().contains("?") ? "&" : "?";
             final String capaUrl = getInputText().concat(separator + "request=Getcapabilities&service=WMS&version=1.3.0");
             try {

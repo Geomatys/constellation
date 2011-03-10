@@ -817,8 +817,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             className = className.substring(0, className.length() - 4);
         }
 
-        if (className.endsWith("Entry") ) {
-            className = className.substring(0, className.length() - 5);
+        if (className.endsWith("Code") ) {
+            className = className.substring(0, className.length() - 4);
         }
         
         final List<Standard> availableStandards = standardMapping.get(mainStandard);
@@ -844,7 +844,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             String name = className;
             int nameType = 0;
             final String codeSuffix = "Code";
-            while (nameType < 17) {
+            while (nameType < 8) {
                 
                 LOGGER.finer("searching: " + standard.getName() + ':' + name);
                 result = mdWriter.getClasse(name, standard);
@@ -856,104 +856,51 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 
                 switch (nameType) {
 
-                        //we add the prefix MD_
                         case 0: {
                             nameType = 1;
-                            name = "MD_" + className;    
-                            break;
-                        }
-                        //we add the prefix MD_ + the suffix "Code"
-                        case 1: {
-                            nameType = 2;
                             name = "MD_" + className + codeSuffix;
                             break;
                         }
-                        //we add the prefix CI_
-                        case 2: {
-                            nameType = 3;
-                            name = "CI_" + className;    
-                            break;
-                        }
                         //we add the prefix CI_ + the suffix "Code"
-                        case 3: {
-                            nameType = 4;
+                        case 1: {
+                            nameType = 2;
                             name = "CI_" + className + codeSuffix;
                             break;
                         }
-                        //we add the prefix EX_
-                        case 4: {
-                            nameType = 5;
-                            name = "EX_" + className;    
-                            break;
-                        }
-                        //we add the prefix SV_
-                        case 5: {
-                            nameType = 6;
-                            name = "SV_" + className;    
-                            break;
-                        }
-                        //we add the prefix FC_
-                        case 6: {
-                            nameType = 7;
-                            name = "FC_" + className;    
-                            break;
-                        }
-                        //we add the prefix DQ_
-                        case 7: {
-                            nameType = 8;
-                            name = "DQ_" + className;    
-                            break;
-                        }
-                        //we add the prefix LI_
-                        case 8: {
-                            nameType = 9;
-                            name = "LI_" + className;    
-                            break;
-                        }
-                        //we add the prefix MI_
-                        case 9: {
-                            nameType = 10;
-                            name = "MI_" + className;
-                            break;
-                        }
-                        //we add the prefix MI_
-                        case 10: {
-                            nameType = 11;
+                        //we add the prefix MI_ + the suffix "Code"
+                        case 2: {
+                            nameType = 3;
                             name = "MI_" + className + codeSuffix;
                             break;
                         }
                         //we add the prefix DS_ + the suffix "Code"
-                        case 11: {
-                            nameType = 12;
+                        case 3: {
+                            nameType = 4;
                             name = "DS_" + className + codeSuffix;
                             break;
                         }
+                        //we add the prefix MI_
+                        case 4: {
+                            nameType = 5;
+                            name = "MI_" + className;
+                            break;
+                        }
                         //for the temporal element we remove add prefix
-                        case 12: {
+                        case 5: {
                             name = "Time" + className;
-                            nameType = 13;
+                            nameType = 6;
                             break;
                         }
                         //for the code list we add the "code" suffix
-                        case 13: {
+                        case 6: {
                             if (name.indexOf(codeSuffix) != -1) {
                                 name += codeSuffix;
                             }
-                            nameType = 14;
-                            break;
-                        }
-                        case 14: {
-                            nameType = 15;
-                            name = "QE_" + className;
-                            break;
-                        }
-                        case 15: {
-                            nameType = 16;
-                            name = "LE_" + className;
+                            nameType = 7;
                             break;
                         }
                         default:
-                            nameType = 17;
+                            nameType = 8;
                             break;
                     }
 

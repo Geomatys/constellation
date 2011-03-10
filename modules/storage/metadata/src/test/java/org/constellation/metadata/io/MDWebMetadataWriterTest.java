@@ -19,6 +19,7 @@
 package org.constellation.metadata.io;
 
 
+import org.geotoolkit.lang.Setup;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
@@ -63,7 +64,7 @@ public class MDWebMetadataWriterTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         
-
+        Setup.initialize(null);
         pool = CSWMarshallerPool.getInstance();
         StaticMetadata.fillPoolAnchor((AnchoredMarshallerPool) pool);
 
@@ -101,6 +102,7 @@ public class MDWebMetadataWriterTest {
         if (ds != null) {
             ds.shutdown();
         }
+        Setup.shutdown();
     }
 
     @Before
@@ -339,8 +341,19 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata result = (DefaultMetadata) absResult;
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta7.xml"));
 
-        pool.release(unmarshaller);
         metadataEquals(expResult,result);
+        
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("42292_5p_19900609195600", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+
+        metadataEquals(expResult,result);
+
+        pool.release(unmarshaller);
     }
 
     /**

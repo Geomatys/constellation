@@ -62,7 +62,6 @@ public class MDWebMetadataReaderTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        System.out.println(UUID.randomUUID());
         pool = CSWMarshallerPool.getInstance();
         StaticMetadata.fillPoolAnchor((AnchoredMarshallerPool) pool);
 
