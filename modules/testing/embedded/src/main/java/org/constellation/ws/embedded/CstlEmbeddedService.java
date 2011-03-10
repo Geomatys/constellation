@@ -34,6 +34,8 @@ import org.geotoolkit.console.Option;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.net.httpserver.HttpContext;
+import org.constellation.metadata.ws.soap.CSWService;
 
 
 /**
@@ -62,7 +64,7 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
  *   <li>For JAX-WS, SOAP based services, set the reference of the Service 
  *       Endpoint Interface.
  * <pre>
- *     serviceInstanceSOAP = org.constellation.sos.ws.soap.SOSService;
+ *     serviceInstanceSOAP = new org.constellation.sos.ws.soap.SOSService();
  * </pre>
  *   </li>
  *   <li>Add a simple main, such as:
@@ -231,14 +233,10 @@ public class CstlEmbeddedService extends CommandLine {
 
         LOGGER.log(Level.INFO, "Starting jax-ws server at: {0}", f.format(new Date()));
 
-        final String service = uri.toString() + "pep";
-        Endpoint ep = null;
+        final String service = uri.toString() + "sos";
+        Endpoint ep =  Endpoint.create(serviceInstanceSOAP);
+
         ep = Endpoint.publish(service, serviceInstanceSOAP);
-//        try {
-//            ep = Endpoint.publish(service, serviceInstanceSOAP);
-//        } catch (JAXBException e) {
-//            e.printStackTrace();
-//        }
 
         LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
         LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
@@ -280,6 +278,6 @@ public class CstlEmbeddedService extends CommandLine {
     }
 
     public static void main(String[] args) {
-        new CstlEmbeddedService(args).runREST();
+        new CstlEmbeddedService(args).runSOAP();
     }
 }
