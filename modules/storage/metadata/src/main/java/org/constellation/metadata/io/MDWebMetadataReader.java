@@ -930,7 +930,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             packagesName.addAll(extraPackage.get(standardName));
 
         } else {
-            if (!className.contains("Code") && !"DCPList".equals(className) && !"SV_CouplingType".equals(className) && !"AxisDirection".equals(className)) {
+            if (!className.contains("Code") && !"DCPList".equals(className) && !"SV_CouplingType".equals(className) && !"CS_AxisDirection".equals(className)) {
                 packagesName.addAll(geotoolkitPackage);
                 packagesName.addAll(gmlPackage);
             } else {

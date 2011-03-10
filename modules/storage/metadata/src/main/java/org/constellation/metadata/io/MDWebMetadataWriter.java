@@ -70,6 +70,7 @@ import org.mdweb.io.MD_IOFactory;
 import org.mdweb.io.Writer;
 import org.mdweb.model.storage.FormInfo;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
+import org.opengis.annotation.UML;
 import org.opengis.metadata.Metadata;
 
 /**
@@ -790,35 +791,17 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         final String annotationName = getNameFromAnnotation(object);
         if (annotationName != null) {
             className =  annotationName;
-        }
+        } else {
 
-        //we remove the Default prefix
-        if (className.startsWith("Default")) {
-            className = className.substring(7, className.length());
-        }
+            //we remove the Default prefix
+            if (className.startsWith("Default")) {
+                className = className.substring(7, className.length());
+            }
 
-        //we remove the Type suffix
-        if (className.endsWith("Type") && !"CouplingType".equals(className)
-                                       && !"OperationType".equals(className)
-                                       && !"GeometryType".equals(className)
-                                       && !"ObjectiveType".equals(className)
-                                       && !"DateType".equals(className)
-                                       && !"KeywordType".equals(className)
-                                       && !"FC_FeatureType".equals(className)
-                                       && !"GeometricObjectType".equals(className)
-                                       && !"SpatialRepresentationType".equals(className)
-                                       && !"AssociationType".equals(className)
-                                       && !"InitiativeType".equals(className)
-                                       && !"DimensionNameType".equals(className)
-                                       && !"GNC_RelationType".equals(className)
-                                       && !"CoverageContentType".equals(className)
-                                       && !"TransferFunctionType".equals(className)
-                                       && !"CodeType".equals(className)) {
-            className = className.substring(0, className.length() - 4);
-        }
-
-        if (className.endsWith("Code") ) {
-            className = className.substring(0, className.length() - 4);
+            //we remove the Type suffix
+            if (className.endsWith("Type") && !"CodeType".equals(className)){
+                className = className.substring(0, className.length() - 4);
+            }
         }
         
         final List<Standard> availableStandards = standardMapping.get(mainStandard);
@@ -843,8 +826,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             String name = className;
             int nameType = 0;
-            final String codeSuffix = "Code";
-            while (nameType < 8) {
+            while (nameType < 2) {
                 
                 LOGGER.finer("searching: " + standard.getName() + ':' + name);
                 result = mdWriter.getClasse(name, standard);
@@ -857,50 +839,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 switch (nameType) {
 
                         case 0: {
-                            nameType = 1;
-                            name = "MD_" + className + codeSuffix;
-                            break;
-                        }
-                        //we add the prefix CI_ + the suffix "Code"
-                        case 1: {
-                            nameType = 2;
-                            name = "CI_" + className + codeSuffix;
-                            break;
-                        }
-                        //we add the prefix MI_ + the suffix "Code"
-                        case 2: {
-                            nameType = 3;
-                            name = "MI_" + className + codeSuffix;
-                            break;
-                        }
-                        //we add the prefix DS_ + the suffix "Code"
-                        case 3: {
-                            nameType = 4;
-                            name = "DS_" + className + codeSuffix;
-                            break;
-                        }
-                        //we add the prefix MI_
-                        case 4: {
-                            nameType = 5;
-                            name = "MI_" + className;
-                            break;
-                        }
-                        //for the temporal element we remove add prefix
-                        case 5: {
                             name = "Time" + className;
-                            nameType = 6;
-                            break;
-                        }
-                        //for the code list we add the "code" suffix
-                        case 6: {
-                            if (name.indexOf(codeSuffix) != -1) {
-                                name += codeSuffix;
-                            }
-                            nameType = 7;
+                            nameType = 1;
                             break;
                         }
                         default:
-                            nameType = 8;
+                            nameType = 2;
                             break;
                     }
 
@@ -913,20 +857,29 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     /**
-     * Find The class name by extracting the XmlElementRoot annotation.
+     * Find The class name by extracting the {@link XmlRootElement} annotation.
+     * For the instance of {@link org.opengis.util.CodeList},
+     * we extract the name from the {@link UML} annotation
      * 
-     * @param object
-     * @return the name parameter in the XmlElementRoot annotation if there is one on the class of the specified object.
+     * @param object A GeotoolKit object
+     * @return the name parameter in the XmlElementRoot annotation or identifier parameter in UM annotation.
      *
      */
     private String getNameFromAnnotation(final Object object) {
         
-        XmlRootElement a = (XmlRootElement) object.getClass().getAnnotation(XmlRootElement.class);
-        if (a != null) {
-            return a.name();
+        if (object instanceof org.opengis.util.CodeList) {
+            UML a = (UML)object.getClass().getAnnotation(UML.class);
+            if (a != null) {
+                return a.identifier();
+            }
+        } else {
+            XmlRootElement a = (XmlRootElement) object.getClass().getAnnotation(XmlRootElement.class);
+            if (a != null) {
+                return a.name();
+            }
         }
         return null;
-    }
+   }
     
     /**
      * Return a {@link Classe} (java primitive type) from a class name.
