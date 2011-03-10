@@ -520,6 +520,29 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 result.add(localeValue);
             }
 
+        //Special case for PT_Locale
+        } else if (classe.getName().equals("PT_Locale")) {
+            final Locale loc = (Locale) object;
+
+            // 1. the root Value PT_Locale
+            final Value rootValue = new Value(path, form, ordinal, classe, parentValue);
+            result.add(rootValue);
+
+            // 2. The languageCode value
+            final String languageValue   = loc.getLanguage();
+            final Path languageValuePath = new Path(path, classe.getPropertyByName("languageCode"));
+            final TextValue lanTextValue = new TextValue(languageValuePath, form , ordinal, languageValue, mdWriter.getClasse("LanguageCode", Standard.ISO_19115), rootValue);
+            result.add(lanTextValue);
+
+            // 3. the country value
+            final String countryValue    = loc.getCountry();
+            final Path countryValuePath  = new Path(path, classe.getPropertyByName("country"));
+            final TextValue couTextValue = new TextValue(countryValuePath, form , ordinal, countryValue, mdWriter.getClasse("CountryCode", Standard.ISO_19115), rootValue);
+            result.add(couTextValue);
+
+            // 4. the encoding value "LOST for now" TODO
+            
+            
         // if its a primitive type we create a TextValue
         } else if (classe.isPrimitive() || classe.getName().equals("LocalName")) {
             if (classe instanceof CodeList) {
@@ -742,6 +765,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         String packageName;
         Classe result;
         if (object != null) {
+
+            // special case variant (we don't want to use cache) for PT_Locale
+            if (object instanceof Locale && ((Locale)object).getCountry() != null && !((Locale)object).getCountry().isEmpty()) {
+                return mdWriter.getClasse("PT_Locale", Standard.ISO_19115);
+            }
+
             // look for previously cached result
             result = classBinding.get(object.getClass().getName());
             if (result != null) {
@@ -750,11 +779,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
             className   = object.getClass().getSimpleName();
             packageName = object.getClass().getPackage().getName();
-            LOGGER.log(Level.FINER, "searche for classe {0}", className);
+            LOGGER.log(Level.FINER, "search for classe {0}", className);
             
         } else {
             return null;
         }
+
         //for the primitive type we return ISO primitive type
         result = getPrimitiveTypeFromName(className);
         if (result != null) {

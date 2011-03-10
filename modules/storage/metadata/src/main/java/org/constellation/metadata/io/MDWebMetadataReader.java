@@ -63,6 +63,7 @@ import org.mdweb.io.Reader;
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.geotoolkit.internal.CodeLists;
+import org.geotoolkit.internal.jaxb.MarshalContext;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.naming.DefaultLocalName;
 import org.geotoolkit.naming.DefaultNameFactory;
@@ -651,6 +652,32 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     resultIS.add(entry.getKey(), entry.getValue());
                 }
                 return resultIS;
+            
+            /**
+             * Again another special case PT_Locale has a special construction.
+             */
+            } else if ("Locale".equals(className)) {
+                String countryValue  = null;
+                String languageValue = null;
+                for (Value childValue : value.getChildren()) {
+                    if (childValue instanceof TextValue && "languageCode".equals(childValue.getPath().getName())) {
+                        languageValue = ((TextValue)childValue).getValue();
+                    } else if (childValue instanceof TextValue && "country".equals(childValue.getPath().getName())) {
+                        countryValue = ((TextValue)childValue).getValue();
+                    }
+                }
+                Locale language = Locales.parse(languageValue);
+                Locale country  = Locales.unique(new Locale("", countryValue));
+                if (language == null) {
+                    language = country;
+                } else if (country != null) {
+                    // Merge the language and the country in a single Locale instance.
+                    final String c = country.getCountry();
+                    if (!c.equals(language.getCountry())) {
+                        language = Locales.unique(new Locale(language.getLanguage(), c));
+                    }
+                }
+                return language;
             }
 
             /**
@@ -851,7 +878,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else if (className.equalsIgnoreCase("URL") || className.equalsIgnoreCase("URI")) {
             return URI.class;
         //special case for locale codeList.
-        } else if (className.equalsIgnoreCase("LanguageCode")) {
+        } else if (className.equalsIgnoreCase("LanguageCode") || className.equals("PT_Locale")) {
             return Locale.class;
         } else if (className.equalsIgnoreCase("CountryCode")) {
             return String.class;

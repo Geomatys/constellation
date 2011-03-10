@@ -63,10 +63,10 @@
     <gmd:metadataStandardVersion>
         <gco:CharacterString>2005/PDAM 1</gco:CharacterString>
     </gmd:metadataStandardVersion>
-    <!--gmd:locale>
+    <gmd:locale>
         <gmd:PT_Locale id="locale-eng">
             <gmd:languageCode>
-                <gmd:LanguageCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#LanguageCode" codeListValue="eng">eng</gmd:LanguageCode>
+                <gmd:LanguageCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#LanguageCode" codeListValue="en">en</gmd:LanguageCode>
             </gmd:languageCode>
             <gmd:country>
                 <gmd:Country codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#Country" codeListValue="GB">GB</gmd:Country>
@@ -75,7 +75,7 @@
                 <gmd:MD_CharacterSetCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#MD_CharacterSetCode" codeListValue="8859part15">8859part15</gmd:MD_CharacterSetCode>
             </gmd:characterEncoding>
         </gmd:PT_Locale>
-    </gmd:locale-->
+    </gmd:locale>
     <gmd:referenceSystemInfo>
         <gmd:MD_ReferenceSystem id="IGNF_PVA_1-0.xml.referenceSystemInfo.LAMBE">
             <gmd:referenceSystemIdentifier>
