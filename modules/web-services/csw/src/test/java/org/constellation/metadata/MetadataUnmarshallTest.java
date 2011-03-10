@@ -148,7 +148,7 @@ public class MetadataUnmarshallTest {
     public void unmarshallTest() throws Exception {
 
         unmarshaller = testPool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
 
         assertTrue(obj instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) obj;
@@ -873,7 +873,7 @@ public class MetadataUnmarshallTest {
         assertTrue(tmpObj instanceof Period);
 
 
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta7.xml"));
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta7.xml"));
 
         assertTrue(obj instanceof DefaultMetadata);
         result = (DefaultMetadata) obj;
@@ -1459,7 +1459,7 @@ public class MetadataUnmarshallTest {
         marshaller.marshal(metadata, sw);
         String result = sw.toString();
 
-        InputStream in = Util.getResourceAsStream("org/constellation/metadata/meta1.xml");
+        InputStream in = Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml");
         StringWriter out = new StringWriter();
         byte[] buffer = new byte[1024];
         int size;

@@ -275,7 +275,7 @@ public class CSWworkerTest {
 
         DefaultMetadata isoResult = (DefaultMetadata) obj;
 
-        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
 
         metadataEquals(ExpResult1, isoResult);
 
@@ -295,7 +295,7 @@ public class CSWworkerTest {
 
         BriefRecordType briefResult =  (BriefRecordType) obj;
 
-        BriefRecordType expBriefResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1BDC.xml"))).getValue();
+        BriefRecordType expBriefResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1BDC.xml"))).getValue();
 
         assertEquals(expBriefResult1, briefResult);
 
@@ -315,7 +315,7 @@ public class CSWworkerTest {
 
         SummaryRecordType sumResult =  (SummaryRecordType) obj;
 
-        SummaryRecordType expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1SDC.xml"))).getValue();
+        SummaryRecordType expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1SDC.xml"))).getValue();
 
         assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
@@ -336,7 +336,7 @@ public class CSWworkerTest {
 
         RecordType recordResult = (RecordType) obj;
 
-        RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1FDC.xml"))).getValue();
+        RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1FDC.xml"))).getValue();
 
         assertEquals(expRecordResult1.getFormat(), recordResult.getFormat());
         assertEquals(expRecordResult1, recordResult);
@@ -360,7 +360,7 @@ public class CSWworkerTest {
         assertTrue(obj instanceof RecordType);
         RecordType recordResult2 = (RecordType) obj;
 
-        RecordType expRecordResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2FDC.xml"))).getValue();
+        RecordType expRecordResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2FDC.xml"))).getValue();
 
         assertEquals(expRecordResult1, recordResult1);
         assertEquals(expRecordResult2, recordResult2);
@@ -381,7 +381,7 @@ public class CSWworkerTest {
 
         sumResult =  (SummaryRecordType) obj;
 
-        expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1SDC.xml"))).getValue();
+        expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1SDC.xml"))).getValue();
 
         assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
@@ -402,7 +402,7 @@ public class CSWworkerTest {
 
         sumResult =  (SummaryRecordType) obj;
 
-        expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1SDC.xml"))).getValue();
+        expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1SDC.xml"))).getValue();
 
         assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
@@ -549,8 +549,8 @@ public class CSWworkerTest {
             recordResult2   = temp;
         }
 
-        RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1FDC.xml"))).getValue();
-        RecordType expRecordResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2FDC.xml"))).getValue();
+        RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1FDC.xml"))).getValue();
+        RecordType expRecordResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2FDC.xml"))).getValue();
 
         assertEquals(expRecordResult1, recordResult1);
         assertEquals(expRecordResult2, recordResult2);
@@ -611,8 +611,8 @@ public class CSWworkerTest {
             briefResult2   = temp;
         }
 
-        BriefRecordType expBriefResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1BDC.xml"))).getValue();
-        BriefRecordType expBriefResult2 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2BDC.xml"))).getValue();
+        BriefRecordType expBriefResult1 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1BDC.xml"))).getValue();
+        BriefRecordType expBriefResult2 =  ((JAXBElement<BriefRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2BDC.xml"))).getValue();
 
         assertEquals(expBriefResult1, briefResult1);
         assertEquals(expBriefResult2, briefResult2);
@@ -665,8 +665,8 @@ public class CSWworkerTest {
             customResult2   = temp;
         }
 
-        RecordType expCustomResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1CustomDC.xml"))).getValue();
-        RecordType expCustomResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2CustomDC.xml"))).getValue();
+        RecordType expCustomResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1CustomDC.xml"))).getValue();
+        RecordType expCustomResult2 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2CustomDC.xml"))).getValue();
 
         assertEquals(expCustomResult1, customResult1);
         assertEquals(expCustomResult2, customResult2);
@@ -1217,7 +1217,7 @@ public class CSWworkerTest {
         assertTrue(obj instanceof DefaultMetadata);
 
         DefaultMetadata isoResult = (DefaultMetadata) obj;
-        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
         metadataEquals(ExpResult1, isoResult);
         
 
@@ -1258,7 +1258,7 @@ public class CSWworkerTest {
         /*
          *  TEST 1 : we add the metadata 42292_5p_19900609195600
          */
-        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
 
         InsertType insert       = new InsertType(ExpResult1);
         TransactionType request = new TransactionType("CSW", "2.0.2", insert);
@@ -1284,7 +1284,7 @@ public class CSWworkerTest {
         /*
          *  TEST 2 : we add the metadata urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd (DC Record)
          */
-        RecordType ExpResult2 = ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta8.xml"))).getValue();
+        RecordType ExpResult2 = ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
 
         insert  = new InsertType(ExpResult2);
         request = new TransactionType("CSW", "2.0.2", insert);
@@ -1322,7 +1322,7 @@ public class CSWworkerTest {
          *  TEST 1 : we update the metadata 42292_5p_19900609195600 by replacing it by another metadata
          */
 
-        DefaultMetadata replacement        = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
+        DefaultMetadata replacement        = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta6.xml"));
         QueryConstraintType constraint  = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
         UpdateType update               = new UpdateType(replacement, constraint);
         TransactionType request         = new TransactionType("CSW", "2.0.2", update);

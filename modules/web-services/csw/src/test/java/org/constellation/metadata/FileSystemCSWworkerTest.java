@@ -239,7 +239,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             dataFile = new File(dataDirectory, identifier + ".xml");
         }
         FileWriter fw = new FileWriter(dataFile);
-        InputStream in = Util.getResourceAsStream("org/constellation/metadata/" + resourceName);
+        InputStream in = Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName);
 
         byte[] buffer = new byte[1024];
         int size;

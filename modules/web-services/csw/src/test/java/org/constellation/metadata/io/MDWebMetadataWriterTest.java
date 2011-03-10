@@ -196,13 +196,13 @@ public class MDWebMetadataWriterTest {
     public void writeMetadataGMLTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta10.xml"));
         writer.storeMetadata(absExpResult);
         Object absResult = reader.getMetadata("IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.xml", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
-        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta10.xml"));
 
         metadataEquals(expResult,result);
         
@@ -310,14 +310,14 @@ public class MDWebMetadataWriterTest {
     public void writeMetadata19110Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        FeatureCatalogue absExpResult = (FeatureCatalogue) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/featcatalog1.xml"));
+        FeatureCatalogue absExpResult = (FeatureCatalogue) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/featcatalog1.xml"));
         writer.storeMetadata(absExpResult);
 
         Object absResult = reader.getMetadata("cat-1", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof FeatureCatalogueImpl);
         FeatureCatalogueImpl result = (FeatureCatalogueImpl) absResult;
-        FeatureCatalogueImpl expResult =  (FeatureCatalogueImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/featcatalog1.xml"));
+        FeatureCatalogueImpl expResult =  (FeatureCatalogueImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/featcatalog1.xml"));
 
         pool.release(unmarshaller);
         catalogueEquals(expResult,result);
@@ -333,13 +333,13 @@ public class MDWebMetadataWriterTest {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         
-        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta7.xml"));
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta7.xml"));
         writer.storeMetadata(absExpResult);
         Object absResult = reader.getMetadata("MDWeb_FR_SY_couche_vecteur_258", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
-        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta7.xml"));
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta7.xml"));
 
         pool.release(unmarshaller);
         metadataEquals(expResult,result);
@@ -354,14 +354,14 @@ public class MDWebMetadataWriterTest {
     public void writeMetadata191152Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
         writer.storeMetadata(absExpResult);
 
         Object absResult = reader.getMetadata("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
-        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
 
         pool.release(unmarshaller);
         metadataEquals(expResult,result);
@@ -379,7 +379,7 @@ public class MDWebMetadataWriterTest {
     @Test
     public void writeMetadata191152Again() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/imageMetadata.xml"));
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
 
         String exceptionMsg = "";
         try {
@@ -410,14 +410,14 @@ public class MDWebMetadataWriterTest {
     public void writeMetadata19119Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-19119.xml"));
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta-19119.xml"));
         writer.storeMetadata(absExpResult);
 
         Object absResult = reader.getMetadata("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4", AbstractMetadataReader.ISO_19115,  null);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
-        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-19119.xml"));
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta-19119.xml"));
 
         pool.release(unmarshaller);
         metadataEquals(expResult, result);

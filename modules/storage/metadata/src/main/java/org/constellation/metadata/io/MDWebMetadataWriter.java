@@ -649,6 +649,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     
                     } else if (prop.getName().equalsIgnoreCase("transformationParameterAvailability")) {
                          propName = "transformationParameterAvailable";
+                    } else if (prop.getName().equalsIgnoreCase("checkPointAvailibility")) {
+                         propName = "checkPointAvailable";
                     } else if (prop.getName().equalsIgnoreCase("UsageDateTime")) {
                          propName = "usageDate";
                     } else if (prop.getName().equalsIgnoreCase("dateTime") && object.getClass().getSimpleName().equals("DefaultProcessStep")) {
@@ -656,7 +658,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     } else if (prop.getName().equalsIgnoreCase("aName") && (object.getClass().getSimpleName().equals("DefaultTypeName") ||
                                                                             object.getClass().getSimpleName().equals("DefaultMemberName"))) {
                         propName = "name";
-                    }else {
+                    } else {
                         propName = prop.getName();
                     }
 

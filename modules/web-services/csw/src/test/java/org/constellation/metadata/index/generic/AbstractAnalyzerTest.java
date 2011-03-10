@@ -46,42 +46,42 @@ public abstract class AbstractAnalyzerTest {
         List<Object> result       = new ArrayList<Object>();
         Unmarshaller unmarshaller = CSWMarshallerPool.getInstance().acquireUnmarshaller();
 
-        Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
         if (obj instanceof DefaultMetadata) {
             result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be DefaultMetadata");
         }
 
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2.xml"));
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta2.xml"));
         if (obj instanceof DefaultMetadata) {
             result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be DefaultMetadata:" + obj);
         }
 
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta3.xml"));
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta3.xml"));
         if (obj instanceof DefaultMetadata) {
             result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be DefaultMetadata:" + obj);
         }
 
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta4.xml"));
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta4.xml"));
         if (obj instanceof DefaultMetadata) {
             result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be DefaultMetadata:" + obj);
         }
 
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta5.xml"));
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta5.xml"));
         if (obj instanceof DefaultMetadata) {
             result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be DefaultMetadata:" + obj);
         }
 
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta6.xml"));
         if (obj instanceof DefaultMetadata) {
             result.add((DefaultMetadata) obj);
         } else {
