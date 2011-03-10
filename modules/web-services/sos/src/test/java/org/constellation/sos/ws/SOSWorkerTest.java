@@ -25,7 +25,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.sos.utils.SOSTestUtils;
+import org.constellation.test.utils.MetadataUtilities;
 
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -338,7 +338,7 @@ public class SOSWorkerTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) absExpResult;
 
-        SOSTestUtils.SystemSMLEquals(expResult, result);
+        MetadataUtilities.SystemSMLEquals(expResult, result);
 
         /**
          * Test 2 component sensor
@@ -353,7 +353,7 @@ public class SOSWorkerTest {
         result = (SensorML) absResult;
         expResult = (SensorML) absExpResult;
 
-        SOSTestUtils.ComponentEquals(expResult, result);
+        MetadataUtilities.ComponentEquals(expResult, result);
 
         SensorMLMarshallerPool.getInstance().release(unmarshaller);
     }
@@ -2100,7 +2100,7 @@ public class SOSWorkerTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) sensorDescription;
 
-        SOSTestUtils.SystemSMLEquals(expResult, result);
+        MetadataUtilities.SystemSMLEquals(expResult, result);
 
 
         marshallerPool.release(unmarshaller);

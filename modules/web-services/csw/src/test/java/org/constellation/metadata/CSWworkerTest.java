@@ -36,7 +36,7 @@ import javax.xml.namespace.QName;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import static org.constellation.metadata.CSWTestUtils.*;
+import static org.constellation.test.utils.MetadataUtilities.*;
 import static org.constellation.metadata.CSWConstants.*;
 
 // geotoolkit dependencies

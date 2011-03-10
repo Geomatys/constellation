@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,20 +19,19 @@
 package org.constellation.metadata.io;
 
 import java.util.UUID;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
 import java.io.StringReader;
 import java.sql.Connection;
 import javax.xml.bind.Unmarshaller;
 
-// cstl dependencies
+// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
-import static org.constellation.metadata.CSWTestUtils.*;
+import static org.constellation.test.utils.MetadataUtilities.*;
 
 // Geotoolkit dependencies
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.internal.sql.DefaultDataSource;
@@ -40,6 +39,7 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 // Junit dependencies
 import org.junit.*;

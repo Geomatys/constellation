@@ -1,9 +1,21 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2007 - 2011, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata;
+package org.constellation.test.utils;
 
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.lineage.Algorithm;
@@ -44,9 +56,9 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal (Geomatys)
  */
-public class CSWTestUtils {
+public class MetadataUtilities {
 
     public static void metadataEquals(DefaultMetadata expResult, DefaultMetadata result) {
 
@@ -669,6 +681,8 @@ public class CSWTestUtils {
         assertEquals(expSysProcess.getPositions(), resSysProcess.getPositions());
         
         assertEquals(expSysProcess.getSMLLocation().getPoint().getPos(), resSysProcess.getSMLLocation().getPoint().getPos());
+        assertEquals(expSysProcess.getSMLLocation().getPoint().getAxisLabels(), resSysProcess.getSMLLocation().getPoint().getAxisLabels());
+        assertEquals(expSysProcess.getSMLLocation().getPoint().getUomLabels(), resSysProcess.getSMLLocation().getPoint().getUomLabels());
         assertEquals(expSysProcess.getSMLLocation().getPoint(), resSysProcess.getSMLLocation().getPoint());
         assertEquals(expSysProcess.getSMLLocation(), resSysProcess.getSMLLocation());
         assertEquals(expSysProcess.getSpatialReferenceFrame().getEngineeringCRS().getSrsName(), resSysProcess.getSpatialReferenceFrame().getEngineeringCRS().getSrsName());

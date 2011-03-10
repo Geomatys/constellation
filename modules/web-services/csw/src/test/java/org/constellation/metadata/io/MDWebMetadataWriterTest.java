@@ -19,7 +19,6 @@
 package org.constellation.metadata.io;
 
 
-import org.constellation.metadata.utils.Utils;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
@@ -31,7 +30,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
-import static org.constellation.metadata.CSWTestUtils.*;
+import static org.constellation.test.utils.MetadataUtilities.*;
 
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.sml.xml.AbstractSensorML;

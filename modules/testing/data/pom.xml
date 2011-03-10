@@ -61,6 +61,35 @@
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
+     <dependency>
+       <groupId>org.geotoolkit.pending</groupId>
+       <artifactId>geotk-xml-sensorML</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-temporal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-metadata-fra</artifactId>
+    </dependency>
+    <dependency>
+     <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-ebrim</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-feature-catalogue</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+    </dependency>
   </dependencies>
 
 

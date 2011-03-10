@@ -209,10 +209,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         availableStandards.add(Standard.ISO_19119);
         availableStandards.add(Standard.ISO_19110);
 
-        /*final Standard nsdi = mdWriter.getStandard("NATSDI");
-            if (nsdi != null)  {
-                availableStandards.add(nsdi);
-            }*/
         standardMapping.put(Standard.ISO_19115, availableStandards);
 
         // CSW standard
@@ -598,21 +594,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
             final TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);
             result.add(textValue);
-            //LOGGER.finer("new TextValue: " + path.getId() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
         
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
             
             final LinkedValue value = new LinkedValue(path, form, ordinal, linkedValue.getForm(), linkedValue, classe, parentValue);
             result.add(value);
-            //LOGGER.finer("new LinkedValue: " + path.getId() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
         
         // else we build a Value node.
         } else {
         
             final Value value = new Value(path, form, ordinal, classe, parentValue);
             result.add(value);
-            //LOGGER.finer("new Value: " + path.getId() + " classe:" + classe.getName() + " ordinal=" + ordinal);
             //we add this object to the listed of already write element
             if (!isNoLink()) {
                 alreadyWrite.put(object, value);
@@ -759,7 +752,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * 
      * @param object the object to identify
      *
-     * @throws java.sql.SQLException
+     * @throws org.mdweb.io.MD_IOException
      */
     protected Classe getClasseFromObject(final Object object) throws MD_IOException {
         
