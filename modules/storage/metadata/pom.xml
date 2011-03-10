@@ -68,14 +68,15 @@
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-       <groupId>org.geotoolkit.pending</groupId>
-       <artifactId>geotk-xml-ebrim</artifactId>
+       <groupId>org.constellation.testing</groupId>
+       <artifactId>cstl-test-data</artifactId>
+       <version>${project.version}</version>
        <scope>test</scope>
     </dependency>
         <dependency>
-       <groupId>org.geotoolkit.pending</groupId>
-       <artifactId>geotk-xml-sensorML</artifactId>
-       <scope>test</scope>
+       <groupId>org.mdweb.metamodel</groupId>
+       <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

@@ -26,7 +26,6 @@ import javax.xml.bind.Unmarshaller;
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
 import static org.constellation.test.utils.MetadataUtilities.*;
 
@@ -65,7 +64,7 @@ public class MDWebMetadataReaderTest {
 
         System.out.println(UUID.randomUUID());
         pool = CSWMarshallerPool.getInstance();
-        CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) pool);
+        StaticMetadata.fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         final String url = "jdbc:derby:memory:MMRTest;create=true";
         ds               = new DefaultDataSource(url);

@@ -17,6 +17,12 @@
 
 package org.constellation.metadata.io;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -330,4 +336,32 @@ public class StaticMetadata {
         "   </gmd:identificationInfo>" + '\n' +
         "</gmd:MD_Metadata>";
 
+        public static void fillPoolAnchor(AnchoredMarshallerPool pool) {
+        try {
+            pool.addAnchor("Common Data Index record", new URI("SDN:L231:3:CDI"));
+            pool.addAnchor("France", new URI("SDN:C320:2:FR"));
+            pool.addAnchor("EPSG:4326", new URI("SDN:L101:2:4326"));
+            pool.addAnchor("2", new URI("SDN:C371:1:2"));
+            pool.addAnchor("35", new URI("SDN:C371:1:35"));
+            pool.addAnchor("Transmittance and attenuance of the water column", new URI("SDN:P021:35:ATTN"));
+            pool.addAnchor("Electrical conductivity of the water column", new URI("SDN:P021:35:CNDC"));
+            pool.addAnchor("Dissolved oxygen parameters in the water column", new URI("SDN:P021:35:DOXY"));
+            pool.addAnchor("Light extinction and diffusion coefficients", new URI("SDN:P021:35:EXCO"));
+            pool.addAnchor("Dissolved noble gas concentration parameters in the water column", new URI("SDN:P021:35:HEXC"));
+            pool.addAnchor("Optical backscatter", new URI("SDN:P021:35:OPBS"));
+            pool.addAnchor("Salinity of the water column", new URI("SDN:P021:35:PSAL"));
+            pool.addAnchor("Dissolved concentration parameters for 'other' gases in the water column", new URI("SDN:P021:35:SCOX"));
+            pool.addAnchor("Temperature of the water column", new URI("SDN:P021:35:TEMP"));
+            pool.addAnchor("Visible waveband radiance and irradiance measurements in the atmosphere", new URI("SDN:P021:35:VSRA"));
+            pool.addAnchor("Visible waveband radiance and irradiance measurements in the water column", new URI("SDN:P021:35:VSRW"));
+            pool.addAnchor("MEDATLAS ASCII", new URI("SDN:L241:1:MEDATLAS"));
+        } catch (URISyntaxException ex) {
+            Logger.getLogger("StaticMetadata").log(Level.SEVERE, null, ex);
+        } catch (IllegalStateException ex) {
+            // this exception happen when we try to put 2 twice the same anchor.
+            // for this test we call many times this method in a static instance (CSWMarshallerPool)
+            // so for now we do bnothing here
+            // TODO find a way to call this only one time in the CSW test
+        }
+    }
 }
