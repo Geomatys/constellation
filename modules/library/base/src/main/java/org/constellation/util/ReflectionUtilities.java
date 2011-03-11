@@ -393,32 +393,19 @@ public final class ReflectionUtilities {
      */
     public static Method getGetterFromName(String propertyName, final Class<?> rootClass) {
 
+        Method getter = getGetterFromAnnotation(propertyName, rootClass);
+
+        if (getter != null) return getter;
+        
         final String rootClassName = rootClass.getName();
         //special case and corrections TODO remove
         if ("beginPosition".equals(propertyName) && !"org.geotoolkit.gml.xml.v311.TimePeriodType".equals(rootClassName)) {
-            if ("org.geotoolkit.temporal.object.DefaultInstant".equals(rootClassName))
-                return null;
-            else
-                propertyName = "beginning";
+            propertyName = "beginning";
         } else if ("endPosition".equals(propertyName)  && !"org.geotoolkit.gml.xml.v311.TimePeriodType".equals(rootClassName)) {
-            if ("org.geotoolkit.temporal.object.DefaultInstant".equals(rootClassName))
-                return null;
-            else
-                propertyName = "ending";
-        } else if ("recordType".equals(propertyName) && "DefaultRecordType".equals(rootClass.getSimpleName())) {
-            return null;
-        } else if ("dataSetURI".equals(propertyName)) {
-            propertyName = "dataSetUri";
-        } else if ("nameOfMeasure".equals(propertyName)) {
-            propertyName = "namesOfMeasure";
-        } else if ("dateTime".equals(propertyName) && rootClassName.startsWith("org.geotoolkit.metadata.iso.quality")) {
-             propertyName = "dates";
-        } else if ("extentTypeCode".equals(propertyName)) {
-            propertyName = "inclusion";
+            propertyName = "ending";
         // TODO remove when this issue will be fix in MDWeb
         } else if (propertyName.indexOf("geographicElement") != -1) {
             propertyName = "geographicElement";
-
         } else if ("value".equals(propertyName) && ("org.geotoolkit.temporal.object.DefaultPosition".equals(rootClassName))) {
             propertyName = "date";
         }
@@ -428,10 +415,9 @@ public final class ReflectionUtilities {
         final String methodName3 = propertyName;
         int occurenceType = 0;
 
-        while (occurenceType < 7) {
+        while (occurenceType < 6) {
 
             try {
-                Method getter = null;
                 switch (occurenceType) {
 
                     case 0: {
@@ -462,14 +448,6 @@ public final class ReflectionUtilities {
                         getter = rootClass.getMethod(methodName3);
                         break;
                     }
-                    case 6: {
-                        String temp = methodName2;
-                        if (methodName2.endsWith("Availability")) {
-                            temp = methodName2.substring(0, methodName2.length() - 12) + "Available";
-                        }
-                        getter = rootClass.getMethod(temp);
-                        break;
-                    }
                     default: break;
 
                 }
@@ -479,7 +457,7 @@ public final class ReflectionUtilities {
                 occurenceType++;
             }
         }
-        return null;
+        return getter;
     }
 
     /**
@@ -490,7 +468,7 @@ public final class ReflectionUtilities {
      *
      * @return a setter to this attribute or {@code null}.
      */
-    public static Method getGetterFromName2(String propertyName, final Class<?> rootClass) {
+    public static Method getGetterFromAnnotation(String propertyName, final Class<?> rootClass) {
         Class[] interfaces = rootClass.getInterfaces();
         boolean hasGeoAPIInterface = false;
         for (Class interf : interfaces) {
@@ -727,7 +705,7 @@ public final class ReflectionUtilities {
     }
 
     /**
-     * Return true if the path is applyable to the specified metadata type.
+     * Return true if the path is applicable to the specified metadata type.
      *
      * @param metadata A metadata object.
      * @param pathID A path on the form Standard:Type:attribute1:attribute2

@@ -353,6 +353,16 @@ public class MDWebMetadataWriterTest {
 
         metadataEquals(expResult,result);
 
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta9.xml"));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("identifier-test", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta9.xml"));
+
+        metadataEquals(expResult,result);
+
         pool.release(unmarshaller);
     }
 

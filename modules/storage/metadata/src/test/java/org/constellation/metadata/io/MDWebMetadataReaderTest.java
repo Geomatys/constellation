@@ -18,7 +18,6 @@
 
 package org.constellation.metadata.io;
 
-import java.util.UUID;
 import java.io.StringReader;
 import java.sql.Connection;
 import javax.xml.bind.Unmarshaller;

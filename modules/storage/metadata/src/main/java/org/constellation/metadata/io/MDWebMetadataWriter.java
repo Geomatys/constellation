@@ -624,12 +624,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     if ("axis".equals(propName)) {
                         getter = ReflectionUtilities.getMethod("get" + StringUtilities.firstToUpper(propName), object.getClass(), int.class);
                     } else {
-                        getter = ReflectionUtilities.getGetterFromName2(propName, object.getClass());
-                        if (getter == null) {
-                            getter = ReflectionUtilities.getGetterFromName(propName, object.getClass());
-                        }
+                        getter = ReflectionUtilities.getGetterFromName(propName, object.getClass());
                     }
-
 
                     if (getter != null) {
                         try {
