@@ -905,9 +905,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             mdwclassName = "LanguageCode";
             mdwStandard = Standard.ISO_19115;
         //special case for Role codeList.
-        } else if ("Role".equals(className)) {
-            mdwclassName = "CI_RoleCode";
-            mdwStandard = Standard.ISO_19115;
         } else if ("Double".equals(className)) {
             mdwclassName = "Real";
             mdwStandard = Standard.ISO_19103;

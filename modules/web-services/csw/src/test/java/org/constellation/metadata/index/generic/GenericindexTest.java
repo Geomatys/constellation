@@ -120,7 +120,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -129,7 +129,7 @@ public class GenericindexTest {
         assertEquals(expectedResult, result);
 
          /**
-         * Test 2 simple search: indentifier != 40510_145_19930221211500
+         * Test 2 simple search: identifier != 40510_145_19930221211500
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc NOT identifier:\"40510_145_19930221211500\"", nullFilter, SerialChainFilter.AND);
@@ -139,7 +139,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -148,6 +148,7 @@ public class GenericindexTest {
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         
 
         assertEquals(expectedResult, result);
@@ -162,7 +163,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("simpleSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -189,7 +190,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -207,7 +208,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -225,7 +226,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wilCharSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "wilCharSearch 3:\n{0}", resultReport);
 
         assertTrue(result.contains("39727_22_19750113062500"));
         assertTrue(result.contains("40510_145_19930221211500"));
@@ -233,7 +234,7 @@ public class GenericindexTest {
         assertTrue(result.contains("42292_9s_19900610041000"));
 
          /**
-         * Test 4 wildCharSearch: anstract LIKE *onnees CTD NEDIPROD VI 120
+         * Test 4 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
          */
         spatialQuery = new SpatialQuery("abstract:(*onnees CTD NEDIPROD VI 120)", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
@@ -242,7 +243,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 4:\n" + resultReport);
+        logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -271,7 +272,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -291,7 +292,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "DateSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("39727_22_19750113062500");
@@ -309,7 +310,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "DateSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("40510_145_19930221211500");
@@ -343,7 +344,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -352,6 +353,7 @@ public class GenericindexTest {
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("CTDF02");
+        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         assertEquals(expectedResult, result);
 
@@ -368,10 +370,11 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("CTDF02");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
@@ -394,7 +397,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 3:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
@@ -404,6 +407,7 @@ public class GenericindexTest {
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
 
         assertEquals(expectedResult, result);
 
@@ -420,9 +424,10 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 4:\n" + resultReport);
+        logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
+        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
@@ -461,7 +466,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 1:\n" + resultReport);
+        logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("39727_22_19750113062500");
@@ -488,13 +493,14 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 2:\n" + resultReport);
+        logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
 
         assertEquals("CRS URN are not working", expectedResult, result);
     }
@@ -515,7 +521,7 @@ public class GenericindexTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 1:\n" + result);
+        logger.log(Level.FINER, "identifier query 1:\n{0}", result);
 
         String expectedResult = "39727_22_19750113062500";
 
@@ -528,7 +534,7 @@ public class GenericindexTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 2:\n" + result);
+        logger.log(Level.FINER, "identifier query 2:\n{0}", result);
 
         expectedResult = "CTDF02";
 
@@ -554,7 +560,7 @@ public class GenericindexTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 1:\n" + result);
+        logger.log(Level.FINER, "identifier query 1:\n{0}", result);
 
         String expectedResult = "39727_22_19750113062500";
 
@@ -567,7 +573,7 @@ public class GenericindexTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 2:\n" + result);
+        logger.log(Level.FINER, "identifier query 2:\n{0}", result);
 
         expectedResult = null;
 
@@ -600,6 +606,9 @@ public class GenericindexTest {
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
         }
+        result.add(obj);
+
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
         result.add(obj);
 
         CSWMarshallerPool.getInstance().release(unmarshaller);

@@ -93,6 +93,8 @@ public class MdwebIndexTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115-2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
@@ -100,6 +102,7 @@ public class MdwebIndexTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-2.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
@@ -174,6 +177,11 @@ public class MdwebIndexTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("CTDF02");
+        expectedResult.add("cat-1");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
+        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
+        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals(expectedResult, result);
@@ -375,11 +383,16 @@ public class MdwebIndexTest {
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
+        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
         expectedResult.add("CTDF02");
+        expectedResult.add("cat-1");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         assertEquals(expectedResult, result);
 
@@ -400,11 +413,16 @@ public class MdwebIndexTest {
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+        expectedResult.add("cat-1");
         expectedResult.add("CTDF02");
+        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
         expectedResult.add("11325_158_19640418141800");
 
         assertEquals(expectedResult, result);
@@ -425,6 +443,7 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
+        expectedResult.add("cat-1"); // TODO why cat-1 in first he is not indexable
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("CTDF02");
         expectedResult.add("11325_158_19640418141800");
@@ -432,6 +451,10 @@ public class MdwebIndexTest {
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
+        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
+        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
 
         assertEquals(expectedResult, result);
 
@@ -451,12 +474,17 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
+        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
+        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
+        expectedResult.add("cat-1");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals(expectedResult, result);
@@ -522,6 +550,11 @@ public class MdwebIndexTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("cat-1");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
+        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
+        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
+        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals("CRS URN are not working", expectedResult, result);
