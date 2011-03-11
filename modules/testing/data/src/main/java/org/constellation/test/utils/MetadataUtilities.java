@@ -214,7 +214,7 @@ public class MetadataUtilities {
                             assertEquals(expStep.getProcessingInformation().getDocumentations(), resStep.getProcessingInformation().getDocumentations());
                             assertEquals(expStep.getProcessingInformation().getIdentifier(), resStep.getProcessingInformation().getIdentifier());
                             assertEquals(expStep.getProcessingInformation().getProcedureDescription(), resStep.getProcessingInformation().getProcedureDescription());
-                            assertEquals(expStep.getProcessingInformation().getRunTimeParameter(), resStep.getProcessingInformation().getRunTimeParameter());
+                            assertEquals(expStep.getProcessingInformation().getRunTimeParameters(), resStep.getProcessingInformation().getRunTimeParameters());
                             assertEquals(expStep.getProcessingInformation().getSoftwareReferences(), resStep.getProcessingInformation().getSoftwareReferences());
                         }
                         assertEquals(expStep.getProcessingInformation(), resStep.getProcessingInformation());
