@@ -1952,6 +1952,8 @@ public class CSWworkerTest {
             result     = worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
+            assertTrue(ex.getMessage(), ex.getMessage().contains("The property: abstract"));
+            assertTrue(ex.getMessage(), ex.getMessage().contains("is not a collection"));
         }
 
         assertTrue(exe != null);
@@ -2023,6 +2025,34 @@ public class CSWworkerTest {
 
         assertEquals(ext, extResult);
         // TODO fix this test assertTrue(removed);
+
+
+         // we update the metadata 42292_9s_1990061004100 by adding a property datasetURI.
+        // this value is not yet present in the metadata.
+        constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
+        properties = new ArrayList<RecordPropertyType>();
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dataSetURI", "someURI"));
+        update     = new UpdateType(properties, constraint);
+        request    = new TransactionType("CSW", "2.0.2", update);
+        result     = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
+
+
+        // then we verify that the modified metadata is well modified and indexed
+        constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.0.0");
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertEquals(1 , response.getSearchResults().getAny().size());
+
+        DefaultMetadata meta = (DefaultMetadata) response.getSearchResults().getAny().get(0);
+            
+        assertEquals("someURI", meta.getDataSetUri());
 
         pool.release(unmarshaller);
     }

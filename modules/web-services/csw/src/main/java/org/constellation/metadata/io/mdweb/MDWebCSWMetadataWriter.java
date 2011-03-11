@@ -37,6 +37,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.PrimitiveType;
+import org.mdweb.model.schemas.Property;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
@@ -110,41 +111,69 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                 LOGGER.log(Level.FINER, "IDValue: {0}", mp.idValue);
                 final List<Value> matchingValues = f.getValueFromNumberedPath(mp.path, mp.idValue);
 
+                // if there is no value for this path
                 if (matchingValues.isEmpty()) {
-                    throw new MetadataIoException("There is no value matching for the xpath:" + property.getName(), INVALID_PARAMETER_VALUE);
-                }
-                for (Value v : matchingValues) {
-                    if (v instanceof TextValue && value instanceof String) {
-                        // TODO verify more Type
-                        if (v.getType().equals(PrimitiveType.DATE)) {
-                            try {
-                                String timeValue = (String)value;
-                                timeValue        = timeValue.replaceAll("T", " ");
-                                if (timeValue.indexOf('+') != -1) {
-                                    timeValue    = timeValue.substring(0, timeValue.indexOf('+'));
-                                }
-                                LOGGER.finer(timeValue);
-                                Timestamp.valueOf(timeValue);
-                            } catch(IllegalArgumentException ex) {
-                                throw new MetadataIoException("The type of the replacement value does not match with the value type : Date",
-                                    INVALID_PARAMETER_VALUE);
-                            }
-                        }
-                        LOGGER.finer("textValue updated");
-                        mdWriter.updateTextValue((TextValue) v, (String) value);
-                    } else {
-                        final Classe requestType = getClasseFromObject(value);
-                        final Classe valueType   = v.getType();
-                        if (!Utilities.equals(requestType, valueType)) {
-                            throw new MetadataIoException("The type of the replacement value (" + requestType.getName() +
-                                                           ") does not match with the value type :" + valueType.getName(),
-                                    INVALID_PARAMETER_VALUE);
-                        } else {
-                            LOGGER.finer("value updated");
-                            mdWriter.deleteValue(v);
-                            final List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent());
+                    //1. if the path is erroned
+                    // 1.1 we have a cardinality in a non multiple property
+                    Property prop = mp.path.getProperty();
+                    if (prop != null && prop.getMaximumOccurence() == 1 && mp.ordinal > 1) {
+                        throw new MetadataIoException("The property: " + prop.getName() + " is not a collection", INVALID_PARAMETER_VALUE);
+                    }
+
+                    //2. We must build the values non existing yet.
+                    // to do that we must find the highest value existing in the value tree,
+                    // and build the chain to the new Value.
+                    //
+                    // TODO for now the algorithm can work only if the parent value exist
+                    // because if we have to build a chain of value, how do we find the type of each element?
+                    final String parentIdValue = mp.idValue.substring(0, mp.idValue.lastIndexOf(':'));
+                    final List<Value> parentValues    = f.getValueFromNumberedPath(mp.path.getParent(), parentIdValue);
+                    if (parentValues != null && !parentValues.isEmpty()) {
+                        for (Value parentValue : parentValues) {
+                            final List<Value> toInsert = addValueFromObject(f, value, mp.path, parentValue);
                             for (Value ins : toInsert) {
                                 mdWriter.writeValue(ins);
+                            }
+                        }
+                    } else {
+                        throw new MetadataIoException("The service is not yet capable to build a value chain", NO_APPLICABLE_CODE);
+                    }
+
+                // if the value(s) already exist
+                } else {
+                    for (Value v : matchingValues) {
+                        if (v instanceof TextValue && value instanceof String) {
+                            // TODO verify more Type
+                            if (v.getType().equals(PrimitiveType.DATE)) {
+                                try {
+                                    String timeValue = (String)value;
+                                    timeValue        = timeValue.replaceAll("T", " ");
+                                    if (timeValue.indexOf('+') != -1) {
+                                        timeValue    = timeValue.substring(0, timeValue.indexOf('+'));
+                                    }
+                                    LOGGER.finer(timeValue);
+                                    Timestamp.valueOf(timeValue);
+                                } catch(IllegalArgumentException ex) {
+                                    throw new MetadataIoException("The type of the replacement value does not match with the value type : Date",
+                                        INVALID_PARAMETER_VALUE);
+                                }
+                            }
+                            LOGGER.finer("textValue updated");
+                            mdWriter.updateTextValue((TextValue) v, (String) value);
+                        } else {
+                            final Classe requestType = getClasseFromObject(value);
+                            final Classe valueType   = v.getType();
+                            if (!Utilities.equals(requestType, valueType)) {
+                                throw new MetadataIoException("The type of the replacement value (" + requestType.getName() +
+                                                               ") does not match with the value type :" + valueType.getName(),
+                                        INVALID_PARAMETER_VALUE);
+                            } else {
+                                LOGGER.finer("value updated");
+                                mdWriter.deleteValue(v);
+                                final List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent());
+                                for (Value ins : toInsert) {
+                                    mdWriter.writeValue(ins);
+                                }
                             }
                         }
                     }

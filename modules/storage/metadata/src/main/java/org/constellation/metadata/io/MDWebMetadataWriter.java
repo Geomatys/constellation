@@ -617,44 +617,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     // TODO remove when fix in MDweb2
                     if (prop.getName().equals("geographicElement3") ||  prop.getName().equals("geographicElement4"))
                         continue;
-                    final String propName;
-                    // special case
-                    if (prop.getName().equalsIgnoreCase("referenceSystemIdentifier") ||
-                       (prop.getName().equalsIgnoreCase("identifier") && object.getClass().getSimpleName().equals("DefaultCoordinateSystemAxis")) ||
-                       (prop.getName().equalsIgnoreCase("identifier") && object.getClass().getSimpleName().equals("DefaultVerticalCS")) ||
-                       (prop.getName().equalsIgnoreCase("identifier") && object.getClass().getSimpleName().equals("DefaultVerticalDatum")) ||
-                       (prop.getName().equalsIgnoreCase("identifier") && object.getClass().getSimpleName().equals("DefaultVerticalCRS"))) {
-                        propName = "name";
-                    } else if (prop.getName().equalsIgnoreCase("verticalCSProperty")) {
-                        propName = "coordinateSystem";
-                    } else if (prop.getName().equalsIgnoreCase("verticalDatumProperty")) {
-                        propName = "datum";
-                    } else if (prop.getName().equalsIgnoreCase("axisDirection")) {
-                        propName = "direction";
-                    } else if (prop.getName().equalsIgnoreCase("axisAbbrev")) {
-                        propName = "abbreviation";
-                    } else if (prop.getName().equalsIgnoreCase("uom") && !object.getClass().getSimpleName().equals("QuantityType")
-                                                                      && !object.getClass().getSimpleName().equals("QuantityRange")
-                                                                      && !object.getClass().getSimpleName().equals("TimeRange")
-                                                                      && !object.getClass().getSimpleName().equals("TimeType")) {
-                        propName = "unit";
-                    } else if (prop.getName().equalsIgnoreCase("position") && object.getClass().getSimpleName().equals("DefaultPosition")) {
-                        propName = "date";
                     
-                    } else if (prop.getName().equalsIgnoreCase("transformationParameterAvailability")) {
-                         propName = "transformationParameterAvailable";
-                    } else if (prop.getName().equalsIgnoreCase("checkPointAvailibility")) {
-                         propName = "checkPointAvailable";
-                    } else if (prop.getName().equalsIgnoreCase("UsageDateTime")) {
-                         propName = "usageDate";
-                    } else if (prop.getName().equalsIgnoreCase("dateTime") && object.getClass().getSimpleName().equals("DefaultProcessStep")) {
-                        propName = "date";
-                    } else if (prop.getName().equalsIgnoreCase("aName") && (object.getClass().getSimpleName().equals("DefaultTypeName") ||
-                                                                            object.getClass().getSimpleName().equals("DefaultMemberName"))) {
-                        propName = "name";
-                    } else {
-                        propName = prop.getName();
-                    }
+                    final String propName = getGetterFromName(prop.getName(), object.getClass());
 
                     final Method getter;
                     if ("axis".equals(propName)) {
@@ -747,6 +711,50 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         LOGGER.log(Level.WARNING, "no such Field:" + propName + " in class:" + origClass.getName());
         return null;
     }
+
+    public String getGetterFromName(final String attributeName, final Class objectClass) {
+        final String propName;
+        // special case
+        if (attributeName.equalsIgnoreCase("referenceSystemIdentifier") ||
+           (attributeName.equalsIgnoreCase("identifier") && objectClass.getSimpleName().equals("DefaultCoordinateSystemAxis")) ||
+           (attributeName.equalsIgnoreCase("identifier") && objectClass.getSimpleName().equals("DefaultVerticalCS")) ||
+           (attributeName.equalsIgnoreCase("identifier") && objectClass.getSimpleName().equals("DefaultVerticalDatum")) ||
+           (attributeName.equalsIgnoreCase("identifier") && objectClass.getSimpleName().equals("DefaultVerticalCRS"))) {
+            propName = "name";
+        } else if (attributeName.equalsIgnoreCase("verticalCSProperty")) {
+            propName = "coordinateSystem";
+        } else if (attributeName.equalsIgnoreCase("verticalDatumProperty")) {
+            propName = "datum";
+        } else if (attributeName.equalsIgnoreCase("axisDirection")) {
+            propName = "direction";
+        } else if (attributeName.equalsIgnoreCase("axisAbbrev")) {
+            propName = "abbreviation";
+        } else if (attributeName.equalsIgnoreCase("uom") && !objectClass.getSimpleName().equals("QuantityType")
+                                                         && !objectClass.getSimpleName().equals("QuantityRange")
+                                                         && !objectClass.getSimpleName().equals("TimeRange")
+                                                         && !objectClass.getSimpleName().equals("TimeType")) {
+            propName = "unit";
+        } else if (attributeName.equalsIgnoreCase("position") && objectClass.getSimpleName().equals("DefaultPosition")) {
+            propName = "date";
+
+        } else if (attributeName.equalsIgnoreCase("transformationParameterAvailability")) {
+             propName = "transformationParameterAvailable";
+        } else if (attributeName.equalsIgnoreCase("checkPointAvailibility")) {
+             propName = "checkPointAvailable";
+        } else if (attributeName.equalsIgnoreCase("UsageDateTime")) {
+             propName = "usageDate";
+        } else if (attributeName.equalsIgnoreCase("dateTime") && objectClass.getSimpleName().equals("DefaultProcessStep")) {
+            propName = "date";
+        } else if (attributeName.equalsIgnoreCase("aName") && (objectClass.getSimpleName().equals("DefaultTypeName") ||
+                                                               objectClass.getSimpleName().equals("DefaultMemberName"))) {
+            propName = "name";
+        } else {
+            propName = attributeName;
+        }
+
+        return propName;
+    }
+    
 
     /**
      * Return an MDWeb {@link Classe} object for the specified java object.
@@ -847,7 +855,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             nameType = 2;
                             break;
                     }
-
                 }
             }
         
@@ -1084,7 +1091,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     /**
-     * Return an MDWeb path from a Xpath.
+     * Return an MDWeb path from a XPath.
      *
      * @param xpath An XPath
      *
@@ -1175,7 +1182,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         LOGGER.finer("last propertyName:" + xpath + " ordinal:" + ordinal);
         final Property property = getProperty(type, xpath);
         p = new Path(p, property);
-        return new MixedPath(p, idValue.toString());
+        return new MixedPath(p, idValue.toString(), ordinal);
     }
 
     private Property getProperty(final Classe type, String propertyName) throws MD_IOException, MetadataIoException {
@@ -1227,9 +1234,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
         public String idValue;
 
-        public MixedPath(Path path, String idValue) {
+        public int ordinal;
+
+        public MixedPath(Path path, String idValue, int ordinal) {
             this.path    = path;
             this.idValue = idValue;
+            this.ordinal = ordinal;
         }
 
     }

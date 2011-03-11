@@ -502,7 +502,7 @@ public final class ReflectionUtilities {
     }
 
     /**
-     * Return a setter Method for the specified attribute (propertyName) of the type "classe"
+     * Return a setter Method for the specified attribute (propertyName) of the type "paramClass"
      * in the class rootClass.
      *
      * @param propertyName The attribute name.
@@ -514,6 +514,9 @@ public final class ReflectionUtilities {
     public static Method getSetterFromName(String propertyName, final Class<?> paramClass, final Class<?> rootClass) {
         LOGGER.finer("search for a setter in " + rootClass.getName() + " of type :" + paramClass.getName());
 
+        if ("dataSetURI".equals(propertyName)) {
+            propertyName = "dataSetUri";
+        }
         final String methodName = "set" + StringUtilities.firstToUpper(propertyName);
         int occurenceType = 0;
 

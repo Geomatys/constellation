@@ -398,7 +398,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             final Object existant = ReflectionUtilities.invokeMethod(parent, getter);
 
             if (!(existant instanceof Collection)) {
-                throw new MetadataIoException("The property:" + propertyName + IN_CLASS_MSG + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("The property: " + propertyName + IN_CLASS_MSG + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
             } 
 
             final Collection c = (Collection) existant;
