@@ -713,6 +713,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return null;
     }
 
+    /**
+     * apply special fix on the property name.
+     * 
+     * @param attributeName
+     * @param objectClass
+     * @return
+     */
     public String specialCorrectionName(final String attributeName, final Class objectClass) {
         final String propName;
         // special case
@@ -722,18 +729,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
            (attributeName.equalsIgnoreCase("identifier") && objectClass.getSimpleName().equals("DefaultVerticalDatum")) ||
            (attributeName.equalsIgnoreCase("identifier") && objectClass.getSimpleName().equals("DefaultVerticalCRS"))) {
             propName = "name";
-        } else if(attributeName.equalsIgnoreCase("verticalCS")) {
-            propName = "coordinateSystem";
-        } else if (attributeName.equalsIgnoreCase("verticalDatum")) {
-            propName = "datum";
         } else if (attributeName.equalsIgnoreCase("uom") && !objectClass.getSimpleName().equals("QuantityType")
                                                          && !objectClass.getSimpleName().equals("QuantityRange")
                                                          && !objectClass.getSimpleName().equals("TimeRange")
                                                          && !objectClass.getSimpleName().equals("TimeType")) {
             propName = "unit";
-        /* else if (attributeName.equalsIgnoreCase("aName") && (objectClass.getSimpleName().equals("DefaultTypeName") ||
-                                                               objectClass.getSimpleName().equals("DefaultMemberName"))) {
-            propName = "name";*/
         } else {
             propName = attributeName;
         }

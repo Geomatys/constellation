@@ -403,9 +403,8 @@ public final class ReflectionUtilities {
             propertyName = "beginning";
         } else if ("endPosition".equals(propertyName)  && !"org.geotoolkit.gml.xml.v311.TimePeriodType".equals(rootClassName)) {
             propertyName = "ending";
-        // TODO remove when this issue will be fix in MDWeb
         } else if (propertyName.indexOf("geographicElement") != -1) {
-            propertyName = "geographicElement";
+            propertyName = "geographicElements";
         } else if ("value".equals(propertyName) && ("org.geotoolkit.temporal.object.DefaultPosition".equals(rootClassName))) {
             propertyName = "date";
         }
@@ -415,7 +414,7 @@ public final class ReflectionUtilities {
         final String methodName3 = propertyName;
         int occurenceType = 0;
 
-        while (occurenceType < 6) {
+        while (occurenceType < 3) {
 
             try {
                 switch (occurenceType) {
@@ -425,26 +424,10 @@ public final class ReflectionUtilities {
                         break;
                     }
                     case 1: {
-                        getter = rootClass.getMethod(methodName + "s");
-                        break;
-                    }
-                    case 2: {
-                        getter = rootClass.getMethod(methodName + "es");
-                        break;
-                    }
-                    case 3: {
-                        String temp = methodName;
-                        if (methodName.endsWith("y")) {
-                            temp = methodName.substring(0, methodName.length() - 1) + 'i';
-                        }
-                        getter = rootClass.getMethod(temp + "es");
-                        break;
-                    }
-                    case 4: {
                         getter = rootClass.getMethod(methodName2);
                         break;
                     }
-                    case 5: {
+                    case 2: {
                         getter = rootClass.getMethod(methodName3);
                         break;
                     }
@@ -461,32 +444,30 @@ public final class ReflectionUtilities {
     }
 
     /**
-     * Return a getter Method for the specified attribute (propertyName)
+     * Return a getter Method by looking the annotation on the method of the specified class.
+     * first it look the {@link XmlElement} name otherwise he search for the GeoAPI interface
+     * and look th {@link UML} identifier.
      *
      * @param propertyName The attribute name.
      * @param rootClass    The class which owe this attribute
      *
      * @return a setter to this attribute or {@code null}.
      */
-    public static Method getGetterFromAnnotation(String propertyName, final Class<?> rootClass) {
-        Class[] interfaces = rootClass.getInterfaces();
-        boolean hasGeoAPIInterface = false;
+    public static Method getGetterFromAnnotation(final String propertyName, final Class<?> rootClass) {
+        for (Method method : rootClass.getMethods()) {
+            final XmlElement annotation = method.getAnnotation(XmlElement.class);
+            if (annotation != null && annotation.name().equals(propertyName)) {
+                return method;
+            }
+        }
+        final Class[] interfaces = rootClass.getInterfaces();
         for (Class interf : interfaces) {
             if (interf.getName().startsWith("org.opengis")) {
-                hasGeoAPIInterface = true;
                 for (Method method : interf.getMethods()) {
-                    UML annotation = method.getAnnotation(UML.class);
+                    final UML annotation = method.getAnnotation(UML.class);
                     if (annotation != null && annotation.identifier().equals(propertyName)) {
                         return method;
                     }
-                }
-            }
-        }
-        if (!hasGeoAPIInterface) {
-            for (Method method : rootClass.getMethods()) {
-                XmlElement annotation = method.getAnnotation(XmlElement.class);
-                if (annotation != null && annotation.name().equals(propertyName)) {
-                    return method;
                 }
             }
         }
