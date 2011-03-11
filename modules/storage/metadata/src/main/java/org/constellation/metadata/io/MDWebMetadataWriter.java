@@ -618,14 +618,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     if (prop.getName().equals("geographicElement3") ||  prop.getName().equals("geographicElement4"))
                         continue;
                     
-                    final String propName = getGetterFromName(prop.getName(), object.getClass());
+                    final String propName = specialCorrectionName(prop.getName(), object.getClass());
 
-                    final Method getter;
+                    Method getter;
                     if ("axis".equals(propName)) {
                         getter = ReflectionUtilities.getMethod("get" + StringUtilities.firstToUpper(propName), object.getClass(), int.class);
                     } else {
-                        getter = ReflectionUtilities.getGetterFromName(propName, object.getClass());
+                        getter = ReflectionUtilities.getGetterFromName2(propName, object.getClass());
+                        if (getter == null) {
+                            getter = ReflectionUtilities.getGetterFromName(propName, object.getClass());
+                        }
                     }
+
+
                     if (getter != null) {
                         try {
                             final Object propertyValue;
@@ -712,7 +717,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return null;
     }
 
-    public String getGetterFromName(final String attributeName, final Class objectClass) {
+    public String specialCorrectionName(final String attributeName, final Class objectClass) {
         final String propName;
         // special case
         if (attributeName.equalsIgnoreCase("referenceSystemIdentifier") ||
@@ -721,33 +726,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
            (attributeName.equalsIgnoreCase("identifier") && objectClass.getSimpleName().equals("DefaultVerticalDatum")) ||
            (attributeName.equalsIgnoreCase("identifier") && objectClass.getSimpleName().equals("DefaultVerticalCRS"))) {
             propName = "name";
-        } else if (attributeName.equalsIgnoreCase("verticalCSProperty")) {
+        } else if(attributeName.equalsIgnoreCase("verticalCS")) {
             propName = "coordinateSystem";
-        } else if (attributeName.equalsIgnoreCase("verticalDatumProperty")) {
+        } else if (attributeName.equalsIgnoreCase("verticalDatum")) {
             propName = "datum";
-        } else if (attributeName.equalsIgnoreCase("axisDirection")) {
-            propName = "direction";
-        } else if (attributeName.equalsIgnoreCase("axisAbbrev")) {
-            propName = "abbreviation";
         } else if (attributeName.equalsIgnoreCase("uom") && !objectClass.getSimpleName().equals("QuantityType")
                                                          && !objectClass.getSimpleName().equals("QuantityRange")
                                                          && !objectClass.getSimpleName().equals("TimeRange")
                                                          && !objectClass.getSimpleName().equals("TimeType")) {
             propName = "unit";
-        } else if (attributeName.equalsIgnoreCase("position") && objectClass.getSimpleName().equals("DefaultPosition")) {
-            propName = "date";
-
-        } else if (attributeName.equalsIgnoreCase("transformationParameterAvailability")) {
-             propName = "transformationParameterAvailable";
-        } else if (attributeName.equalsIgnoreCase("checkPointAvailibility")) {
-             propName = "checkPointAvailable";
-        } else if (attributeName.equalsIgnoreCase("UsageDateTime")) {
-             propName = "usageDate";
-        } else if (attributeName.equalsIgnoreCase("dateTime") && objectClass.getSimpleName().equals("DefaultProcessStep")) {
-            propName = "date";
-        } else if (attributeName.equalsIgnoreCase("aName") && (objectClass.getSimpleName().equals("DefaultTypeName") ||
+        /* else if (attributeName.equalsIgnoreCase("aName") && (objectClass.getSimpleName().equals("DefaultTypeName") ||
                                                                objectClass.getSimpleName().equals("DefaultMemberName"))) {
-            propName = "name";
+            propName = "name";*/
         } else {
             propName = attributeName;
         }

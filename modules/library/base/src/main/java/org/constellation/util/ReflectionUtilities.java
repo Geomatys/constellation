@@ -30,8 +30,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlElement;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.Logging;
+import org.opengis.annotation.UML;
 
 
 /**
@@ -72,17 +74,17 @@ public final class ReflectionUtilities {
             return constructor.newInstance();
 
         } catch (InstantiationException ex) {
-            LOGGER.warning("Unable to instantiate the class: " + classe.getName() + "()");
+            LOGGER.log(Level.WARNING, "Unable to instantiate the class: {0}()", classe.getName());
         } catch (IllegalAccessException ex) {
-            LOGGER.warning("Unable to access the constructor in class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Unable to access the constructor in class: {0}", classe.getName());
         } catch (IllegalArgumentException ex) {//TODO: this cannot possibly happen.
-            LOGGER.warning("Illegal Argument in empty constructor for class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Illegal Argument in empty constructor for class: {0}", classe.getName());
         } catch (InvocationTargetException ex) {
-            LOGGER.warning("Invocation Target Exception in empty constructor for class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Invocation Target Exception in empty constructor for class: {0}", classe.getName());
         } catch (NoSuchMethodException ex) {
-            LOGGER.warning("There is no empty constructor for class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "There is no empty constructor for class: {0}", classe.getName());
         } catch (SecurityException ex) {
-            LOGGER.warning("Security exception while instantiating class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Security exception while instantiating class: {0}", classe.getName());
         }
         return null;
     }
@@ -108,17 +110,17 @@ public final class ReflectionUtilities {
             return constructor.newInstance(parameter);
 
         } catch (InstantiationException ex) {
-            LOGGER.warning("Unable to instantiate the class: " + classe.getName() + "(string)");
+            LOGGER.log(Level.WARNING, "Unable to instantiate the class: {0}(string)", classe.getName());
         } catch (IllegalAccessException ex) {
-            LOGGER.warning("Unable to access the constructor in class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Unable to access the constructor in class: {0}", classe.getName());
         } catch (IllegalArgumentException ex) {
-            LOGGER.warning("Illegal Argument in string constructor for class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Illegal Argument in string constructor for class: {0}", classe.getName());
         } catch (InvocationTargetException ex) {
             LOGGER.warning("Invocation target exception in string constructor for class: " + classe.getName() + " for parameter: " + parameter);
         } catch (NoSuchMethodException ex) {
-            LOGGER.warning("No single string constructor in class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "No single string constructor in class: {0}", classe.getName());
         } catch (SecurityException ex) {
-            LOGGER.warning("Security exception while instantiating class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Security exception while instantiating class: {0}", classe.getName());
         }
         return null;
     }
@@ -146,17 +148,17 @@ public final class ReflectionUtilities {
             return constructor.newInstance(parameter1, parameter2);
 
         } catch (InstantiationException ex) {
-            LOGGER.warning("The service can't instantiate the class: " + classe.getName() + "(string, string)");
+            LOGGER.log(Level.WARNING, "The service can''t instantiate the class: {0}(string, string)", classe.getName());
         } catch (IllegalAccessException ex) {
-            LOGGER.warning("The service can not access the constructor in class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "The service can not access the constructor in class: {0}", classe.getName());
         } catch (IllegalArgumentException ex) {
-            LOGGER.warning("Illegal Argument in double string constructor for class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Illegal Argument in double string constructor for class: {0}", classe.getName());
         } catch (InvocationTargetException ex) {
-            LOGGER.warning("Invocation target exception in double string constructor for class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Invocation target exception in double string constructor for class: {0}", classe.getName());
         } catch (NoSuchMethodException ex) {
-            LOGGER.warning("No double string constructor in class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "No double string constructor in class: {0}", classe.getName());
         } catch (SecurityException ex) {
-            LOGGER.warning("Security exception while instantiating class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Security exception while instantiating class: {0}", classe.getName());
         }
         return null;
     }
@@ -182,17 +184,17 @@ public final class ReflectionUtilities {
             return constructor.newInstance(parameter);
 
         } catch (InstantiationException ex) {
-            LOGGER.warning("The service can't instantiate the class: " + classe.getName() + "(CharSequence)");
+            LOGGER.log(Level.WARNING, "The service can''t instantiate the class: {0}(CharSequence)", classe.getName());
         } catch (IllegalAccessException ex) {
-            LOGGER.warning("The service can not access the constructor in class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "The service can not access the constructor in class: {0}", classe.getName());
         } catch (IllegalArgumentException ex) {
-            LOGGER.warning("Illegal Argument in CharSequence constructor for class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Illegal Argument in CharSequence constructor for class: {0}", classe.getName());
         } catch (InvocationTargetException ex) {
-            LOGGER.warning("Invocation target exception in CharSequence constructor for class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Invocation target exception in CharSequence constructor for class: {0}", classe.getName());
         } catch (NoSuchMethodException ex) {
-            LOGGER.warning("No such CharSequence constructor in class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "No such CharSequence constructor in class: {0}", classe.getName());
         } catch (SecurityException ex) {
-            LOGGER.warning("Security exception while instantiating class: " + classe.getName());
+            LOGGER.log(Level.WARNING, "Security exception while instantiating class: {0}", classe.getName());
         }
         return null;
     }
@@ -218,14 +220,14 @@ public final class ReflectionUtilities {
             if (method != null) {
                 result = method.invoke(object);
             } else {
-                LOGGER.warning(baseMessage + "the method reference is null.");
+                LOGGER.log(Level.WARNING, "{0}the method reference is null.", baseMessage);
             }
 
         } catch (IllegalAccessException ex) {
-            LOGGER.warning(baseMessage + "the class is not accessible.");
+            LOGGER.log(Level.WARNING, "{0}the class is not accessible.", baseMessage);
 
         } catch (IllegalArgumentException ex) {//TODO: this cannot happen
-            LOGGER.warning(baseMessage + "the argument does not match with the method.");
+            LOGGER.log(Level.WARNING, "{0}the argument does not match with the method.", baseMessage);
 
         } catch (InvocationTargetException ex) {
             LOGGER.log(Level.WARNING, baseMessage + "an Exception was thrown by the invoked method.", ex);
@@ -260,10 +262,10 @@ public final class ReflectionUtilities {
                     result = method.invoke(object, parameter);
                 }
             } else {
-                LOGGER.warning(baseMessage + "the method reference is null.");
+                LOGGER.log(Level.WARNING, "{0}the method reference is null.", baseMessage);
             }
         } catch (IllegalAccessException ex) {
-            LOGGER.warning(baseMessage + "the class is not accessible.");
+            LOGGER.log(Level.WARNING, "{0}the class is not accessible.", baseMessage);
 
         } catch (IllegalArgumentException ex) {
             String param = "null";
@@ -417,27 +419,6 @@ public final class ReflectionUtilities {
         } else if (propertyName.indexOf("geographicElement") != -1) {
             propertyName = "geographicElement";
 
-        // avoid unnecesary log flood
-        } else if ("org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription".equals(rootClassName) &&
-                  ("westBoundLongitude".equals(propertyName) || "eastBoundLongitude".equals(propertyName) ||
-                   "northBoundLatitude".equals(propertyName) || "southBoundLatitude".equals(propertyName))) {
-            return null;
-        // avoid unnecesary log flood
-        } else if (("accessConstraints".equals(propertyName))
-                   && "org.geotoolkit.metadata.iso.constraint.DefaultConstraints".equals(rootClassName)) {
-            return null;
-        // avoid unnecesary log flood
-        } else if ("org.geotoolkit.service.ServiceIdentificationImpl".equals(rootClassName) &&
-                  ("spatialResolution".equals(propertyName) || "language".equals(propertyName) ||
-                   "topicCategory".equals(propertyName))) {
-            return null;
-        } else if ("geographicIdentifier".equals(propertyName) && "org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox".equals(rootClassName)) {
-            return null;
-        } else if ("position".equals(propertyName) && ("org.geotoolkit.temporal.object.DefaultPeriod".equals(rootClassName))) {
-            return null;
-        }  else if (("calendarEraName".equals(propertyName) || "frame".equals(propertyName) || "indeterminatePosition".equals(propertyName))
-                && ("org.geotoolkit.temporal.object.DefaultPosition".equals(rootClassName))) {
-            return null;
         } else if ("value".equals(propertyName) && ("org.geotoolkit.temporal.object.DefaultPosition".equals(rootClassName))) {
             propertyName = "date";
         }
@@ -496,6 +477,39 @@ public final class ReflectionUtilities {
 
             } catch (NoSuchMethodException e) {
                 occurenceType++;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return a getter Method for the specified attribute (propertyName)
+     *
+     * @param propertyName The attribute name.
+     * @param rootClass    The class which owe this attribute
+     *
+     * @return a setter to this attribute or {@code null}.
+     */
+    public static Method getGetterFromName2(String propertyName, final Class<?> rootClass) {
+        Class[] interfaces = rootClass.getInterfaces();
+        boolean hasGeoAPIInterface = false;
+        for (Class interf : interfaces) {
+            if (interf.getName().startsWith("org.opengis")) {
+                hasGeoAPIInterface = true;
+                for (Method method : interf.getMethods()) {
+                    UML annotation = method.getAnnotation(UML.class);
+                    if (annotation != null && annotation.identifier().equals(propertyName)) {
+                        return method;
+                    }
+                }
+            }
+        }
+        if (!hasGeoAPIInterface) {
+            for (Method method : rootClass.getMethods()) {
+                XmlElement annotation = method.getAnnotation(XmlElement.class);
+                if (annotation != null && annotation.name().equals(propertyName)) {
+                    return method;
+                }
             }
         }
         return null;

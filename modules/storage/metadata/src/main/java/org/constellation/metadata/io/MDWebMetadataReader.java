@@ -725,9 +725,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         attribName = "ending";
                     } else if ("value".equals(attribName) && "DefaultPosition".equals(classe.getSimpleName())) {
                         attribName = "position";
-                    } else if (attribName.equalsIgnoreCase("verticalCSProperty")) {
+                    } else if (attribName.equalsIgnoreCase("verticalCS")) {
                         attribName = "coordinateSystem";
-                    } else if (attribName.equalsIgnoreCase("verticalDatumProperty")) {
+                    } else if (attribName.equalsIgnoreCase("verticalDatum")) {
                         attribName = "datum";
                     } else if (attribName.equalsIgnoreCase("axisDirection")) {
                         attribName = "direction";
