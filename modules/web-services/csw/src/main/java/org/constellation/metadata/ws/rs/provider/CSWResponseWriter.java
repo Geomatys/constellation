@@ -36,6 +36,7 @@ import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.metadata.utils.SerializerResponse;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.CSWResponse;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.XML;
 
 /**
@@ -46,7 +47,7 @@ import org.geotoolkit.xml.XML;
 @Produces("application/xml,text/xml,*/*")
 public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWriter<T>  {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.ws.rs");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.ws.rs");
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {

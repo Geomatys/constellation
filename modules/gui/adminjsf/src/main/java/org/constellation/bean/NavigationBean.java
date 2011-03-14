@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -39,7 +40,7 @@ public class NavigationBean {
     /**
      * Debugging purpose
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.bean");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
     static final String AUTH_FILE_PATH = "WEB-INF/authentication.properties";
     private static final String HOME_HREF = "pages/home.xhtml";
     private static final String SERVICES_HREF = "pages/services.xhtml";
@@ -179,11 +180,11 @@ public class NavigationBean {
         return passwd;
     }
 
-    public void setPasswd(String password) {
+    public void setPasswd(final String password) {
         this.passwd = password;
     }
 
-    public void setAuthenticated(boolean authenticated) {
+    public void setAuthenticated(final boolean authenticated) {
             this.authenticated = authenticated;
     }
 
@@ -191,7 +192,7 @@ public class NavigationBean {
             return authenticated;
     }
 
-    public void setAuthenticationError(AUTHENTICATIONERROR authenticationError) {
+    public void setAuthenticationError(final AUTHENTICATIONERROR authenticationError) {
             this.authenticationError = authenticationError;
     }
 
@@ -199,7 +200,7 @@ public class NavigationBean {
             return authenticationError;
     }
 
-    public void setCurrentHref(String currentHref) {
+    public void setCurrentHref(final String currentHref) {
             this.currentHref = currentHref;
     }
 
@@ -207,7 +208,7 @@ public class NavigationBean {
             return currentHref;
     }
 
-    public void setNewLogin(String newLogin) {
+    public void setNewLogin(final String newLogin) {
             this.newLogin = newLogin;
     }
 
@@ -215,7 +216,7 @@ public class NavigationBean {
             return newLogin;
     }
 
-    public void setNewPasswd1(String newPasswd1) {
+    public void setNewPasswd1(final String newPasswd1) {
             this.newPasswd1 = newPasswd1;
     }
 
@@ -223,7 +224,7 @@ public class NavigationBean {
             return newPasswd1;
     }
 
-    public void setNewPasswd2(String newPasswd2) {
+    public void setNewPasswd2(final String newPasswd2) {
             this.newPasswd2 = newPasswd2;
     }
 

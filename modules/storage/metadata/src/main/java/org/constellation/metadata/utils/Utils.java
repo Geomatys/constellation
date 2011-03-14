@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  * Utility methods used in CSW object.
@@ -33,7 +34,7 @@ public final class Utils {
     /**
      * A debugging logger.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.Utils");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.Utils");
 
     /**
      * A string constant used when we don't find a title on an object.
@@ -56,7 +57,7 @@ public final class Utils {
       *
       * @return the founded title or UNKNOW_TITLE
       */
-    public static String findTitle(Object obj) {
+    public static String findTitle(final Object obj) {
 
         //here we try to get the title
         String title = UNKNOW_TITLE;
@@ -110,7 +111,7 @@ public final class Utils {
       *
       * @return the founded standard name or {@code null}
       */
-    public static String findStandardName(Object obj) {
+    public static String findStandardName(final Object obj) {
 
         //here we try to get the title
         String standardName = null;

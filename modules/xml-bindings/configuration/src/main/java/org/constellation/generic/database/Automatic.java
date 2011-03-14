@@ -29,7 +29,7 @@ import org.geotoolkit.util.Utilities;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "automatic")
@@ -67,7 +67,7 @@ public class Automatic {
     private List<BDD> thesaurus;
 
     /**
-     * The directory whe is stored the configuration file.
+     * The directory where is stored the configuration file.
      * must be set by java, not in the xml file because it is transient.
      */
     @XmlTransient
@@ -105,12 +105,12 @@ public class Automatic {
     private String enableCache;
 
     /**
-     * Enable the indexation of pusblished/all metadata.
+     * Enable the indexation of published/all metadata.
      */
     private Boolean indexOnlyPublishedMetadata;
 
     /**
-     * Enable the indexation of internal recordset.
+     * Enable the indexation of internal recordSet.
      */
     private Boolean indexInternalRecordset;
 
@@ -140,7 +140,7 @@ public class Automatic {
 
     /**
      * In the case of a CSW configuration,
-     * you can use this flag to substitute the Default catalogue harvester,
+     * you can use this flag to substitute the Default catalog harvester,
      * by a ByIdHarvester or a fileSystemHarvester.
      */
     private String harvester;
@@ -154,7 +154,7 @@ public class Automatic {
 
     /**
      * In the case of a generic Implementation,
-     * this object contains all the sql queries used to retrieve and build metadata.
+     * this object contains all the SQL queries used to retrieve and build metadata.
      */
     private Queries queries;
 
@@ -165,35 +165,35 @@ public class Automatic {
     }
 
     /**
-     * Build an configuration object for filesystem datasource.
+     * Build an configuration object for file system dataSource.
      *
      * @param format type of the implementation.
-     * @param dataDirectory Direcory containing the data file.
+     * @param dataDirectory Directory containing the data file.
      */
-    public Automatic(String format, String dataDirectory) {
+    public Automatic(final String format, final String dataDirectory) {
         this.format        = format;
         this.dataDirectory = dataDirectory;
     }
 
     /**
-     * Build an configuration object for SGBD datasource.
+     * Build an configuration object for SGBD dataSource.
      *
      * @param format format type of the implementation.
-     * @param bdd A datasource description.
+     * @param bdd A dataSource description.
      */
-    public Automatic(String format, BDD bdd) {
+    public Automatic(final String format, final BDD bdd) {
         this.format = format;
         this.bdd    = bdd;
     }
 
     /**
-     * Build an configuration object for SGBD datasource with generic SQL queries.
+     * Build an configuration object for SGBD dataSource with generic SQL queries.
      *
       * @param format format type of the implementation.
-     * @param bdd A datasource description.
+     * @param bdd A dataSource description.
      * @param queries A list of SQL queries
      */
-    public Automatic(String format, BDD bdd, Queries queries) {
+    public Automatic(final String format, final BDD bdd, final Queries queries) {
         this.format  = format;
         this.bdd     = bdd;
         this.queries = queries;
@@ -219,7 +219,7 @@ public class Automatic {
      * Set the database connection informations.
      * @param bdd a database description.
      */
-    public void setBdd(BDD bdd) {
+    public void setBdd(final BDD bdd) {
         this.bdd = bdd;
     }
 
@@ -233,7 +233,7 @@ public class Automatic {
     /**
      * @param configurationDirectory the configurationDirectory to set
      */
-    public void setConfigurationDirectory(File configurationDirectory) {
+    public void setConfigurationDirectory(final File configurationDirectory) {
         this.configurationDirectory = configurationDirectory;
     }
 
@@ -250,7 +250,7 @@ public class Automatic {
      * 
      * @param format
      */
-    public void setFormat(String format) {
+    public void setFormat(final String format) {
         this.format = format;
     }
 
@@ -273,7 +273,7 @@ public class Automatic {
      * set the directory containing the data files.
      * @param s
      */
-    public void setDataDirectory(String s) {
+    public void setDataDirectory(final String s) {
         this.dataDirectory = s;
     }
 
@@ -329,7 +329,7 @@ public class Automatic {
      * Set the type of profile.
      * @param profile
      */
-    public void setProfile(String profile) {
+    public void setProfile(final String profile) {
         this.profile = profile;
     }
     
@@ -346,7 +346,7 @@ public class Automatic {
     /**
      * @param Thesaurus the Thesaurus to set
      */
-    public void setThesaurus(List<BDD> thesaurus) {
+    public void setThesaurus(final List<BDD> thesaurus) {
         this.thesaurus = thesaurus;
     }
 
@@ -360,7 +360,7 @@ public class Automatic {
     /**
      * @param name the name to set
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -374,21 +374,21 @@ public class Automatic {
     /**
      * @param enableThread the enableThread to set
      */
-    public void setEnableThread(String enableThread) {
+    public void setEnableThread(final String enableThread) {
         this.enableThread = enableThread;
     }
 
     /**
-     * @return the enablecache
+     * @return the enableCache flag.
      */
     public String getEnableCache() {
         return enableCache;
     }
 
     /**
-     * @param enablecache the enablecache to set
+     * @param enablecache the enableCache flag to set
      */
-    public void setEnablecache(String enableCache) {
+    public void setEnablecache(final String enableCache) {
         this.enableCache = enableCache;
     }
 
@@ -402,7 +402,7 @@ public class Automatic {
     /**
      * @param storeMapping the storeMapping to set
      */
-    public void setStoreMapping(String storeMapping) {
+    public void setStoreMapping(final String storeMapping) {
         this.storeMapping = storeMapping;
     }
 
@@ -416,7 +416,7 @@ public class Automatic {
     /**
      * @param noIndexation the noIndexation to set
      */
-    public void setNoIndexation(String noIndexation) {
+    public void setNoIndexation(final String noIndexation) {
         this.noIndexation = noIndexation;
     }
 
@@ -430,7 +430,7 @@ public class Automatic {
     /**
      * @param defaultRecordSet the defaultRecordSet to set
      */
-    public void setDefaultRecordSet(String defaultRecordSet) {
+    public void setDefaultRecordSet(final String defaultRecordSet) {
         this.defaultRecordSet = defaultRecordSet;
     }
 
@@ -444,7 +444,7 @@ public class Automatic {
     /**
      * @param byIdHarvester the byIdHarvester to set
      */
-    public void setHarvester(String harvester) {
+    public void setHarvester(final String harvester) {
         this.harvester = harvester;
     }
 
@@ -458,10 +458,44 @@ public class Automatic {
     /**
      * @param identifierDirectory the identifierDirectory to set
      */
-    public void setIdentifierDirectory(String identifierDirectory) {
+    public void setIdentifierDirectory(final String identifierDirectory) {
         this.identifierDirectory = identifierDirectory;
     }
 
+    /**
+     * @return the indexOnlyPublishedMetadata
+     */
+    public boolean getIndexOnlyPublishedMetadata() {
+        if (indexOnlyPublishedMetadata == null) {
+            return true;
+        }
+        return indexOnlyPublishedMetadata;
+    }
+
+    /**
+     * @param indexOnlyPublishedMetadata the indexOnlyPublishedMetadata to set
+     */
+    public void setIndexOnlyPublishedMetadata(final Boolean indexOnlyPublishedMetadata) {
+        this.indexOnlyPublishedMetadata = indexOnlyPublishedMetadata;
+    }
+
+    /**
+     * @return the indexInternalRecordset
+     */
+    public boolean getIndexInternalRecordset() {
+        if (indexInternalRecordset == null) {
+            return false;
+        }
+        return indexInternalRecordset;
+    }
+
+    /**
+     * @param indexInternalRecordset the indexInternalRecordset to set
+     */
+    public void setIndexInternalRecordset(final Boolean indexInternalRecordset) {
+        this.indexInternalRecordset = indexInternalRecordset;
+    }
+    
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Automatic]");
@@ -557,39 +591,4 @@ public class Automatic {
         hash = 37 * hash + (this.harvester != null ? this.harvester.hashCode() : 0);
         return hash;
     }
-
-    /**
-     * @return the indexOnlyPublishedMetadata
-     */
-    public boolean getIndexOnlyPublishedMetadata() {
-        if (indexOnlyPublishedMetadata == null) {
-            return true;
-        }
-        return indexOnlyPublishedMetadata;
-    }
-
-    /**
-     * @param indexOnlyPublishedMetadata the indexOnlyPublishedMetadata to set
-     */
-    public void setIndexOnlyPublishedMetadata(Boolean indexOnlyPublishedMetadata) {
-        this.indexOnlyPublishedMetadata = indexOnlyPublishedMetadata;
-    }
-
-    /**
-     * @return the indexInternalRecordset
-     */
-    public boolean getIndexInternalRecordset() {
-        if (indexInternalRecordset == null) {
-            return false;
-        }
-        return indexInternalRecordset;
-    }
-
-    /**
-     * @param indexInternalRecordset the indexInternalRecordset to set
-     */
-    public void setIndexInternalRecordset(Boolean indexInternalRecordset) {
-        this.indexInternalRecordset = indexInternalRecordset;
-    }
-
 }

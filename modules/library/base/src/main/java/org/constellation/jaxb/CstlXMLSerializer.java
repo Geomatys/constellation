@@ -25,6 +25,7 @@ import org.apache.xerces.dom.DOMMessageFormatter;
 import org.apache.xml.serialize.ElementState;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.geotoolkit.util.logging.Logging;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -35,7 +36,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class CstlXMLSerializer extends XMLSerializer {
 
-    private static final Logger LOGGER = Logger.getLogger("test");
+    private static final Logger LOGGER = Logging.getLogger("test");
 
     String currentPath = "";
 
@@ -44,7 +45,7 @@ public class CstlXMLSerializer extends XMLSerializer {
     }
 
     @Override
-    public void startElement(String namespaceURI, String localName, String rawName, Attributes attrs)
+    public void startElement(final String namespaceURI, final String localName, String rawName, Attributes attrs)
             throws SAXException {
         int i;
         if (namespaceURI == null || namespaceURI.isEmpty()) {
@@ -208,7 +209,7 @@ public class CstlXMLSerializer extends XMLSerializer {
     /**
      * Retrieve and remove the namespaces declarations from the list of attributes.
      */
-    private Attributes extractNamespaces(Attributes attrs) throws SAXException {
+    private Attributes extractNamespaces(final Attributes attrs) throws SAXException {
         AttributesImpl attrsOnly;
         String rawName;
         int i;
@@ -240,7 +241,7 @@ public class CstlXMLSerializer extends XMLSerializer {
     }
 
     @Override
-    public void endElement(String namespace, String localname, String rawname) throws SAXException {
+    public void endElement(final String namespace, final String localname, final String rawname) throws SAXException {
         String element;
         if (namespace == null || namespace.isEmpty()) {
             element = localname;

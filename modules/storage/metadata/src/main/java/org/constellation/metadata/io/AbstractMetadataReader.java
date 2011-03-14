@@ -25,6 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
+import org.geotoolkit.util.logging.Logging;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -39,7 +41,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     /**
      * A debugging logger
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.io");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.io");
     
     /**
      * A flag indicating if the cache mecanism is enabled or not.
@@ -67,7 +69,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * @param isCacheEnabled A flag indicating if the cache mecanism is enabled or not.
      * @param isThreadEnabled A flag indicating if the multi thread mecanism is enabled or not.
      */
-    public AbstractMetadataReader(boolean isCacheEnabled, boolean isThreadEnabled) {
+    public AbstractMetadataReader(final boolean isCacheEnabled, final boolean isThreadEnabled) {
         this.cacheEnabled  = isCacheEnabled;
         this.threadEnabled = isThreadEnabled;
     }
@@ -83,7 +85,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * @throws MetadataIoException
      */
     @Override
-    public abstract Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException;
+    public abstract Object getMetadata(final String identifier, final int mode, final List<QName> elementName) throws MetadataIoException;
     
     /**
      * Return all the entries from the database
@@ -109,7 +111,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * @param identifier The metadata identifier.
      */
     @Override
-    public void removeFromCache(String identifier) {
+    public void removeFromCache(final String identifier) {
         if (cacheEnabled)
             metadatas.remove(identifier);
     }
@@ -120,7 +122,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * @param identifier The metadata identifier.
      * @param metadata The object to put in cache.
      */
-    protected void addInCache(String identifier,  Object metadata) {
+    protected void addInCache(final String identifier, final Object metadata) {
         metadatas.put(identifier, metadata);
     }
     
@@ -129,7 +131,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * 
      * @param identifier The metadata identifier.
      */
-    protected Object getFromCache(String identifier) {
+    protected Object getFromCache(final String identifier) {
         return metadatas.get(identifier);
     }
     
@@ -152,21 +154,21 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     /**
      * @param LogLevel the LogLevel to set
      */
-    public void setLogLevel(Level logLevel) {
+    public void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
     }
 
     /**
      * @param isCacheEnabled the isCacheEnabled to set
      */
-    public void setIsCacheEnabled(boolean isCacheEnabled) {
+    public void setIsCacheEnabled(final boolean isCacheEnabled) {
         this.cacheEnabled = isCacheEnabled;
     }
 
     /**
      * @param isThreadEnabled the isThreadEnabled to set
      */
-    public void setIsThreadEnabled(boolean isThreadEnabled) {
+    public void setIsThreadEnabled(final boolean isThreadEnabled) {
         this.threadEnabled = isThreadEnabled;
     }
 }

@@ -26,6 +26,8 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.geotoolkit.util.logging.Logging;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -35,7 +37,7 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
     /**
      * A debugging logger.
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.io");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.io");
     
     /**
      * Record the date format in the metadata.
@@ -69,13 +71,13 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
     }
 
     /**
-     * Record an object in the metadata datasource.
+     * Record an object in the metadata dataSource.
      * 
-     * @param obj The object to store in the datasource.
+     * @param obj The object to store in the dataSource.
      * @return true if the storage succeed, false else.
      */
     @Override
-    public abstract boolean storeMetadata(Object obj) throws MetadataIoException;
+    public abstract boolean storeMetadata(final Object obj) throws MetadataIoException;
 
     /**
      * Delete an object in the metadata database.
@@ -83,17 +85,17 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
      * @return true if the delete succeed, false else.
      */
     @Override
-    public abstract boolean deleteMetadata(String metadataID) throws MetadataIoException;
+    public abstract boolean deleteMetadata(final String metadataID) throws MetadataIoException;
 
 
     /**
-     * Replace an object in the metadata datasource.
+     * Replace an object in the metadata dataSource.
      *
      * @param metadataID The identifier of the metadata to Replace.
      * @param any The object to replace the matching metadata.
      */
     @Override
-    public abstract boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException;
+    public abstract boolean replaceMetadata(final String metadataID, final Object any) throws MetadataIoException;
 
     /**
      * Return true if the Writer supports the delete mecanism.
@@ -108,7 +110,7 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
     public abstract boolean updateSupported();
 
     /**
-     * Destoy all the resource and close connection.
+     * Destroy all the resource and close connection.
      */
     @Override
     public abstract void destroy();
@@ -116,7 +118,7 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
     /**
      * @param LogLevel the LogLevel to set
      */
-    public void setLogLevel(Level logLevel) {
+    public void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
     }
 }

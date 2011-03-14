@@ -51,11 +51,18 @@ public final class WFSConstants {
 
     private WFSConstants() {}
 
-    public static final String HANDLE = "handle";
-    public static final String SERVICE = "service";
-    public static final String VERSION = "version";
+    public static final String HANDLE    = "handle";
+    public static final String SERVICE   = "service";
+    public static final String VERSION   = "version";
     public static final String NAMESPACE = "namespace";
-    public static final String FILTER = "filter";
+    public static final String FILTER    = "filter";
+
+    public static final String STR_GETCAPABILITIES      = "GetCapabilities";
+    public static final String STR_DESCRIBEFEATURETYPE  = "DescribeFeatureType";
+    public static final String STR_GETFEATURE           = "GetFeature";
+    public static final String STR_GETGMLOBJECT         = "getGMLObject";
+    public static final String STR_LOCKFEATURE          = "lockFeature";
+    public static final String STR_TRANSACTION          = "Transaction";
 
     public static final String UNKNOW_TYPENAME= "The specified TypeNames does not exist:";
 

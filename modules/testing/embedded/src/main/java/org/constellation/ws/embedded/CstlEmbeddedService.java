@@ -31,11 +31,13 @@ import javax.xml.ws.Endpoint;
 
 import org.geotoolkit.console.CommandLine;
 import org.geotoolkit.console.Option;
+import org.geotoolkit.util.logging.Logging;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import com.sun.net.httpserver.HttpContext;
 import org.constellation.metadata.ws.soap.CSWService;
+
 
 
 /**
@@ -95,7 +97,7 @@ public class CstlEmbeddedService extends CommandLine {
     /**
      * Logger for this service.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
     // THESE ARE INJECTED BY THE CommandLine CLASS
     //   TODO: these default values clobber main's args; fixed in Geotidy
     @Option
@@ -148,7 +150,7 @@ public class CstlEmbeddedService extends CommandLine {
      * <p>
      * Extending classes using the REST facade should
      */
-    protected CstlEmbeddedService(String[] args) {
+    protected CstlEmbeddedService(final String[] args) {
         this(args, new String[] {
             "org.constellation.map.ws.rs",
             "org.constellation.coverage.ws.rs",
@@ -169,7 +171,7 @@ public class CstlEmbeddedService extends CommandLine {
      * @param args The command line arguments.
      * @param providerPackages The packages for providers to start.
      */
-    protected CstlEmbeddedService(String[] args, String[] providerPackages) {
+    protected CstlEmbeddedService(final String[] args, final String[] providerPackages) {
         super(null, args);
 
         final StringBuilder sb = new StringBuilder();

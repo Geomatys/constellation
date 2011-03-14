@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.geotoolkit.util.logging.Logging;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -39,7 +40,7 @@ import org.xml.sax.SAXException;
  */
 public class ProviderConfig {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.configuration");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.configuration");
     private static final String TAG_SOURCE    = "Source";
     private static final String TAG_PARAMETER = "Parameter";
     private static final String TAG_LAYER     = "Layer";
@@ -170,7 +171,7 @@ public class ProviderConfig {
     }
     
     
-    private static void parseStyles(String strStyles, List<String> styles) {
+    private static void parseStyles(final String strStyles, final List<String> styles) {
         if(strStyles == null || strStyles.trim().isEmpty()){
             return;
         }

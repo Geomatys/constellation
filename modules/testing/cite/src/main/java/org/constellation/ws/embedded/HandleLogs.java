@@ -33,6 +33,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 import org.constellation.sql.Result;
 import org.constellation.sql.ResultsDatabase;
+import org.geotoolkit.util.logging.Logging;
 
 
 /**
@@ -46,9 +47,9 @@ import org.constellation.sql.ResultsDatabase;
  */
 public final class HandleLogs {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
     /**
-     * Prevents instanciation.
+     * Prevents instantiation.
      */
     private HandleLogs() {}
 
@@ -118,7 +119,7 @@ public final class HandleLogs {
      *
      * @return True if the directory of the current result contain the directory of the precedent result.
      */
-    private static boolean isChildOf(Result oldResult, Result result) {
+    private static boolean isChildOf(final Result oldResult, final Result result) {
         final String oldDirectory   = oldResult.getDirectory();
         final String childDirectory = result.getDirectory();
         return childDirectory.startsWith(oldDirectory);

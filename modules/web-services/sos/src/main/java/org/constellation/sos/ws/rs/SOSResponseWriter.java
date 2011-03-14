@@ -34,6 +34,7 @@ import javax.xml.bind.Marshaller;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.SOSResponse;
 import org.geotoolkit.sos.xml.SOSResponseWrapper;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -43,7 +44,7 @@ import org.geotoolkit.sos.xml.SOSResponseWrapper;
 @Produces("application/xml,text/xml,*/*")
 public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWriter<T> {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.ws.rs");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.sos.ws.rs");
 
     private static final String SCHEMA_LOCATION =  "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd";
    

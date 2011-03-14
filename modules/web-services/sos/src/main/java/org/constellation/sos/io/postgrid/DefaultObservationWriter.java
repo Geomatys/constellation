@@ -19,13 +19,10 @@ package org.constellation.sos.io.postgrid;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-// constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.geotoolkit.internal.sql.table.CatalogException;
-import org.geotoolkit.internal.sql.table.Database;
-import org.geotoolkit.internal.sql.table.NoSuchTableException;
+
+// constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.observation.MeasurementTable;
@@ -33,6 +30,12 @@ import org.constellation.observation.ObservationTable;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
+
+// Geotoolkit dependencies
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.NoSuchTableException;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
@@ -57,7 +60,7 @@ public class DefaultObservationWriter implements ObservationWriter {
     /**
      * use for debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
 
     /**
      * A Database object for the O&M dataBase.
@@ -75,12 +78,12 @@ public class DefaultObservationWriter implements ObservationWriter {
     private final MeasurementTable measTable;
 
     /**
-     * A database table for insert and get observation offerring.
+     * A database table for insert and get observation offering.
      */
     private final ObservationOfferingTable offTable;
 
     /**
-     * A flag indicating if the datasource is a postgreSQL SGBD
+     * A flag indicating if the dataSource is a postgreSQL SGBD
      */
     private final boolean isPostgres;
 
@@ -89,13 +92,13 @@ public class DefaultObservationWriter implements ObservationWriter {
     private static final String CAT_ERROR_MSG = "The service has throw a Catalog Exception:";
 
     /**
-     * Build a new Observation witer for postgrid datasource.
+     * Build a new Observation writer for postgrid dataSource.
      *
      * @param configuration
      * 
      * @throws org.constellation.ws.CstlServiceException
      */
-    public DefaultObservationWriter(Automatic configuration) throws CstlServiceException {
+    public DefaultObservationWriter(final Automatic configuration) throws CstlServiceException {
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
@@ -122,7 +125,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservation(Observation observation) throws CstlServiceException {
+    public String writeObservation(final Observation observation) throws CstlServiceException {
         try {
             if (observation instanceof MeasurementType && measTable != null) {
                 return measTable.getIdentifier((Measurement) observation);
@@ -143,7 +146,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeMeasurement(Measurement measurement) throws CstlServiceException {
+    public String writeMeasurement(final Measurement measurement) throws CstlServiceException {
         try {
             return measTable.getIdentifier(measurement);
         } catch (CatalogException ex) {
@@ -158,7 +161,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeOffering(ObservationOfferingType offering) throws CstlServiceException {
+    public String writeOffering(final ObservationOfferingType offering) throws CstlServiceException {
         try {
             return offTable.getIdentifier(offering);
 
@@ -174,7 +177,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(OfferingProcedureType offProc, OfferingPhenomenonType offPheno, OfferingSamplingFeatureType offSF) throws CstlServiceException {
+    public void updateOffering(final OfferingProcedureType offProc, final OfferingPhenomenonType offPheno, final OfferingSamplingFeatureType offSF) throws CstlServiceException {
         try {
             if (offProc != null)
                 offTable.getProcedures().getIdentifier(offProc);
@@ -203,7 +206,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException {
+    public void recordProcedureLocation(final String physicalID, final DirectPositionType position) throws CstlServiceException {
         if (position == null || position.getValue().size() < 2 || !isPostgres)
             return;
         try {

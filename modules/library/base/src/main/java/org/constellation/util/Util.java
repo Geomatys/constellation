@@ -35,6 +35,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
 
 /**
@@ -55,7 +56,7 @@ import org.opengis.feature.type.Name;
  */
 public final class Util {
 	
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.util");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.util");
     
     private Util() {}
 
@@ -146,11 +147,11 @@ public final class Util {
     }
 
     /**
-     * Parse a String to instanciate a named Layer (namespace : name).
+     * Parse a String to instantiate a named Layer (namespace : name).
      * @param layerName
      * @return
      */
-    public static Name parseLayerName(String layerName) {
+    public static Name parseLayerName(final String layerName) {
         final Name name;
         if (layerName != null && layerName.lastIndexOf(':') != -1) {
             final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));

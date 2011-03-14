@@ -34,6 +34,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -43,7 +44,7 @@ import org.geotoolkit.image.io.metadata.SpatialMetadata;
 @Produces("image/geotiff")
 public class GridCoverageWriter<T extends Entry> implements MessageBodyWriter<T> {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.coverage.ws.rs");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.coverage.ws.rs");
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {

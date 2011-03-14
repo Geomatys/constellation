@@ -31,6 +31,7 @@ import org.constellation.generic.database.BDD;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.postgresql.ds.PGConnectionPoolDataSource;
 import org.geotoolkit.jdbc.WrappedDataSource;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -43,7 +44,7 @@ public final class DatabasePool {
      */
     private static final Map<BDD, Database> DATABASE_MAP = new HashMap<BDD, Database>();
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.io.postgrid");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.sos.io.postgrid");
 
     private DatabasePool(){}
 
@@ -53,7 +54,7 @@ public final class DatabasePool {
      * @param bdd Some database informations.
      * @return A postgrid {@link Database}.
      */
-    public static Database getDatabase(BDD bdd) {
+    public static Database getDatabase(final BDD bdd) {
         Database db = DATABASE_MAP.get(bdd);
         if (db == null) {
             db = createDatabase(bdd);
@@ -68,10 +69,10 @@ public final class DatabasePool {
      *
      * @param bdd Some database informations.
      *
-     * @return A connection to a postrgid {@link Database} or {@code null}.
+     * @return A connection to a postgrid {@link Database} or {@code null}.
      * @throws SQLException
      */
-    public static Connection getDatabaseConnection(BDD bdd) throws SQLException {
+    public static Connection getDatabaseConnection(final BDD bdd) throws SQLException {
         final Database db =  DATABASE_MAP.get(bdd);
         if (db != null) {
             return db.getDataSource(true).getConnection();
@@ -88,7 +89,7 @@ public final class DatabasePool {
      * @param bdd Some database informations.
      * @return A new postgrid {@link Database}
      */
-    private static Database createDatabase(BDD bdd) {
+    private static Database createDatabase(final BDD bdd) {
 
     final DataSource dataSource;
     DataSource ds =null;

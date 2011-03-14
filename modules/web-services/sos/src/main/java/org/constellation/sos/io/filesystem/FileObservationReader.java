@@ -17,10 +17,8 @@
 
 package org.constellation.sos.io.filesystem;
 
+
 import java.util.Map;
-import org.constellation.sos.factory.AbstractSOSFactory;
-import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,9 +29,15 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
+
+import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureType;
@@ -55,7 +59,7 @@ public class FileObservationReader implements ObservationReader {
      /**
      * use for debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
 
     /**
      * The base for observation id.
@@ -81,7 +85,7 @@ public class FileObservationReader implements ObservationReader {
 
     private static final String FILE_EXTENSION = ".xml";
 
-    public FileObservationReader(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public FileObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase = (String) properties.get(AbstractSOSFactory.OBSERVATION_ID_BASE);
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
@@ -120,7 +124,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingType getObservationOffering(String offeringName) throws CstlServiceException {
+    public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
         final File offeringFile = new File(offeringDirectory, offeringName + FILE_EXTENSION);
         if (offeringFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -211,7 +215,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
+    public PhenomenonType getPhenomenon(final String phenomenonName) throws CstlServiceException {
         final File phenomenonFile = new File(phenomenonDirectory, phenomenonName + FILE_EXTENSION);
         if (phenomenonFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -256,7 +260,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeatureType getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
+    public SamplingFeatureType getFeatureOfInterest(final String samplingFeatureName) throws CstlServiceException {
         final File samplingFeatureFile = new File(foiDirectory, samplingFeatureName + FILE_EXTENSION);
         if (samplingFeatureFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -285,7 +289,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationType getObservation(String identifier, QName resultModel) throws CstlServiceException {
+    public ObservationType getObservation(final String identifier, final QName resultModel) throws CstlServiceException {
         File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (!observationFile.exists()) {
             observationFile = new File(observationTemplateDirectory, identifier + FILE_EXTENSION);
@@ -317,7 +321,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AnyResult getResult(String identifier, QName resutModel) throws CstlServiceException {
+    public AnyResult getResult(final String identifier, final QName resutModel) throws CstlServiceException {
         final File anyResultFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (anyResultFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -348,7 +352,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ReferenceType getReference(String href) throws CstlServiceException {
+    public ReferenceType getReference(final String href) throws CstlServiceException {
         return new ReferenceType(null, href);
     }
 
@@ -372,7 +376,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(String samplingFeatureName) throws CstlServiceException {
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
         throw new CstlServiceException("The Filesystem implementation of SOS does not support GetFeatureofInterestTime");
     }
     

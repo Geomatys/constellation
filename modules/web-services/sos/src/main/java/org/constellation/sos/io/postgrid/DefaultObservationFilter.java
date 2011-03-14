@@ -18,6 +18,7 @@
 
 package org.constellation.sos.io.postgrid;
 
+
 import java.util.Map;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -26,17 +27,22 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-// Constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+
+// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.ws.CstlServiceException;
+
+import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.SOSConstants.*;
+
+// Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
@@ -44,11 +50,12 @@ import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import org.opengis.observation.Observation;
+import org.geotoolkit.util.logging.Logging;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.sos.ws.Utils.*;
-import static org.constellation.sos.ws.SOSConstants.*;
+
+// GeoAPI dependencies
+import org.opengis.observation.Observation;
 
 /**
  *
@@ -72,7 +79,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      /**
      * use for debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
 
     /**
      * The base for observation id.
@@ -89,7 +96,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * 
      * @param omFilter
      */
-    public DefaultObservationFilter(DefaultObservationFilter omFilter) {
+    public DefaultObservationFilter(final DefaultObservationFilter omFilter) {
         this.connection                = omFilter.connection;
         this.map                       = omFilter.map;
         this.observationIdBase         = omFilter.observationIdBase;
@@ -97,7 +104,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     }
 
     
-    public DefaultObservationFilter(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public DefaultObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase         = (String)     properties.get(AbstractSOSFactory.OBSERVATION_ID_BASE);
         this.observationTemplateIdBase = (String)     properties.get(AbstractSOSFactory.OBSERVATION_TEMPLATE_ID_BASE);
         this.map                       = (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);
@@ -126,7 +133,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
+    public void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) {
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             sqlRequest = new StringBuilder("SELECT \"name\" FROM \"observation\".\"measurements\" WHERE \"name\" LIKE '%");
         } else {
@@ -144,7 +151,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterGetResult(Observation template, QName resultModel) {
+    public void initFilterGetResult(final Observation template, final QName resultModel) {
         final ProcessType process = (ProcessType) template.getProcedure();
         
         if (resultModel.equals(MEASUREMENT_QNAME)) {
@@ -160,7 +167,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(List<String> procedures, ObservationOfferingType off) {
+    public void setProcedure(final List<String> procedures, final ObservationOfferingType off) {
         sqlRequest.append(" ( ");
         if (!procedures.isEmpty()) {
 
@@ -187,7 +194,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
+    public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
         sqlRequest.append(" AND( ");
         for (String p : phenomenon) {
             sqlRequest.append(" \"observed_property\"='").append(p).append("' OR ");
@@ -204,7 +211,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setFeatureOfInterest(List<String> fois) {
+    public void setFeatureOfInterest(final List<String> fois) {
         sqlRequest.append(" AND (");
         for (String foi : fois) {
             sqlRequest.append("(\"feature_of_interest_point\"='").append(foi).append("' OR \"feature_of_interest\"='").append(foi).append("' OR \"feature_of_interest_curve\"='").append(foi).append("') OR");
@@ -217,7 +224,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeEquals(Object time) throws CstlServiceException {
+    public void setTimeEquals(final Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
             final TimePeriodType tp = (TimePeriodType) time;
             final String begin      = getTimeValue(tp.getBeginPosition());
@@ -251,7 +258,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeBefore(Object time) throws CstlServiceException  {
+    public void setTimeBefore(final Object time) throws CstlServiceException  {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
             final TimeInstantType ti = (TimeInstantType) time;
@@ -271,7 +278,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeAfter(Object time) throws CstlServiceException {
+    public void setTimeAfter(final Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
             final TimeInstantType ti = (TimeInstantType) time;
@@ -295,7 +302,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeDuring(Object time) throws CstlServiceException {
+    public void setTimeDuring(final Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
             final TimePeriodType tp = (TimePeriodType) time;
             final String begin      = getTimeValue(tp.getBeginPosition());
@@ -328,7 +335,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setResultEquals(String propertyName, String value) throws CstlServiceException{
+    public void setResultEquals(final String propertyName, final String value) throws CstlServiceException{
         throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
     
@@ -411,7 +418,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(EnvelopeType e) throws CstlServiceException {
+    public void setBoundingBox(final EnvelopeType e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
@@ -427,7 +434,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setLoglevel(Level logLevel) {
+    public void setLoglevel(final Level logLevel) {
          //do nothing
     }
 }

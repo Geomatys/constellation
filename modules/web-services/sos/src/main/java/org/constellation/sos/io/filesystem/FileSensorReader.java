@@ -19,8 +19,6 @@ package org.constellation.sos.io.filesystem;
 
 // J2SE dependencies
 import java.io.File;
-
-// JAXB dependencies
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,11 +30,14 @@ import javax.xml.bind.Unmarshaller;
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
-import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
+
+// Geotoolkit dependendies
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.util.logging.Logging;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -45,7 +46,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 public class FileSensorReader implements SensorReader {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.io.filesystem");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.sos.io.filesystem");
     
     /**
      * A JAXB unmarshaller used to unmarshall the xml files.
@@ -60,7 +61,7 @@ public class FileSensorReader implements SensorReader {
      */
     private final File dataDirectory;
     
-    public FileSensorReader(Automatic configuration) throws MetadataIoException  {
+    public FileSensorReader(final Automatic configuration) throws MetadataIoException  {
         //we initialize the unmarshaller
         dataDirectory  = configuration.getDataDirectory();
         if (MARSHALLER_POOL == null) {

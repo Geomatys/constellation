@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
@@ -38,6 +37,7 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.mosaic.TileManager;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -73,7 +73,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
 
     private final File folder;
 
-    protected CoverageMosaicProvider(ProviderSource source) throws IOException, SQLException {
+    protected CoverageMosaicProvider(final ProviderSource source) throws IOException, SQLException {
         super(source);
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
@@ -158,9 +158,9 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
                 index.put(name, entry);
                 visit(); //will log errors if any
             }catch(IOException ex){
-                Logger.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
+                Logging.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
             }catch(CoverageStoreException ex){
-                Logger.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
+                Logging.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
             }
             
         }
@@ -182,7 +182,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public ElevationModel getElevationModel(Name name) {
+    public ElevationModel getElevationModel(final Name name) {
 
         final ProviderLayer layer = source.getLayer(name.getLocalPart());
         if(layer != null && layer.isElevationModel){

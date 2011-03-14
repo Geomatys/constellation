@@ -49,6 +49,7 @@ import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 // MDWeb dependencies
@@ -81,7 +82,7 @@ public class IndexLuceneTest {
     protected static final FilterFactory2 FF = (FilterFactory2)
             FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
     
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
    
     private static AbstractIndexSearcher indexSearcher;
 

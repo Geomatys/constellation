@@ -17,16 +17,15 @@
 package org.constellation.metadata.harvest;
 
 // J2SE dependencies
-import org.constellation.metadata.io.MetadataIoException;
 import java.util.logging.Level;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Logger;
 
 // JAXB dependencies
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
@@ -34,12 +33,14 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.metadata.DistributedResults;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.metadata.io.MetadataIoException;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
+import org.geotoolkit.util.logging.Logging;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -52,7 +53,7 @@ public abstract class CatalogueHarvester {
     /**
      * use for debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
     
     /**
      * A Marshaller / unMarshaller pool to send request to another CSW services / to get object from harvested resource.
@@ -65,30 +66,31 @@ public abstract class CatalogueHarvester {
     protected final MetadataWriter metadataWriter;
 
     /**
-     * Build a new Catalogue harvester xith the specified metadataWriter.
+     * Build a new Catalog harvester with the specified metadataWriter.
      *
-     * @param metadataWriter A writer to store matadata in the datasource.
+     * @param metadataWriter A writer to store metadata in the dataSource.
      */
-    public CatalogueHarvester(MetadataWriter metadataWriter) {
+    public CatalogueHarvester(final MetadataWriter metadataWriter) {
         this.marshallerPool = EBRIMMarshallerPool.getInstance();
         this.metadataWriter = metadataWriter;
     }
     
     /**
-     * Harvest another CSW service by getting all this records ans storing it into the database
+     * Harvest another CSW service by getting all this records and storing it into the database
      * 
      * @param sourceURL The URL of the distant CSW service
      * 
      * @return An array containing: the number of inserted records, the number of updated records and the number of deleted records.
      */
-    public abstract int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, CstlServiceException, SQLException;
+    public abstract int[] harvestCatalogue(final String sourceURL) throws MalformedURLException, IOException, CstlServiceException, SQLException;
     
     /**
      * Transfer The request to all the servers specified in distributedServers.
      * 
      * @return
      */
-    public abstract DistributedResults transferGetRecordsRequest(GetRecordsRequest request, List<String> distributedServers, int startPosition, int maxRecords);
+    public abstract DistributedResults transferGetRecordsRequest(final GetRecordsRequest request, final List<String> distributedServers,
+            final int startPosition, final int maxRecords);
         
     /**
      * Harvest a single record and storing it into the database
@@ -98,7 +100,7 @@ public abstract class CatalogueHarvester {
      * 
      * @return An array containing: the number of inserted records, the number of updated records and the number of deleted records.
      */
-    public int[] harvestSingle(String sourceURL, String resourceType) throws MalformedURLException, IOException, CstlServiceException, JAXBException {
+    public int[] harvestSingle(final String sourceURL, final String resourceType) throws MalformedURLException, IOException, CstlServiceException, JAXBException {
         final int[] result = new int[3];
         result[0] = 0;
         result[1] = 0;
@@ -142,7 +144,7 @@ public abstract class CatalogueHarvester {
         return result;
     }
 
-    protected abstract InputStream getSingleMetadata(String sourceURL) throws CstlServiceException;
+    protected abstract InputStream getSingleMetadata(final String sourceURL) throws CstlServiceException;
     
     public void destroy() {
         if (metadataWriter != null) {

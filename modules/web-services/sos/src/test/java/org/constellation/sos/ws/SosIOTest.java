@@ -32,6 +32,7 @@ import org.constellation.ws.MimeType;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // geotoolkit dependencies
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -66,7 +67,7 @@ import static org.junit.Assert.*;
  */
 public class SosIOTest {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.ws");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.sos.ws");
 
 
     private SOSworker defaultWorker;

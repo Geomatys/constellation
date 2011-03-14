@@ -34,6 +34,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -44,7 +45,7 @@ public class ConfigurationBean {
     /**
      * Debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.bean");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
 
     /**
      * A servlet context allowing to find the path to deployed file.
@@ -77,7 +78,7 @@ public class ConfigurationBean {
         performRequest(url);
     }
 
-    private String performRequest(String url) {
+    private String performRequest(final String url) {
         try {
 
             final Properties properties = getProperties();

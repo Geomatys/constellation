@@ -50,6 +50,7 @@ import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.AbstractIndexer.IndexDirectoryFilter;
+import org.geotoolkit.util.logging.Logging;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -60,7 +61,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 public abstract class AbstractCSWConfigurer {
     
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.configuration.ws.rs");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.configuration.ws.rs");
     
     /**
      * A container notifier allowing to restart the webService. 
@@ -88,7 +89,7 @@ public abstract class AbstractCSWConfigurer {
      * @param cn a injected container notifier allowing to reload all the jersey web-services.
      * @throws org.constellation.configuration.exception.ConfigurationException
      */
-    public AbstractCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
+    public AbstractCSWConfigurer(final ContainerNotifierImpl cn) throws ConfigurationException {
         this.containerNotifier = cn;
 
         try {
@@ -112,7 +113,7 @@ public abstract class AbstractCSWConfigurer {
      * @return A lucene Indexer
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected AbstractIndexer initIndexer(String serviceID, CSWMetadataReader currentReader) throws CstlServiceException {
+    protected AbstractIndexer initIndexer(final String serviceID, CSWMetadataReader currentReader) throws CstlServiceException {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
@@ -140,7 +141,7 @@ public abstract class AbstractCSWConfigurer {
      * @return A metadata reader.
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected CSWMetadataReader initReader(String serviceID) throws CstlServiceException {
+    protected CSWMetadataReader initReader(final String serviceID) throws CstlServiceException {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
@@ -216,7 +217,7 @@ public abstract class AbstractCSWConfigurer {
      * @return
      * @throws CstlServiceException
      */
-    public AcknowlegementType refreshIndex(boolean asynchrone, String id) throws CstlServiceException {
+    public AcknowlegementType refreshIndex(final boolean asynchrone, final String id) throws CstlServiceException {
         String suffix = "";
         if (asynchrone) {
             suffix = " (asynchrone)";
@@ -255,7 +256,7 @@ public abstract class AbstractCSWConfigurer {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    private void synchroneIndexRefresh(List<File> cswInstanceDirectories) throws CstlServiceException {
+    private void synchroneIndexRefresh(final List<File> cswInstanceDirectories) throws CstlServiceException {
         boolean deleted = false;
         for (File cswInstanceDirectory : cswInstanceDirectories) {
             //we delete each index directory
@@ -290,7 +291,7 @@ public abstract class AbstractCSWConfigurer {
      * 
      * @throws org.constellation.ws.CstlServiceException
      */
-    private void asynchroneIndexRefresh(List<File> cswInstanceDirectories) throws CstlServiceException {
+    private void asynchroneIndexRefresh(final List<File> cswInstanceDirectories) throws CstlServiceException {
         for (File cswInstanceDirectory : cswInstanceDirectories) {
             String id = cswInstanceDirectory.getName();
             final File nexIndexDir        = new File(cswInstanceDirectory, "index-" + System.currentTimeMillis());
@@ -322,13 +323,13 @@ public abstract class AbstractCSWConfigurer {
     }
 
     /**
-     * Add some csw record to the index.
+     * Add some CSW record to the index.
      *
      * @param asynchrone
      * @return
      * @throws CstlServiceException
      */
-    public AcknowlegementType addToIndex(String service, String id, List<String> identifiers) throws CstlServiceException {
+    public AcknowlegementType addToIndex(final String service, final String id, final List<String> identifiers) throws CstlServiceException {
         LOGGER.info("Add to index requested");
 
         AbstractIndexer indexer  = null;
@@ -383,7 +384,7 @@ public abstract class AbstractCSWConfigurer {
      * Because the injectable fields are null at initialization time
      * @param containerNotifier
      */
-    public void setContainerNotifier(ContainerNotifierImpl containerNotifier) {
+    public void setContainerNotifier(final ContainerNotifierImpl containerNotifier) {
         this.containerNotifier = containerNotifier;
     }
 
@@ -409,7 +410,7 @@ public abstract class AbstractCSWConfigurer {
     }
     
     /**
-     * Update all the vocabularies skos files and the list of contact.
+     * Update all the vocabularies SKOS files and the list of contact.
      */
     public AcknowlegementType updateVocabularies() throws CstlServiceException {
         throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
@@ -425,7 +426,7 @@ public abstract class AbstractCSWConfigurer {
     /*
      * Return the configuration directory for the specified instance identifier.
      */
-    protected abstract File getCswInstanceDirectory(String instanceId);
+    protected abstract File getCswInstanceDirectory(final String instanceId);
 
     /**
      * Return the configuration directory for all the instances.

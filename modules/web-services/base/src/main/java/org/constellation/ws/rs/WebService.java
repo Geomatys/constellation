@@ -349,9 +349,9 @@ public abstract class WebService {
                         final Schema schema    = sf.newSchema(new URL(mainXsdPath));
                         unmarshaller.setSchema(schema);
                     } catch (SAXException ex) {
-                        LOGGER.severe("SAX exception while adding the Validator to the JAXB unmarshaller");
+                        LOGGER.warning("SAX exception while adding the Validator to the JAXB unmarshaller");
                     } catch (MalformedURLException ex) {
-                        LOGGER.severe("MalformedURL exception while adding the Validator to the JAXB unmarshaller");
+                        LOGGER.warning("MalformedURL exception while adding the Validator to the JAXB unmarshaller");
                     }
                 }
                 request = unmarshaller.unmarshal(is);

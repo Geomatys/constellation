@@ -29,11 +29,15 @@ import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import oracle.jdbc.pool.OracleConnectionPoolDataSource;
 import oracle.jdbc.pool.OracleDataSource;
+
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.jdbc.WrappedDataSource;
 import org.geotoolkit.util.Utilities;
+import org.geotoolkit.util.logging.Logging;
+
 import org.postgresql.ds.PGConnectionPoolDataSource;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.postgresql.ds.common.BaseDataSource;
@@ -46,7 +50,7 @@ import org.postgresql.ds.common.BaseDataSource;
 @XmlRootElement(name = "BDD")
 public class BDD {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.generic.database");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.generic.database");
 
     public static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
 
@@ -82,7 +86,7 @@ public class BDD {
     }
 
     /**
-     * Build a new Datasource informations.
+     * Build a new DataSource informations.
      *
      * @param className the type of the driver (such as "org.postgresql.Driver").
      * @param connectURL the url of the database.
@@ -181,28 +185,28 @@ public class BDD {
     /**
      * @param className the className to set
      */
-    public void setClassName(String className) {
+    public void setClassName(final String className) {
         this.className = className;
     }
 
     /**
      * @param connectURL the connectURL to set
      */
-    public void setConnectURL(String connectURL) {
+    public void setConnectURL(final String connectURL) {
         this.connectURL = connectURL;
     }
 
     /**
      * @param user the user to set
      */
-    public void setUser(String user) {
+    public void setUser(final String user) {
         this.user = user;
     }
 
     /**
      * @param password the password to set
      */
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
     
@@ -302,10 +306,10 @@ public class BDD {
     }
 
     /**
-     * Fill the datasource suplied with the informations extracted from the database URL.
+     * Fill the dataSource supplied with the informations extracted from the database URL.
      * @param pgSource
      */
-    private void fillSourceFromURL(BaseDataSource pgSource) {
+    private void fillSourceFromURL(final BaseDataSource pgSource) {
          // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
          String url = connectURL.substring(18);
         final String host = url.substring(0, url.indexOf(':'));

@@ -44,7 +44,7 @@ public interface ObservationWriter {
      *
      * @throws CstlServiceException
      */
-    String writeObservation(Observation observation) throws CstlServiceException;
+    String writeObservation(final Observation observation) throws CstlServiceException;
 
     /**
      * Write a new Measurement into the database
@@ -55,7 +55,7 @@ public interface ObservationWriter {
      *
      * @throws CstlServiceException
      */
-    String writeMeasurement(Measurement measurement) throws CstlServiceException;
+    String writeMeasurement(final Measurement measurement) throws CstlServiceException;
 
     /**
      * Write a new Observation offering into the database
@@ -64,7 +64,7 @@ public interface ObservationWriter {
      * @return
      * @throws CstlServiceException
      */
-    String writeOffering(ObservationOfferingType offering) throws CstlServiceException;
+    String writeOffering(final ObservationOfferingType offering) throws CstlServiceException;
 
     /**
      * Update an offering after the add of a new Observation.
@@ -76,8 +76,8 @@ public interface ObservationWriter {
      *
      * @throws CstlServiceException
      */
-    void updateOffering(OfferingProcedureType offProc, OfferingPhenomenonType offPheno,
-            OfferingSamplingFeatureType offSF) throws CstlServiceException;
+    void updateOffering(final OfferingProcedureType offProc, final OfferingPhenomenonType offPheno,
+            final OfferingSamplingFeatureType offSF) throws CstlServiceException;
 
     /**
      * Refresh the cached offerings.
@@ -85,13 +85,13 @@ public interface ObservationWriter {
     void updateOfferings();
 
     /**
-     * Record the location of a sensor in a separated datasource if there is one (depends on the implementation).
+     * Record the location of a sensor in a separated dataSource if there is one (depends on the implementation).
      *
-     * @param physicalID The pysical id of the sensor.
+     * @param physicalID The physical id of the sensor.
      * @param position The GML position of the sensor.
      * @throws CstlServiceException
      */
-    void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException;
+    void recordProcedureLocation(final String physicalID, final DirectPositionType position) throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.
@@ -99,7 +99,7 @@ public interface ObservationWriter {
     String getInfos();
 
     /**
-     * Free all the resources and close datasource connections.
+     * Free all the resources and close dataSource connections.
      */
     void destroy();
 }

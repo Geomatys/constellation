@@ -19,17 +19,20 @@ package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
 import java.io.File;
-import org.constellation.ws.WebServiceUtilities;
-import org.geotoolkit.ows.xml.RequestBase;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 // JAXB dependencies
-import java.util.logging.Logger;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.JAXBException;
@@ -38,21 +41,15 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
-
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 // constellation dependencies
+import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ServiceDef;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
@@ -60,7 +57,12 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
+import static org.constellation.query.Query.*;
+import static org.constellation.wfs.ws.WFSConstants.*;
+
 // Geotoolkit dependencies
+import org.geotoolkit.ows.xml.RequestBase;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
@@ -93,8 +95,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.sort.SortOrder;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.query.wfs.WFSQuery.*;
-import static org.constellation.wfs.ws.WFSConstants.*;
 
 /**
  *
@@ -112,7 +112,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
     }
 
     /**
-     * Build a new Restfull WFS service.
+     * Build a new Restful WFS service.
      */
     public WFSService() {
         super(ServiceDef.WFS_1_1_0);
@@ -137,7 +137,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
     }
 
     @Override
-    protected WFSWorker createWorker(File instanceDirectory) {
+    protected WFSWorker createWorker(final File instanceDirectory) {
         return new DefaultWFSWorker(instanceDirectory.getName(), instanceDirectory);
     }
 
@@ -146,7 +146,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest, WFSWorker worker) {
+    public Response treatIncomingRequest(final Object objectRequest, final WFSWorker worker) {
 
         ServiceDef version    = null;
 
@@ -224,7 +224,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
      *
      * We have to redefine this method because we can't read the feature with JAXB.
      * we have to use JAXP.
-     * TODO we must do somethin to treat this case in the super class.
+     * TODO we must do something to treat this case in the super class.
      * 
      * @return an image or xml response.
      * @throw JAXBException
@@ -232,7 +232,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
     @POST
     @Consumes("*/xml")
     @Override
-    public Response doPOSTXml(InputStream is) throws JAXBException  {
+    public Response doPOSTXml(final InputStream is) throws JAXBException  {
         final MarshallerPool marshallerPool = getMarshallerPool();
         if (marshallerPool != null) {
             Object request = null;
@@ -278,7 +278,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
                             try {
                                 featuresToInsert = featureReader.read(xml);
                             } catch (XMLStreamException ex) {
-                                Logger.getLogger(WFSService.class.getName()).log(Level.WARNING, null, ex);
+                                Logging.getLogger(WFSService.class.getName()).log(Level.WARNING, null, ex);
                             }
                         }
                         worker.setprefixMapping(featureReader.extractNamespace(xml));
@@ -357,7 +357,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
         }
     }
 
-    private RequestBase adaptQuery(String request) throws CstlServiceException {
+    private RequestBase adaptQuery(final String request) throws CstlServiceException {
         if (STR_GETCAPABILITIES.equalsIgnoreCase(request)) {
             return createNewGetCapabilitiesRequest();
         } else if (STR_DESCRIBEFEATURETYPE.equalsIgnoreCase(request)) {
@@ -654,9 +654,9 @@ public class WFSService extends OGCWebService<WFSWorker> {
      *
      * @return A list of QName.
      * @throws CstlServiceException if the pattern of the typeName parameter if wrong,
-     *                              or if a refix is not bounded to a namespace in the mapping map.
+     *                              or if a prefix is not bounded to a namespace in the mapping map.
      */
-    private List<QName> extractTypeName(String typeName, Map<String, String> mapping) throws CstlServiceException {
+    private List<QName> extractTypeName(final String typeName, final Map<String, String> mapping) throws CstlServiceException {
         final List<QName> typeNames = new ArrayList<QName>();
         if (typeName != null) {
             final StringTokenizer tokens = new StringTokenizer(typeName, ",;");

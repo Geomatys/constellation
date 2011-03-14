@@ -31,6 +31,7 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.WFSResponse;
 
@@ -42,7 +43,7 @@ import org.geotoolkit.wfs.xml.WFSResponse;
 @Produces("application/xml,text/xml,*/*")
 public class WFSResponseWriter<T extends WFSResponse> implements MessageBodyWriter<T>  {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.ws.rs");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.ws.rs");
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {

@@ -18,6 +18,7 @@
 package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
+import org.geotoolkit.util.logging.Logging;
 import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class MdwebIndexTest {
 
     private static DefaultDataSource ds;
     
-    private static final Logger logger = Logger.getLogger("org.constellation.metadata");
+    private static final Logger logger = Logging.getLogger("org.constellation.metadata");
 
     private static AbstractIndexSearcher indexSearcher;
 

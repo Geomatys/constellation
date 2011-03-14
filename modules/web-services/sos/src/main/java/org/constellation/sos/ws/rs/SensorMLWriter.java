@@ -33,6 +33,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -42,7 +43,7 @@ import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 @Produces("application/xml,text/xml,*/*")
 public class SensorMLWriter<T extends AbstractSensorML> implements MessageBodyWriter<T>  {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.rs.provider");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs.provider");
 
     private static final String SML_101_XSD = "http://www.opengis.net/sensorML/1.0.1 http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd";
 

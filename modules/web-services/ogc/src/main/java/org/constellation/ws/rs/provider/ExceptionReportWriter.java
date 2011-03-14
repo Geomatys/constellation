@@ -34,6 +34,7 @@ import javax.xml.bind.Marshaller;
 import org.constellation.writer.ExceptionFilterWriter;
 import org.geotoolkit.ows.xml.ExceptionResponse;
 import org.geotoolkit.ows.xml.ExceptionReportMarshallerPool;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -43,7 +44,7 @@ import org.geotoolkit.ows.xml.ExceptionReportMarshallerPool;
 @Produces("application/xml,text/xml,*/*")
 public class ExceptionReportWriter<T extends ExceptionResponse> implements MessageBodyWriter<T>  {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.rs.provider");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.rs.provider");
 
     private static final String OWS_110_XSD = "http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsExceptionReport.xsd";
 

@@ -22,7 +22,6 @@ import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 // Junit dependencies
 import javax.xml.bind.Unmarshaller;
@@ -51,8 +50,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * @author Guilhem Legal (Geomatys)
  */
 public class UtilsTest {
-
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.ws");
 
     private static MarshallerPool marshallerPool;
 

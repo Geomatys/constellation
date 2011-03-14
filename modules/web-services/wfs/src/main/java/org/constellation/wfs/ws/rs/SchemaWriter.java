@@ -31,6 +31,7 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 
@@ -42,7 +43,7 @@ import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 @Produces("application/xml,text/xml,*/*")
 public class SchemaWriter<T extends Schema> implements MessageBodyWriter<T>  {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.ws.rs");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.ws.rs");
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {

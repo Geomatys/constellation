@@ -43,6 +43,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.naming.NamingException;
 import org.constellation.configuration.ConfigDirectory;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  * Utility class to send mails
@@ -51,7 +52,7 @@ import org.constellation.configuration.ConfigDirectory;
  */
 public final class MailSendingUtilities {
 
-    private static final Logger LOGGER = Logger.getLogger(MailSendingUtilities.class.getName());
+    private static final Logger LOGGER = Logging.getLogger(MailSendingUtilities.class.getName());
     private static final String FROM;
     private static final String MAILHOST;
     private static final String MAILER;

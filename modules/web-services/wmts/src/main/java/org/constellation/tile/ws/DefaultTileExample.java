@@ -193,7 +193,7 @@ public final class DefaultTileExample {
 
 
 
-    public static TileMatrixSet getTileMatrixSet(String name) {
+    public static TileMatrixSet getTileMatrixSet(final String name) {
         if ("ThauScan25IGN".equals(name)) {
             return THAU_SCAN_25_IGN;
         } else if ("ThauScan250IGN".equals(name)) {
@@ -210,7 +210,7 @@ public final class DefaultTileExample {
         return null;
     }
 
-    public static Path getPathForMatrixSet(String name) {
+    public static Path getPathForMatrixSet(final String name) {
         if ("ThauScan25IGN".equals(name)) {
             return new Path(false, "/France/Scan/IGN/BassinDeThau/Scan25/");
         } else if ("ThauScan250IGN".equals(name)) {
@@ -227,7 +227,8 @@ public final class DefaultTileExample {
         return null;
     }
 
-    public static TileMatrix createTileMatrix(String id, int nX, int nY, int mWidth, int mHeight, double scale, double tlc1, double tlc2, boolean realScale) {
+    public static TileMatrix createTileMatrix(final String id, final int nX, final int nY, final int mWidth,
+            final int mHeight, double scale, final double tlc1, final double tlc2, final boolean realScale) {
         final TileMatrix tm = new TileMatrix();
         tm.setIdentifier(new CodeType(id));
         tm.setMatrixHeight(nY);
@@ -247,11 +248,13 @@ public final class DefaultTileExample {
         return tm;
     }
 
-     public static TileMatrix createTileMatrix(String id, int nX, int nY, int mWidth, int mHeight, double realscale, double tlc1, double tlc2) {
+     public static TileMatrix createTileMatrix(final String id, final int nX, final int nY, final int mWidth,
+             final int mHeight, final double realscale, final double tlc1, final double tlc2) {
         return createTileMatrix(id, nX, nY, mWidth, mHeight, realscale, tlc1, tlc2, false);
      }
 
-     public static TileMatrixLimits createTileMatrixLimits(String tileMatrix, int minTileCol, int maxTileCol,int minTileRow, int maxTileRow) {
+     public static TileMatrixLimits createTileMatrixLimits(final String tileMatrix, final int minTileCol, final int maxTileCol,
+             final int minTileRow, final int maxTileRow) {
         final TileMatrixLimits tm = new TileMatrixLimits();
         tm.setTileMatrix(tileMatrix);
         tm.setMaxTileCol(maxTileCol);
@@ -266,7 +269,7 @@ public final class DefaultTileExample {
 
         public final String path;
 
-        public Path(boolean isAbsolute, String path) {
+        public Path(final boolean isAbsolute, final String path) {
             this.isAbsolute = isAbsolute;
             this.path       = path;
         }

@@ -21,7 +21,6 @@ package org.constellation.filter;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -39,7 +38,6 @@ import static org.junit.Assert.*;
 public class SQLFilterParserTest {
     
     private SQLFilterParser filterParser;
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.filter");
     private final static QName _ExtrinsicObject25_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExtrinsicObject");
     private final static QName _Association25_QNAME     = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Association");
     private static MarshallerPool pool;

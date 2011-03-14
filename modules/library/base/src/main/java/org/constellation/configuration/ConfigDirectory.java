@@ -27,6 +27,7 @@ import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  * Temporary copy of static methods from the WebService class (in module web-base),
@@ -47,7 +48,7 @@ public final class ConfigDirectory {
     /**
      * The default debugging logger.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.configuration");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.configuration");
 
     /**
      * Specifies if the process is running on a Glassfish application server.
@@ -68,7 +69,7 @@ public final class ConfigDirectory {
 
     /**
      * The user directory where configuration files are stored.
-     * this variable is fill by the user in the jsf interface.
+     * this variable is fill by the user in the JSF interface.
      */
     public static String USER_DIRECTORY = null;
 
@@ -164,7 +165,7 @@ public final class ConfigDirectory {
     /**
      * Return a file at the root in the configuration directory.
      */
-    public static File getProviderConfigFile(String fileName) {
+    public static File getProviderConfigFile(final String fileName) {
         final File constellationDirectory = getConfigDirectory();
         if (constellationDirectory != null && constellationDirectory.exists()) {
             final File providerDirectory = new File(constellationDirectory, "provider");

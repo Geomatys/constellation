@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 /**
@@ -356,7 +357,7 @@ public class StaticMetadata {
             pool.addAnchor("Visible waveband radiance and irradiance measurements in the water column", new URI("SDN:P021:35:VSRW"));
             pool.addAnchor("MEDATLAS ASCII", new URI("SDN:L241:1:MEDATLAS"));
         } catch (URISyntaxException ex) {
-            Logger.getLogger("StaticMetadata").log(Level.SEVERE, null, ex);
+            Logging.getLogger("StaticMetadata").log(Level.SEVERE, null, ex);
         } catch (IllegalStateException ex) {
             // this exception happen when we try to put 2 twice the same anchor.
             // for this test we call many times this method in a static instance (CSWMarshallerPool)

@@ -37,6 +37,7 @@ import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.util.SimpleInternationalString;
 
 // GeoAPI dependencies
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.extent.GeographicExtent;
@@ -56,7 +57,7 @@ public final class GenericMetadataUtilities {
     private GenericMetadataUtilities() {}
     
     /**
-     * A List of date Formater.
+     * A List of date formatter.
      */
     public static final List<DateFormat> DATE_FORMATS;
     static {
@@ -69,13 +70,13 @@ public final class GenericMetadataUtilities {
     /**
      * A debugging logger
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.io.generic");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata.io.generic");
 
     /**
      * Avoid the IllegalArgumentException when the variable value is null.
      *
      */
-    public static InternationalString getInternationalStringVariable(String value) {
+    public static InternationalString getInternationalStringVariable(final String value) {
         if (value != null){
             return new SimpleInternationalString(value);
         }
@@ -89,7 +90,7 @@ public final class GenericMetadataUtilities {
      *
      * @return A CitationDate of type revision.
      */
-    public static CitationDate createRevisionDate(String date) {
+    public static CitationDate createRevisionDate(final String date) {
         return createCitationDate(date, DateType.REVISION);
     }
 
@@ -100,7 +101,7 @@ public final class GenericMetadataUtilities {
      *
      * @return A CitationDate of type revision.
      */
-    public static CitationDate createPublicationDate(String date) {
+    public static CitationDate createPublicationDate(final String date) {
         return createCitationDate(date, DateType.PUBLICATION);
     }
 
@@ -111,7 +112,7 @@ public final class GenericMetadataUtilities {
      *
      * @return A CitationDate of type revision.
      */
-    public static CitationDate createCreationDate(String date) {
+    public static CitationDate createCreationDate(final String date) {
         return createCitationDate(date, DateType.CREATION);
     }
 
@@ -122,7 +123,7 @@ public final class GenericMetadataUtilities {
      *
      * @return A CitationDate of type revision.
      */
-    public static CitationDate createCitationDate(String date, DateType type) {
+    public static CitationDate createCitationDate(final String date, final DateType type) {
         final DefaultCitationDate ciDate = new DefaultCitationDate();
         ciDate.setDateType(type);
         final Date d = parseDate(date);
@@ -136,7 +137,7 @@ public final class GenericMetadataUtilities {
      * Parse a date from a String
      * @param date The date to parse.
      */
-    public static Date parseDate(String date) {
+    public static Date parseDate(final String date) {
         if (date == null || date.isEmpty())
             return null;
         int i = 0;
@@ -165,11 +166,12 @@ public final class GenericMetadataUtilities {
      * @param eastVar The name of the east coordinates variable.
      * @param southVar The name of the south coordinates variable.
      * @param northVar The name of the north coordinates variable.
-     * @param values A set of variables and their correspounding values.
+     * @param values A set of variables and their corresponding values.
      *
      * @return
      */
-    private static List<Double[]> getCoordinateList(String westVar, String eastVar, String southVar, String northVar, Values values) {
+    private static List<Double[]> getCoordinateList(final String westVar, final String eastVar,
+            final String southVar, final String northVar, final Values values) {
         final List<Double[]> result = new ArrayList<Double[]>();
 
         final List<String> w = values.getVariables(westVar);
@@ -177,11 +179,11 @@ public final class GenericMetadataUtilities {
         final List<String> s = values.getVariables(southVar);
         final List<String> n = values.getVariables(northVar);
         if (w == null || e == null || s == null || n == null) {
-            LOGGER.severe("One or more extent/BBOX coordinates are null");
+            LOGGER.warning("One or more extent/BBOX coordinates are null");
             return result;
         }
         if (!(w.size() == e.size() &&  e.size() == s.size() && s.size() == n.size())) {
-            LOGGER.severe("There is not the same number of geographic extent/BBOX coordinates");
+            LOGGER.warning("There is not the same number of geographic extent/BBOX coordinates");
             return result;
         }
         final int size = w.size();
@@ -230,7 +232,7 @@ public final class GenericMetadataUtilities {
                 coordinate[3] = north;
                 result.add(coordinate);
             } catch (NumberFormatException ex) {
-                LOGGER.severe("Number format exception while parsing boundingBox:\ncurrent box: " +
+                LOGGER.warning("Number format exception while parsing boundingBox:\ncurrent box: " +
                         westValue + ',' + eastValue + ',' + southValue + ',' + northValue);
             }
         }
@@ -244,11 +246,12 @@ public final class GenericMetadataUtilities {
      * @param eastVar The name of the east coordinates variable.
      * @param southVar The name of the south coordinates variable.
      * @param northVar The name of the north coordinates variable.
-     * @param values A set of variables and their correspounding values.
+     * @param values A set of variables and their corresponding values.
      *
      * @return A list of geographic extent.
      */
-    public static List<GeographicExtent> createGeographicExtent(String westVar, String eastVar, String southVar, String northVar, Values values) {
+    public static List<GeographicExtent> createGeographicExtent(final String westVar, final String eastVar,
+            final String southVar, final String northVar, final Values values) {
         final List<GeographicExtent> result = new ArrayList<GeographicExtent>();
         final List<Double[]> coordinates = getCoordinateList(westVar, eastVar, southVar, northVar, values);
         
@@ -268,11 +271,12 @@ public final class GenericMetadataUtilities {
      * @param eastVar The name of the east coordinates variable.
      * @param southVar The name of the south coordinates variable.
      * @param northVar The name of the north coordinates variable.
-     * @param values A set of variables and their correspounding values.
+     * @param values A set of variables and their corresponding values.
      *
      * @return A list of BoundingBox.
      */
-    public static List<BoundingBoxType> createBoundingBoxes(String westVar, String eastVar, String southVar, String northVar, Values values) {
+    public static List<BoundingBoxType> createBoundingBoxes(final String westVar, final String eastVar,
+            final String southVar, final String northVar, final Values values) {
         final List<BoundingBoxType> result = new ArrayList<BoundingBoxType>();
         final List<Double[]> coordinates = getCoordinateList(westVar, eastVar, southVar, northVar, values);
         

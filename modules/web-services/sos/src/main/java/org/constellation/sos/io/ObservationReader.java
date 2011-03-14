@@ -54,7 +54,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    ObservationOfferingType getObservationOffering(String offeringName) throws CstlServiceException;
+    ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException;
 
     /**
      * Return a list of all the offerings.
@@ -83,7 +83,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    Phenomenon getPhenomenon(String phenomenonName) throws CstlServiceException;
+    Phenomenon getPhenomenon(final String phenomenonName) throws CstlServiceException;
 
     /**
      * Return a list of sampling feature identifiers.
@@ -98,10 +98,10 @@ public interface ObservationReader {
      *
      * @param samplingFeatureName The identifier of the feature of interest.
      *
-     * @return the correspounding feature Of interest.
+     * @return the corresponding feature Of interest.
      * @throws org.constellation.ws.CstlServiceException
      */
-    SamplingFeature getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
+    SamplingFeature getFeatureOfInterest(final String samplingFeatureName) throws CstlServiceException;
 
 
     /**
@@ -111,7 +111,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    AbstractTimePrimitiveType getFeatureOfInterestTime(String samplingFeatureName) throws CstlServiceException;
+    AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException;
 
     /**
      * Return an observation for the specified identifier.
@@ -120,7 +120,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    Observation getObservation(String identifier, QName resultModel) throws CstlServiceException;
+    Observation getObservation(final String identifier, final QName resultModel) throws CstlServiceException;
 
     /**
      * Return a result for the specified identifier.
@@ -129,7 +129,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    Object getResult(String identifier, QName resultModel) throws CstlServiceException;
+    Object getResult(final String identifier, final QName resultModel) throws CstlServiceException;
 
     /**
      * Return a reference from the specified identifier
@@ -137,7 +137,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    ReferenceType getReference(String href) throws CstlServiceException;
+    ReferenceType getReference(final String href) throws CstlServiceException;
     
     /**
      * Create a new identifier for an observation.

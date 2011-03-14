@@ -40,6 +40,7 @@ import org.constellation.configuration.HarvestTasks;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.utils.MailSendingUtilities;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.util.logging.Logging;
 
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -52,7 +53,7 @@ public class HarvestTaskSchreduler {
     /**
      * use for debugging purpose
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
     
     /**
      * The name of the harvest task file
@@ -67,13 +68,13 @@ public class HarvestTaskSchreduler {
     private final File configDir;
 
     /**
-     * A list of schreduled Task (used in close method).
+     * A list of scheduled Task (used in close method).
      */
     private final List<Timer> schreduledTask = new ArrayList<Timer>();
 
     private final CatalogueHarvester catalogueHarvester;
 
-    public HarvestTaskSchreduler(File configDir, CatalogueHarvester catalogueHarvester) {
+    public HarvestTaskSchreduler(final File configDir, final CatalogueHarvester catalogueHarvester) {
         MarshallerPool candidate = null;
         try {
             candidate = new MarshallerPool(HarvestTasks.class);
@@ -148,7 +149,7 @@ public class HarvestTaskSchreduler {
      * @param period The time between each Harvest.
      * @param lastHarvest The time of the last task launch.
      */
-    private void saveSchreduledHarvestTask(String sourceURL, String resourceType, int mode, List<String> emails, long period, long lastHarvest) {
+    private void saveSchreduledHarvestTask(final String sourceURL, final String resourceType, final int mode, final List<String> emails, final long period, final long lastHarvest) {
         final HarvestTask newTask = new HarvestTask(sourceURL, resourceType, mode, emails, period, lastHarvest);
         final File f              = new File(configDir, HARVEST_TASK_FILE_NAME);
         Marshaller marshaller     = null;
@@ -198,7 +199,7 @@ public class HarvestTaskSchreduler {
      * @param sourceURL Used as the task identifier.
      * @param lastHarvest a long representing the last time where the task was launch
      */
-     private void updateSchreduledHarvestTask(String sourceURL, long lastHarvest) {
+     private void updateSchreduledHarvestTask(final String sourceURL, final long lastHarvest) {
         final File f              = new File(configDir, HARVEST_TASK_FILE_NAME);
         Marshaller marshaller     = null;
         Unmarshaller unmarshaller = null;
@@ -234,7 +235,7 @@ public class HarvestTaskSchreduler {
         }
     }
 
-    public void newAsynchronousHarvestTask(long period, String sourceURL, String resourceType, int mode, List<String> emails) {
+    public void newAsynchronousHarvestTask(long period, final String sourceURL, final String resourceType, final int mode, final List<String> emails) {
         final Timer t = new Timer();
         final TimerTask harvestTask = new AsynchronousHarvestTask(sourceURL, resourceType, mode, emails);
         //we launch only once the harvest
@@ -284,7 +285,7 @@ public class HarvestTaskSchreduler {
          * Build a new Timer which will Harvest the source periodically.
          *
          */
-        public AsynchronousHarvestTask(String sourceURL, String resourceType, int mode, List<String> emails) {
+        public AsynchronousHarvestTask(final String sourceURL, final String resourceType, final int mode, final List<String> emails) {
             this.sourceURL    = sourceURL;
             this.mode         = mode;
             this.resourceType = resourceType;
@@ -330,19 +331,19 @@ public class HarvestTaskSchreduler {
 
                  MailSendingUtilities.mail(emails, "Harvest report", report.toString());
             } catch (SQLException ex) {
-                LOGGER.severe("The service has throw an SQLException: " + ex.getMessage());
+                LOGGER.log(Level.SEVERE, "The service has throw an SQLException: {0}", ex.getMessage());
             } catch (JAXBException ex) {
-                LOGGER.severe("The resource can not be parsed: " + ex.getMessage());
+                LOGGER.log(Level.SEVERE, "The resource can not be parsed: {0}", ex.getMessage());
             } catch (MalformedURLException ex) {
                 LOGGER.severe("The source URL is malformed");
             } catch (IOException ex) {
                 LOGGER.severe("The service can't open the connection to the source");
             } catch (CstlServiceException ex) {
-                LOGGER.severe("Constellation exception:" + ex.getMessage());
+                LOGGER.log(Level.SEVERE, "Constellation exception:{0}", ex.getMessage());
             } catch (MessagingException ex) {
-                LOGGER.severe("MessagingException exception:" + ex.getMessage());
+                LOGGER.log(Level.SEVERE, "MessagingException exception:{0}", ex.getMessage());
             } catch (NamingException ex) {
-                LOGGER.severe("Naming exception:" + ex.getMessage());
+                LOGGER.log(Level.SEVERE, "Naming exception:{0}", ex.getMessage());
             }
         }
     }

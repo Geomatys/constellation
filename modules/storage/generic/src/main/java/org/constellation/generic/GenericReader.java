@@ -40,6 +40,7 @@ import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.QueryList;
 import org.constellation.metadata.io.MetadataIoException;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -50,7 +51,7 @@ public abstract class GenericReader  {
     /**
      * use for debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
 
     /**
      * A precompiled Statement requesting all The identifiers
@@ -63,7 +64,7 @@ public abstract class GenericReader  {
     private final Map<LockedPreparedStatement, List<String>> statements = new HashMap<LockedPreparedStatement, List<String>>();
 
     /**
-     * A flag indicating if the jdbc driver support several specific operation
+     * A flag indicating if the JDBC driver support several specific operation
      * (the oracle driver does not support a lot of method for example).
      *
      */
@@ -183,7 +184,7 @@ public abstract class GenericReader  {
 
     /**
      * Fill the static parameters map, with the direct parameters in the configuration
-     * and the results of the statique queries.
+     * and the results of the static queries.
      * 
      * @param queries
      * @throws SQLException

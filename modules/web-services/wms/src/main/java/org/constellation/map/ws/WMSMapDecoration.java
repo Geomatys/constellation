@@ -184,11 +184,11 @@ public final class WMSMapDecoration {
     private final File instanceDirectory;
 
     /**
-     * A flag used in test to forbid to read the confiuration file.
+     * A flag used in test to forbid to read the configuration file.
      */
     private static boolean emptyExtension = false;
 
-    public WMSMapDecoration(File instanceDirectory) {
+    public WMSMapDecoration(final File instanceDirectory) {
         this.instanceDirectory = instanceDirectory;
     }
 
@@ -228,7 +228,7 @@ public final class WMSMapDecoration {
      *
      * @return PortrayalExtension
      */
-    public static synchronized void setEmptyExtension(boolean emptyExt) {
+    public static synchronized void setEmptyExtension(final boolean emptyExt) {
         emptyExtension = emptyExt;
     }
 
@@ -244,7 +244,7 @@ public final class WMSMapDecoration {
     /**
      * @return Float or null if no compression has been set for the given mime type.
      */
-    public Float getCompression(String mime){
+    public Float getCompression(final String mime){
         getExtension();
         if(compressions != null){
             return compressions.get(mime.toLowerCase());
@@ -253,7 +253,7 @@ public final class WMSMapDecoration {
         }
     }
 
-    private PortrayalExtension read(File configFile) throws ParserConfigurationException, SAXException, IOException{
+    private PortrayalExtension read(final File configFile) throws ParserConfigurationException, SAXException, IOException{
 
         if(!configFile.exists()){
             return null;
@@ -645,7 +645,7 @@ public final class WMSMapDecoration {
         return null;
     }
 
-    private static int parseInteger(String str, int fallback){
+    private static int parseInteger(final String str, final int fallback){
         if(str == null) return fallback;
 
         try{
@@ -656,7 +656,7 @@ public final class WMSMapDecoration {
         }
     }
 
-    private static boolean parseBoolean(String str, boolean fallback){
+    private static boolean parseBoolean(final String str, final boolean fallback){
         if(str == null) return fallback;
 
         try{
@@ -667,7 +667,7 @@ public final class WMSMapDecoration {
         }
     }
 
-    private static float parseFloat(String str, int fallback){
+    private static float parseFloat(final String str, final int fallback){
         if(str == null) return fallback;
 
         try{
@@ -678,11 +678,11 @@ public final class WMSMapDecoration {
         }
     }
 
-    private static Font parseFont(String strFont){
+    private static Font parseFont(final String strFont){
         return Font.decode(strFont);
     }
 
-    private static Insets parseInsets(String str, Insets fallback){
+    private static Insets parseInsets(final String str, final Insets fallback){
         if(str == null) return fallback;
 
         final String[] parts = str.split(",");
@@ -699,7 +699,7 @@ public final class WMSMapDecoration {
 
     }
 
-    private static Color parseColor(String strColor, String strOpacity, Color fallback){
+    private static Color parseColor(final String strColor, final String strOpacity, final Color fallback){
         if(strColor == null) return fallback;
 
         Color color = Converters.convert(strColor, Color.class);
@@ -718,7 +718,7 @@ public final class WMSMapDecoration {
         return color;
     }
 
-    private static int parsePosition(String str, int fallback){
+    private static int parsePosition(final String str, final int fallback){
         if(POSTION_CENTER.equalsIgnoreCase(str)){
             return SwingConstants.CENTER;
         }else if(POSTION_EAST.equalsIgnoreCase(str)){
@@ -742,7 +742,7 @@ public final class WMSMapDecoration {
         }
     }
 
-    private static URL parseURL(String url, URL fallback){
+    private static URL parseURL(final String url, final URL fallback){
         if(url == null) return fallback;
 
         try{
@@ -753,7 +753,7 @@ public final class WMSMapDecoration {
         }
     }
 
-    private static Stroke parseStroke(String strWidth, String strDashes){
+    private static Stroke parseStroke(final String strWidth, final String strDashes){
 
         final int width = parseInteger(strWidth, 1);
 
@@ -777,7 +777,7 @@ public final class WMSMapDecoration {
         private final List<Map<String,Object>> decorations = new ArrayList<Map<String,Object>>();
 
         @Override
-        public void completeCanvas(J2DCanvas canvas) throws PortrayalException {
+        public void completeCanvas(final J2DCanvas canvas) throws PortrayalException {
 
             for(final Map<String,Object> params : decorations){
 

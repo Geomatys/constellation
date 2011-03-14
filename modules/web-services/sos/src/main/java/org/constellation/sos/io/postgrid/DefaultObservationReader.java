@@ -18,7 +18,6 @@
 package org.constellation.sos.io.postgrid;
 
 // J2SE dependencies
-import org.constellation.sos.factory.AbstractSOSFactory;
 import java.util.Map;
 import java.util.Date;
 import java.sql.Connection;
@@ -34,6 +33,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
@@ -57,6 +57,7 @@ import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ws.SOSConstants.*;
 
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -80,7 +81,7 @@ public class DefaultObservationReader implements ObservationReader {
     /**
      * use for debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
 
     /**
      * The base for observation id.
@@ -103,7 +104,7 @@ public class DefaultObservationReader implements ObservationReader {
     private final MeasurementTable measTable;
 
     /**
-     * A database table for insert and get observation offerring.
+     * A database table for insert and get observation offering.
      */
     private final ObservationOfferingTable offTable;
 
@@ -113,7 +114,7 @@ public class DefaultObservationReader implements ObservationReader {
     private final ReferenceTable refTable;
 
     /**
-     * An SQL statement verying if the specified observation already exist.
+     * An SQL statement verifying if the specified observation already exist.
      */
     private final SpecialOperationsTable specialTable;
 
@@ -128,7 +129,7 @@ public class DefaultObservationReader implements ObservationReader {
      * @param dataSourceOM
      * @param observationIdBase
      */
-    public DefaultObservationReader(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public DefaultObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase = (String) properties.get(AbstractSOSFactory.OBSERVATION_ID_BASE);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
@@ -176,7 +177,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOfferingType getObservationOffering(String offeringName) throws CstlServiceException {
+    public ObservationOfferingType getObservationOffering(final String offeringName) throws CstlServiceException {
         try {
             return offTable.getEntry(offeringName);
         } catch (NoSuchRecordException ex) {
@@ -257,7 +258,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
+    public PhenomenonType getPhenomenon(final String phenomenonName) throws CstlServiceException {
         try {
             final CompositePhenomenonTable compositePhenomenonTable = omDatabase.getTable(CompositePhenomenonTable.class);
             CompositePhenomenonType cphen = null;
@@ -310,7 +311,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeatureType getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
+    public SamplingFeatureType getFeatureOfInterest(final String samplingFeatureName) throws CstlServiceException {
         //TODO remove those duplicated catch block
         try {
             final SamplingPointTable pointTable = omDatabase.getTable(SamplingPointTable.class);
@@ -358,7 +359,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationType getObservation(String identifier, QName resultModel) throws CstlServiceException {
+    public ObservationType getObservation(final String identifier, final QName resultModel) throws CstlServiceException {
         try {
             if (resultModel.equals(MEASUREMENT_QNAME)) {
                 return (MeasurementType) measTable.getEntry(identifier);
@@ -387,7 +388,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Object getResult(String identifier, QName resultModel) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resultModel) throws CstlServiceException {
         try {
             if (resultModel.equals(MEASUREMENT_QNAME)) {
                 final MeasureTable meaTable = omDatabase.getTable(MeasureTable.class);
@@ -415,7 +416,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ReferenceType getReference(String href) throws CstlServiceException {
+    public ReferenceType getReference(final String href) throws CstlServiceException {
         try {
             final Set<ReferenceType> references = refTable.getEntries();
             if (references != null) {
@@ -478,7 +479,7 @@ public class DefaultObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(String samplingFeatureName) throws CstlServiceException {
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(final String samplingFeatureName) throws CstlServiceException {
         try {
             List<Date> bounds = specialTable.getTimeForStation(samplingFeatureName);
             return new TimePeriodType(new TimePositionType(bounds.get(0)), new TimePositionType(bounds.get(1)));

@@ -68,6 +68,7 @@ import org.geotoolkit.ows.xml.v110.ResponsiblePartySubsetType;
 import org.geotoolkit.ows.xml.v110.ServiceIdentification;
 import org.geotoolkit.ows.xml.v110.ServiceProvider;
 import org.geotoolkit.ows.xml.v110.TelephoneType;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wcs.xml.v100.Keywords;
 import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
 import org.geotoolkit.wcs.xml.v100.ResponsiblePartyType;
@@ -234,7 +235,7 @@ public final class ServicesBean {
     /**
      * Debugging purpose
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.bean");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
 
     public ServicesBean() throws JAXBException, FileNotFoundException {
 
@@ -262,7 +263,7 @@ public final class ServicesBean {
     /**
      * fill The formular with OWS 1.1.0 Object
      */
-    private void fillFormFromOWS(AbstractCapabilitiesBase cap) {
+    private void fillFormFromOWS(final AbstractCapabilitiesBase cap) {
 
         //we fill the default value of Service Identification
         final AbstractServiceIdentification si = cap.getServiceIdentification();
@@ -316,7 +317,7 @@ public final class ServicesBean {
     /**
      * fill The formular with WMS 1.3.0 Object
      */
-    private void fillFormFromWMS(WMSCapabilities cap) {
+    private void fillFormFromWMS(final WMSCapabilities cap) {
 
         //we fill the default value of Service Identification
         final Service s = cap.getService();
@@ -370,7 +371,7 @@ public final class ServicesBean {
      * @param keywords
      * @return
      */
-    private List<SelectItem> keywordsToSelectItem(AbstractKeywords keywords) {
+    private List<SelectItem> keywordsToSelectItem(final AbstractKeywords keywords) {
         final List<SelectItem> results = new ArrayList<SelectItem>();
 
         for (String keyword : keywords.getKeywordList()) {
@@ -386,7 +387,7 @@ public final class ServicesBean {
      * @param keywords
      * @return
      */
-    private List<SelectItem> keywordsToSelectItem(KeywordList keywords) {
+    private List<SelectItem> keywordsToSelectItem(final KeywordList keywords) {
         final List<SelectItem> results = new ArrayList<SelectItem>();
 
         for (Keyword keyword : keywords.getKeyword()) {
@@ -401,7 +402,7 @@ public final class ServicesBean {
      * @param list
      * @return
      */
-    private List<SelectItem> stringToSelectItem(List<String> list) {
+    private List<SelectItem> stringToSelectItem(final List<String> list) {
         final List<SelectItem> results = new ArrayList<SelectItem>();
 
         for (String item : list) {
@@ -712,7 +713,7 @@ public final class ServicesBean {
      * 
      * @param f the uploaded file.
      */
-    private void loadUserData(File f) throws FileNotFoundException, IOException {
+    private void loadUserData(final File f) throws FileNotFoundException, IOException {
         try {
             if (f != null) {
                 final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
@@ -1013,7 +1014,7 @@ public final class ServicesBean {
      * @param value
      * @throws ValidatorException
      */
-    public void validateWebService(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+    public void validateWebService(final FacesContext context, final UIComponent component, final Object value) throws ValidatorException {
         if (!(value instanceof String)) {
             throw new ValidatorException(new FacesMessage("A Validation error was found ! the selected item in selectOneListbox is not a string !!"));
         }
@@ -1037,7 +1038,7 @@ public final class ServicesBean {
         }
     }
 
-    public boolean existsCapabilities(String ws) {
+    public boolean existsCapabilities(final String ws) {
         boolean exist = false;
         final File file;
         final String path;
@@ -1152,7 +1153,7 @@ public final class ServicesBean {
         return abstractDescription;
     }
 
-    public void setAbstract(String abstractt) {
+    public void setAbstract(final String abstractt) {
         this.abstractDescription = abstractt;
     }
 
@@ -1163,7 +1164,7 @@ public final class ServicesBean {
         return keywords;
     }
 
-    public void setKeywords(List<SelectItem> keywords) {
+    public void setKeywords(final List<SelectItem> keywords) {
         this.keywords = keywords;
     }
 
@@ -1171,7 +1172,7 @@ public final class ServicesBean {
         return serviceType;
     }
 
-    public void setServiceType(String serviceType) {
+    public void setServiceType(final String serviceType) {
         this.serviceType = serviceType;
     }
 
@@ -1182,7 +1183,7 @@ public final class ServicesBean {
         return versions;
     }
 
-    public void setVersions(List<SelectItem> versions) {
+    public void setVersions(final List<SelectItem> versions) {
         this.versions = versions;
     }
 
@@ -1190,7 +1191,7 @@ public final class ServicesBean {
         return fees;
     }
 
-    public void setFees(String fees) {
+    public void setFees(final String fees) {
         this.fees = fees;
     }
 
@@ -1198,7 +1199,7 @@ public final class ServicesBean {
         return accessConstraints;
     }
 
-    public void setAccessConstraints(String accesConstraints) {
+    public void setAccessConstraints(final String accesConstraints) {
         this.accessConstraints = accesConstraints;
     }
 
@@ -1206,7 +1207,7 @@ public final class ServicesBean {
         return phoneVoice;
     }
 
-    public void setPhoneVoice(String phoneVoice) {
+    public void setPhoneVoice(final String phoneVoice) {
         this.phoneVoice = phoneVoice;
     }
 
@@ -1214,7 +1215,7 @@ public final class ServicesBean {
         return phoneFacsimile;
     }
 
-    public void setPhoneFacsimile(String phoneFacsimile) {
+    public void setPhoneFacsimile(final String phoneFacsimile) {
         this.phoneFacsimile = phoneFacsimile;
     }
 
@@ -1222,7 +1223,7 @@ public final class ServicesBean {
         return deliveryPoint;
     }
 
-    public void setDeliveryPoint(String deliveryPoint) {
+    public void setDeliveryPoint(final String deliveryPoint) {
         this.deliveryPoint = deliveryPoint;
     }
 
@@ -1230,7 +1231,7 @@ public final class ServicesBean {
         return city;
     }
 
-    public void setCity(String city) {
+    public void setCity(final String city) {
         this.city = city;
     }
 
@@ -1238,7 +1239,7 @@ public final class ServicesBean {
         return administrativeArea;
     }
 
-    public void setAdministrativeArea(String administrativeArea) {
+    public void setAdministrativeArea(final String administrativeArea) {
         this.administrativeArea = administrativeArea;
     }
 
@@ -1246,7 +1247,7 @@ public final class ServicesBean {
         return postalCode;
     }
 
-    public void setPostalCode(String postalCode) {
+    public void setPostalCode(final String postalCode) {
         this.postalCode = postalCode;
     }
 
@@ -1254,7 +1255,7 @@ public final class ServicesBean {
         return providerName;
     }
 
-    public void setProviderName(String providerName) {
+    public void setProviderName(final String providerName) {
         this.providerName = providerName;
     }
 
@@ -1262,7 +1263,7 @@ public final class ServicesBean {
         return providerSite;
     }
 
-    public void setProviderSite(String providerSite) {
+    public void setProviderSite(final String providerSite) {
         this.providerSite = providerSite;
     }
 
@@ -1270,7 +1271,7 @@ public final class ServicesBean {
         return individualName;
     }
 
-    public void setIndividualName(String individualName) {
+    public void setIndividualName(final String individualName) {
         this.individualName = individualName;
     }
 
@@ -1278,7 +1279,7 @@ public final class ServicesBean {
         return positionName;
     }
 
-    public void setPositionName(String positionName) {
+    public void setPositionName(final String positionName) {
         this.positionName = positionName;
     }
 
@@ -1286,7 +1287,7 @@ public final class ServicesBean {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(final String country) {
         this.country = country;
     }
 
@@ -1294,7 +1295,7 @@ public final class ServicesBean {
         return electronicAddress;
     }
 
-    public void setElectronicAddress(String electronicAddress) {
+    public void setElectronicAddress(final String electronicAddress) {
         this.electronicAddress = electronicAddress;
     }
 
@@ -1310,7 +1311,7 @@ public final class ServicesBean {
         return addressType;
     }
 
-    public void setAddressType(String addressType) {
+    public void setAddressType(final String addressType) {
         this.addressType = addressType;
     }
 
@@ -1318,7 +1319,7 @@ public final class ServicesBean {
         return layerLimit;
     }
 
-    public void setLayerLimit(int layerLimit) {
+    public void setLayerLimit(final int layerLimit) {
         this.layerLimit = layerLimit;
     }
 
@@ -1326,7 +1327,7 @@ public final class ServicesBean {
         return maxWidth;
     }
 
-    public void setMaxWidth(int maxWidth) {
+    public void setMaxWidth(final int maxWidth) {
         this.maxWidth = maxWidth;
     }
 
@@ -1334,7 +1335,7 @@ public final class ServicesBean {
         return maxHeight;
     }
 
-    public void setMaxHeight(int maxHeight) {
+    public void setMaxHeight(final int maxHeight) {
         this.maxHeight = maxHeight;
     }
 
@@ -1342,7 +1343,7 @@ public final class ServicesBean {
         return webServiceMode;
     }
 
-    public void setWebServiceMode(String webServiceMode) {
+    public void setWebServiceMode(final String webServiceMode) {
         this.webServiceMode = webServiceMode;
     }
 
@@ -1350,7 +1351,7 @@ public final class ServicesBean {
         return webServices;
     }
 
-    public void setWebServices(List webServices) {
+    public void setWebServices(final List webServices) {
         this.webServices = webServices;
     }
     /*
@@ -1366,7 +1367,7 @@ public final class ServicesBean {
         return urlPreference;
     }
 
-    public void setUrlPreference(String urlPreference) {
+    public void setUrlPreference(final String urlPreference) {
         this.urlPreference = urlPreference;
     }
 
@@ -1374,7 +1375,7 @@ public final class ServicesBean {
         return existPrefrence;
     }
 
-    public void setExistPrefrence(boolean existPrefrence) {
+    public void setExistPrefrence(final boolean existPrefrence) {
         this.existPrefrence = existPrefrence;
     }
 
@@ -1418,7 +1419,7 @@ public final class ServicesBean {
         return names;
     }
 
-    public void setLayerProviderError(SERVICESERROR layerProviderError) {
+    public void setLayerProviderError(final SERVICESERROR layerProviderError) {
         this.layerProviderError = layerProviderError;
     }
 
@@ -1426,7 +1427,7 @@ public final class ServicesBean {
         return layerProviderError;
     }
 
-    public void setStyleProviderError(SERVICESERROR styleProviderError) {
+    public void setStyleProviderError(final SERVICESERROR styleProviderError) {
         this.styleProviderError = styleProviderError;
     }
 

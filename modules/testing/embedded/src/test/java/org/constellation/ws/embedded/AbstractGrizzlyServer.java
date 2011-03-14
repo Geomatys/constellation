@@ -17,7 +17,6 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-import org.geotoolkit.feature.DefaultName;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,13 +43,16 @@ import org.constellation.provider.om.OMProvider;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.util.Util;
 
-// JUnit dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.feature.DefaultName;
 
+// JUnit dependencies
 import org.junit.*;
 import static org.junit.Assume.*;
 
@@ -82,7 +84,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
     private static DefaultDataSource ds;
     
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
     /**
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
@@ -260,7 +262,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     }
 
     /**
-     * Initialises the data directory in unzipping the jar containing the resources
+     * Initializes the data directory in unzipping the jar containing the resources
      * into a temporary directory.
      *
      * @return The root output directory where the data are unzipped.

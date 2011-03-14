@@ -17,25 +17,28 @@
 
 package org.constellation.sos.io.generic;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.constellation.sos.factory.AbstractSOSFactory;
 import java.util.logging.Level;
-import java.io.File;
-import javax.xml.bind.JAXBException;
-import java.sql.SQLException;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import javax.xml.bind.Unmarshaller;
-import javax.sql.DataSource;
 import java.util.logging.Logger;
+import java.io.File;
+import java.sql.SQLException;
+import javax.sql.DataSource;
+
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.JAXBException;
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.FilterQuery;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.sos.io.ObservationFilter;
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.ws.CstlServiceException;
 
+import org.geotoolkit.util.logging.Logging;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -85,9 +88,9 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
     /**
      * use for debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos.io.generic");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos.io.generic");
 
-    public AbstractGenericObservationFilter(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public AbstractGenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase         = (String) properties.get(AbstractSOSFactory.OBSERVATION_ID_BASE);
         this.observationTemplateIdBase = (String) properties.get(AbstractSOSFactory.OBSERVATION_TEMPLATE_ID_BASE);
         if (configuration == null) {
@@ -122,7 +125,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
         }
     }
 
-    public AbstractGenericObservationFilter(AbstractGenericObservationFilter that) {
+    public AbstractGenericObservationFilter(final AbstractGenericObservationFilter that) {
         this.observationIdBase         = that.observationIdBase;
         this.observationTemplateIdBase = that.observationTemplateIdBase;
         this.configurationQuery        = that.configurationQuery;
@@ -134,7 +137,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      * {@inheritDoc}
      */
     @Override
-    public void setLoglevel(Level logLevel) {
+    public void setLoglevel(final Level logLevel) {
          this.logLevel = logLevel;
     }
 
@@ -158,7 +161,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      * {@inheritDoc}
      */
     @Override
-    public void setResultEquals(String propertyName, String value) throws CstlServiceException{
+    public void setResultEquals(final String propertyName, final String value) throws CstlServiceException{
         throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
 

@@ -90,6 +90,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
@@ -110,7 +111,7 @@ public abstract class FilterParser {
     /**
      * use for debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
 
     protected static final String PARSE_ERROR_MSG = "The service was unable to parse the Date: ";
 
@@ -125,7 +126,7 @@ public abstract class FilterParser {
      * 
      * @param cqlQuery A well-formed CQL query .
      */
-    public static FilterType cqlToFilter(String cqlQuery) throws CQLException, JAXBException {
+    public static FilterType cqlToFilter(final String cqlQuery) throws CQLException, JAXBException {
         final FilterType result;
         final Object newFilter = CQL.toFilter(cqlQuery, new FilterFactoryImpl());
 
@@ -142,7 +143,7 @@ public abstract class FilterParser {
      *
      * @param filter A well-formed Filter .
      */
-    public static String filterToCql(FilterType filter) throws CQLException, JAXBException {
+    public static String filterToCql(final FilterType filter) throws CQLException, JAXBException {
         return CQL.toCQL(filter);
     }
 
@@ -151,7 +152,7 @@ public abstract class FilterParser {
      *
      * @param constraint a constraint expressed in CQL or FilterType
      */
-    public Object getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
+    public Object getQuery(final QueryConstraint constraint, final Map<String, QName> variables, final Map<String, String> prefixs) throws CstlServiceException {
         //if the constraint is null we make a null filter
         if (constraint == null)  {
             return getNullFilter();
@@ -168,7 +169,7 @@ public abstract class FilterParser {
      */
     protected abstract Object getNullFilter();
     
-    protected abstract Object getQuery(final FilterType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
+    protected abstract Object getQuery(final FilterType constraint, final Map<String, QName> variables, final Map<String, String> prefixs) throws CstlServiceException;
 
     /**
      * Build a piece of query with the specified logical filter.
@@ -186,7 +187,7 @@ public abstract class FilterParser {
      * @return
      * @throws org.constellation.coverage.web.CstlServiceException
      */
-    protected String treatComparisonOperator(ComparisonOpsType comparisonOps) throws CstlServiceException {
+    protected String treatComparisonOperator(final ComparisonOpsType comparisonOps) throws CstlServiceException {
         final StringBuilder response = new StringBuilder();
 
         if (comparisonOps instanceof PropertyIsLike ) {
@@ -278,10 +279,10 @@ public abstract class FilterParser {
      * @param literalValue The value of the filter.
      * @param operator The comparison operator.
      */
-    protected abstract void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator);
+    protected abstract void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator);
 
     /**
-     * Add to the StringBuilder a piece of query with the specified operator fr a date property.
+     * Add to the StringBuilder a piece of query with the specified operator for a date property.
      *
      * @param response A stringBuilder containing the query.
      * @param propertyName The name of the date property to filter.
@@ -289,17 +290,17 @@ public abstract class FilterParser {
      * @param operator The comparison operator.
      * @throws CstlServiceException
      */
-    protected abstract void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws CstlServiceException;
+    protected abstract void addDateComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws CstlServiceException;
 
     /**
      * Extract and format a date representation from the specified String.
-     * If the string is not a welle formed date it will raise an exception.
+     * If the string is not a well formed date it will raise an exception.
      *
      * @param literal A Date representation.
      * @return A formatted date representation.
      * @throws CstlServiceException if the specified string can not be parsed.
      */
-    protected abstract String extractDateValue(String literal) throws CstlServiceException;
+    protected abstract String extractDateValue(final String literal) throws CstlServiceException;
 
     /**
      * Replace The special character in a literal value for a propertyIsLike filter,
@@ -312,7 +313,7 @@ public abstract class FilterParser {
      *
      * @return A formatted value.
      */
-    protected String translateSpecialChar(PropertyIsLike pil, String wildchar, String singleChar, String escapeChar) {
+    protected String translateSpecialChar(final PropertyIsLike pil, final String wildchar, final String singleChar, final String escapeChar) {
         String brutValue = pil.getLiteral();
         brutValue = brutValue.replace(pil.getWildCard(), wildchar);
         brutValue = brutValue.replace(pil.getSingleChar(), singleChar);
@@ -332,7 +333,7 @@ public abstract class FilterParser {
      * @param pil propertyIsLike filter.
      * @return A formatted value.
      */
-    protected abstract String translateSpecialChar(PropertyIsLike pil);
+    protected abstract String translateSpecialChar(final PropertyIsLike pil);
 
     /**
      * Return a piece of query for An Id filter.
@@ -392,14 +393,14 @@ public abstract class FilterParser {
     }
 
     /**
-     * Return A single Filter Concatening the list of specified Filter.
+     * Return A single Filter concatening the list of specified Filter.
      *
      * @param logicalOperand A logical operator.
      * @param filters A List of lucene filter.
      *
      * @return A single Filter.
      */
-    protected Filter getSpatialFilterFromList(int logicalOperand, final List<Filter> filters) {
+    protected Filter getSpatialFilterFromList(final int logicalOperand, final List<Filter> filters) {
 
         Filter spatialFilter = null;
         if (filters.size() == 1) {
@@ -651,7 +652,7 @@ public abstract class FilterParser {
     }
 
     /**
-     * In the case of a NOT operator containing a comparison operator, the easyest way is to
+     * In the case of a NOT operator containing a comparison operator, the easiest way is to
      * reverse the comparison operator.
      * example: NOT PropertyIsLessOrEqualsThan => PropertyIsGreaterThan
      *          NOT PropertyIsLessThan         => PropertyIsGreaterOrEqualsThan
@@ -661,7 +662,7 @@ public abstract class FilterParser {
      * 
      * @throws CstlServiceException
      */
-    protected ComparisonOpsType reverseComparisonOperator(ComparisonOpsType c) throws CstlServiceException {
+    protected ComparisonOpsType reverseComparisonOperator(final ComparisonOpsType c) throws CstlServiceException {
         String operator;
         if (c != null) {
             operator = c.getClass().getSimpleName();

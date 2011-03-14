@@ -18,6 +18,7 @@
 package org.constellation.filter;
 
 // J2SE dependencies
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.ogc.xml.v110.UpperBoundaryType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import java.io.StringReader;
@@ -55,7 +56,7 @@ import static org.junit.Assert.*;
 public class FilterParserTest {
     
     private LuceneFilterParser filterParser;
-    private final static Logger LOGGER = Logger.getLogger("org.constellation.filter");
+    private final static Logger LOGGER = Logging.getLogger("org.constellation.filter");
     private static MarshallerPool pool;
    
     @BeforeClass

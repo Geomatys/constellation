@@ -35,6 +35,7 @@ import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.storage.DataStoreException;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -43,7 +44,7 @@ import org.geotoolkit.storage.DataStoreException;
 @Provider
 public class FeatureCollectionWriter<T extends FeatureCollection> implements MessageBodyWriter<T> {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs.ws.rs");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.wfs.ws.rs");
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {

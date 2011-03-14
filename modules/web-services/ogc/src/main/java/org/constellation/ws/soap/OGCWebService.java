@@ -35,6 +35,7 @@ import org.constellation.configuration.ConfigDirectory;
 // Geotoolkit dependencies
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
+import org.geotoolkit.util.logging.Logging;
 
 
 // GeoAPI dependencies
@@ -66,7 +67,7 @@ public abstract class OGCWebService<W extends Worker> {
     /**
      * use for debugging purpose
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.ws.soap");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws.soap");
 
     /**
      * A map of service worker.
@@ -87,7 +88,7 @@ public abstract class OGCWebService<W extends Worker> {
      *                          The first version specified <strong>MUST</strong> be the highest
      *                          one, the best one.
      */
-    public OGCWebService(Specification spec) {
+    public OGCWebService(final Specification spec) {
 
         LOGGER.log(Level.INFO, "Starting the SOAP {0} service facade.\n", spec.name());
 
@@ -110,7 +111,7 @@ public abstract class OGCWebService<W extends Worker> {
      *                          one, the best one.
      * @param workers A map of worker id / worker.
      */
-    public OGCWebService(Map<String, W> workers, final Specification spec) {
+    public OGCWebService(final Map<String, W> workers, final Specification spec) {
         super();
 
         this.specification = spec;
@@ -137,7 +138,7 @@ public abstract class OGCWebService<W extends Worker> {
     }
 
     /**
-     * Scan the configuration directory to instanciate Web service workers.
+     * Scan the configuration directory to instantiate Web service workers.
      */
     private void buildWorkerMap() {
         final File serviceDirectory = getServiceDirectory();
@@ -160,7 +161,7 @@ public abstract class OGCWebService<W extends Worker> {
      * @param instanceDirectory The configuration directory of the instance.
      * @return
      */
-    protected abstract W createWorker(File instanceDirectory);
+    protected abstract W createWorker(final File instanceDirectory);
 
     /**
      * extract the service URL (before serviceName/serviceID?)
@@ -186,7 +187,7 @@ public abstract class OGCWebService<W extends Worker> {
     }
 
     /**
-     * Return the current worker dpecified by the url.
+     * Return the current worker specified by the URL.
      *
      * @return
      * @throws CstlServiceException

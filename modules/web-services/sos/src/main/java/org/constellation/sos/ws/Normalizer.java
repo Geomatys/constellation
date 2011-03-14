@@ -40,17 +40,18 @@ import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
 import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.observation.Observation;
 
 /**
  * Static methods use to create valid XML file, by setting object into referenceMode.
- * The goal is to avois to declare the same block many times in a XML file.
+ * The goal is to avoid to declare the same block many times in a XML file.
  * 
  * @author Guilhem Legal (Geomatys)
  */
 public final class Normalizer {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
 
     private Normalizer() {}
     
@@ -61,7 +62,7 @@ public final class Normalizer {
      *
      * @return a normalized document
      */
-    public static Capabilities normalizeDocument(Capabilities capa){
+    public static Capabilities normalizeDocument(final Capabilities capa){
         final List<PhenomenonPropertyType> alreadySee = new ArrayList<PhenomenonPropertyType>();
         if (capa.getContents() != null) {
             for (ObservationOfferingType off: capa.getContents().getObservationOfferingList().getObservationOffering()) {
@@ -94,7 +95,7 @@ public final class Normalizer {
      *
      * @return a collection
      */
-    public static ObservationCollectionType regroupObservation(ObservationCollectionType collection){
+    public static ObservationCollectionType regroupObservation(final ObservationCollectionType collection){
         final List<Observation> members = collection.getMember();
         final Map<String, ObservationType> merged = new HashMap<String, ObservationType>();
         for (Observation obs : members) {
@@ -139,7 +140,7 @@ public final class Normalizer {
      *
      * @return a normalized document
      */
-    public static ObservationCollectionType normalizeDocument(ObservationCollectionType collection) {
+    public static ObservationCollectionType normalizeDocument(final ObservationCollectionType collection) {
         //first if the collection is empty
         if (collection.getMember().isEmpty()) {
             return new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");

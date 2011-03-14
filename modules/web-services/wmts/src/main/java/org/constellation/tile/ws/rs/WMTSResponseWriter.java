@@ -31,6 +31,7 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.WMTSResponse;
 
@@ -42,7 +43,7 @@ import org.geotoolkit.wmts.xml.WMTSResponse;
 @Produces("application/xml,text/xml,*/*")
 public class WMTSResponseWriter<T extends WMTSResponse> implements MessageBodyWriter<T>  {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.map.ws.rs");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.map.ws.rs");
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {

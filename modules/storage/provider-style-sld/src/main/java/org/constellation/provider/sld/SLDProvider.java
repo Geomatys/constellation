@@ -43,11 +43,12 @@ import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.util.FactoryException;
 
 /**
- * Style provider. index and cache MutableStyle whithin the given folder.
+ * Style provider. index and cache MutableStyle within the given folder.
  *
  * @version $Id$
  *
@@ -57,7 +58,7 @@ public class SLDProvider extends AbstractStyleProvider{
 
     public static final String KEY_FOLDER_PATH = "path";
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.sld");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.sld");
     private static final MutableStyleFactory SF = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
     private static final Collection<String> MASKS = new ArrayList<String>();
@@ -73,7 +74,7 @@ public class SLDProvider extends AbstractStyleProvider{
     private final Cache<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
     
     
-    protected SLDProvider(ProviderSource source){
+    protected SLDProvider(final ProviderSource source){
         super(source);
         folder = new File(source.parameters.get(KEY_FOLDER_PATH));
 
@@ -207,7 +208,7 @@ public class SLDProvider extends AbstractStyleProvider{
         }
     }
         
-    private void visit(File file) {
+    private void visit(final File file) {
 
         if (file.isDirectory()) {
             final File[] list = file.listFiles();
@@ -221,7 +222,7 @@ public class SLDProvider extends AbstractStyleProvider{
         }
     }
     
-    private void test(File candidate){
+    private void test(final File candidate){
         if(candidate.isFile()){
             final String fullName = candidate.getName();
             final String lowerCase = fullName.toLowerCase();

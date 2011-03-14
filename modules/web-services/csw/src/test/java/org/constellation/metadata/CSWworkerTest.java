@@ -18,6 +18,7 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -113,7 +114,7 @@ public class CSWworkerTest {
 
     protected static MarshallerPool pool;
 
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
 
     public static void fillPoolAnchor(AnchoredMarshallerPool pool) {
         try {

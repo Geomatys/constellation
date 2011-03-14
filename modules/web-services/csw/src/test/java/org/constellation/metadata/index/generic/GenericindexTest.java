@@ -18,6 +18,7 @@
 package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
+import org.geotoolkit.util.logging.Logging;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,7 @@ public class GenericindexTest {
             FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
 
 
-    private static final Logger logger = Logger.getLogger("org.constellation.metadata");
+    private static final Logger logger = Logging.getLogger("org.constellation.metadata");
 
     private static AbstractIndexSearcher indexSearcher;
 

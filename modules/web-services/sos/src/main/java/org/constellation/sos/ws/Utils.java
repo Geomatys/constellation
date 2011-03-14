@@ -17,7 +17,6 @@
 
 package org.constellation.sos.ws;
 
-import org.geotoolkit.swe.xml.v101.TextBlockType;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -39,6 +38,8 @@ import org.geotoolkit.sml.xml.AbstractIdentification;
 import org.geotoolkit.sml.xml.AbstractIdentifier;
 import org.geotoolkit.sml.xml.AbstractProcess;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.swe.xml.v101.TextBlockType;
 import org.opengis.observation.Observation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -51,7 +52,7 @@ public final class Utils {
     /**
      * use for debugging purpose
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
 
     private Utils() {}
     
@@ -226,7 +227,7 @@ public final class Utils {
      * @param collection
      * @return
      */
-    public static EnvelopeType getCollectionBound(final ObservationCollectionType collection, String srsName) {
+    public static EnvelopeType getCollectionBound(final ObservationCollectionType collection, final String srsName) {
         double minx = Double.MAX_VALUE;
         double miny = Double.MAX_VALUE;
         double maxx = -Double.MAX_VALUE;
@@ -308,7 +309,7 @@ public final class Utils {
      * @param value the datablock builder.
      * @param phenomenonIndex the current phenomenon index.
      */
-    public static void fillEndingDataHoles(Appendable value, int phenomenonIndex, List<String> fieldList, TextBlockType encoding) throws IOException {
+    public static void fillEndingDataHoles(final Appendable value, int phenomenonIndex, final List<String> fieldList, final TextBlockType encoding) throws IOException {
         while (phenomenonIndex < fieldList.size()) {
             value.append(encoding.getTokenSeparator());
             phenomenonIndex++;
@@ -327,7 +328,7 @@ public final class Utils {
      *
      * @return the updated phenomenon index.
      */
-    public static int fillDataHoles(Appendable value, int currentIndex, String searchedField, List<String> fieldList, TextBlockType encoding, int nbBlockByHole) throws IOException {
+    public static int fillDataHoles(final Appendable value, int currentIndex, final String searchedField, final List<String> fieldList, final TextBlockType encoding, final int nbBlockByHole) throws IOException {
         while (currentIndex < fieldList.size() && !fieldList.get(currentIndex).equals(searchedField)) {
             if (value != null) {
                 for (int i = 0; i < nbBlockByHole; i++) {

@@ -28,6 +28,7 @@ import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.filter.FilterFactory2;
 
 /**
@@ -38,7 +39,7 @@ public abstract class AbstractAnalyzerTest {
 
     protected static final FilterFactory2 FF = (FilterFactory2) FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
 
-    protected static final Logger logger = Logger.getLogger("org.constellation.metadata.index.generic");
+    protected static final Logger logger = Logging.getLogger("org.constellation.metadata.index.generic");
 
     protected static AbstractIndexSearcher indexSearcher;
 
