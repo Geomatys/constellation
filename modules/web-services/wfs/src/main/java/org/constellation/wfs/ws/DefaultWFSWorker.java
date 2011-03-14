@@ -138,6 +138,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         DEFAULT_CRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
         DEFAULT_CRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
     }
+
+    /**
+     * The Mime type for describe feature GML 3.1.1
+     */
+    private final static MediaType GML_3_1_1 = new MediaType("text", "xml; subtype=gml/3.1.1");
+
     /**
      * The current version of the service.
      */
@@ -876,7 +882,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     @Override
     public MediaType getOutputFormat() {
         if ("text/xml; subtype=gml/3.1.1".equals(outputFormat)) {
-            return new MediaType("text", "xml; subtype=gml/3.1.1");
+            return GML_3_1_1;
         } else {
             return MediaType.valueOf(outputFormat);
         }

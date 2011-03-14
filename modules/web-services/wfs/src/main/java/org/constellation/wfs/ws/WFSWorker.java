@@ -61,7 +61,7 @@ public interface WFSWorker extends Worker {
     /**
      * describe the structure of any feature type it can service.
      *
-     * @param model A desribeFeatureType request contains typenames.
+     * @param model A desribeFeatureType request contains typeNames.
      *
      * @return A marshallable object representing a xsd.
      * @throws CstlServiceException
@@ -71,7 +71,7 @@ public interface WFSWorker extends Worker {
     /**
      * Allows retrieval of features from a web feature service.
      * 
-     * @param request e request containg typeNames, comparison filter, spatial filter, etc.
+     * @param request a request containing typeNames, comparison filter, spatial filter, etc.
      * @return features instances.
      * @throws CstlServiceException
      */
@@ -82,17 +82,17 @@ public interface WFSWorker extends Worker {
      *
      * @param grbi a getGMLObject request containing IDs.
      * 
-     * @return A GML representation of a fature instance or element.
+     * @return A GML representation of a feature instance or element.
      * @throws CstlServiceException
      */
     AbstractGMLType getGMLObject(GetGmlObjectType grbi) throws CstlServiceException;
 
     /**
-     * lock request on one or more instancesof a feature type for the duration of a transaction
+     * lock request on one or more instances of a feature type for the duration of a transaction
      *
      * @param gr a lockFeature request identifying which feature are to lock.
      *
-     * @return An acknowledgement
+     * @return An acknowledgment
      * @throws CstlServiceException
      */
     LockFeatureResponseType lockFeature(LockFeatureType gr) throws CstlServiceException;
@@ -110,7 +110,10 @@ public interface WFSWorker extends Worker {
      * Return the current outputFormat.
      *
      * @return the current outputFormat.
+     * 
+     * @deprecated Thread unsafe must be replaced.
      */
+    @Deprecated
     MediaType getOutputFormat();
 
     /**
@@ -118,7 +121,10 @@ public interface WFSWorker extends Worker {
      * this map is added to the XML output.
      *
      * @return a map with namespace - xsd location.
+     *
+     * @deprecated Thread unsafe must be replaced.
      */
+    @Deprecated
     Map<String, String> getSchemaLocations();
 
     /**

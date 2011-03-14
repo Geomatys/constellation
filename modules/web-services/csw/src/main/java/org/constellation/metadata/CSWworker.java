@@ -1544,7 +1544,10 @@ public class CSWworker extends AbstractWorker {
     
     /**
      * Return the current output format (default: application/xml)
+     *
+     * @deprecated Thread unsafe todo replace.
      */
+    @Deprecated
     public String getOutputFormat() {
         if (outputFormat == null) {
             return MimeType.APPLICATION_XML;

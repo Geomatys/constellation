@@ -2132,7 +2132,10 @@ public class SOSworker extends AbstractWorker {
      * Return the current output format MIME type (default: application/xml).
      * 
      * @return The current output format MIME type (default: application/xml).
+     *
+     * @deprecated thread unsafe todo replace
      */
+    @Deprecated
     public String getOutputFormat() {
         if (outputFormat == null) {
             return MimeType.APPLICATION_XML;
