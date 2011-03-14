@@ -30,12 +30,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import org.apache.xml.serialize.XMLSerializer;
 import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.metadata.utils.SerializerResponse;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.CSWResponse;
-import org.geotoolkit.xml.Catching;
+import org.geotoolkit.xml.XML;
 
 /**
  *
@@ -59,11 +60,11 @@ public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWrit
 
     @Override
     public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
-        Catching.Marshaller m = null;
+        Marshaller m = null;
         final MarshallWarnings warnings = new MarshallWarnings();
         try {
             m = CSWMarshallerPool.getInstance().acquireMarshaller();
-            m.setObjectConverters(warnings);
+            m.setProperty(XML.CONVERTERS, warnings);
             if (t instanceof SerializerResponse) {
                 final SerializerResponse response = (SerializerResponse) t;
                 final XMLSerializer serializer    = response.getSerializer();

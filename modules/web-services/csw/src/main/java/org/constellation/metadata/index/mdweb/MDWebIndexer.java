@@ -235,7 +235,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     @Override
     protected boolean isISO19139(Form form) {
-       return form.getRoot().getType().getName().equals("MD_Metadata");
+       return form.getRoot().getType().getName().equals("MD_Metadata") ||
+              form.getRoot().getType().getName().equals("MI_Metadata");
     }
 
     /**
