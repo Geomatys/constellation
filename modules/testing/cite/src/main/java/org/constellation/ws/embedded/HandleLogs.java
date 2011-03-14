@@ -100,7 +100,9 @@ public final class HandleLogs {
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
         } finally {
             try {
-                resDB.close();
+                if (resDB != null) {
+                    resDB.close();
+                }
             } catch (SQLException ex) {
                 System.err.println(ex);
             }
@@ -123,7 +125,7 @@ public final class HandleLogs {
     }
 
     /**
-     * Analyses the result gotten from this session, with the ones of the previous session.
+     * Analyzes the result gotten from this session, with the ones of the previous session.
      *
      * @param date    The execution date of the current {@code Cite tests} session.
      * @param service The service name.
@@ -144,7 +146,9 @@ public final class HandleLogs {
             return true;
         } finally {
             try {
-                resDB.close();
+                if (resDB != null) {
+                    resDB.close();
+                }
             } catch (SQLException ex) {
                 System.err.println(ex);
             }
@@ -169,7 +173,9 @@ public final class HandleLogs {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         } finally {
             try {
-                resDB.close();
+                if (resDB != null) {
+                    resDB.close();
+                }
             } catch (SQLException ex) {
                 System.err.println(ex);
             }
@@ -194,7 +200,9 @@ public final class HandleLogs {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         } finally {
             try {
-                resDB.close();
+                if (resDB != null) {
+                    resDB.close();
+                }
             } catch (SQLException ex) {
                 System.err.println(ex);
             }
