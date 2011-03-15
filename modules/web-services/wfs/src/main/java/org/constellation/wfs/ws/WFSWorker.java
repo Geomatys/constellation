@@ -107,16 +107,6 @@ public interface WFSWorker extends Worker {
     TransactionResponseType transaction(TransactionType t) throws CstlServiceException;
 
     /**
-     * Return the current outputFormat.
-     *
-     * @return the current outputFormat.
-     * 
-     * @deprecated Thread unsafe must be replaced.
-     */
-    @Deprecated
-    MediaType getOutputFormat();
-
-    /**
      * Return a map with namespace - xsd location.
      * this map is added to the XML output.
      *

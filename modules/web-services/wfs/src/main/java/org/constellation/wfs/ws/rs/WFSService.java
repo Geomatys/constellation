@@ -18,6 +18,7 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
+import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -169,30 +170,50 @@ public class WFSService extends OGCWebService<WFSWorker> {
 
             if (request instanceof GetCapabilitiesType) {
                 final GetCapabilitiesType model = (GetCapabilitiesType) request;
-                return Response.ok(worker.getCapabilities(model), worker.getOutputFormat()).build();
+                String outputFormat = model.getFirstAcceptFormat();
+                if (outputFormat == null) {
+                    outputFormat = "application/xml";
+                }
+                return Response.ok(worker.getCapabilities(model), outputFormat).build();
 
             } else if (request instanceof DescribeFeatureTypeType) {
                 final DescribeFeatureTypeType model = (DescribeFeatureTypeType) request;
-                return Response.ok(worker.describeFeatureType(model), worker.getOutputFormat()).build();
+                String requestOutputFormat = model.getOutputFormat();
+                final MediaType outputFormat;
+                if (requestOutputFormat == null || requestOutputFormat.equals("text/xml; subtype=gml/3.1.1")) {
+                    outputFormat = GML_3_1_1;
+                } else {
+                    outputFormat = MediaType.valueOf(requestOutputFormat);
+                }
+                LOGGER.log(Level.INFO, "outputFormat asked:{0}", requestOutputFormat);
+                
+                return Response.ok(worker.describeFeatureType(model), outputFormat).build();
 
             } else if (request instanceof GetFeatureType) {
                 final GetFeatureType model = (GetFeatureType) request;
+                String requestOutputFormat = model.getOutputFormat();
+                final MediaType outputFormat;
+                if (requestOutputFormat == null || requestOutputFormat.equals("text/xml; subtype=gml/3.1.1")) {
+                    outputFormat = GML_3_1_1;
+                } else {
+                    outputFormat = MediaType.valueOf(requestOutputFormat);
+                }
                 final Object response = worker.getFeature(model);
                 schemaLocations = worker.getSchemaLocations();
-                return Response.ok(response, worker.getOutputFormat()).build();
+                return Response.ok(response, outputFormat).build();
                 
             } else if (request instanceof GetGmlObjectType) {
                 final GetGmlObjectType model = (GetGmlObjectType) request;
                 final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model));
-                return Response.ok(response, worker.getOutputFormat()).build();
+                return Response.ok(response, MediaType.TEXT_XML).build();
 
             } else if (request instanceof LockFeatureType) {
                 final LockFeatureType model = (LockFeatureType) request;
-                return Response.ok(worker.lockFeature(model), worker.getOutputFormat()).build();
+                return Response.ok(worker.lockFeature(model), MediaType.TEXT_XML).build();
 
             } else if (request instanceof TransactionType) {
                 final TransactionType model = (TransactionType) request;
-                return Response.ok(worker.transaction(model), worker.getOutputFormat()).build();
+                return Response.ok(worker.transaction(model), MediaType.TEXT_XML).build();
             }
 
             throw new CstlServiceException("The operation " + request.getClass().getName() + " is not supported by the service",
@@ -278,7 +299,7 @@ public class WFSService extends OGCWebService<WFSWorker> {
                             try {
                                 featuresToInsert = featureReader.read(xml);
                             } catch (XMLStreamException ex) {
-                                Logging.getLogger(WFSService.class.getName()).log(Level.WARNING, null, ex);
+                               LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
                             }
                         }
                         worker.setprefixMapping(featureReader.extractNamespace(xml));

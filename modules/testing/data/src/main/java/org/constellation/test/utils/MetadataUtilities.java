@@ -60,7 +60,9 @@ import static org.junit.Assert.*;
  */
 public class MetadataUtilities {
 
-    public static void metadataEquals(DefaultMetadata expResult, DefaultMetadata result) {
+    private MetadataUtilities() {}
+
+    public static void metadataEquals(final DefaultMetadata expResult, final DefaultMetadata result) {
 
         assertEquals(expResult.getAcquisitionInformation().size(), result.getAcquisitionInformation().size());
         Iterator<AcquisitionInformation> expAcquIt = expResult.getAcquisitionInformation().iterator();
@@ -471,7 +473,7 @@ public class MetadataUtilities {
         assertEquals(expResult, result);
     }
 
-    public static void citationEquals(Citation expectedCitation, Citation resultCitation) {
+    public static void citationEquals(final Citation expectedCitation, final Citation resultCitation) {
         if (expectedCitation != null && resultCitation != null) {
             assertEquals(expectedCitation.getAlternateTitles(), resultCitation.getAlternateTitles());
             assertEquals(expectedCitation.getCitedResponsibleParties(), resultCitation.getCitedResponsibleParties());
@@ -496,7 +498,7 @@ public class MetadataUtilities {
         }
     }
 
-    public static void catalogueEquals(FeatureCatalogueImpl expResult, FeatureCatalogueImpl result) {
+    public static void catalogueEquals(final FeatureCatalogueImpl expResult, final FeatureCatalogueImpl result) {
 
         assertEquals(expResult.getDefinitionSource(), result.getDefinitionSource());
 
@@ -553,7 +555,7 @@ public class MetadataUtilities {
     }
 
 
-    public static void SystemSMLEquals(SensorML expResult, SensorML result) {
+    public static void SystemSMLEquals(final SensorML expResult, final SensorML result) {
         
         assertEquals(expResult.getCapabilities(), result.getCapabilities());
         assertEquals(expResult.getCharacteristics(), result.getCharacteristics());
@@ -704,7 +706,7 @@ public class MetadataUtilities {
         assertEquals(expResult, result);
     }
 
-    public static void ComponentEquals(SensorML expResult, SensorML result) {
+    public static void ComponentEquals(final SensorML expResult, final SensorML result) {
         
         assertEquals(expResult.getCapabilities(), result.getCapabilities());
         assertEquals(expResult.getCharacteristics(), result.getCharacteristics());

@@ -140,11 +140,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     /**
-     * The Mime type for describe feature GML 3.1.1
-     */
-    private final static MediaType GML_3_1_1 = new MediaType("text", "xml; subtype=gml/3.1.1");
-
-    /**
      * The current version of the service.
      */
     private ServiceDef actingVersion = ServiceDef.WFS_1_1_0;
@@ -164,7 +159,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      */
     private String outputFormat = "text/xml";
 
-    public DefaultWFSWorker(String id, File configurationDirectory) {
+    public DefaultWFSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WFS);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WFS worker {0} running", id);
@@ -188,11 +183,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, false, true);
 
-        outputFormat = request.getFirstAcceptFormat();
-        if (outputFormat == null) {
-            outputFormat = "application/xml";
-        }
-        
         final WFSCapabilitiesType inCapabilities;
         try {
             inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(actingVersion.version.toString(), "WFS");
@@ -328,12 +318,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, false, false);
 
-        String requestOutputFormat                = request.getOutputFormat();
-        if (requestOutputFormat == null) {
-            requestOutputFormat = "text/xml; subtype=gml/3.1.1";
-        }
-        outputFormat = requestOutputFormat;
-        
         final JAXBFeatureTypeWriter writer;
         try {
             writer = new JAXBFeatureTypeWriter();
@@ -398,7 +382,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * @param fld A feature layer object.
      * @return A Feature type.
      */
-    private FeatureType getFeatureTypeFromLayer(FeatureLayerDetails fld) throws DataStoreException {
+    private FeatureType getFeatureTypeFromLayer(final FeatureLayerDetails fld) throws DataStoreException {
         return fld.getStore().getFeatureType(fld.getName());
     }
 
@@ -414,13 +398,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         // we verify the base attribute
         isWorking();
         verifyBaseRequest(request, false, false);
-
-        // we verify the outputFormat requested (default text/xml; subtype=gml/3.1.1)
-        String requestOutputFormat = request.getOutputFormat();
-        if (requestOutputFormat == null) {
-            requestOutputFormat = "text/xml; subtype=gml/3.1.1";
-        }
-        outputFormat = requestOutputFormat;
 
         final LayerProviderProxy namedProxy       = LayerProviderProxy.getInstance();
         final String featureId                    = request.getFeatureId();
@@ -497,7 +474,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                 final Name fullTypeName = Utils.getNameFromQname(typeName);
                 if (layersContainsKey(fullTypeName) == null) {
-                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName, INVALID_PARAMETER_VALUE);
                 }
                 final LayerDetails layerD = namedProxy.get(fullTypeName);
 
@@ -595,7 +572,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public AbstractGMLType getGMLObject(GetGmlObjectType grbi) throws CstlServiceException {
+    public AbstractGMLType getGMLObject(final GetGmlObjectType grbi) throws CstlServiceException {
         throw new CstlServiceException("WFS get GML Object is not supported on this Constellation version.");
     }
 
@@ -603,7 +580,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public LockFeatureResponseType lockFeature(LockFeatureType gr) throws CstlServiceException {
+    public LockFeatureResponseType lockFeature(final LockFeatureType gr) throws CstlServiceException {
         throw new CstlServiceException("WFS Lock is not supported on this Constellation version.");
     }
 
@@ -611,7 +588,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public TransactionResponseType transaction(TransactionType request) throws CstlServiceException {
+    public TransactionResponseType transaction(final TransactionType request) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
         final long startTime = System.currentTimeMillis();
         isWorking();
@@ -836,7 +813,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      *
      * @return a string containing the xml representation.
      */
-    private  String getXMLFromElementNSImpl(ElementNSImpl elt) {
+    private  String getXMLFromElementNSImpl(final ElementNSImpl elt) {
         final StringBuilder s = new StringBuilder();
         s.append('<').append(elt.getLocalName()).append('>');
         final Node node = elt.getFirstChild();
@@ -853,7 +830,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      *
      * @return a string builder containing the xml.
      */
-    private  StringBuilder getXMLFromNode(Node node) {
+    private  StringBuilder getXMLFromNode(final Node node) {
         final StringBuilder temp = new StringBuilder();
         if (!node.getNodeName().equals("#text")){
             temp.append("<").append(node.getNodeName());
@@ -877,26 +854,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     /**
-     * {@inheritDoc }
-     */
-    @Override
-    public MediaType getOutputFormat() {
-        if ("text/xml; subtype=gml/3.1.1".equals(outputFormat)) {
-            return GML_3_1_1;
-        } else {
-            return MediaType.valueOf(outputFormat);
-        }
-    }
-
-    /**
-     * Extract an OGC filter usable by the datastore from the request filter
+     * Extract an OGC filter usable by the dataStore from the request filter
      * unmarshalled by JAXB.
      *
      * @param jaxbFilter an OGC JAXB filter.
      * @return An OGC filter
      * @throws CstlServiceException
      */
-    private Filter extractJAXBFilter(FilterType jaxbFilter, Filter defaultFilter) throws CstlServiceException {
+    private Filter extractJAXBFilter(final FilterType jaxbFilter, final Filter defaultFilter) throws CstlServiceException {
         final XMLUtilities util = new XMLUtilities();
         final Filter filter;
         try {
@@ -918,7 +883,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * @return
      * @throws CstlServiceException
      */
-    private CoordinateReferenceSystem extractCRS(String srsName) throws CstlServiceException {
+    private CoordinateReferenceSystem extractCRS(final String srsName) throws CstlServiceException {
         final CoordinateReferenceSystem crs;
         if (srsName != null) {
             try {
@@ -943,7 +908,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      *
      * @throws CstlServiceException if one of the propertyName in the filter is not present in the featureType.
      */
-    private void verifyFilterProperty(FeatureType ft, Filter filter) throws CstlServiceException {
+    private void verifyFilterProperty(final FeatureType ft, final Filter filter) throws CstlServiceException {
         final Collection<String> filterProperties = (Collection<String>) filter.accept(ListingPropertyVisitor.VISITOR, null);
         if (filterProperties != null) {
             for (String filterProperty : filterProperties) {
@@ -967,9 +932,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     
     /**
      * Extract the WGS84 BBOx from a featureSource.
-     * what ? may not be wgs84 exactly ? why is there a crs attribute on a wgs84 bbox ?
+     * what ? may not be wgs84 exactly ? why is there a CRS attribute on a wgs84 bbox ?
      */
-    private static WGS84BoundingBoxType toBBox(DataStore source, Name groupName) throws CstlServiceException{
+    private static WGS84BoundingBoxType toBBox(final DataStore source, final Name groupName) throws CstlServiceException{
         try {
             Envelope env = source.getEnvelope(QueryBuilder.all(groupName));
             final CoordinateReferenceSystem epsg4326 = CRS.decode("urn:ogc:def:crs:OGC:2:84");
@@ -1001,7 +966,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      *
      * @param request an object request with the base attribute (all except GetCapabilities request);
      */
-    private void verifyBaseRequest(final RequestBase request, boolean versionMandatory, boolean getCapabilities) throws CstlServiceException {
+    private void verifyBaseRequest(final RequestBase request, final boolean versionMandatory, final boolean getCapabilities) throws CstlServiceException {
         if (request != null) {
             if (request.getService() != null) {
                 if (request.getService().isEmpty()) {
@@ -1076,7 +1041,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public void setprefixMapping(Map<String, String> namespaceMapping) {
+    public void setprefixMapping(final Map<String, String> namespaceMapping) {
        this.namespaceMapping = namespaceMapping;
     }
 

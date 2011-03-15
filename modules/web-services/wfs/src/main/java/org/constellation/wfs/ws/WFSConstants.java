@@ -20,6 +20,7 @@ package org.constellation.wfs.ws;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.ws.rs.core.MediaType;
 import javax.xml.namespace.QName;
 import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.ogc.xml.v110.ArithmeticOperatorsType;
@@ -65,6 +66,11 @@ public final class WFSConstants {
     public static final String STR_TRANSACTION          = "Transaction";
 
     public static final String UNKNOW_TYPENAME= "The specified TypeNames does not exist:";
+
+    /**
+     * The Mime type for describe feature GML 3.1.1
+     */
+    public final static MediaType GML_3_1_1 = new MediaType("text", "xml; subtype=gml/3.1.1");
 
     public static final FilterCapabilities FILTER_CAPABILITIES;
     static {
