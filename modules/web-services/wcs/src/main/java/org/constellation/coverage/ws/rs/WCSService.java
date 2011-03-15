@@ -123,7 +123,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(final Object objectRequest, final WCSWorker worker) {
+    public Response treatIncomingRequest(Object objectRequest, final WCSWorker worker) {
         final UriInfo uriContext = getUriContext();
 
         ServiceDef serviceDef = null;
