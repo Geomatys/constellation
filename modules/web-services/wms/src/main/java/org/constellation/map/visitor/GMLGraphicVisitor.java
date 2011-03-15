@@ -36,7 +36,6 @@ import javax.measure.unit.Unit;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
@@ -54,6 +53,7 @@ import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
 
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;

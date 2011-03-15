@@ -21,13 +21,13 @@ import java.util.List;
 import java.util.Map.Entry;
 import javax.measure.unit.Unit;
 
-import org.constellation.query.wms.GetFeatureInfo;
 import org.geotoolkit.coverage.GridSampleDimension;
 
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
 
 import org.opengis.feature.type.Name;
 

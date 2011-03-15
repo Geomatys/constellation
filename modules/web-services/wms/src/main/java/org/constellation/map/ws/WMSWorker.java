@@ -21,16 +21,16 @@ import java.awt.image.BufferedImage;
 
 //Constellation dependencies
 import org.constellation.portrayal.internal.PortrayalResponse;
-import org.constellation.query.wms.DescribeLayer;
-import org.constellation.query.wms.GetCapabilities;
-import org.constellation.query.wms.GetFeatureInfo;
-import org.constellation.query.wms.GetLegendGraphic;
-import org.constellation.query.wms.GetMap;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
 //Geotoolkit dependencies
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
+import org.geotoolkit.wms.xml.DescribeLayer;
+import org.geotoolkit.wms.xml.GetCapabilities;
+import org.geotoolkit.wms.xml.GetMap;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
+import org.geotoolkit.sld.xml.GetLegendGraphic;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 
 

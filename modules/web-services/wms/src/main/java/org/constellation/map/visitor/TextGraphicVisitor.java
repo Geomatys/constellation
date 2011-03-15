@@ -22,13 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.constellation.query.wms.GetFeatureInfo;
-
 import org.geotoolkit.display2d.canvas.AbstractGraphicVisitor;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
 
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;

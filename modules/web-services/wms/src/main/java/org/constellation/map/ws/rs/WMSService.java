@@ -44,11 +44,6 @@ import org.constellation.map.ws.QueryContext;
 import org.constellation.map.ws.WMSWorker;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.query.QueryAdapter;
-import org.constellation.query.wms.DescribeLayer;
-import org.constellation.query.wms.GetMap;
-import org.constellation.query.wms.GetCapabilities;
-import org.constellation.query.wms.GetFeatureInfo;
-import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -59,17 +54,22 @@ import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.GetLegendGraphic;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
-import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
-import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
+import org.geotoolkit.wms.xml.GetCapabilities;
+import org.geotoolkit.wms.xml.GetMap;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
+import org.geotoolkit.wms.xml.DescribeLayer;
 
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
@@ -443,7 +443,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         }
         final String strScale   = getParameter(KEY_SCALE,       false);
         final Double scale = RequestsUtilities.toDouble(strScale);
-        return new GetLegendGraphic(strLayer, format, width, height, strStyle, strSld, sldVersion, strRule, scale);
+        return new GetLegendGraphic(strLayer, format, width, height, strStyle, strSld, sldVersion, strRule, scale, ServiceDef.WMS_1_1_1_SLD.version);
     }
 
     private boolean isV111orUnder(String version) {

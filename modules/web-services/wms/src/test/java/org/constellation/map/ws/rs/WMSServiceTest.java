@@ -27,10 +27,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import org.constellation.map.ws.QueryContext;
-import org.constellation.query.wms.GetFeatureInfo;
-import org.constellation.query.wms.GetMap;
 import org.constellation.ws.rs.WebService;
+import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.internal.referencing.CRSUtilities;
+import org.geotoolkit.wms.xml.GetMap;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
 
 import org.junit.Test;
 import org.opengis.geometry.Envelope;
@@ -135,7 +136,7 @@ public class WMSServiceTest {
         assertEquals(560d, env2D.getMaximum(1),DELTA);
 
         //enevelope 4D
-        Envelope env4D = parsedQuery.getEnvelope();
+        Envelope env4D = GO2Utilities.combine(parsedQuery.getEnvelope2D(), new Date[]{parsedQuery.getTime(), parsedQuery.getTime()}, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
         CoordinateReferenceSystem crs = env4D.getCoordinateReferenceSystem();
         assertEquals(4, crs.getCoordinateSystem().getDimension());
         CoordinateReferenceSystem crs2D = CRSUtilities.getCRS2D(crs);
@@ -214,7 +215,7 @@ public class WMSServiceTest {
         assertEquals(560d, env2D.getMaximum(1),DELTA);
 
         //enevelope 4D
-        Envelope env4D = parsedQuery.getEnvelope();
+        Envelope env4D = GO2Utilities.combine(parsedQuery.getEnvelope2D(), new Date[]{parsedQuery.getTime(), parsedQuery.getTime()}, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
         CoordinateReferenceSystem crs = env4D.getCoordinateReferenceSystem();
         assertEquals(4, crs.getCoordinateSystem().getDimension());
         CoordinateReferenceSystem crs2D = CRSUtilities.getCRS2D(crs);

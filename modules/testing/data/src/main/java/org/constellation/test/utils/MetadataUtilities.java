@@ -17,6 +17,7 @@
 
 package org.constellation.test.utils;
 
+import java.util.Collection;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.lineage.Algorithm;
 import org.opengis.metadata.acquisition.Operation;
@@ -306,54 +307,7 @@ public class MetadataUtilities {
                     DefaultDataIdentification idResult    = (DefaultDataIdentification) result.getIdentificationInfo().iterator().next();
                     assertEquals(idExpResult.getCharacterSets(), idResult.getCharacterSets());
                     assertEquals(idExpResult.getEnvironmentDescription(), idResult.getEnvironmentDescription());
-                    assertEquals(idExpResult.getExtents().size(), idResult.getExtents().size());
-
-                    Iterator<Extent> expIt = idExpResult.getExtents().iterator();
-                    Iterator<Extent> resIt = idResult.getExtents().iterator();
-
-                    while (expIt.hasNext() && resIt.hasNext()) {
-                        Extent expEx = expIt.next();
-                        Extent resEx = resIt.next();
-                        assertEquals(expEx.getGeographicElements().size(), resEx.getGeographicElements().size());
-                        Iterator<? extends GeographicExtent> expGeExIt = expEx.getGeographicElements().iterator();
-                        Iterator<? extends GeographicExtent> resGeExIt = resEx.getGeographicElements().iterator();
-                        while (expGeExIt.hasNext() && resGeExIt.hasNext()) {
-                            GeographicExtent expGeEx = expGeExIt.next();
-                            GeographicExtent resGeEx = resGeExIt.next();
-
-                            //assertEquals(expGeEx.getInclusion(), resGeEx.getInclusion());
-                            assertEquals(expGeEx, resGeEx);
-                        }
-                        assertEquals(expEx.getGeographicElements(), resEx.getGeographicElements());
-                        assertEquals(expEx.getVerticalElements().size(),   resEx.getVerticalElements().size());
-                        Iterator<? extends VerticalExtent> expVIt = expEx.getVerticalElements().iterator();
-                        Iterator<? extends VerticalExtent> resVIt = resEx.getVerticalElements().iterator();
-                        while (expVIt.hasNext() && resVIt.hasNext()) {
-                            VerticalExtent expVEx = expVIt.next();
-                            VerticalExtent resVEx = resVIt.next();
-                            if (expVEx != null && resVEx != null) {
-                                if (expVEx.getVerticalCRS() != null && resVEx.getVerticalCRS() != null) {
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getDimension(), resVEx.getVerticalCRS().getCoordinateSystem().getDimension());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
-                                    assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
-                                    assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
-                                }
-                            }
-                            assertEquals(expVEx, resVEx);
-                        }
-                        assertEquals(expEx.getTemporalElements(),   resEx.getTemporalElements());
-                    }
-
-                    assertEquals(idExpResult.getExtents(), idResult.getExtents());
+                    extentsEquals(idExpResult.getExtents(), idResult.getExtents());
                     assertEquals(idExpResult.getInterface(), idResult.getInterface());
                     assertEquals(idExpResult.getLanguages(), idResult.getLanguages());
                     assertEquals(idExpResult.getSpatialRepresentationTypes(), idResult.getSpatialRepresentationTypes());
@@ -368,52 +322,7 @@ public class MetadataUtilities {
                     assertEquals(expService.getContainsOperations(), resService.getContainsOperations());
                     assertEquals(expService.getCoupledResource(), resService.getCoupledResource());
                     assertEquals(expService.getCouplingType(), resService.getCouplingType());
-
-                    Iterator<Extent> expIt = expService.getExtent().iterator();
-                    Iterator<Extent> resIt = resService.getExtent().iterator();
-
-                    while (expIt.hasNext() && resIt.hasNext()) {
-                        Extent expEx = expIt.next();
-                        Extent resEx = resIt.next();
-                        assertEquals(expEx.getGeographicElements().size(), resEx.getGeographicElements().size());
-                        Iterator<? extends GeographicExtent> expGeExIt = expEx.getGeographicElements().iterator();
-                        Iterator<? extends GeographicExtent> resGeExIt = resEx.getGeographicElements().iterator();
-                        while (expGeExIt.hasNext() && resGeExIt.hasNext()) {
-                            GeographicExtent expGeEx = expGeExIt.next();
-                            GeographicExtent resGeEx = resGeExIt.next();
-
-                            //assertEquals(expGeEx.getInclusion(), resGeEx.getInclusion());
-                            assertEquals(expGeEx, resGeEx);
-                        }
-                        assertEquals(expEx.getGeographicElements(), resEx.getGeographicElements());
-                        assertEquals(expEx.getVerticalElements().size(),   resEx.getVerticalElements().size());
-                        Iterator<? extends VerticalExtent> expVIt = expEx.getVerticalElements().iterator();
-                        Iterator<? extends VerticalExtent> resVIt = resEx.getVerticalElements().iterator();
-                        while (expVIt.hasNext() && resVIt.hasNext()) {
-                            VerticalExtent expVEx = expVIt.next();
-                            VerticalExtent resVEx = resVIt.next();
-                            if (expVEx != null && resVEx != null) {
-                                if (expVEx.getVerticalCRS() != null && resVEx.getVerticalCRS() != null) {
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getDimension(), resVEx.getVerticalCRS().getCoordinateSystem().getDimension());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
-                                    assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
-                                    assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
-                                    assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
-                                }
-                            }
-                            assertEquals(expVEx, resVEx);
-                        }
-                        assertEquals(expEx.getTemporalElements(),   resEx.getTemporalElements());
-                    }
-                    assertEquals(expService.getExtent(), resService.getExtent());
+                    extentsEquals(expService.getExtent(), resService.getExtent());
                     assertEquals(expService.getOperatesOn(), resService.getOperatesOn());
                     assertEquals(expService.getRestrictions(), resService.getRestrictions());
                     assertEquals(expService.getServiceType(), resService.getServiceType());
@@ -473,6 +382,57 @@ public class MetadataUtilities {
         assertEquals(expResult, result);
     }
 
+    public static void extentsEquals(final Collection<Extent> expectedExtents, final Collection<Extent> resultExtents) {
+        assertEquals(expectedExtents.size(), resultExtents.size());
+
+        Iterator<Extent> expIt = expectedExtents.iterator();
+        Iterator<Extent> resIt = resultExtents.iterator();
+
+        while (expIt.hasNext() && resIt.hasNext()) {
+            Extent expEx = expIt.next();
+            Extent resEx = resIt.next();
+            assertEquals(expEx.getGeographicElements().size(), resEx.getGeographicElements().size());
+            Iterator<? extends GeographicExtent> expGeExIt = expEx.getGeographicElements().iterator();
+            Iterator<? extends GeographicExtent> resGeExIt = resEx.getGeographicElements().iterator();
+            while (expGeExIt.hasNext() && resGeExIt.hasNext()) {
+                GeographicExtent expGeEx = expGeExIt.next();
+                GeographicExtent resGeEx = resGeExIt.next();
+
+                //assertEquals(expGeEx.getInclusion(), resGeEx.getInclusion());
+                assertEquals(expGeEx, resGeEx);
+            }
+            assertEquals(expEx.getGeographicElements(), resEx.getGeographicElements());
+            assertEquals(expEx.getVerticalElements().size(),   resEx.getVerticalElements().size());
+            Iterator<? extends VerticalExtent> expVIt = expEx.getVerticalElements().iterator();
+            Iterator<? extends VerticalExtent> resVIt = resEx.getVerticalElements().iterator();
+            while (expVIt.hasNext() && resVIt.hasNext()) {
+                VerticalExtent expVEx = expVIt.next();
+                VerticalExtent resVEx = resVIt.next();
+                if (expVEx != null && resVEx != null) {
+                    if (expVEx.getVerticalCRS() != null && resVEx.getVerticalCRS() != null) {
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getDimension(), resVEx.getVerticalCRS().getCoordinateSystem().getDimension());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
+                        assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
+                        assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
+                    }
+                }
+                assertEquals(expVEx, resVEx);
+            }
+            assertEquals(expEx.getTemporalElements(),   resEx.getTemporalElements());
+        }
+
+        assertEquals(expectedExtents, resultExtents);
+    }
+    
     public static void citationEquals(final Citation expectedCitation, final Citation resultCitation) {
         if (expectedCitation != null && resultCitation != null) {
             assertEquals(expectedCitation.getAlternateTitles(), resultCitation.getAlternateTitles());
@@ -555,8 +515,7 @@ public class MetadataUtilities {
     }
 
 
-    public static void systemSMLEquals(final SensorML expResult, final SensorML result) {
-        
+    public static void sensorMLEquals(final SensorML expResult, final SensorML result) {
         assertEquals(expResult.getCapabilities(), result.getCapabilities());
         assertEquals(expResult.getCharacteristics(), result.getCharacteristics());
         assertEquals(expResult.getClassification(), result.getClassification());
@@ -571,6 +530,11 @@ public class MetadataUtilities {
         assertEquals(expResult.getVersion(), result.getVersion());
 
         assertEquals(expResult.getMember().size(), result.getMember().size());
+    }
+    
+    public static void systemSMLEquals(final SensorML expResult, final SensorML result) {
+        
+        sensorMLEquals(expResult, result);
         assertEquals(expResult.getMember().size(), 1);
         SystemType expSysProcess = (SystemType) expResult.getMember().iterator().next().getProcess().getValue();
         assertTrue(result.getMember().iterator().next().getProcess().getValue() instanceof SystemType);
@@ -708,20 +672,8 @@ public class MetadataUtilities {
 
     public static void componentEquals(final SensorML expResult, final SensorML result) {
         
-        assertEquals(expResult.getCapabilities(), result.getCapabilities());
-        assertEquals(expResult.getCharacteristics(), result.getCharacteristics());
-        assertEquals(expResult.getClassification(), result.getClassification());
-        assertEquals(expResult.getContact(), result.getContact());
-        assertEquals(expResult.getDocumentation(), result.getDocumentation());
-        assertEquals(expResult.getHistory(), result.getHistory());
-        assertEquals(expResult.getIdentification(), result.getIdentification());
-        assertEquals(expResult.getKeywords(), result.getKeywords());
-        assertEquals(expResult.getLegalConstraint(), result.getLegalConstraint());
-        assertEquals(expResult.getSecurityConstraint(), result.getSecurityConstraint());
-        assertEquals(expResult.getValidTime(), result.getValidTime());
-        assertEquals(expResult.getVersion(), result.getVersion());
-
-        assertEquals(expResult.getMember().size(), result.getMember().size());
+        sensorMLEquals(expResult, result);
+        
         assertEquals(expResult.getMember().size(), 1);
         ComponentType expProcess = (ComponentType) expResult.getMember().iterator().next().getProcess().getValue();
         assertTrue(result.getMember().iterator().next().getProcess().getValue() instanceof ComponentType);

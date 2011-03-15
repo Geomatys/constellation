@@ -26,7 +26,6 @@ import javax.measure.unit.Unit;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDetails.TYPE;
-import org.constellation.query.wms.GetFeatureInfo;
 import org.geotoolkit.coverage.GridSampleDimension;
 
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
@@ -34,6 +33,7 @@ import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
 
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;

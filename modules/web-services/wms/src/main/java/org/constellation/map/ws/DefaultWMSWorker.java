@@ -17,6 +17,7 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import org.geotoolkit.display2d.GO2Utilities;
 import java.util.Collections;
 import java.beans.PropertyChangeEvent;
 import org.geotoolkit.display2d.service.OutputDef;
@@ -71,11 +72,6 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.StyleProviderProxy;
-import org.constellation.query.wms.DescribeLayer;
-import org.constellation.query.wms.GetCapabilities;
-import org.constellation.query.wms.GetFeatureInfo;
-import org.constellation.query.wms.GetLegendGraphic;
-import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
 import org.geotoolkit.util.PeriodUtilities;
 import org.constellation.ws.CstlServiceException;
@@ -100,6 +96,7 @@ import org.geotoolkit.sld.MutableNamedStyle;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
+import org.geotoolkit.sld.xml.GetLegendGraphic;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
@@ -110,6 +107,10 @@ import org.geotoolkit.wms.xml.AbstractLayer;
 import org.geotoolkit.wms.xml.AbstractRequest;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
+import org.geotoolkit.wms.xml.GetCapabilities;
+import org.geotoolkit.wms.xml.GetMap;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
+import org.geotoolkit.wms.xml.DescribeLayer;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v130.Attribution;
 import org.geotoolkit.wms.xml.v130.AuthorityURL;
@@ -776,7 +777,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 2. VIEW
         Envelope refEnv;
         try {
-            refEnv = getFI.getEnvelope();
+            refEnv = GO2Utilities.combine(getFI.getEnvelope2D(), new Date[]{getFI.getTime(), getFI.getTime()}, new Double[]{getFI.getElevation(), getFI.getElevation()});
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
@@ -1026,7 +1027,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 2. VIEW
         final Envelope refEnv;
         try {
-            refEnv = getMap.getEnvelope();
+            refEnv = GO2Utilities.combine(getMap.getEnvelope2D(), new Date[]{getMap.getTime(), getMap.getTime()}, new Double[]{getMap.getElevation(), getMap.getElevation()});
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
