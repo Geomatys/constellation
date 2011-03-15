@@ -52,7 +52,8 @@ import org.constellation.ws.MimeType;
 import org.constellation.configuration.Layer;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.ws.LayerWorker;
-import static org.constellation.query.wcs.WCSQuery.*;
+import static org.constellation.query.Query.*;
+import static org.constellation.coverage.ws.WCSConstant.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -202,7 +203,7 @@ public final class WCSWorker extends LayerWorker {
     private static final Map<String,GetCapabilitiesResponse> CAPS_RESPONSE =
             new HashMap<String,GetCapabilitiesResponse>();
 
-    public WCSWorker(String id, File configurationDirectory) {
+    public WCSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WCS);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WCS worker {0} running", id);
@@ -416,7 +417,7 @@ public final class WCSWorker extends LayerWorker {
      * @param elevations
      * @return
      */
-    private List<DirectPositionType> buildPositions(GeographicBoundingBox inputGeoBox, SortedSet<Number> elevations) {
+    private List<DirectPositionType> buildPositions(final GeographicBoundingBox inputGeoBox, final SortedSet<Number> elevations) {
         final List<Double> pos1 = new ArrayList<Double>();
         pos1.add(inputGeoBox.getWestBoundLongitude());
         pos1.add(inputGeoBox.getSouthBoundLatitude());
@@ -589,7 +590,7 @@ public final class WCSWorker extends LayerWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    public GetCapabilitiesResponse getCapabilities(GetCapabilities request) throws CstlServiceException {
+    public GetCapabilitiesResponse getCapabilities(final GetCapabilities request) throws CstlServiceException {
         isWorking();
         //we begin by extract the base attribute
         String version = request.getVersion().toString();
@@ -1184,7 +1185,7 @@ public final class WCSWorker extends LayerWorker {
      * @param layerName
      * @return
      */
-    private Name parseCoverageName(String layerName) {
+    private Name parseCoverageName(final String layerName) {
         final Name namedLayerName;
         if (layerName != null && layerName.lastIndexOf(':') != -1) {
             final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));

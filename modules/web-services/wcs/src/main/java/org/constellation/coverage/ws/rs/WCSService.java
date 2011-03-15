@@ -40,7 +40,8 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
-import static org.constellation.query.wcs.WCSQuery.*;
+import static org.constellation.query.Query.*;
+import static org.constellation.coverage.ws.WCSConstant.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.CodeType;
@@ -113,7 +114,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * {@inheritDoc}
      */
     @Override
-    protected WCSWorker createWorker(File instanceDirectory) {
+    protected WCSWorker createWorker(final File instanceDirectory) {
         return new WCSWorker(instanceDirectory.getName() , instanceDirectory);
     }
 
@@ -122,7 +123,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest, WCSWorker worker) {
+    public Response treatIncomingRequest(final Object objectRequest, final WCSWorker worker) {
         final UriInfo uriContext = getUriContext();
 
         ServiceDef serviceDef = null;
@@ -237,7 +238,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         return format;
     }
 
-    private boolean isSupportedFormat(String format) {
+    private boolean isSupportedFormat(final String format) {
         return format.equalsIgnoreCase(MimeType.IMAGE_BMP)  ||format.equalsIgnoreCase(BMP)  ||
                format.equalsIgnoreCase(MimeType.IMAGE_GIF)   ||format.equalsIgnoreCase(GIF)  ||
                format.equalsIgnoreCase(MimeType.IMAGE_JPEG)  ||format.equalsIgnoreCase(JPEG) ||
@@ -275,7 +276,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         return Response.ok(report, MimeType.APP_SE_XML).build();
     }
 
-    public RequestBase adaptQuery(String request) throws CstlServiceException {
+    public RequestBase adaptQuery(final String request) throws CstlServiceException {
         if (GETCAPABILITIES.equalsIgnoreCase(request)) {
             return adaptKvpGetCapabilitiesRequest();
         } else if (GETCOVERAGE.equalsIgnoreCase(request)) {

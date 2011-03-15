@@ -338,7 +338,7 @@ public class SOSWorkerTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) absExpResult;
 
-        MetadataUtilities.SystemSMLEquals(expResult, result);
+        MetadataUtilities.systemSMLEquals(expResult, result);
 
         /**
          * Test 2 component sensor
@@ -353,7 +353,7 @@ public class SOSWorkerTest {
         result = (SensorML) absResult;
         expResult = (SensorML) absExpResult;
 
-        MetadataUtilities.ComponentEquals(expResult, result);
+        MetadataUtilities.componentEquals(expResult, result);
 
         SensorMLMarshallerPool.getInstance().release(unmarshaller);
     }
@@ -2100,7 +2100,7 @@ public class SOSWorkerTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) sensorDescription;
 
-        MetadataUtilities.SystemSMLEquals(expResult, result);
+        MetadataUtilities.systemSMLEquals(expResult, result);
 
 
         marshallerPool.release(unmarshaller);

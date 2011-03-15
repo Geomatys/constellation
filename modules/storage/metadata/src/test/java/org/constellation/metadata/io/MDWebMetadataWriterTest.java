@@ -142,7 +142,7 @@ public class MDWebMetadataWriterTest {
 
         pool.release(unmarshaller);
 
-        ComponentEquals(expResult, result);
+        componentEquals(expResult, result);
     }
     
     /**
@@ -165,7 +165,7 @@ public class MDWebMetadataWriterTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
 
-        SystemSMLEquals(expResult, result);
+        systemSMLEquals(expResult, result);
 
         absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system2.xml"));
 
@@ -183,7 +183,7 @@ public class MDWebMetadataWriterTest {
         result = (SensorML) absResult;
         expResult = (SensorML) absExpResult;
 
-        SystemSMLEquals(expResult, result);
+        systemSMLEquals(expResult, result);
         
     }
 

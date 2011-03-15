@@ -555,7 +555,7 @@ public class MetadataUtilities {
     }
 
 
-    public static void SystemSMLEquals(final SensorML expResult, final SensorML result) {
+    public static void systemSMLEquals(final SensorML expResult, final SensorML result) {
         
         assertEquals(expResult.getCapabilities(), result.getCapabilities());
         assertEquals(expResult.getCharacteristics(), result.getCharacteristics());
@@ -706,7 +706,7 @@ public class MetadataUtilities {
         assertEquals(expResult, result);
     }
 
-    public static void ComponentEquals(final SensorML expResult, final SensorML result) {
+    public static void componentEquals(final SensorML expResult, final SensorML result) {
         
         assertEquals(expResult.getCapabilities(), result.getCapabilities());
         assertEquals(expResult.getCharacteristics(), result.getCharacteristics());

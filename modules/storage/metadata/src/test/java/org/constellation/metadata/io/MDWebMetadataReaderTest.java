@@ -366,7 +366,7 @@ public class MDWebMetadataReaderTest {
         SensorML expResult = (SensorML) absExpResult;
 
 
-        SystemSMLEquals(expResult, result);
+        systemSMLEquals(expResult, result);
 
 
         absResult = reader.getMetadata("urn:ogc:object:sensor:GEOM:3", AbstractMetadataReader.SENSORML, null);
@@ -382,7 +382,7 @@ public class MDWebMetadataReaderTest {
         expResult = (SensorML) absExpResult;
 
 
-        SystemSMLEquals(expResult, result);
+        systemSMLEquals(expResult, result);
         
     }
 
@@ -407,6 +407,6 @@ public class MDWebMetadataReaderTest {
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) absExpResult;
         
-        ComponentEquals(expResult, result);
+        componentEquals(expResult, result);
     }
 }
