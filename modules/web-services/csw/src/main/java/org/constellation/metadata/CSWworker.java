@@ -259,7 +259,7 @@ public class CSWworker extends AbstractWorker {
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
      *
      */
-    public CSWworker(final String serviceID, File configDir, Automatic configuration) {
+    public CSWworker(final String serviceID, final File configDir, Automatic configuration) {
         super(serviceID, configDir, ServiceDef.Specification.CSW);
         isStarted = true;
         try {
@@ -297,31 +297,31 @@ public class CSWworker extends AbstractWorker {
             isStarted = false;
         } catch (IllegalArgumentException e) {
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: IllegalArgumentException: {0}\n", e.getLocalizedMessage());
-            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
         } catch (CstlServiceException e) {
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: CstlServiceException: {0}\n", e.getLocalizedMessage());
-            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
         }  catch (JAXBException e) {
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: JAXBException: {0}\n", e.getLocalizedMessage());
-            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
         }
     }
 
     /**
-     * Initialize the readers and indexSearcher to the datasource for the discovery profile.
+     * Initialize the readers and indexSearcher to the dataSource for the discovery profile.
      * If The transactional part is enabled, it also initialize Writer and catalog harvester.
      *
-     * @param configuration A configuration object containing the datasource informations
+     * @param configuration A configuration object containing the dataSource informations
      * @param serviceID The identifier of the instance.
      * @param configDir The directory containing the configuration files.
      *
-     * @throws MetadataIoException If an error occurs while querying the datasource.
+     * @throws MetadataIoException If an error occurs while querying the dataSource.
      * @throws IndexingException If an error occurs while initializing the indexation.
      */
-    private void init(final Automatic configuration, String serviceID, File configDir) throws MetadataIoException, IndexingException, JAXBException, CstlServiceException {
+    private void init(final Automatic configuration,final String serviceID, final File configDir) throws MetadataIoException, IndexingException, JAXBException, CstlServiceException {
 
         // we assign the configuration directory
         configuration.setConfigurationDirectory(configDir);
@@ -675,7 +675,7 @@ public class CSWworker extends AbstractWorker {
     }
     
     /**
-     * Web service operation which permits to search the catalogue to find records.
+     * Web service operation which permits to search the catalog to find records.
      * 
      * @param request
      *

@@ -53,12 +53,13 @@ import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
 
 // GeoApi dependencies
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.opengis.util.InternationalString;
 
 
 /**
- * A csw Metadata Writer. This writer does not require a database.
- * The csw records are stored XML file in a directory .
+ * A CSW Metadata Writer. This writer does not require a database.
+ * The CSW records are stored XML file in a directory .
  *
  * @author Guilhem Legal (Geomatys)
  */
@@ -357,7 +358,11 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         //Special case for dateStamp
         if (propertyName.contains("date") && parameterType.equals(String.class)) {
             parameterType = Date.class;
-            value = parseDate((String) value);
+            try {
+                value = TemporalUtilities.parseDate((String) value);
+            } catch (ParseException ex) {
+                throw new MetadataIoException("There service was unable to parse the date:" + value, INVALID_PARAMETER_VALUE);
+            }
         }
 
         if (parent instanceof Collection) {
@@ -557,42 +562,5 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         } else {
             throw new MetadataIoException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
         }
-    }
-
-    /**
-     * Try to parse a date in a string.
-     * If the string can not be parsed a MetadataIoException will be throw.
-     *
-     * @param dateValue the string representation of the date.
-     * @return a Date object.
-     *
-     * @throws MetadataIoException if the string can not be parsed.
-     */
-    @Deprecated
-    private Date parseDate(String dateValue) throws MetadataIoException {
-        // in the case of a timezone expressed like this +01:00 we must transform it in +0100
-        if (dateValue.indexOf('.') != -1) {
-            String msNtz = dateValue.substring(dateValue.indexOf('.'));
-            if (msNtz.indexOf(':') != -1) {
-                msNtz = msNtz.replace(":", "");
-                dateValue = dateValue.substring(0, dateValue.indexOf('.'));
-                dateValue = dateValue + msNtz;
-            }
-        }
-        Date result = null;
-        boolean success = true;
-        try {
-            result = DATE_FORMAT.get(0).parse((String) dateValue);
-        } catch (ParseException ex) {
-            success = false;
-        }
-        if (!success) {
-            try {
-               result = DATE_FORMAT.get(1).parse((String) dateValue);
-            } catch (ParseException ex) {
-                throw new MetadataIoException("There service was unable to parse the date:" + dateValue, INVALID_PARAMETER_VALUE);
-            }
-        }
-        return result;
     }
 }
