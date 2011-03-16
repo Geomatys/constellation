@@ -159,6 +159,11 @@
             <artifactId>cstl-web-configuration</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- The 4 xml bindings are added here, because the JSF interface uses
          those bindings to marshall capabilities.
     -->
@@ -191,18 +196,6 @@
         <dependency>
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-coverageio-netcdf</artifactId>
-        </dependency>
-
-        <!-- Mapfaces library -->
-        <dependency>
-            <groupId>org.mapfaces</groupId>
-            <artifactId>mapfaces-core</artifactId>
-            <version>${mapfaces.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mapfaces</groupId>
-            <artifactId>mapfaces-base</artifactId>
-            <version>${mapfaces.version}</version>
         </dependency>
 
         <!-- JSP, Servlet, portlet, Facelet-->

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration for the "gui/constellation" module from Constellation project.
+  Version: $Id$
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>gui</artifactId>
+        <version>0.7-SNAPSHOT</version>
+    </parent>
+
+
+
+    <!--
+    Module description.
+  -->
+    <groupId>org.constellation.gui</groupId>
+    <artifactId>admin-base</artifactId>
+    <packaging>jar</packaging>
+    <name>Web sites GUI base</name>
+    <description>Base GUI interface classes.</description>
+
+
+
+    <!--
+    Developers and contributors.
+  -->
+    <developers>
+        <developer>
+            <id>jsorel</id>
+            <name>Johann Sorel</name>
+            <email>johann.sorel@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+
+    <!--
+    Dependencies required only for compilation. These dependencies will be
+    included in the JARs' list for which Maven will move into "target/binaries".
+  -->
+    <dependencies>
+
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-utility</artifactId>
+        </dependency>
+
+        <!-- JSP, Servlet, portlet, Facelet-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.facelets</groupId>
+            <artifactId>jsf-facelets</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Mapfaces library -->
+        <dependency>
+            <groupId>org.mapfaces</groupId>
+            <artifactId>mapfaces-core</artifactId>
+            <version>${mapfaces.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapfaces</groupId>
+            <artifactId>mapfaces-base</artifactId>
+            <version>${mapfaces.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
+
+
+
+
+
+

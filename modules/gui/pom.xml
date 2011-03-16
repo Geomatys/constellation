@@ -116,4 +116,8 @@
     </profiles>
 
 
+    <modules>
+        <module>admin-base</module>
+    </modules>
+
 </project>
