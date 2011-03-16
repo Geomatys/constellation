@@ -1,0 +1,59 @@
+
+html {
+    background: #f8f8f8 url(../img/background.png) 0 0 repeat-x;
+    color: #525c66;
+    min-height: 100%;
+}
+
+.maindiv {
+    width: 75%;
+    height: 600px;
+    border-color: #FFFFFF;
+    border-width: 1px 1px 1px 1px;
+    border-style: solid solid solid solid;
+    padding: 30px;
+    margin: 0pt auto;
+    background: #ffffff;
+    border-radius : 20px;
+    -moz-border-radius : 20px;
+    box-shadow: 0px 0px 10px 0px #555;
+    -moz-box-shadow: 0px 0px 10px 0px #555;
+}
+
+a{
+    color: inherit;
+    text-decoration: none;
+}
+
+.col1{
+    border-color: #999999;
+    border-width: 1px;
+    border-style: none solid none none;
+    padding: 0px 20px 0px 0px;
+    vertical-align: top;
+    width: 200px;
+}
+
+.col2{
+    padding: 0px 0px 0px 10px;
+    vertical-align: top;
+}
+
+
+/* menu item style */
+tr.navigationGroupClass{
+    font: normal;
+    padding: 5px;
+}
+
+tr.navigationLeafClass{
+    color: #999999;
+}
+
+tr.navigationLeafClass:hover{
+    background: #aecae4;
+    color: #FFFFFF;
+    cursor: pointer;
+    font: normal;
+}
+

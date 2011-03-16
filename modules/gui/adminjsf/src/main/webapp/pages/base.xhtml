@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html   xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:a4j="http://richfaces.org/a4j"
+        xmlns:mf="http://mapfaces.org/taglib">
+<f:view>
+
+    <head>
+        <title>Constellation</title>
+        <link rel="stylesheet" type="text/css" href="#{facesContext.externalContext.requestContextPath}/resources/css/base.css"/>
+        <mf:Resources/>
+        <ui:insert name="header"/>
+    </head>
+
+    <body>
+        <h:form>
+
+        <div class="maindiv">
+
+            <h:panelGrid columns="2" columnClasses="col1,col2" style="height:100%;width:100%">
+
+                <h:panelGroup>
+                    <!-- Menus -->
+                    <mf:Outline id="navTree" actionVisible="false" rootVisible="false"
+                                rowStyler="#{menuBean.styler}" value="#{menuBean.model}"
+                                var="node" width="100%">
+                        <!-- Name column -->
+                        <h:column>
+
+
+                            <h:outputLink value="#{node.targetPage}" rendered="#{node.targetPage != null}">
+                                <h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}"/>
+                                <span> </span>
+                                <h:outputText value="#{node.title}" styleClass="profile-element"/>
+                            </h:outputLink>
+
+                            <h:panelGroup rendered="#{node.targetPage == null}">
+                                <h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}"/>
+                                <span> </span>
+                                <h:outputText value="#{node.title}" styleClass="profile-element"/>
+                            </h:panelGroup>
+
+                        </h:column>
+                    </mf:Outline>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <!-- dynamic content -->
+                    <ui:insert name="content">
+                        <center>
+                            <br/>
+                            <h:graphicImage url="/resources/img/constellation400.png"/>
+                            <br/>
+                            <br/>
+                            Please select a administration section in the left side menu.
+                            <br/><br/><br/>
+                        </center>
+                    </ui:insert>
+                </h:panelGroup>
+            </h:panelGrid>
+
+        </div>
+
+        </h:form>
+    </body>
+            
+</f:view>
+</html>

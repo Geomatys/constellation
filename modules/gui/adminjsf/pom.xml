@@ -60,6 +60,17 @@
             </roles>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <id>jsorel</id>
+            <name>Johann Sorel</name>
+            <email>johann.sorel@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
 
 
@@ -182,28 +193,36 @@
             <artifactId>geotk-coverageio-netcdf</artifactId>
         </dependency>
 
-        <!-- mapfaces -->
+        <!-- Mapfaces library -->
         <dependency>
             <groupId>org.mapfaces</groupId>
-            <artifactId>mapfaces-map</artifactId>
+            <artifactId>mapfaces-core</artifactId>
+            <version>${mapfaces.version}</version>
         </dependency>
-
-        <!-- FACELET -->
         <dependency>
-            <groupId>com.sun.facelets</groupId>
-            <artifactId>jsf-facelets</artifactId>
+            <groupId>org.mapfaces</groupId>
+            <artifactId>mapfaces-base</artifactId>
+            <version>${mapfaces.version}</version>
         </dependency>
 
-        <!-- JSTL -->
+        <!-- JSP, Servlet, portlet, Facelet-->
         <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.facelets</groupId>
+            <artifactId>jsf-facelets</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
         </dependency>
 
         <dependency>
@@ -211,9 +230,8 @@
             <artifactId>commons-collections</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
             <groupId>poi</groupId>

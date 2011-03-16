@@ -1,9 +1,6 @@
-<?xml version='1.0' encoding='UTF-8'?>
-
-<!-- =========== FULL CONFIGURATION FILE ================================== -->
-<faces-config version="1.2" 
-    xmlns="http://java.sun.com/xml/ns/javaee" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config version="1.2" xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_1_2.xsd">
     
     <!-- Beans -->
@@ -12,22 +9,18 @@
         <managed-bean-class>org.constellation.bean.NavigationBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
-    
     <managed-bean>
-        <managed-bean-name>servicesBean</managed-bean-name>
-        <managed-bean-class>org.constellation.bean.ServicesBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
-    
-    <managed-bean>
-        <managed-bean-name>configurationBean</managed-bean-name>
-        <managed-bean-class>org.constellation.bean.ConfigurationBean</managed-bean-class>
+        <managed-bean-name>menuBean</managed-bean-name>
+        <managed-bean-class>org.constellation.bean.MenuBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
 
-    <managed-bean>
-        <managed-bean-name>layersBean</managed-bean-name>
-        <managed-bean-class>org.constellation.bean.LayersBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
+    <navigation-rule>
+        <from-view-id>/authentication.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>login</from-outcome>
+            <to-view-id>/pages/base.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+
 </faces-config>

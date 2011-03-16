@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,10 +16,8 @@
  */
 package org.constellation.bean;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -33,107 +31,33 @@ import org.geotoolkit.util.logging.Logging;
 
 /**
  *
- * @author Leo Pratlong
+ * @author Leo Pratlong (Geomatys)
+ * @author Johann sorel (Geomatys)
  */
 public class NavigationBean {
     
-    /**
-     * Debugging purpose
-     */
     private static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
     static final String AUTH_FILE_PATH = "WEB-INF/authentication.properties";
-    private static final String HOME_HREF = "pages/home.xhtml";
-    private static final String SERVICES_HREF = "pages/services.xhtml";
-    private static final String USERCONFIG_HREF = "pages/configuration.xhtml";
-    private static final String LAYERS_HREF = "pages/layers.xhtml";
     
-    private String login;
-    private String passwd;
-    private boolean authenticated;
-    private AUTHENTICATIONERROR authenticationError;
-    
-    private String newLogin;
-    private String newPasswd1;
-    private String newPasswd2;
-    
-    
-    private String currentHref = HOME_HREF;
-    
-    public NavigationBean() {
-    	
-    }
-    
-    private static enum AUTHENTICATIONERROR {
-    	MISMATCH,
-    	CONFIGFILENOTFOUND,
-    	EMPTYFIELD,
-    	SUCCESS
-    }
-    
-    public void authentify() throws IOException {
-        final Properties properties = getProperties();
+    private String login = "";
+    private String password = "";
 
-        if (login.isEmpty() || passwd.isEmpty()) {
-            authenticationError = AUTHENTICATIONERROR.EMPTYFIELD;
-        } else {
-            if (checkEqualProperty(properties, "user", login) && checkEqualProperty(properties, "passwd", passwd)) {
-                authenticated = true;
-                authenticationError = AUTHENTICATIONERROR.SUCCESS;
-            } else {
-                authenticated = false;
-                authenticationError = AUTHENTICATIONERROR.MISMATCH;
+    public String authentify() {
+        //TODO login authentification should be handle by services
+        try{
+            final Properties properties = getProperties();
+            
+            if(password.equals(properties.getProperty(login))){
+                return "login";
             }
+        }catch(IOException ex){
+            LOGGER.log(Level.WARNING,"Failed to read authorization file.",ex);
         }
+
+        return "failed";
     }
     
-    public void changePasswd() throws IOException {
-    	   if (checkEqualProperty(getProperties(), "passwd", passwd)) {
-            if (newPasswd1.isEmpty() || newLogin.isEmpty()) {
-                // error
-            } else {
-                if (newPasswd1.equals(newPasswd2)) {
-                    final Properties properties = new Properties();
-                    properties.setProperty("user", newLogin);
-                    properties.setProperty("passwd", newPasswd1);
-
-                    final ServletContext sc = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
-
-                    final File file = new File(sc.getRealPath(AUTH_FILE_PATH));
-                    final FileOutputStream fos = new FileOutputStream(file);
-                    properties.store(fos, "Config");
-                }
-            }
-        } else {
-            // error
-        }
-    }
-    
-    public void logout() {
-    	authenticated = false;
-    	currentHref = HOME_HREF;
-    }
-    
-    public void goToServices() {
-    	currentHref = SERVICES_HREF;
-    }
-    
-    public void goToUserConfiguration() {
-    	currentHref = USERCONFIG_HREF;
-    }
-
-    public void goToLayers(){
-        currentHref = LAYERS_HREF;
-    }
-
-    private boolean checkEqualProperty(final Properties properties, final String property, final String value) {
-        if ((properties != null) && (property != null) && (value != null)) {
-            final String cfgProperty = properties.getProperty(property);
-            return value.equals(cfgProperty);
-        }
-        return false;
-    }
-
-    private Properties getProperties() throws IOException {
+    private static Properties getProperties() throws IOException {
         final Properties properties = new Properties();
         InputStream inputStream = null;
         final FacesContext context = FacesContext.getCurrentInstance();
@@ -146,19 +70,16 @@ public class NavigationBean {
                         inputStream = new FileInputStream(sc.getRealPath(AUTH_FILE_PATH));
                     } catch (FileNotFoundException e) {
                         LOGGER.log(Level.SEVERE, "No configuration file found.");
-                        authenticationError = AUTHENTICATIONERROR.CONFIGFILENOTFOUND;
                     }
                 }
             }
         }
 
         if (inputStream == null) {
-            inputStream = getClass().getResourceAsStream(AUTH_FILE_PATH);
+            inputStream = NavigationBean.class.getResourceAsStream(AUTH_FILE_PATH);
         }
 
-        if (inputStream == null) {
-            authenticationError = AUTHENTICATIONERROR.CONFIGFILENOTFOUND;
-        } else {
+        if (inputStream != null) {
             try {
                 properties.load(inputStream);
             } finally {
@@ -176,60 +97,12 @@ public class NavigationBean {
         this.login = login;
     }
 
-    public String getPasswd() {
-        return passwd;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswd(final String password) {
-        this.passwd = password;
-    }
-
-    public void setAuthenticated(final boolean authenticated) {
-            this.authenticated = authenticated;
-    }
-
-    public boolean isAuthenticated() {
-            return authenticated;
-    }
-
-    public void setAuthenticationError(final AUTHENTICATIONERROR authenticationError) {
-            this.authenticationError = authenticationError;
-    }
-
-    public AUTHENTICATIONERROR getAuthenticationError() {
-            return authenticationError;
-    }
-
-    public void setCurrentHref(final String currentHref) {
-            this.currentHref = currentHref;
-    }
-
-    public String getCurrentHref() {
-            return currentHref;
-    }
-
-    public void setNewLogin(final String newLogin) {
-            this.newLogin = newLogin;
-    }
-
-    public String getNewLogin() {
-            return newLogin;
-    }
-
-    public void setNewPasswd1(final String newPasswd1) {
-            this.newPasswd1 = newPasswd1;
-    }
-
-    public String getNewPasswd1() {
-            return newPasswd1;
-    }
-
-    public void setNewPasswd2(final String newPasswd2) {
-            this.newPasswd2 = newPasswd2;
-    }
-
-    public String getNewPasswd2() {
-            return newPasswd2;
+    public void setPassword(final String password) {
+        this.password = password;
     }
 
 }
