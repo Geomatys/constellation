@@ -19,7 +19,7 @@
     <groupId>org.constellation.gui</groupId>
     <artifactId>admin-base</artifactId>
     <packaging>jar</packaging>
-    <name>Web sites GUI base</name>
+    <name>Web site : base</name>
     <description>Base GUI interface classes.</description>
 
 

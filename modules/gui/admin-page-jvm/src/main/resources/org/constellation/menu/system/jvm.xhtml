@@ -10,7 +10,25 @@
                 template="/pages/base.xhtml">
 
     <ui:define name="content">
-        <h:outputText>Page JVM : some JVM stats and infos</h:outputText>
+
+        <h3>Memory informations</h3><br/>
+        Maximum memory = <h:outputText value="#{jvmBean.maxMemory}"/><br/>
+        Free memory = <h:outputText value="#{jvmBean.freeMemory}"/><br/>
+        <br/>
+        <h:commandButton action="#{jvmBean.gc}" value="Force garbage collector"/>
+        <br/>
+        <br/>
+
+        <h3>System properties</h3>
+        <table>
+            <tbody>
+                <tr jsfc="ui:repeat" value="#{jvmBean.systemProperties}" var="key">
+                    <td>#{key}</td>
+                    <td>#{jvmBean.systemMap[key]}</td>
+                </tr>
+            </tbody>
+        </table>
+
     </ui:define>
 
 </ui:composition>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration for the "gui/constellation" module from Constellation project.
+  Version: $Id$
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>gui</artifactId>
+        <version>0.7-SNAPSHOT</version>
+    </parent>
+
+
+
+    <!--
+    Module description.
+  -->
+    <groupId>org.constellation.gui</groupId>
+    <artifactId>admin-page-jvm</artifactId>
+    <packaging>jar</packaging>
+    <name>Web site : JVM informations</name>
+
+
+    <!--
+    Developers and contributors.
+  -->
+    <developers>
+        <developer>
+            <id>jsorel</id>
+            <name>Johann Sorel</name>
+            <email>johann.sorel@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+
+    <!--
+    Dependencies required only for compilation. These dependencies will be
+    included in the JARs' list for which Maven will move into "target/binaries".
+  -->
+    <dependencies>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-base</artifactId>
+            <version>0.7-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+</project>
+
+
+
+
+
+

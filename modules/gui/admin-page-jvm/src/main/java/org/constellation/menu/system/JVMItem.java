@@ -21,14 +21,15 @@ import org.constellation.bean.AbstractMenuItem;
 
 
 /**
+ * Add a JVM information page to constellation administration interface.
  *
  * @author Johann Sorel (Geomatys)
  */
-public class JAIItem extends AbstractMenuItem{
+public class JVMItem extends AbstractMenuItem{
 
-    public JAIItem() {
+    public JVMItem() {
         super(null,
-            new Path(SYSTEMS_PATH,"JAI", "/org/constellation/menu/system/jai.xhtml", null)
+            new Path(SYSTEMS_PATH,"JVM", "/org/constellation/menu/system/jvm.xhtml", null)
             );
     }
 

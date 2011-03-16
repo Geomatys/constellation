@@ -159,9 +159,16 @@
             <artifactId>cstl-web-configuration</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!-- administration pages -->
         <dependency>
             <groupId>org.constellation.gui</groupId>
             <artifactId>admin-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-jvm</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- The 4 xml bindings are added here, because the JSF interface uses
