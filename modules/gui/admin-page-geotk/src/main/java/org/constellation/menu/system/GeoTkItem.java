@@ -29,7 +29,7 @@ public class GeoTkItem extends AbstractMenuItem{
 
     public GeoTkItem() {
         super(null,
-            new Path(SYSTEMS_PATH,"GeotoolKit", "/org/constellation/menu/system/geotk.xhtml", null)
+            new Path(SYSTEMS_PATH,"GeotoolKit", "/org/constellation/menu/system/geotk.xhtml", null,300)
             );
     }
 

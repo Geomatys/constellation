@@ -29,7 +29,7 @@ public class JVMItem extends AbstractMenuItem{
 
     public JVMItem() {
         super(null,
-            new Path(SYSTEMS_PATH,"JVM", "/org/constellation/menu/system/jvm.xhtml", null)
+            new Path(SYSTEMS_PATH,"JVM", "/org/constellation/menu/system/jvm.xhtml", null,200)
             );
     }
 

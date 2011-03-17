@@ -29,7 +29,7 @@ public class JAIItem extends AbstractMenuItem{
 
     public JAIItem() {
         super(null,
-            new Path(SYSTEMS_PATH,"JAI", "/org/constellation/menu/system/jai.xhtml", null)
+            new Path(SYSTEMS_PATH,"JAI", "/org/constellation/menu/system/jai.xhtml", null,100)
             );
     }
 

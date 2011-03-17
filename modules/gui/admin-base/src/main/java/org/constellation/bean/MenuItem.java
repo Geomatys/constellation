@@ -35,12 +35,15 @@ public interface MenuItem {
         public final String i18nKey;
         public final String linkedPage;
         public final String icon;
+        public final int priority;
 
-        public Path(final Path parent, final String i18nKey, final String linkedPage, final String icon) {
+        public Path(final Path parent, final String i18nKey, final String linkedPage, 
+                final String icon, final int priority) {
             this.parent = parent;
             this.i18nKey = i18nKey;
             this.linkedPage = linkedPage;
             this.icon = icon;
+            this.priority = priority;
         }
 
     }

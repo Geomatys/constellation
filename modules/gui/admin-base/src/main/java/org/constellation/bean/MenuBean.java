@@ -60,7 +60,7 @@ public class MenuBean extends I18NBean{
 
         addBundle("org.constellation.bundle.base");
 
-        final I18NNode root = new I18NNode("root",null,null);
+        final I18NNode root = new I18NNode("root",null,null,0);
         nodes.put("root", root);
         model = new DefaultTreeModel(root);
 
@@ -81,9 +81,7 @@ public class MenuBean extends I18NBean{
     }
 
     private I18NNode create(final I18NNode root, final Map<String,I18NNode> cache, final Path path){
-
-        
-
+       
         //find the node where to insert this one
         I18NNode parent = root;
         if(path.parent != null){
@@ -103,10 +101,26 @@ public class MenuBean extends I18NBean{
             link = webapp+link;
         }
 
-        final I18NNode node = new I18NNode(path.i18nKey, path.icon, link);
+        final I18NNode node = new I18NNode(path.i18nKey, path.icon, link,path.priority);
         cache.put(path.i18nKey, node);
-        parent.add(node);
+
+        //insert node based on it's priority
+
+        parent.insert(node, getInsertIndex(parent, node));
         return node;
+    }
+
+    private static int getInsertIndex(final I18NNode parent, final I18NNode candidate){
+
+        int index = 0;
+        for(int n=parent.getChildCount(); index<n; index++){
+            final I18NNode child = (I18NNode) parent.getChildAt(index);
+            if(child.priority < candidate.priority){
+                //found the insert index
+                break;
+            }
+        }
+        return index;
     }
 
 
@@ -147,11 +161,13 @@ public class MenuBean extends I18NBean{
         private final String i18nkey;
         private final String icon;
         private final String targetPage;
+        private final int priority;
 
-        private I18NNode(final String i18nKey, final String icon, final String targetPage){
+        private I18NNode(final String i18nKey, final String icon, final String targetPage, final int priority){
             this.i18nkey = i18nKey;
             this.icon = icon;
             this.targetPage = targetPage;
+            this.priority = priority;
         }
 
         public String getTitle(){
