@@ -466,8 +466,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             !ex.getExceptionCode().equals(INVALID_POINT)              && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_POINT) &&
             !ex.getExceptionCode().equals(INVALID_FORMAT)             && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_FORMAT) &&
             !ex.getExceptionCode().equals(INVALID_CRS)                && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_CRS) &&
-            !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_SRS) &&
-            !ex.getExceptionCode().equals(LAYER_NOT_DEFINED)          && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED)) {
+            !ex.getExceptionCode().equals(LAYER_NOT_DEFINED)          && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED) &&
+            !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_SRS) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_REQUEST)) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');

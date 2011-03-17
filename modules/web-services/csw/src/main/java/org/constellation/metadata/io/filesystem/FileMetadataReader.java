@@ -99,7 +99,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     private static final DateFormat FORMATTER;
     static {
         FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        //FORMATTER.setTimeZone(TimeZone.getTimeZone("GMT+0"));
     }
 
     /**
@@ -159,10 +158,11 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     }
 
     /**
-     * Try to find a file named identifier.xml or identifier
+     * Try to find a file named identifier.xml or identifier recursively
+     * in the specified directory and its sub-directories.
      *
-     * @param identifier
-     * @param directory
+     * @param identifier The metadata identifier.
+     * @param directory The current directory to explore.
      * @return
      */
     private File getFileFromIdentifier(final String identifier, final File directory) {

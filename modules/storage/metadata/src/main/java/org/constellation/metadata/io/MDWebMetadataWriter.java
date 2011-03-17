@@ -970,15 +970,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (form != null) {
             try {
                 final long startWrite = System.currentTimeMillis();
-                final int result      = mdWriter.writeForm(form, false, true);
+                mdWriter.writeForm(form, false, true);
                 writeTime             = System.currentTimeMillis() - startWrite;
-                /**
-                 * this case should not happen now that the writer don't skip
-                 */
-                if (result == 1) {
-                    LOGGER.log(logLevel, "The record have been skipped:{0}", form.getTitle());
-                    return false;
-                }
 
             } catch (MD_IOException e) {
                 throw new MetadataIoException("The service has throw an SQLException while writing the metadata :" + e.getMessage(), e, null);
