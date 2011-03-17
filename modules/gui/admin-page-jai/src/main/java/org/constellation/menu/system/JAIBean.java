@@ -17,14 +17,21 @@
 
 package org.constellation.menu.system;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.media.jai.JAI;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  * Returns several information of available imagery readers and writers.
@@ -33,23 +40,35 @@ import javax.media.jai.JAI;
  */
 public class JAIBean {
 
+    private static final Logger LOGGER = Logging.getLogger(JAIBean.class);
+
+    private final Map<String,String> types;
+
+    public JAIBean(){
+        types = new TreeMap<String, String>();
+        for(String mime : ImageIO.getReaderMIMETypes()){
+            try{
+                final Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(mime);
+                if(readers.hasNext()){
+                    types.put(mime, readers.next().getClass().getName());
+                }
+            }catch(Exception ex){
+                //might happen, jai or other problems with native codecs
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+            }
+        }
+    }
+
     public String getTileCacheMemory(){
         return String.valueOf(JAI.getDefaultInstance().getTileCache().getMemoryCapacity());
     }
 
     public List<String> getMimeTypes(){
-        return Arrays.asList(ImageIO.getReaderMIMETypes());
+        return new ArrayList<String>(types.keySet());
     }
 
     public Map<String,String> getReaders(){
-        final Map<String,String> map = new HashMap<String, String>();
-        for(String mime : ImageIO.getReaderMIMETypes()){
-            final Iterator<ImageReader> readers = ImageIO.getImageReadersByMIMEType(mime);
-            if(readers.hasNext()){
-                map.put(mime, readers.next().getClass().getName());
-            }
-        }
-        return map;
+        return types;
     }
 
 }

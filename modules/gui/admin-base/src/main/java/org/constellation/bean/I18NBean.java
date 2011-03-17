@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import javax.faces.context.FacesContext;
 
 /**
  *
@@ -40,7 +41,7 @@ public class I18NBean {
     }
 
     public void addBundle(final String ... bundles){
-        final Locale lc = getLocale();
+        final Locale lc = locale;
         for(final String bundle : bundles){
             this.bundles.put(bundle, ResourceBundle.getBundle(bundle, lc));
         }
@@ -54,13 +55,7 @@ public class I18NBean {
         bundles.clear();
     }
 
-    public Locale getLocale() {
-        return locale;
-    }
-
-    public void setLocale(final Locale local) {
-        this.locale = local;
-        
+    private void reload(){
         //reload bundles
         final Set<String> keys = new HashSet<String>(bundles.keySet());
         removeAllBundles();
@@ -68,6 +63,13 @@ public class I18NBean {
     }
 
     public Map<String,String> getI18n(){
+        final FacesContext context = FacesContext.getCurrentInstance();
+        final Locale currentLocal = context.getViewRoot().getLocale();
+        if(!currentLocal.equals(locale)){
+            //local changed, reload bundles
+            locale = currentLocal;
+            reload();
+        }
         return i18n;
     }
 

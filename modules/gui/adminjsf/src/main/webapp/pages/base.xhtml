@@ -4,13 +4,15 @@
         xmlns:ui="http://java.sun.com/jsf/facelets"
         xmlns:h="http://java.sun.com/jsf/html"
         xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:c="http://java.sun.com/jstl/core"
         xmlns:a4j="http://richfaces.org/a4j"
         xmlns:mf="http://mapfaces.org/taglib">
-<f:view>
+<f:view locale="#{localeBean.locale}">
 
     <head>
         <title>Constellation</title>
-        <link rel="stylesheet" type="text/css" href="#{facesContext.externalContext.requestContextPath}/resources/css/base.css"/>
+        <c:set var="contextPath" value="#{facesContext.externalContext.requestContextPath}" />
+        <link rel="stylesheet" type="text/css" href="#{contextPath}/resources/css/base.css"/>
         <mf:Resources/>
         <ui:insert name="header"/>
     </head>
@@ -23,6 +25,18 @@
             <h:panelGrid columns="2" columnClasses="col1,col2" style="height:100%;width:100%">
 
                 <h:panelGroup>
+
+                    <!--translation-->
+                    <h:commandLink action="#{localeBean.toEnglish}">
+                        <img alt="en" style="border:0px" src="#{contextPath}/resources/img/en.png"/>
+                    </h:commandLink>
+                    <h:commandLink action="#{localeBean.toFrench}">
+                        <img alt="fr" style="border:0px" src="#{contextPath}/resources/img/fr.png"/>
+                    </h:commandLink>
+                    <br/>
+                    <br/>
+
+
                     <!-- Menus -->
                     <mf:Outline id="navTree" actionVisible="false" rootVisible="false"
                                 rowStyler="#{menuBean.styler}" value="#{menuBean.model}"
@@ -32,15 +46,21 @@
 
 
                             <h:outputLink value="#{node.targetPage}" rendered="#{node.targetPage != null}">
-                                <h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}"/>
-                                <span> </span>
-                                <h:outputText value="#{node.title}" styleClass="profile-element"/>
+                                <table cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td><h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}"/></td>
+                                        <td><h:outputText value="#{node.title}" styleClass="profile-element"/></td>
+                                    </tr>
+                                </table>
                             </h:outputLink>
 
                             <h:panelGroup rendered="#{node.targetPage == null}">
-                                <h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}"/>
-                                <span> </span>
-                                <h:outputText value="#{node.title}" styleClass="profile-element"/>
+                                <table cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td><h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}"/></td>
+                                        <td><h:outputText value="#{node.title}" styleClass="profile-element"/></td>
+                                    </tr>
+                                </table>
                             </h:panelGroup>
 
                         </h:column>
@@ -48,6 +68,8 @@
                 </h:panelGroup>
 
                 <h:panelGroup>
+                    <h2><h:outputText value="#{pageTitle}"/></h2>
+                    
                     <!-- dynamic content -->
                     <ui:insert name="content">
                         <center>

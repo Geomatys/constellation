@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib"
+                template="/pages/base.xhtml">
+
+    <ui:param name="pageTitle" value="#{providerBean.i18n['provider_overview_title']}"/>
+
+    <ui:define name="content">
+
+        <h:panelGrid columns="2">
+
+            <!-- layer providers -->
+            <h:panelGroup>
+                <h3>#{providerBean.i18n['provider_overview_layers']}</h3>
+                <h:commandButton action="#{providerBean.reloadLayerProviders}" value="Force reload"/>
+                <br/>
+                <br/>
+                <ui:repeat value="#{providerBean.layerProviders}" var="candidate">
+                    <h:outputText value="#{candidate}"/><br/>
+                </ui:repeat>
+            </h:panelGroup>
+
+            <!-- style providers -->
+            <h:panelGroup>
+                <h3>#{providerBean.i18n['provider_overview_styles']}</h3>
+                <h:commandButton action="#{providerBean.reloadStyleProviders}" value="Force reload"/>
+                <br/>
+                <br/>
+                <ui:repeat value="#{providerBean.styleProviders}" var="candidate">
+                    <h:outputText value="#{candidate}"/><br/>
+                </ui:repeat>
+            </h:panelGroup>
+
+
+        </h:panelGrid>
+
+    </ui:define>
+
+</ui:composition>

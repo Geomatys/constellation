@@ -28,7 +28,7 @@ public abstract class AbstractMenuItem implements MenuItem {
 
     public static final Path SERVICES_PATH = new Path(null, "services", null, "org.constellation.icons.socket.png.mfRes",300);
     public static final Path PROVIDERS_PATH = new Path(null, "providers", null, "org.constellation.icons.nfs_unmount.png.mfRes",200);
-    public static final Path SYSTEMS_PATH = new Path(null, "systems", null, "org.constellation.icons.utilities.png.mfRes",100);
+    public static final Path SYSTEMS_PATH = new Path(null, "systems", null, "org.constellation.icons.configure.png.mfRes",100);
 
     private final String bundlePath;
     private final List<Path> paths;
