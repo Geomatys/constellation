@@ -21,6 +21,7 @@ import org.constellation.bean.AbstractMenuItem;
 
 
 /**
+ * Add a JAI information page to constellation administration interface.
  *
  * @author Johann Sorel (Geomatys)
  */

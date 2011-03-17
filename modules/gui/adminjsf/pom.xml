@@ -173,6 +173,11 @@
         </dependency>
         <dependency>
             <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-jai</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
             <artifactId>admin-page-geotk</artifactId>
             <version>${project.version}</version>
         </dependency>
