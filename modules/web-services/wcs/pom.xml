@@ -70,6 +70,15 @@
      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-wcs</artifactId>
     </dependency>
+
+    <!-- Web interface -->
+    <dependency>
+        <groupId>org.constellation.gui</groupId>
+        <artifactId>admin-base</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
+    </dependency>
+
 	<!-- Test dependencies -->
     <dependency>
       <groupId>org.constellation.storage</groupId>

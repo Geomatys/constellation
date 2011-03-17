@@ -8,11 +8,11 @@ html {
 .maindiv {
     width: 75%;
     border-color: #FFFFFF;
-    border-width: 1px 1px 1px 1px;
+    border-width: 0px;
     border-style: solid solid solid solid;
     padding: 30px;
     margin: 0pt auto;
-    background: #ffffff;
+    background: #FFF url("../img/menu.png") no-repeat;
     border-radius : 20px;
     -moz-border-radius : 20px;
     box-shadow: 0px 0px 10px 0px #555;

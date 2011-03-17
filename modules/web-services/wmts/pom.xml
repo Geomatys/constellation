@@ -71,6 +71,14 @@
       <artifactId>geotk-xml-wmts</artifactId>
     </dependency>
 
+    <!-- Web interface -->
+    <dependency>
+        <groupId>org.constellation.gui</groupId>
+        <artifactId>admin-base</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
+    </dependency>
+
     <!-- for debugging, netcdf ifremer readers -->
     <!--<dependency>
       <groupId>fr.ifremer.seagrid</groupId>
