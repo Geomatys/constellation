@@ -121,6 +121,7 @@
         <module>admin-page-jvm</module>
         <module>admin-page-jai</module>
         <module>admin-page-geotk</module>
+        <module>admin-page-tool</module>
     </modules>
 
 </project>
