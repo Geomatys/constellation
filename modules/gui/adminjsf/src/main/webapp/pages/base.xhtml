@@ -16,6 +16,7 @@
         <link rel="stylesheet" type="text/css" href="#{contextPath}/resources/css/base.css"/>
         <mf:Resources/>
         <ui:insert name="header"/>
+        <script type="text/javascript" src="org.mapfaces.resources.js.jquery.jquery.js.mfRes" />
     </head>
 
     <body>
@@ -32,8 +33,6 @@
                 <h:commandLink action="#{localeBean.toFrench}">
                     <img alt="fr" style="border:0px" src="#{contextPath}/resources/img/fr.png"/>
                 </h:commandLink>
-
-
 
                 <span class="logout">
                     <h:commandLink action="#{navigationBean.logout}">
@@ -59,28 +58,17 @@
                                 var="node" width="100%">
                         <!-- Name column -->
                         <h:column>
+                            <h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}" style="vertical-align: middle;"/>
 
-
-                            <h:outputLink value="#{node.targetPage}" rendered="#{node.targetPage != null}">
-                                <table cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td><h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}"/></td>
-                                        <td><h:outputText value="#{node.title}" styleClass="profile-element"/></td>
-                                    </tr>
-                                </table>
+                            <h:outputLink id="test" value="#{node.targetPage}" rendered="#{node.targetPage != null}">
+                                <h:outputText value="#{node.title}" styleClass="profile-element"/>
                             </h:outputLink>
 
-                            <h:panelGroup rendered="#{node.targetPage == null}">
-                                <table cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td><h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}"/></td>
-                                        <td><h:outputText value="#{node.title}" styleClass="profile-element"/></td>
-                                    </tr>
-                                </table>
-                            </h:panelGroup>
+                            <h:outputText value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage == null}"/>
 
                         </h:column>
                     </mf:Outline>
+
                 </h:panelGroup>
 
                 <h:panelGroup>
@@ -104,6 +92,32 @@
             2007-2011 Geomatys
         </div>
         </h:form>
+
+        <!-- script to handle menu navigation -->
+        <script type="text/javascript">
+            if(!window.currentPosition){
+                window.currentPosition = null;
+            }
+            jQuery(document).ready(
+                function(){
+                    if(window.currentPosition){
+                        window.currentPosition.addClass('active');
+                    }
+                    jQuery("tr.navigationLeafClass").bind("click",
+                        function(event){
+                            event.preventDefault();
+                            var tr = jQuery(this);
+                            var link = tr.find('a');
+                            if(link){
+                                window.currentPosition = tr;
+                                window.location = link.attr("href");
+                            }
+                        }
+                    );
+                }
+            );
+        </script>
+
     </body>
             
 </f:view>
