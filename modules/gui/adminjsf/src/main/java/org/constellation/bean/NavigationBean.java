@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseEvent;
 import javax.servlet.ServletContext;
 import org.geotoolkit.util.logging.Logging;
 
@@ -35,7 +36,9 @@ import org.geotoolkit.util.logging.Logging;
  * @author Johann sorel (Geomatys)
  */
 public class NavigationBean {
-    
+
+    private static final String LOGIN_FLAG = "cstl-logged";
+
     private static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
     static final String AUTH_FILE_PATH = "WEB-INF/authentication.properties";
     
@@ -48,6 +51,7 @@ public class NavigationBean {
             final Properties properties = getProperties();
             
             if(password.equals(properties.getProperty(login))){
+                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(LOGIN_FLAG,LOGIN_FLAG);
                 return "login";
             }
         }catch(IOException ex){
@@ -103,6 +107,24 @@ public class NavigationBean {
 
     public void setPassword(final String password) {
         this.password = password;
+    }
+
+    public void logout(){
+        FacesContext.getCurrentInstance().getExternalContext()
+                .getSessionMap().remove(LOGIN_FLAG);
+    }
+
+    public void checkLogged(final PhaseEvent event){
+        final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        if(!context.getSessionMap().containsKey(LOGIN_FLAG)){
+            final String webapp = context.getRequestContextPath();
+            try {
+                //the session is not logged, redirect him to the authentication page
+                context.redirect(webapp+"/authentication.jsf");
+            } catch (IOException ex) {
+                Logger.getLogger(NavigationBean.class.getName()).log(Level.WARNING, null, ex);
+            }
+        }
     }
 
 }

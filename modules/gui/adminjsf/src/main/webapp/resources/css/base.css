@@ -10,13 +10,36 @@ html {
     border-color: #FFFFFF;
     border-width: 0px;
     border-style: solid solid solid solid;
-    padding: 30px;
+    padding: 10px 30px 30px 30px;
     margin: 0pt auto;
     background: #FFF url("../img/menu.png") no-repeat;
     border-radius : 20px;
     -moz-border-radius : 20px;
     box-shadow: 0px 0px 10px 0px #555;
     -moz-box-shadow: 0px 0px 10px 0px #555;
+}
+
+.logout{
+    font-size: 0.8em;
+    padding: 5px;
+    margin: 10px;
+    color: #A2AcB6;
+    border-color: #C2CcD6;
+    border-style: solid solid solid solid;
+    border-width: 1px;
+    border-radius : 20px;
+    -moz-border-radius : 20px;
+}
+
+.logout:hover{
+    color: #FFFFFF;
+    border-color: #FFFFFF;
+    border-style: solid solid solid solid;
+    border-width: 1px;
+    background: #aecae4;
+    cursor: pointer;
+    border-radius : 20px;
+    -moz-border-radius : 20px;
 }
 
 a{
