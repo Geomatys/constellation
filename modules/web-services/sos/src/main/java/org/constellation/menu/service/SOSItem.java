@@ -28,7 +28,9 @@ import org.constellation.bean.AbstractMenuItem;
 public class SOSItem extends AbstractMenuItem{
 
     public SOSItem() {
-        super("org.constellation.menu.service.sos",
+        super(
+            new String[]{"/org/constellation/menu/service/sos.xhtml"},
+            "org.constellation.menu.service.sos",
             new Path(SERVICES_PATH,"SOS", "/org/constellation/menu/service/sos.xhtml", null,500)
             );
     }

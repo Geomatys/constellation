@@ -20,15 +20,33 @@ package org.constellation.bean;
 import java.util.List;
 
 /**
- *
+ * 
  * @author Johann Sorel (Geomatys)
  */
 public interface MenuItem {
 
+    /**
+     * List of string path to xhtml pages that need to be copied in the web application.
+     * 
+     * @return list never null
+     */
+    public List<String> getPages();
+
+    /**
+     *
+     * @return path to the resource bundle used for pages and path translation.
+     */
     public String getResourceBundlePath();
 
+    /**
+     * List of Path which will be added in the administration menu.
+     * @return never null.
+     */
     public List<Path> getPaths();
 
+    /**
+     * A Path describe a menu item displayed in the administration menu.
+     */
     public static final class Path{
 
         public final Path parent;

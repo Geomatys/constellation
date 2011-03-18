@@ -28,7 +28,9 @@ import org.constellation.bean.AbstractMenuItem;
 public class GeoTkItem extends AbstractMenuItem{
 
     public GeoTkItem() {
-        super(null,
+        super(
+            new String[]{"/org/constellation/menu/system/geotk.xhtml"},
+            null,
             new Path(SYSTEMS_PATH,"GeotoolKit", "/org/constellation/menu/system/geotk.xhtml", null,300)
             );
     }

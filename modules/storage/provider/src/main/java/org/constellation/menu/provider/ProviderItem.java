@@ -28,7 +28,9 @@ import org.constellation.bean.AbstractMenuItem;
 public class ProviderItem extends AbstractMenuItem{
 
     public ProviderItem() {
-        super("org.constellation.menu.provider.overview",
+        super(
+            new String[]{"/org/constellation/menu/provider/overview.xhtml"},
+            "org.constellation.menu.provider.overview",
             new Path(PROVIDERS_PATH,"provider_overview_title", "/org/constellation/menu/provider/overview.xhtml", null,300)
             );
     }

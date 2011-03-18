@@ -28,7 +28,9 @@ import org.constellation.bean.AbstractMenuItem;
 public class JVMItem extends AbstractMenuItem{
 
     public JVMItem() {
-        super(null,
+        super(
+            new String[]{"/org/constellation/menu/system/jvm.xhtml"},
+            null,
             new Path(SYSTEMS_PATH,"JVM", "/org/constellation/menu/system/jvm.xhtml", null,200)
             );
     }

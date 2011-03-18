@@ -105,7 +105,6 @@ public class MenuBean extends I18NBean{
         cache.put(path.i18nKey, node);
 
         //insert node based on it's priority
-
         parent.insert(node, getInsertIndex(parent, node));
         return node;
     }

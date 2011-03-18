@@ -30,7 +30,6 @@ import javax.faces.context.FacesContext;
 import javax.imageio.spi.ServiceRegistry;
 import javax.servlet.ServletContext;
 import org.apache.commons.io.IOUtils;
-import org.constellation.bean.MenuItem.Path;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 /**
@@ -57,20 +56,18 @@ public final class MenuItems {
             lst.add(page);
 
             // copy each file in the web app folder preserving the path
-            for(Path p : page.getPaths()){
-                if(p.linkedPage != null){
-                    final String[] parts = p.linkedPage.split("/");
-                    File parent = webappFolder;
-                    for(int i=0;i<parts.length-1;i++){
-                        parent = new File(parent,parts[i]);
-                        //ensure it is removed when application stops
-                        parent.deleteOnExit();
-                        parent.mkdirs();
-                    }
-
-                    final File target = new File(parent,parts[parts.length-1]);
-                    copy(MenuItems.class.getResourceAsStream(p.linkedPage), target);
+            for(String path : page.getPages()){
+                final String[] parts = path.split("/");
+                File parent = webappFolder;
+                for(int i=0;i<parts.length-1;i++){
+                    parent = new File(parent,parts[i]);
+                    //ensure it is removed when application stops
+                    parent.deleteOnExit();
+                    parent.mkdirs();
                 }
+
+                final File target = new File(parent,parts[parts.length-1]);
+                copy(MenuItems.class.getResourceAsStream(path), target);
             }
         }
 

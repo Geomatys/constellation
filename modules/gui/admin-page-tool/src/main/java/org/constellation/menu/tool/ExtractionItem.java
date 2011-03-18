@@ -29,7 +29,9 @@ public class ExtractionItem extends AbstractMenuItem{
 
 
     public ExtractionItem() {
-        super(null,
+        super(
+            new String[]{"/org/constellation/menu/tool/extraction.xhtml"},
+            null,
             new Path(TOOLS_PATH,"extraction", "/org/constellation/menu/tool/extraction.xhtml", "org.constellation.icons.antenna.png.mfRes",100)
             );
     }

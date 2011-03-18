@@ -18,6 +18,7 @@
 package org.constellation.bean;
 
 import java.util.List;
+import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 /**
@@ -31,12 +32,20 @@ public abstract class AbstractMenuItem implements MenuItem {
     public static final Path SYSTEMS_PATH = new Path(null, "systems", null, "org.constellation.icons.configure.png.mfRes",200);
     public static final Path TOOLS_PATH = new Path(null, "tools", null, "org.constellation.icons.tool.png.mfRes",100);
 
+    private final List<String> pages;
     private final String bundlePath;
     private final List<Path> paths;
 
-    public AbstractMenuItem(final String bundlePath, Path ... paths) {
+    public AbstractMenuItem(final String[] pages, final String bundlePath, Path ... paths) {
+        ArgumentChecks.ensureNonNull("pages", pages);
+        this.pages = UnmodifiableArrayList.wrap(pages);
         this.bundlePath = bundlePath;
         this.paths = UnmodifiableArrayList.wrap(paths);
+    }
+
+    @Override
+    public List<String> getPages() {
+        return pages;
     }
 
     @Override
