@@ -79,3 +79,9 @@ tr.navigationLeafClass:hover{
     font: normal;
 }
 
+.active{
+    background: #DDEEFF;
+    color: #FFFFFF;
+    font: normal;
+}
+

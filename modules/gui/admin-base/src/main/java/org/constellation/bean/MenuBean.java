@@ -17,14 +17,19 @@
 
 package org.constellation.bean;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import org.constellation.bean.MenuItem.Path;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
+import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 import org.mapfaces.utils.FacesUtils;
@@ -35,6 +40,8 @@ import org.mapfaces.utils.FacesUtils;
  */
 public class MenuBean extends I18NBean{
 
+    private static final Logger LOGGER = Logging.getLogger(MenuBean.class);
+
     private static final OutlineRowStyler STYLER = new OutlineRowStyler() {
         @Override
         public String getRowStyle(TreeNode node) {
@@ -42,17 +49,29 @@ public class MenuBean extends I18NBean{
         }
         @Override
         public String getRowClass(TreeNode node) {
+
+            String candidate = "";
             if(node.getChildCount() > 0){
-                return "navigationGroupClass";
+                candidate += "navigationGroupClass";
             }else{
-                return "navigationLeafClass";
+                candidate += "navigationLeafClass";
             }
 
+            String page = FacesContext.getCurrentInstance().getViewRoot().getViewId();
+            final I18NNode n = (I18NNode) node;
+            if(page != null && n.targetPage != null){
+                final String sp = n.targetPage.substring(0, n.targetPage.length()-3);
+                final String rp = page.substring(0, page.length()-5);
+                if(sp.contains(rp)){
+                    candidate += " active";
+                }
+            }
+            
+            return candidate;
         }
     };
 
     private final TreeModel model;
-    private String currentPage;
 
     public MenuBean() {
 
@@ -131,13 +150,9 @@ public class MenuBean extends I18NBean{
         return STYLER;
     }
 
-    public String getCurrentPage() {
-        return currentPage;
-    }
-
     public void navigateTo(){
-        final String nodeId = FacesContext.getCurrentInstance().getExternalContext()
-                              .getRequestParameterMap().get("targetPageNode");
+        final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        final String nodeId = context.getRequestParameterMap().get("targetPageNode");
 
         if(nodeId == null || nodeId.isEmpty()){
             return;
@@ -150,7 +165,12 @@ public class MenuBean extends I18NBean{
         final TreeNode[] path = outline.getPath(rowId);
 
         if(path != null){
-            currentPage = ((I18NNode)path[path.length-1]).getTargetPage();
+            final String targetPage = ((I18NNode)path[path.length-1]).getTargetPage();
+            try {
+                context.redirect(targetPage);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
         }
         
     }

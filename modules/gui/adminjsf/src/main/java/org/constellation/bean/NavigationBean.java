@@ -122,6 +122,7 @@ public final class NavigationBean extends I18NBean{
      * Check if the session is logged in, if not redirect to authentication page.
      */
     public void checkLogged(final PhaseEvent event){
+
         final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         if(!context.getSessionMap().containsKey(LOGIN_FLAG)){
             final String webapp = context.getRequestContextPath();

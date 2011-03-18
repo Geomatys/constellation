@@ -20,7 +20,8 @@
     </head>
 
     <body>
-        <h:form>
+        <h:form id="form">
+
 
         <div class="maindiv">
 
@@ -51,18 +52,17 @@
                     <br/>
                     <br/>
 
-
                     <!-- Menus -->
-                    <mf:Outline id="navTree" actionVisible="false" rootVisible="false"
+                    <mf:Outline id="navTree" actionVisible="true" rootVisible="false"
                                 rowStyler="#{menuBean.styler}" value="#{menuBean.model}"
                                 var="node" width="100%">
                         <!-- Name column -->
                         <h:column>
                             <h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}" style="vertical-align: middle;"/>
 
-                            <h:outputLink id="test" value="#{node.targetPage}" rendered="#{node.targetPage != null}">
-                                <h:outputText value="#{node.title}" styleClass="profile-element"/>
-                            </h:outputLink>
+                            <h:commandLink action="#{menuBean.navigateTo}" value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage != null}">
+                                <f:param name="targetPageNode" value="#{navTree.nodeIndex}"/>
+                            </h:commandLink>
 
                             <h:outputText value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage == null}"/>
 
@@ -95,22 +95,18 @@
 
         <!-- script to handle menu navigation -->
         <script type="text/javascript">
-            if(!window.currentPosition){
-                window.currentPosition = null;
-            }
+            var visited = false;
             jQuery(document).ready(
                 function(){
-                    if(window.currentPosition){
-                        window.currentPosition.addClass('active');
-                    }
-                    jQuery("tr.navigationLeafClass").bind("click",
-                        function(event){
-                            event.preventDefault();
-                            var tr = jQuery(this);
-                            var link = tr.find('a');
-                            if(link){
-                                window.currentPosition = tr;
-                                window.location = link.attr("href");
+                    jQuery("tr.navigationLeafClass").click(
+                        function(){
+                            if(!visited){
+                                var tr = jQuery(this);
+                                var link = tr.find('a');
+                                if(link){
+                                    visited = true;
+                                    link.click();
+                                }
                             }
                         }
                     );
