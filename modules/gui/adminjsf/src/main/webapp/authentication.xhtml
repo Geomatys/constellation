@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:h="http://java.sun.com/jsf/html">
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:c="http://java.sun.com/jstl/core">
+
+    <f:view locale="#{localeBean.locale}">
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <c:set var="contextPath" value="#{facesContext.externalContext.requestContextPath}" />
         <title>Constellation</title>
         <link rel="stylesheet" type="text/css" href="resources/css/login.css"/>
         <link rel="stylesheet" type="text/css" href="resources/css/base.css"/>
@@ -19,16 +24,29 @@
                 <h:form>
                 <h:panelGroup>
                     <center>
+
+                        <!--translation-->
+                        <div style="margin: 5px 10px;text-align:right;">
+
+                            <!--translation-->
+                            <h:commandLink action="#{localeBean.toEnglish}">
+                                <img alt="en" style="border:0px" src="#{contextPath}/resources/img/en.png"/>
+                            </h:commandLink>
+                            <h:commandLink action="#{localeBean.toFrench}">
+                                <img alt="fr" style="border:0px" src="#{contextPath}/resources/img/fr.png"/>
+                            </h:commandLink>
+                        </div>
+
                         <div style="text-align:right; padding:15px; width:300px">
-                            <h:outputText value="Login : " />
+                            <h:outputText value="#{navigationBean.i18n['user']} : " />
                             <h:inputText id="loginId" value="#{navigationBean.login}"/>
                             <br/>
-                            <h:outputText value="Password : " />
+                            <h:outputText value="#{navigationBean.i18n['password']} : " />
                             <h:inputSecret id="passId" value="#{navigationBean.password}"/>
                             <br/>
                         </div>
 
-                        <h:commandButton styleClass="button" action="#{navigationBean.authentify}" value="Connection" />                        
+                        <h:commandButton styleClass="button" action="#{navigationBean.authentify}" value="#{navigationBean.i18n['connect']}" />
                         <br/>
                         <br/>
                     </center>
@@ -40,5 +58,7 @@
             2007-2011 <b>Geomatys</b>
         </center>
     </body>
+
+    </f:view>
     
 </html>

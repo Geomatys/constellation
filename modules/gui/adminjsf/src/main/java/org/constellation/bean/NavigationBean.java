@@ -35,7 +35,7 @@ import org.geotoolkit.util.logging.Logging;
  * @author Leo Pratlong (Geomatys)
  * @author Johann sorel (Geomatys)
  */
-public class NavigationBean {
+public final class NavigationBean extends I18NBean{
 
     private static final String LOGIN_FLAG = "cstl-logged";
 
@@ -44,6 +44,10 @@ public class NavigationBean {
     
     private String login = "";
     private String password = "";
+
+    public NavigationBean() {
+        addBundle("org.constellation.bundle.base");
+    }
 
     public String authentify() {
         //TODO login authentification should be handle by services
@@ -114,6 +118,9 @@ public class NavigationBean {
                 .getSessionMap().remove(LOGIN_FLAG);
     }
 
+    /**
+     * Check if the session is logged in, if not redirect to authentication page.
+     */
     public void checkLogged(final PhaseEvent event){
         final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         if(!context.getSessionMap().containsKey(LOGIN_FLAG)){
@@ -122,7 +129,7 @@ public class NavigationBean {
                 //the session is not logged, redirect him to the authentication page
                 context.redirect(webapp+"/authentication.jsf");
             } catch (IOException ex) {
-                Logger.getLogger(NavigationBean.class.getName()).log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, null, ex);
             }
         }
     }
