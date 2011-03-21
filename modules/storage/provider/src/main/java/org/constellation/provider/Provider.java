@@ -21,10 +21,9 @@ import java.util.Set;
 import org.constellation.provider.configuration.ProviderSource;
 
 /**
- * A dataprovider is basicly a index class  
+ * A data provider is basically a index class
  *
  * @version $Id$
- *
  * @author Johann Sorel (Geomatys)
  */
 public interface Provider<K,V> {
@@ -32,7 +31,12 @@ public interface Provider<K,V> {
     final String RELOAD_TIME_PROPERTY = "updateTime";
 
     final String JNDI_GROUP = "Data Provider Properties";
-    
+
+    /**
+     * @return the service which created this provider.
+     */
+    ProviderService<K, V, Provider<K, V>> getService();
+
     /**
      * @return the Key class
      */
@@ -65,26 +69,26 @@ public interface Provider<K,V> {
 
     /**
      * Get the data related to the given key. the key is stored as a String here
-     * for convinient needs. The service should be able to transform
+     * for convenient needs. The service should be able to transform
      * the String key to it's own key class.
-     * @return V object if it is in the dataprovider, or null if not.
+     * @return V object if it is in the data provider, or null if not.
      */
     V getByIdentifier(K key);
 
     /**
      * Get the data related to the given key.
-     * @return V object if it is in the dataprovider, or null if not.
+     * @return V object if it is in the data provider, or null if not.
      */
     V get(K key);
 
     /**
-     * Reload data provider. this may be usefull if new entries on disk have been
+     * Reload data provider. this may be useful if new entries on disk have been
      * added after creation.
      */
     void reload();
     
     /**
-     * Clear every caches, this dataprovider should not be used after a call
+     * Clear every caches, this data provider should not be used after a call
      * to this method.
      */
     void dispose();

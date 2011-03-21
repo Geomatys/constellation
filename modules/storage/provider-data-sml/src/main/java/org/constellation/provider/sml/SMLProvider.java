@@ -64,8 +64,9 @@ public class SMLProvider extends AbstractDataStoreProvider {
     public  static final String KEY_PASSWD     = PASSWD.getName().getCode();
     public  static final String KEY_NAMESPACE  = NAMESPACE.getName().getCode();
 
-    protected SMLProvider(ProviderSource source) throws DataStoreException {
-        super(source);
+    protected SMLProvider(final SMLProviderService service,
+            final ProviderSource source) throws DataStoreException {
+        super(service,source);
     }
 
 
@@ -138,7 +139,7 @@ public class SMLProvider extends AbstractDataStoreProvider {
         }
         for(final ProviderSource ps : config.sources) {
             try {
-                dps.add(new SMLProvider(ps));
+                dps.add(new SMLProvider(null,ps));
             } catch(DataStoreException ex){
                 getLogger().log(Level.WARNING, "Invalide SML provider config", ex);
             }

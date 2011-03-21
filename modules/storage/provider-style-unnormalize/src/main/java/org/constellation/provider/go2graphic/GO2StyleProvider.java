@@ -43,8 +43,8 @@ public class GO2StyleProvider extends AbstractStyleProvider{
     private final Map<String,MutableStyle> index = new HashMap<String,MutableStyle>();
     
     
-    protected GO2StyleProvider(){
-        super(null);
+    protected GO2StyleProvider(final GO2StyleProviderService service){
+        super(service,null);
         visit();
     }
 

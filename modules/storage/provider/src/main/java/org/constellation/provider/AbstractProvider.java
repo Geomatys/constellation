@@ -35,11 +35,20 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
 
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
     protected final ProviderSource source;
+    protected final ProviderService<K, V, Provider<K, V>> service;
     private long lastUpdateTime = System.currentTimeMillis();
 
-    public AbstractProvider(ProviderSource source){
+    public AbstractProvider(final ProviderService<K, V, Provider<K, V>> service, final ProviderSource source){
         this.source = source;
+        this.service = service;
     }
+
+    @Override
+    public ProviderService<K, V, Provider<K, V>> getService() {
+        return service;
+    }
+
+
 
     public static Logger getLogger() {
         return LOGGER;

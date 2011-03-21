@@ -46,7 +46,7 @@ public class SLDProviderService extends AbstractProviderService
     @Override
     public StyleProvider createProvider(ProviderSource ps) {
         try {
-            final SLDProvider provider = new SLDProvider(ps);
+            final SLDProvider provider = new SLDProvider(this,ps);
             getLogger().log(Level.INFO, "[PROVIDER]> SLD provider created : {0}", provider.getSource().parameters.get(KEY_FOLDER_PATH));
             return provider;
         } catch (Exception ex) {

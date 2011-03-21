@@ -45,7 +45,7 @@ public class CoverageFileProviderService extends AbstractProviderService<Name,La
     @Override
     public LayerProvider createProvider(ProviderSource ps) {
         try {
-            final CoverageFileProvider provider = new CoverageFileProvider(ps);
+            final CoverageFileProvider provider = new CoverageFileProvider(this,ps);
             getLogger().log(Level.INFO, "[PROVIDER]> File coverage provider created : {0}",
                     provider.getSource().parameters.get(KEY_FOLDER_PATH));
             return provider;

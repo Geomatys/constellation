@@ -46,7 +46,7 @@ public class CoverageSQLProviderService extends AbstractProviderService
     @Override
     public LayerProvider createProvider(ProviderSource ps) {
         try {
-            final CoverageSQLProvider provider = new CoverageSQLProvider(ps);
+            final CoverageSQLProvider provider = new CoverageSQLProvider(this,ps);
             getLogger().log(Level.INFO, "[PROVIDER]> coverage-sql provider created : {0} > {1}"
                     , new Object[]{
                         provider.getSource().parameters.get(KEY_DATABASE),

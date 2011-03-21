@@ -46,7 +46,7 @@ public class ShapeFileProviderService extends AbstractProviderService
     @Override
     public LayerProvider createProvider(ProviderSource ps) {
         try {
-            final ShapeFileProvider provider = new ShapeFileProvider(ps);
+            final ShapeFileProvider provider = new ShapeFileProvider(this,ps);
             getLogger().log(Level.INFO, "[PROVIDER]> shapefile provider created : {0}",
                     provider.getSource().parameters.get(KEY_FOLDER_PATH));
             return provider;

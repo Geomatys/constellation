@@ -45,7 +45,7 @@ public class OMProviderService extends AbstractProviderService
     @Override
     public LayerProvider createProvider(ProviderSource ps) {
         try {
-            final OMProvider provider = new OMProvider(ps);
+            final OMProvider provider = new OMProvider(this,ps);
             String msg = "[PROVIDER]> O&M provider created : ";
             final String sgbdType = provider.getSource().parameters.get(KEY_SGBDTYPE);
             if (sgbdType != null && sgbdType.equals("derby")) {

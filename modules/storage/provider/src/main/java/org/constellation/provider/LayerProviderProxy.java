@@ -79,14 +79,7 @@ public class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDetails,
     public Collection<LayerProviderService> getServices() {
         return SERVICES;
     }
-
-    /**
-     * Returns the current instance of {@link LayerProviderProxy}.
-     */
-    public static LayerProviderProxy getInstance(){
-        return INSTANCE;
-    }
-
+    
     @Override
     public LayerDetails getByIdentifier(Name key) {
         for(final Name n : getKeys()){
@@ -95,6 +88,21 @@ public class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDetails,
             }
         }
         return null;
+    }
+
+    /**
+     * @return null, this provider does not have a service.
+     */
+    @Override
+    public ProviderService<Name, LayerDetails, Provider<Name, LayerDetails>> getService() {
+        return null;
+    }
+
+    /**
+     * Returns the current instance of {@link LayerProviderProxy}.
+     */
+    public static LayerProviderProxy getInstance(){
+        return INSTANCE;
     }
 
 }

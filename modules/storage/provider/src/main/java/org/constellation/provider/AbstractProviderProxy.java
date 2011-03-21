@@ -44,7 +44,7 @@ abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     private Configurator configurator = Configurator.DEFAULT;
 
     protected AbstractProviderProxy(){
-        super(null);
+        super(null,null);
     }
 
     /**

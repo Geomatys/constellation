@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageReader;
 
 import org.constellation.provider.AbstractLayerProvider;
@@ -39,7 +38,6 @@ import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.util.collection.Cache;
-import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
 
@@ -96,8 +94,9 @@ public class CoverageFileProvider extends AbstractLayerProvider{
 
     private final File folder;
 
-    protected CoverageFileProvider(ProviderSource source) throws IOException, SQLException {
-        super(source);
+    protected CoverageFileProvider(final CoverageFileProviderService service,
+            final ProviderSource source) throws IOException, SQLException {
+        super(service,source);
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
         if (path == null) {

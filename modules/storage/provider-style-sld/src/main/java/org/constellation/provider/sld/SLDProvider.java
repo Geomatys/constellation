@@ -74,8 +74,8 @@ public class SLDProvider extends AbstractStyleProvider{
     private final Cache<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
     
     
-    protected SLDProvider(final ProviderSource source){
-        super(source);
+    protected SLDProvider(final SLDProviderService service,final ProviderSource source){
+        super(service,source);
         folder = new File(source.parameters.get(KEY_FOLDER_PATH));
 
         if(folder == null || !folder.exists() || !folder.isDirectory()){

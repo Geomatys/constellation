@@ -43,7 +43,7 @@ public class GO2StyleProviderService extends AbstractProviderService
         super("go2style");
         PROVIDERS.clear();
         //GO2 Style are hard coded java objects with no property configuration
-        PROVIDERS.add(new GO2StyleProvider());
+        PROVIDERS.add(new GO2StyleProvider(this));
     }
 
     @Override

@@ -47,7 +47,7 @@ public class MockLayerProviderService extends AbstractProviderService
     private static class MockLayerProvider extends AbstractLayerProvider{
 
         public MockLayerProvider(ProviderSource config){
-            super(config);
+            super(null,config);
         }
 
         @Override

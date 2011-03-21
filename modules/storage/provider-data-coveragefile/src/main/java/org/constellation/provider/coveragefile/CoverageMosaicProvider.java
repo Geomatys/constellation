@@ -73,8 +73,9 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
 
     private final File folder;
 
-    protected CoverageMosaicProvider(final ProviderSource source) throws IOException, SQLException {
-        super(source);
+    protected CoverageMosaicProvider(final CoverageMosaicProviderService service,
+            final ProviderSource source) throws IOException, SQLException {
+        super(service,source);
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
         if (path == null) {

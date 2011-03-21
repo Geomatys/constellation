@@ -46,7 +46,7 @@ public class CoverageMosaicProviderService extends AbstractProviderService
     @Override
     public LayerProvider createProvider(ProviderSource ps) {
         try {
-            final CoverageMosaicProvider provider = new CoverageMosaicProvider(ps);
+            final CoverageMosaicProvider provider = new CoverageMosaicProvider(this,ps);
             getLogger().log(Level.INFO, "[PROVIDER]> Mosaic coverage provider created : {0}",
                     provider.getSource().parameters.get(KEY_FOLDER_PATH));
         } catch (Exception ex) {

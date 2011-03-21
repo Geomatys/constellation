@@ -18,12 +18,17 @@
 package org.constellation.menu.provider;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import org.constellation.bean.I18NBean;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
@@ -47,6 +52,19 @@ public class ProviderBean extends I18NBean{
 
     public void reloadStyleProviders() {
         StyleProviderProxy.getInstance().reload();
+    }
+
+    /**
+     * Build a tree model representation of all available layers.
+     */
+    public TreeModel getLayerModel(){
+        final DefaultMutableTreeNode node = new DefaultMutableTreeNode("root");
+
+        final Collection<LayerProviderService> services = LayerProviderProxy.getInstance().getServices();
+        for(LayerProviderService service : services){
+        }
+
+        return new DefaultTreeModel(node);
     }
 
     public List<String> getLayerProviders() {

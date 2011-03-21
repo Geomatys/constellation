@@ -48,8 +48,9 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
     private final Set<Name> index = new LinkedHashSet<Name>();
     private final ExtendedDataStore store;
 
-    public AbstractDataStoreProvider(final ProviderSource config) throws DataStoreException {
-        super(config);
+    public AbstractDataStoreProvider(final ProviderService service,
+            final ProviderSource config) throws DataStoreException {
+        super(service,config);
 
         params = prepareParameters(config.parameters);
 

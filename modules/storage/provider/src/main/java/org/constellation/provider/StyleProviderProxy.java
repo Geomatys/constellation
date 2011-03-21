@@ -84,6 +84,14 @@ public final class StyleProviderProxy extends AbstractProviderProxy
     }
 
     /**
+     * @return null, this provider does not have a service.
+     */
+    @Override
+    public ProviderService<String, MutableStyle, Provider<String, MutableStyle>> getService() {
+        return null;
+    }
+
+    /**
      * Returns the current instance of {@link StyleProviderProxy}.
      */
     public static StyleProviderProxy getInstance(){

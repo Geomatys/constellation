@@ -79,8 +79,9 @@ public class ShapeFileProvider extends AbstractLayerProvider {
     private final Map<Name,DataStore> cache = new Cache<Name, DataStore>(10, 10, true);
 
 
-    protected ShapeFileProvider(final ProviderSource source) throws IllegalArgumentException {
-        super(source);
+    protected ShapeFileProvider(final ShapeFileProviderService service,
+            final ProviderSource source) throws IllegalArgumentException {
+        super(service,source);
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
         if (path == null) {

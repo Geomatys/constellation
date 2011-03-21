@@ -28,8 +28,9 @@ import org.geotoolkit.style.MutableStyle;
  */
 public abstract class AbstractStyleProvider extends AbstractProvider<String,MutableStyle> implements StyleProvider{
 
-    protected AbstractStyleProvider(ProviderSource source){
-        super(source);
+    protected AbstractStyleProvider(final ProviderService service, 
+            final ProviderSource source){
+        super(service, source);
     }
 
     /**

@@ -44,8 +44,9 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
     protected static final String NO_NAMESPACE = "no namespace";
 
 
-    protected AbstractLayerProvider(ProviderSource config){
-        super(config);
+    protected AbstractLayerProvider(final ProviderService service,
+            final ProviderSource config){
+        super(service,config);
     }
 
     /**

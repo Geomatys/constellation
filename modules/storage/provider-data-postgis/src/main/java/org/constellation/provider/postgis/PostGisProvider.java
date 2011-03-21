@@ -62,8 +62,9 @@ public class PostGisProvider extends AbstractDataStoreProvider{
     public static final String KEY_VALIDATECONN    = VALIDATECONN.getName().getCode();
     public static final String KEY_LOOSEBBOX       = LOOSEBBOX.getName().getCode();
 
-    protected PostGisProvider(final ProviderSource source) throws DataStoreException {
-        super(source);
+    protected PostGisProvider(final PostGisProviderService service,
+            final ProviderSource source) throws DataStoreException {
+        super(service,source);
     }
 
     @Override
@@ -132,7 +133,7 @@ public class PostGisProvider extends AbstractDataStoreProvider{
         }
         for(final ProviderSource ps : config.sources) {
             try {
-                dps.add(new PostGisProvider(ps));
+                dps.add(new PostGisProvider(null,ps));
             } catch(DataStoreException ex){
                 getLogger().log(Level.WARNING, "Invalide postgis provider config", ex);
             }

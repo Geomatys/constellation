@@ -68,8 +68,9 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
     private final Set<Name> index = new HashSet<Name>();
 
-    protected CoverageSQLProvider(ProviderSource source) throws IOException, SQLException {
-        super(source);
+    protected CoverageSQLProvider(final CoverageSQLProviderService service,
+            final ProviderSource source) throws IOException, SQLException {
+        super(service,source);
         loadDataBase();
         visit();
     }
