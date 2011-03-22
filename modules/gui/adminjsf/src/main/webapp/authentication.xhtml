@@ -27,8 +27,6 @@
 
                         <!--translation-->
                         <div style="margin: 5px 10px;text-align:right;">
-
-                            <!--translation-->
                             <h:commandLink action="#{localeBean.toEnglish}">
                                 <img alt="en" style="border:0px" src="#{contextPath}/resources/img/en.png"/>
                             </h:commandLink>
@@ -37,15 +35,19 @@
                             </h:commandLink>
                         </div>
 
-                        <div style="text-align:right; padding:15px; width:300px">
-                            <h:outputText value="#{navigationBean.i18n['user']} : " />
-                            <h:inputText id="loginId" value="#{navigationBean.login}"/>
-                            <br/>
-                            <h:outputText value="#{navigationBean.i18n['password']} : " />
-                            <h:inputSecret id="passId" value="#{navigationBean.password}"/>
-                            <br/>
-                        </div>
-
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td><h:outputText value="#{navigationBean.i18n['user']} : " /></td>
+                                    <td><h:inputText id="loginId" value="#{navigationBean.login}"/></td>
+                                </tr>
+                                <tr>
+                                    <td><h:outputText value="#{navigationBean.i18n['password']} : " /></td>
+                                    <td><h:inputSecret id="passId" value="#{navigationBean.password}"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br/>
                         <h:commandButton styleClass="button" action="#{navigationBean.authentify}" value="#{navigationBean.i18n['connect']}" />
                         <br/>
                         <br/>
