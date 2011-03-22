@@ -14,9 +14,11 @@
         <title>Constellation</title>
         <c:set var="contextPath" value="#{facesContext.externalContext.requestContextPath}" />
         <link rel="stylesheet" type="text/css" href="#{contextPath}/resources/css/base.css"/>
-        <mf:Resources/>
-        <ui:insert name="header"/>
         <script type="text/javascript" src="org.mapfaces.resources.js.jquery.jquery.js.mfRes" />
+        <mf:Resources exclude="jquery.js"/>
+        <link rel="stylesheet" type="text/css" href="#{contextPath}/resources/theme/casablanca/theme.css"/>
+        <ui:insert name="header"/>
+        
     </head>
 
     <body>

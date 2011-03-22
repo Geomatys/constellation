@@ -86,6 +86,33 @@
         <url-pattern>/mfRes/*</url-pattern>
     </servlet-mapping>
 
+    <!-- REST Servlet for constellation web service -->
+    <servlet>
+        <servlet-name>ServletAdaptor</servlet-name>
+        <servlet-class>org.constellation.ws.rs.CstlServletContainer</servlet-class>
+        <init-param>
+          <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
+          <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
+        </init-param>
+        <init-param>
+          <param-name>com.sun.jersey.config.property.packages</param-name>
+             <!-- To disable CSW            service remove packageName: org.constellation.metadata.ws.rs                             -->
+             <!-- To enable  SOS            service add    packageName: org.constellation.sos.ws.rs                                  -->
+             <!-- To enable  GeoDRM         service add    packageName: org.constellation.security.ws                                -->
+             <!-- To enabme  Security for WMS       add    packageName: org.constellation.security.wms                               -->
+             <!-- To disable configuration  service remove packageName: org.constellation.configuration.ws                           -->
+             <!-- To disable new WMS        service remove packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
+             <!-- To disable new WCS        service remove packageName: org.constellation.coverage.ws.rs                             -->
+          <!--param-value>org.constellation.configuration.ws;org.constellation.metadata.ws.rs;org.constellation.map.ws.rs;org.constellation.ws.rs.provider;org.constellation.coverage.ws.rs</param-value-->
+          <param-value>${constellation.services.packages}</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ServletAdaptor</servlet-name>
+        <url-pattern>/WS/*</url-pattern>
+    </servlet-mapping>
+
 
     <session-config>
         <session-timeout>-1</session-timeout>

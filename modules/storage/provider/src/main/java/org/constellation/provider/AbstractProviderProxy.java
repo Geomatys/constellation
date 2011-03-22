@@ -36,7 +36,7 @@ import org.geotoolkit.util.NullArgumentException;
  *
  * @author Johann Sorel (Geomatys)
  */
-abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
+public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         extends ProviderService<K,V,P>> extends AbstractProvider<K, V>{
 
     //all loaded providers
@@ -102,7 +102,7 @@ abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         return null;
     }
 
-    protected abstract Collection<? extends S> getServices();
+    public abstract Collection<? extends S> getServices();
 
     public synchronized Collection<P> getProviders(){
         if(PROVIDERS != null){

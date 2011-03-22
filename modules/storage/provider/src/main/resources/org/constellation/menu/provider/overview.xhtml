@@ -13,32 +13,130 @@
 
     <ui:define name="content">
 
-        <h:panelGrid columns="2">
+        <!-- layer providers -->
+        <h:panelGroup>
+            <h3>#{providerBean.i18n['provider_overview_layers']}</h3>
+            <h:commandButton action="#{providerBean.reloadLayerProviders}" value="Force reload"/>
+            <br/>
+            <br/>
+            <mf:Outline id="layerPreview" value="#{providerBean.layerModel}" var="node" width="100%">
 
-            <!-- layer providers -->
-            <h:panelGroup>
-                <h3>#{providerBean.i18n['provider_overview_layers']}</h3>
-                <h:commandButton action="#{providerBean.reloadLayerProviders}" value="Force reload"/>
-                <br/>
-                <br/>
-                <ui:repeat value="#{providerBean.layerProviders}" var="candidate">
-                    <h:outputText value="#{candidate}"/><br/>
-                </ui:repeat>
-            </h:panelGroup>
+                <h:column>
+                    <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value=""/></mf:CustomHtml></f:facet>
 
-            <!-- style providers -->
-            <h:panelGroup>
-                <h3>#{providerBean.i18n['provider_overview_styles']}</h3>
-                <h:commandButton action="#{providerBean.reloadStyleProviders}" value="Force reload"/>
-                <br/>
-                <br/>
-                <ui:repeat value="#{providerBean.styleProviders}" var="candidate">
-                    <h:outputText value="#{candidate}"/><br/>
-                </ui:repeat>
-            </h:panelGroup>
+                    <mf:switch>
+                        <mf:case condition="#{mf:isInstance(node.userObject,'ProviderService')}" fallthrought="false">
+                            <h:outputText value="#{node.userObject.name}"/>
+                        </mf:case>
+                        <mf:case condition="#{mf:isInstance(node.userObject,'Provider')}" fallthrought="false">
+                            <h:outputText value="#{node.userObject.source.id}"/>
+                        </mf:case>
+                        <mf:case condition="#{mf:isInstance(node.userObject,'LayerDetails')}" fallthrought="false">
+                            <h:outputText value="#{node.userObject.name.localPart}"/>
+                        </mf:case>
+                        <mf:default>
+                            <h:outputText value="#{node.userObject}"/>
+                        </mf:default>
+                    </mf:switch>
+
+                </h:column>
+
+                <mf:DataTableColumn>
+                    <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value="Style"/></mf:CustomHtml></f:facet>
+
+                    <mf:switch>
+                        <mf:case condition="#{mf:isInstance(node.userObject,'LayerDetails')}" fallthrought="false">
+                            <h:outputText value="#{node.userObject.favoriteStyles}"/>
+                        </mf:case>
+                    </mf:switch>
+
+                </mf:DataTableColumn>
+
+                <mf:DataTableColumn width="16">
+                    <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value="View"/></mf:CustomHtml></f:facet>
+
+                    <mf:switch>
+                        <mf:case condition="#{mf:isInstance(node.userObject,'LayerDetails')}" fallthrought="false">
+
+                            <a4j:commandLink action="#{providerBean.show}" reRender="dialogContent" oncomplete="dlg4.show();">
+                                <f:param name="currentNodeId" value="#{layerPreview.nodeIndex}" />
+                                <h:graphicImage value="org.constellation.menu.provider.view.png.mfRes" style="border:none;"/>
+
+                            </a4j:commandLink>
 
 
-        </h:panelGrid>
+                        </mf:case>
+                    </mf:switch>
+
+                </mf:DataTableColumn>
+
+
+            </mf:Outline>
+
+        </h:panelGroup>
+
+        <!-- style providers -->
+        <h:panelGroup>
+            <h3>#{providerBean.i18n['provider_overview_styles']}</h3>
+            <h:commandButton action="#{providerBean.reloadStyleProviders}" value="Force reload"/>
+            <br/>
+            <br/>
+            <mf:Outline id="stylePreview" value="#{providerBean.styleModel}" var="node">
+
+                <h:column>
+                    <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value=""/></mf:CustomHtml></f:facet>
+
+                    <mf:switch>
+                        <mf:case condition="#{mf:isInstance(node.userObject,'ProviderService')}" fallthrought="false">
+                            <h:outputText value="#{node.userObject.name}"/>
+                        </mf:case>
+                        <mf:case condition="#{mf:isInstance(node.userObject,'Provider')}" fallthrought="false">
+                            <h:outputText value="#{node.userObject.source.id}"/>
+                        </mf:case>
+                        <mf:default>
+                            <h:outputText value="#{node.userObject}"/>
+                        </mf:default>
+                    </mf:switch>
+
+                </h:column>
+
+            </mf:Outline>
+
+        </h:panelGroup>
+
+
+        <mf:dialog  id="dialog4" header="Preview" widgetVar="dlg4"
+                    width="650" height="430" modal="true"
+                    showEffect="fade" hideEffect="fade">
+            <a4j:support id="dialog4_Ajax" event=""/>
+
+            <mf:Div id="dialogContent">
+                <mf:Context id="context" service="/resources/context/empty.xml">
+                    <table>
+                        <colgroup>
+                            <col width="50" />
+                            <col width="500" />
+                        </colgroup>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <mf:LayerControl id="tree" deleteColumn="true" displayMode="tree"
+                                                     style="float:left;width:150px;" width="150px" />
+                                </td>
+                                <td>
+                                    <mf:ButtonBar id="buttonbar" defaultToolName="pan" zoomBoxOut="true" history="false"></mf:ButtonBar>
+                                    <mf:MapPane id="mappane" value="#{providerBean.mapContext}" style="width:450px;"></mf:MapPane>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                </mf:Context>
+            </mf:Div>
+
+        </mf:dialog>
+
 
     </ui:define>
 

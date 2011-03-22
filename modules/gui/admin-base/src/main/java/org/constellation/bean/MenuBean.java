@@ -29,6 +29,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import org.constellation.bean.MenuItem.Path;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
+import org.geotoolkit.lang.Setup;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
@@ -74,6 +75,7 @@ public class MenuBean extends I18NBean{
     private final TreeModel model;
 
     public MenuBean() {
+        Setup.initialize(null);
 
         final Map<String,I18NNode> nodes = new HashMap<String, I18NNode>();
 

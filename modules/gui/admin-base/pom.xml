@@ -86,6 +86,11 @@
             <artifactId>mapfaces-base</artifactId>
             <version>${mapfaces.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mapfaces</groupId>
+            <artifactId>mapfaces-map</artifactId>
+            <version>${mapfaces.version}</version>
+        </dependency>
 
 
         <dependency>

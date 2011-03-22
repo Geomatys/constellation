@@ -79,7 +79,7 @@ public final class StyleProviderProxy extends AbstractProviderProxy
     }
 
     @Override
-    protected Collection<StyleProviderService> getServices() {
+    public Collection<StyleProviderService> getServices() {
         return SERVICES;
     }
 

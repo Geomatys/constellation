@@ -47,6 +47,10 @@ public class ProviderSource {
     public final List<ProviderLayer> layers = new ArrayList<ProviderLayer>();
     public final List<ProviderLayer> querylayers = new ArrayList<ProviderLayer>();
 
+    public String getId() {
+        return id;
+    }
+
     public ProviderLayer getLayer(final String key){
         for (final ProviderLayer layer : layers) {
             if (layer.name.equals(key)) {
