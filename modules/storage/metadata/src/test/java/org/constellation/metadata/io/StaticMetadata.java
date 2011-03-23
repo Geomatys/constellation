@@ -235,9 +235,9 @@ public class StaticMetadata {
         "            <gml:pos>858000 6526000</gml:pos>" + '\n' +
         "        </gml:Point>" + '\n' +
         "    </gmd:cornerPoints>" + '\n' +
-       // "    <gmd:pointInPixel>" + '\n' +
-       // "        <gmd:MD_PixelOrientationCode>center</gmd:MD_PixelOrientationCode>" + '\n' +
-       // "    </gmd:pointInPixel>" + '\n' +
+        "    <gmd:pointInPixel>" + '\n' +
+        "        <gmd:MD_PixelOrientationCode>center</gmd:MD_PixelOrientationCode>" + '\n' +
+       "    </gmd:pointInPixel>" + '\n' +
         "</gmd:MD_Georectified>" + '\n' +
         "</gmd:spatialRepresentationInfo>" + '\n' +
         "</gmd:MD_Metadata>";
