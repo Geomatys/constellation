@@ -17,6 +17,7 @@
 
 package org.constellation.configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -48,6 +49,9 @@ public class InstanceReport {
      * @return the instances
      */
     public List<Instance> getInstances() {
+        if (instances == null) {
+            instances = new ArrayList<Instance>();
+        }
         return instances;
     }
 

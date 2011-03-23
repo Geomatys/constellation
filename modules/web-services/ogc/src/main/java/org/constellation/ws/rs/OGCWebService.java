@@ -32,6 +32,7 @@ import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceStatus;
@@ -243,146 +244,152 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     /**
      * treat the request sent to the admin instance.
      */
-    public Response treatAdminRequest(Object objectRequest) throws CstlServiceException {
-        final String request = getParameter("request", true);
+    public Response treatAdminRequest(Object objectRequest) {
+        try {
+            final String request = getParameter("request", true);
 
-        /*
-         * restart operation
-         * kill all the workers and rebuild each one.
-         */
-        if ("restart".equalsIgnoreCase(request)) {
-            LOGGER.info("refreshing the workers");
-            final String identifier = getParameter("id", false);
-            specificRestart(identifier);
-            if (identifier == null) {
-                for (final Worker worker : workersMap.values()) {
-                    worker.destroy();
-                }
-                workersMap.clear();
-                buildWorkerMap();
-            } else {
-                if (workersMap.containsKey(identifier)) {
-                    Worker worker = workersMap.get(identifier);
-                    workersMap.remove(identifier);
-                    worker.destroy();
-                    buildWorker(identifier);
+            /*
+             * restart operation
+             * kill all the workers and rebuild each one.
+             */
+            if ("restart".equalsIgnoreCase(request)) {
+                LOGGER.info("refreshing the workers");
+                final String identifier = getParameter("id", false);
+                specificRestart(identifier);
+                if (identifier == null) {
+                    for (final Worker worker : workersMap.values()) {
+                        worker.destroy();
+                    }
+                    workersMap.clear();
+                    buildWorkerMap();
                 } else {
-                    throw new CstlServiceException("There is no instance " + identifier, INVALID_PARAMETER_VALUE, "id");
-                }
-            }
-            return Response.ok(new AcknowlegementType("success", "instances succefully restarted"), "text/xml").build();
-
-        } else if ("start".equalsIgnoreCase(request)) {
-            LOGGER.info("starting a new worker");
-            final String identifier = getParameter("id", true);
-            specificRestart(identifier);
-            final AcknowlegementType response;
-            if (workersMap.containsKey(identifier)) {
-                throw new CstlServiceException("The instance " + identifier + " is already started try restart method instead.", INVALID_PARAMETER_VALUE);
-            } else {
-                final Worker worker = buildWorker(identifier);
-                if (worker == null) {
-                    throw new CstlServiceException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", INVALID_PARAMETER_VALUE);
-                } else {
-                    if (worker.isStarted()) {
-                        response = new AcknowlegementType("Success", "new instance succefully started");
+                    if (workersMap.containsKey(identifier)) {
+                        Worker worker = workersMap.get(identifier);
+                        workersMap.remove(identifier);
+                        worker.destroy();
+                        buildWorker(identifier);
                     } else {
-                        response = new AcknowlegementType("Error", "unable to start the instance");
+                        throw new CstlServiceException("There is no instance " + identifier, INVALID_PARAMETER_VALUE, "id");
                     }
                 }
-            }
-            return Response.ok(response, "text/xml").build();
-        
-        } else if ("delete".equalsIgnoreCase(request)) {
-            LOGGER.info("deleting an instance");
-            final String identifier = getParameter("id", true);
-            final W worker = workersMap.get(identifier);
-            final AcknowlegementType response;
-            if (worker == null) {
-                throw new CstlServiceException("The instance " + identifier + " is does not exist.", INVALID_PARAMETER_VALUE);
-            } else {
-                worker.destroy();
-                workersMap.remove(identifier);
+                return Response.ok(new AcknowlegementType("success", "instances succefully restarted"), "text/xml").build();
+
+            } else if ("start".equalsIgnoreCase(request)) {
+                LOGGER.info("starting a new worker");
+                final String identifier = getParameter("id", true);
+                specificRestart(identifier);
+                final AcknowlegementType response;
+                if (workersMap.containsKey(identifier)) {
+                    throw new CstlServiceException("The instance " + identifier + " is already started try restart method instead.", INVALID_PARAMETER_VALUE);
+                } else {
+                    final Worker worker = buildWorker(identifier);
+                    if (worker == null) {
+                        throw new CstlServiceException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", INVALID_PARAMETER_VALUE);
+                    } else {
+                        if (worker.isStarted()) {
+                            response = new AcknowlegementType("Success", "new instance succefully started");
+                        } else {
+                            response = new AcknowlegementType("Error", "unable to start the instance");
+                        }
+                    }
+                }
+                return Response.ok(response, "text/xml").build();
+
+            } else if ("delete".equalsIgnoreCase(request)) {
+                LOGGER.info("deleting an instance");
+                final String identifier = getParameter("id", true);
+                final W worker = workersMap.get(identifier);
+                final AcknowlegementType response;
+                if (worker == null) {
+                    throw new CstlServiceException("The instance " + identifier + " is does not exist.", INVALID_PARAMETER_VALUE);
+                } else {
+                    worker.destroy();
+                    workersMap.remove(identifier);
+                    final File serviceDirectory = getServiceDirectory();
+                    if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                        File instanceDirectory     = new File (serviceDirectory, identifier);
+                        File instanceDirectoryBack = new File (serviceDirectory, "." + identifier);
+                        if (instanceDirectory.isDirectory()) {
+                            if (instanceDirectory.renameTo(instanceDirectoryBack)) {
+                                response = new AcknowlegementType("Success", "instance succesfully deleted");
+                            } else {
+                                response = new AcknowlegementType("Error", "instance was deactivated new but can't be deleted");
+                            }
+                        } else {
+                            throw new CstlServiceException("The instance " + identifier + " does not have a proper directory.", NO_APPLICABLE_CODE);
+                        }
+                    } else {
+                        throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+                    }
+                }
+                return Response.ok(response, "text/xml").build();
+
+            } else if ("newInstance".equalsIgnoreCase(request)) {
+                LOGGER.info("creating an instance");
+                final String identifier = getParameter("id", true);
+                final AcknowlegementType response;
                 final File serviceDirectory = getServiceDirectory();
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     File instanceDirectory     = new File (serviceDirectory, identifier);
-                    File instanceDirectoryBack = new File (serviceDirectory, "." + identifier);
-                    if (instanceDirectory.isDirectory()) {
-                        if (instanceDirectory.renameTo(instanceDirectoryBack)) {
-                            response = new AcknowlegementType("Success", "instance succesfully deleted");
-                        } else {
-                            response = new AcknowlegementType("Error", "instance was deactivated new but can't be deleted");
-                        }
+                    if (instanceDirectory.mkdir()) {
+                        response = new AcknowlegementType("Success", "instance succefully created");
                     } else {
-                        throw new CstlServiceException("The instance " + identifier + " does not have a proper directory.", NO_APPLICABLE_CODE);
+                        response = new AcknowlegementType("Error", "unbale to create an instance");
                     }
                 } else {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
                 }
-            }
-            return Response.ok(response, "text/xml").build();
+                return Response.ok(response, "text/xml").build();
 
-        } else if ("newInstance".equalsIgnoreCase(request)) {
-            LOGGER.info("creating an instance");
-            final String identifier = getParameter("id", true);
-            final AcknowlegementType response;
-            final File serviceDirectory = getServiceDirectory();
-            if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                File instanceDirectory     = new File (serviceDirectory, identifier);
-                if (instanceDirectory.mkdir()) {
-                    response = new AcknowlegementType("Success", "instance succefully created");
+
+            } else if ("configure".equalsIgnoreCase(request)) {
+                LOGGER.info("configure an instance");
+                final String identifier = getParameter("id", true);
+                final File serviceDirectory = getServiceDirectory();
+                final AcknowlegementType response;
+                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                    File instanceDirectory     = new File (serviceDirectory, identifier);
+                    configureInstance(instanceDirectory, objectRequest);
+                    response = new AcknowlegementType("Success", "Instance correctly configured");
                 } else {
-                    response = new AcknowlegementType("Error", "unbale to create an instance");
+                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
                 }
-            } else {
-                throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
-            }
-            return Response.ok(response, "text/xml").build();
+                return Response.ok(response, "text/xml").build();
 
 
-        } else if ("configure".equalsIgnoreCase(request)) {
-            LOGGER.info("configure an instance");
-            final String identifier = getParameter("id", true);
-            final File serviceDirectory = getServiceDirectory();
-            final AcknowlegementType response;
-            if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                File instanceDirectory     = new File (serviceDirectory, identifier);
-                configureInstance(instanceDirectory, objectRequest);
-                response = new AcknowlegementType("Success", "Instance correctly configured");
-            } else {
-                throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
-            }
-            return Response.ok(response, "text/xml").build();
-
-
-        } else if ("listInstance".equalsIgnoreCase(request)) {
-            LOGGER.info("listing instances");
-            final List<Instance> instances = new ArrayList<Instance>();
-            // 1- First we list the instance in the map
-            for (Entry<String, W> entry : workersMap.entrySet()) {
-                final ServiceStatus status;
-                if (entry.getValue().isStarted()) {
-                    status = ServiceStatus.WORKING;
-                } else {
-                    status = ServiceStatus.ERROR;
+            } else if ("listInstance".equalsIgnoreCase(request)) {
+                LOGGER.info("listing instances");
+                final List<Instance> instances = new ArrayList<Instance>();
+                // 1- First we list the instance in the map
+                for (Entry<String, W> entry : workersMap.entrySet()) {
+                    final ServiceStatus status;
+                    if (entry.getValue().isStarted()) {
+                        status = ServiceStatus.WORKING;
+                    } else {
+                        status = ServiceStatus.ERROR;
+                    }
+                    instances.add(new Instance(entry.getKey(), status));
                 }
-                instances.add(new Instance(entry.getKey(), status));
-            }
-            // 2- Then we list the instance not yet started
-            final File serviceDirectory = getServiceDirectory();
-            if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                for (File instanceDirectory : serviceDirectory.listFiles()) {
-                    final String name = instanceDirectory.getName();
-                    if (instanceDirectory.isDirectory() && !name.startsWith(".") && !workersMap.containsKey(name)) {
-                        instances.add(new Instance(name, ServiceStatus.NOT_STARTED));
+                // 2- Then we list the instance not yet started
+                final File serviceDirectory = getServiceDirectory();
+                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                    for (File instanceDirectory : serviceDirectory.listFiles()) {
+                        final String name = instanceDirectory.getName();
+                        if (instanceDirectory.isDirectory() && !name.startsWith(".") && !workersMap.containsKey(name)) {
+                            instances.add(new Instance(name, ServiceStatus.NOT_STARTED));
+                        }
                     }
                 }
+                final InstanceReport report = new InstanceReport(instances);
+                return Response.ok(report, "text/xml").build();
+            } else {
+                throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
+                        INVALID_PARAMETER_VALUE, "request");
             }
-            final InstanceReport report = new InstanceReport(instances);
+        } catch (CstlServiceException ex) {
+            LOGGER.log(Level.WARNING, "Sending admin exception:{0}", ex.getMessage());
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getMessage());
             return Response.ok(report, "text/xml").build();
-        } else {
-            throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
-                    INVALID_PARAMETER_VALUE, "request");
         }
     }
 

@@ -98,4 +98,8 @@ public class ObjectFactory {
     public Instance createInstance() {
         return new Instance();
     }
+
+    public ExceptionReport createExceptionReport() {
+        return new ExceptionReport();
+    }
 }
