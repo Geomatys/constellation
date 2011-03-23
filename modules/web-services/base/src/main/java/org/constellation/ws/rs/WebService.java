@@ -341,8 +341,17 @@ public abstract class WebService {
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
+            final MarshallerPool pool;
+            // we look for a configuration query
+            final List<String> serviceId = getParameter("serviceId");
+            if (serviceId != null && !serviceId.isEmpty() && "admin".equals(serviceId.get(0))) {
+                pool = getConfigurationPool();
+            } else {
+                pool = getMarshallerPool();
+            }
+
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                unmarshaller = pool.acquireUnmarshaller();
                 if (requestValidationActivated) {
                     try {
                         final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -374,7 +383,7 @@ public abstract class WebService {
                 return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, null);
             } finally {
                 if (unmarshaller != null)  {
-                    marshallerPool.release(unmarshaller);
+                    pool.release(unmarshaller);
                 }
             }
 
@@ -413,20 +422,15 @@ public abstract class WebService {
         		       "MIME type.", INVALID_REQUEST.name(), null);
     }
 
+
     /**
      * Extracts the value, for a parameter specified, from a query.
-     * If it is a mandatory one, and if it is {@code null}, it throws an exception.
-     * Otherwise returns {@code null} in the case of an optional paramater not found.
      *
      * @param parameterName The name of the parameter.
-     * @param mandatory true if this parameter is mandatory, false if its optional.
-      *
-     * @return the parameter, or {@code null} if not specified and not mandatory.
-     * @throw CstlServiceException
+     *
+     * @return the parameter, or {@code null} if not specified.
      */
-    protected String getParameter(final String parameterName, final boolean mandatory)
-                                                           throws CstlServiceException {
-
+    private List<String> getParameter(final String parameterName) {
         final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
         List<String> values = parameters.get(parameterName);
 
@@ -452,7 +456,24 @@ public abstract class WebService {
                 }
             }
         }
+        return values;
+    }
+    
+    /**
+     * Extracts the value, for a parameter specified, from a query.
+     * If it is a mandatory one, and if it is {@code null}, it throws an exception.
+     * Otherwise returns {@code null} in the case of an optional parameter not found.
+     *
+     * @param parameterName The name of the parameter.
+     * @param mandatory true if this parameter is mandatory, false if its optional.
+      *
+     * @return the parameter, or {@code null} if not specified and not mandatory.
+     * @throw CstlServiceException
+     */
+    protected String getParameter(final String parameterName, final boolean mandatory)
+                                                           throws CstlServiceException {
 
+        final List<String> values = getParameter(parameterName);
         if (values == null) {
             if (mandatory) {
                 throw new CstlServiceException("The parameter " + parameterName + " must be specified",
@@ -582,10 +603,16 @@ public abstract class WebService {
      * When a request will arrive, the service will try to validate it against the specified
      * XSD specified in mainXsdPath.
      * 
-     * @param mainXsdPath The url to the xsd.
+     * @param mainXsdPath The URL to the xsd.
      */
     public void activateRequestValidation(String mainXsdPath) {
         this.mainXsdPath                = mainXsdPath;
         this.requestValidationActivated = true;
     }
+
+    /**
+     * Return the Marshaller pool for configuration request
+     * @return
+     */
+    protected abstract MarshallerPool getConfigurationPool();
 }

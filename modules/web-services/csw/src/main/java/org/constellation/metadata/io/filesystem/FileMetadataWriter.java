@@ -84,19 +84,19 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * Build a new File metadata writer, with the specified indexer.
      *
      * @param index A lucene indexer.
-     * @param configuration An object containing all the datasource informations (in this case the data directory).
+     * @param configuration An object containing all the dataSource informations (in this case the data directory).
      *
      * @throws org.constellation.metadata.io.MetadataIoException
      */
     public FileMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException {
         super(index);
         File dataDir = configuration.getDataDirectory();
-        if (dataDir == null || !dataDir.exists()) {
+        if (!dataDir.exists()) {
             final File configDir = configuration.getConfigurationDirectory();
             dataDir = new File(configDir, dataDir.getName());
         }
         dataDirectory = dataDir;
-        if (dataDirectory == null || !dataDirectory.exists()) {
+        if (dataDirectory == null || !dataDirectory.isDirectory()) {
             throw new MetadataIoException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }
         marshallerPool = EBRIMMarshallerPool.getInstance();

@@ -46,6 +46,7 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;
@@ -416,7 +417,7 @@ public final class ConfigurationService extends WebService  {
     }
 
     /**
-     * Free the resource and close the connection at undeploy time.
+     * {@inheritDoc}
      */
     @Override
     @PreDestroy
@@ -443,5 +444,13 @@ public final class ConfigurationService extends WebService  {
             // @TODO avoid this above block if StyleProviderProxy has never been initialized.
             LOGGER.fine(ex.toString());
         }**/
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected MarshallerPool getConfigurationPool() {
+        return GenericDatabaseMarshallerPool.getInstance();
     }
 }

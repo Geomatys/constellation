@@ -124,12 +124,12 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     public FileMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(true, false);
         File dataDir = configuration.getDataDirectory();
-        if (dataDir == null || !dataDir.exists()) {
+        if (!dataDir.exists()) {
             final File configDir = configuration.getConfigurationDirectory();
             dataDir = new File(configDir, dataDir.getName());
         }
         dataDirectory = dataDir;
-        if (dataDirectory == null || !dataDirectory.exists() || !dataDirectory.isDirectory()) {
+        if (dataDirectory == null || !dataDirectory.isDirectory()) {
             throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
         }
         marshallerPool = EBRIMMarshallerPool.getInstance();

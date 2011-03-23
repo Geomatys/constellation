@@ -18,6 +18,7 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
+import org.constellation.ws.rs.GridWebService;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.StringWriter;
@@ -103,7 +104,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 @Path("wfs/{serviceId}")
 @Singleton
-public class WFSService extends OGCWebService<WFSWorker> {
+public class WFSService extends GridWebService<WFSWorker> {
 
     private static Map<String, String> schemaLocations;
     static {

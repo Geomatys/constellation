@@ -19,15 +19,22 @@ package org.constellation.ws.rs;
 
 // J2SE dependencies
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.core.Response;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.InstanceReport;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies
@@ -41,6 +48,7 @@ import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.util.CodeList;
 
 
@@ -82,19 +90,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     protected final Map<String, W> workersMap;
 
-    private static final String RESTART_ANCKNOWLEDEGEMENT ="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
-                                                           "<Acknowlegement xmlns=\"http://www.constellation.org/config\">\n" +
-                                                           "    <message>workers succefully restarted</message>\n" +
-                                                           "    <status>Success</status>\n" +
-                                                           "</Acknowlegement>";
-
-    private static final String START_ANCKNOWLEDEGEMENT ="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
-                                                           "<Acknowlegement xmlns=\"http://www.constellation.org/config\">\n" +
-                                                           "    <message>new worker succefully started</message>\n" +
-                                                           "    <status>Success</status>\n" +
-                                                           "</Acknowlegement>";
-    
-    
     /**
      * Initialize the basic attributes of a web serviceType.
      *
@@ -249,14 +244,14 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     public Response treatAdminRequest(Object objectRequest) throws CstlServiceException {
         final String request = getParameter("request", true);
-        final String identifier = getParameter("id", false);
 
         /*
          * restart operation
          * kill all the workers and rebuild each one.
          */
-        if ("restart".equals(request)) {
-            LOGGER.info("\nrefreshing the workers\n");
+        if ("restart".equalsIgnoreCase(request)) {
+            LOGGER.info("refreshing the workers");
+            final String identifier = getParameter("id", false);
             specificRestart(identifier);
             if (identifier == null) {
                 for (final Worker worker : workersMap.values()) {
@@ -274,23 +269,116 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     throw new CstlServiceException("There is no instance " + identifier, INVALID_PARAMETER_VALUE, "id");
                 }
             }
-            return Response.ok(RESTART_ANCKNOWLEDEGEMENT, "text/xml").build();
-        } else if ("start".equals(request)) {
-            LOGGER.info("\nstarting a new worker\n");
+            return Response.ok(new AcknowlegementType("success", "instances succefully restarted"), "text/xml").build();
+
+        } else if ("start".equalsIgnoreCase(request)) {
+            LOGGER.info("starting a new worker");
+            final String identifier = getParameter("id", true);
             specificRestart(identifier);
-            if (identifier == null) {
-                throw new CstlServiceException("The parameter id is not specified.", MISSING_PARAMETER_VALUE, "id");
+            final AcknowlegementType response;
+            if (workersMap.containsKey(identifier)) {
+                throw new CstlServiceException("The instance " + identifier + " is already started try restart method instead.", INVALID_PARAMETER_VALUE);
             } else {
-                if (workersMap.containsKey(identifier)) {
-                    throw new CstlServiceException("The instance " + identifier + " is already started try restart method instead.", INVALID_PARAMETER_VALUE);
+                final Worker worker = buildWorker(identifier);
+                if (worker == null) {
+                    throw new CstlServiceException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", INVALID_PARAMETER_VALUE);
                 } else {
-                    final Worker worker = buildWorker(identifier);
-                    if (worker == null) {
-                        throw new CstlServiceException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", INVALID_PARAMETER_VALUE);
+                    if (worker.isStarted()) {
+                        response = new AcknowlegementType("Success", "new instance succefully started");
+                    } else {
+                        response = new AcknowlegementType("Error", "unable to start the instance");
                     }
                 }
             }
-            return Response.ok(START_ANCKNOWLEDEGEMENT, "text/xml").build();
+            return Response.ok(response, "text/xml").build();
+        
+        } else if ("delete".equalsIgnoreCase(request)) {
+            LOGGER.info("deleting an instance");
+            final String identifier = getParameter("id", true);
+            final W worker = workersMap.get(identifier);
+            final AcknowlegementType response;
+            if (worker == null) {
+                throw new CstlServiceException("The instance " + identifier + " is does not exist.", INVALID_PARAMETER_VALUE);
+            } else {
+                worker.destroy();
+                workersMap.remove(identifier);
+                final File serviceDirectory = getServiceDirectory();
+                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                    File instanceDirectory     = new File (serviceDirectory, identifier);
+                    File instanceDirectoryBack = new File (serviceDirectory, "." + identifier);
+                    if (instanceDirectory.isDirectory()) {
+                        if (instanceDirectory.renameTo(instanceDirectoryBack)) {
+                            response = new AcknowlegementType("Success", "instance succesfully deleted");
+                        } else {
+                            response = new AcknowlegementType("Error", "instance was deactivated new but can't be deleted");
+                        }
+                    } else {
+                        throw new CstlServiceException("The instance " + identifier + " does not have a proper directory.", NO_APPLICABLE_CODE);
+                    }
+                } else {
+                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+                }
+            }
+            return Response.ok(response, "text/xml").build();
+
+        } else if ("newInstance".equalsIgnoreCase(request)) {
+            LOGGER.info("creating an instance");
+            final String identifier = getParameter("id", true);
+            final AcknowlegementType response;
+            final File serviceDirectory = getServiceDirectory();
+            if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                File instanceDirectory     = new File (serviceDirectory, identifier);
+                if (instanceDirectory.mkdir()) {
+                    response = new AcknowlegementType("Success", "instance succefully created");
+                } else {
+                    response = new AcknowlegementType("Error", "unbale to create an instance");
+                }
+            } else {
+                throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+            }
+            return Response.ok(response, "text/xml").build();
+
+
+        } else if ("configure".equalsIgnoreCase(request)) {
+            LOGGER.info("configure an instance");
+            final String identifier = getParameter("id", true);
+            final File serviceDirectory = getServiceDirectory();
+            final AcknowlegementType response;
+            if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                File instanceDirectory     = new File (serviceDirectory, identifier);
+                configureInstance(instanceDirectory, objectRequest);
+                response = new AcknowlegementType("Success", "Instance correctly configured");
+            } else {
+                throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+            }
+            return Response.ok(response, "text/xml").build();
+
+
+        } else if ("listInstance".equalsIgnoreCase(request)) {
+            LOGGER.info("listing instances");
+            final List<Instance> instances = new ArrayList<Instance>();
+            // 1- First we list the instance in the map
+            for (Entry<String, W> entry : workersMap.entrySet()) {
+                final String status;
+                if (entry.getValue().isStarted()) {
+                    status = "working";
+                } else {
+                    status = "error";
+                }
+                instances.add(new Instance(entry.getKey(), status));
+            }
+            // 2- Then we list the instance not yet started
+            final File serviceDirectory = getServiceDirectory();
+            if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                for (File instanceDirectory : serviceDirectory.listFiles()) {
+                    final String name = instanceDirectory.getName();
+                    if (instanceDirectory.isDirectory() && !name.startsWith(".") && !workersMap.containsKey(name)) {
+                        instances.add(new Instance(name, "not started"));
+                    }
+                }
+            }
+            final InstanceReport report = new InstanceReport(instances);
+            return Response.ok(report, "text/xml").build();
         } else {
             throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
                     INVALID_PARAMETER_VALUE, "request");
@@ -302,9 +390,17 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * 
      * @param identifier the instance identifier or {@code null} for all the instance.
      */
-    protected void specificRestart(String identifier) {
+    protected void specificRestart(final String identifier) {
         // do nothing in this implementation
     }
+
+    /**
+     * create a new File containing the specific object sent.
+     *
+     * @param instanceDirectory The directory containing the instance configuration files.
+     * @param configuration A service specific configuration Object.
+     */
+    protected abstract void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException;
 
     /**
      * Treat the incoming request and call the right function.
@@ -317,7 +413,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * 
      * @return an xml response.
      */
-    protected abstract Response treatIncomingRequest(final Object objectRequest, W worker);
+    protected abstract Response treatIncomingRequest(final Object objectRequest,final  W worker);
 
     /**
      * Verify if the version is supported by this serviceType.
@@ -325,7 +421,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * If the version is not accepted we send an exception.
      * </p>
      */
-    protected void isVersionSupported(String versionNumber) throws CstlServiceException {
+    protected void isVersionSupported(final String versionNumber) throws CstlServiceException {
         if (getVersionFromNumber(versionNumber) == null) {
             final StringBuilder messageb = new StringBuilder("The parameter ");
             for (ServiceDef vers : supportedVersions) {
@@ -347,7 +443,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * </ul>
      * In both ways, the exception is then marshalled and returned to the client.
      *
-     * @param ex         The exception that has been generated during the webservice operation requested.
+     * @param ex         The exception that has been generated during the web-service operation requested.
      * @param marshaller The marshaller to use for the exception report.
      * @param serviceDef The service definition, from which the version number of exception report will
      *                   be extracted.
@@ -379,7 +475,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param exceptionCode
      * @return
      */
-    protected String getOWSExceptionCodeRepresentation(CodeList exceptionCode) {
+    protected String getOWSExceptionCodeRepresentation(final CodeList exceptionCode) {
         final String codeRepresentation;
         if (exceptionCode instanceof org.constellation.ws.ExceptionCode) {
             codeRepresentation = StringUtilities.transformCodeName(exceptionCode.name());
@@ -396,7 +492,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param number the version number.
      * @return
      */
-    protected ServiceDef getVersionFromNumber(String number) {
+    protected ServiceDef getVersionFromNumber(final String number) {
         for (ServiceDef v : supportedVersions) {
             if (v.version.toString().equals(number)){
                 return v;
@@ -412,7 +508,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param number the version number.
      * @return
      */
-    protected ServiceDef getVersionFromNumber(Version number) {
+    protected ServiceDef getVersionFromNumber(final Version number) {
         if (number != null) {
             for (ServiceDef v : supportedVersions) {
                 if (v.version.toString().equals(number.toString())){
@@ -457,7 +553,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * - if the version number is wrong.
      * - if the user have send a wrong request parameter
      */
-    protected void logException(CstlServiceException ex) {
+    protected void logException(final CstlServiceException ex) {
         if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE) &&
             !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED) &&
             !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE) &&
@@ -474,6 +570,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @PreDestroy
     @Override
     public void destroy() {
@@ -483,6 +582,14 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             worker.destroy();
         }
         workersMap.clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected MarshallerPool getConfigurationPool() {
+        return GenericDatabaseMarshallerPool.getInstance();
     }
 
 }

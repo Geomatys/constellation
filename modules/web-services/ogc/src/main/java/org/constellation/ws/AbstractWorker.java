@@ -225,6 +225,14 @@ public abstract class AbstractWorker implements Worker {
      * {@inheritDoc}
      */
     @Override
+    public boolean isStarted() {
+        return isStarted;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isAuthorized(String ip, String referer) {
         return true;
     }

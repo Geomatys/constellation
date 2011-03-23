@@ -88,7 +88,7 @@ public class SQLFilterParser extends FilterParser {
      */
     @Override
     protected SQLQuery getNullFilter() {
-        return new SQLQuery("Select \"identifier\", \"catalog\" from \"Forms\" where \"catalog\" != 'MDATA");
+        return new SQLQuery("Select \"identifier\" from \"Records\" where \"recordSet\" != 'MDATA");
     }
     
      /**

@@ -54,6 +54,11 @@ public interface Worker {
     boolean isSecured();
 
     /**
+     * Returns {@code true} if the worker is working, {@code false} otherwise.
+     */
+    boolean isStarted();
+
+    /**
      * Verifies if the ip or referrer is authorized to request the service or not.
      * Should delegate the verification to the Policy Desicion Point (PDP).
      *

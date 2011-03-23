@@ -18,6 +18,9 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.util.logging.Level;
 import org.constellation.ws.WebServiceUtilities;
 import java.io.File;
@@ -40,6 +43,7 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.generic.database.Automatic;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.utils.SerializerResponse;
@@ -93,7 +97,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     private final XMLSerializer serializer;
     
     /**
-     * Build a new Restfull CSW service.
+     * Build a new Restful CSW service.
      */
     public CSWService() {
         super(ServiceDef.CSW_2_0_2);
@@ -103,7 +107,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     }
 
     /**
-     * Build a new Restfull CSW service with multiple workers.
+     * Build a new restful CSW service with multiple workers.
      * used by subClasses.
      */
     protected CSWService(final Map<String, CSWworker> workers) {
@@ -232,7 +236,31 @@ public class CSWService extends OGCWebService<CSWworker> {
 
 
     /**
-     * Build request object fom KVP parameters.
+     * {@inheritDoc}
+     */
+    @Override
+    protected void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException {
+        if (configuration instanceof Automatic) {
+            final File configurationFile = new File(instanceDirectory, "config.xml");
+            Marshaller marshaller = null;
+            try {
+                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                marshaller.marshal(configuration, configurationFile);
+
+            } catch(JAXBException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            } finally {
+                if (marshaller != null) {
+                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                }
+            }
+        } else {
+            throw new CstlServiceException("The configuration Object is not an Automatic object", INVALID_PARAMETER_VALUE);
+        }
+    }
+
+    /**
+     * Build request object from KVP parameters.
      * 
      * @param request
      * @return

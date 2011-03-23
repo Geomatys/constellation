@@ -134,11 +134,11 @@ public class ShapeFileProvider extends AbstractLayerProvider {
                 if (store != null) {
                     //cache the datastore
                     cache.put(key, store);
-                }
-                try {
-                    key = store.getNames().iterator().next();
-                } catch (DataStoreException ex) {
-                    getLogger().log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                    try {
+                        key = store.getNames().iterator().next();
+                    } catch (DataStoreException ex) {
+                        getLogger().log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                    }
                 }
             }
         }

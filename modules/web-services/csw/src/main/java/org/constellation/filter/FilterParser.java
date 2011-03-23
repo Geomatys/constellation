@@ -597,10 +597,12 @@ public abstract class FilterParser {
                     crsName                   = ((AbstractGeometryType)gmlGeometry).getSrsName();
                     filterGeometry            = GeometrytoJTS.toJTS((AbstractGeometryType)gmlGeometry);
 
-                } 
-
-                final int srid = SRIDGenerator.toSRID(crsName, Version.V1);
-                filterGeometry.setSRID(srid);
+                }
+                
+                if (filterGeometry != null) {
+                    final int srid = SRIDGenerator.toSRID(crsName, Version.V1);
+                    filterGeometry.setSRID(srid);
+                }
 
                 switch (filterType) {
                     case CONTAINS   : spatialfilter = wrap(FF.contains(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;

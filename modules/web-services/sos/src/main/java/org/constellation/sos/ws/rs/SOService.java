@@ -18,6 +18,8 @@
 package org.constellation.sos.ws.rs;
 
 // Jersey dependencies
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import javax.xml.bind.Marshaller;
 import java.util.logging.Level;
 import java.io.File;
 import org.geotoolkit.ows.xml.RequestBase;
@@ -33,6 +35,7 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.configuration.SOSConfiguration;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -203,7 +206,31 @@ public class SOService extends OGCWebService<SOSworker> {
     }
 
     /**
-     * Build request object fom KVP parameters.
+     * {@inheritDoc}
+     */
+    @Override
+    protected void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException {
+        if (configuration instanceof SOSConfiguration) {
+            final File configurationFile = new File(instanceDirectory, "config.xml");
+            Marshaller marshaller = null;
+            try {
+                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                marshaller.marshal(configuration, configurationFile);
+
+            } catch(JAXBException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            } finally {
+                if (marshaller != null) {
+                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                }
+            }
+        } else {
+            throw new CstlServiceException("The configuration Object is not a SOSConfiguration", INVALID_PARAMETER_VALUE);
+        }
+    }
+
+    /**
+     * Build request object from KVP parameters.
      *
      * @param request
      * @return
