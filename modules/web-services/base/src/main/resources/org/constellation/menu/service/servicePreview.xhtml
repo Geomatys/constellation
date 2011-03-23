@@ -10,7 +10,7 @@
 
     <h:outputText value="#{bean.i18n['newinstance']}" />
     <span/>
-    <h:inputText value="default" />
+    <h:inputText value="#{bean.newServiceName}" />
     <span/>
     <h:commandButton action="#{bean.createInstance}" value="#{bean.i18n['add']}" />
     <br/>
