@@ -547,10 +547,10 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
     /**
      * Send a request to another CSW service.
      * 
-     * @param sourceURL the url of the distant web-service
+     * @param sourceURL the URL of the distant web-service
      * @param request The XML object to send in POST mode (if null the request is GET)
      * 
-     * @return The object correspounding to the XML response of the distant web-service
+     * @return The object corresponding to the XML response of the distant web-service
      * 
      * @throws java.net.MalformedURLException
      * @throws java.io.IOException

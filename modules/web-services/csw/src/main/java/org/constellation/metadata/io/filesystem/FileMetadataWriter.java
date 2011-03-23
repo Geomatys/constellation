@@ -76,7 +76,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     private final File dataDirectory;
 
     /**
-     * A string constant frequantly used in error message.
+     * A string constant frequently used in error message.
      */
     private static final String IN_CLASS_MSG = " in the class:";
      

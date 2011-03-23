@@ -143,9 +143,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 
     protected File getServiceDirectory() {
         final File configDirectory   = ConfigDirectory.getConfigDirectory();
-        if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
+        if (configDirectory != null && configDirectory.isDirectory()) {
             final File serviceDirectory = new File(configDirectory, supportedVersions.get(0).specification.name());
-            if (serviceDirectory.exists() && serviceDirectory.isDirectory()) {
+            if (serviceDirectory.isDirectory()) {
                 return serviceDirectory;
             } else {
                 LOGGER.log(Level.SEVERE, "The service configuration directory: {0} does not exist or is not a directory.", serviceDirectory.getPath());
@@ -165,7 +165,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     private void buildWorkerMap() {
         final File serviceDirectory = getServiceDirectory();
-        if (serviceDirectory != null && serviceDirectory.exists() && serviceDirectory.isDirectory()) {
+        if (serviceDirectory != null && serviceDirectory.isDirectory()) {
             for (File instanceDirectory : serviceDirectory.listFiles()) {
                 /*
                  * For each sub-directory we build a new Worker.
@@ -184,7 +184,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         final File serviceDirectory = getServiceDirectory();
         if (serviceDirectory != null) {
             final File instanceDirectory = new File(serviceDirectory, identifier);
-            if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+            if (instanceDirectory.isDirectory()) {
                 final W newWorker = createWorker(instanceDirectory);
                 workersMap.put(instanceDirectory.getName(), newWorker);
                 return newWorker;
