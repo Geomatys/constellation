@@ -5,6 +5,7 @@
 
 package org.constellation.configuration;
 
+import java.io.StringReader;
 import java.util.Arrays;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -46,7 +47,54 @@ public class ConfigurationXmlBindingTest {
     }
 
     /**
-     * Test simple Record Marshalling.
+     * Test InstanceReport Marshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void instanceReportMarshalingTest() throws Exception {
+        List<Instance> instances = new ArrayList<Instance>();
+        instances.add(new Instance("default", ServiceStatus.WORKING));
+        instances.add(new Instance("test1", ServiceStatus.NOT_STARTED));
+        InstanceReport report = new InstanceReport(instances);
+
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(report, sw);
+
+        String expresult =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:InstanceReport >" + '\n'
+                + "    <ns2:instance status=\"WORKING\" name=\"default\"/>" + '\n'
+                + "    <ns2:instance status=\"NOT_STARTED\" name=\"test1\"/>" + '\n'
+                + "</ns2:InstanceReport>\n";
+
+        String result =  removeXmlns(sw.toString());
+        result =  removeXmlns(sw.toString());
+        assertEquals(expresult, result);
+    }
+
+    @Test
+    public void instanceReportUnMarshalingTest() throws Exception {
+        List<Instance> instances = new ArrayList<Instance>();
+        instances.add(new Instance("default", ServiceStatus.WORKING));
+        instances.add(new Instance("test1", ServiceStatus.NOT_STARTED));
+        InstanceReport expResult = new InstanceReport(instances);
+
+
+        String xml =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:InstanceReport xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
+                + "    <ns2:instance status=\"WORKING\" name=\"default\"/>" + '\n'
+                + "    <ns2:instance status=\"NOT_STARTED\" name=\"test1\"/>" + '\n'
+                + "</ns2:InstanceReport>\n";
+
+        Object result =  unmarshaller.unmarshal(new StringReader(xml));
+
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * Test layerContext Marshalling.
      *
      * @throws java.lang.Exception
      */

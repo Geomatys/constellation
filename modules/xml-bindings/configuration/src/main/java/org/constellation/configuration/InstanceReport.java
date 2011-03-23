@@ -20,7 +20,9 @@ package org.constellation.configuration;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.geotoolkit.util.Utilities;
 
 /**
  * Create a report about a service with the instances informations.
@@ -31,6 +33,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InstanceReport {
 
+    @XmlElement(name="instance")
     private List<Instance> instances;
 
     public InstanceReport() {
@@ -48,4 +51,32 @@ public class InstanceReport {
         return instances;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof InstanceReport) {
+            final InstanceReport that = (InstanceReport) obj;
+            return Utilities.equals(this.instances, that.instances);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + (this.instances != null ? this.instances.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[InstanceReport]\n");
+        sb.append("Instances:\n");
+        for (Instance instance : instances) {
+            sb.append(instance);
+        }
+        return sb.toString();
+    }
 }

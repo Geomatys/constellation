@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -34,13 +35,13 @@ public class Instance {
     private String name;
 
     @XmlAttribute
-    private String status;
+    private ServiceStatus status;
 
     public Instance() {
 
     }
 
-    public Instance(final String name, final String status) {
+    public Instance(final String name, final ServiceStatus status) {
         this.name   = name;
         this.status = status;
     }
@@ -55,8 +56,42 @@ public class Instance {
     /**
      * @return the status
      */
-    public String getStatus() {
+    public ServiceStatus getStatus() {
         return status;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof Instance) {
+            final Instance that = (Instance) obj;
+            return Utilities.equals(this.name, that.name) &&
+                   Utilities.equals(this.status, that.status);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 73 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 73 * hash + (this.status != null ? this.status.hashCode() : 0);
+        return hash;
+    }
+
+    
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[Instance]\n");
+        if (name != null) {
+            sb.append("name:").append(name).append('\n');
+        }
+        if (status != null) {
+            sb.append("status:").append(status).append('\n');
+        }
+        return sb.toString();
+    }
 }

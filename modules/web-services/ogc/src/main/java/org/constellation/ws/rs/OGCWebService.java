@@ -34,6 +34,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.ServiceStatus;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ws.CstlServiceException;
 
@@ -359,11 +360,11 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             final List<Instance> instances = new ArrayList<Instance>();
             // 1- First we list the instance in the map
             for (Entry<String, W> entry : workersMap.entrySet()) {
-                final String status;
+                final ServiceStatus status;
                 if (entry.getValue().isStarted()) {
-                    status = "working";
+                    status = ServiceStatus.WORKING;
                 } else {
-                    status = "error";
+                    status = ServiceStatus.ERROR;
                 }
                 instances.add(new Instance(entry.getKey(), status));
             }
@@ -373,7 +374,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 for (File instanceDirectory : serviceDirectory.listFiles()) {
                     final String name = instanceDirectory.getName();
                     if (instanceDirectory.isDirectory() && !name.startsWith(".") && !workersMap.containsKey(name)) {
-                        instances.add(new Instance(name, "not started"));
+                        instances.add(new Instance(name, ServiceStatus.NOT_STARTED));
                     }
                 }
             }

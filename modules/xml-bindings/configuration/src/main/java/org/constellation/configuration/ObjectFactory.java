@@ -91,4 +91,11 @@ public class ObjectFactory {
         return new Source();
     }
 
+    public InstanceReport createInstanceReport() {
+        return new InstanceReport();
+    }
+
+    public Instance createInstance() {
+        return new Instance();
+    }
 }
