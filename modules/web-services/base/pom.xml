@@ -105,6 +105,15 @@
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <!-- Web interface -->
+    <dependency>
+        <groupId>org.constellation.gui</groupId>
+        <artifactId>admin-base</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
 </project>

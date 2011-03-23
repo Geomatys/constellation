@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib">
+
+    <h:outputText value="#{bean.i18n['newinstance']}" />
+    <span/>
+    <h:inputText value="default" />
+    <span/>
+    <h:commandButton action="#{bean.createInstance}" value="#{bean.i18n['add']}" />
+    <br/>
+    <br/>
+
+    <table width="100%">
+        <colgroup>
+            <col width="16px"/>
+            <col />
+            <col />
+            <col width="24px"/>
+            <col width="24px"/>
+            <col width="24px"/>
+        </colgroup>
+        <tbody>
+            <a4j:repeat value="#{bean.instances}" var="instance">
+                <tr>
+                    <td><h:graphicImage value="#{instance.statusIcon}" style="border:none;"/></td>
+                    <td>#{instance.name}</td>
+                    <td>#{instance.path}</td>
+                    <td><h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/></td>
+                    <td>
+                        <h:commandLink action="#{instance.restart}">
+                            <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
+                        </h:commandLink>
+                    </td>
+                    <td>
+                        <h:commandLink action="#{instance.delete}">
+                            <h:graphicImage value="org.constellation.menu.provider.remove.png.mfRes" style="border:none;"/>
+                        </h:commandLink>
+                    </td>
+                </tr>
+            </a4j:repeat>
+        </tbody>
+    </table>
+
+</ui:composition>

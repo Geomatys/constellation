@@ -23,10 +23,10 @@ import org.constellation.ServiceDef.Specification;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class WMSBean extends AbstractServiceBean{
+public class SOSBean extends AbstractServiceBean{
 
-    public WMSBean() {
-        super(Specification.WMS);
+    public SOSBean() {
+        super(Specification.SOS);
     }
 
 }

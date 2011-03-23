@@ -7,11 +7,14 @@
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib"
+                xmlns:cstl="http://constellation.org/taglib"
                 template="/pages/base.xhtml">
 
     <ui:param name="pageTitle" value="WMTS"/>
 
     <ui:define name="content">
+
+        <cstl:servicepreview bean="#{wmtsBean}" />
 
     </ui:define>
 
