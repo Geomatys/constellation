@@ -78,6 +78,18 @@ public class ServiceAdministrator {
     }
 
     /**
+     * Return a complete URL for the specified service  (wms, wfs, csw,...) and instance identifier.
+     *
+     * @param service The service name (wms, wfs, csw,...).
+     * @param instanceId The instance identifier.
+     *
+     * @return A complete URL for the specified service.
+     */
+    public static String getInstanceURL(final String service, final String instanceId) {
+        return getServiceURL() + service.toLowerCase() + '/' + instanceId;
+    }
+
+    /**
      * Restart all the instance of a specific web-service (wms, wfs, csw,...)
      * 
      * @param service The service name to restart (wms, wfs, csw,...).
