@@ -82,6 +82,13 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         visit();
     }
 
+    /**
+     * @return the datastore this provider encapsulate.
+     */
+    public ExtendedDataStore getDataStore(){
+        return store;
+    }
+
     public abstract Map<String,Serializable> prepareParameters(Map<String,String> params);
 
     /**

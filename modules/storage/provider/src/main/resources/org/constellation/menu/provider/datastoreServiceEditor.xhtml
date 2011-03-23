@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib">
+
+    <mf:Outline id="storePreview" rootVisible="false" value="#{bean.layerModel}" var="node" width="100%">
+
+        <mf:DataTableColumn>
+            <mf:switch>
+                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
+                    <h:outputText value="#{node.userObject.source.id}"/>
+                </mf:case>
+                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode')}" fallthrought="false">
+                    <h:outputText value="#{node.userObject.localPart}"/>
+                </mf:case>
+            </mf:switch>
+        </mf:DataTableColumn>
+
+        <mf:DataTableColumn width="50">
+            <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value="Load all"/></mf:CustomHtml></f:facet>
+
+            <mf:switch>
+                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
+                    <h:selectBooleanCheckbox value="#{node.loadAll}"/>
+                </mf:case>
+            </mf:switch>
+        </mf:DataTableColumn>
+
+        <mf:DataTableColumn >
+            <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value=""/></mf:CustomHtml></f:facet>
+
+            <mf:switch>
+                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
+
+                    <h:outputLink>
+                        <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
+                    </h:outputLink>
+                    <h:outputLink>
+                        <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
+                    </h:outputLink>
+                </mf:case>
+                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode')}" fallthrought="false">
+
+                    <mf:switch>
+                        <mf:case condition="#{!node.exist}" fallthrought="false">
+                            <h:outputLink>
+                                <h:graphicImage value="org.constellation.menu.provider.smallred.png.mfRes" style="border:none;"/>
+                            </h:outputLink>
+                            <h:outputLink>
+                                <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
+                            </h:outputLink>
+                        </mf:case>
+                        <mf:case condition="#{!node.visible}" fallthrought="false">
+                            <h:outputLink>
+                                <h:graphicImage value="org.constellation.menu.provider.smallgray.png.mfRes" style="border:none;"/>
+                            </h:outputLink>
+                            <h:outputLink>
+                                <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
+                            </h:outputLink>
+                            <h:outputLink>
+                                <h:graphicImage value="org.constellation.menu.provider.view.png.mfRes" style="border:none;"/>
+                            </h:outputLink>
+                        </mf:case>
+                        <mf:case condition="#{node.visible}" fallthrought="false">
+                            <h:outputLink>
+                                <h:graphicImage value="org.constellation.menu.provider.smallgreen.png.mfRes" style="border:none;"/>
+                            </h:outputLink>
+                            <h:outputLink>
+                                <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
+                            </h:outputLink>
+                            <h:outputLink>
+                                <h:graphicImage value="org.constellation.menu.provider.view.png.mfRes" style="border:none;"/>
+                            </h:outputLink>
+                        </mf:case>
+                    </mf:switch>
+
+                </mf:case>
+            </mf:switch>
+        </mf:DataTableColumn>
+
+        <mf:DataTableColumn width="16px">
+            <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value=""/></mf:CustomHtml></f:facet>
+
+            <mf:switch>
+                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
+                    <h:outputLink>
+                        <h:graphicImage value="org.constellation.menu.provider.remove.png.mfRes" style="border:none;"/>
+                    </h:outputLink>
+                </mf:case>
+                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode')}" fallthrought="false">
+
+                    <mf:switch>
+                        <mf:case condition="#{!node.exist}" fallthrought="false">
+                            <h:outputLink>
+                                <h:graphicImage value="org.constellation.menu.provider.remove.png.mfRes" style="border:none;"/>
+                            </h:outputLink>
+                        </mf:case>
+                    </mf:switch>
+
+                </mf:case>
+            </mf:switch>
+        </mf:DataTableColumn>
+
+    </mf:Outline>
+
+</ui:composition>
+

@@ -15,17 +15,24 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.menu.service;
+package org.constellation.menu.provider;
 
-import org.constellation.bean.I18NBean;
+import org.constellation.provider.postgis.PostGisProvider;
 
 /**
+ * PostGIS configuration bean.
  *
  * @author Johann Sorel (Geomatys)
  */
-public class WMSBean extends I18NBean{
+public class PostGISBean extends AbstractDataStoreServiceBean{
 
-    public WMSBean() {        
+    public PostGISBean(){
+        addBundle("org.constellation.menu.provider.postgis");
+    }
+
+    @Override
+    protected Class getProviderClass() {
+        return PostGisProvider.class;
     }
 
 }

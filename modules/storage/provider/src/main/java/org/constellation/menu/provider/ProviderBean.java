@@ -43,6 +43,7 @@ import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
+import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.utils.FacesUtils;
 
@@ -59,8 +60,8 @@ public class ProviderBean extends I18NBean implements PropertyChangeListener{
 
     public ProviderBean(){
         addBundle("org.constellation.menu.provider.overview");
-        LayerProviderProxy.getInstance().addPropertyListener(this);
-        StyleProviderProxy.getInstance().addPropertyListener(this);
+        new WeakPropertyChangeListener(LayerProviderProxy.getInstance(), this);
+        new WeakPropertyChangeListener(StyleProviderProxy.getInstance(), this);
     }
 
     public void reloadLayerProviders() {

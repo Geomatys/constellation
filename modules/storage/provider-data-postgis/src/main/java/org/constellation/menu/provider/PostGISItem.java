@@ -15,17 +15,24 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.menu.service;
+package org.constellation.menu.provider;
 
-import org.constellation.bean.I18NBean;
+import org.constellation.bean.AbstractMenuItem;
+
 
 /**
+ * Add an overview page for providers.
  *
  * @author Johann Sorel (Geomatys)
  */
-public class WMSBean extends I18NBean{
+public class PostGISItem extends AbstractMenuItem{
 
-    public WMSBean() {        
+    public PostGISItem() {
+        super(
+            new String[]{"/org/constellation/menu/provider/postgis.xhtml"},
+            "org.constellation.menu.provider.postgis",
+            new Path(PROVIDERS_PATH,"PostGIS", "/org/constellation/menu/provider/postgis.xhtml", null,200)
+            );
     }
 
 }
