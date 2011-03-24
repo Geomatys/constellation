@@ -79,4 +79,12 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
             throw new CstlServiceException("The configuration Object is not a layer context", INVALID_PARAMETER_VALUE);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
+        configureInstance(instanceDirectory, new LayerContext());
+    }
 }

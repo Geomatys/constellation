@@ -126,7 +126,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     }
     
     /**
-     * This method has to be overriden by child classes.
+     * This method has to be overridden by child classes.
      * 
      * @return
      */
@@ -258,6 +258,15 @@ public class CSWService extends OGCWebService<CSWworker> {
             throw new CstlServiceException("The configuration Object is not an Automatic object", INVALID_PARAMETER_VALUE);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
+        configureInstance(instanceDirectory, new Automatic());
+    }
+
 
     /**
      * Build request object from KVP parameters.

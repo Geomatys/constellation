@@ -43,6 +43,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
@@ -143,6 +144,11 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         this.workersMap        = workers;
     }
 
+    /**
+     * Return the dedicated Web-service configuration directory.
+     * 
+     * @return
+     */
     protected File getServiceDirectory() {
         final File configDirectory   = ConfigDirectory.getConfigDirectory();
         if (configDirectory != null && configDirectory.isDirectory()) {
@@ -150,7 +156,12 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             if (serviceDirectory.isDirectory()) {
                 return serviceDirectory;
             } else {
-                LOGGER.log(Level.SEVERE, "The service configuration directory: {0} does not exist or is not a directory.", serviceDirectory.getPath());
+                LOGGER.log(Level.INFO, "The service configuration directory: {0} does not exist or is not a directory, creating new one.", serviceDirectory.getPath());
+                if (!serviceDirectory.mkdir()) {
+                    LOGGER.log(Level.SEVERE, "The service was unable to create the directory.{0}", serviceDirectory.getPath());
+                } else {
+                    return serviceDirectory;
+                }
             }
         } else {
             if (configDirectory == null) {
@@ -300,28 +311,34 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 final String identifier = getParameter("id", true);
                 final W worker = workersMap.get(identifier);
                 final AcknowlegementType response;
-                if (worker == null) {
-                    throw new CstlServiceException("The instance " + identifier + " is does not exist.", INVALID_PARAMETER_VALUE);
-                } else {
+                if (worker != null) {
                     worker.destroy();
                     workersMap.remove(identifier);
-                    final File serviceDirectory = getServiceDirectory();
-                    if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                        File instanceDirectory     = new File (serviceDirectory, identifier);
-                        File instanceDirectoryBack = new File (serviceDirectory, "." + identifier);
-                        if (instanceDirectory.isDirectory()) {
-                            if (instanceDirectory.renameTo(instanceDirectoryBack)) {
-                                response = new AcknowlegementType("Success", "instance succesfully deleted");
-                            } else {
-                                response = new AcknowlegementType("Error", "instance was deactivated new but can't be deleted");
-                            }
+                } 
+                    
+                final File serviceDirectory = getServiceDirectory();
+                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                    File instanceDirectory     = new File (serviceDirectory, identifier);
+                    File instanceDirectoryBack = new File (serviceDirectory, "." + identifier);
+                    //if the backup directory already exist we delete it
+                    if (instanceDirectoryBack.isDirectory()) {
+                        if (!FileUtilities.deleteDirectory(instanceDirectoryBack)) {
+                            throw new CstlServiceException("The previous backup directory for " + identifier + " instance can not be deleted.", NO_APPLICABLE_CODE);
+                        }
+                    }
+                    if (instanceDirectory.isDirectory()) {
+                        if (instanceDirectory.renameTo(instanceDirectoryBack)) {
+                            response = new AcknowlegementType("Success", "instance succesfully deleted");
                         } else {
-                            throw new CstlServiceException("The instance " + identifier + " does not have a proper directory.", NO_APPLICABLE_CODE);
+                            response = new AcknowlegementType("Error", "instance was deactivated but can't be deleted");
                         }
                     } else {
-                        throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+                        throw new CstlServiceException("The instance " + identifier + " does not have a proper directory.", NO_APPLICABLE_CODE);
                     }
+                } else {
+                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
                 }
+                
                 return Response.ok(response, "text/xml").build();
 
             } else if ("newInstance".equalsIgnoreCase(request)) {
@@ -332,6 +349,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     File instanceDirectory     = new File (serviceDirectory, identifier);
                     if (instanceDirectory.mkdir()) {
+                        basicConfigure(instanceDirectory);
                         response = new AcknowlegementType("Success", "instance succefully created");
                     } else {
                         response = new AcknowlegementType("Error", "unbale to create an instance");
@@ -357,6 +375,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 return Response.ok(response, "text/xml").build();
 
 
+            /*
+             * Return a report about the instances in the service.
+             */
             } else if ("listInstance".equalsIgnoreCase(request)) {
                 LOGGER.info("listing instances");
                 final List<Instance> instances = new ArrayList<Instance>();
@@ -409,6 +430,13 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param configuration A service specific configuration Object.
      */
     protected abstract void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException;
+
+    /**
+     * create an empty configuration for the service.
+     *
+     * @param instanceDirectory The directory containing the instance configuration files.
+     */
+    protected abstract void basicConfigure(final File instanceDirectory) throws CstlServiceException;
 
     /**
      * Treat the incoming request and call the right function.

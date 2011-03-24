@@ -178,9 +178,9 @@ public class SOService extends OGCWebService<SOSworker> {
     }
 
     /**
-     * Throw an CstlServiceException when a request is not avalable in GET.
+     * Throw an CstlServiceException when a request is not available in GET.
      * 
-     * @param operationName The name of the request. (exemple getCapabilities)
+     * @param operationName The name of the request. (example getCapabilities)
      *
      * @throws CstlServiceException every time.
      */
@@ -227,6 +227,14 @@ public class SOService extends OGCWebService<SOSworker> {
         } else {
             throw new CstlServiceException("The configuration Object is not a SOSConfiguration", INVALID_PARAMETER_VALUE);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
+        configureInstance(instanceDirectory, new SOSConfiguration());
     }
 
     /**
