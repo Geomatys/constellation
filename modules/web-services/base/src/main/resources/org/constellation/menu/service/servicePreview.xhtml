@@ -22,22 +22,36 @@
             <col />
             <col />
             <col width="24px"/>
-            <col width="24px"/>
-            <col width="24px"/>
+            <col width="16px"/>
+            <col width="16px"/>
+            <col width="16px"/>
+            <col width="32px"/>
         </colgroup>
         <tbody>
             <a4j:repeat value="#{bean.instances}" var="instance">
                 <tr>
                     <td><h:graphicImage value="#{instance.statusIcon}" style="border:none;"/></td>
                     <td>#{instance.name}</td>
-                    <td>#{instance.path}</td>
-                    <td><h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/></td>
+                    <td><a href="#{instance.path}" target="blank">#{instance.path}</a></td>
+                    <td style="text-align:left;">
+                        <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
+                    </td>
                     <td>
                         <h:commandLink action="#{instance.restart}">
                             <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
                         </h:commandLink>
                     </td>
                     <td>
+                        <h:commandLink action="#{instance.stop}">
+                            <h:graphicImage value="org.constellation.menu.service.stop.png.mfRes" style="border:none;"/>
+                        </h:commandLink>
+                    </td>
+                    <td>
+                        <h:commandLink action="#{instance.start}">
+                            <h:graphicImage value="org.constellation.menu.service.start.png.mfRes" style="border:none;"/>
+                        </h:commandLink>
+                    </td>
+                    <td style="text-align:right;">
                         <h:commandLink action="#{instance.delete}">
                             <h:graphicImage value="org.constellation.menu.provider.remove.png.mfRes" style="border:none;"/>
                         </h:commandLink>

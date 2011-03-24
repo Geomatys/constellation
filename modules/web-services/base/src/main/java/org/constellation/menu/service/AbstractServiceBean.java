@@ -18,6 +18,7 @@
 package org.constellation.menu.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ServiceAdministrator;
@@ -48,6 +49,7 @@ public class AbstractServiceBean extends I18NBean{
         for(Instance instance : report.getInstances()){
             instances.add(new ServiceInstance(instance));
         }
+        Collections.sort(instances);
         return instances;
     }
 
@@ -76,7 +78,7 @@ public class AbstractServiceBean extends I18NBean{
         ServiceAdministrator.newInstance(specification.name(), newServiceName);
     }
 
-    public class ServiceInstance{
+    public class ServiceInstance implements Comparable<ServiceInstance>{
 
         private final Instance instance;
 
@@ -100,6 +102,13 @@ public class AbstractServiceBean extends I18NBean{
             }
         }
 
+        public void start(){
+            ServiceAdministrator.startInstance(specification.name(), instance.getName());
+        }
+        public void stop(){
+            ServiceAdministrator.stopInstance(specification.name(), instance.getName());
+        }
+
         public void delete(){
             ServiceAdministrator.deleteInstance(specification.name(), instance.getName());
         }
@@ -110,6 +119,11 @@ public class AbstractServiceBean extends I18NBean{
 
         public void edit(){
             //todo
+        }
+
+        @Override
+        public int compareTo(final ServiceInstance other) {
+            return getName().compareTo(other.getName());
         }
 
     }
