@@ -31,6 +31,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.util.logging.Logging;
@@ -102,6 +103,9 @@ public class ServiceAdministrator {
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
             } else {
                 LOGGER.warning("The service respond uncorrectly");
                 return false;
@@ -126,6 +130,9 @@ public class ServiceAdministrator {
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
             } else {
                 LOGGER.warning("The service respond uncorrectly");
                 return false;
@@ -150,6 +157,9 @@ public class ServiceAdministrator {
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
             } else {
                 LOGGER.warning("The service respond uncorrectly");
                 return false;
@@ -174,6 +184,36 @@ public class ServiceAdministrator {
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
+            } else {
+                LOGGER.warning("The service respond uncorrectly");
+                return false;
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
+
+    /**
+     * Stop a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
+     *
+     * @param service The service name to restart (wms, wfs, csw,...).
+     * @param instanceId The instance identifier to create.
+     *
+     * @return true if the operation succeed.
+     */
+    public static boolean stopInstance(final String service, final String instanceId) {
+        try {
+            String url = getServiceURL() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
+            final Object response = sendRequest(url, null);
+            if (response instanceof AcknowlegementType) {
+                return "Success".equals(((AcknowlegementType)response).getStatus());
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
             } else {
                 LOGGER.warning("The service respond uncorrectly");
                 return false;
@@ -187,7 +227,7 @@ public class ServiceAdministrator {
     /**
      * Delete a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
      *
-     * @param service The service name to restart (wms, wfs, csw,...).
+     * @param service The service name to start (wms, wfs, csw,...).
      * @param instanceId The instance identifier to create.
      *
      * @return true if the operation succeed.
@@ -198,6 +238,9 @@ public class ServiceAdministrator {
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
             } else {
                 LOGGER.warning("The service respond uncorrectly");
                 return false;
@@ -221,6 +264,9 @@ public class ServiceAdministrator {
             final Object response = sendRequest(url, null);
             if (response instanceof InstanceReport) {
                 return (InstanceReport) response;
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return null;
             } else {
                 LOGGER.warning("The service respond uncorrectly");
                 return null;
@@ -246,6 +292,9 @@ public class ServiceAdministrator {
             final Object response = sendRequest(url, configuration);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
             } else {
                 LOGGER.warning("The service respond uncorrectly");
                 return false;
@@ -272,7 +321,7 @@ public class ServiceAdministrator {
 
         final URL source          = new URL(sourceURL);
         final URLConnection conec = source.openConnection();
-        Object harvested    = null;
+        Object response    = null;
 
         try {
 
@@ -293,13 +342,12 @@ public class ServiceAdministrator {
                     }
                 }
             }
-
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = POOL.acquireUnmarshaller();
-                harvested = unmarshaller.unmarshal(conec.getInputStream());
-                if (harvested instanceof JAXBElement) {
-                    harvested = ((JAXBElement) harvested).getValue();
+                response = unmarshaller.unmarshal(conec.getInputStream());
+                if (response instanceof JAXBElement) {
+                    response = ((JAXBElement) response).getValue();
                 }
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
@@ -314,7 +362,7 @@ public class ServiceAdministrator {
             LOGGER.severe("The Distant service have made an error");
             return null;
         }
-        return harvested;
+        return response;
     }
 
 

@@ -306,6 +306,20 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
                 return Response.ok(response, "text/xml").build();
 
+            } else if ("stop".equalsIgnoreCase(request)) {
+                LOGGER.info("stopping an instance");
+                final String identifier = getParameter("id", true);
+                final W worker = workersMap.get(identifier);
+                final AcknowlegementType response;
+                if (worker != null) {
+                    worker.destroy();
+                    workersMap.remove(identifier);
+                    response = new AcknowlegementType("Success", "instance succesfully stopped");
+                } else {
+                    response = new AcknowlegementType("Error", "The is no running instance named:" + identifier);
+                }
+                return Response.ok(response, "text/xml").build();
+
             } else if ("delete".equalsIgnoreCase(request)) {
                 LOGGER.info("deleting an instance");
                 final String identifier = getParameter("id", true);
@@ -379,7 +393,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
              * Return a report about the instances in the service.
              */
             } else if ("listInstance".equalsIgnoreCase(request)) {
-                LOGGER.info("listing instances");
                 final List<Instance> instances = new ArrayList<Instance>();
                 // 1- First we list the instance in the map
                 for (Entry<String, W> entry : workersMap.entrySet()) {
