@@ -306,6 +306,34 @@ public class ServiceAdministrator {
     }
 
     /**
+     * Return the current configuration object for the specified service and instance.
+     *
+     * @param service The service name to restart (wms, wfs, csw,...).
+     * @param instanceId The instance identifier to configure.
+     *
+     * @return  A configuration object depending on the service type (for example WxS service return LayerContext object).
+     */
+    public static Object getInstanceconfiguration(final String service, final String instanceId) {
+        try {
+            String url = getServiceURL() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
+            final Object response = sendRequest(url, null);
+            if (response instanceof ExceptionReport) {
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return null;
+            } else if (response != null){
+                return response;
+            } else {
+                LOGGER.warning("The service respond uncorrectly");
+                return null;
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
+
+
+    /**
      * Send a request to another service.
      *
      * @param sourceURL the URL of the distant web-service

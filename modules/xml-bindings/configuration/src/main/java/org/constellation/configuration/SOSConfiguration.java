@@ -415,4 +415,19 @@ public class SOSConfiguration {
         this.keepCapabilities = keepCapabilities;
     }
 
+    /**
+     * Replace all the password in this object by '****'
+     */
+    public void hideSensibleField() {
+        final String hidden = "****";
+        for (Automatic aut: getExtensions()) {
+            aut.hideSensibleField();
+        }
+        if (omConfiguration != null) {
+            omConfiguration.hideSensibleField();
+        }
+        if (omConfiguration != null) {
+            smlConfiguration.hideSensibleField();
+        }
+    }
 }

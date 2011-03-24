@@ -18,6 +18,7 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
+import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -267,6 +268,35 @@ public class CSWService extends OGCWebService<CSWworker> {
         configureInstance(instanceDirectory, new Automatic());
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
+        final File configurationFile = new File(instanceDirectory, "config.xml");
+        if (configurationFile.exists()) {
+            Unmarshaller unmarshaller = null;
+            try {
+                unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                Object obj = unmarshaller.unmarshal(configurationFile);
+                if (obj instanceof Automatic) {
+                    ((Automatic)obj).hideSensibleField();
+                    return obj;
+                } else {
+                    throw new CstlServiceException("The config.xml file does not contain a Automatic object");
+                }
+            } catch (JAXBException ex) {
+                throw new CstlServiceException(ex);
+            } finally {
+                if (unmarshaller != null) {
+                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                }
+            }
+        } else {
+            throw new CstlServiceException("Unable to find a file config.xml");
+        }
+    }
 
     /**
      * Build request object from KVP parameters.

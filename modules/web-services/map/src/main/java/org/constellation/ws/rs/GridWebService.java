@@ -17,6 +17,7 @@
  */
 package org.constellation.ws.rs;
 
+import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import javax.xml.bind.Marshaller;
 import java.io.File;
@@ -86,5 +87,33 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
     @Override
     protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
         configureInstance(instanceDirectory, new LayerContext());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
+        final File configurationFile = new File(instanceDirectory, "layerContext.xml");
+        if (configurationFile.exists()) {
+            Unmarshaller unmarshaller = null;
+            try {
+                unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                Object obj = unmarshaller.unmarshal(configurationFile);
+                if (obj instanceof LayerContext) {
+                    return obj;
+                } else {
+                    throw new CstlServiceException("The layerContext.xml file does not contain a LayerContext object");
+                }
+            } catch (JAXBException ex) {
+                throw new CstlServiceException(ex);
+            } finally {
+                if (unmarshaller != null) {
+                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                }
+            }
+        } else {
+            throw new CstlServiceException("Unable to find a file layerContext.xml");
+        }
     }
 }

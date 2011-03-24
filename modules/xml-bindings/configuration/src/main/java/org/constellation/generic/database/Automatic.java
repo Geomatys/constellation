@@ -490,6 +490,19 @@ public class Automatic {
     }
 
     /**
+     * Replace all the password in this object by '****'
+     */
+    public void hideSensibleField() {
+        final String hidden = "****";
+        if (bdd != null) {
+            bdd.setPassword(hidden);
+        }
+        for (BDD bd : getThesaurus()) {
+            bd.setPassword(hidden);
+        }
+    }
+
+    /**
      * @param indexInternalRecordset the indexInternalRecordset to set
      */
     public void setIndexInternalRecordset(final Boolean indexInternalRecordset) {

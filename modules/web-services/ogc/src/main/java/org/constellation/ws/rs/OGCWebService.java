@@ -374,6 +374,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 return Response.ok(response, "text/xml").build();
 
 
+            /*
+             * Update the configuration file of an instance.
+             */
             } else if ("configure".equalsIgnoreCase(request)) {
                 LOGGER.info("configure an instance");
                 final String identifier = getParameter("id", true);
@@ -388,6 +391,25 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
                 return Response.ok(response, "text/xml").build();
 
+            /*
+             * Send the configuration file of an instance.
+             */
+            } else if ("getConfiguration".equalsIgnoreCase(request)) {
+                LOGGER.info("sending instance configuration");
+                final String identifier = getParameter("id", true);
+                final File serviceDirectory = getServiceDirectory();
+                final Object response;
+                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                    File instanceDirectory     = new File (serviceDirectory, identifier);
+                    if (instanceDirectory.isDirectory()) {
+                        response = getInstanceConfiguration(instanceDirectory);
+                    } else {
+                        throw new CstlServiceException("Unable to find an instance:" + identifier, NO_APPLICABLE_CODE);
+                    }
+                } else {
+                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+                }
+                return Response.ok(response, "text/xml").build();
 
             /*
              * Return a report about the instances in the service.
@@ -443,6 +465,13 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param configuration A service specific configuration Object.
      */
     protected abstract void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException;
+
+    /**
+     * Return the configuration object of the instance.
+     *
+     * @param instanceDirectory The directory containing the instance configuration files.
+     */
+    protected abstract Object getInstanceConfiguration(final File instanceDirectory) throws CstlServiceException;
 
     /**
      * create an empty configuration for the service.
