@@ -40,7 +40,6 @@ public abstract class CSWConstants {
     public static final String FILTER_CAPABILITIES = "Filter_Capabilities";
     public static final String PARAMETERNAME = "parameterName";
     public static final String TRANSACTION_TYPE = "TransactionType";
-    public static final String QUERY_CONSTRAINT = "QueryConstraint";
     public static final String SOURCE = "Source";
     public static final String ALL = "All";
     public static final String NAMESPACE = "namespace";

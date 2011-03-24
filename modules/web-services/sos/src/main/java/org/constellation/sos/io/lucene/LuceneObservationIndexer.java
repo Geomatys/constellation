@@ -145,7 +145,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
             if (msg == null && ex.getCause() != null) {
                 msg = ex.getCause().getMessage();
             }
-            LOGGER.severe("JAXB Exception while indexing: " + msg);
+            LOGGER.log(Level.SEVERE, "JAXB Exception while indexing: {0}", msg);
             throw new IndexingException("JAXBException while indexing documents.", ex);
         } finally {
             if (unmarshaller != null) SOSMarshallerPool.getInstance().release(unmarshaller);

@@ -51,6 +51,7 @@ import org.apache.lucene.search.SortField;
 //Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.filter.FilterParser;
+import org.constellation.filter.FilterParserException;
 import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
@@ -797,7 +798,12 @@ public class CSWworker extends AbstractWorker {
         if (outputSchema.equals(EBRIM_30) || outputSchema.equals(EBRIM_25)) {
            
             // build the sql query from the specified filter
-           final SQLQuery sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs);
+            final SQLQuery sqlQuery;
+            try {
+                sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs);
+            } catch (FilterParserException ex) {
+                throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
+            }
            
            // TODO sort not yet implemented
            LOGGER.log(logLevel, "ebrim SQL query obtained:{0}", sqlQuery);
@@ -815,7 +821,12 @@ public class CSWworker extends AbstractWorker {
         } else {
             
             // build the lucene query from the specified filter
-            final SpatialQuery luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(query.getConstraint(), variables, prefixs);
+            final SpatialQuery luceneQuery;
+            try {
+                luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(query.getConstraint(), variables, prefixs);
+            } catch (FilterParserException ex) {
+                throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
+            }
         
             //we look for a sorting request (for now only one sort is used)
             final SortByType sortBy = query.getSortBy();
@@ -1077,11 +1088,11 @@ public class CSWworker extends AbstractWorker {
                     LOGGER.log(Level.WARNING, "The form {0} has not be read is null.", id);
                 }
             } catch (MetadataIoException ex) {
-                CodeList execptionCode = ex.getExceptionCode();
-                if (execptionCode == null) {
-                    execptionCode = NO_APPLICABLE_CODE;
+                CodeList exceptionCode = ex.getExceptionCode();
+                if (exceptionCode == null) {
+                    exceptionCode = NO_APPLICABLE_CODE;
                 }
-                throw new CstlServiceException(ex, execptionCode);
+                throw new CstlServiceException(ex, exceptionCode);
             }
         }
 
@@ -1188,7 +1199,7 @@ public class CSWworker extends AbstractWorker {
     /**
      * Return a list / range of values for the specified property.
      * The property can be a parameter of the GetCapabilities document or
-     * a property of the metadatas.
+     * a property of the metadata.
      * 
      * @param request
      * @return
@@ -1334,8 +1345,12 @@ public class CSWworker extends AbstractWorker {
                     }
 
                     // build the lucene query from the specified filter
-                    final SpatialQuery luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(deleteRequest.getConstraint(), null, null);
-
+                    final SpatialQuery luceneQuery;
+                    try {
+                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(deleteRequest.getConstraint(), null, null);
+                    } catch (FilterParserException ex) {
+                        throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
+                    }
                     // we try to execute the query
                     final List<String> results = executeLuceneQuery(luceneQuery);
 
@@ -1378,8 +1393,13 @@ public class CSWworker extends AbstractWorker {
                     }
 
                     // build the lucene query from the specified filter
-                    final SpatialQuery luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(updateRequest.getConstraint(), null, null);
-
+                    final SpatialQuery luceneQuery;
+                    try {
+                        luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(updateRequest.getConstraint(), null, null);
+                    } catch (FilterParserException ex) {
+                        throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
+                    }
+                    
                     // we try to execute the query
                     try {
                         final List<String> results = executeLuceneQuery(luceneQuery);

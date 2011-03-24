@@ -28,10 +28,6 @@ import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-// Constellation dependencies
-import org.constellation.ws.CstlServiceException;
-import static org.constellation.metadata.CSWConstants.*;
-
 // Lucene dependencies
 import org.apache.lucene.search.Filter;
 
@@ -77,7 +73,7 @@ public class LuceneFilterParser extends FilterParser {
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
     @Override
-    protected SpatialQuery getQuery(final FilterType filter, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
+    protected SpatialQuery getQuery(final FilterType filter, Map<String, QName> variables, Map<String, String> prefixs) throws FilterParserException {
 
         SpatialQuery response = null;
         if (filter != null) { 
@@ -104,7 +100,7 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException {
+    protected SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws FilterParserException {
         final List<SpatialQuery> subQueries = new ArrayList<SpatialQuery>();
         final StringBuilder queryBuilder    = new StringBuilder();
         final LogicOpsType logicOps         = jbLogicOps.getValue();
@@ -243,7 +239,7 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws CstlServiceException {
+    protected void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws FilterParserException {
         if (isDateField(propertyName)) {
             final String dateValue = extractDateValue(literalValue);
             response.append(removePrefix(propertyName.getPropertyName())).append(":");
@@ -264,7 +260,7 @@ public class LuceneFilterParser extends FilterParser {
                 response.append('{').append(comparison).append('}');
             }
         } else {
-            throw new CstlServiceException(operator + " operator works only on Date field.",
+            throw new FilterParserException(operator + " operator works only on Date field.",
                     OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
         }
     }
@@ -273,11 +269,11 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String extractDateValue(String literal) throws CstlServiceException {
+    protected String extractDateValue(String literal) throws FilterParserException {
         try {
             return toLuceneDate(TemporalUtilities.parseDate(literal));
         } catch (ParseException ex) {
-            throw new CstlServiceException(PARSE_ERROR_MSG + literal,
+            throw new FilterParserException(PARSE_ERROR_MSG + literal,
                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }
     }

@@ -184,12 +184,6 @@ public abstract class WebService {
     private volatile HttpServletRequest httpServletRequest;
 
     /**
-     * A container notifier allowing to dynamically reload all the active service.
-     */
-    @Context
-    protected volatile ContainerNotifierImpl cn;
-
-    /**
      * If this flag is set the method logParameters() will write the entire request in the logs
      * instead of the parameters map.
      */

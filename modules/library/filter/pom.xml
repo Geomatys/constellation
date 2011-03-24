@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.library</groupId>
-  <artifactId>cstl-lib-base</artifactId>
+  <artifactId>cstl-lib-filter</artifactId>
   <packaging>jar</packaging>
-  <name>Library providing base utilities</name>
+  <name>Library providing CSW Filter parsers</name>
   <description>
-    The base library for Constellation.
+    The library for Constellation CSW FIlter parsers.
   </description>
 
 
@@ -31,28 +31,6 @@
     Developers and contributors.
   -->
   <developers>
-    <developer>
-      <id>acuster</id>
-      <name>Adrian Custer</name>
-      <email>adrian.custer@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>    
-    <developer>
-      <id>cedricbr</id>
-      <name>Briançon Cédric</name>
-      <email>cedric.briancon@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>    
     <developer>
       <id>glegal</id>
       <name>Guilhem Legal</name>
@@ -66,23 +44,23 @@
     </developer>
   </developers>
 
+
   <!--
     Required dependencies for building. These dependencies wil be included into
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-utility-pending</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>xerces</groupId>
-        <artifactId>xercesImpl</artifactId>
+     <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-csw</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-gml</artifactId>
-      <scope>test</scope>
+      <artifactId>geotk-spatial-lucene</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-cql</artifactId>
     </dependency>
   </dependencies>
 

@@ -33,10 +33,6 @@ import java.util.Date;
 import java.util.TimeZone;
 import org.apache.lucene.search.Filter;
 
-// constellation dependencies
-import org.constellation.ws.CstlServiceException;
-import static org.constellation.metadata.CSWConstants.*;
-
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.ogc.xml.v110.BinaryLogicOpType;
@@ -51,9 +47,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // GeoAPI dependencies
 import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.expression.PropertyName;
-
-// MDWeb dependencies
-import org.mdweb.model.schemas.Standard;
 
 
 /**
@@ -97,7 +90,7 @@ public class SQLFilterParser extends FilterParser {
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
     @Override
-    protected SQLQuery getQuery(final FilterType filter, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
+    protected SQLQuery getQuery(final FilterType filter, Map<String, QName> variables, Map<String, String> prefixs) throws FilterParserException {
         this.variables    = variables;
         this.prefixs      = prefixs;
         executeSelect     = true;
@@ -132,7 +125,7 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected SQLQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException {
+    protected SQLQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws FilterParserException {
         final List<SQLQuery> subQueries  = new ArrayList<SQLQuery>();
         final StringBuilder queryBuilder = new StringBuilder();
         final LogicOpsType logicOps      = jbLogicOps.getValue();
@@ -289,12 +282,12 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws CstlServiceException {
+    protected void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws FilterParserException {
         if (isDateField(propertyName)) {
             final String dateValue = extractDateValue(literalValue);
             addComparisonFilter(response, propertyName, dateValue, operator);
         } else {
-            throw new CstlServiceException(operator + " operator works only on Date field.",
+            throw new FilterParserException(operator + " operator works only on Date field.",
                     OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
         }
     }
@@ -303,14 +296,14 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String extractDateValue(String literal) throws CstlServiceException {
+    protected String extractDateValue(String literal) throws FilterParserException {
         try {
             synchronized (DATE_FORMATTER) {
                 final Date d = TemporalUtilities.parseDate(literal);
                 return DATE_FORMATTER.format(d);
             }
         } catch (ParseException ex) {
-            throw new CstlServiceException(PARSE_ERROR_MSG + literal, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+            throw new FilterParserException(PARSE_ERROR_MSG + literal, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }
     }
 
@@ -342,20 +335,20 @@ public class SQLFilterParser extends FilterParser {
     }
 
     /**
-     * Return a MDweb standard representation from a namespace URI.
+     * Return a MDweb standard name representation from a namespace URI.
      * 
      * @param namespace
      * @return
      */
     private String getStandardFromNamespace(String namespace) {
         if ("http://www.opengis.net/cat/wrs/1.0".equals(namespace))
-            return Standard.WRS.getName();
+            return "Web Registry Service v1.0";
         else if ("http://www.opengis.net/cat/wrs".equals(namespace))
-            return Standard.WRS_V09.getName();
+            return "Web Registry Service v0.9";
         else if ("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5".equals(namespace))
-            return Standard.EBRIM_V2_5.getName();
+            return "Ebrim v2.5";
         else if ("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0".equals(namespace))
-            return Standard.EBRIM_V3.getName();
+            return "Ebrim v3.0";
         else 
             throw new IllegalArgumentException("unexpected namespace: " + namespace);
     }

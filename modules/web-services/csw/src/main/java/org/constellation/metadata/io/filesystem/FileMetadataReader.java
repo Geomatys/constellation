@@ -29,6 +29,7 @@ import java.util.Map;
 
 // JAXB dependencies
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -270,7 +271,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         }
 
                     } catch (IllegalArgumentException ex) {
-                        LOGGER.warning("illegal argument exception while invoking the method for attribute" + qn.getLocalPart() + " in the classe RecordType");
+                        LOGGER.log(Level.WARNING, "illegal argument exception while invoking the method for attribute{0} in the classe RecordType", qn.getLocalPart());
                     }
                 } else {
                     LOGGER.warning("An elementName was null.");

@@ -68,6 +68,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>base</module>
+    <module>filter</module>
   </modules>
 
 </project>

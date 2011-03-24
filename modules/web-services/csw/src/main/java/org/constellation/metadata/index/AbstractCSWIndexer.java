@@ -51,7 +51,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      *
      * @param serviceID The identifier, if there is one, of the index/service.
      * @param configDirectory The directory where the files of the index will be stored.
-     * @param additionalQueryable A map of additionnal queryable elements.
+     * @param additionalQueryable A map of additional queryable elements.
      */
     public AbstractCSWIndexer(String serviceID, File configDirectory, Map<String, List<String>> additionalQueryable) {
         super(serviceID, configDirectory);
@@ -68,7 +68,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      * @param serviceID The identifier, if there is one, of the index/service.
      * @param configDirectory The directory where the files of the index will be stored.
      * @param analyzer A lucene analyzer used in text values indexation (default is StandardAnalyzer).
-     * @param additionalQueryable  A map of additionnal queryable elements.
+     * @param additionalQueryable  A map of additional queryable elements.
      */
     public AbstractCSWIndexer(String serviceID, File configDirectory, Analyzer analyzer, Map<String, List<String>> additionalQueryable) {
         super(serviceID, configDirectory, analyzer);
@@ -133,7 +133,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     }
 
     /**
-     * Remove the mapping of the specified Queryable set if it is overriden by one in the additional Queryable set.
+     * Remove the mapping of the specified Queryable set if it is overridden by one in the additional Queryable set.
      * 
      * @param queryableSet
      */
@@ -169,8 +169,8 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      *
      * @param doc The lucene document currently building.
      * @param metadata The metadata to index.
-     * @param queryableSet A set of querybale properties and their relative path int the metadata.
-     * @param anyText A Stringbuilder in which are concatened all the text values.
+     * @param queryableSet A set of queryable properties and their relative path in the metadata.
+     * @param anyText A {@link StringBuilder} in which are concatened all the text values.
      * @throws IndexingException
      */
     protected abstract void indexQueryableSet(final Document doc, final A metadata, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException;
@@ -179,7 +179,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      * Spatially index the form extracting the BBOX values with the specified queryable set.
      *
      * @param doc The current Lucene document.
-     * @param form The mdweb records to spatially index.
+     * @param form The metadata records to spatially index.
      * @param queryableSet A set of queryable Term.
      * @param ordinal
      *

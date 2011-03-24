@@ -17,6 +17,7 @@
 package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
+import javax.ws.rs.core.Context;
 import org.constellation.ws.rs.WebService;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,7 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.constellation.ws.rs.ContainerNotifierImpl;
 
 
 // Geotoolkit dependencies
@@ -76,6 +78,12 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 @Singleton
 public final class ConfigurationService extends WebService  {
 
+    /**
+     * A container notifier allowing to dynamically reload all the active service.
+     */
+    @Context
+    protected volatile ContainerNotifierImpl cn;
+    
     /**
      * The implementation specific CSW configurer.
      */
