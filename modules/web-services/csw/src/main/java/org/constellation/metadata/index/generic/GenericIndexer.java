@@ -46,7 +46,7 @@ import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.AbstractCSWIndexer;
 import org.constellation.metadata.io.AbstractMetadataReader;
-import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 
@@ -61,7 +61,7 @@ import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.util.FileUtilities;
 
-// geoAPI dependencies
+// GeoAPI dependencies
 import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
 
@@ -75,7 +75,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     /**
      * The Reader of this lucene index (generic DB mode).
      */
-    private final CSWMetadataReader reader;
+    private final MetadataReader reader;
     
     private static final DateFormat LUCENE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
@@ -90,9 +90,10 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param reader A generic reader to request the metadata dataSource.
      * @param configuration  A configuration object containing the directory where the index can write indexation file.
      * @param serviceID The identifier, if there is one, of the index/service.
+     * @param additionalQueryable A map of additional queryable element.
      */
-    public GenericIndexer(final CSWMetadataReader reader, final Automatic configuration, final String serviceID) throws IndexingException {
-        super(serviceID, configuration.getConfigurationDirectory(), reader.getAdditionalQueryablePathMap());
+    public GenericIndexer(final MetadataReader reader, final Automatic configuration, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
+        super(serviceID, configuration.getConfigurationDirectory(), additionalQueryable);
         this.reader = reader;
         if (create) {
             createIndex();

@@ -21,6 +21,8 @@ package org.constellation.metadata.factory;
 import java.io.File;
 
 // Constellation dependencies
+import java.util.List;
+import java.util.Map;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;
@@ -57,7 +59,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public CSWMetadataReader getMetadataReader(Automatic configuration) throws MetadataIoException {
+    public CSWMetadataReader getMetadataReader(final Automatic configuration) throws MetadataIoException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -75,7 +77,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws MetadataIoException {
+    public CSWMetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -93,7 +95,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public AbstractIndexer getIndexer(Automatic configuration, CSWMetadataReader reader, String serviceID) throws IndexingException {
+    public AbstractIndexer getIndexer(final Automatic configuration, final CSWMetadataReader reader, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -101,7 +103,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebIndexer(configuration, serviceID);
             case FILESYSTEM:
-                return new GenericIndexer(reader, configuration, serviceID);
+                return new GenericIndexer(reader, configuration, serviceID, additionalQueryable);
             default:
                 throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type + DEFAULT_FACTORY);
         }

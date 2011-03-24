@@ -21,6 +21,8 @@ package org.constellation.metadata.factory;
 import java.io.File;
 
 // constellation dependencies
+import java.util.List;
+import java.util.Map;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -42,59 +44,61 @@ import org.geotoolkit.lucene.index.AbstractIndexer;
 public abstract class AbstractCSWFactory extends Factory {
 
     /**
-     * Return a Metadata reader for the specified datasource type.
+     * Return a Metadata reader for the specified dataSource type.
      *
-     * @param configuration A configuration object containing all the information to use the datasource.
+     * @param configuration A configuration object containing all the information to use the dataSource.
      *
-     * @return a Metadata reader for the specified datasource type.
+     * @return a Metadata reader for the specified dataSource type.
      * @throws MetadataIoException
      */
-    public abstract CSWMetadataReader getMetadataReader(Automatic configuration) throws MetadataIoException;
+    public abstract CSWMetadataReader getMetadataReader(final Automatic configuration) throws MetadataIoException;
 
     /**
-     * Return a Metadata Writer for the specified datasource type.
+     * Return a Metadata Writer for the specified dataSource type.
      *
-     * @param configuration A configuration object containing all the information to use the datasource.
+     * @param configuration A configuration object containing all the information to use the dataSource.
      * @param indexer A metadata Indexer use by the metadata writer to add new metadata to the Lucene index.
      *
-     * @return a Metadata Writer for the specified datasource type.
+     * @return a Metadata Writer for the specified dataSource type.
      * @throws org.constellation.metadata.io.MetadataIoException
      */
-    public abstract CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws MetadataIoException;
+    public abstract CSWMetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException;
 
     /**
-     * Return a Lucene indexer for the specified datasource type.
+     * Return a Lucene indexer for the specified dataSource type.
      *
-     * @param configuration A configuration object containing all the information to use the datasource.
-     * @param reader A metadata reader to acces the datasource.
+     * @param configuration A configuration object containing all the information to use the dataSource.
+     * @param reader A metadata reader to access the dataSource.
      * @param serviceID An identifier of the service/index.
+     * @param additionalQueryable A map of additional queryable element.
      *
-     * @return A Lucene indexer for the specified datasource type.
+     * @return A Lucene indexer for the specified dataSource type.
      * @throws IndexingException
      */
-    public abstract AbstractIndexer getIndexer(Automatic configuration, CSWMetadataReader reader, String serviceID) throws IndexingException;
+    public abstract AbstractIndexer getIndexer(final Automatic configuration, final CSWMetadataReader reader,
+            final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException;
 
     /**
-     * Return a Lucene index searcher for the specified datasource type.
+     * Return a Lucene index searcher for the specified dataSource type.
      *
-     * @param dbType The type of the datasource.
+     * @param dbType The type of the dataSource.
      * @param configDir The directory containing the lucene index.
      * @param serviceID  An identifier of the service/index.
      *
-     * @return  a Lucene index searcher for the specified datasource type.
+     * @return  a Lucene index searcher for the specified dataSource type.
      * @throws IndexingException
      */
-    public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws IndexingException;
+    public abstract AbstractIndexSearcher getIndexSearcher(final int dbType, final File configDir, final String serviceID) throws IndexingException;
 
     /**
-     * Return a catalogue harvester in the specified implementation type.
+     * Return a catalog harvester in the specified implementation type.
      *
-     * @param configuration  A configuration object containing all the information about the choosen harvester implementation.
-     * @param writer A metadata writer to store the harvested metadata into the datasource.
+     * @param configuration  A configuration object containing all the information about the chosen harvester implementation.
+     * @param writer A metadata writer to store the harvested metadata into the dataSource.
      *
-     * @return A Catalogue harvester implementation.
+     * @return A Catalog harvester implementation.
      * @throws MetadataIoException
      */
-    public abstract CatalogueHarvester getCatalogueHarvester(Automatic configuration, MetadataWriter writer) throws MetadataIoException;
+    public abstract CatalogueHarvester getCatalogueHarvester(final Automatic configuration, final MetadataWriter writer) throws MetadataIoException;
 
 }

@@ -335,7 +335,7 @@ public class CSWworker extends AbstractWorker {
         //we initialize all the data retriever (reader/writer) and index worker
         mdReader                      = cswfactory.getMetadataReader(configuration);
         profile                       = configuration.getProfile();
-        final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID);
+        final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID, mdReader.getAdditionalQueryablePathMap());
         indexSearcher                 = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
         if (profile == TRANSACTIONAL) {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);

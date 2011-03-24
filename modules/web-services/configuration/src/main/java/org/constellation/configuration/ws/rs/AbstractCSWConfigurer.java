@@ -122,7 +122,7 @@ public abstract class AbstractCSWConfigurer {
                 if (currentReader == null) {
                     currentReader = cswfactory.getMetadataReader(config);
                 }
-                return cswfactory.getIndexer(config, currentReader, "");
+                return cswfactory.getIndexer(config, currentReader, "", currentReader.getAdditionalQueryablePathMap());
 
             } catch (Exception ex) {
                 throw new CstlServiceException("An eception occurs while initializing the indexer!" + '\n' +
