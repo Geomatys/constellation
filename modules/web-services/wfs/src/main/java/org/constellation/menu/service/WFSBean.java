@@ -26,7 +26,7 @@ import org.constellation.ServiceDef.Specification;
 public class WFSBean extends AbstractServiceBean{
 
     public WFSBean() {
-        super(Specification.WFS);
+        super(Specification.WFS,"/org/constellation/menu/service/layerContextConfig.xhtml");
     }
 
 }

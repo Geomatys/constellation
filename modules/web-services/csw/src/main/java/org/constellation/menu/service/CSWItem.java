@@ -29,7 +29,9 @@ public class CSWItem extends AbstractMenuItem{
 
     public CSWItem() {
         super(
-            new String[]{"/org/constellation/menu/service/csw.xhtml"},
+            new String[]{
+                "/org/constellation/menu/service/csw.xhtml",
+                "/org/constellation/menu/service/layerContextConfig.xhtml"},
             "org.constellation.menu.service.csw",
             new Path(SERVICES_PATH,"CSW", "/org/constellation/menu/service/csw.xhtml",null,600)
             );

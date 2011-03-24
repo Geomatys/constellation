@@ -26,7 +26,7 @@ import org.constellation.ServiceDef.Specification;
 public class SOSBean extends AbstractServiceBean{
 
     public SOSBean() {
-        super(Specification.SOS);
+        super(Specification.SOS,"/org/constellation/menu/service/layerContextConfig.xhtml");
     }
 
 }

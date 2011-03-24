@@ -26,7 +26,7 @@ import org.constellation.ServiceDef.Specification;
 public class CSWBean extends AbstractServiceBean{
 
     public CSWBean() {
-        super(Specification.CSW);
+        super(Specification.CSW,"/org/constellation/menu/service/layerContextConfig.xhtml");
     }
 
 }

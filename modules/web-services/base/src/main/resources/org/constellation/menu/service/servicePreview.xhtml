@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
@@ -21,7 +19,7 @@
             <col width="16px"/>
             <col />
             <col />
-            <col width="24px"/>
+            <col width="28px"/>
             <col width="16px"/>
             <col width="16px"/>
             <col width="16px"/>
@@ -32,9 +30,13 @@
                 <tr>
                     <td><h:graphicImage value="#{instance.statusIcon}" style="border:none;"/></td>
                     <td>#{instance.name}</td>
-                    <td><a href="#{instance.path}" target="blank">#{instance.path}</a></td>
+                    <td>
+                        <a href="#{instance.path}" target="blank">#{instance.path}</a>
+                    </td>
                     <td style="text-align:left;">
-                        <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
+                        <a4j:commandLink action="#{instance.config}" reRender="dialogContent" oncomplete="dlg4.show();">
+                            <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
+                        </a4j:commandLink>
                     </td>
                     <td>
                         <h:commandLink action="#{instance.restart}">
@@ -60,5 +62,16 @@
             </a4j:repeat>
         </tbody>
     </table>
+
+
+    <mf:dialog  id="dlg4" header="Preview" widgetVar="dlg4" modal="true"
+                showEffect="fade" hideEffect="fade">
+        <a4j:support id="dialog4_Ajax" event=""/>
+
+        <mf:Div id="dialogContent">
+            <ui:include src="#{bean.configPage}"/>
+        </mf:Div>
+
+    </mf:dialog>
 
 </ui:composition>

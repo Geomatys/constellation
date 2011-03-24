@@ -116,10 +116,7 @@ public class MenuBean extends I18NBean{
 
         String link = null;
         if(path.linkedPage != null){
-            final String webapp = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();            
-            link = path.linkedPage;
-            link = link.replaceAll(".xhtml", ".jsf");
-            link = webapp+link;
+            link = toApplicationPath(path.linkedPage);
         }
 
         final I18NNode node = new I18NNode(path.i18nKey, path.icon, link,path.priority);
@@ -128,6 +125,17 @@ public class MenuBean extends I18NBean{
         //insert node based on it's priority
         parent.insert(node, getInsertIndex(parent, node));
         return node;
+    }
+
+    /**
+     * change a path to an .xhtml pag to a path to .jsf prefixed with application name.
+     */
+    public static String toApplicationPath(final String pagePath){
+        final String webapp = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+        String link = pagePath;
+        link = link.replaceAll(".xhtml", ".jsf");
+        link = webapp+link;
+        return link;
     }
 
     private static int getInsertIndex(final I18NNode parent, final I18NNode candidate){

@@ -29,7 +29,9 @@ public class WMSItem extends AbstractMenuItem{
 
     public WMSItem() {
         super(
-            new String[]{"/org/constellation/menu/service/wms.xhtml"},
+            new String[]{
+                "/org/constellation/menu/service/wms.xhtml",
+                "/org/constellation/menu/service/layerContextConfig.xhtml"},
             "org.constellation.menu.service.wms",
             new Path(SERVICES_PATH,"WMS", "/org/constellation/menu/service/wms.xhtml", null,200)
             );

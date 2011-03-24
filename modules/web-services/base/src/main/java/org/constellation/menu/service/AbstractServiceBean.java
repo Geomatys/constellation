@@ -23,6 +23,7 @@ import java.util.List;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ServiceAdministrator;
 import org.constellation.bean.I18NBean;
+import org.constellation.bean.MenuBean;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.geotoolkit.util.ArgumentChecks;
@@ -35,11 +36,13 @@ import org.geotoolkit.util.ArgumentChecks;
 public class AbstractServiceBean extends I18NBean{
 
     private final Specification specification;
+    private final String configPage;
     private String newServiceName = "default";
 
-    public AbstractServiceBean(final Specification specification) {
+    public AbstractServiceBean(final Specification specification, final String configPage) {
         ArgumentChecks.ensureNonNull("specification", specification);
         this.specification = specification;
+        this.configPage = configPage;
         addBundle("org.constellation.menu.service.service");
     }
 
@@ -59,6 +62,10 @@ public class AbstractServiceBean extends I18NBean{
 
     public void setNewServiceName(final String newServiceName) {
         this.newServiceName = newServiceName;
+    }
+
+    public String getConfigPage(){
+        return configPage;
     }
 
     public void createInstance(){
@@ -102,6 +109,10 @@ public class AbstractServiceBean extends I18NBean{
             }
         }
 
+        public void config(){
+            //TODO
+        }
+
         public void start(){
             ServiceAdministrator.startInstance(specification.name(), instance.getName());
         }
@@ -115,10 +126,6 @@ public class AbstractServiceBean extends I18NBean{
 
         public void restart(){
             ServiceAdministrator.restartInstance(specification.name(), instance.getName());
-        }
-
-        public void edit(){
-            //todo
         }
 
         @Override
