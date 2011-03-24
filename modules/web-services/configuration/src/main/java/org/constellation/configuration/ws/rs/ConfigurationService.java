@@ -32,7 +32,6 @@ import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
@@ -51,7 +50,6 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.ContainerNotifierImpl;
 
 
 // Geotoolkit dependencies
@@ -70,10 +68,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * <p>
  * This web service enables basic remote management of a Constellation server. 
  * </p>
- * <p>
- * <b>WARNING:</b>Use of this service is discouraged since it is run without any 
- * security control. 
- * </p>
  * 
  * @author Guilhem Legal (Geomatys)
  * @since 0.1
@@ -81,12 +75,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 @Path("configuration")
 @Singleton
 public final class ConfigurationService extends WebService  {
-
-    /**
-     * A container notifier allowing to dynamically reload all the active service.
-     */
-    @Context
-    private ContainerNotifierImpl cn;
 
     /**
      * The implementation specific CSW configurer.
@@ -335,7 +323,7 @@ public final class ConfigurationService extends WebService  {
      * If some services are currently indexing, the service will not restart
      * unless you specified the flag "forced".
      * 
-     * @return an Acknowlegement if the restart succeed.
+     * @return an Acknowledgment if the restart succeed.
      */
     private AcknowlegementType restartService(final boolean forced) {
         LOGGER.info("\n restart requested \n");
@@ -363,7 +351,7 @@ public final class ConfigurationService extends WebService  {
     /**
      * Stop all the indexation going on.
      *
-     * @return an Acknowlegement.
+     * @return an Acknowledgment.
      */
     private AcknowlegementType stopIndexation(final String id) {
         LOGGER.info("\n stop indexation requested \n");
@@ -379,7 +367,7 @@ public final class ConfigurationService extends WebService  {
      * Receive a file and write it into the static file path.
      * 
      * @param in The input stream.
-     * @return an acknowledgement indicating if the operation succeed or not.
+     * @return an Acknowledgment indicating if the operation succeed or not.
      *
      * @todo Not implemented. This is just a placeholder where we can customize the
      *       download action for some users. Will probably be removed in a future version.

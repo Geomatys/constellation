@@ -283,7 +283,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                         throw new CstlServiceException("There is no instance " + identifier, INVALID_PARAMETER_VALUE, "id");
                     }
                 }
-                return Response.ok(new AcknowlegementType("success", "instances succefully restarted"), "text/xml").build();
+                return Response.ok(new AcknowlegementType("Success", "instances succefully restarted"), "text/xml").build();
 
             } else if ("start".equalsIgnoreCase(request)) {
                 LOGGER.info("starting a new worker");
@@ -366,7 +366,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                         basicConfigure(instanceDirectory);
                         response = new AcknowlegementType("Success", "instance succefully created");
                     } else {
-                        response = new AcknowlegementType("Error", "unbale to create an instance");
+                        response = new AcknowlegementType("Error", "unable to create an instance");
                     }
                 } else {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
@@ -612,7 +612,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             !ex.getExceptionCode().equals(INVALID_FORMAT)             && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_FORMAT) &&
             !ex.getExceptionCode().equals(INVALID_CRS)                && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_CRS) &&
             !ex.getExceptionCode().equals(LAYER_NOT_DEFINED)          && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED) &&
-            !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_SRS) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_REQUEST)) {
+            !ex.getExceptionCode().equals(INVALID_REQUEST)            && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_REQUEST) &&
+            !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_SRS)) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');

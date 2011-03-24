@@ -156,7 +156,7 @@ public abstract class WebService {
     /**
      * Automatically set by Jersey.
      * 
-     * Used to communicate with the servlet container, for example, to obtain
+     * Used to communicate with the Servlet container, for example, to obtain
      * the MIME type of a file, to dispatch requests or to write to a log file.
      * The field is injected, thanks to the annotation, when a request arrives.
      */
@@ -176,12 +176,18 @@ public abstract class WebService {
     /**
      * Automatically set by Jersey.
      *
-     * The HTTP servlet request used to get information about the client which
+     * The HTTP Servlet request used to get information about the client which
      * sent the request. The field is injected, thanks to the annotation, when a
      * request arrives.
      */
     @Context
     private volatile HttpServletRequest httpServletRequest;
+
+    /**
+     * A container notifier allowing to dynamically reload all the active service.
+     */
+    @Context
+    protected volatile ContainerNotifierImpl cn;
 
     /**
      * If this flag is set the method logParameters() will write the entire request in the logs
@@ -575,10 +581,10 @@ public abstract class WebService {
     }
 
     /**
-     * Return the service url obtain by the first request made.
+     * Return the service URL obtain by the first request made.
      * something like : http://localhost:8080/constellation/WS/
      *
-     * @return the service url.
+     * @return the service uURL.
      */
     protected String getServiceURL() {
         return getUriContext().getBaseUri().toString();

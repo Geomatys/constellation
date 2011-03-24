@@ -85,6 +85,9 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     private static DefaultDataSource ds;
     
     private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
+
+    private static boolean datasourceCreated = false;
+    
     /**
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
@@ -128,11 +131,14 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
                     try{
                         final String url = "jdbc:derby:memory:TestWFSWorker";
                         ds = new DefaultDataSource(url + ";create=true");
-                        Connection con = ds.getConnection();
-                        ScriptRunner sr = new ScriptRunner(con);
-                        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
-                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
-                        con.close();
+                        if (!datasourceCreated) {
+                            Connection con = ds.getConnection();
+                            ScriptRunner sr = new ScriptRunner(con);
+                            sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
+                            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                            con.close();
+                            datasourceCreated = true;
+                        }
                         final ProviderSource sourceOM = new ProviderSource();
                         sourceOM.loadAll = true;
                         sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
