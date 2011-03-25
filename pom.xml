@@ -160,7 +160,7 @@
   -->
     <properties>
         <!-- Define parent projects versions -->
-        <geoapi.version>2.3-SNAPSHOT</geoapi.version>
+        <geoapi.version>3.1-SNAPSHOT</geoapi.version>
         <geotoolkit.version>SNAPSHOT</geotoolkit.version>
         <geotoolkit-pending.version>SNAPSHOT</geotoolkit-pending.version>
         <mdweb-meta.version>2.2-SNAPSHOT</mdweb-meta.version>
