@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
-// JUnit dependencies
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
@@ -41,11 +40,16 @@ import org.geotoolkit.ogc.xml.v110.ObjectFactory;
 import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.xml.MarshallerPool;
-import org.junit.*;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Contains;
 import org.opengis.filter.spatial.DWithin;
 import org.opengis.filter.spatial.Intersects;
+
+// JUnit dependencies
+import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
@@ -328,7 +332,17 @@ public class FilterParserTest {
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "CreationDate:[20070602  30000101]CreationDate:[00000101 20070604]");
-        
+
+         /**
+         * Test 10: a simple empty Filter
+         */
+        QueryConstraintType nullConstraint = null;
+        spaQuery = (SpatialQuery) filterParser.getQuery(nullConstraint, null, null);
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
+
         pool.release(filterUnmarshaller);
         
     }
@@ -500,6 +514,62 @@ public class FilterParserTest {
         assertEquals(spaQuery.getQuery(), "Title:\"starship trooper\"");
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.NOT);
 
+        /**
+         * Test 5: a simple Filter Not propertyIsNotEqualTo
+         */
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"                 +
+                           "    <ogc:Not>                                        "          +
+			   "        <ogc:PropertyIsNotEqualTo>"                                +
+                           "            <ogc:PropertyName>apiso:Title</ogc:PropertyName>"   +
+                           "            <ogc:Literal>starship trooper</ogc:Literal>"        +
+		           "        </ogc:PropertyIsNotEqualTo>"                               +
+                           "    </ogc:Not>"                                                 +
+                           "</ogc:Filter>";
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() == null);
+        assertTrue(filter.getLogicOps()      != null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "metafile:doc NOT Title:\"starship trooper\"");
+        assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.NOT);
+
+        /**
+         * Test 6: a simple Filter Not PropertyIsGreaterThanOrEqualTo
+         */
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"                 +
+                           "    <ogc:Not>                                        "          +
+			   "    <ogc:PropertyIsGreaterThanOrEqualTo>"                        +
+                           "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
+                           "        <ogc:Literal>2007-06-02</ogc:Literal>"                   +
+                           "    </ogc:PropertyIsGreaterThanOrEqualTo>"                       +
+                           "    </ogc:Not>"                                                 +
+                           "</ogc:Filter>";
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() == null);
+        assertTrue(filter.getLogicOps()      != null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "CreationDate:[20070602  30000101]");
+        assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.NOT);
+
         pool.release(filterUnmarshaller);
     }
     
@@ -619,6 +689,233 @@ public class FilterParserTest {
                 
         assertTrue(spatialFilter.getOGCFilter() instanceof Intersects);
 
+        pool.release(filterUnmarshaller);
+    }
+
+    /**
+     * Test invalid Filter
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void errorFilterTest() throws Exception {
+
+        Unmarshaller filterUnmarshaller = pool.acquireUnmarshaller();
+
+        /**
+         * Test 1: a simple Filter PropertyIsGreaterThanOrEqualTo with bad time format
+         */
+        String XMLrequest =
+                    "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
+	            "    <ogc:PropertyIsGreaterThanOrEqualTo>"                        +
+                    "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
+                    "        <ogc:Literal>bonjour</ogc:Literal>"                   +
+                    "    </ogc:PropertyIsGreaterThanOrEqualTo>"                       +
+                    "</ogc:Filter>";
+
+        StringReader reader = new StringReader(XMLrequest);
+
+        JAXBElement element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        FilterType filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        SpatialQuery spaQuery;
+        boolean error = false;
+        try {
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        } catch (FilterParserException ex) {
+            assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
+            assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
+            error = true;
+        }
+
+        assertTrue(error);
+
+        /**
+         * Test 2: a simple Filter PropertyIsGreaterThanOrEqualTo on a non date field
+         */
+        XMLrequest =
+                    "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
+	            "    <ogc:PropertyIsGreaterThanOrEqualTo>"                        +
+                    "        <ogc:PropertyName>apiso:Title</ogc:PropertyName>" +
+                    "        <ogc:Literal>2007-06-02</ogc:Literal>"                   +
+                    "    </ogc:PropertyIsGreaterThanOrEqualTo>"                       +
+                    "</ogc:Filter>";
+
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        error = false;
+        try {
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        } catch (FilterParserException ex) {
+            assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
+            assertEquals(OPERATION_NOT_SUPPORTED, ex.getExceptionCode());
+            error = true;
+        }
+
+        assertTrue(error);
+
+        /**
+         * Test 3: a simple Filter propertyIsLike without literal
+         */
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"                                                               +
+			   "    <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">" +
+                           "        <ogc:PropertyName>apiso:Title</ogc:PropertyName>"                   +
+			   "    </ogc:PropertyIsLike>"                                                  +
+                           "</ogc:Filter>";
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        error = false;
+        try {
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        } catch (FilterParserException ex) {
+            assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
+            assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
+            error = true;
+        }
+        assertTrue(error);
+
+        /**
+         * Test 4: a simple Filter PropertyIsNull without propertyName
+         */
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"    +
+	            "    <ogc:PropertyIsNull>"                           +
+                    "    </ogc:PropertyIsNull>"                          +
+                    "</ogc:Filter>";
+
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        error = false;
+        try {
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        } catch (FilterParserException ex) {
+            assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
+            assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
+            error = true;
+        }
+        assertTrue(error);
+
+        /**
+         * Test 5: a simple Filter PropertyIsBetween without upper boundary
+         */
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">" +
+	            "    <ogc:PropertyIsBetween>"                                     +
+                    "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
+                    "        <ogc:LowerBoundary>"                                     +
+                    "           <ogc:Literal>2007-06-02</ogc:Literal>"                +
+                    "        </ogc:LowerBoundary>"                                    +
+                    "    </ogc:PropertyIsBetween>"                                    +
+                    "</ogc:Filter>";
+
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        error = false;
+        try {
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        } catch (FilterParserException ex) {
+            assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
+            assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
+            error = true;
+        }
+        assertTrue(error);
+
+         /**
+         * Test 6: a simple Filter PropertyIsBetween without lower boundary
+         */
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">" +
+	            "    <ogc:PropertyIsBetween>"                                     +
+                    "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
+                    "        <ogc:UpperBoundary>"                                     +
+                    "           <ogc:Literal>2007-06-02</ogc:Literal>"                +
+                    "        </ogc:UpperBoundary>"                                    +
+                    "    </ogc:PropertyIsBetween>"                                    +
+                    "</ogc:Filter>";
+
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        error = false;
+        try {
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        } catch (FilterParserException ex) {
+            assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
+            assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
+            error = true;
+        }
+        assertTrue(error);
+
+         /**
+         * Test 7: a simple Filter PropertyIsLessThanOrEqualTo without propertyName
+         */
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
+	            "    <ogc:PropertyIsLessThanOrEqualTo>"                                 +
+                    "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
+                    "    </ogc:PropertyIsLessThanOrEqualTo>"                                +
+                    "</ogc:Filter>";
+
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        error = false;
+        try {
+            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        } catch (FilterParserException ex) {
+            assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
+            assertEquals(INVALID_PARAMETER_VALUE, ex.getExceptionCode());
+            error = true;
+        }
+        assertTrue(error);
+        
         pool.release(filterUnmarshaller);
     }
     

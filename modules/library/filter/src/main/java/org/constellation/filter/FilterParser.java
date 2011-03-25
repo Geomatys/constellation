@@ -217,9 +217,15 @@ public abstract class FilterParser {
             final PropertyIsBetweenType pib = (PropertyIsBetweenType) comparisonOps;
             final PropertyName propertyName = (PropertyName) pib.getExpression();
             final LowerBoundaryType low     = pib.getLowerBoundary();
-            final LiteralType lowLit        = low.getLiteral();
+            LiteralType lowLit = null;
+            if (low != null) {
+                lowLit = low.getLiteral();
+            } 
             final UpperBoundaryType upp     = pib.getUpperBoundary();
-            final LiteralType uppLit        = upp.getLiteral();
+            LiteralType uppLit = null;
+            if (upp != null) {
+                uppLit = upp.getLiteral();
+            }
             if (propertyName == null || lowLit == null || uppLit == null) {
                 throw new FilterParserException("A PropertyIsBetween operator must be constitued of a lower boundary containing a literal, "
                                              + "an upper boundary containing a literal and a property name.", INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
