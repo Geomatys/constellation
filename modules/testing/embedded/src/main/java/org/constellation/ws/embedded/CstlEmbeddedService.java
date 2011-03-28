@@ -33,10 +33,11 @@ import org.geotoolkit.console.CommandLine;
 import org.geotoolkit.console.Option;
 import org.geotoolkit.util.logging.Logging;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+
+import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
 import com.sun.net.httpserver.HttpContext;
 import org.constellation.metadata.ws.soap.CSWService;
+import org.glassfish.grizzly.http.server.HttpServer;
 
 
 
@@ -201,7 +202,7 @@ public class CstlEmbeddedService extends CommandLine {
 
         LOGGER.log(Level.INFO, "Starting grizzly server at: {0}", f.format(new Date()));
 
-        SelectorThread threadSelector = null;
+        HttpServer threadSelector = null;
         try {
             if (grizzlyWebContainerProperties.isEmpty()) {
                 threadSelector = GrizzlyWebContainerFactory.create(uri);
@@ -217,7 +218,7 @@ public class CstlEmbeddedService extends CommandLine {
 
         stayAlive();
 
-        threadSelector.stopEndpoint();
+        threadSelector.stop();
         LOGGER.log(Level.INFO, "*Stopped grizzly server at: {0}.", f.format(new Date()));
     }
 
