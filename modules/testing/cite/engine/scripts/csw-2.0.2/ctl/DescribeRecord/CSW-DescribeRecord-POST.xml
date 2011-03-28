@@ -208,7 +208,7 @@
                   <ctl:fail/>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:variable name="content-type" select="$response//headers/header[@name='Content-Type']"/>
+                <xsl:variable name="content-type" select="$response//headers/header[@name='content-type']"/><!-- modified by glegal to accept lower-case-->
                 <xsl:if test="matches($content-type,'.+/xml') != true()">
                     <ctl:message>[FAILURE] Content-Type response header does not indicate an XML media type (<xsl:value-of select="$content-type"/>)</ctl:message>
                     <ctl:fail/>

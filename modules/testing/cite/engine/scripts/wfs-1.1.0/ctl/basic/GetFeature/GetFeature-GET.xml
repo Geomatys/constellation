@@ -1209,7 +1209,7 @@
                             </parsers:HTTPParser>
                                 </ctl:request>
                         </xsl:variable>
-                        <xsl:variable name="header" select="$RESPONSE/response/headers/header[@name='Content-Type']" />
+                        <xsl:variable name="header" select="$RESPONSE/response/headers/header[@name='content-type']" /><!-- modified by glegal to accept lower-case-->
                         <xsl:variable name="content-type" select="substring-before(concat($header, ';'), ';')"/>
                         <xsl:if test="not($content-type = 'text/xml' and contains($header, 'subtype=gml/3.1.1'))">
                           <ctl:fail/>

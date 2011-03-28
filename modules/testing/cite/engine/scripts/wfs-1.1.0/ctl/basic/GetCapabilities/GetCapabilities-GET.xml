@@ -749,7 +749,7 @@
 						<ctl:with-param name="doc" select="$request1"/>
 					</ctl:call-test>
 
-					<xsl:variable name="content-type" select="substring-before(concat($request1/response/headers/header[@name='Content-Type'], ';'), ';')"/>
+					<xsl:variable name="content-type" select="substring-before(concat($request1/response/headers/header[@name='content-type'], ';'), ';')"/><!-- modified by glegal to accept lower-case-->
 					<xsl:if test="not($content-type = 'application/xml') and not($content-type = 'text/xml')">
 						<ctl:message>FAILURE: Incorrect response encoding.</ctl:message>
 						<ctl:fail/>
@@ -1437,7 +1437,7 @@
 					<parsers:HTTPParser />
 				</ctl:request>
 			</xsl:variable>
-            <xsl:variable name="content-type" select="$response//headers/header[@name='Content-Type']"/>
+            <xsl:variable name="content-type" select="$response//headers/header[@name='content-type']"/><!-- modified by glegal to accept lower-case-->
 			<xsl:if test="not(starts-with($content-type, $format))">
 				<ctl:message>FAILURE: Unexpected content type for response entity (Request: <xsl:value-of select="$format"/>, Response: <xsl:value-of select="$content-type"/>).</ctl:message>
 				<ctl:fail/>
