@@ -37,7 +37,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
  *
  * @author legal
  */
-public class EnvelopeTable extends SingletonTable<EnvelopeType> {
+public class EnvelopeTable extends SingletonTable<EnvelopeType> implements Cloneable {
 
     
     /**

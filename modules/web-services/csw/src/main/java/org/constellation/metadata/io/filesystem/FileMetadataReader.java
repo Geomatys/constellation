@@ -140,8 +140,8 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(final String identifier, final int mode, final List<QName> elementName) throws MetadataIoException {
-        return getMetadata(identifier, mode, ElementSetType.FULL, elementName);
+    public Object getMetadata(final String identifier, final int mode) throws MetadataIoException {
+        return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
 
      /**

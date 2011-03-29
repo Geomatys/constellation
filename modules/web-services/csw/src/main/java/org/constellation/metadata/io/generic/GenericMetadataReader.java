@@ -83,8 +83,8 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * {@inheritDoc}
      */
     @Override
-    public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
-        return getMetadata(identifier, mode, ElementSetType.FULL, elementName);
+    public Object getMetadata(String identifier, int mode) throws MetadataIoException {
+        return getMetadata(identifier, mode, ElementSetType.FULL, new ArrayList<QName>());
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * @param mode An output schema mode: ISO_19115 and DUBLINCORE supported.
      * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
-     * @return A metadata Object (dublin core Record / geotoolkit metadata)
+     * @return A metadata Object (Dublin core Record / GeotoolKit metadata)
      * 
      * @throws MetadataIoException
      */

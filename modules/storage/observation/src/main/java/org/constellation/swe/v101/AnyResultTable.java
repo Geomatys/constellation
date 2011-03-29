@@ -35,36 +35,36 @@ import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 
 /**
- * Connexion vers la table des {@linkplain AnyResultType AnyResult}.
+ * Connection to the {@linkplain AnyResultType AnyResult} table.
  *
  * @version $Id:
  * @author Guilhem Legal
  */
-public class AnyResultTable extends SingletonTable<AnyResultType>{
+public class AnyResultTable extends SingletonTable<AnyResultType> implements Cloneable {
     
     /**
      * Connection to the table of {@linkplain Reference reference}.
-     * A connection (potentielly shared) will be establish the first time it'll be necesary.
+     * A connection (potentially shared) will be establish the first time it'll be necessary.
      */
     private ReferenceTable references;
     
     /**
      * Connection to the table of {@linkplain Reference reference}.
-     * A connection (potentielly shared) will be establish the first time it'll be necesary.
+     * A connection (potentially shared) will be establish the first time it'll be necessary.
      */
     private DataArrayTable dataArrays;
     
     /**
-     * Construit une table des resultats.
+     * Build a results table.
      *
-     * @param  database Connexion vers la base de données.
+     * @param database A connection to the database.
      */
     public AnyResultTable(final Database database) {
         this(new AnyResultQuery(database));
     }
 
     /**
-     * Initialise l'identifiant de la table.
+     * Initialize the table identifier.
      */
     private AnyResultTable(final AnyResultQuery query) {
         super(query, query.byIdResult);

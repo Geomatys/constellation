@@ -132,7 +132,7 @@ public class MDWebMetadataWriterTest {
 
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("component2", AbstractMetadataReader.SENSORML,  null);
+        Object absResult = reader.getMetadata("component2", AbstractMetadataReader.SENSORML);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
@@ -157,7 +157,7 @@ public class MDWebMetadataWriterTest {
 
         writer.storeMetadata(absExpResult);
 
-        AbstractSensorML absResult = (AbstractSensorML) reader.getMetadata("sensor-system", AbstractMetadataReader.SENSORML, null);
+        AbstractSensorML absResult = (AbstractSensorML) reader.getMetadata("sensor-system", AbstractMetadataReader.SENSORML);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
@@ -173,7 +173,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system2.xml"));
 
-        absResult = (AbstractSensorML) reader.getMetadata("sensor-system2", AbstractMetadataReader.SENSORML, null);
+        absResult = (AbstractSensorML) reader.getMetadata("sensor-system2", AbstractMetadataReader.SENSORML);
 
         pool.release(unmarshaller);
 
@@ -198,7 +198,7 @@ public class MDWebMetadataWriterTest {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta10.xml"));
         writer.storeMetadata(absExpResult);
-        Object absResult = reader.getMetadata("IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.xml", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.xml", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
@@ -209,7 +209,7 @@ public class MDWebMetadataWriterTest {
         
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_11));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("af24f70a-818c-4da1-9afb-1fc1e0058760", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("af24f70a-818c-4da1-9afb-1fc1e0058760", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -219,7 +219,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_12));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("1c7d52ac-66c5-449b-a88b-8a0feeccb5fa", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("1c7d52ac-66c5-449b-a88b-8a0feeccb5fa", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -229,7 +229,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_13));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("4c017cc5-3e0e-49d5-9f68-549943247e7e", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("4c017cc5-3e0e-49d5-9f68-549943247e7e", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -239,7 +239,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_14));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("4c017cc5-3e0e-49d5-9f68-549943247e89", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("4c017cc5-3e0e-49d5-9f68-549943247e89", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -249,7 +249,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_15));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("484fc4d9-8d11-48a5-a386-65c19398f7c3", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("484fc4d9-8d11-48a5-a386-65c19398f7c3", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -259,7 +259,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_16));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("484fc4d9-8d11-48a5-a386-65c19398f7k7", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("484fc4d9-8d11-48a5-a386-65c19398f7k7", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -269,7 +269,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_17));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("81a25c84-2bb0-4727-8f36-4a296e1e7b57", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("81a25c84-2bb0-4727-8f36-4a296e1e7b57", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -279,7 +279,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_18));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -289,7 +289,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_19));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("937491cd-4bc4-43e4-9509-f6cc606f906e", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("937491cd-4bc4-43e4-9509-f6cc606f906e", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -313,7 +313,7 @@ public class MDWebMetadataWriterTest {
         FeatureCatalogue absExpResult = (FeatureCatalogue) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/featcatalog1.xml"));
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("cat-1", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("cat-1", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof FeatureCatalogueImpl);
         FeatureCatalogueImpl result = (FeatureCatalogueImpl) absResult;
@@ -335,7 +335,7 @@ public class MDWebMetadataWriterTest {
         
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta7.xml"));
         writer.storeMetadata(absExpResult);
-        Object absResult = reader.getMetadata("MDWeb_FR_SY_couche_vecteur_258", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("MDWeb_FR_SY_couche_vecteur_258", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
@@ -345,7 +345,7 @@ public class MDWebMetadataWriterTest {
         
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("42292_5p_19900609195600", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("42292_5p_19900609195600", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -355,7 +355,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta9.xml"));
         writer.storeMetadata(absExpResult);
-        absResult = reader.getMetadata("identifier-test", AbstractMetadataReader.ISO_19115,  null);
+        absResult = reader.getMetadata("identifier-test", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         result = (DefaultMetadata) absResult;
@@ -378,7 +378,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
@@ -410,7 +410,7 @@ public class MDWebMetadataWriterTest {
         }
         assertTrue(exceptionMsg.contains("is already used"));
         
-        /*Object absResult = reader.getMetadata("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX", AbstractMetadataReader.ISO_19115,  null);
+        /*Object absResult = reader.getMetadata("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
@@ -434,7 +434,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta-19119.xml"));
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4", AbstractMetadataReader.ISO_19115,  null);
+        Object absResult = reader.getMetadata("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
@@ -442,5 +442,37 @@ public class MDWebMetadataWriterTest {
 
         pool.release(unmarshaller);
         metadataEquals(expResult, result);
+    }
+
+    @Test
+    public void deleteMetadataTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+
+        Object absResult = reader.getMetadata("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4", AbstractMetadataReader.ISO_19115);
+
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        DefaultMetadata result = (DefaultMetadata) absResult;
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta-19119.xml"));
+        pool.release(unmarshaller);
+        metadataEquals(expResult, result);
+
+        /*
+         * we delete the metadata
+         */
+        writer.deleteMetadata("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
+
+        /*
+         * Metadata is still in cache.
+         */
+        Object cacheResult = reader.getMetadata("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4", AbstractMetadataReader.ISO_19115);
+        metadataEquals(result, (DefaultMetadata)cacheResult);
+
+        /*
+         * removing from cache
+         */
+        reader.removeFromCache("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
+
+        assertNull(reader.getMetadata("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4", AbstractMetadataReader.ISO_19115));
     }
 }

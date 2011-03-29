@@ -50,17 +50,17 @@ public class SensorMLWriter<T extends AbstractSensorML> implements MessageBodyWr
     private static final String SML_100_XSD = "http://www.opengis.net/sensorML/1.0 http://schemas.opengis.net/sensorML/1.0.0/sensorML.xsd";
 
     @Override
-    public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
+    public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return AbstractSensorML.class.isAssignableFrom(type);
     }
 
     @Override
-    public long getSize(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
+    public long getSize(final T t, Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return -1;
     }
 
     @Override
-    public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
+    public void writeTo(final T t, Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         Marshaller m = null;
         try {
             m = SensorMLMarshallerPool.getInstance().acquireMarshaller();

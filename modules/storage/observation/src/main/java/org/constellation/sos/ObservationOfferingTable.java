@@ -53,7 +53,7 @@ import org.geotoolkit.xml.Namespaces;
  *
  * @author Guilhem Legal
  */
-public class ObservationOfferingTable extends SingletonTable<ObservationOfferingType>{
+public class ObservationOfferingTable extends SingletonTable<ObservationOfferingType> implements Cloneable {
 
     /**
      * a link to the offering procedure.

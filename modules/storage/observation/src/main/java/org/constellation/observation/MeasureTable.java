@@ -34,7 +34,7 @@ import org.geotoolkit.observation.xml.v100.MeasureType;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class MeasureTable extends SingletonTable<MeasureType> {
+public class MeasureTable extends SingletonTable<MeasureType> implements Cloneable {
     
     /**
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.

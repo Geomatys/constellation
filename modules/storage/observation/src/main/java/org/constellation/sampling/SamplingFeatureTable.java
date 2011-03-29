@@ -37,7 +37,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class SamplingFeatureTable extends SingletonTable<SamplingFeatureType> {
+public class SamplingFeatureTable extends SingletonTable<SamplingFeatureType> implements Cloneable {
    
        
     /**

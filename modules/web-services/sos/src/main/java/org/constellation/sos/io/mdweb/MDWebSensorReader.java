@@ -99,7 +99,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
             if (dbId == null) {
                 dbId = sensorId;
             }
-            final Object metadata   = getMetadata(dbId, AbstractMetadataReader.SENSORML, null);
+            final Object metadata   = getMetadata(dbId, AbstractMetadataReader.SENSORML);
             
             if (metadata instanceof AbstractSensorML) {
                return (AbstractSensorML) metadata;

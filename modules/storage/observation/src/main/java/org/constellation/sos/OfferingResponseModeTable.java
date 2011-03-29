@@ -33,7 +33,7 @@ import org.geotoolkit.util.Utilities;
  *
  * @author Guilhem Legal
  */
-public class OfferingResponseModeTable extends SingletonTable<OfferingResponseModeType>{
+public class OfferingResponseModeTable extends SingletonTable<OfferingResponseModeType> implements Cloneable {
 
         
     /**
@@ -97,7 +97,7 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
     }
     
     
-    public String getIdOffering() {
+    public synchronized String getIdOffering() {
         return idOffering;
     }
     

@@ -54,13 +54,13 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
     private static final Logger LOGGER = Logging.getLogger(PortrayalResponseWriter.class);
 
     @Override
-    public long getSize(PortrayalResponse r, Class<?> c, Type t, Annotation[] as, MediaType mt) {
+    public long getSize(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt) {
         return -1;
     }
 
     @Override
-    public void writeTo(PortrayalResponse r, Class<?> c, Type t, Annotation[] as, MediaType mt,
-            MultivaluedMap<String, Object> h, OutputStream out) throws IOException, WebApplicationException {
+    public void writeTo(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt,
+            final MultivaluedMap<String, Object> h, final OutputStream out) throws IOException, WebApplicationException {
 
         BufferedImage img = r.getImage();
         if(img != null){
@@ -103,7 +103,7 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
     }
 
     @Override
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType) {
         return PortrayalResponse.class.isAssignableFrom(type);
     }
 }

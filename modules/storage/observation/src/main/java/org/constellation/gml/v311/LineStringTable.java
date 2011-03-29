@@ -35,7 +35,7 @@ import org.geotoolkit.internal.sql.table.Table;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class LineStringTable extends Table {
+public class LineStringTable extends Table implements Cloneable {
 
     public LineStringTable(final Database database) {
         this(new LineStringQuery(database));

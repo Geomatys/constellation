@@ -44,7 +44,7 @@ import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
+public class SamplingCurveTable extends SingletonTable<SamplingCurveType> implements Cloneable {
 
     /**
      * Connexion vers la table des {@linkplain LineStringTable lineStrings}.

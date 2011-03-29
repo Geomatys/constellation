@@ -39,7 +39,7 @@ import org.geotoolkit.sampling.xml.v100.SamplingPointType;
  *
  * @author Guilhem Legal
  */
-public class SamplingPointTable extends SingletonTable<SamplingPointType> {
+public class SamplingPointTable extends SingletonTable<SamplingPointType> implements Cloneable {
     
     /** Creates a new instance of SamplingPointTable */
     public SamplingPointTable(final Database database) {

@@ -81,7 +81,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      * {@inheritDoc}
      */
     @Override
-    protected WMTSWorker createWorker(File instanceDirectory) {
+    protected WMTSWorker createWorker(final File instanceDirectory) {
         return new DefaultWMTSWorker(instanceDirectory.getName(), instanceDirectory);
     }
 
@@ -90,7 +90,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(final Object objectRequest, WMTSWorker worker) {
+    public Response treatIncomingRequest(final Object objectRequest, final WMTSWorker worker) {
         ServiceDef serviceDef = null;
         try {
             if (worker == null) {
@@ -139,7 +139,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      * @return
      * @throws CstlServiceException
      */
-    private RequestBase adaptQuery(String request) throws CstlServiceException {
+    private RequestBase adaptQuery(final String request) throws CstlServiceException {
 
         if ("GetCapabilities".equalsIgnoreCase(request)) {
             return createNewGetCapabilitiesRequest();
@@ -207,10 +207,8 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      * @return The {@link GetCapabilities} request.
      * @throws CstlServiceException if a required parameter is not present in the request.
      */
-    private GetCapabilities createNewGetCapabilitiesRequestRestful(final String version)
-                                                             throws CstlServiceException
-    {
-        AcceptVersionsType versions;
+    private GetCapabilities createNewGetCapabilitiesRequestRestful(final String version) throws CstlServiceException {
+        final AcceptVersionsType versions;
         if (version != null) {
             versions = new AcceptVersionsType(version);
         } else {
@@ -264,9 +262,9 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      * @return The {@link GetTile} request.
      * @throws CstlServiceException if a required parameter is not present in the request.
      */
-    private GetTile createNewGetTileRequestRestful(String layer, String tileMatrixSet,
-                                                   String tileMatrix, String tileRow,
-                                                   String tileCol, String format, String style)
+    private GetTile createNewGetTileRequestRestful(final String layer, final String tileMatrixSet,
+                                                   final String tileMatrix, final String tileRow,
+                                                   final String tileCol, final String format, final String style)
                                                    throws CstlServiceException
     {
         final GetTile getTile = new GetTile();
@@ -318,8 +316,8 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      */
     @GET
     @Path("{version}/{caps}")
-    public Response processGetCapabilitiesRestful(@PathParam("version") String version,
-                                                  @PathParam("caps") String resourcename)
+    public Response processGetCapabilitiesRestful(@PathParam("version") final String version,
+                                                  @PathParam("caps") final String resourcename)
                                                                      
     {
         ServiceDef serviceDef = null;
@@ -354,16 +352,16 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      */
     @GET
     @Path("{layer}/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}.{format}")
-    public Response processGetTileRestful(@PathParam("layer") String layer,
-                                          @PathParam("tileMatrixSet") String tileMatrixSet,
-                                          @PathParam("tileMatrix") String tileMatrix,
-                                          @PathParam("tileRow") String tileRow,
-                                          @PathParam("tileCol") String tileCol,
-                                          @PathParam("format") String format)
+    public Response processGetTileRestful(@PathParam("layer") final String layer,
+                                          @PathParam("tileMatrixSet") final String tileMatrixSet,
+                                          @PathParam("tileMatrix") final String tileMatrix,
+                                          @PathParam("tileRow") final String tileRow,
+                                          @PathParam("tileCol") final String tileCol,
+                                          @PathParam("format") final String format)
     {
         try {
             final String serviceId = getParameter("serviceId", false);
-            WMTSWorker worker = workersMap.get(serviceId);
+            final WMTSWorker worker = workersMap.get(serviceId);
             if (worker == null) {
                 throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
@@ -388,11 +386,11 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      *   <li>if the exception code indicates a mistake done by the user, just display a single
      *       line message in logs.</li>
      *   <li>otherwise logs the full stack trace in logs, because it is something interesting for
-     *       a developper</li>
+     *       a developer</li>
      * </ul>
      * In both ways, the exception is then marshalled and returned to the client.
      *
-     * @param ex The exception that has been generated during the webservice operation requested.
+     * @param ex The exception that has been generated during the web-service operation requested.
      * @return An XML representing the exception.
      *
      */

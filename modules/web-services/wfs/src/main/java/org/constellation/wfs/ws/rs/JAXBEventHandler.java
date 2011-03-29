@@ -31,7 +31,7 @@ public class JAXBEventHandler implements ValidationEventHandler {
     public int level = -1;
 
     @Override
-    public boolean handleEvent(ValidationEvent ve) {
+    public boolean handleEvent(final ValidationEvent ve) {
         if (ve.getSeverity() == ve.FATAL_ERROR || ve.getSeverity() == ve.ERROR) {
             if (ve.getMessage() != null && ve.getMessage().startsWith("unexpected element")) {
                 level = ve.getSeverity();

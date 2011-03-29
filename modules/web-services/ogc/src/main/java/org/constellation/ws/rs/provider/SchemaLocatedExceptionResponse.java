@@ -30,7 +30,7 @@ public class SchemaLocatedExceptionResponse implements ExceptionResponse {
 
     private final String schemaLocation;
 
-    public SchemaLocatedExceptionResponse(ExceptionResponse response, String schemaLocation) {
+    public SchemaLocatedExceptionResponse(final ExceptionResponse response, final String schemaLocation) {
         this.response       = response;
         this.schemaLocation = schemaLocation;
     }

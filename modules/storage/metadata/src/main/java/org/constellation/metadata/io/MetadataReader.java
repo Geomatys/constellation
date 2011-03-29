@@ -19,7 +19,6 @@
 package org.constellation.metadata.io;
 
 import java.util.List;
-import javax.xml.namespace.QName;
 
 /**
  *
@@ -32,12 +31,11 @@ public interface MetadataReader {
      * 
      * @param identifier The metadata identifier.
      * @param mode An output schema mode: EBRIM, ISO_19115, DUBLINCORE and SENSORML supported.
-     * @param elementName A list of QName describing the requested fields. (implies type == null)
      * 
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException;
+    Object getMetadata(final String identifier, final int mode) throws MetadataIoException;
     
     /**
      * Return all the entries from the database
@@ -59,7 +57,7 @@ public interface MetadataReader {
      * 
      * @param identifier The metadata identifier.
      */
-    void removeFromCache(String identifier);
+    void removeFromCache(final String identifier);
     
     
     /**

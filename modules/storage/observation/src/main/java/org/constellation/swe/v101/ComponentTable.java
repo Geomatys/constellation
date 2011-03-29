@@ -35,7 +35,7 @@ import org.geotoolkit.util.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class ComponentTable extends SingletonTable<ComponentType>{
+public class ComponentTable extends SingletonTable<ComponentType> implements Cloneable {
     
     /**
      * identifiant secondaire de la table.
@@ -105,7 +105,7 @@ public class ComponentTable extends SingletonTable<ComponentType>{
     }
     
     
-    public String getIdCompositePhenomenon() {
+    public synchronized String getIdCompositePhenomenon() {
         return idCompositePhenomenon;
     }
     

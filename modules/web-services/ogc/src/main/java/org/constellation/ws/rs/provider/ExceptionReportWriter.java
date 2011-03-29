@@ -51,17 +51,17 @@ public class ExceptionReportWriter<T extends ExceptionResponse> implements Messa
     private static final String OWS_100_XSD = "http://www.opengis.net/ows http://schemas.opengis.net/ows/1.0.0/owsExceptionReport.xsd";
 
     @Override
-    public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
+    public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return ExceptionResponse.class.isAssignableFrom(type);
     }
 
     @Override
-    public long getSize(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
+    public long getSize(final T t, Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return -1;
     }
 
     @Override
-    public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
+    public void writeTo(T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         Marshaller m = null;
         try {
             m = ExceptionReportMarshallerPool.getInstance().acquireMarshaller();

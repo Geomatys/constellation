@@ -83,7 +83,7 @@ import org.geotoolkit.swe.xml.v101.PhenomenonType;
  * @author Antoine Hnawia
  * @author Guilhem Legal
  */
-public class ObservationTable extends SingletonTable<ObservationType> {
+public class ObservationTable extends SingletonTable<ObservationType> implements Cloneable {
     
     /**
      * Connexion vers la table des stations.

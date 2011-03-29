@@ -46,17 +46,17 @@ public class WCSResponseWriter<T extends WCSResponse> implements MessageBodyWrit
     private static final Logger LOGGER = Logging.getLogger("org.constellation.coverage.ws.rs");
 
     @Override
-    public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
+    public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return WCSResponse.class.isAssignableFrom(type);
     }
 
     @Override
-    public long getSize(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
+    public long getSize(final T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return -1;
     }
 
     @Override
-    public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
+    public void writeTo(final T t, Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         Marshaller m = null;
         try {
             m = WCSMarshallerPool.getInstance().acquireMarshaller();

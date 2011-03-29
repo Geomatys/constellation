@@ -34,7 +34,7 @@ import org.opengis.observation.sampling.SurveyProcedure;
  *
  * @author Guilhem Legal
  */
-public class SurveyProcedureTable extends SingletonTable<SurveyProcedureType>{
+public class SurveyProcedureTable extends SingletonTable<SurveyProcedureType> implements Cloneable {
     
    /**
     * Construit une table des survey procedures.

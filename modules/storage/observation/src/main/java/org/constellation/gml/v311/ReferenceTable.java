@@ -31,7 +31,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class ReferenceTable extends SingletonTable<ReferenceType>{
+public class ReferenceTable extends SingletonTable<ReferenceType> implements Cloneable {
     
     /**
      * Construit une table des reference.

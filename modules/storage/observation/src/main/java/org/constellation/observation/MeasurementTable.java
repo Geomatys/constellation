@@ -56,7 +56,7 @@ import org.opengis.observation.Measurement;
  * @see MergedMeasurementTable
  * @see org.constellation.measervation.coverage.MeasurementTableFiller
  */
-public class MeasurementTable extends SingletonTable<MeasurementType> {
+public class MeasurementTable extends SingletonTable<MeasurementType> implements Cloneable {
     
     /**
      * Connexion vers la table des stations.

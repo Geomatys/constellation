@@ -36,7 +36,7 @@ import org.geotoolkit.util.Utilities;
  *
  * @author Guilhem Legal
  */
-public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonType>{
+public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonType> implements Cloneable {
 
     /**
      * identifier secondary of the table.
@@ -117,7 +117,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonTy
     }
     
     
-    public String getIdOffering() {
+    public synchronized String getIdOffering() {
         return idOffering;
     }
     

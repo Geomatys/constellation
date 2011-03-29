@@ -33,7 +33,7 @@ import org.geotoolkit.swe.xml.v101.TextBlockType;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class TextBlockTable extends SingletonTable<TextBlockType>{
+public class TextBlockTable extends SingletonTable<TextBlockType> implements Cloneable {
     
     /**
      * Construit une table des text Block encodage.

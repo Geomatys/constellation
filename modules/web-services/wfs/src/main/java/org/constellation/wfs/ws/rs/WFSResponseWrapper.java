@@ -27,7 +27,7 @@ public class WFSResponseWrapper implements WFSResponse {
 
     private final Object response;
 
-    public WFSResponseWrapper(Object response) {
+    public WFSResponseWrapper(final Object response) {
         this.response = response;
     }
 

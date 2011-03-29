@@ -32,7 +32,7 @@ import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry> {
+public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry> implements Cloneable {
     
    /**
     * Construit une table des unites de mesure.

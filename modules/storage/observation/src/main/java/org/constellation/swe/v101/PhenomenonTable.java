@@ -37,7 +37,7 @@ import org.geotoolkit.swe.xml.v101.PhenomenonType;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class PhenomenonTable extends SingletonTable<PhenomenonType> {
+public class PhenomenonTable extends SingletonTable<PhenomenonType> implements Cloneable {
    
     /**
      * Construit une table des phénomènes.

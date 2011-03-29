@@ -36,7 +36,7 @@ import org.geotoolkit.observation.xml.v100.ProcessType;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class ProcessTable extends SingletonTable<ProcessType> {
+public class ProcessTable extends SingletonTable<ProcessType> implements Cloneable {
     
     /**
      * Construit une table des procédures.

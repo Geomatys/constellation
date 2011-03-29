@@ -85,7 +85,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * @throws MetadataIoException
      */
     @Override
-    public abstract Object getMetadata(final String identifier, final int mode, final List<QName> elementName) throws MetadataIoException;
+    public abstract Object getMetadata(final String identifier, final int mode) throws MetadataIoException;
     
     /**
      * Return all the entries from the database

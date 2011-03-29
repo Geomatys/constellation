@@ -37,7 +37,7 @@ import org.geotoolkit.swe.xml.v101.TextBlockType;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class DataArrayTable extends SingletonTable<DataArrayType>{
+public class DataArrayTable extends SingletonTable<DataArrayType> implements Cloneable {
     
     /**
      * Connexion vers la table des {@linkplain TextBlock text block encoding}.

@@ -40,7 +40,7 @@ import org.geotoolkit.util.Utilities;
  * @author Guilhem Legal
  * @version $Id:
  */
-public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
+public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType> implements Cloneable {
     
     /**
      * identifiant secondaire de la table
@@ -88,7 +88,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
     /**
      * retourne l'identifiant du DataBlock contenant le dataRecord qui possede ce champ.
      */
-    public String getIdDataBlock() {
+    public synchronized String getIdDataBlock() {
         return idDataBlock;
     }
     

@@ -34,7 +34,7 @@ import org.geotoolkit.internal.sql.table.Table;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class SpecialOperationsTable extends Table{
+public class SpecialOperationsTable extends Table implements Cloneable {
 
      public SpecialOperationsTable(final Database database) {
         this(new SpecialOperationsQuery(database));

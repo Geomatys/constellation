@@ -38,7 +38,7 @@ import org.geotoolkit.swe.xml.v101.AbstractEncodingPropertyType;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinitionType>{
+public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinitionType> implements Cloneable {
     
     /**
      * Connexion vers la table des {@linkplain TextBlock text block encoding}.

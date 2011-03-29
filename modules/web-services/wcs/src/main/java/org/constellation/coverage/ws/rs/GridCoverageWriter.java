@@ -47,17 +47,17 @@ public class GridCoverageWriter<T extends Entry> implements MessageBodyWriter<T>
     private static final Logger LOGGER = Logging.getLogger("org.constellation.coverage.ws.rs");
 
     @Override
-    public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
+    public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return Entry.class.isAssignableFrom(type);
     }
 
     @Override
-    public long getSize(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
+    public long getSize(final T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return -1;
     }
 
     @Override
-    public void writeTo(T entry, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
+    public void writeTo(final T entry, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt, final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         final GridCoverage2D coverage    = (GridCoverage2D) entry.getKey();
         final SpatialMetadata metadata   = (SpatialMetadata) entry.getValue();
         IIOImage iioimage                = new IIOImage(coverage.getRenderedImage(), null, metadata);

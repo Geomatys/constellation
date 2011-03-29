@@ -53,7 +53,6 @@ import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.util.StringUtilities;
 
 import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.Value;
 import org.mdweb.io.MD_IOException;
@@ -66,7 +65,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * A CSW Metadata reader specific for MDweb data source.
- * It allows to read metadatas from the datasource.
+ * It allows to read metadata from the dataSource.
  * 
  * @author Guilhem Legal (Geomatys)
  */

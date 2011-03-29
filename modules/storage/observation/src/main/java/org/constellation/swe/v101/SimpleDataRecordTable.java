@@ -38,7 +38,7 @@ import org.geotoolkit.util.Utilities;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType>{
+public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType> implements Cloneable {
     
     /**
      * identifiant secondaire de la table
@@ -89,7 +89,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordType>{
     /**
      * retourne l'identifiant du DataBlock contenant le dataRecord qui possede ce champ.
      */
-    public String getIdDataBlock() {
+    public synchronized String getIdDataBlock() {
         return idDataBlock;
     }
     

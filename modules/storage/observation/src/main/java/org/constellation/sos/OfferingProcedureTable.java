@@ -34,7 +34,7 @@ import org.geotoolkit.util.Utilities;
  *
  * @author Guilhem Legal
  */
-public class OfferingProcedureTable extends SingletonTable<OfferingProcedureType>{
+public class OfferingProcedureTable extends SingletonTable<OfferingProcedureType> implements Cloneable {
 
         
     /**
@@ -105,7 +105,7 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureType
     }
     
     
-    public String getIdOffering() {
+    public synchronized String getIdOffering() {
         return idOffering;
     }
     

@@ -63,7 +63,6 @@ import org.mdweb.io.Reader;
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.geotoolkit.internal.CodeLists;
-import org.geotoolkit.internal.jaxb.MarshalContext;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.naming.DefaultLocalName;
 import org.geotoolkit.naming.DefaultNameFactory;
@@ -322,14 +321,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * 
      * @param identifier The metadata identifier.
      * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
-     * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
-     * @param elementName A list of QName describing the requested fields. (implies type == null)
+     * 
      * @return A metadata Object (Dublin core Record / GeotoolKit metadata / EBrim registry object)
      * 
      * @throws java.sql.MetadataIoException
      */
     @Override
-    public Object getMetadata(String identifier, final int mode, final List<QName> elementName) throws MetadataIoException {
+    public Object getMetadata(String identifier, final int mode) throws MetadataIoException {
         try {
             alreadyRead.clear();
 
@@ -376,7 +374,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         //debugging part to see why the form cannot be read.
         } else {
             if (form == null) {
-                LOGGER.severe("form is null");
+                LOGGER.warning("form is null");
             } else if (form.getRoot() == null) {
                 LOGGER.severe("Top value is null");
             } else {

@@ -39,7 +39,7 @@ import org.geotoolkit.swe.xml.v101.PhenomenonType;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenonType> {
+public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenonType> implements Cloneable {
     
     /**
      * Connexion vers la table des {@linkplain ComponentTable composants}.

@@ -34,7 +34,7 @@ import org.geotoolkit.util.Utilities;
  *
  * @author Guilhem Legal
  */
-public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplingFeatureType> {
+public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplingFeatureType> implements Cloneable {
 
     /**
      * identifier secondary of the table.
@@ -114,7 +114,7 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
         }
     }
 
-    public String getIdOffering() {
+    public synchronized String getIdOffering() {
         return idOffering;
     }
 

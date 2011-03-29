@@ -340,7 +340,7 @@ public abstract class AbstractCSWConfigurer {
             if (reader != null) {
                 try {
                     for (String identifier : identifiers) {
-                        objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115, null));
+                        objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115));
                     }
                 } catch (MetadataIoException ex) {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
