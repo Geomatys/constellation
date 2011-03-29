@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration for the "xacml-security" module of Constellation project.
+  Version: $Id$
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.constellation</groupId>
+    <artifactId>library</artifactId>
+    <version>0.7-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Module description.
+  -->
+  <groupId>org.constellation.library</groupId>
+  <artifactId>cstl-lib-index</artifactId>
+  <packaging>jar</packaging>
+  <name>Library providing CSW Lucene Index handlers</name>
+  <description>
+    The library for Constellation CSW Lucene Index handlers.
+  </description>
+
+
+
+  <!--
+    Developers and contributors.
+  -->
+  <developers>
+    <developer>
+      <id>glegal</id>
+      <name>Guilhem Legal</name>
+      <email>guilhem.legal@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+
+  <!--
+    Required dependencies for building. These dependencies wil be included into
+    the JARs list that Maven will put into the directory "target/binaries".
+  -->
+  <dependencies>
+    <dependency>
+     <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-ebrim</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-spatial-lucene</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mdweb.metamodel</groupId>
+      <artifactId>mdweb-metamodel-lib-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-metadata</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+       <groupId>org.constellation.testing</groupId>
+       <artifactId>cstl-test-data</artifactId>
+       <version>${project.version}</version>
+       <scope>test</scope>
+    </dependency>
+    <dependency>
+       <groupId>org.mdweb.metamodel</groupId>
+       <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>
