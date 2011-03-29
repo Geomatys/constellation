@@ -69,6 +69,7 @@
   <modules>
     <module>base</module>
     <module>filter</module>
+    <module>index</module>
   </modules>
 
 </project>

@@ -68,7 +68,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * Clone a  Generic Observation Filter for CSTL O&M datasource.
      * @param omFilter
      */
-    public GenericObservationFilter(GenericObservationFilter omFilter) {
+    public GenericObservationFilter(final GenericObservationFilter omFilter) {
         super(omFilter);
         this.map                       = omFilter.map;
     }
@@ -82,7 +82,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * @param configuration
      * @throws CstlServiceException
      */
-    public GenericObservationFilter(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public GenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         super(configuration, properties);
         this.map = (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);
     }
@@ -91,7 +91,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
+    public void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) {
         currentQuery              = new FilterQuery();
         final FilterSelect select = configurationQuery.getSelect("filterObservation");
         final From from           = configurationQuery.getFrom("observations");
@@ -111,7 +111,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterGetResult(Observation template, QName resultModel) {
+    public void initFilterGetResult(final Observation template, final QName resultModel) {
         currentQuery              = new FilterQuery();
         final FilterSelect select = configurationQuery.getSelect("filterResult");
         final From from           = configurationQuery.getFrom("observations");
@@ -128,7 +128,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(List<String> procedures, ObservationOfferingType off) {
+    public void setProcedure(final List<String> procedures, final ObservationOfferingType off) {
         if (!procedures.isEmpty()) {
             for (String s : procedures) {
                 if (s != null) {
@@ -155,7 +155,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
+    public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
         for (String p : phenomenon) {
             final Where where = configurationQuery.getWhere("simplePhenomenon");
             where.replaceVariable("phenomenon", p, true);
@@ -172,7 +172,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setFeatureOfInterest(List<String> fois) {
+    public void setFeatureOfInterest(final List<String> fois) {
         for (String foi : fois) {
             final Where where = configurationQuery.getWhere("foi");
             where.replaceVariable("foi", foi, true);
@@ -184,7 +184,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeEquals(Object time) throws CstlServiceException {
+    public void setTimeEquals(final Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
             final TimePeriodType tp = (TimePeriodType) time;
             final String begin      = getTimeValue(tp.getBeginPosition());
@@ -214,7 +214,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeBefore(Object time) throws CstlServiceException  {
+    public void setTimeBefore(final Object time) throws CstlServiceException  {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
             final TimeInstantType ti = (TimeInstantType) time;
@@ -234,7 +234,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeAfter(Object time) throws CstlServiceException {
+    public void setTimeAfter(final Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
             final TimeInstantType ti = (TimeInstantType) time;
@@ -254,7 +254,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeDuring(Object time) throws CstlServiceException {
+    public void setTimeDuring(final Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
             final TimePeriodType tp = (TimePeriodType) time;
             final String begin      = getTimeValue(tp.getBeginPosition());

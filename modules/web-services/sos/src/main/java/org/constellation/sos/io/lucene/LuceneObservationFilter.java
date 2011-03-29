@@ -66,12 +66,12 @@ public class LuceneObservationFilter implements ObservationFilter {
 
     private static final String OR_OPERATOR = " OR ";
 
-    public LuceneObservationFilter(LuceneObservationFilter omFilter) throws CstlServiceException {
+    public LuceneObservationFilter(final LuceneObservationFilter omFilter) throws CstlServiceException {
         this.map      = omFilter.map;
         this.searcher = omFilter.searcher;
     }
 
-    public LuceneObservationFilter(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public LuceneObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.map  =  (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);
         try {
             this.searcher = new LuceneObservationSearcher(configuration.getConfigurationDirectory(), "");
@@ -85,7 +85,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
+    public void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) {
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             luceneRequest = new StringBuilder("type:measurement ");
         } else {
@@ -103,7 +103,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterGetResult(Observation template, QName resultModel) {
+    public void initFilterGetResult(final Observation template, final QName resultModel) {
         final ProcessType process = (ProcessType) template.getProcedure();
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             luceneRequest = new StringBuilder("type:measurement AND procedure:\"" + process.getHref() + "\" ");
@@ -116,7 +116,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setProcedure(List<String> procedures, ObservationOfferingType off) {
+    public void setProcedure(final List<String> procedures, final ObservationOfferingType off) {
         luceneRequest.append(" ( ");
         if (!procedures.isEmpty()) {
 
@@ -143,7 +143,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
+    public void setObservedProperties(final List<String> phenomenon, final List<String> compositePhenomenon) {
         luceneRequest.append(" AND( ");
         for (String p : phenomenon) {
             luceneRequest.append(" observed_property:\"").append(p).append('"').append(OR_OPERATOR);
@@ -160,7 +160,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setFeatureOfInterest(List<String> fois) {
+    public void setFeatureOfInterest(final List<String> fois) {
         luceneRequest.append(" AND (");
         for (String foi : fois) {
             luceneRequest.append("feature_of_interest:").append(foi).append(" OR ");
@@ -173,7 +173,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeEquals(Object time) throws CstlServiceException {
+    public void setTimeEquals(final Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
             final TimePeriodType tp = (TimePeriodType) time;
             final String begin      = getLuceneTimeValue(tp.getBeginPosition());
@@ -207,7 +207,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeBefore(Object time) throws CstlServiceException {
+    public void setTimeBefore(final Object time) throws CstlServiceException {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
             final TimeInstantType ti = (TimeInstantType) time;
@@ -227,7 +227,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeAfter(Object time) throws CstlServiceException {
+    public void setTimeAfter(final Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
             final TimeInstantType ti = (TimeInstantType) time;
@@ -251,7 +251,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeDuring(Object time) throws CstlServiceException {
+    public void setTimeDuring(final Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
             final TimePeriodType tp = (TimePeriodType) time;
             final String begin      = getLuceneTimeValue(tp.getBeginPosition());
@@ -363,7 +363,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setLoglevel(Level logLevel) {
+    public void setLoglevel(final Level logLevel) {
         if (searcher != null) {
             searcher.setLogLevel(logLevel);
         }

@@ -49,7 +49,7 @@ public class PEP {
      * 
      * @param PDP
      */
-    public PEP(PolicyDecisionPoint pdp) {
+    public PEP(final PolicyDecisionPoint pdp) {
         this.pdp = pdp;
     }
     
@@ -63,7 +63,7 @@ public class PEP {
      * @return An XACML request.
      * @throws java.lang.Exception
      */
-    public RequestContext createXACMLRequest(String resourceURI, Principal principal, Group roleGroup, String action) throws URISyntaxException, IOException {
+    public RequestContext createXACMLRequest(final String resourceURI, final Principal principal, final Group roleGroup, final String action) throws URISyntaxException, IOException {
         final RequestContext requestCtx = new CstlRequestContext();
 
         //Create a subject type
@@ -100,7 +100,7 @@ public class PEP {
      * @return An XACML request.
      * @throws java.lang.Exception
      */
-    public RequestContext createXACMLRequest(URI resourceURI, Principal principal, Group roleGroup, String action) throws IOException {
+    public RequestContext createXACMLRequest(final URI resourceURI, final Principal principal, final Group roleGroup, final String action) throws IOException {
         final RequestContext requestCtx = new CstlRequestContext();
 
         //Create a subject type
@@ -130,12 +130,12 @@ public class PEP {
     /**
      * Create a part of XACML request about the user and group.
      * 
-     * @param user      The authentified user.
+     * @param user      The authenticated user.
      * @param roleGroup The user group.
      * 
      * @return a subject Type which is a part of XACML request.
      */
-    protected SubjectType createSubject(Principal user, Group roleGroup) {
+    protected SubjectType createSubject(final Principal user, final Group roleGroup) {
     
         //Create a subject type
         final SubjectType subject = new SubjectType();
@@ -161,7 +161,7 @@ public class PEP {
      * 
      * @return a resource Type which is a part of XACML request.
      */
-    protected ResourceType createResource(String uri) throws URISyntaxException {
+    protected ResourceType createResource(final String uri) throws URISyntaxException {
     
         //Create a resource type
         final ResourceType resourceType = new ResourceType();
@@ -177,7 +177,7 @@ public class PEP {
      * 
      * @return a resource Type which is a part of XACML request.
      */
-    protected ResourceType createResource(URI uri) {
+    protected ResourceType createResource(final URI uri) {
     
         //Create a resource type
         final ResourceType resourceType = new ResourceType();
@@ -193,7 +193,7 @@ public class PEP {
      * 
      * @return a action Type which is a part of XACML request.
      */
-    protected ActionType createAction(String action)  {
+    protected ActionType createAction(final String action)  {
         
         //Create an action type
         final ActionType actionType = new ActionType();
@@ -224,7 +224,7 @@ public class PEP {
     * @return
     * @throws Exception
     */
-   public ResponseContext getResponse(RequestContext request) {
+   public ResponseContext getResponse(final RequestContext request) {
       return pdp.evaluate(request);
    }
 
@@ -235,7 +235,7 @@ public class PEP {
     * @return
     * @throws Exception
     */
-   public int getDecision(RequestContext request) {
+   public int getDecision(final RequestContext request) {
       final ResponseContext response = pdp.evaluate(request);
       return response.getDecision();
    }

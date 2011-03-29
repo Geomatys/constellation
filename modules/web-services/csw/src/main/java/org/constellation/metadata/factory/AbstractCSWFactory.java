@@ -30,6 +30,7 @@ import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 
 // Geotoolkit dependencies
+import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.geotoolkit.factory.Factory;
 import org.geotoolkit.lucene.IndexingException;
@@ -75,7 +76,7 @@ public abstract class AbstractCSWFactory extends Factory {
      * @return A Lucene indexer for the specified dataSource type.
      * @throws IndexingException
      */
-    public abstract AbstractIndexer getIndexer(final Automatic configuration, final CSWMetadataReader reader,
+    public abstract AbstractIndexer getIndexer(final Automatic configuration, final MetadataReader reader,
             final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException;
 
     /**

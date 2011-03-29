@@ -67,13 +67,11 @@ public class LuceneFilterParser extends FilterParser {
         return new SpatialQuery(DEFAULT_FIELD, nullFilter, SerialChainFilter.AND);
     }
     
-     /**
-     * Build a lucene request from the specified Filter.
-     * 
-     * @param filter a Filter object build directly from the XML or from a CQL request
+    /**
+     * {@inheritDoc}
      */
     @Override
-    protected SpatialQuery getQuery(final FilterType filter, Map<String, QName> variables, Map<String, String> prefixs) throws FilterParserException {
+    protected SpatialQuery getQuery(final FilterType filter, final Map<String, QName> variables, final Map<String, String> prefixs) throws FilterParserException {
 
         SpatialQuery response = null;
         if (filter != null) { 
@@ -222,7 +220,7 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) {
+    protected void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) {
         if ("!=".equals(operator)) {
             response.append("metafile:doc NOT ");
         }
@@ -239,7 +237,7 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws FilterParserException {
+    protected void addDateComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException {
         if (isDateField(propertyName)) {
             final String dateValue = extractDateValue(literalValue);
             response.append(removePrefix(propertyName.getPropertyName())).append(":");
@@ -269,7 +267,7 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String extractDateValue(String literal) throws FilterParserException {
+    protected String extractDateValue(final String literal) throws FilterParserException {
         try {
             return toLuceneDate(TemporalUtilities.parseDate(literal));
         } catch (ParseException ex) {
@@ -282,7 +280,7 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String translateSpecialChar(PropertyIsLike pil) {
+    protected String translateSpecialChar(final PropertyIsLike pil) {
         return translateSpecialChar(pil, "*", "?", "\\");
     }
 
@@ -299,7 +297,7 @@ public class LuceneFilterParser extends FilterParser {
         return s;
     }
 
-    private static String toLuceneDate(Date date){
+    private static String toLuceneDate(final Date date){
         final Calendar c = Calendar.getInstance();
         c.setTime(date);
         final StringBuilder sb = new StringBuilder();

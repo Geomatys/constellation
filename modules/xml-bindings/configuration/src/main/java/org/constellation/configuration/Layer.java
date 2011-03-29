@@ -70,12 +70,13 @@ public class Layer {
 
     }
 
-    public Layer(QName name) {
+    public Layer(final QName name) {
         this.name = name;
     }
 
-    public Layer(QName name, String title, String abstrac, List<String> keywords, FormatURL metadataURL, FormatURL dataURL, FormatURL authorityURL,
-            Reference identifier, AttributionType attribution, Boolean opaque, List<String> crs) {
+    public Layer(final QName name, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+            final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
+            final List<String> crs) {
         this.name         = name;
         this.title        = title;
         this.abstrac      = abstrac;
@@ -99,7 +100,7 @@ public class Layer {
     /**
      * @param name the name to set
      */
-    public void setName(QName name) {
+    public void setName(final QName name) {
         this.name = name;
     }
 
@@ -107,7 +108,7 @@ public class Layer {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
@@ -115,7 +116,7 @@ public class Layer {
         return abstrac;
     }
 
-    public void setAbstrac(String abstrac) {
+    public void setAbstrac(final String abstrac) {
         this.abstrac = abstrac;
     }
 
@@ -126,7 +127,7 @@ public class Layer {
         return keywords;
     }
 
-    public void setKeywords(List<String> keywords) {
+    public void setKeywords(final List<String> keywords) {
         this.keywords = keywords;
     }
 
@@ -134,7 +135,7 @@ public class Layer {
         return metadataURL;
     }
 
-    public void setMetadataURL(FormatURL metadataURL) {
+    public void setMetadataURL(final FormatURL metadataURL) {
         this.metadataURL = metadataURL;
     }
 
@@ -142,7 +143,7 @@ public class Layer {
         return dataURL;
     }
 
-    public void setDataURL(FormatURL dataURL) {
+    public void setDataURL(final FormatURL dataURL) {
         this.dataURL = dataURL;
     }
 
@@ -150,7 +151,7 @@ public class Layer {
         return authorityURL;
     }
 
-    public void setAuthorityURL(FormatURL authorityURL) {
+    public void setAuthorityURL(final FormatURL authorityURL) {
         this.authorityURL = authorityURL;
     }
 
@@ -171,7 +172,7 @@ public class Layer {
     /**
      * @param attribution the attribution to set
      */
-    public void setAttribution(AttributionType attribution) {
+    public void setAttribution(final AttributionType attribution) {
         this.attribution = attribution;
     }
 
@@ -179,7 +180,7 @@ public class Layer {
         return opaque;
     }
 
-    public void setOpaque(Boolean opaque) {
+    public void setOpaque(final Boolean opaque) {
         this.opaque = opaque;
     }
 
@@ -196,7 +197,7 @@ public class Layer {
     /**
      * @param crs the crs to set
      */
-    public void setCrs(List<String> crs) {
+    public void setCrs(final List<String> crs) {
         this.crs = crs;
     }
 }

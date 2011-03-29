@@ -48,8 +48,6 @@ public abstract class CSWConstants {
     // TODO those 3 namespace must move to geotk Namespace class
     public static final String EBRIM_25 = "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
     public static final String EBRIM_30 = "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
-    public static final String INSPIRE  = "http://www.inspire.org";
-    public static final String INSPIRE_PREFIX  = "ins";
 
     /**
      * Error message

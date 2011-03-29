@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
 
-import static org.constellation.metadata.CSWConstants.*;
 
 /**
  * A container for list of queryable elements in different schemas used in CSW.
@@ -30,6 +29,9 @@ import static org.constellation.metadata.CSWConstants.*;
  * @author Guilhem Legal
  */
 public final class CSWQueryable {
+
+     public static final String INSPIRE  = "http://www.inspire.org";
+     public static final String INSPIRE_PREFIX  = "ins";
 
      public static final QName DEGREE_QNAME                               = new QName(INSPIRE, "Degree",                          INSPIRE_PREFIX);
      public static final QName ACCESS_CONSTRAINTS_QNAME                   = new QName(INSPIRE, "AccessConstraints",               INSPIRE_PREFIX);

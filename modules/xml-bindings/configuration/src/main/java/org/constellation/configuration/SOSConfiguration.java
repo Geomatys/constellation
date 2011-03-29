@@ -139,11 +139,11 @@ public class SOSConfiguration {
     }
 
     /**
-     * Build a new SOS configuration with the specified SML datasource and O&M datasource.
+     * Build a new SOS configuration with the specified SML dataSource and O&M dataSource.
      * @param smlConfiguration
      * @param omConfiguration
      */
-    public SOSConfiguration(Automatic smlConfiguration, Automatic omConfiguration) {
+    public SOSConfiguration(final Automatic smlConfiguration, final Automatic omConfiguration) {
         this.omConfiguration  = omConfiguration;
         this.smlConfiguration = smlConfiguration;
     }
@@ -158,7 +158,7 @@ public class SOSConfiguration {
     /**
      * @param SMLConfiguration the SMLConfiguration to set
      */
-    public void setSMLConfiguration(Automatic smlConfiguration) {
+    public void setSMLConfiguration(final Automatic smlConfiguration) {
         this.smlConfiguration = smlConfiguration;
     }
 
@@ -172,7 +172,7 @@ public class SOSConfiguration {
     /**
      * @param OMConfiguration the OMConfiguration to set
      */
-    public void setOMConfiguration(Automatic omConfiguration) {
+    public void setOMConfiguration(final Automatic omConfiguration) {
         this.omConfiguration = omConfiguration;
     }
 
@@ -188,7 +188,7 @@ public class SOSConfiguration {
     /**
      * @param observationFilterType the observationFilterType to set
      */
-    public void setObservationFilterType(ObservationFilterType observationFilterType) {
+    public void setObservationFilterType(final ObservationFilterType observationFilterType) {
         this.observationFilterType = observationFilterType;
     }
 
@@ -204,7 +204,7 @@ public class SOSConfiguration {
     /**
      * @param observationReaderType the observationReaderType to set
      */
-    public void setObservationReaderType(ObservationReaderType observationReaderType) {
+    public void setObservationReaderType(final ObservationReaderType observationReaderType) {
         this.observationReaderType = observationReaderType;
     }
 
@@ -220,7 +220,7 @@ public class SOSConfiguration {
     /**
      * @param SMLType the SMLType to set
      */
-    public void setSMLType(DataSourceType smlType) {
+    public void setSMLType(final DataSourceType smlType) {
         this.smlType = smlType;
     }
 
@@ -234,7 +234,7 @@ public class SOSConfiguration {
     /**
      * @param observationIdBase the observationIdBase to set
      */
-    public void setObservationIdBase(String observationIdBase) {
+    public void setObservationIdBase(final String observationIdBase) {
         this.observationIdBase = observationIdBase;
     }
 
@@ -250,7 +250,7 @@ public class SOSConfiguration {
      * set the the phenomenon id prefix.
      * @param phenomenonIdBase
      */
-    public void setPhenomenonIdBase(String phenomenonIdBase) {
+    public void setPhenomenonIdBase(final String phenomenonIdBase) {
         this.phenomenonIdBase = phenomenonIdBase;
     }
 
@@ -264,7 +264,7 @@ public class SOSConfiguration {
     /**
      * @param observationTemplateIdBase the observationTemplateIdBase to set
      */
-    public void setObservationTemplateIdBase(String observationTemplateIdBase) {
+    public void setObservationTemplateIdBase(final String observationTemplateIdBase) {
         this.observationTemplateIdBase = observationTemplateIdBase;
     }
 
@@ -278,7 +278,7 @@ public class SOSConfiguration {
     /**
      * @param sensorIdBase the sensorIdBase to set
      */
-    public void setSensorIdBase(String sensorIdBase) {
+    public void setSensorIdBase(final String sensorIdBase) {
         this.sensorIdBase = sensorIdBase;
     }
 
@@ -292,7 +292,7 @@ public class SOSConfiguration {
     /**
      * @param maxObservationByRequest the maxObservationByRequest to set
      */
-    public void setMaxObservationByRequest(int maxObservationByRequest) {
+    public void setMaxObservationByRequest(final int maxObservationByRequest) {
         this.maxObservationByRequest = maxObservationByRequest;
     }
 
@@ -306,7 +306,7 @@ public class SOSConfiguration {
     /**
      * @param templateValidTime the templateValidTime to set
      */
-    public void setTemplateValidTime(String templateValidTime) {
+    public void setTemplateValidTime(final String templateValidTime) {
         this.templateValidTime = templateValidTime;
     }
 
@@ -320,7 +320,7 @@ public class SOSConfiguration {
     /**
      * @param observationWriterType the observationWriterType to set
      */
-    public void setObservationWriterType(ObservationWriterType observationWriterType) {
+    public void setObservationWriterType(final ObservationWriterType observationWriterType) {
         this.observationWriterType = observationWriterType;
     }
 
@@ -338,7 +338,7 @@ public class SOSConfiguration {
      * set the flag for the SOS profile (discovery/transactional)
      * @param profile
      */
-    public void setProfile(String profile) {
+    public void setProfile(final String profile) {
         this.profile = profile;
     }
 
@@ -352,7 +352,7 @@ public class SOSConfiguration {
     /**
      * @param logFolder the logFolder to set
      */
-    public void setLogFolder(String logFolder) {
+    public void setLogFolder(final String logFolder) {
         this.logFolder = logFolder;
     }
 
@@ -366,7 +366,7 @@ public class SOSConfiguration {
     /**
      * @param debugMode the debugMode to set
      */
-    public void setDebugMode(boolean debugMode) {
+    public void setDebugMode(final boolean debugMode) {
         this.debugMode = debugMode;
     }
 
@@ -380,7 +380,7 @@ public class SOSConfiguration {
     /**
      * @param verifySynchronization the verifySynchronization to set
      */
-    public void setVerifySynchronization(boolean verifySynchronization) {
+    public void setVerifySynchronization(final boolean verifySynchronization) {
         this.verifySynchronization = verifySynchronization;
     }
 
@@ -397,7 +397,7 @@ public class SOSConfiguration {
     /**
      * @param extensions the extensions to set
      */
-    public void setExtensions(List<Automatic> extensions) {
+    public void setExtensions(final List<Automatic> extensions) {
         this.extensions = extensions;
     }
 
@@ -411,7 +411,7 @@ public class SOSConfiguration {
     /**
      * @param keepCapabilities the keepCapabilities to set
      */
-    public void setKeepCapabilities(boolean keepCapabilities) {
+    public void setKeepCapabilities(final boolean keepCapabilities) {
         this.keepCapabilities = keepCapabilities;
     }
 
@@ -419,7 +419,6 @@ public class SOSConfiguration {
      * Replace all the password in this object by '****'
      */
     public void hideSensibleField() {
-        final String hidden = "****";
         for (Automatic aut: getExtensions()) {
             aut.hideSensibleField();
         }
