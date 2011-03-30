@@ -18,6 +18,7 @@
 package org.constellation.menu.service;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.LayerContext;
 
 /**
  *
@@ -26,7 +27,18 @@ import org.constellation.ServiceDef.Specification;
 public class WFSBean extends AbstractServiceBean{
 
     public WFSBean() {
-        super(Specification.WFS,"/org/constellation/menu/service/layerContextConfig.xhtml");
+        super(Specification.WFS,"/org/constellation/menu/service/wfsConfig.xhtml");
+    }
+
+    @Override
+    public Object getConfigurationObject() {
+        Object candidate = super.getConfigurationObject();
+
+        if(candidate == null){
+            candidate = new LayerContext();
+        }
+
+        return candidate;
     }
 
 }

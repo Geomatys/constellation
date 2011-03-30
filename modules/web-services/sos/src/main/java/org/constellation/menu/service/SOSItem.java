@@ -31,7 +31,7 @@ public class SOSItem extends AbstractMenuItem{
         super(
             new String[]{
                 "/org/constellation/menu/service/sos.xhtml",
-                "/org/constellation/menu/service/layerContextConfig.xhtml"},
+                "/org/constellation/menu/service/sosConfig.xhtml"},
             "org.constellation.menu.service.sos",
             new Path(SERVICES_PATH,"SOS", "/org/constellation/menu/service/sos.xhtml", null,500)
             );

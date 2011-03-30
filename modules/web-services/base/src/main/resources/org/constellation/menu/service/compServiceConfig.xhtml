@@ -65,10 +65,12 @@
 
 
     <mf:dialog  id="dlg4" header="Preview" widgetVar="dlg4" modal="true"
-                showEffect="fade" hideEffect="fade">
+                showEffect="fade" hideEffect="fade"
+                closeListener="#{bean.configurationClosed}">
         <a4j:support id="dialog4_Ajax" event=""/>
 
         <mf:Div id="dialogContent">
+            <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}"/><br/>
             <ui:include src="#{bean.configPage}"/>
         </mf:Div>
 

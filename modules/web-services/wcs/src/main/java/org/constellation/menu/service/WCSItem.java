@@ -31,7 +31,7 @@ public class WCSItem extends AbstractMenuItem{
         super(
             new String[]{
                 "/org/constellation/menu/service/wcs.xhtml",
-                "/org/constellation/menu/service/layerContextConfig.xhtml"},
+                "/org/constellation/menu/service/wcsConfig.xhtml"},
             "org.constellation.menu.service.wcs",
             new Path(SERVICES_PATH,"WCS", "/org/constellation/menu/service/wcs.xhtml", null,400)
             );

@@ -18,6 +18,7 @@
 package org.constellation.menu.service;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.LayerContext;
 
 /**
  *
@@ -26,7 +27,19 @@ import org.constellation.ServiceDef.Specification;
 public class WMTSBean extends AbstractServiceBean{
 
     public WMTSBean() {
-        super(Specification.WMTS,"/org/constellation/menu/service/layerContextConfig.xhtml");
+        super(Specification.WMTS,"/org/constellation/menu/service/wmtsConfig.xhtml");
+    }
+
+
+    @Override
+    public Object getConfigurationObject() {
+        Object candidate = super.getConfigurationObject();
+
+        if(candidate == null){
+            candidate = new LayerContext();
+        }
+
+        return candidate;
     }
 
 }

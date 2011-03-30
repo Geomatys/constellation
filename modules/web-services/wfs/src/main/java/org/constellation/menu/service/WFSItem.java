@@ -31,7 +31,7 @@ public class WFSItem extends AbstractMenuItem{
         super(
             new String[]{
                 "/org/constellation/menu/service/wfs.xhtml",
-                "/org/constellation/menu/service/layerContextConfig.xhtml"},
+                "/org/constellation/menu/service/wfsConfig.xhtml"},
             "org.constellation.menu.service.wfs",
             new Path(SERVICES_PATH,"WFS", "/org/constellation/menu/service/wfs.xhtml", null,300)
             );
