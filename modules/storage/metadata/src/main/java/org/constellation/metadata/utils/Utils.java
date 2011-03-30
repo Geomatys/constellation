@@ -74,7 +74,9 @@ public final class Utils {
         paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
         paths.add("Ebrim v3.0:RegistryPackage:id");
         paths.add("Ebrim v2.5:RegistryObject:name:localizedString:value");
+        paths.add("Ebrim v2.5:ExtrinsicObject:name:localizedString:value");
         paths.add("Ebrim v2.5:RegistryObject:id");
+        paths.add("Ebrim v2.5:ExtrinsicObject:id");// TODO try to replace the ebrim type by a '*' because there is multiple subtype
         paths.add("SensorML:SensorML:member:process:id");
 
         for (String path : paths) {
@@ -152,6 +154,7 @@ public final class Utils {
         paths.add("Ebrim v3.0:RegistryObject:id");
         paths.add("Ebrim v3.0:RegistryPackage:id");
         paths.add("Ebrim v2.5:RegistryObject:id");
+        paths.add("Ebrim v2.5:ExtrinsicObject:id"); // TODO try to replace the ebrim type by a '*' because there is multiple subtype
         paths.add("ISO 19110:FC_FeatureCatalogue:id");
         paths.add("SensorML:SensorML:member:process:id");
 

@@ -302,6 +302,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return cat;
     }
 
+    /**
+     * Load the contact from MDweb database.
+     *
+     * @throws MD_IOException
+     */
     private void initContactMap() throws MD_IOException {
         final List<Form> contactForms = mdWriter.getContacts();
         if (contactForms.size() > 0) {
@@ -368,13 +373,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             ) {
                 mainStandard   = Standard.ISO_19115;
             
-            // Ebrim Types    
-            } else if ("IdentifiableType".equals(className)) {
-                mainStandard = Standard.EBRIM_V3;
-           
-            } else if ("RegistryObjectType".equals(className)) {
-                mainStandard = Standard.EBRIM_V2_5;
-            
             // CSW Types    
             } else if ("RecordType".equals(className)) {
                 mainStandard = Standard.CSW;
@@ -383,8 +381,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             } else if ("SensorML".equals(className)) {
                 mainStandard = Standard.SENSORML;
 
-            // unkow types
+            // Ebrim Types
+            } else if (object.getClass().getName().startsWith("org.geotoolkit.ebrim.xml.v300")) {
+                mainStandard = Standard.EBRIM_V3;
 
+            } else if (object.getClass().getName().startsWith("org.geotoolkit.ebrim.xml.v250")) {
+                mainStandard = Standard.EBRIM_V2_5;
+                
             // unkow types
             } else {
                 final String msg = "Can't register ths kind of object:" + object.getClass().getName();
@@ -472,7 +475,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         } else {
             ordinal  = parentValue.getNewOrdinalForChild(path.getName());
         }
-        
+
         //we look if the object have been already write
         final Value linkedValue;
         if (contacts.get(object) != null) {
@@ -598,7 +601,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
-            
+
             final LinkedValue value = new LinkedValue(path, form, ordinal, linkedValue.getForm(), linkedValue, classe, parentValue);
             result.add(value);
         
@@ -980,7 +983,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final long time = System.currentTimeMillis() - start;
 
             final StringBuilder report = new StringBuilder("inserted new Form: ");
-            report.append(report).append(form.getTitle()).append("( ID:").append(form.getId());
+            report.append(form.getTitle()).append('[').append(form.getIdentifier()).append(']').append("( ID:").append(form.getId());
             report.append(" in ").append(time).append(" ms (transformation: ").append(transTime).append(" DB write: ").append(writeTime).append(")");
             LOGGER.log(logLevel, report.toString());
             if (!noIndexation) {
