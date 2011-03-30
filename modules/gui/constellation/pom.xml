@@ -18,7 +18,7 @@
     <groupId>org.constellation.gui</groupId>
     <artifactId>constellation</artifactId>
     <packaging>war</packaging>
-    <name>WAR for webservices</name>
+    <name>Constellation (without admin interface)</name>
     <description>The WAR for Constellation.</description>
 
     

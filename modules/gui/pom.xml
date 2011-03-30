@@ -94,34 +94,14 @@
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
 
-    <profiles>
-        <profile>
-            <id>jsf</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <modules>
-                <module>adminjsf</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>constellation</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>constellation</module>
-            </modules>
-        </profile>
-    </profiles>
-
-
     <modules>
         <module>admin-base</module>
         <module>admin-page-jvm</module>
         <module>admin-page-jai</module>
         <module>admin-page-geotk</module>
         <module>admin-page-tool</module>
+        <module>adminjsf</module>
+        <module>constellation</module>
     </modules>
 
 </project>

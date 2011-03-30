@@ -18,9 +18,8 @@
     <groupId>org.constellation.gui</groupId>
     <artifactId>adminjsf</artifactId>
     <packaging>war</packaging>
-    <name>Web sites GUI (and Constellation WAR)</name>
+    <name>Constellation (with admin interface)</name>
     <description>The WAR and GUI for Constellation.</description>
-
 
 
     <!--
