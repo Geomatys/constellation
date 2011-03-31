@@ -24,10 +24,12 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -88,6 +90,7 @@ import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
+import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -296,9 +299,14 @@ public class MetadataUnmarshallTest {
         revisionDate.setDateType(DateType.REVISION);
         Date d = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
         revisionDate.setDate(d);
-        set = new HashSet();
-        set.add(revisionDate);
-        citation.setDates(set);
+        DefaultCitationDate creationDate = new DefaultCitationDate();
+        creationDate.setDateType(DateType.CREATION);
+        Date dc = TemporalUtilities.parseDate("1979-08-03T00:00:00+0200");
+        creationDate.setDate(dc);
+        List<CitationDate> dates = new ArrayList<CitationDate>();
+        dates.add(revisionDate);
+        dates.add(creationDate);
+        citation.setDates(dates);
 
 
         Set<ResponsibleParty> originators = new HashSet<ResponsibleParty>();
@@ -1116,9 +1124,14 @@ public class MetadataUnmarshallTest {
         revisionDate.setDateType(DateType.REVISION);
         Date d = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
         revisionDate.setDate(d);
-        set = new HashSet();
-        set.add(revisionDate);
-        citation.setDates(set);
+        DefaultCitationDate creationDate = new DefaultCitationDate();
+        creationDate.setDateType(DateType.CREATION);
+        Date dc = TemporalUtilities.parseDate("1979-08-03T00:00:00+0200");
+        creationDate.setDate(dc);
+        List<CitationDate> dates = new ArrayList<CitationDate>();
+        dates.add(revisionDate);
+        dates.add(creationDate);
+        citation.setDates(dates);
 
 
         Set<ResponsibleParty> originators = new HashSet<ResponsibleParty>();

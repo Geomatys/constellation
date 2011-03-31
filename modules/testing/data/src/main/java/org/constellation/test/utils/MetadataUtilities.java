@@ -17,6 +17,7 @@
 
 package org.constellation.test.utils;
 
+import org.opengis.metadata.citation.CitationDate;
 import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
 import java.util.Collection;
 import org.opengis.metadata.identification.Identification;
@@ -270,6 +271,19 @@ public class MetadataUtilities {
                 Identification resId = result.getIdentificationInfo().iterator().next();
                 assertEquals(expId.getAbstract(), resId.getAbstract());
                 assertEquals(expId.getAggregationInfo(), resId.getAggregationInfo());
+                if (expId.getCitation() != null && resId.getCitation() != null) {
+                    assertEquals(expId.getCitation().getDates().size(), resId.getCitation().getDates().size());
+                    Iterator<? extends CitationDate> expCitDateIt = expId.getCitation().getDates().iterator();
+                    Iterator<? extends CitationDate> resCitDateIt = resId.getCitation().getDates().iterator();
+                    while (expCitDateIt.hasNext()) {
+                        CitationDate expCitDate = expCitDateIt.next();
+                        CitationDate resCitDate = resCitDateIt.next();
+                        assertEquals(expCitDate.getDate(), resCitDate.getDate());
+                        assertEquals(expCitDate.getDateType(), resCitDate.getDateType());
+                        assertEquals(expCitDate, resCitDate);
+                    }
+                    assertEquals(expId.getCitation().getDates(), resId.getCitation().getDates());
+                }
                 assertEquals(expId.getCitation(), resId.getCitation());
                 assertEquals(expId.getCredits(), resId.getCredits());
                 if (resId.getDescriptiveKeywords().iterator().hasNext()) {

@@ -355,6 +355,22 @@ public class GenericindexTest {
 
         assertEquals(expectedResult, result);
 
+        /**
+         * Test 6 date search: CreationDate between 01/01/1800 and 01/01/2000
+         */
+        spatialQuery = new SpatialQuery("CreationDate:[18000101  30000101]CreationDate:[00000101 20000101]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "DateSearch 6:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+
+        assertEquals(expectedResult, result);
     }
 
     /**

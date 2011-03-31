@@ -733,7 +733,7 @@ public class CSWworkerTest {
         assertEquals(expCustomResult2, customResult2);
 
         /*
-         *  TEST 7 : getRecords with RESULTS - DC mode (Custom) - CQL text: CreationDate BETWEEN 2009-01-10 AND 2009-01-30
+         *  TEST 7 : getRecords with RESULTS - DC mode (Custom) - CQL text: Modified BETWEEN 2009-01-10 AND 2009-01-30
          */
 
         typeNames        = Arrays.asList(RECORD_QNAME);
