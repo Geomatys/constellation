@@ -220,16 +220,23 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) {
+    protected void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException {
+        final String literal;
+        if (isDateField(propertyName) && !"LIKE".equals(operator)) {
+            literal = extractDateValue(literalValue);
+        } else {
+            literal = literalValue;
+        }
         if ("!=".equals(operator)) {
             response.append("metafile:doc NOT ");
         }
         if ("LIKE".equals(operator)) {
-            response.append(removePrefix(propertyName.getPropertyName())).append(":").append('(').append(literalValue).append(')');
+            response.append(removePrefix(propertyName.getPropertyName())).append(":").append('(').append(literal).append(')');
         } else if ("IS NULL ".equals(operator)) {
-            response.append(removePrefix(propertyName.getPropertyName())).append(":").append(literalValue);
+            response.append(removePrefix(propertyName.getPropertyName())).append(":").append(literal);
+        // Equals
         } else {
-            response.append(removePrefix(propertyName.getPropertyName())).append(":\"").append(literalValue).append('"');
+            response.append(removePrefix(propertyName.getPropertyName())).append(":\"").append(literal).append('"');
         }
     }
 
@@ -297,6 +304,12 @@ public class LuceneFilterParser extends FilterParser {
         return s;
     }
 
+    /**
+     * Build a Lucene representation of a date.
+     * 
+     * @param date
+     * @return
+     */
     private static String toLuceneDate(final Date date){
         final Calendar c = Calendar.getInstance();
         c.setTime(date);

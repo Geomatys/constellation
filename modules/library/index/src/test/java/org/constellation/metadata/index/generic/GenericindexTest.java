@@ -279,7 +279,6 @@ public class GenericindexTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");
         
         assertEquals(expectedResult, result);
@@ -319,6 +318,42 @@ public class GenericindexTest {
 
         assertEquals(expectedResult, result);
 
+        /**
+         * Test 4 date search: date = 26/01/2009
+         */
+        spatialQuery = new SpatialQuery("date:\"20090126\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "DateSearch 4:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 5 date search: date LIKE 26/01/200*
+         */
+        spatialQuery = new SpatialQuery("date:(200*0126)", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "DateSearch 4:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
 
     }
 

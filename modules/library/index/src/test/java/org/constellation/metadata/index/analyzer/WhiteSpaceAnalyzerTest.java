@@ -1,9 +1,9 @@
 /*
- *    Constellation - An open source and standard compliant SDI
+ *    Constellation - An open source and WhiteSpace compliant SDI
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,113 +15,72 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata.index.generic;
 
-// J2SE dependencies
-import org.geotoolkit.util.logging.Logging;
+package org.constellation.metadata.index.analyzer;
+
+import org.constellation.metadata.index.generic.GenericIndexer;
 import java.io.File;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-
-// Constellation dependencies
-import org.constellation.util.Util;
-
-// lucene dependencies
+// Lucene dependencies
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
-// geotoolkit dependencies
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.metadata.index.mdweb.MDWebIndexer;
-import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.factory.Hints;
-import org.geotoolkit.referencing.CRS;
+// Geotoolkit dependencies
 import org.geotoolkit.geometry.GeneralEnvelope;
-import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
-import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.util.FileUtilities;
 
-// GeoAPI dependencies
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 //Junit dependencies
+import org.geotoolkit.referencing.CRS;
 import org.junit.*;
-import org.opengis.filter.FilterFactory2;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.*;
 
 /**
- * Test class for constellation lucene index
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class MdwebIndexTest {
+public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
 
-    protected static final FilterFactory2 FF = (FilterFactory2)
-            FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
+    private static File configDirectory = new File("WhiteSpaceAnalyzerTest");
 
-
-    private static DefaultDataSource ds;
-    
-    private static final Logger logger = Logging.getLogger("org.constellation.metadata");
-
-    private static AbstractIndexSearcher indexSearcher;
-
-    private static AbstractIndexer indexer;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        File configDirectory      = new File("MDwebIndexTest");
         FileUtilities.deleteDirectory(configDirectory);
-
-        final String url = "jdbc:derby:memory:MDITest;create=true";
-        ds = new DefaultDataSource(url);
-
-        Connection con = ds.getConnection();
-
-        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115-2.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-2.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
-
-        //we write the configuration file
-        BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
-        Automatic configuration = new Automatic("mdweb", bdd);
-        configuration.setConfigurationDirectory(configDirectory);
-        indexer                 = new MDWebIndexer(configuration, "");
-        indexSearcher           = new AbstractIndexSearcher(configDirectory, "");
-        indexer.setLogLevel(Level.FINER);
+        List<Object> object = fillTestData();
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new WhitespaceAnalyzer(), Level.FINER);
+        indexer.destroy();
+        
+        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new WhitespaceAnalyzer());
         indexSearcher.setLogLevel(Level.FINER);
-
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        if (ds != null) {
-            ds.shutdown();
+        FileUtilities.deleteDirectory(configDirectory);
+        indexSearcher.destroy();
+    }
+
+    public static void deleteIndex() {
+        if (configDirectory.exists()) {
+            File indexDirectory = new File(configDirectory, "index");
+            if (indexDirectory.exists()) {
+                for (File f : indexDirectory.listFiles()) {
+                    f.delete();
+                }
+                indexDirectory.delete();
+            }
+            configDirectory.delete();
         }
-        FileUtilities.deleteDirectory(new File("MDwebIndexTest"));
     }
 
     @Before
@@ -153,14 +112,16 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
+        // the result we want are this
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
         //expectedResult.add("42292_9s_19900610041000");
 
         assertEquals(expectedResult, result);
 
+
          /**
-         * Test 2 simple search: identifier != 40510_145_19930221211500
+         * Test 2 simple search: indentifier != 40510_145_19930221211500
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc NOT identifier:\"40510_145_19930221211500\"", nullFilter, SerialChainFilter.AND);
@@ -173,23 +134,16 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("39727_22_19750113062500");
-        expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
-        expectedResult.add("cat-1");
-        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
-        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
-        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
-        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals(expectedResult, result);
 
         /**
-         * Test 3 simple search: originator = UNIVERSITE DE LA MEDITERRANNEE (U2) / COM - LAB. OCEANOG. BIOGEOCHIMIE - LUMINY
+         * Test 3 simple search: originator = Donnees CTD NEDIPROD VI 120
          */
         spatialQuery = new SpatialQuery("abstract:\"Donnees CTD NEDIPROD VI 120\"", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
@@ -202,6 +156,42 @@ public class MdwebIndexTest {
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 4 simple search: ID = World Geodetic System 84
+         */
+        spatialQuery = new SpatialQuery("ID:\"World Geodetic System 84\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "simpleSearch 4:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 5 simple search: ID = 0UINDITENE
+         */
+        spatialQuery = new SpatialQuery("ID:\"0UINDITENE\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "simpleSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("11325_158_19640418141800");
 
         assertEquals(expectedResult, result);
     }
@@ -228,14 +218,13 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
-        
+        expectedResult.add("42292_9s_19900610041000");
 
         assertEquals(expectedResult, result);
 
         /**
-         * Test 2 wildChar search: originator LIKE *UNIVER....
+         * Test 2 wildChar search: abstract LIKE *NEDIPROD*
          */
         spatialQuery = new SpatialQuery("abstract:*NEDIPROD*", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
@@ -249,7 +238,8 @@ public class MdwebIndexTest {
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
 
-
+        // ERROR it didn't find any result (why???)
+        expectedResult = new ArrayList<String>();
         assertEquals(expectedResult, result);
 
         /**
@@ -262,16 +252,17 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "wilCharSearch 3:\n{0}", resultReport);
+        logger.log(Level.FINER, "wildCharSearch 3:\n{0}", resultReport);
 
-        assertTrue(result.contains("42292_5p_19900609195600"));
-        assertTrue(result.contains("42292_9s_19900610041000"));
         assertTrue(result.contains("39727_22_19750113062500"));
         assertTrue(result.contains("40510_145_19930221211500"));
-        
+        assertTrue(result.contains("42292_5p_19900609195600"));
+        assertTrue(result.contains("42292_9s_19900610041000"));
 
-         /**
-         * Test 4 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
+
+
+        /**
+         * Test 4 wildCharSearch: anstract LIKE *onnees CTD NEDIPROD VI 120
          */
         spatialQuery = new SpatialQuery("abstract:(*onnees CTD NEDIPROD VI 120)", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
@@ -285,7 +276,29 @@ public class MdwebIndexTest {
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
 
-        //issues here it found
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 5 wildCharSearch: Format LIKE *MEDATLAS ASCII*
+         */
+        spatialQuery = new SpatialQuery("Format:(*MEDATLAS ASCII*)", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("40510_145_19930221211500");
+
+         // ERROR it didn't find any result (why???)
+        expectedResult = new ArrayList<String>();
+
         assertEquals(expectedResult, result);
 
     }
@@ -312,50 +325,12 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_9s_19900610041000");
-        expectedResult.add("40510_145_19930221211500");
-        expectedResult.add("CTDF02");
-
-        assertEquals(expectedResult, result);
-
-        /**
-         * Test 2 date search: TempExtent_begin before 01/01/1985
-         */
-        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101 19850101}", nullFilter, SerialChainFilter.AND);
-        result = indexSearcher.doSearch(spatialQuery);
-
-        for (String s: result)
-            resultReport = resultReport + s + '\n';
-
-        logger.log(Level.FINER, "DateSearch 2:\n{0}", resultReport);
-
-        expectedResult = new ArrayList<String>();
-        expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
-
-        /**
-         * Test 3 date search: TempExtent_end after 01/01/1991
-         */
-        spatialQuery = new SpatialQuery("TempExtent_end:{19910101 30000101}", nullFilter, SerialChainFilter.AND);
-        result = indexSearcher.doSearch(spatialQuery);
-
-        for (String s: result)
-            resultReport = resultReport + s + '\n';
-
-        logger.log(Level.FINER, "DateSearch 3:\n{0}", resultReport);
-
-        expectedResult = new ArrayList<String>();
-        expectedResult.add("40510_145_19930221211500");
-        expectedResult.add("CTDF02");
-
-        assertEquals(expectedResult, result);
-
-
     }
 
     /**
@@ -385,18 +360,12 @@ public class MdwebIndexTest {
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
-        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
         expectedResult.add("CTDF02");
-        expectedResult.add("cat-1");
-        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+
         assertEquals(expectedResult, result);
 
         /**
@@ -415,18 +384,11 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
-        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        expectedResult.add("cat-1");
         expectedResult.add("CTDF02");
-        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("39727_22_19750113062500");
-        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
         expectedResult.add("11325_158_19640418141800");
 
         assertEquals(expectedResult, result);
@@ -447,19 +409,12 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("cat-1"); // TODO why cat-1 in first he is not indexable
-        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("CTDF02");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
-        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
-        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
-        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
 
         assertEquals(expectedResult, result);
 
@@ -479,24 +434,17 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
-        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
-        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
-        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
-        expectedResult.add("cat-1");
-        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals(expectedResult, result);
     }
 
-    /**
+   /**
      *
      * Test spatial lucene search.
      *
@@ -515,7 +463,7 @@ public class MdwebIndexTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        LuceneOGCFilter sf = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
+        LuceneOGCFilter sf          = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", sf, SerialChainFilter.AND);
 
         List<String> result = indexSearcher.doSearch(spatialQuery);
@@ -526,8 +474,8 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
@@ -539,7 +487,6 @@ public class MdwebIndexTest {
         List<Filter> lf = new ArrayList<Filter>();
         //sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
         sf           = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
-
         lf.add(sf);
         int[] op = {SerialChainFilter.NOT};
         SerialChainFilter f = new SerialChainFilter(lf, op);
@@ -553,18 +500,11 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
-        expectedResult.add("cat-1");
-        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
-        expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
-        expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
-        expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
-        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
-        assertEquals("CRS URN are not working", expectedResult, result);
+        assertEquals(expectedResult, result);
     }
 
     /**
@@ -601,59 +541,5 @@ public class MdwebIndexTest {
         expectedResult = "CTDF02";
 
         assertEquals(expectedResult, result);
-
-        /**
-         * Test 3
-         */
-
-        identifier = "urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd";
-        result = indexSearcher.identifierQuery(identifier);
-
-        logger.log(Level.FINER, "identifier query 3:\n{0}", result);
-
-        expectedResult = "urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd";
-
-        assertEquals(expectedResult, result);
     }
-
-    /**
-     *
-     * Test spatial lucene search.
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void DeleteDocumentTest() throws Exception {
-        indexer.removeDocument("CTDF02");
-
-        indexSearcher.refresh();
-
-        /**
-         * Test 1
-         */
-
-        String identifier = "39727_22_19750113062500";
-        String result = indexSearcher.identifierQuery(identifier);
-
-        logger.log(Level.FINER, "identifier query 1:\n{0}", result);
-
-        String expectedResult = "39727_22_19750113062500";
-
-        assertEquals(expectedResult, result);
-
-        /**
-         * Test 2
-         */
-
-        identifier = "CTDF02";
-        result = indexSearcher.identifierQuery(identifier);
-
-        logger.log(Level.FINER, "identifier query 2:\n{0}", result);
-
-        expectedResult = null;
-
-        assertEquals(expectedResult, result);
-    }
-
 }
-

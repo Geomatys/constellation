@@ -16,8 +16,9 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.index.generic;
+package org.constellation.metadata.index.analyzer;
 
+import org.constellation.metadata.index.generic.GenericIndexer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -319,7 +320,6 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");
         
         assertEquals(expectedResult, result);

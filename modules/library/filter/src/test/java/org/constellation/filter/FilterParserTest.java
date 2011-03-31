@@ -344,7 +344,67 @@ public class FilterParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
 
         pool.release(filterUnmarshaller);
+    }
+
+    @Test
+    public void comparisonFilterOnDateTest() throws Exception {
+        Unmarshaller filterUnmarshaller = pool.acquireUnmarshaller();
         
+        /**
+         * Test 1: a simple Filter PropertyIsEqualTo on a Date field
+         */
+        String XMLrequest =
+                    "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
+	            "    <ogc:PropertyIsEqualTo>"                                 +
+                    "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
+                    "        <ogc:Literal>2007-06-02</ogc:Literal>"                   +
+                    "    </ogc:PropertyIsEqualTo>"                                +
+                    "</ogc:Filter>";
+
+        StringReader reader = new StringReader(XMLrequest);
+
+        JAXBElement element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        FilterType filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        SpatialQuery spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "CreationDate:\"20070602\"");
+
+        /**
+         * Test 2: a simple Filter PropertyIsLike on a Date field
+         */
+        XMLrequest =
+                    "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
+	            "    <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">" +
+                    "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>"                   +
+		    "        <ogc:Literal>200*-06-02</ogc:Literal>"                                    +
+		    "    </ogc:PropertyIsLike>"                                                  +
+                    "</ogc:Filter>";
+
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "CreationDate:(200*0602)");
+
+        pool.release(filterUnmarshaller);
     }
 
     /**

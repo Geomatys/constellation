@@ -1,5 +1,5 @@
 /*
- *    Constellation - An open source and Stop compliant SDI
+ *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
@@ -16,14 +16,15 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.index.generic;
+package org.constellation.metadata.index.analyzer;
 
+import org.constellation.metadata.index.generic.GenericIndexer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -33,39 +34,39 @@ import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.util.FileUtilities;
 
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 //Junit dependencies
+import org.geotoolkit.referencing.CRS;
 import org.junit.*;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import static org.junit.Assert.*;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class StopAnalyzerTest extends AbstractAnalyzerTest {
+public class StandardAnalyzerTest extends AbstractAnalyzerTest {
 
-    private static File configDirectory = new File("StopAnalyzerTest");
+    private static File configDirectory = new File("StandardAnalyzerTest");
 
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT), Level.FINER);
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StandardAnalyzer(Version.LUCENE_CURRENT), Level.FINER);
         indexer.destroy();
-        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT));
+        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new StandardAnalyzer(Version.LUCENE_CURRENT));
         indexSearcher.setLogLevel(Level.FINER);
+        
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-       FileUtilities.deleteDirectory(configDirectory);
-       indexSearcher.destroy();
+        FileUtilities.deleteDirectory(configDirectory);
+        indexSearcher.destroy();
     }
 
     @Before
@@ -100,12 +101,6 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         // the result we want are this
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
-        expectedResult.add("42292_9s_19900610041000");
-
-        // ERROR: but with the stop Analyzer remove the number so we get all the results finishing by ctd (why???)
-        expectedResult.add("39727_22_19750113062500");
-        expectedResult.add("40510_145_19930221211500");
-        expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
 
@@ -128,10 +123,6 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
-
-        // ERROR: here the stop analyzer remove all the number and '_'
-        // the result is all the records instead of only 4 result
-        expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
@@ -152,7 +143,7 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
-
+        
         /**
          * Test 4 simple search: ID = World Geodetic System 84
          */
@@ -203,7 +194,7 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         /**
          * Test 1 simple search: title = title1
          */
-        SpatialQuery spatialQuery = new SpatialQuery("Title:*0008411.ctd", nullFilter, SerialChainFilter.AND);
+        SpatialQuery spatialQuery = new SpatialQuery("Title:90008411*", nullFilter, SerialChainFilter.AND);
         List<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
@@ -215,9 +206,6 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
 
-        // ERROR: it didn't find any result (why???)
-        expectedResult = new ArrayList<String>();
-        
         assertEquals(expectedResult, result);
 
         /**
@@ -249,19 +237,15 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 3:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
-        expectedResult.add("39727_22_19750113062500");
-        expectedResult.add("40510_145_19930221211500");
-        expectedResult.add("42292_5p_19900609195600");
-        expectedResult.add("42292_9s_19900610041000");
+        assertTrue(result.contains("39727_22_19750113062500"));
+        assertTrue(result.contains("40510_145_19930221211500"));
+        assertTrue(result.contains("42292_5p_19900609195600"));
+        assertTrue(result.contains("42292_9s_19900610041000"));
 
-        // ERROR: it didn't find any result (why???)
-        expectedResult = new ArrayList<String>();
 
-        assertEquals(expectedResult, result);
 
         /**
-         * Test 4 wildCharSearch: anstract LIKE *onnees CTD NEDIPROD VI 120
+         * Test 4 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
          */
         spatialQuery = new SpatialQuery("abstract:(*onnees CTD NEDIPROD VI 120)", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
@@ -326,12 +310,8 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");
 
-        //ERROR: it didn't find any result (why???)
-        expectedResult = new ArrayList<String>();
-        
         assertEquals(expectedResult, result);
     }
 
@@ -446,7 +426,7 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         assertEquals(expectedResult, result);
     }
 
-   /**
+    /**
      *
      * Test spatial lucene search.
      *
@@ -487,7 +467,7 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
          */
         resultReport = "";
         List<Filter> lf = new ArrayList<Filter>();
-        //sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
+       //sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
         sf           = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         lf.add(sf);
         int[] op = {SerialChainFilter.NOT};

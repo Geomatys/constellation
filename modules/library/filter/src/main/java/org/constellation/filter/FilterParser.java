@@ -282,7 +282,7 @@ public abstract class FilterParser {
      * @param literalValue The value of the filter.
      * @param operator The comparison operator.
      */
-    protected abstract void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator);
+    protected abstract void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException;
 
     /**
      * Add to the StringBuilder a piece of query with the specified operator for a date property.

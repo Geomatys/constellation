@@ -77,7 +77,7 @@ import org.opengis.filter.FilterFactory2;
  * 
  * @author Guilhem Legal
  */
-public class IndexLuceneTest {
+public class MdwebFormIndexTest {
 
     protected static final FilterFactory2 FF = (FilterFactory2)
             FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
@@ -196,7 +196,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        LOGGER.log(LOG_LEVEL,"SimpleSearch 3:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 3:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");

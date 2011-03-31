@@ -749,16 +749,15 @@ public class CSWworkerTest {
         result = (GetRecordsResponseType) worker.getRecords(request);
 
         assertTrue(result.getSearchResults() != null);
-        assertEquals(4, result.getSearchResults().getAbstractRecord().size());
+        assertEquals(3, result.getSearchResults().getAbstractRecord().size());
         assertTrue(result.getSearchResults().getAny().isEmpty());
-        assertEquals(4, result.getSearchResults().getNumberOfRecordsMatched());
-        assertEquals(4, result.getSearchResults().getNumberOfRecordsReturned());
+        assertEquals(3, result.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(3, result.getSearchResults().getNumberOfRecordsReturned());
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
         customResult2            = null;
         RecordType customResult3 = null;
         RecordType customResult4 = null;
-        RecordType customResult5 = null;
 
         List<? extends AbstractRecordType> records = result.getSearchResults().getAbstractRecord();
         for (AbstractRecordType rec : records) {
@@ -767,12 +766,10 @@ public class CSWworkerTest {
             RecordType r = (RecordType)rec;
             if (r.getIdentifier().getContent().get(0).equals("42292_9s_19900610041000")){
                 customResult2 = r;
-            } else if (r.getIdentifier().getContent().get(0).equals("40510_145_19930221211500")){
-                customResult3 = r;
             } else if (r.getIdentifier().getContent().get(0).equals("39727_22_19750113062500")) {
-                customResult4 = r;
+                customResult3 = r;
             } else if (r.getIdentifier().getContent().get(0).equals("11325_158_19640418141800")) {
-                customResult5 = r;
+                customResult4 = r;
             } else {
                 fail("unexpected metadata:" + r.getIdentifier().getContent().get(0));
             }
@@ -784,26 +781,19 @@ public class CSWworkerTest {
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.3667, 36.6, 1.3667, 36.6));
         
         RecordType expCustomResult3 =  new RecordType();
-        expCustomResult3.setIdentifier(new SimpleLiteral("40510_145_19930221211500"));
-        expCustomResult3.setModified(new SimpleLiteral("2009-01-26T12:22:52+01:00"));
-        expCustomResult3.setBoundingBox(new BoundingBoxType("EPSG:4326", 156.0, 0, 156.0, 0));
+        expCustomResult3.setIdentifier(new SimpleLiteral("39727_22_19750113062500"));
+        expCustomResult3.setModified(new SimpleLiteral("2009-01-26T12:21:45+01:00"));
+        expCustomResult3.setBoundingBox(new BoundingBoxType("EPSG:4326", -4.967, -6.95, -4.967, -6.95));
 
         RecordType expCustomResult4 =  new RecordType();
-        expCustomResult4.setIdentifier(new SimpleLiteral("39727_22_19750113062500"));
-        expCustomResult4.setModified(new SimpleLiteral("2009-01-26T12:21:45+01:00"));
-        expCustomResult4.setBoundingBox(new BoundingBoxType("EPSG:4326", -4.967, -6.95, -4.967, -6.95));
-
-        RecordType expCustomResult5 =  new RecordType();
-        expCustomResult5.setIdentifier(new SimpleLiteral("11325_158_19640418141800"));
-        expCustomResult5.setModified(new SimpleLiteral("2009-01-26T12:22:24+01:00"));
-        expCustomResult5.setBoundingBox(new BoundingBoxType("EPSG:4326", 9.2667, 3.55, 9.2667, 3.55));
+        expCustomResult4.setIdentifier(new SimpleLiteral("11325_158_19640418141800"));
+        expCustomResult4.setModified(new SimpleLiteral("2009-01-26T12:22:24+01:00"));
+        expCustomResult4.setBoundingBox(new BoundingBoxType("EPSG:4326", 9.2667, 3.55, 9.2667, 3.55));
 
         assertEquals(expCustomResult1, customResult1);
         assertEquals(expCustomResult2, customResult2);
         assertEquals(expCustomResult3, customResult3);
         assertEquals(expCustomResult4, customResult4);
-        assertEquals(expCustomResult5, customResult5);
-
          
         pool.release(unmarshaller);
     }
