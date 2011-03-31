@@ -17,6 +17,7 @@
 
 package org.constellation.test.utils;
 
+import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
 import java.util.Collection;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.lineage.Algorithm;
@@ -35,6 +36,7 @@ import org.geotoolkit.feature.catalog.FeatureTypeImpl;
 import org.opengis.metadata.citation.Citation;
 import org.geotoolkit.util.DefaultInternationalString;
 import java.util.Iterator;
+import org.geotoolkit.ebrim.xml.v250.SlotType;
 import org.geotoolkit.feature.catalog.FeatureAttributeImpl;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
@@ -753,6 +755,41 @@ public class MetadataUtilities {
         assertEquals(expResult.getMember().iterator().next(), result.getMember().iterator().next());
         assertEquals(expResult.getMember(), result.getMember());
 
+        assertEquals(expResult, result);
+    }
+
+    public static void ebrimEquals(final ExtrinsicObjectType expResult, final ExtrinsicObjectType result) {
+        assertEquals(expResult.getExpiration(), result.getExpiration());
+        assertEquals(expResult.getDescription(), result.getDescription());
+        assertEquals(expResult.getClassification(), result.getClassification());
+        assertEquals(expResult.getExternalIdentifier(), result.getExternalIdentifier());
+        assertEquals(expResult.getHome(), result.getHome());
+        assertEquals(expResult.getId(), result.getId());
+        assertEquals(expResult.getIsOpaque(), result.getIsOpaque());
+        assertEquals(expResult.getMajorVersion(), result.getMajorVersion());
+        assertEquals(expResult.getMimeType(), result.getMimeType());
+        assertEquals(expResult.getMinorVersion(), result.getMinorVersion());
+        assertEquals(expResult.getName(), result.getName());
+        assertEquals(expResult.getObjectType(), result.getObjectType());
+        assertEquals(expResult.getSlot().size(), result.getSlot().size());
+        Iterator<SlotType> expSlotIt = expResult.getSlot().iterator();
+        Iterator<SlotType> resSlotIt = result.getSlot().iterator();
+        while (expSlotIt.hasNext()) {
+            SlotType resSlot = resSlotIt.next();
+            SlotType expSlot = expSlotIt.next();
+            assertEquals(expSlot.getName(), resSlot.getName());
+            assertEquals(expSlot.getSlotType(), resSlot.getSlotType());
+            if (expSlot.getValueList() != null && resSlot.getValueList() != null) {
+                assertEquals(expSlot.getValueList().getValue(), resSlot.getValueList().getValue());
+            }
+            assertEquals(expSlot.getValueList(), resSlot.getValueList());
+            assertEquals(expSlot, resSlot);
+        }
+        assertEquals(expResult.getSlot(), result.getSlot());
+
+        assertEquals(expResult.getStability(), result.getStability());
+        assertEquals(expResult.getStatus(), result.getStatus());
+        assertEquals(expResult.getUserVersion(), result.getUserVersion());
         assertEquals(expResult, result);
     }
 }

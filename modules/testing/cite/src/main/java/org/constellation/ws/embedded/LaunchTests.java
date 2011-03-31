@@ -47,6 +47,8 @@ public final class LaunchTests implements Runnable {
      */
     private final Process process;
 
+    private boolean hasCompleted = false;
+    
     /**
      * Creates a new monitor for the given process.
      */
@@ -72,6 +74,7 @@ public final class LaunchTests implements Runnable {
             // a summary of the exception, not the full stack trace.
             System.err.println(e);
         }
+        hasCompleted = true;
     }
 
     /**
@@ -94,17 +97,21 @@ public final class LaunchTests implements Runnable {
         final Runtime rt = Runtime.getRuntime();
         for (String arg : args) {
             final Process process = rt.exec(new String[]{"../cite/run.sh", arg});
-            final Thread t = new Thread(new LaunchTests(process));
+            final LaunchTests lt = new LaunchTests(process);
+            final Thread t = new Thread(lt);
             t.setDaemon(true);
             t.start();
             try {
-                t.join(15*60*1000L);
+                t.join(30*60*1000L);
             } catch (InterruptedException e) {
                 // Ignore. We will kill the process.
             }
+            if (!lt.hasCompleted) {
+               LOGGER.severe("Shutting down process after timeout");
+            }
             process.destroy();
         }
-
+        
         // Then we can kill the server.
         GrizzlyServer.finish();
 

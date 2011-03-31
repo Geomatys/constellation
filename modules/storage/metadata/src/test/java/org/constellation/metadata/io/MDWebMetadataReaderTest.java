@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import javax.xml.bind.JAXBElement;
 import java.io.StringReader;
 import java.sql.Connection;
 import javax.xml.bind.Unmarshaller;
@@ -29,7 +30,8 @@ import org.constellation.util.Util;
 import static org.constellation.test.utils.MetadataUtilities.*;
 
 // Geotoolkit dependencies
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.internal.sql.DefaultDataSource;
@@ -61,7 +63,7 @@ public class MDWebMetadataReaderTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        pool = CSWMarshallerPool.getInstance();
+        pool = EBRIMMarshallerPool.getInstance();
         StaticMetadata.fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         final String url = "jdbc:derby:memory:MMRTest;create=true";
@@ -83,6 +85,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-5.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
         
@@ -409,4 +412,34 @@ public class MDWebMetadataReaderTest {
         
         componentEquals(expResult, result);
     }
+
+    @Test
+    public void getMetadataEbrimTest() throws Exception {
+
+        Object absResult = reader.getMetadata("000068C3-3B49-C671-89CF-10A39BB1B652", AbstractMetadataReader.EBRIM);
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        ExtrinsicObjectType expResult =  (ExtrinsicObjectType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim1.xml"))).getValue();
+
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof ExtrinsicObjectType);
+        ExtrinsicObjectType result = (ExtrinsicObjectType) absResult;
+
+
+        ebrimEquals(expResult, result);
+
+
+        absResult = reader.getMetadata("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076", AbstractMetadataReader.SENSORML);
+
+        expResult =  (ExtrinsicObjectType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim2.xml"))).getValue();
+
+        pool.release(unmarshaller);
+
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof ExtrinsicObjectType);
+        result = (ExtrinsicObjectType) absResult;
+
+        ebrimEquals(expResult, result);
+    }
+
 }

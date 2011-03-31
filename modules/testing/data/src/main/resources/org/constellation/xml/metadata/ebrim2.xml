@@ -22,34 +22,34 @@
     </rim:Slot>
     <rim:Slot name="Envelope" slotType="geometry">
         <rim:ValueList>
-            <rim:Value>
-                <gml:Envelope>
+            <rim:Value>test</rim:Value>
+                <!--gml:Envelope> marked in the binding as a string ??
                     <gml:lowerCorner>-180 -90</gml:lowerCorner>
                     <gml:upperCorner>180 90</gml:upperCorner>
                 </gml:Envelope>
-            </rim:Value>
-            <rim:Value>
-                <gml:Envelope>
+            </rim:Value-->
+            <rim:Value>test2</rim:Value>
+                <!--gml:Envelope>
                     <gml:lowerCorner>-90 -180</gml:lowerCorner>
                     <gml:upperCorner>90 180</gml:upperCorner>
                 </gml:Envelope>
-            </rim:Value>
+            </rim:Value-->
         </rim:ValueList>
     </rim:Slot>
     <rim:Slot name="Footprint" slotType="geometry">
         <rim:ValueList>
-            <rim:Value>
-                <gml:Envelope>
+            <rim:Value>test3</rim:Value>
+                <!--gml:Envelope>
                     <gml:lowerCorner>-180 -90</gml:lowerCorner>
                     <gml:upperCorner>180 90</gml:upperCorner>
                 </gml:Envelope>
-            </rim:Value>
-            <rim:Value>
-                <gml:Envelope>
+            </rim:Value-->
+            <rim:Value>test4</rim:Value>
+                <!--gml:Envelope>
                     <gml:lowerCorner>-90 -180</gml:lowerCorner>
                     <gml:upperCorner>90 180</gml:upperCorner>
                 </gml:Envelope>
-            </rim:Value>
+            </rim:Value-->
         </rim:ValueList>
     </rim:Slot>
     <rim:Slot name="Queryable" slotType="integer">

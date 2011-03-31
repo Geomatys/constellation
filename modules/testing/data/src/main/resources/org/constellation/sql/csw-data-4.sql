@@ -74,12 +74,12 @@ INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 12, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.1:valueList.1:value.12', 'EPSG:900913');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:name', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.1:name.1', 'CRS');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:slotType', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.1:slotType.1', 'string');
-INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.2:valueList.1:value.1', '');
-INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 2, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.2:valueList.1:value.2', '');
+INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.2:valueList.1:value.1', 'test');
+INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 2, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.2:valueList.1:value.2', 'test2');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:name', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.2:name.1', 'Envelope');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:slotType', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.2:slotType.1', 'geometry');
-INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.3:valueList.1:value.1', '');
-INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 2, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.3:valueList.1:value.2', '');
+INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.3:valueList.1:value.1', 'test3');
+INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 2, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.3:valueList.1:value.2', 'test4');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:name', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.3:name.1', 'Footprint');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:slotType', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.3:slotType.1', 'geometry');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot:valueList:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:slot.4:valueList.1:value.1', '0');
