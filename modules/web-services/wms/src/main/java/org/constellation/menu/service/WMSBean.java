@@ -27,7 +27,9 @@ import org.constellation.configuration.LayerContext;
 public class WMSBean extends AbstractServiceBean{
 
     public WMSBean() {
-        super(Specification.WMS,"/org/constellation/menu/service/wmsConfig.xhtml");
+        super(Specification.WMS,
+                "/org/constellation/menu/service/wms.xhtml",
+                "/org/constellation/menu/service/wmsConfig.xhtml");
     }
 
     @Override

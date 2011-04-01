@@ -5,8 +5,13 @@
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib"
-                xmlns:cstl="http://constellation.org/taglib">
+                xmlns:cstl="http://constellation.org/taglib"
+                template="/pages/slider.xhtml">
 
-    <cstl:layerContextConfig bean="#{wmsBean}" />
+    <ui:define name="content">
+        
+        <cstl:layerContextConfig bean="#{wmsBean}" />
+
+    </ui:define>
 
 </ui:composition>

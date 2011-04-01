@@ -7,7 +7,40 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
+    <center><a href="#{bean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
+    <br/>
+    <br/>
+
+    
+    <b>#{bean.i18n['instance']}</b><br/>
+    <div class="rounded">
+        <h:graphicImage value="#{bean.configuredInstance.statusIcon}" style="border:none;"/>
+        <a href="#{bean.configuredInstance.path}" target="blank">#{bean.configuredInstance.name}</a>
+        
+        &#160;
+        <h:commandLink action="#{bean.configuredInstance.restart}">
+            <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
+        </h:commandLink>
+        &#160;
+        <h:commandLink action="#{bean.configuredInstance.stop}">
+            <h:graphicImage value="org.constellation.menu.service.stop.png.mfRes" style="border:none;"/>
+        </h:commandLink>
+        &#160;
+        <h:commandLink action="#{bean.configuredInstance.start}">
+            <h:graphicImage value="org.constellation.menu.service.start.png.mfRes" style="border:none;"/>
+        </h:commandLink>
+        <br/>
+    </div>
+    <br/>
+
     <h:outputText value="#{bean.i18n['security']} :"/><br/>
-    <h:inputTextarea value="#{bean.configurationObject.security}" />
+    <h:inputTextarea value="#{bean.configurationObject.security}" style="width:100%;" />
+    <br/>
+    TODO, layer context configuration tree.
+    <br/>
+    
+    <div style="text-align: right;">
+        <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
+    </div>
 
 </ui:composition>

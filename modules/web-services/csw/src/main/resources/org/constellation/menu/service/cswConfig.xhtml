@@ -5,8 +5,17 @@
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib"
-                xmlns:cstl="http://constellation.org/taglib">
+                xmlns:cstl="http://constellation.org/taglib"
+                template="/pages/slider.xhtml">
 
-    CSW Configuration
+    <ui:define name="content">
+
+        <center><a href="#{cswBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
+        <br/>
+        <br/>
+
+        CSW Configuration
+    </ui:define>
+    
 
 </ui:composition>

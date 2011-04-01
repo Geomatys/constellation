@@ -5,6 +5,17 @@ html {
     min-height: 100%;
 }
 
+.base-content {
+    color: #525c66;
+    font-size: 1em;
+    font-family: none;
+}
+
+.base-content input, .base-content select, .base-content textarea, .base-content button {
+    font-family: none;
+    font-size: 1em;
+}
+
 .maindiv {
     width: 75%;
     border-color: #FFFFFF;
@@ -17,6 +28,16 @@ html {
     -moz-border-radius : 20px;
     box-shadow: 0px 0px 10px 0px #555;
     -moz-box-shadow: 0px 0px 10px 0px #555;
+}
+
+.rounded{
+    padding: 15px;
+    margin: 10px;
+    border-color: #C2CcD6;
+    border-style: solid solid solid solid;
+    border-width: 1px;
+    border-radius : 20px;
+    -moz-border-radius : 20px;
 }
 
 .logout{

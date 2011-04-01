@@ -26,7 +26,9 @@ import org.constellation.ServiceDef.Specification;
 public class CSWBean extends AbstractServiceBean{
 
     public CSWBean() {
-        super(Specification.CSW,"/org/constellation/menu/service/cswConfig.xhtml");
+        super(Specification.CSW,
+                "/org/constellation/menu/service/csw.xhtml",
+                "/org/constellation/menu/service/cswConfig.xhtml");
     }
 
 }

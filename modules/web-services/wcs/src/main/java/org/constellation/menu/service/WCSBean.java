@@ -27,7 +27,9 @@ import org.constellation.configuration.LayerContext;
 public class WCSBean extends AbstractServiceBean{
 
     public WCSBean() {
-        super(Specification.WCS,"/org/constellation/menu/service/wcsConfig.xhtml");
+        super(Specification.WCS,
+                "/org/constellation/menu/service/wcs.xhtml",
+                "/org/constellation/menu/service/wcsConfig.xhtml");
     }
 
     @Override

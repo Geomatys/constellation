@@ -17,15 +17,22 @@
 
 package org.constellation.menu.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ServiceAdministrator;
 import org.constellation.bean.I18NBean;
+import org.constellation.bean.MenuBean;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.geotoolkit.util.ArgumentChecks;
+import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.event.CloseEvent;
 
 /**
@@ -35,16 +42,21 @@ import org.mapfaces.event.CloseEvent;
  */
 public class AbstractServiceBean extends I18NBean{
 
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
+
     private final Specification specification;
     private final String configPage;
+    private final String mainPage;
     private String newServiceName = "default";
     private ServiceInstance configuredInstance = null;
     private Object configurationObject = null;
 
-    public AbstractServiceBean(final Specification specification, final String configPage) {
+    public AbstractServiceBean(final Specification specification, final String mainPage, final String configPage) {
         ArgumentChecks.ensureNonNull("specification", specification);
+        ArgumentChecks.ensureNonNull("main page", mainPage);
         this.specification = specification;
-        this.configPage = configPage;
+        this.mainPage = MenuBean.toApplicationPath(mainPage);
+        this.configPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
         addBundle("org.constellation.menu.service.service");
     }
 
@@ -114,14 +126,11 @@ public class AbstractServiceBean extends I18NBean{
     // CONFIGURE CURRENT INSTANCE //////////////////////////////////////////////
 
     /**
-     * @return Path to the configuration page of this service.
+     * @return the main service page.
+     * this is used to return from the configuration page.
      */
-    public String getConfigPage(){
-        if(configuredInstance != null){
-            return configPage;
-        }else{
-            return null;
-        }
+    public String getMainPage(){
+        return mainPage;
     }
 
     /**
@@ -161,7 +170,7 @@ public class AbstractServiceBean extends I18NBean{
 
     public class ServiceInstance implements Comparable<ServiceInstance>{
 
-        protected final Instance instance;
+        protected Instance instance;
 
         public ServiceInstance(final Instance instance) {
             this.instance = instance;
@@ -192,21 +201,49 @@ public class AbstractServiceBean extends I18NBean{
         public void config(){
             configuredInstance = this;
             configurationObject = ServiceAdministrator.getInstanceconfiguration(getSpecificationName(), instance.getName());
+
+            if(configPage != null){
+                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+                try {
+                    //the session is not logged, redirect him to the authentication page
+                    context.redirect(configPage);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                }
+            }
+
         }
 
         public void start(){
             ServiceAdministrator.startInstance(getSpecificationName(), instance.getName());
+            refresh();
         }
         public void stop(){
             ServiceAdministrator.stopInstance(getSpecificationName(), instance.getName());
+            refresh();
         }
 
         public void delete(){
             ServiceAdministrator.deleteInstance(getSpecificationName(), instance.getName());
+            refresh();
         }
 
         public void restart(){
             ServiceAdministrator.restartInstance(getSpecificationName(), instance.getName());
+            refresh();
+        }
+
+        /**
+         * Refresh this instance.
+         */
+        private void refresh(){
+            final InstanceReport report = ServiceAdministrator.listInstance(getSpecificationName());
+            for(final Instance inst : report.getInstances()){
+                if(instance.getName().equals(inst.getName())){
+                    instance = inst;
+                    return;
+                }
+            }
         }
 
         @Override

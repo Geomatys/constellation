@@ -27,7 +27,9 @@ import org.constellation.configuration.LayerContext;
 public class WMTSBean extends AbstractServiceBean{
 
     public WMTSBean() {
-        super(Specification.WMTS,"/org/constellation/menu/service/wmtsConfig.xhtml");
+        super(Specification.WMTS,
+                "/org/constellation/menu/service/wmts.xhtml",
+                "/org/constellation/menu/service/wmtsConfig.xhtml");
     }
 
 

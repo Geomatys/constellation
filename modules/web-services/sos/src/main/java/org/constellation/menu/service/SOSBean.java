@@ -26,7 +26,9 @@ import org.constellation.ServiceDef.Specification;
 public class SOSBean extends AbstractServiceBean{
 
     public SOSBean() {
-        super(Specification.SOS,"/org/constellation/menu/service/sosConfig.xhtml");
+        super(Specification.SOS,
+                "/org/constellation/menu/service/sos.xhtml",
+                "/org/constellation/menu/service/sosConfig.xhtml");
     }
 
 }

@@ -1,122 +1,60 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html   xmlns="http://www.w3.org/1999/xhtml"
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
         xmlns:ui="http://java.sun.com/jsf/facelets"
         xmlns:h="http://java.sun.com/jsf/html"
         xmlns:f="http://java.sun.com/jsf/core"
         xmlns:c="http://java.sun.com/jstl/core"
         xmlns:a4j="http://richfaces.org/a4j"
-        xmlns:mf="http://mapfaces.org/taglib">
+        xmlns:mf="http://mapfaces.org/taglib"
+        template="/pages/structure.xhtml">
 
-<f:view locale="#{localeBean.locale}" beforePhaseListener="#{navigationBean.checkLogged}">
+    <ui:define name="page">
 
-    <head>
-        <title>Constellation</title>
-        <c:set var="contextPath" value="#{facesContext.externalContext.requestContextPath}" />
-        <link rel="stylesheet" type="text/css" href="#{contextPath}/resources/css/base.css"/>
-        <script type="text/javascript" src="org.mapfaces.resources.js.jquery.jquery.js.mfRes" />
-        <mf:Resources exclude="jquery.js"/>
-        <link rel="stylesheet" type="text/css" href="#{contextPath}/resources/theme/casablanca/theme.css"/>
-        <ui:insert name="header"/>
-        
-    </head>
+        <h:panelGrid columns="2" columnClasses="col1,col2" style="height:100%;width:100%">
 
-    <body>
-        <h:form id="form">
+            <h:panelGroup>
 
+                <br/>
+                <br/>
+                <br/>
+                <br/>
 
-        <div class="maindiv">
+                <!-- Menus -->
+                <mf:Outline id="navTree" actionVisible="true" rootVisible="false"
+                            rowStyler="#{menuBean.styler}" value="#{menuBean.model}"
+                            var="node" width="100%">
+                    <!-- Name column -->
+                    <h:column>
+                        <h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}" style="vertical-align: middle;"/>
 
-            <div style="margin: 0pt auto;text-align:right;position: relative;left: 25px;">
+                        <h:commandLink action="#{menuBean.navigateTo}" value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage != null}">
+                            <f:param name="targetPageNode" value="#{navTree.nodeIndex}"/>
+                        </h:commandLink>
 
-                <!--translation-->
-                <h:commandLink action="#{localeBean.toEnglish}">
-                    <img alt="en" style="border:0px" src="#{contextPath}/resources/img/en.png"/>
-                </h:commandLink>
-                <h:commandLink action="#{localeBean.toFrench}">
-                    <img alt="fr" style="border:0px" src="#{contextPath}/resources/img/fr.png"/>
-                </h:commandLink>
+                        <h:outputText value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage == null}"/>
 
-                <span class="logout">
-                    <h:commandLink action="#{navigationBean.logout}">
-                        #{menuBean.i18n['logout']}
-                    </h:commandLink>
-                </span>
-                
-            </div>
+                    </h:column>
+                </mf:Outline>
 
-            <h:panelGrid columns="2" columnClasses="col1,col2" style="height:100%;width:100%">
+            </h:panelGroup>
 
-                <h:panelGroup>
+            <h:panelGroup>
+                <h2><h:outputText value="#{pageTitle}"/></h2>
 
-                    <br/>
-                    <br/>
-                    <br/>
-                    <br/>
+                <!-- dynamic content -->
+                <ui:insert name="content">
+                    <center>
+                        <br/>
+                        <h:graphicImage url="/resources/img/constellation400.png"/>
+                        <br/>
+                        <br/>
+                        Please select a administration section in the left side menu.
+                        <br/><br/><br/>
+                    </center>
+                </ui:insert>
+            </h:panelGroup>
+        </h:panelGrid>
 
-                    <!-- Menus -->
-                    <mf:Outline id="navTree" actionVisible="true" rootVisible="false"
-                                rowStyler="#{menuBean.styler}" value="#{menuBean.model}"
-                                var="node" width="100%">
-                        <!-- Name column -->
-                        <h:column>
-                            <h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}" style="vertical-align: middle;"/>
+    </ui:define>
 
-                            <h:commandLink action="#{menuBean.navigateTo}" value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage != null}">
-                                <f:param name="targetPageNode" value="#{navTree.nodeIndex}"/>
-                            </h:commandLink>
-
-                            <h:outputText value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage == null}"/>
-
-                        </h:column>
-                    </mf:Outline>
-
-                </h:panelGroup>
-
-                <h:panelGroup>
-                    <h2><h:outputText value="#{pageTitle}"/></h2>
-                    
-                    <!-- dynamic content -->
-                    <ui:insert name="content">
-                        <center>
-                            <br/>
-                            <h:graphicImage url="/resources/img/constellation400.png"/>
-                            <br/>
-                            <br/>
-                            Please select a administration section in the left side menu.
-                            <br/><br/><br/>
-                        </center>
-                    </ui:insert>
-                </h:panelGroup>
-            </h:panelGrid>
-        </div>
-        <div style="width:75%;margin:0px auto;text-align:right;">
-            2007-2011 Geomatys
-        </div>
-        </h:form>
-
-        <!-- script to handle menu navigation -->
-        <script type="text/javascript">
-            var visited = false;
-            jQuery(document).ready(
-                function(){
-                    jQuery("tr.navigationLeafClass").click(
-                        function(){
-                            if(!visited){
-                                var tr = jQuery(this);
-                                var link = tr.find('a');
-                                if(link){
-                                    visited = true;
-                                    link.click();
-                                }
-                            }
-                        }
-                    );
-                }
-            );
-        </script>
-
-    </body>
-            
-</f:view>
-</html>
+</ui:composition>
