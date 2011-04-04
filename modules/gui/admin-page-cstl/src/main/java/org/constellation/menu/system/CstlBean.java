@@ -17,6 +17,7 @@
 
 package org.constellation.menu.system;
 
+import java.io.File;
 import org.constellation.admin.service.ServiceAdministrator;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.provider.LayerProviderProxy;
@@ -35,8 +36,11 @@ public class CstlBean extends I18NBean{
     }
 
     public void setConfigurationDirectory(final String path){
-        if(path != null && !path.isEmpty()){
-            ConfigDirectory.USER_DIRECTORY = path;
+        
+        // Set the new user directory
+        if (path != null && !path.isEmpty()) {
+            final File userDirectory = new File(path);
+            ConfigDirectory.setConfigDirectory(userDirectory);
         }
 
         //reload services

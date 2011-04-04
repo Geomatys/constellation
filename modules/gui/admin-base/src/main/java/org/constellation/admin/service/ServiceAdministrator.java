@@ -97,7 +97,7 @@ public class ServiceAdministrator {
      */
     public static boolean restartAll() {
         try {
-            final String url = getServiceURL() + "/configuration?request=restart";
+            final String url = getServiceURL() + "configuration?request=restart";
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());

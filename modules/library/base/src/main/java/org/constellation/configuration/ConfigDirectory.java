@@ -152,6 +152,18 @@ public final class ConfigDirectory {
         /*
          * 4) .constellation in home directory
          */
+        constellationDirectory = getConstellationDirectory();
+        
+        return constellationDirectory;
+    }
+
+    /**
+     * Return the ".constellation" configuration directory in the user home.
+     * 
+     * @return
+     */
+    private static File getConstellationDirectory() {
+        File constellationDirectory;
         final String home = System.getProperty("user.home");
 
         if (System.getProperty("os.name", "").startsWith("Windows")) {
@@ -178,6 +190,35 @@ public final class ConfigDirectory {
             LOGGER.warning("Unable to find a configuration directory");
         }
         return null;
+    }
+
+    public static void setConfigDirectory(final File directory) {
+        USER_DIRECTORY = null;
+        if (directory != null && directory.isDirectory()) {
+            if (!directory.getPath().equals(getConstellationDirectory().getPath())) {
+                USER_DIRECTORY = directory.getPath();
+            }
+        }
+        //store the configuration properties file
+        final File webInfDirectory = getWebInfDiretory();
+        final File propertiesFile = new File(webInfDirectory, "constellation.properties");
+        try {
+            if (!propertiesFile.exists()) {
+                propertiesFile.createNewFile();
+            }
+            final Properties prop = new Properties();
+            final String pathValue;
+            if (USER_DIRECTORY == null) {
+                pathValue = "";
+            } else {
+                pathValue = USER_DIRECTORY;
+            }
+            prop.put("configuration_directory", pathValue);
+            FileUtilities.storeProperties(prop, propertiesFile);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "IOException while writing the constellation properties file", ex);
+        }
+        
     }
 
     /**
