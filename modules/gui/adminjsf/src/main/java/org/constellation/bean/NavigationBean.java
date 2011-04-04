@@ -29,6 +29,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
 import javax.servlet.ServletContext;
 import org.geotoolkit.util.logging.Logging;
+import org.mapfaces.i18n.I18NBean;
 
 /**
  *

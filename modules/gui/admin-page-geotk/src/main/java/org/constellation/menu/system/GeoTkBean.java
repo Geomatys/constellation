@@ -22,9 +22,7 @@ import java.util.List;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
-import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.lang.Setup;
 import org.geotoolkit.referencing.CRS;
 
 import org.geotoolkit.referencing.factory.FactoryDependencies;

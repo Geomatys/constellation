@@ -18,10 +18,10 @@
 package org.constellation.menu.system;
 
 import org.constellation.admin.service.ServiceAdministrator;
-import org.constellation.bean.I18NBean;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
+import org.mapfaces.i18n.I18NBean;
 
 /**
  * Bean for general constellation configuration.
