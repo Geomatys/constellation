@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
 import javax.xml.bind.JAXBElement;
 import java.io.StringReader;
 import java.sql.Connection;
@@ -88,6 +89,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-5.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
         
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
@@ -442,4 +444,20 @@ public class MDWebMetadataReaderTest {
         ebrimEquals(expResult, result);
     }
 
+    @Test
+    public void getMetadataEbrim30Test() throws Exception {
+
+        Object absResult = reader.getMetadata("urn:motiive:csw-ebrim", AbstractMetadataReader.EBRIM);
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        RegistryPackageType expResult =  (RegistryPackageType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim3.xml"))).getValue();
+
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof RegistryPackageType);
+        RegistryPackageType result = (RegistryPackageType) absResult;
+
+        pool.release(unmarshaller);
+
+        ebrimEquals(expResult, result);
+    }
 }

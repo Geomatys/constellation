@@ -940,27 +940,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
 
         // we create a MDWeb form form the object
-        Form form = null;
+        Form form       = null;
+        Profile profile = null;
         try {
-            final Profile profile;
             // we try to determine the profile for the Object
             if ("org.geotoolkit.csw.xml.v202.RecordType".equals(obj.getClass().getName())) {
                 profile = mdWriter.getProfile("DublinCore");
             } else if (obj instanceof Metadata) {
                 profile = mdWriter.getProfileByUrn(Utils.findStandardName(obj));
-            } else {
-                profile = null;
             }
 
             final long startTrans = System.currentTimeMillis();
             form                  = getFormFromObject(obj, title);
             transTime             = System.currentTimeMillis() - startTrans;
-	    if (profile != null) {
-	        form.setProfile(profile);
-            // if the profile is null we set the level completion to complete
-            } else {
-                form.setInputLevelCompletion(new boolean[]{true, true, true}, new Date(System.currentTimeMillis()));
-            }
             
         } catch (IllegalArgumentException e) {
              throw new MetadataIoException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
@@ -971,6 +963,14 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         
         // and we store it in the database
         if (form != null) {
+
+            if (profile != null) {
+	        form.setProfile(profile);
+            // if the profile is null we set the level completion to complete
+            } else {
+                form.setInputLevelCompletion(new boolean[]{true, true, true}, new Date(System.currentTimeMillis()));
+            }
+            
             try {
                 final long startWrite = System.currentTimeMillis();
                 mdWriter.writeForm(form, false, true);
