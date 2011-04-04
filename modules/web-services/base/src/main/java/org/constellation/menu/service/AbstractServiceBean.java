@@ -27,13 +27,13 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ServiceAdministrator;
-import org.constellation.bean.I18NBean;
 import org.constellation.bean.MenuBean;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.event.CloseEvent;
+import org.mapfaces.i18n.I18NBean;
 
 /**
  * Abstract JSF Bean for service administration interface.

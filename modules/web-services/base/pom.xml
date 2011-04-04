@@ -113,6 +113,12 @@
         <version>${project.version}</version>
         <scope>provided</scope>
     </dependency>
+    <dependency>
+        <groupId>org.mapfaces</groupId>
+        <artifactId>mapfaces-core</artifactId>
+        <version>${mapfaces.version}</version>
+        <scope>provided</scope>
+    </dependency>
 
   </dependencies>
 

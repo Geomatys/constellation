@@ -33,7 +33,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
-import org.constellation.bean.I18NBean;
 import org.constellation.provider.AbstractProviderProxy;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
@@ -45,6 +44,7 @@ import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.mapfaces.component.outline.UIOutline;
+import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.utils.FacesUtils;
 
 /**

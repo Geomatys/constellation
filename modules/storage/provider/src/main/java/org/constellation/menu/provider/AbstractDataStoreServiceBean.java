@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
-import org.constellation.bean.I18NBean;
 import org.constellation.provider.AbstractDataStoreProvider;
 import org.constellation.provider.AbstractProviderProxy;
 import org.constellation.provider.LayerProviderProxy;
@@ -41,6 +40,7 @@ import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
+import org.mapfaces.i18n.I18NBean;
 
 /**
  * Abstract Datastore service configuration bean.

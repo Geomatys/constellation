@@ -32,6 +32,7 @@ import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotoolkit.lang.Setup;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.component.outline.UIOutline;
+import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 import org.mapfaces.utils.FacesUtils;
 
