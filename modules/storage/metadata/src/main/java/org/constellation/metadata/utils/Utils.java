@@ -103,7 +103,7 @@ public final class Utils {
 
     /**
       * This method try to find a standard name for this object.
-      * if the object is a ISO19115:Metadata we know were to search,
+      * if the object is a ISO19115:Metadata we know where to search,
       *
       * @param obj the object for which we want a title.
       *

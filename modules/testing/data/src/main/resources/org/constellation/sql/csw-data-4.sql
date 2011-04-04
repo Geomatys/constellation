@@ -1,5 +1,5 @@
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type")  VALUES (10, 'CSWCat', '000068C3-3B49-C671-89CF-10A39BB1B652', '000068C3-3B49-C671-89CF-10A39BB1B652', 'admin', 'admin', 'inspire_core_service', '2009-07-01', 0, 1, 'NORMALFORM');
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type")  VALUES (11, 'CSWCat', 'urn:uuid:3e195454-42e8-11dd-8329-00e08157d076','urn:uuid:3e195454-42e8-11dd-8329-00e08157d076', 'admin', 'admin', 'inspire_core_service', '2009-07-01', 0, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type")  VALUES (10, 'CSWCat', '000068C3-3B49-C671-89CF-10A39BB1B652', 'ebrim1Title', 'admin', 'admin', NULL, '2009-07-01', 0, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type")  VALUES (11, 'CSWCat', 'urn:uuid:3e195454-42e8-11dd-8329-00e08157d076','ebrim2Title', 'admin', 'admin', NULL, '2009-07-01', 0, 1, 'NORMALFORM');
 
 INSERT INTO "Storage"."Values" VALUES (10, 'Ebrim v2.5:ExtrinsicObject', 1, 'ExtrinsicObject', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1');
 INSERT INTO "Storage"."Values" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:name', 1, 'InternationalString', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1:name.1');
@@ -15,6 +15,8 @@ INSERT INTO "Storage"."Values" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:slot:valu
 INSERT INTO "Storage"."Values" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:slot', 4, 'Slot', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1:slot.4');
 INSERT INTO "Storage"."Values" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:slot:valueList', 1, 'ValueList', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1:slot.4:valueList.1');
 INSERT INTO "Storage"."Values" VALUES (11, 'Ebrim v2.5:ExtrinsicObject', 1, 'ExtrinsicObject', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1');
+INSERT INTO "Storage"."Values" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:name', 1, 'InternationalString', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1:name.1');
+INSERT INTO "Storage"."Values" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:name:localizedString', 1, 'LocalizedString', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1:name.1:localizedString.1');
 INSERT INTO "Storage"."Values" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:description', 1, 'InternationalString', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1:description.1');
 INSERT INTO "Storage"."Values" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:description:localizedString', 1, 'LocalizedString', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1:description.1:localizedString.1');
 INSERT INTO "Storage"."Values" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:slot', 1, 'Slot', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1:slot.1');
@@ -37,7 +39,7 @@ INSERT INTO "Storage"."TextValues" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:stabi
 INSERT INTO "Storage"."TextValues" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:userVersion', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:userVersion.1', '');
 INSERT INTO "Storage"."TextValues" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:name:localizedString:lang', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:name.1:localizedString.1:lang.1', 'en-US');
 INSERT INTO "Storage"."TextValues" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:name:localizedString:charset', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:name.1:localizedString.1:charset.1', 'UTF-8');
-INSERT INTO "Storage"."TextValues" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:name:localizedString:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:name.1:localizedString.1:value.1', '');
+INSERT INTO "Storage"."TextValues" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:name:localizedString:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:name.1:localizedString.1:value.1', 'ebrim1Title');
 INSERT INTO "Storage"."TextValues" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:description:localizedString:lang', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:description.1:localizedString.1:lang.1', 'en-US');
 INSERT INTO "Storage"."TextValues" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:description:localizedString:charset', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:description.1:localizedString.1:charset.1', 'UTF-8');
 INSERT INTO "Storage"."TextValues" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:description:localizedString:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:description.1:localizedString.1:value.1', '');
@@ -57,6 +59,9 @@ INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:isOpa
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:majorVersion', 1, 'Integer', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:majorVersion.1', '1');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:minorVersion', 1, 'Integer', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:minorVersion.1', '0');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:stability', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:stability.1', 'Static');
+INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:name:localizedString:lang', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:name.1:localizedString.1:lang.1', 'en-US');
+INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:name:localizedString:charset', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:name.1:localizedString.1:charset.1', 'UTF-8');
+INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:name:localizedString:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:name.1:localizedString.1:value.1', 'ebrim2Title');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:description:localizedString:lang', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:description.1:localizedString.1:lang.1', 'en-US');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:description:localizedString:charset', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:description.1:localizedString.1:charset.1', 'UTF-8');
 INSERT INTO "Storage"."TextValues" VALUES (11, 'Ebrim v2.5:ExtrinsicObject:description:localizedString:value', 1, 'CharacterString', 'ISO 19103', 'Ebrim v2.5:ExtrinsicObject.1:description.1:localizedString.1:value.1', 'CubeSERV layers');

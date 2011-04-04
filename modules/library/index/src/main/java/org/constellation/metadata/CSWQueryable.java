@@ -293,8 +293,8 @@ public final class CSWQueryable {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
         paths.add("Catalog Web Service:Record:title:content");
-        paths.add("Ebrim v3.0:RegistryObject:name:localizedString:value");
-        paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
+        paths.add("Ebrim v3.0:*:name:localizedString:value");
+        paths.add("Ebrim v2.5:*:name:localizedString:value");
         DUBLIN_CORE_QUERYABLE.put("title", paths);
         
         paths = new ArrayList<String>();
@@ -310,8 +310,8 @@ public final class CSWQueryable {
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:topicCategory");
         paths.add("Catalog Web Service:Record:subject:content");
         //TODO @name = “http://purl.org/dc/elements/1.1/subject”
-        paths.add("Ebrim v3.0:RegistryObject:slot:valueList:value");
-        paths.add("Ebrim v3.0:RegistryPackage:slot:valueList:value");
+        paths.add("Ebrim v3.0:*:slot:valueList:value");
+        paths.add("Ebrim v2.5:*:slot:valueList:value");
         DUBLIN_CORE_QUERYABLE.put("description", paths);
         DUBLIN_CORE_QUERYABLE.put("subject", paths);
         
@@ -319,8 +319,8 @@ public final class CSWQueryable {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:abstract");
         paths.add("Catalog Web Service:Record:abstract:content");
-        paths.add("Ebrim v3.0:RegistryObject:description:localizedString:value");
-        paths.add("Ebrim v3.0:RegistryPackage:description:localizedString:value");
+        paths.add("Ebrim v3.0:*:description:localizedString:value");
+        paths.add("Ebrim v2.5:*:description:localizedString:value");
         DUBLIN_CORE_QUERYABLE.put("abstract", paths);
         
         paths = new ArrayList<String>();
@@ -345,15 +345,16 @@ public final class CSWQueryable {
         paths.add("ISO 19115:MD_Metadata:hierarchyLevel");
         paths.add("ISO 19115-2:MI_Metadata:hierarchyLevel");
         paths.add("Catalog Web Service:Record:type:content");
-        paths.add("Ebrim v3.0:RegistryObject:objectType");
-        paths.add("Ebrim v3.0:RegistryPackage:objectType");
+        paths.add("Ebrim v3.0:*:objectType");
+        paths.add("Ebrim v2.5:*:objectType");
         DUBLIN_CORE_QUERYABLE.put("type", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");
         paths.add("ISO 19115-2:MI_Metadata:distributionInfo:distributionFormat:name");
         paths.add("Catalog Web Service:Record:format:content");
-        paths.add("Ebrim v3.0:ExtrinsicObject:mimeType");
+        paths.add("Ebrim v3.0:*:mimeType");
+        paths.add("Ebrim v2.5:*:mimeType");
         DUBLIN_CORE_QUERYABLE.put("format", paths);
         
         paths = new ArrayList<String>();
@@ -364,54 +365,11 @@ public final class CSWQueryable {
         
         paths.add("ISO 19110:FC_FeatureCatalogue:id");
         
-        paths.add("Ebrim v3.0:RegistryObject:id");
-        paths.add("Ebrim v3.0:RegistryPackage:id");
-        paths.add("Ebrim v3.0:ExtrinsicObject:id");
-        paths.add("Ebrim v3.0:ClassificationScheme:id");
-        paths.add("Ebrim v3.0:Service:id"); 
-        paths.add("Ebrim v3.0:ClassificationNode:id");
-        paths.add("Ebrim v3.0:Association:id");
-        paths.add("Ebrim v3.0:Organization:id");
-        paths.add("Ebrim v3.0:AdhocQuery:id");
-        paths.add("Ebrim v3.0:Registry:id");
-        paths.add("Ebrim v3.0:Classification:id");
-        paths.add("Ebrim v3.0:Federation:id");
-        paths.add("Ebrim v3.0:ServiceBinding:id");
-        paths.add("Ebrim v3.0:Notification:id");
-        paths.add("Ebrim v3.0:SpecificationLink:id");
-        paths.add("Ebrim v3.0:ExternalLink:id");
-        paths.add("Ebrim v3.0:AuditableEvent:id");
-        paths.add("Ebrim v3.0:Subscription:id");
-        paths.add("Ebrim v3.0:Person:id");
-        paths.add("Ebrim v3.0:ExternalIdentifier:id");
-        paths.add("Ebrim v3.0:User:id");
-        paths.add("Ebrim v3.0:ObjectRef:id");
+        paths.add("Ebrim v3.0:*:id");
         paths.add("Web Registry Service v1.0:ExtrinsicObject:id");
         
         paths.add("Ebrim v2.5:*:id");
-        /*paths.add("Ebrim v2.5:User:id");
-        paths.add("Ebrim v2.5:ClassificationNode:id");
-        paths.add("Ebrim v2.5:Association:id");
-        paths.add("Ebrim v2.5:Organization:id");
-        paths.add("Ebrim v2.5:Classification:id");
-        paths.add("Ebrim v2.5:RegistryEntry:id");
-        paths.add("Ebrim v2.5:ServiceBinding:id");
-        paths.add("Ebrim v2.5:SpecificationLink:id");
-        paths.add("Ebrim v2.5:ExternalLink:id");
-        paths.add("Ebrim v2.5:AuditableEvent:id");
-        paths.add("Ebrim v2.5:ExternalIdentifier:id");
-        paths.add("Ebrim v2.5:AdhocQuery:id");
-        paths.add("Ebrim v2.5:Subscription:id");
-        paths.add("Ebrim v2.5:RegistryPackage:id");
-        paths.add("Ebrim v2.5:RegistryObject:id");
-        paths.add("Ebrim v2.5:ClassificationScheme:id");
-        paths.add("Ebrim v2.5:Service:id");
-        paths.add("Ebrim v2.5:Registry:id");
-        paths.add("Ebrim v2.5:Federation:id");*/
-        paths.add("Web Registry Service v0.9:WRSExtrinsicObject:id");
-        paths.add("Web Registry Service v0.9:ApplicationModule:id");
-        paths.add("Web Registry Service v0.9:Geometry:id");
-        
+        paths.add("Web Registry Service v0.9:*:id");
         DUBLIN_CORE_QUERYABLE.put("identifier", paths);
         
         paths = new ArrayList<String>();

@@ -1,6 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <rim:ExtrinsicObject xmlns:rim="urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5" xmlns:gml="http://www.opengis.net/gml" id="urn:uuid:3e195454-42e8-11dd-8329-00e08157d076"
       home="http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi" objectType="Theme" status="Approved" majorVersion="1" minorVersion="0" stability="Static" isOpaque="false">
+    <rim:Name>
+        <rim:LocalizedString lang='EN-US' charset='UTF-8' value="ebrim2Title"/>
+    </rim:Name>
     <rim:Description>
         <rim:LocalizedString rim:lang="en-US" value="CubeSERV layers"/>
     </rim:Description>

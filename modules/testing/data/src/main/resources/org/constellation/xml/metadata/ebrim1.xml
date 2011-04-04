@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <rim:ExtrinsicObject xmlns:rim='urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5' id='000068C3-3B49-C671-89CF-10A39BB1B652' objectType='Geometry' majorVersion='1' minorVersion='0' status='urn:oasis:names:tc:ebxml-regrep:StatusType:Submitted' mimeType='' isOpaque='F' userVersion='' stability='' accessControlPolicy='' expiration=''>
     <rim:Name>
-        <rim:LocalizedString lang='EN-US' charset='UTF-8' value=""/>
+        <rim:LocalizedString lang='EN-US' charset='UTF-8' value="ebrim1Title"/>
     </rim:Name>
     <rim:Description>
         <rim:LocalizedString lang='EN-US' charset='UTF-8' value=""/>

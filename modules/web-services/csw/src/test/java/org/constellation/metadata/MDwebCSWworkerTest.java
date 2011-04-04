@@ -76,6 +76,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
 
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");

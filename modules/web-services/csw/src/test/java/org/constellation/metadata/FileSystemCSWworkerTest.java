@@ -58,6 +58,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             writeDataFile(dataDirectory, "meta-19119.xml", "mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
             writeDataFile(dataDirectory, "ebrim1.xml", "000068C3-3B49-C671-89CF-10A39BB1B652");
             writeDataFile(dataDirectory, "ebrim2.xml", "urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
+            writeDataFile(dataDirectory, "ebrim3.xml", "urn:motiive:csw-ebrim");
 
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");

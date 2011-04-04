@@ -976,6 +976,7 @@ public class CSWworkerTest {
         list.add("42292_5p_19900609195600");
         list.add("42292_9s_19900610041000");
         list.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
+        list.add("urn:motiive:csw-ebrim");
         list.add("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
         values = new ListOfValuesType(list);
         value  = new DomainValuesType(null, "identifier", values, METADATA_QNAME);
@@ -1026,7 +1027,10 @@ public class CSWworkerTest {
         list.add("90008411-2.ctd");
         list.add("90008411.ctd");
         list.add("92005711.ctd");
+        list.add("Feature Type Catalogue Extension Package");
         list.add("WMS Server for CORINE Land Cover France");
+        list.add("ebrim1Title");
+        list.add("ebrim2Title");
         values = new ListOfValuesType(list);
         value  = new DomainValuesType(null, "title", values, METADATA_QNAME);
         domainValues.add(value);
