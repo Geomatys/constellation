@@ -33,7 +33,7 @@ public class Parameter {
 
     }
 
-    public Parameter(String name, String value) {
+    public Parameter(final String name, final String value) {
         this.name = name;
         this.value = value;
     }
@@ -48,7 +48,7 @@ public class Parameter {
     /**
      * @param name the name to set
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -62,7 +62,7 @@ public class Parameter {
     /**
      * @param value the value to set
      */
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 

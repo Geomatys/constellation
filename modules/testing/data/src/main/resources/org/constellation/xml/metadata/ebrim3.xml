@@ -1,0 +1,797 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rim:RegistryPackage id="urn:motiive:csw-ebrim" versionInfo="1.0" xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" xmlns="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+    <rim:Name>
+        <rim:LocalizedString xml:lang="en" value="Feature Type Catalogue Extension Package"/>
+    </rim:Name>
+    <rim:RegistryObjectList>
+        <rim:ClassificationNode code="ebFC_FeatureType" id="urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureType" parent="urn:oasis:names:tc:ebxml-regrep:ObjectType:Identifiable:RegistryObject:ExtrinsicObject">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="ebFC_FeatureType"/>
+            </rim:Name>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="ebFC_PropertyType" id="urn:motiive:csw-ebrim:ObjectType:ebFC_PropertyType" parent="urn:oasis:names:tc:ebxml-regrep:ObjectType:Identifiable:RegistryObject:ExtrinsicObject">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="ebFC_PropertyType"/>
+            </rim:Name>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="ebFC_FeatureAttribute" id="urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureAttribute" parent="urn:motiive:csw-ebrim:ObjectType:ebFC_PropertyType">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="ebFC_FeatureAttribute"/>
+            </rim:Name>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="ebFC_FeatureOperation" id="urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureOperation" parent="urn:motiive:csw-ebrim:ObjectType:ebFC_PropertyType">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="ebFC_FeatureOperation"/>
+            </rim:Name>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="ebFC_AssociationRole" id="urn:motiive:csw-ebrim:ObjectType:ebFC_AssociationRole" parent="urn:motiive:csw-ebrim:ObjectType:ebFC_PropertyType">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="ebFC_AssociationRole"/>
+            </rim:Name>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="ebFC_FeatureAssociation" id="urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureAssociation" parent="urn:oasis:names:tc:ebxml-regrep:ObjectType:Identifiable:RegistryObject:ExtrinsicObject">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="ebFC_FeatureAssociation"/>
+            </rim:Name>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="ebFC_DefinitionSource" id="urn:motiive:csw-ebrim:ObjectType:ebFC_DefinitionSource" parent="urn:oasis:names:tc:ebxml-regrep:ObjectType:Identifiable:RegistryObject:ExtrinsicObject">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="ebFC_DefinitionSource"/>
+            </rim:Name>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="ebFC_DefinitionReference" id="urn:motiive:csw-ebrim:ObjectType:ebFC_DefinitionReference" parent="urn:oasis:names:tc:ebxml-regrep:ObjectType:Identifiable:RegistryObject:ExtrinsicObject">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="ebFC_DefinitionReference"/>
+            </rim:Name>
+        </rim:ClassificationNode>
+        <rim:ClassificationScheme id="urn:motiive:csw-ebrim:scheme:xml:value-type" isInternal="false" nodeType="UniqueCode">
+            <rim:ClassificationNode code="gml:StringOrRef" id="urn:motiive:ftc:GML:StringOrRef"/>
+        </rim:ClassificationScheme>
+        <rim:ClassificationNode code="SubTypeOf" id="urn:motiive:csw-ebrim:AssociationType:SubTypeOf" parent="urn:oasis:names:tc:ebxml-regrep:AssociationType">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="SubTypeOf"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Is a specialisation of the parent feature type, and inherits characteristics (including attributes, associations and operations) from a parent feature type. Each feature type may be the subtype of only one parent feature type."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="Defines" id="urn:motiive:csw-ebrim:AssociationType:Defines" parent="urn:oasis:names:tc:ebxml-regrep:AssociationType">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="Defines"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Provides a meaning or supporting document for the object."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="ConstrainedBy" id="urn:motiive:csw-ebrim:AssociationType:ConstrainedBy" parent="urn:oasis:names:tc:ebxml-regrep:AssociationType">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="ConstrainedBy"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Applies constraints to an object."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="PropertyOf" id="urn:motiive:csw-ebrim:AssociationType:PropertyOf" parent="urn:oasis:names:tc:ebxml-regrep:AssociationType">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="PropertyOf"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Indicates that an operation, attribute or association is a property of a feature type."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="Affects" id="urn:motiive:csw-ebrim:AssociationType:Affects" parent="urn:oasis:names:tc:ebxml-regrep:AssociationType">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="Affects"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Indicates an operation that affects an attribute for a feature type."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="Observes" id="urn:motiive:csw-ebrim:AssociationType:Observes" parent="urn:oasis:names:tc:ebxml-regrep:AssociationType:Uses">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="Observes"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Indicates an operation that observes the value of an attribute for a feature type."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="TriggeredBy" id="urn:motiive:csw-ebrim:AssociationType:TriggeredBy" parent="urn:oasis:names:tc:ebxml-regrep:AssociationType">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="TriggeredBy"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Indicates an operation that is triggered by an attribute for a feature type."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <!-- =========================================================  -->
+        <!-- Classification Nodes to describe the new slots needed for the FTC.                      -->
+        <!-- However, this seems to be of limited usefulness given that you can't                   -->
+        <!-- specify the data type or parent class that the slot may exist within.                                      -->
+        <!-- =========================================================  -->
+        <rim:ClassificationNode code="fieldOfApplication" id="urn:motiive:csw-ebrim:Slots:fieldOfApplication" parent="urn:x-ogc:specification:csw-ebrim:ClassificationScheme:Slots">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="fieldOfApplication"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="The kinds of use to which the feature catalogue (i.e. the RegistryPackage) may be put."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="isAbstract" id="urn:motiive:csw-ebrim:Slot:isAbstract" parent="urn:x-ogc:specification:csw-ebrim:ClassificationScheme:Slots">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="isAbstract"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="A flag indicating whether a Feature Type is abstract or not, attached to the ebFC_FeatureType class."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="uniqueInstance" id="urn:motiive:csw-ebrim:Slot:uniqueInstance" parent="urn:x-ogc:specification:csw-ebrim:ClassificationScheme:Slots">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="uniqueInstance"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="A flag indicating whether an instance of the supertype may be an instance of more than one subtype or not, attached to the ebFC_InheritanceRelation class."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="formalDefinition" id="urn:motiive:csw-ebrim:Slot:formalDefinition" parent="urn:x-ogc:specification:csw-ebrim:ClassificationScheme:Slots">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="formalDefinition"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Formal description of the behaviour of the member, expressed in the symbol set defined in ebFC_Catalogue.functionalLanguage. Involves operational parameters and interactions with other members of the feature type, attached to ebFC_FeatureOperation."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="formalDefinition" id="urn:motiive:csw-ebrim:Slot:signature" parent="urn:x-ogc:specification:csw-ebrim:ClassificationScheme:Slots">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="signature"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Name and parameters for this operation. It may contain optional returned parameters. The signature is normally derived from the formal definition. The signature of the operation must be unique. This is the equivalent of the UML signature, attached to ebFC_FeatureOperation.."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="cardinality" id="urn:motiive:csw-ebrim:Slot:cardinality" parent="urn:x-ogc:specification:csw-ebrim:ClassificationScheme:Slots">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="cardinality"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Cardinality of the member in the feature class. If this is an attribute or operation, the default cardinality is 1. If this is an association role, the default cardinality is 0..*. For operations, this is the number of return values possible. this is an elaboration of the GFM to allow for complete specifications for various programming and data definition languages, attached to ebFC_PropertyType."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="isOrdered" id="urn:motiive:csw-ebrim:Slot:isOrdered" parent="urn:x-ogc:specification:csw-ebrim:ClassificationScheme:Slots">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="isOrdered"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Indicates if the instances of the association role within the containing feature instance are ordered or not, with FALSE='not ordered' and TRUE='ordered. If TRUE, ebFC_PropertyType.rim::description shall contain an explanation of the meaning of the order, attached to ebFC_AssociationRole."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="isNavigable" id="urn:motiive:csw-ebrim:Slot:isNavigable" parent="urn:x-ogc:specification:csw-ebrim:ClassificationScheme:Slots">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="isNavigable"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="A flag indicating whether the association can be navigated from the source feature to the target feature, attached to ebFC_AssociationRole."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <rim:ClassificationNode code="sourceIdentifier" id="urn:motiive:csw-ebrim:Slot:sourceIdentifier" parent="urn:x-ogc:specification:csw-ebrim:ClassificationScheme:Slots">
+            <rim:Name>
+                <rim:LocalizedString xml:lang="en" value="sourceIdentifier"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString xml:lang="en" value="Additional information to help locate the definition in the source document. The format of this information is specific to the structure of the source document , attached to ebFC_DefinitionReference."/>
+            </rim:Description>
+        </rim:ClassificationNode>
+        <!-- =========================================================  -->
+        <!-- Extension package dependency on BasicPackage.                                                                                   -->
+        <!-- =========================================================  -->
+        <rim:Association id="urn:uuid:xxxxxx" associationType="urn:oasis:names:tc:ebxml-regrep:AssociationType:Uses" sourceObject="urn:motiive:csw-ebrim" targetObject="urn:x-ogc:specification:csw-ebrim:package:Basic"/>
+        <!-- =========================================================  -->
+        <!-- Stored queries for common search patterns on the FTC. -->
+        <!-- =========================================================  -->
+        <!-- ============= -->
+        <!-- getFeatureTypes -->
+        <!-- ============= -->
+        <rim:AdhocQuery id="urn:motiive:csw-ebrim:Query:getFeatureTypes">
+
+          <!-- may also need other slots to allow search on package and name, but keeping it simpler for now -->
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getFeatureTypes"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature type. Returns: Feature type records that have that id. This is version dependent - id refers to a specific version of a feature type. This returns only the feature type. Other queries are used to return associated attributes, operations, etc."/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject ClassificationNode">
+                        <csw:ElementSetName typeNames="ExtrinsicObject">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@objectType</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>
+        <rim:AdhocQuery xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" id="urn:motiive:csw-ebrim:Query:getFeatureTypeAttributes">
+          <!-- may also need other slots to allow search on package and name, but keeping it simpler for now -->
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getFeatureTypeAttributes"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature type. Returns: Feature Attribute records for feature types that have that id. This is version dependent - id refers to a specific version of a feature type. This query may not be very efficient, because there are so many joins and I don't know how the query is executed."/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject=ft, pt, fa ClassificationNode=cnft, cnpt, cnfa">
+                        <csw:ElementSetName typeNames="ExtrinsicObject=fa">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                      <!-- The first two clauses say that we are looking for Feature Types. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ft@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature types with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ft/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These two clauses say that we are looking for Property Types. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/pt/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnpt/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnpt/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_PropertyType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for property types of the feature types with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ft/@id</ogc:PropertyName>
+                                        <ogc:PropertyName>/pt/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These two clauses say that we are looking for Feature Attributes. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/fa/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureAttribute</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature attributes of the property types of the feature types with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/fa/@id</ogc:PropertyName>
+                                        <ogc:PropertyName>/pt/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>
+        <!-- ==================== -->
+        <!-- getFeatureTypeOperations -->
+        <!-- ==================== -->
+        <rim:AdhocQuery xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" id="urn:motiive:csw-ebrim:Query:getFeatureTypeOperations">
+          <!-- may also need other slots to allow search on package and name, but keeping it simpler for now -->
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getFeatureTypeOperations"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature type. Returns: Feature Operation records for feature types that have that id. This is version dependent - id refers to a specific version of a feature type. This query may not be very efficient, because there are so many joins and I don't know how the query is executed."/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject=ft, pt, fo ClassificationNode=cnft, cnpt, cnfo">
+                        <csw:ElementSetName typeNames="ExtrinsicObject=fo">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                      <!-- The first two clauses say that we are looking for Feature Types. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ft@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature types with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ft/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These two clauses say that we are looking for Property Types. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/pt/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnpt/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnpt/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_PropertyType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for property types of the feature types with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ft/@id</ogc:PropertyName>
+                                        <ogc:PropertyName>/pt/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These two clauses say that we are looking for Feature Operations. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/fo/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnfo/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnfo/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureOperation</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature operations of the property types of the feature types with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/fo/@id</ogc:PropertyName>
+                                        <ogc:PropertyName>/pt/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>
+        <!-- ============================= -->
+        <!-- getFeatureOperationServiceBindings -->
+        <!-- ============================= -->
+        <rim:AdhocQuery xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" id="urn:motiive:csw-ebrim:Query:getFeatureOperationServiceBindings">
+          <!-- may also need other slots to allow search on package and name, but keeping it simpler for now -->
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getFeatureOperationServiceBindings"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature operation. Returns: Service Bindng records for that operation. It may be better to use DAQMs instead?"/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject ClassificationNode ServiceBinding Association">
+                        <csw:ElementSetName typeNames="ServiceBinding Association">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                      <!-- These two clauses say that we are looking for Feature Operations. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/ClassificationNode/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ClassificationNode/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureOperation</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature operations with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for associations of type Implements, which is used to connect Feature Operations . -->
+                      <!-- to ServiceBindings.  -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                        <ogc:Literal>Implements</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause gets only associations with source objects that are ServiceBindings.  -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@sourceObject</ogc:PropertyName>
+                                        <ogc:PropertyName>/ServiceBinding/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause gets only associations with target objects that are Feature Operations with the specified id.  -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@targetObject</ogc:PropertyName>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>
+        <!-- ======================== -->
+        <!-- getFeatureOperationAttributes -->
+        <!-- ======================== -->
+        <rim:AdhocQuery xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" id="urn:motiive:csw-ebrim:Query:getFeatureOperationAttributes">
+          <!-- may also need other slots to allow search on package and name, but keeping it simpler for now -->
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getFeatureOperationAttributes"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature operation. Returns: Feature Operation records, their linked Feature Attribute records and the type of link between the operations and the attributes."/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject=fo, fa ClassificationNode=cnfo, cnfa Association">
+
+                        <csw:ElementSetName typeNames="ExtrinsicObject=fo, fa Association">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                      <!-- These two clauses say that we are looking for Feature Operations. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/fo/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnfo/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnfo/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureOperation</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature operations with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/fo/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These clauses say that we are looking for associations of types Affects, Observes and TriggeredBy -->
+                                    <ogc:Or>
+                                        <ogc:PropertyIsEqualTo>
+                                            <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                            <ogc:Literal>Affects</ogc:Literal>
+                                        </ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyIsEqualTo>
+                                            <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                            <ogc:Literal>Observes</ogc:Literal>
+                                        </ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyIsEqualTo>
+                                            <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                            <ogc:Literal>TriggeredBy</ogc:Literal>
+                                        </ogc:PropertyIsEqualTo>
+                                    </ogc:Or>
+                      <!-- This clause gets only associations with source objects that are Feature Operations with the specified id.  -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@sourceObject</ogc:PropertyName>
+                                        <ogc:PropertyName>/fo/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These two clauses say that we are looking for Feature Attributes. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/fa/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureAttribute</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause gets only associations with target objects that are Feature Attributes.  -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@targetObject</ogc:PropertyName>
+                                        <ogc:PropertyName>/fa/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>
+        <!-- ====================== -->
+        <!-- getFeatureTypeAssociations -->
+        <!-- ====================== -->
+        <rim:AdhocQuery xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" id="urn:motiive:csw-ebrim:Query:getFeatureTypeAssociations">
+          <!-- may also need other slots to allow search on package and name, but keeping it simpler for now -->
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getFeatureTypeAssociations"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature type. Returns: FeatureAssociation records for feature types that have that id. This returns only feature associations of types RelatedTo, Uses, Extends, AffiliatedWith or EquivalentTo. Associations between Feature Types that are of type Implements are returned by getImplementedFeatureTypes and getImplementingFeatureTypes. Associations between Feature Types that are of type SubTypeOf (inheritance) are returned by getInheritedFeatureTypes and getInheritingFeatureTypes."/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject Association ClassificationNode=cnft, cnfa Association">
+                        <csw:ElementSetName typeNames="Association">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                      <!-- The first two clauses say that we are looking for Feature Types. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature types with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These two clauses say that we are looking for Feature Associations. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureAssociation</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature associations with the specified ft id as source. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@sourceObject</ogc:PropertyName>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These clauses say that we are looking for associations of types Uses, Extends, AffiliatedWith, RelatedTo, EquivalentTo -->
+                                    <ogc:Or>
+                                        <ogc:PropertyIsEqualTo>
+                                            <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                            <ogc:Literal>Uses</ogc:Literal>
+                                        </ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyIsEqualTo>
+                                            <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                            <ogc:Literal>Extends</ogc:Literal>
+                                        </ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyIsEqualTo>
+                                            <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                            <ogc:Literal>AffiliatedWith</ogc:Literal>
+                                        </ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyIsEqualTo>
+                                            <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                            <ogc:Literal>RelatedTo</ogc:Literal>
+                                        </ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyIsEqualTo>
+                                            <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                            <ogc:Literal>EquivalentTo</ogc:Literal>
+                                        </ogc:PropertyIsEqualTo>
+                                    </ogc:Or>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>
+        <!-- ====================== -->
+        <!-- getImplementedFeatureTypes -->
+        <!-- ====================== -->
+        <rim:AdhocQuery xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" id="urn:motiive:csw-ebrim:Query:getImplementedFeatureTypes">
+          <!-- may also need other slots to allow search on package and name, but keeping it simpler for now -->
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getImplementedFeatureTypes"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature type. Returns: Feature Types that are associated with the specified feature type via an Implements association."/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject Association ClassificationNode=cnft, cnfa Association">
+                        <csw:ElementSetName typeNames="ExtrinsicObject">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                      <!-- The first two clauses say that we are looking for Feature Types. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature types with the specified id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These two clauses say that we are looking for Feature Associations. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureAssociation</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- This clause says we are looking for feature associations with the specified ft id as source. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@sourceObject</ogc:PropertyName>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                      <!-- These clauses say that we are looking for associations of types Uses, Extends, AffiliatedWith, RelatedTo, EquivalentTo -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                        <ogc:Literal>Implements</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>
+        <rim:AdhocQuery xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" id="urn:motiive:csw-ebrim:Query:getImplementingFeatureTypes">
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getImplementingFeatureTypes"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature type. Returns: Feature Types that are associated with the specified feature type via an Implements association (reverse diretion)."/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject Association ClassificationNode=cnft, cnfa Association">
+                        <csw:ElementSetName typeNames="ExtrinsicObject">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnfa/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureAssociation</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@targetObject</ogc:PropertyName>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                        <ogc:Literal>Implements</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>>
+        <rim:AdhocQuery xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" id="urn:motiive:csw-ebrim:Query:getInheritingFeatureTypes">
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getInheritingFeatureTypes"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature type. Returns: Feature Types that are associated with the specified feature type via InheritanceRelation (gets children)."/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject Association ClassificationNode=cnft, cnir Association">
+                        <csw:ElementSetName typeNames="ExtrinsicObject">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnir/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnir/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_InheritanceRelation</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@targetObject</ogc:PropertyName>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                        <ogc:Literal>SubTypeOf</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>
+        <rim:AdhocQuery xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0" id="urn:motiive:csw-ebrim:Query:getInheritedFeatureTypes">
+            <rim:Name>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="getInheritedFeatureTypes"/>
+            </rim:Name>
+            <rim:Description>
+                <rim:LocalizedString charset="URF-8" xml:lang="en" value="Takes as a parameter the id of a feature type. Returns: Feature Types that are associated with the specified feature type via InheritanceRelation (gets parents)."/>
+            </rim:Description>
+            <rim:Slot name="searchid" slotType="URN">
+                <rim:ValueList/>
+            </rim:Slot>
+            <rim:QueryExpression queryLanguage="urn:x-ogc:specification:csw-ebrim:QueryLanguage:CSWQuery" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc">
+                <csw:GetRecords>
+                    <csw:Query typeNames="ExtrinsicObject Association ClassificationNode=cnft, cnir Association">
+                        <csw:ElementSetName typeNames="ExtrinsicObject">full</csw:ElementSetName>
+                        <csw:Constraint version="1.1.0">
+                            <ogc:Filter>
+                                <ogc:And>
+                      <!-- The first two clauses say that we are looking for Feature Types. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnft/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_FeatureType</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>id. -->
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                        <ogc:Literal>${searchid}</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@objectType</ogc:PropertyName>
+                                        <ogc:PropertyName>/cnir/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/cnir/@id</ogc:PropertyName>
+                                        <ogc:Literal>urn:motiive:csw-ebrim:ObjectType:ebFC_InheritanceRelation</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@sourceObject</ogc:PropertyName>
+                                        <ogc:PropertyName>/ExtrinsicObject/@id</ogc:PropertyName>
+                                    </ogc:PropertyIsEqualTo>
+                                    <ogc:PropertyIsEqualTo>
+                                        <ogc:PropertyName>/Association/@associationType</ogc:PropertyName>
+                                        <ogc:Literal>SubTypeOf</ogc:Literal>
+                                    </ogc:PropertyIsEqualTo>
+                                </ogc:And>
+                            </ogc:Filter>
+                        </csw:Constraint>
+                    </csw:Query>
+                </csw:GetRecords>
+            </rim:QueryExpression>
+        </rim:AdhocQuery>
+    </rim:RegistryObjectList>
+</rim:RegistryPackage>

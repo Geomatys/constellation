@@ -47,7 +47,7 @@ public final class ReflectionUtilities {
     private static final String INCLASS = " in the class ";
 
     /**
-     * A map of getters to avoid to seach the same getters many times.
+     * A map of getters to avoid to search the same getters many times.
      */
     private static final Map<String, Method> GETTERS = new HashMap<String, Method>();
 
@@ -701,9 +701,8 @@ public final class ReflectionUtilities {
                (pathID.startsWith("Catalog Web Service:Record")    && "RecordType".equals(metadata.getClass().getSimpleName())) ||
                (pathID.startsWith("ISO 19110:FC_FeatureCatalogue") && "FeatureCatalogueImpl".equals(metadata.getClass().getSimpleName())) ||
                (pathID.startsWith("SensorML:SensorML")             && "SensorML".equals(metadata.getClass().getSimpleName())) ||
-               (pathID.startsWith("Ebrim v2.5:ExtrinsicObject")    && "org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType".equals(metadata.getClass().getName())||
-               (pathID.startsWith("Ebrim v2.5:RegistryObject")     && "org.geotoolkit.ebrim.xml.v250.RegistryObjectType".equals(metadata.getClass().getName()))||
-               (pathID.startsWith("Ebrim v3.0:RegistryObject")     && "org.geotoolkit.ebrim.xml.v300.RegistryObjectType".equals(metadata.getClass().getName())));
+               (pathID.startsWith("Ebrim v2.5:*")                  && metadata.getClass().getName().startsWith("org.geotoolkit.ebrim.xml.v250")||
+               (pathID.startsWith("Ebrim v3.0:*")                  && metadata.getClass().getName().startsWith("org.geotoolkit.ebrim.xml.v300")));
     }
 
      /**

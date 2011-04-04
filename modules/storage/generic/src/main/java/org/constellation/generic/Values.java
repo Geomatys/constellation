@@ -49,7 +49,7 @@ public class Values {
      * @param singleValue   A map of (variable name) - (value)
      * @param multipleValue A map of (variable name) - (list of values)
      */
-    public Values(Map<String, List<String>> values) {
+    public Values(final Map<String, List<String>> values) {
         if (values != null) {
             this.values = values;
         } else {
@@ -63,7 +63,7 @@ public class Values {
      * @param variable
      * @return
      */
-    public String getVariable(String variable) {
+    public String getVariable(final String variable) {
         final List<String> result = values.get(variable);
         if (result != null && result.size() > 0) {
             return result.get(0);
@@ -77,7 +77,7 @@ public class Values {
      * @param variables
      * @return
      */
-    public List<String> getVariables(String variable) {
+    public List<String> getVariables(final String variable) {
         if (values != null) {
             List<String> result = values.get(variable);
             if (result == null) {
@@ -94,7 +94,7 @@ public class Values {
      * @param varName The name of the variable.
      * @param value   The value to add.
      */
-    public void addToValue(String varName, String value) {
+    public void addToValue(final String varName, final String value) {
         if (values.get(varName) == null) {
            values.put(varName, new ArrayList<String>());
         }
@@ -107,7 +107,7 @@ public class Values {
      * @param varName The name of the variable.
      * @param value   The value to add.
      */
-    public void mergedValues(Values value) {
+    public void mergedValues(final Values value) {
         if (value != null) {
             this.values.putAll(value.values);
         }

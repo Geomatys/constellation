@@ -45,7 +45,7 @@ public abstract class AbstractFilterWriter extends FilterWriter {
      * @param out  a Writer object to provide the underlying stream.
      * @throws NullPointerException if <code>out</code> is <code>null</code>
      */
-    protected AbstractFilterWriter(Writer out) {
+    protected AbstractFilterWriter(final Writer out) {
         super(out);
     }
 
@@ -62,7 +62,7 @@ public abstract class AbstractFilterWriter extends FilterWriter {
     @Override
     public void write(final char[] cbuf, int offset, final int length) throws IOException {
         final int upper = offset + length;
-        for (int i=offset; i<upper; i++) {
+        for (int i = offset; i < upper; i++) {
             char c = cbuf[i];
             if (c != '\r' && c != '\n') {
                 continue;

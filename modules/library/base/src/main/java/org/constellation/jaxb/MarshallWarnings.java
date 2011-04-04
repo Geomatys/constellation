@@ -32,7 +32,7 @@ public class MarshallWarnings extends ObjectConverters {
 
     // Collects the warnings and allows the process to continue.
     @Override
-    protected <T> boolean exceptionOccured(T value, Class<T> sourceType, Class<?> targetType, Exception exception) {
+    protected <T> boolean exceptionOccured(final T value, final Class<T> sourceType, final Class<?> targetType, final Exception exception) {
         messages.add(exception.getLocalizedMessage() + " value=[" + value + "] sourceType:" + sourceType + " targetType:" + targetType);
         return true;
     }

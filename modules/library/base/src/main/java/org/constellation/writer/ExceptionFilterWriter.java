@@ -38,7 +38,7 @@ public final class ExceptionFilterWriter extends AbstractFilterWriter {
      * @param out  a Writer object to provide the underlying stream.
      * @throws NullPointerException if <code>out</code> is <code>null</code>
      */
-    public ExceptionFilterWriter(Writer out) {
+    public ExceptionFilterWriter(final Writer out) {
         super(out);
     }
 
@@ -48,7 +48,7 @@ public final class ExceptionFilterWriter extends AbstractFilterWriter {
      * @param out  a Writer object to provide the underlying stream.
      * @throws NullPointerException if <code>out</code> is <code>null</code>
      */
-    public ExceptionFilterWriter(OutputStream out, String enc) throws UnsupportedEncodingException {
+    public ExceptionFilterWriter(final OutputStream out, final String enc) throws UnsupportedEncodingException {
         super(new OutputStreamWriter(out, enc));
     }
 

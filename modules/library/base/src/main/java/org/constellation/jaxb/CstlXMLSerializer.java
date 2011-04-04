@@ -40,7 +40,7 @@ public class CstlXMLSerializer extends XMLSerializer {
 
     String currentPath = "";
 
-    public CstlXMLSerializer(OutputFormat of) {
+    public CstlXMLSerializer(final OutputFormat of) {
         super(of);
     }
 

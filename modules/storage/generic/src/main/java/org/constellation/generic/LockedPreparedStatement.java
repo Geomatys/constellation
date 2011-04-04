@@ -38,12 +38,12 @@ public final class LockedPreparedStatement extends StatementEntry {
     private final String sql;
 
     /**
-     * Build a ne LockedPreparedStatement.
+     * Build a new LockedPreparedStatement.
      *
      * @param stmt A java.sql.preparedStatement.
      * @param sql The SQL code contain in the specified statement.
      */
-    public LockedPreparedStatement(PreparedStatement stmt, String sql) {
+    public LockedPreparedStatement(final PreparedStatement stmt, final String sql) {
         super(stmt);
         this.sql = sql;
     }
@@ -55,7 +55,7 @@ public final class LockedPreparedStatement extends StatementEntry {
      * @param value the value to insert in the request
      * @throws SQLException
      */
-    public void setString(int index, String value) throws SQLException {
+    public void setString(final int index, final String value) throws SQLException {
         statement.setString(index, value);
     }
 
@@ -66,7 +66,7 @@ public final class LockedPreparedStatement extends StatementEntry {
      * @param value the value to insert in the request
      * @throws SQLException
      */
-    public void setInt(int index, int value) throws SQLException {
+    public void setInt(final int index, final int value) throws SQLException {
         statement.setInt(index, value);
     }
 
@@ -77,7 +77,7 @@ public final class LockedPreparedStatement extends StatementEntry {
      * @param value the value to insert in the request
      * @throws SQLException
      */
-    public void setBoolean(int index, boolean value) throws SQLException {
+    public void setBoolean(final int index, final boolean value) throws SQLException {
         statement.setBoolean(index, value);
     }
 
@@ -88,7 +88,7 @@ public final class LockedPreparedStatement extends StatementEntry {
      * @param value the value to insert in the request
      * @throws SQLException
      */
-    public void setDate(int index, Date value) throws SQLException {
+    public void setDate(final int index, final Date value) throws SQLException {
         statement.setDate(index, value);
     }
 
@@ -99,7 +99,7 @@ public final class LockedPreparedStatement extends StatementEntry {
      * @param value the value to insert in the request
      * @throws SQLException
      */
-    public void setNull(int index, int value) throws SQLException {
+    public void setNull(final int index, final int value) throws SQLException {
         statement.setNull(index, value);
     }
 

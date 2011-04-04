@@ -39,7 +39,7 @@ public final class CapabilitiesFilterWriter extends AbstractFilterWriter {
      * @param out  a Writer object to provide the underlying stream.
      * @throws NullPointerException if <code>out</code> is <code>null</code>
      */
-    public CapabilitiesFilterWriter(Writer out) {
+    public CapabilitiesFilterWriter(final Writer out) {
         super(out);
     }
 
@@ -50,16 +50,16 @@ public final class CapabilitiesFilterWriter extends AbstractFilterWriter {
      * @param enc The character encoding.
      * @throws NullPointerException if <code>out</code> is <code>null</code>
      */
-    public CapabilitiesFilterWriter(OutputStream out, String enc) throws UnsupportedEncodingException {
+    public CapabilitiesFilterWriter(final OutputStream out, final String enc) throws UnsupportedEncodingException {
         super(new OutputStreamWriter(out, enc));
     }
 
     /**
      * In general, returns the line unchanged.
-     * If the line is the root tag WMT_MS_Capabilities, then it justs returns the root tag
+     * If the line is the root tag WMT_MS_Capabilities, then it just returns the root tag
      * with only the version number. Consequently it will remove all namespace definitions
      * if there are some.
-     * If the line is a OnlineResource tag, then add the xml namespace xlink url.
+     * If the line is a OnlineResource tag, then add the xml namespace xlink URL.
      *
      * @param buffer Contains a whole line.
      */

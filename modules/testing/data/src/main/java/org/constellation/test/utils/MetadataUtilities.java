@@ -17,32 +17,41 @@
 
 package org.constellation.test.utils;
 
-import org.opengis.metadata.citation.CitationDate;
-import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
+import org.geotoolkit.csw.xml.v202.QueryType;
+import java.util.Iterator;
 import java.util.Collection;
+import javax.xml.bind.JAXBElement;
+import org.geotoolkit.csw.xml.v202.GetRecordsType;
+
+import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
+import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
+import org.geotoolkit.sml.xml.v100.ComponentType;
+import org.geotoolkit.swe.xml.v100.DataRecordType;
+import org.geotoolkit.sml.xml.v100.IoComponentPropertyType;
+import org.geotoolkit.sml.xml.v100.SystemType;
+import org.geotoolkit.sml.xml.v100.SensorML;
+import org.geotoolkit.feature.catalog.PropertyTypeImpl;
+import org.geotoolkit.feature.catalog.FeatureTypeImpl;
+import org.geotoolkit.util.DefaultInternationalString;
+import org.geotoolkit.ebrim.xml.v250.SlotType;
+import org.geotoolkit.ebrim.xml.v300.AdhocQueryType;
+import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
+import org.geotoolkit.ebrim.xml.v300.RegistryObjectType;
+import org.geotoolkit.feature.catalog.FeatureAttributeImpl;
+import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
+import org.geotoolkit.service.ServiceIdentificationImpl;
+
+import org.opengis.metadata.content.ContentInformation;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.lineage.Algorithm;
 import org.opengis.metadata.acquisition.Operation;
 import org.opengis.metadata.acquisition.AcquisitionInformation;
 import org.opengis.metadata.content.RangeDimension;
 import org.opengis.metadata.lineage.Source;
-import org.geotoolkit.sml.xml.v100.ComponentType;
-import org.geotoolkit.swe.xml.v100.DataRecordType;
-import org.geotoolkit.sml.xml.v100.IoComponentPropertyType;
-import org.geotoolkit.sml.xml.v100.SystemType;
-import org.geotoolkit.sml.xml.v100.SensorML;
-import org.opengis.metadata.content.ContentInformation;
-import org.geotoolkit.feature.catalog.PropertyTypeImpl;
-import org.geotoolkit.feature.catalog.FeatureTypeImpl;
-import org.opengis.metadata.citation.Citation;
-import org.geotoolkit.util.DefaultInternationalString;
-import java.util.Iterator;
-import org.geotoolkit.ebrim.xml.v250.SlotType;
-import org.geotoolkit.feature.catalog.FeatureAttributeImpl;
-import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
-import org.geotoolkit.service.ServiceIdentificationImpl;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
 import org.opengis.metadata.content.CoverageDescription;
@@ -804,6 +813,146 @@ public class MetadataUtilities {
         assertEquals(expResult.getStability(), result.getStability());
         assertEquals(expResult.getStatus(), result.getStatus());
         assertEquals(expResult.getUserVersion(), result.getUserVersion());
+        assertEquals(expResult, result);
+    }
+
+    public static void ebrimEquals(final RegistryPackageType expResult, final RegistryPackageType result) {
+        assertEquals(expResult.getClassification(), result.getClassification());
+        assertEquals(expResult.getDescription(), result.getDescription());
+        assertEquals(expResult.getExternalIdentifier(), result.getExternalIdentifier());
+        assertEquals(expResult.getHome(), result.getHome());
+        assertEquals(expResult.getId(), result.getId());
+        assertEquals(expResult.getLid(), result.getLid());
+        assertEquals(expResult.getName(), result.getName());
+        assertEquals(expResult.getObjectType(), result.getObjectType());
+        if (expResult.getRegistryObjectList() != null && result.getRegistryObjectList() != null) {
+            assertEquals(expResult.getRegistryObjectList().getIdentifiable().size(), result.getRegistryObjectList().getIdentifiable().size());
+            Iterator<JAXBElement<? extends IdentifiableType>> expIdentList = expResult.getRegistryObjectList().getIdentifiable().iterator();
+            Iterator<JAXBElement<? extends IdentifiableType>> resIdentList = result.getRegistryObjectList().getIdentifiable().iterator();
+            while (expIdentList.hasNext()) {
+                IdentifiableType expIdent = (IdentifiableType) ((JAXBElement)expIdentList.next()).getValue();
+                IdentifiableType resIdent = (IdentifiableType) ((JAXBElement)resIdentList.next()).getValue();
+                assertEquals(expIdent.getHome(), resIdent.getHome());
+                assertEquals(expIdent.getId(), resIdent.getId());
+                if (expIdent.getSlot() != null && resIdent.getSlot() != null) {
+                    assertEquals(expIdent.getSlot().size(), resIdent.getSlot().size());
+                    Iterator<org.geotoolkit.ebrim.xml.v300.SlotType> expSlotIt = expIdent.getSlot().iterator();
+                    Iterator<org.geotoolkit.ebrim.xml.v300.SlotType> resSlotIt = resIdent.getSlot().iterator();
+                    while (expSlotIt.hasNext()) {
+                        org.geotoolkit.ebrim.xml.v300.SlotType expSlot = expSlotIt.next();
+                        org.geotoolkit.ebrim.xml.v300.SlotType resSlot = resSlotIt.next();
+                        assertEquals(expSlot.getName(), resSlot.getName());
+                        assertEquals(expSlot.getSlotType(), resSlot.getSlotType());
+                        if (expSlot.getValueList() != null && resSlot.getValueList() != null) {
+                            assertEquals(expSlot.getValueList().getValue(), resSlot.getValueList().getValue());
+                        }
+                        assertEquals(expSlot, resSlot);
+                    }
+                }
+                assertEquals(expIdent.getSlot(), resIdent.getSlot());
+
+                if (expIdent instanceof RegistryObjectType) {
+                    assertTrue(resIdent instanceof RegistryObjectType);
+                    RegistryObjectType expReg = (RegistryObjectType) expIdent;
+                    RegistryObjectType resReg = (RegistryObjectType) resIdent;
+                    assertEquals(expReg.getClassification(), resReg.getClassification());
+                    assertEquals(expReg.getDescription(), resReg.getDescription());
+                    assertEquals(expReg.getExternalIdentifier(), resReg.getExternalIdentifier());
+                    assertEquals(expReg.getLid(), resReg.getLid());
+                    assertEquals(expReg.getName(), resReg.getName());
+                    assertEquals(expReg.getObjectType(), resReg.getObjectType());
+                    assertEquals(expReg.getStatus(), resReg.getStatus());
+                    assertEquals(expReg.getVersionInfo(), resReg.getVersionInfo());
+
+                    if (expIdent instanceof AdhocQueryType) {
+                        assertTrue(resIdent instanceof AdhocQueryType);
+                        AdhocQueryType expAq = (AdhocQueryType) expIdent;
+                        AdhocQueryType resAq = (AdhocQueryType) resIdent;
+                        if (expAq.getQueryExpression() != null && resAq.getQueryExpression() != null) {
+                            if (expAq.getQueryExpression().getContent() != null && resAq.getQueryExpression().getContent() != null) {
+                                assertEquals(expAq.getQueryExpression().getContent().size(), resAq.getQueryExpression().getContent().size());
+                                for (int i = 0; i < expAq.getQueryExpression().getContent().size(); i++) {
+                                    Object expCont = expAq.getQueryExpression().getContent().get(i);
+                                    Object resCont = resAq.getQueryExpression().getContent().get(i);
+                                    if (expCont instanceof JAXBElement) {
+                                        expCont = ((JAXBElement)expCont).getValue();
+                                    }
+                                    if (resCont instanceof JAXBElement) {
+                                        resCont = ((JAXBElement)resCont).getValue();
+                                    }
+                                    if (expCont instanceof GetRecordsType) {
+                                        assertTrue("unexpected type:" + resCont.getClass().getName(), resCont instanceof GetRecordsType);
+                                        GetRecordsType expGR = (GetRecordsType) expCont;
+                                        GetRecordsType resGR = (GetRecordsType) resCont;
+                                        if (expGR.getAbstractQuery() instanceof QueryType) {
+                                            assertTrue(resGR.getAbstractQuery() instanceof QueryType);
+                                            QueryType expQuery = (QueryType) expGR.getAbstractQuery();
+                                            QueryType resQuery = (QueryType) resGR.getAbstractQuery();
+                                            assertEquals(expQuery.getElementName(), resQuery.getElementName());
+                                            if (expQuery.getConstraint() != null && resQuery.getConstraint() != null) {
+                                                assertEquals(expQuery.getConstraint().getCqlText(), resQuery.getConstraint().getCqlText());
+                                                if (expQuery.getConstraint().getFilter() != null && resQuery.getConstraint().getFilter() != null) {
+                                                    if (expQuery.getConstraint().getFilter().getComparisonOps() != null){
+                                                        assertEquals(expQuery.getConstraint().getFilter().getComparisonOps().getValue(), resQuery.getConstraint().getFilter().getComparisonOps().getValue());
+                                                    }
+                                                    if (expQuery.getConstraint().getFilter().getLogicOps() != null) {
+                                                        assertEquals(expQuery.getConstraint().getFilter().getLogicOps().getValue(), resQuery.getConstraint().getFilter().getLogicOps().getValue());
+                                                    }
+                                                    if (expQuery.getConstraint().getFilter().getSpatialOps() != null) {
+                                                        assertEquals(expQuery.getConstraint().getFilter().getSpatialOps().getValue(), resQuery.getConstraint().getFilter().getSpatialOps().getValue());
+                                                    }
+                                                }
+                                                assertEquals(expQuery.getConstraint().getFilter(), resQuery.getConstraint().getFilter());
+                                                assertEquals(expQuery.getConstraint().getVersion(), resQuery.getConstraint().getVersion());
+                                            }
+                                            assertEquals(expQuery.getConstraint(), resQuery.getConstraint());
+                                            assertEquals(expQuery.getElementSetName(), resQuery.getElementSetName());
+                                            assertEquals(expQuery.getSortBy(), resQuery.getSortBy());
+                                            assertEquals(expQuery.getTypeNames(), resQuery.getTypeNames());
+
+                                        }
+                                        assertEquals(expGR.getAbstractQuery(), resGR.getAbstractQuery());
+                                        assertEquals(expGR.getAny(), resGR.getAny());
+                                        assertEquals(expGR.getDistributedSearch(), resGR.getDistributedSearch());
+                                        assertEquals(expGR.getMaxRecords(), resGR.getMaxRecords());
+                                        assertEquals(expGR.getOutputFormat(), resGR.getOutputFormat());
+                                        assertEquals(expGR.getOutputSchema(), resGR.getOutputSchema());
+                                        assertEquals(expGR.getRequestId(), resGR.getRequestId());
+                                        assertEquals(expGR.getResponseHandler(), resGR.getResponseHandler());
+                                        assertEquals(expGR.getResultType(), resGR.getResultType());
+                                        assertEquals(expGR.getStartPosition(), resGR.getStartPosition());
+                                        assertEquals(expGR, resGR);
+                                    }
+                                    assertEquals(expCont, resCont);
+                                }
+                            }
+                            assertEquals(expAq.getQueryExpression(), resAq.getQueryExpression());
+                            assertEquals(expAq.getQueryExpression().getQueryLanguage(), resAq.getQueryExpression().getQueryLanguage());
+                        }
+                    }
+                }
+                assertEquals(expIdent, resIdent);
+            }
+        }
+        assertEquals(expResult.getRegistryObjectList(), result.getRegistryObjectList());
+        assertEquals(expResult.getSlot().size(), result.getSlot().size());
+        Iterator<org.geotoolkit.ebrim.xml.v300.SlotType> expSlotIt = expResult.getSlot().iterator();
+        Iterator<org.geotoolkit.ebrim.xml.v300.SlotType> resSlotIt = result.getSlot().iterator();
+        while (expSlotIt.hasNext()) {
+            org.geotoolkit.ebrim.xml.v300.SlotType resSlot = resSlotIt.next();
+            org.geotoolkit.ebrim.xml.v300.SlotType expSlot = expSlotIt.next();
+            assertEquals(expSlot.getName(), resSlot.getName());
+            assertEquals(expSlot.getSlotType(), resSlot.getSlotType());
+            if (expSlot.getValueList() != null && resSlot.getValueList() != null) {
+                assertEquals(expSlot.getValueList().getValue(), resSlot.getValueList().getValue());
+            }
+            assertEquals(expSlot.getValueList(), resSlot.getValueList());
+            assertEquals(expSlot, resSlot);
+        }
+        assertEquals(expResult.getSlot(), result.getSlot());
+
+        assertEquals(expResult.getStatus(), result.getStatus());
+        assertEquals(expResult.getVersionInfo(), result.getVersionInfo());
         assertEquals(expResult, result);
     }
 }

@@ -429,7 +429,7 @@ public class MDWebMetadataReaderTest {
         ebrimEquals(expResult, result);
 
 
-        absResult = reader.getMetadata("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076", AbstractMetadataReader.SENSORML);
+        absResult = reader.getMetadata("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076", AbstractMetadataReader.EBRIM);
 
         expResult =  (ExtrinsicObjectType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim2.xml"))).getValue();
 

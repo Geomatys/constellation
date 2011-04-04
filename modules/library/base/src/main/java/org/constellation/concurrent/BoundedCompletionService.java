@@ -50,7 +50,7 @@ public class BoundedCompletionService<V> implements CompletionService<V> {
         }
     }
 
-    public BoundedCompletionService(final Executor executor, int permits) {
+    public BoundedCompletionService(final Executor executor, final int permits) {
       this.executor = executor;
       this.semaphore = new Semaphore(permits);
       this.completionQueue = new LinkedBlockingQueue<Future<V>>();
@@ -62,12 +62,12 @@ public class BoundedCompletionService<V> implements CompletionService<V> {
     }
 
     @Override
-    public Future<V> poll(long timeout, TimeUnit unit) throws InterruptedException {
+    public Future<V> poll(final long timeout, final TimeUnit unit) throws InterruptedException {
       return this.completionQueue.poll(timeout, unit);
     }
 
     @Override
-    public Future<V> submit(Callable<V> task)  {
+    public Future<V> submit(final Callable<V> task)  {
       if (task == null) throw new IllegalArgumentException();
       try {
         final BoundedFuture f = new BoundedFuture(task);
@@ -81,7 +81,7 @@ public class BoundedCompletionService<V> implements CompletionService<V> {
     }
 
     @Override
-    public Future<V> submit(Runnable task, V result) {
+    public Future<V> submit(final Runnable task, final V result) {
       if (task == null) throw new IllegalArgumentException();
       try {
         final BoundedFuture f = new BoundedFuture(task, result);

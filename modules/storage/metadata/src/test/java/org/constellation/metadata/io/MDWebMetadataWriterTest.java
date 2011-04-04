@@ -32,6 +32,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
 import static org.constellation.test.utils.MetadataUtilities.*;
 
 import org.geotoolkit.internal.sql.DefaultDataSource;
@@ -460,7 +461,7 @@ public class MDWebMetadataWriterTest {
         ExtrinsicObjectType result = (ExtrinsicObjectType) absResult;
         ExtrinsicObjectType expResult =  (ExtrinsicObjectType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim1.xml"))).getValue();
 
-        assertEquals(expResult, result);
+        ebrimEquals(expResult, result);
 
         absExpResult = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim2.xml"));
         writer.storeMetadata(absExpResult);
@@ -471,7 +472,25 @@ public class MDWebMetadataWriterTest {
         result = (ExtrinsicObjectType) absResult;
         expResult =  (ExtrinsicObjectType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim2.xml"))).getValue();
 
-        assertEquals(expResult, result);
+        ebrimEquals(expResult, result);
+
+        pool.release(unmarshaller);
+    }
+
+    @Test
+    public void writeMetadataEbrim30Test() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object absExpResult = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim3.xml"));
+        writer.storeMetadata(absExpResult);
+
+        Object absResult = reader.getMetadata("urn:motiive:csw-ebrim", AbstractMetadataReader.EBRIM);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof RegistryPackageType);
+        RegistryPackageType result = (RegistryPackageType) absResult;
+        RegistryPackageType expResult =  (RegistryPackageType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim3.xml"))).getValue();
+
+        ebrimEquals(expResult, result);
 
         pool.release(unmarshaller);
     }

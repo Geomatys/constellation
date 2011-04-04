@@ -91,6 +91,30 @@ public class ServiceAdministrator {
     }
 
     /**
+     * Restart all the web-service (wms, wfs, csw,...)
+     *
+     * @return true if the operation succeed
+     */
+    public static boolean restartAll() {
+        try {
+            final String url = getServiceURL() + "/configuration?request=restart";
+            final Object response = sendRequest(url, null);
+            if (response instanceof AcknowlegementType) {
+                return "Success".equals(((AcknowlegementType)response).getStatus());
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
+            } else {
+                LOGGER.warning("The service respond uncorrectly");
+                return false;
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
+
+    /**
      * Restart all the instance of a specific web-service (wms, wfs, csw,...)
      * 
      * @param service The service name to restart (wms, wfs, csw,...).

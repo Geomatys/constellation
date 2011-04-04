@@ -94,7 +94,7 @@ public final class ConfigDirectory {
     }
 
     private static File getWebInfDiretory() {
-        URL url = baseClassLoader.getResource("org/constellation/configuration/ConfigDirectory.class");
+        final URL url = baseClassLoader.getResource("org/constellation/configuration/ConfigDirectory.class");
         String path = url.toString();
         path = path.substring(path.lastIndexOf(':') + 1); // we remove the file type
         final int separator = path.indexOf('!'); // we remove the path inside the jar
@@ -123,10 +123,10 @@ public final class ConfigDirectory {
          */
          final File webInfDirectory = getWebInfDiretory();
 
-        constellationDirectory = new File(webInfDirectory, "constellation");
-        if (constellationDirectory != null && constellationDirectory.isDirectory()) {
-            return constellationDirectory;
-        }
+         constellationDirectory = new File(webInfDirectory, "constellation");
+         if (constellationDirectory != null && constellationDirectory.isDirectory()) {
+             return constellationDirectory;
+         }
 
         /*
          * 2) resource packaged config

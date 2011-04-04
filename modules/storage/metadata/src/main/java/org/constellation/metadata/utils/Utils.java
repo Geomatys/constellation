@@ -69,14 +69,10 @@ public final class Utils {
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
         paths.add("Catalog Web Service:Record:title:content");
         paths.add("Catalog Web Service:Record:identifier:content");
-        paths.add("Ebrim v3.0:RegistryObject:name:localizedString:value");
-        paths.add("Ebrim v3.0:RegistryObject:id");
-        paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
-        paths.add("Ebrim v3.0:RegistryPackage:id");
-        paths.add("Ebrim v2.5:RegistryObject:name:localizedString:value");
-        paths.add("Ebrim v2.5:ExtrinsicObject:name:localizedString:value");
-        paths.add("Ebrim v2.5:RegistryObject:id");
-        paths.add("Ebrim v2.5:ExtrinsicObject:id");// TODO try to replace the ebrim type by a '*' because there is multiple subtype
+        paths.add("Ebrim v3.0:*:name:localizedString:value");
+        paths.add("Ebrim v3.0:*:id");
+        paths.add("Ebrim v2.5:*:name:localizedString:value");
+        paths.add("Ebrim v2.5:*:id");
         paths.add("SensorML:SensorML:member:process:id");
 
         for (String path : paths) {
@@ -151,10 +147,8 @@ public final class Utils {
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
         paths.add("Catalog Web Service:Record:identifier:content");
-        paths.add("Ebrim v3.0:RegistryObject:id");
-        paths.add("Ebrim v3.0:RegistryPackage:id");
-        paths.add("Ebrim v2.5:RegistryObject:id");
-        paths.add("Ebrim v2.5:ExtrinsicObject:id"); // TODO try to replace the ebrim type by a '*' because there is multiple subtype
+        paths.add("Ebrim v3.0:*:id");
+        paths.add("Ebrim v2.5:*:id"); 
         paths.add("ISO 19110:FC_FeatureCatalogue:id");
         paths.add("SensorML:SensorML:member:process:id");
 

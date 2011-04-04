@@ -388,8 +388,8 @@ public final class CSWQueryable {
         paths.add("Ebrim v3.0:ObjectRef:id");
         paths.add("Web Registry Service v1.0:ExtrinsicObject:id");
         
-        paths.add("Ebrim v2.5:ExtrinsicObject:id");
-        paths.add("Ebrim v2.5:User:id");
+        paths.add("Ebrim v2.5:*:id");
+        /*paths.add("Ebrim v2.5:User:id");
         paths.add("Ebrim v2.5:ClassificationNode:id");
         paths.add("Ebrim v2.5:Association:id");
         paths.add("Ebrim v2.5:Organization:id");
@@ -407,7 +407,7 @@ public final class CSWQueryable {
         paths.add("Ebrim v2.5:ClassificationScheme:id");
         paths.add("Ebrim v2.5:Service:id");
         paths.add("Ebrim v2.5:Registry:id");
-        paths.add("Ebrim v2.5:Federation:id");
+        paths.add("Ebrim v2.5:Federation:id");*/
         paths.add("Web Registry Service v0.9:WRSExtrinsicObject:id");
         paths.add("Web Registry Service v0.9:ApplicationModule:id");
         paths.add("Web Registry Service v0.9:Geometry:id");
