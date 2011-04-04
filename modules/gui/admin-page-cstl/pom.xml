@@ -17,9 +17,9 @@
     Module description.
   -->
     <groupId>org.constellation.gui</groupId>
-    <artifactId>admin-page-jvm</artifactId>
+    <artifactId>admin-page-cstl</artifactId>
     <packaging>jar</packaging>
-    <name>Web site : JVM informations</name>
+    <name>Web site : CSTL informations</name>
 
 
     <!--
@@ -50,6 +50,17 @@
             <artifactId>admin-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.web-services</groupId>
+            <artifactId>cstl-web-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-provider</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

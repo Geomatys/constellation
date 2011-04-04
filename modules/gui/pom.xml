@@ -96,6 +96,7 @@
 
     <modules>
         <module>admin-base</module>
+        <module>admin-page-cstl</module>
         <module>admin-page-jvm</module>
         <module>admin-page-jai</module>
         <module>admin-page-geotk</module>
