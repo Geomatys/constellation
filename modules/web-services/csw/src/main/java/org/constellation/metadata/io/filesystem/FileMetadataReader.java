@@ -653,7 +653,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public List<Integer> getSupportedDataTypes() {
-        return Arrays.asList(ISO_19115, DUBLINCORE);
+        return Arrays.asList(ISO_19115, DUBLINCORE, EBRIM);
     }
 
     /**

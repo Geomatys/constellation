@@ -352,10 +352,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     
     /**
      * Return an object from a MDWeb record.
-     * 
+     *
+     * @param identifier The metadata Identifier.
      * @param form the MDWeb record.
-     * @param type An elementSet : BRIEF, SUMMARY, FULL. (default is FULL);
-     * @param mode
+     * @param mode The data type (EBRIM, SENSORML, ISO)
      * 
      * @return a GeotoolKit/constellation object representing the metadata.
      */
@@ -364,7 +364,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         if (form != null && form.getRoot() != null && form.getRoot().getType() != null) {
             final Value topValue = form.getRoot();
             final Object result  = getObjectFromValue(topValue, mode);
-            
+
             //we put the full object in the already read metadatas.
             if (result != null && isCacheEnabled()) {
                addInCache(identifier, result);

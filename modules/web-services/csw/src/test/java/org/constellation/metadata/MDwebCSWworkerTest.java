@@ -22,14 +22,13 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
@@ -86,11 +85,8 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             marshaller.marshal(configuration, configFile);
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);
         }
-        pool = CSWMarshallerPool.getInstance();
+        pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
-
-        Unmarshaller u = pool.acquireUnmarshaller();
-        pool.release(u);
 
         worker = new CSWworker("", configDir);
         worker.setLogLevel(Level.FINER);

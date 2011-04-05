@@ -48,6 +48,7 @@ import org.constellation.metadata.index.AbstractCSWIndexer;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
 
 // geotoolkit dependencies
@@ -323,22 +324,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     @Override
     protected String getIdentifier(final Object obj) {
-        final String identifier;
-        if (obj instanceof DefaultMetadata) {
-            identifier = ((DefaultMetadata)obj).getFileIdentifier();
-        } else if (obj instanceof RecordType) {
-            identifier = ((RecordType)obj).getIdentifier().getContent().get(0);
-        } else if (obj instanceof RegistryObjectType) {
-            identifier = ((RegistryObjectType)obj).getId();
-        } else {
-            String type = "null type";
-            if (obj != null) {
-                type = obj.getClass().getSimpleName();
-            }
-            LOGGER.log(Level.WARNING, "unexpected metadata type: {0}", type);
-            identifier = "unknow";
-        }
-        return identifier;
+        return Utils.findIdentifier(obj);
     }
 
     /**

@@ -18,8 +18,6 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
@@ -83,6 +81,10 @@ import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.geotoolkit.csw.xml.v202.UpdateType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
+import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
+import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
@@ -139,7 +141,7 @@ public class CSWworkerTest {
             LOGGER.log(Level.SEVERE, null, ex);
         } catch (IllegalStateException ex) {
             // this exception happen when we try to put 2 twice the same anchor.
-            // for this test we call many times this method in a static instance (CSWMarshallerPool)
+            // for this test we call many times this method in a static instance (MarshallerPool)
             // so for now we do bnothing here
             // TODO find a way to call this only one time in the CSW test
         }
@@ -407,6 +409,46 @@ public class CSWworkerTest {
 
         assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
+
+        /*
+         *  TEST 8 : getRecordById with ebrim 2.5 etadata.
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", null,
+                MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", Arrays.asList("000068C3-3B49-C671-89CF-10A39BB1B652"));
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAbstractRecord().isEmpty());
+        assertTrue(result.getAny().size() == 1);
+
+        obj = result.getAny().get(0);
+        assertTrue(obj instanceof ExtrinsicObjectType);
+
+        ExtrinsicObjectType eoResult =  (ExtrinsicObjectType) obj;
+
+        ExtrinsicObjectType expEoResult =  ((JAXBElement<ExtrinsicObjectType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim1.xml"))).getValue();
+
+        assertEquals(expEoResult, eoResult);
+
+        /*
+         *  TEST 9 : getRecordById with ebrim 3.0 metadata.
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", Arrays.asList("urn:motiive:csw-ebrim"));
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAbstractRecord().isEmpty());
+        assertTrue(result.getAny().size() == 1);
+
+        obj = result.getAny().get(0);
+        assertTrue("unexpected ebrim 3.0 class:" + obj.getClass() , obj instanceof RegistryPackageType);
+
+        RegistryPackageType rpResult =  (RegistryPackageType) obj;
+
+        RegistryPackageType expRpResult =  ((JAXBElement<RegistryPackageType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim3.xml"))).getValue();
+
+        assertEquals(expRpResult, rpResult);
 
         pool.release(unmarshaller);
     }

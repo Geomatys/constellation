@@ -99,6 +99,9 @@ public class MDWebMetadataReaderTest {
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
         configuration = new Automatic("mdweb", bdd);
+        configuration.setEnableThread("false");
+        configuration.setEnablecache("true");
+        configuration.setStoreMapping("false");
         
     }
 
