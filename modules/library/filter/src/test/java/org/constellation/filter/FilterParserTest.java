@@ -217,7 +217,7 @@ public class FilterParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:[20070602  30000101]");
+        assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602\" 30000101]");
         
         /**
          * Test 6: a simple Filter PropertyIsGreaterThan
@@ -243,7 +243,7 @@ public class FilterParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:{20070602  30000101}");
+        assertEquals(spaQuery.getQuery(), "CreationDate:{\"20070602\" 30000101}");
         
         /**
          * Test 7: a simple Filter PropertyIsLessThan
@@ -269,7 +269,7 @@ public class FilterParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:{00000101 20070602}");
+        assertEquals(spaQuery.getQuery(), "CreationDate:{00000101 \"20070602\"}");
         
         
          /**
@@ -296,7 +296,7 @@ public class FilterParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:[00000101 20070602]");
+        assertEquals(spaQuery.getQuery(), "CreationDate:[00000101 \"20070602\"]");
 
         
         /**
@@ -328,7 +328,7 @@ public class FilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:[20070602  30000101]CreationDate:[00000101 20070604]");
+        assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602\" 30000101]CreationDate:[00000101 \"20070604\"]");
 
          /**
          * Test 10: a simple empty Filter
@@ -624,7 +624,7 @@ public class FilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:[20070602  30000101]");
+        assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602\" 30000101]");
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.NOT);
 
         pool.release(filterUnmarshaller);
@@ -793,39 +793,7 @@ public class FilterParserTest {
         assertTrue(error);
 
         /**
-         * Test 2: a simple Filter PropertyIsGreaterThanOrEqualTo on a non date field
-         */
-        XMLrequest =
-                    "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
-	            "    <ogc:PropertyIsGreaterThanOrEqualTo>"                        +
-                    "        <ogc:PropertyName>apiso:Title</ogc:PropertyName>" +
-                    "        <ogc:Literal>2007-06-02</ogc:Literal>"                   +
-                    "    </ogc:PropertyIsGreaterThanOrEqualTo>"                       +
-                    "</ogc:Filter>";
-
-        reader = new StringReader(XMLrequest);
-
-        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
-        filter = (FilterType) element.getValue();
-
-        assertTrue(filter.getComparisonOps() != null);
-        assertTrue(filter.getLogicOps()      == null);
-        assertTrue(filter.getId().isEmpty()   );
-        assertTrue(filter.getSpatialOps()    == null);
-
-        error = false;
-        try {
-            spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
-        } catch (FilterParserException ex) {
-            assertEquals(FilterParser.QUERY_CONSTRAINT, ex.getLocator());
-            assertEquals(OPERATION_NOT_SUPPORTED, ex.getExceptionCode());
-            error = true;
-        }
-
-        assertTrue(error);
-
-        /**
-         * Test 3: a simple Filter propertyIsLike without literal
+         * Test 2: a simple Filter propertyIsLike without literal
          */
         XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"                                                               +
 			   "    <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">" +
@@ -853,7 +821,7 @@ public class FilterParserTest {
         assertTrue(error);
 
         /**
-         * Test 4: a simple Filter PropertyIsNull without propertyName
+         * Test 3: a simple Filter PropertyIsNull without propertyName
          */
         XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"    +
 	            "    <ogc:PropertyIsNull>"                           +
@@ -881,7 +849,7 @@ public class FilterParserTest {
         assertTrue(error);
 
         /**
-         * Test 5: a simple Filter PropertyIsBetween without upper boundary
+         * Test 4: a simple Filter PropertyIsBetween without upper boundary
          */
         XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">" +
 	            "    <ogc:PropertyIsBetween>"                                     +
@@ -913,7 +881,7 @@ public class FilterParserTest {
         assertTrue(error);
 
          /**
-         * Test 6: a simple Filter PropertyIsBetween without lower boundary
+         * Test 5: a simple Filter PropertyIsBetween without lower boundary
          */
         XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">" +
 	            "    <ogc:PropertyIsBetween>"                                     +
@@ -945,7 +913,7 @@ public class FilterParserTest {
         assertTrue(error);
 
          /**
-         * Test 7: a simple Filter PropertyIsLessThanOrEqualTo without propertyName
+         * Test 6: a simple Filter PropertyIsLessThanOrEqualTo without propertyName
          */
         XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
 	            "    <ogc:PropertyIsLessThanOrEqualTo>"                                 +

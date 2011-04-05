@@ -95,6 +95,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
+ * Abstract class used to parse OGC filter and transform them into the specific implementation filter language.
  *
  * @author Guilhem Legal (Geomatys)
  */
@@ -230,8 +231,8 @@ public abstract class FilterParser {
                 throw new FilterParserException("A PropertyIsBetween operator must be constitued of a lower boundary containing a literal, "
                                              + "an upper boundary containing a literal and a property name.", INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } else {
-                addDateComparisonFilter(response, propertyName, lowLit.getStringValue(), ">=");
-                addDateComparisonFilter(response, propertyName, uppLit.getStringValue(), "<=");
+                addComparisonFilter(response, propertyName, lowLit.getStringValue(), ">=");
+                addComparisonFilter(response, propertyName, uppLit.getStringValue(), "<=");
             }
 
         } else if (comparisonOps instanceof BinaryComparisonOperator) {
@@ -253,16 +254,16 @@ public abstract class FilterParser {
                     addComparisonFilter(response, propertyName, literalValue, "!=");
 
                 } else if (bc instanceof PropertyIsGreaterThanOrEqualTo) {
-                    addDateComparisonFilter(response, propertyName, literalValue, ">=");
+                    addComparisonFilter(response, propertyName, literalValue, ">=");
 
                 } else if (bc instanceof PropertyIsGreaterThan) {
-                    addDateComparisonFilter(response, propertyName, literalValue, ">");
+                    addComparisonFilter(response, propertyName, literalValue, ">");
 
                 } else if (bc instanceof  PropertyIsLessThan) {
-                    addDateComparisonFilter(response, propertyName, literalValue, "<");
+                    addComparisonFilter(response, propertyName, literalValue, "<");
 
                 } else if (bc instanceof PropertyIsLessThanOrEqualTo) {
-                    addDateComparisonFilter(response, propertyName, literalValue, "<=");
+                    addComparisonFilter(response, propertyName, literalValue, "<=");
 
                 } else {
                     final String operator = bc.getClass().getSimpleName();
@@ -281,19 +282,10 @@ public abstract class FilterParser {
      * @param propertyName The name of the property to filter.
      * @param literalValue The value of the filter.
      * @param operator The comparison operator.
-     */
-    protected abstract void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException;
-
-    /**
-     * Add to the StringBuilder a piece of query with the specified operator for a date property.
      *
-     * @param response A stringBuilder containing the query.
-     * @param propertyName The name of the date property to filter.
-     * @param literalValue The value of the filter.
-     * @param operator The comparison operator.
      * @throws FilterParserException
      */
-    protected abstract void addDateComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException;
+    protected abstract void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException;
 
     /**
      * Extract and format a date representation from the specified String.

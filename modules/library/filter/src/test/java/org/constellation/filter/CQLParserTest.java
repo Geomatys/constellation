@@ -167,7 +167,7 @@ public class CQLParserTest {
         
         assertNull(spaQuery.getSpatialFilter());
         assertEquals(0, spaQuery.getSubQueries().size());
-        assertEquals("CreationDate:{20070602  30000101}", spaQuery.getQuery());
+        assertEquals("CreationDate:{\"20070602\" 30000101}", spaQuery.getQuery());
         
          /**
          * Test 6: PropertyIsLessThan
@@ -184,7 +184,7 @@ public class CQLParserTest {
         
         assertNull(spaQuery.getSpatialFilter());
         assertEquals(0, spaQuery.getSubQueries().size());
-        assertEquals("CreationDate:{00000101 20070602}", spaQuery.getQuery());
+        assertEquals("CreationDate:{00000101 \"20070602\"}", spaQuery.getQuery());
 
         /**
          * Test 6: PropertyIsBetween
@@ -201,7 +201,7 @@ public class CQLParserTest {
 
         assertNull(spaQuery.getSpatialFilter());
         assertEquals(0, spaQuery.getSubQueries().size());
-        assertEquals("CreationDate:[20070602  30000101]CreationDate:[00000101 20070604]", spaQuery.getQuery());
+        assertEquals("CreationDate:[\"20070602\" 30000101]CreationDate:[00000101 \"20070604\"]", spaQuery.getQuery());
     }
     
     /**

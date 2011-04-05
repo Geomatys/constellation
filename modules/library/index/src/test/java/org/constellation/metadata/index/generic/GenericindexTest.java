@@ -267,7 +267,7 @@ public class GenericindexTest {
         /**
          * Test 1 date search: date after 25/01/2009
          */
-        SpatialQuery spatialQuery = new SpatialQuery("date:{20090125 30000101}", nullFilter, SerialChainFilter.AND);
+        SpatialQuery spatialQuery = new SpatialQuery("date:{\"20090125\" 30000101}", nullFilter, SerialChainFilter.AND);
         List<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
@@ -286,7 +286,7 @@ public class GenericindexTest {
         /**
          * Test 2 date search: TempExtent_begin before 01/01/1985
          */
-        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101 19850101}", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101 \"19850101\"}", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
@@ -304,7 +304,7 @@ public class GenericindexTest {
         /**
          * Test 3 date search: TempExtent_end after 01/01/1991
          */
-        spatialQuery = new SpatialQuery("TempExtent_end:{19910101 30000101}", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("TempExtent_end:{\"19910101\" 30000101}", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)

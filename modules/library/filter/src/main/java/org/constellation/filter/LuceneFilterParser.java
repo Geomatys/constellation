@@ -52,7 +52,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 /**
  * A parser for filter 1.1.0 and CQL 2.0
  * 
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public class LuceneFilterParser extends FilterParser {
 
@@ -222,51 +222,50 @@ public class LuceneFilterParser extends FilterParser {
     @Override
     protected void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException {
         final String literal;
-        if (isDateField(propertyName) && !"LIKE".equals(operator)) {
+        final boolean isDate = isDateField(propertyName);
+        if ( isDate && !"LIKE".equals(operator)) {
             literal = extractDateValue(literalValue);
         } else {
             literal = literalValue;
         }
+        final char open;
+        final char close;
+        if (operator.indexOf('=') != -1) {
+            open = '[';
+            close = ']';
+        } else {
+            open = '{';
+            close = '}';
+        }
         if ("!=".equals(operator)) {
             response.append("metafile:doc NOT ");
         }
+        response.append(removePrefix(propertyName.getPropertyName())).append(":");
+
         if ("LIKE".equals(operator)) {
-            response.append(removePrefix(propertyName.getPropertyName())).append(":").append('(').append(literal).append(')');
+            response.append('(').append(literal).append(')');
         } else if ("IS NULL ".equals(operator)) {
-            response.append(removePrefix(propertyName.getPropertyName())).append(":").append(literal);
-        // Equals
-        } else {
-            response.append(removePrefix(propertyName.getPropertyName())).append(":\"").append(literal).append('"');
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void addDateComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException {
-        if (isDateField(propertyName)) {
-            final String dateValue = extractDateValue(literalValue);
-            response.append(removePrefix(propertyName.getPropertyName())).append(":");
-
-            String comparison;
-            if ("<=".equals(operator) || "<".equals(operator)) {
-                comparison = "00000101 " + dateValue;
-            } else if (">=".equals(operator) || ">".equals(operator)){
-                comparison = dateValue + "  30000101";
+            response.append(literal);
+        } else if ("<=".equals(operator) || "<".equals(operator)) {
+            final String lowerBound;
+            if (isDate) {
+                lowerBound = "00000101 \"";
             } else {
-                // TODO
-                comparison = "";
+                lowerBound = "0 \"";
             }
-
-            if (operator.contains("=")) {
-                response.append('[').append(comparison).append(']');
+            response.append(open).append(lowerBound).append(literal).append('\"').append(close);
+        } else if (">=".equals(operator) || ">".equals(operator)) {
+            final String upperBound;
+            if (isDate) {
+                upperBound = "\" 30000101";
             } else {
-                response.append('{').append(comparison).append('}');
+                upperBound = "\" z";
             }
+            response.append(open).append('\"').append(literal).append(upperBound).append(close);
+
+            // Equals
         } else {
-            throw new FilterParserException(operator + " operator works only on Date field.",
-                    OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
+            response.append("\"").append(literal).append('"');
         }
     }
 

@@ -268,9 +268,12 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) {
+    protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws FilterParserException {
         response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName.getPropertyName())).append("' AND ");
         response.append('v').append(nbField).append(".\"value\" ").append(operator);
+        if (isDateField(propertyName)) {
+            literalValue = extractDateValue(literalValue);
+        }
         if (!"IS NULL ".equals(operator)) {
             response.append("'").append(literalValue).append("' ");
         }
@@ -282,21 +285,7 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws FilterParserException {
-        if (isDateField(propertyName)) {
-            final String dateValue = extractDateValue(literalValue);
-            addComparisonFilter(response, propertyName, dateValue, operator);
-        } else {
-            throw new FilterParserException(operator + " operator works only on Date field.",
-                    OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String extractDateValue(String literal) throws FilterParserException {
+    protected String extractDateValue(final String literal) throws FilterParserException {
         try {
             synchronized (DATE_FORMATTER) {
                 final Date d = TemporalUtilities.parseDate(literal);
@@ -311,7 +300,7 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String translateSpecialChar(PropertyIsLike pil) {
+    protected String translateSpecialChar(final PropertyIsLike pil) {
         return translateSpecialChar(pil, "%", "%", "\\");
     }
     
@@ -340,7 +329,7 @@ public class SQLFilterParser extends FilterParser {
      * @param namespace
      * @return
      */
-    private String getStandardFromNamespace(String namespace) {
+    private String getStandardFromNamespace(final String namespace) {
         if ("http://www.opengis.net/cat/wrs/1.0".equals(namespace))
             return "Web Registry Service v1.0";
         else if ("http://www.opengis.net/cat/wrs".equals(namespace))
@@ -358,7 +347,7 @@ public class SQLFilterParser extends FilterParser {
      * @param prefix
      * @return
      */
-    private String getStandardFromPrefix(String prefix) {
+    private String getStandardFromPrefix(final String prefix) {
         if (prefixs != null) {
             final String namespace = prefixs.get(prefix);
             if (namespace == null) {
