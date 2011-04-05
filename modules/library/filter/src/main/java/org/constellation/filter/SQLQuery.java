@@ -58,9 +58,9 @@ public class SQLQuery {
     }
     
     public void createSelect() {
-        final StringBuilder select = new StringBuilder("SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\" ");
+        final StringBuilder select = new StringBuilder("SELECT distinct \"identifier\" FROM \"Storage\".\"Records\" ");
         for (int i = 1; i <= nbField; i++) {
-            select.append(" , \"TextValues\" v").append(i);
+            select.append(" , \"Storage\".\"TextValues\" v").append(i);
         }
         select.append(" WHERE ");
         query = select.toString() + query;

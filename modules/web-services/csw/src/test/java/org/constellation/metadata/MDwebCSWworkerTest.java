@@ -157,6 +157,11 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         super.getRecordsTest();
     }
 
+    @Test
+    @Override
+    public void getRecordsEbrimTest() throws Exception {
+        super.getRecordsEbrimTest();
+    }
     /**
      * Tests the getRecords method
      *

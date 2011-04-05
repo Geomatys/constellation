@@ -81,7 +81,7 @@ public class SQLFilterParser extends FilterParser {
      */
     @Override
     protected SQLQuery getNullFilter() {
-        return new SQLQuery("Select \"identifier\" from \"Records\" where \"recordSet\" != 'MDATA");
+        return new SQLQuery("Select \"identifier\" from \"Storage\".\"Records\" where \"recordSet\" != 'MDATA");
     }
     
      /**
@@ -277,7 +277,7 @@ public class SQLFilterParser extends FilterParser {
         if (!"IS NULL ".equals(operator)) {
             response.append("'").append(literalValue).append("' ");
         }
-        response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
+        response.append(" AND v").append(nbField).append(".\"form\"=\"accessionNumber\" ");
         nbField++;
     }
 

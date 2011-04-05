@@ -18,6 +18,7 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
+import org.geotoolkit.ogc.xml.v110.FilterType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
@@ -83,6 +84,10 @@ import org.geotoolkit.csw.xml.v202.UpdateType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
+import org.geotoolkit.ogc.xml.v110.LiteralType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsLessThanOrEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.util.SimpleInternationalString;
@@ -105,7 +110,7 @@ import org.junit.Ignore;
 import static org.junit.Assert.*;
 
 /**
- * Test the differents methods of CSWWorker with a FileSystem reader/writer.
+ * Test the different methods of CSWWorker with a FileSystem reader/writer.
  * 
  * @author Guilhem Legal (geomatys)
  */
@@ -837,6 +842,70 @@ public class CSWworkerTest {
         assertEquals(expCustomResult3, customResult3);
         assertEquals(expCustomResult4, customResult4);
          
+        pool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the getRecords method
+     *
+     * @throws java.lang.Exception
+     */
+    public void getRecordsEbrimTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        /*
+         *  TEST 1 : getRecords with RESULTS- Ebrim mode (FULL) - Filter: rim:ExtrinsicObject/@stability = Static
+         */
+
+        QName t                           = new QName(EXTRINSIC_OBJECT_25_QNAME.getNamespaceURI(), EXTRINSIC_OBJECT_25_QNAME.getLocalPart(), "rim");
+        List<QName> typeNames             = Arrays.asList(t);
+        ElementSetNameType elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        SortByType sortBy                 = null;
+        PropertyIsEqualToType propEq      = new PropertyIsEqualToType(new LiteralType("Static"), new PropertyNameType("rim:ExtrinsicObject/@stability"), Boolean.TRUE);
+        FilterType filter                 = new FilterType(propEq);
+        QueryConstraintType constraint    = new QueryConstraintType(filter, "1.0.0");
+        QueryType query = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", 1, 5, query, null);
+
+        GetRecordsResponseType result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+
+        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
+        assertTrue(result.getSearchResults().getAny().size() == 1);
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 1);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        Object obj = result.getSearchResults().getAny().get(0);
+        assertTrue(obj instanceof ExtrinsicObjectType);
+
+        ExtrinsicObjectType eoResult =  (ExtrinsicObjectType) obj;
+        ExtrinsicObjectType expEoResult =  ((JAXBElement<ExtrinsicObjectType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim2.xml"))).getValue();
+
+        assertEquals(eoResult, expEoResult);
+
+        /*
+         *  TEST 2 : getRecords with RESULTS- Ebrim mode (FULL) - Filter: rim:ExtrinsicObject/@minorVersion <= 1
+         */
+
+        PropertyIsLessThanOrEqualToType propLe = new PropertyIsLessThanOrEqualToType(new LiteralType("1"), new PropertyNameType("rim:ExtrinsicObject/@minorVersion"), Boolean.TRUE);
+        filter                                 = new FilterType(propLe);
+        constraint                             = new QueryConstraintType(filter, "1.0.0");
+        query                                  = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request                               = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+
+        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
+        assertTrue(result.getSearchResults().getAny().size() == 2);
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+        
         pool.release(unmarshaller);
     }
 

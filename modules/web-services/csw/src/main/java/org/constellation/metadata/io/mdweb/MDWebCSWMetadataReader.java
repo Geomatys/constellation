@@ -722,7 +722,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         try {
             return mdReader.executeFilterQuery(sqlQuery);
         } catch (MD_IOException ex) {
-           throw new MetadataIoException("The service has throw an SQL exception while making eberim request:" + '\n' +
+           throw new MetadataIoException("The service has throw an SQL exception while making ebrim request:" + '\n' +
                                          "Cause: " + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
