@@ -183,6 +183,8 @@ public class MdwebFormIndexTest {
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
         
         assertEquals(expectedResult, result);
         
@@ -202,6 +204,8 @@ public class MdwebFormIndexTest {
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
         
         assertEquals(expectedResult, result);
 
@@ -223,7 +227,8 @@ public class MdwebFormIndexTest {
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
-        
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
 
         assertEquals(expectedResult, result);
 
@@ -285,7 +290,8 @@ public class MdwebFormIndexTest {
         expectedResult = new ArrayList<String>();
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
-
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
 
         assertEquals(expectedResult, result);
 
@@ -310,9 +316,9 @@ public class MdwebFormIndexTest {
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
         expectedResult.add("2345-aa453-ade456");
-
-
 
         assertEquals(expectedResult, result);
 
@@ -337,9 +343,75 @@ public class MdwebFormIndexTest {
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
 
+        assertEquals(expectedResult, result);
 
+        /**
+         * Test 9 simple search: type < silent hill
+         */
+        spatialQuery = new SpatialQuery("type:[0 TO \"silent hill\"]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
 
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 9:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 10 simple search: type > silent hill
+         */
+        spatialQuery = new SpatialQuery("type:[\"silent hill\" TO z]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 10:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 11 simple search: 11458.test < type < silent hill
+         */
+        spatialQuery = new SpatialQuery("type:[\"21958.test\" TO \"silent hill\"]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 11:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
+        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("test-6");
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 12 simple search: 9 < type < a
+         */
+        spatialQuery = new SpatialQuery("type:[ba TO bov]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 11:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("test-6");
         assertEquals(expectedResult, result);
 
     }
@@ -370,6 +442,8 @@ public class MdwebFormIndexTest {
         LOGGER.log(LOG_LEVEL, "SortedSearch 1:\n{0}", resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("2345-aa453-ade456");
@@ -397,6 +471,8 @@ public class MdwebFormIndexTest {
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
+        expectedResult.add("test-6");
+        expectedResult.add("test-5");
         
         assertEquals(expectedResult, result);
         
@@ -419,6 +495,8 @@ public class MdwebFormIndexTest {
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         
         assertEquals(expectedResult, result);
@@ -440,6 +518,8 @@ public class MdwebFormIndexTest {
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        expectedResult.add("test-6");
+        expectedResult.add("test-5");
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
@@ -497,6 +577,8 @@ public class MdwebFormIndexTest {
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("2345-aa453-ade456");
+        expectedResult.add("test-5");
+        expectedResult.add("test-6");
         
         assertEquals(expectedResult, result);
     }
@@ -627,11 +709,29 @@ public class MdwebFormIndexTest {
         TextValue f4_lcyValue = new TextValue(lowerCornPath, f4, 2, "10", PrimitiveType.STRING, f4_bbox);
         TextValue f4_ucxValue = new TextValue(upperCornPath, f4, 1, "10", PrimitiveType.STRING, f4_bbox);
         TextValue f4_ucyValue = new TextValue(upperCornPath, f4, 2, "15", PrimitiveType.STRING, f4_bbox);
+
+        Form f5 = new Form(5, "test-5", cat, "title5", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+        Value f5_rootValue    = new Value(recordPath, f5, 1, recordClass, null);
+        Value f5_ident        = new Value(identifierPath, f5, 1, sLiteralClass, f5_rootValue);
+        TextValue f5_idValue  = new TextValue(idenContentPath, f5, 1, "test-5", PrimitiveType.STRING, f5_ident);
+        Value f5_type         = new Value(typePath, f5, 1, sLiteralClass, f5_rootValue);
+        TextValue f5_tyValue  = new TextValue(typContentPath, f5, 1, "218a", PrimitiveType.STRING, f5_type);
+
+
+        Form f6 = new Form(6, "test-6", cat, "title6", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+        Value f6_rootValue    = new Value(recordPath, f6, 1, recordClass, null);
+        Value f6_ident        = new Value(identifierPath, f6, 1, sLiteralClass, f6_rootValue);
+        TextValue f6_idValue  = new TextValue(idenContentPath, f6, 1, "test-6", PrimitiveType.STRING, f6_ident);
+        Value f6_type         = new Value(typePath, f6, 1, sLiteralClass, f6_rootValue);
+        TextValue f6_tyValue  = new TextValue(typContentPath, f6, 1, "Bou", PrimitiveType.STRING, f6_type);
+
         
         writer.writeForm(f1, false, true);
         writer.writeForm(f2, false, true);
         writer.writeForm(f3, false, true);
         writer.writeForm(f4, false, true);
+        writer.writeForm(f5, false, true);
+        writer.writeForm(f6, false, true);
         
         
     }

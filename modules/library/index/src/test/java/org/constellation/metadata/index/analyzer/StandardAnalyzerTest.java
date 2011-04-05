@@ -179,6 +179,46 @@ public class StandardAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("11325_158_19640418141800");
 
         assertEquals(expectedResult, result);
+
+
+        /**
+         * Test 6 range search: Title <= fra
+         */
+        spatialQuery = new SpatialQuery("Title_sort:[0 TO FRA]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "simpleSearch 6:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 7 range search: Title > FRA
+         */
+        spatialQuery = new SpatialQuery("Title_sort:[FRA TO z]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "simpleSearch 7:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("CTDF02");
+
+        assertEquals(expectedResult, result);
+
     }
 
      /**
