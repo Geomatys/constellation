@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
+import org.geotoolkit.csw.xml.v202.RecordType;
 import static org.constellation.test.utils.MetadataUtilities.*;
 
 // Geotoolkit dependencies
@@ -85,6 +86,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-5.sql"));
@@ -133,7 +135,25 @@ public class MDWebMetadataReaderTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void getMetadataISOTest() throws Exception {
+    public void getMetadataDublinCoreTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd", AbstractMetadataReader.DUBLINCORE);
+
+        RecordType expResult = (RecordType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
+
+        assertTrue(result instanceof RecordType);
+        assertEquals(expResult, (RecordType)result);
+
+        pool.release(unmarshaller);
+    }
+    
+    /**
+     * Tests the getMetadata method for ISO 19139 data
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getMetadataISO19115Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object result = reader.getMetadata("42292_5p_19900609195600", AbstractMetadataReader.ISO_19115);

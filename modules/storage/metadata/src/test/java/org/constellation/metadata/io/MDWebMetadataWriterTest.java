@@ -19,6 +19,7 @@
 package org.constellation.metadata.io;
 
 
+import org.geotoolkit.csw.xml.v202.RecordType;
 import javax.xml.bind.JAXBElement;
 import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
 import org.geotoolkit.lang.Setup;
@@ -328,12 +329,33 @@ public class MDWebMetadataWriterTest {
     }
 
     /**
+     * Tests the storeMetadata method for Dublin Core data
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void writeMetadataDCTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        RecordType absExpResult = (RecordType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
+        writer.storeMetadata(absExpResult);
+
+        Object absResult = reader.getMetadata("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd", AbstractMetadataReader.DUBLINCORE);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof RecordType);
+        RecordType result = (RecordType) absResult;
+        RecordType expResult =  (RecordType) ((JAXBElement)unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta8.xml"))).getValue();
+
+        pool.release(unmarshaller);
+        assertEquals(expResult,result);
+    }
+    
+    /**
      * Tests the storeMetadata method for ISO 19139 data
      *
      * @throws java.lang.Exception
      */
     @Test
-    public void writeMetadataTest() throws Exception {
+    public void writeMetadataISO19115Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         
