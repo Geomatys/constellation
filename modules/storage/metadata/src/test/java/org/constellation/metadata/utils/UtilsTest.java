@@ -150,7 +150,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void FindIdentifierISOTest() throws Exception {
+    public void FindIdentifierISO19115Test() throws Exception {
         /*
          * ISO 19139 Metadata
          */
@@ -532,7 +532,7 @@ public class UtilsTest {
         assertEquals(expResult, result);
 
          /*
-         * Ebrim v 2.5 nothign
+         * Ebrim v 2.5 nothing
          */
         reg25 = new org.geotoolkit.ebrim.xml.v250.RegistryObjectType();
 
@@ -542,4 +542,166 @@ public class UtilsTest {
         assertEquals(expResult, result);
     }
 
+    @Test
+    public void SetIdentifierTestDC() throws Exception {
+        /*
+         * DublinCore Record v202 with identifier (replace)
+         */
+        RecordType record = new RecordType();
+        record.setIdentifier(new SimpleLiteral("42292_5p_19900609195600"));
+        record.setModified(new SimpleLiteral("2009-01-01T06:00:00+01:00"));
+        record.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.1667, 36.6, 1.1667, 36.6));
+
+        Utils.setIdentifier("new-ident", record);
+
+        assertEquals(1, record.getIdentifier().getContent().size());
+        assertEquals("new-ident", record.getIdentifier().getContent().get(0));
+
+
+        /*
+         * DublinCore Record v202 without identifier (insert)
+         */
+        record = new RecordType();
+        record.setModified(new SimpleLiteral("2009-01-01T06:00:00+01:00"));
+        record.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.1667, 36.6, 1.1667, 36.6));
+
+
+        Utils.setIdentifier("new-ident", record);
+
+        assertEquals("new-ident", record.getIdentifier().getContent().get(0));
+    }
+
+    @Test
+    public void SetIdentifierEbrimTest() throws Exception {
+        /*
+         * Ebrim v 3.0 with identifier (replace)
+         */
+        RegistryObjectType reg = new RegistryObjectType();
+        reg.setId("ebrimid-1");
+
+        Utils.setIdentifier("id1", reg);
+
+        assertEquals("id1", reg.getId());
+
+        /*
+         * Ebrim v 3.0 with no identifier (insert)
+         */
+        reg = new RegistryObjectType();
+
+        Utils.setIdentifier("id12", reg);
+
+        assertEquals("id12", reg.getId());
+
+
+        /*
+         * Ebrim v 2.5 with identifier (replace)
+         */
+        org.geotoolkit.ebrim.xml.v250.RegistryObjectType reg25 = new org.geotoolkit.ebrim.xml.v250.RegistryObjectType();
+        reg25.setId("ebrimid-2");
+
+        Utils.setIdentifier("id2", reg25);
+
+        assertEquals("id2", reg25.getId());
+
+         /*
+         * Ebrim v 2.5 with no identifier (insert)
+         */
+        reg25 = new org.geotoolkit.ebrim.xml.v250.RegistryObjectType();
+        
+
+        Utils.setIdentifier("id22", reg25);
+
+        assertEquals("id22", reg25.getId());
+    }
+
+    @Test
+    public void setIdentifierISO19115Test() throws Exception {
+        /*
+         * ISO 19139 Metadata with identifier (replace)
+         */
+        DefaultMetadata metadata = new DefaultMetadata();
+        metadata.setFileIdentifier("ident1");
+        
+        Utils.setIdentifier("ident-2", metadata);
+        assertEquals("ident-2", metadata.getFileIdentifier());
+
+        /*
+         * ISO 19139 Metadata with no identifier (insert)
+         */
+        metadata = new DefaultMetadata();
+
+        Utils.setIdentifier("ident-3", metadata);
+        assertEquals("ident-3", metadata.getFileIdentifier());
+
+    }
+
+    @Test
+    public void setIdentifierISO19110Test() throws Exception {
+
+        /*
+         * ISO 19110 Metadata with identifier (replace)
+         */
+        FeatureCatalogueImpl catalogue = new FeatureCatalogueImpl();
+        catalogue.setId("someid");
+
+        Utils.setIdentifier("fcat", catalogue);
+        assertEquals("fcat", catalogue.getId());
+
+        /*
+         * ISO 19110 Metadata with no id (insert)
+         */
+        catalogue = new FeatureCatalogueImpl();
+
+        Utils.setIdentifier("fcat2", catalogue);
+        assertEquals("fcat2", catalogue.getId());
+    }
+
+    @Test
+    public void setIdentifierSensorMLTest() throws Exception {
+        /*
+         * SensorML 1.0.0 with identifier (replace)
+         */
+        SystemType system = new SystemType();
+        system.setId("sml-id-1");
+        Member member = new Member(system);
+        SensorML sml = new SensorML("1.0", Arrays.asList(member));
+
+        Utils.setIdentifier("newid", sml);
+
+        assertEquals("newid", sml.getMember().get(0).getProcess().getValue().getId());
+
+        ComponentType component = new ComponentType();
+        component.setId("sml-id-1-compo");
+        Member memberC = new Member(component);
+        SensorML smlC = new SensorML("1.0", Arrays.asList(memberC));
+
+        Utils.setIdentifier("newidC", smlC);
+
+        assertEquals("newidC", smlC.getMember().get(0).getProcess().getValue().getId());;
+
+
+        /*
+         * SensorML 1.0.1 with identifier (replace)
+         */
+        org.geotoolkit.sml.xml.v101.SystemType system1 = new org.geotoolkit.sml.xml.v101.SystemType();
+        system1.setId("sml-id-101");
+        org.geotoolkit.sml.xml.v101.SensorML.Member member1 = new org.geotoolkit.sml.xml.v101.SensorML.Member(system1);
+        org.geotoolkit.sml.xml.v101.SensorML sml1 = new org.geotoolkit.sml.xml.v101.SensorML("1.0.1", Arrays.asList(member1));
+
+        Utils.setIdentifier("newid-101", sml1);
+
+        assertEquals("newid-101", sml1.getMember().get(0).getProcess().getValue().getId());
+
+        /*
+         * SensorML 1.0.1
+         */
+        org.geotoolkit.sml.xml.v101.ComponentType component1 = new org.geotoolkit.sml.xml.v101.ComponentType();
+        component1.setId("sml-id-101-compo");
+        org.geotoolkit.sml.xml.v101.SensorML.Member memberC1 = new org.geotoolkit.sml.xml.v101.SensorML.Member(component1);
+        org.geotoolkit.sml.xml.v101.SensorML smlC1 = new org.geotoolkit.sml.xml.v101.SensorML("1.0.1", Arrays.asList(memberC1));
+
+        Utils.setIdentifier("newidC-101", smlC1);
+
+        assertEquals("newidC-101", smlC1.getMember().get(0).getProcess().getValue().getId());
+    }
 }

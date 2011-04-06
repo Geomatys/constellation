@@ -105,7 +105,7 @@ public class SQLFilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Web Registry Service v0.9:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 WHERE v1.\"path\" = 'Web Registry Service v0.9:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"accessionNumber\" ");
 
         /**
          * Test 2: a simple Filter propertyIsNull
@@ -129,7 +129,7 @@ public class SQLFilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" IS NULL  AND v1.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" IS NULL  AND v1.\"form\"=\"accessionNumber\" ");
 
         /**
          * Test 3: a simple Filter propertyIsLike
@@ -154,7 +154,7 @@ public class SQLFilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Web Registry Service v1.0:ExtrinsicObject:mimeType' AND v1.\"value\" LIKE'%application%'  AND v1.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 WHERE v1.\"path\" = 'Web Registry Service v1.0:ExtrinsicObject:mimeType' AND v1.\"value\" LIKE'%application%'  AND v1.\"form\"=\"accessionNumber\" ");
 
         pool.release(filterUnmarshaller);
     }
@@ -216,7 +216,7 @@ public class SQLFilterParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 , \"TextValues\" v2 , \"TextValues\" v3 , \"TextValues\" v4 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"identifier\"  AND v2.\"path\" = 'Ebrim v2.5:ExtrinsicObject:home' AND v2.\"value\" ='http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi'  AND v2.\"form\"=\"identifier\"  AND v3.\"path\" = 'Ebrim v2.5:ExtrinsicObject:minorVersion' AND v3.\"value\" ='0'  AND v3.\"form\"=\"identifier\"  AND v4.\"path\" = 'Ebrim v2.5:ExtrinsicObject:majorVersion' AND v4.\"value\" ='1'  AND v4.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 , \"Storage\".\"TextValues\" v2 , \"Storage\".\"TextValues\" v3 , \"Storage\".\"TextValues\" v4 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"accessionNumber\"  AND v2.\"path\" = 'Ebrim v2.5:ExtrinsicObject:home' AND v2.\"value\" ='http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi'  AND v2.\"form\"=\"accessionNumber\"  AND v3.\"path\" = 'Ebrim v2.5:ExtrinsicObject:minorVersion' AND v3.\"value\" ='0'  AND v3.\"form\"=\"accessionNumber\"  AND v4.\"path\" = 'Ebrim v2.5:ExtrinsicObject:majorVersion' AND v4.\"value\" ='1'  AND v4.\"form\"=\"accessionNumber\" ");
         
         
         /**
@@ -263,7 +263,7 @@ public class SQLFilterParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "(SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v2.5:Association:status' AND v1.\"value\" ='Approved'  AND v1.\"form\"=\"identifier\" ) UNION (SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 , \"TextValues\" v2 , \"TextValues\" v3 , \"TextValues\" v4 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"identifier\"  AND v2.\"path\" = 'Ebrim v2.5:ExtrinsicObject:home' AND v2.\"value\" ='http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi'  AND v2.\"form\"=\"identifier\"  AND v3.\"path\" = 'Ebrim v2.5:ExtrinsicObject:minorVersion' AND v3.\"value\" ='0'  AND v3.\"form\"=\"identifier\"  AND v4.\"path\" = 'Ebrim v2.5:ExtrinsicObject:majorVersion' AND v4.\"value\" ='1'  AND v4.\"form\"=\"identifier\" ) ");
+        assertEquals(spaQuery.getQuery(), "(SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v2.5:Association:status' AND v1.\"value\" ='Approved'  AND v1.\"form\"=\"accessionNumber\" ) UNION (SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 , \"Storage\".\"TextValues\" v2 , \"Storage\".\"TextValues\" v3 , \"Storage\".\"TextValues\" v4 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"accessionNumber\"  AND v2.\"path\" = 'Ebrim v2.5:ExtrinsicObject:home' AND v2.\"value\" ='http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi'  AND v2.\"form\"=\"accessionNumber\"  AND v3.\"path\" = 'Ebrim v2.5:ExtrinsicObject:minorVersion' AND v3.\"value\" ='0'  AND v3.\"form\"=\"accessionNumber\"  AND v4.\"path\" = 'Ebrim v2.5:ExtrinsicObject:majorVersion' AND v4.\"value\" ='1'  AND v4.\"form\"=\"accessionNumber\" ) ");
         
         pool.release(filterUnmarshaller);
     }
@@ -316,7 +316,7 @@ public class SQLFilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" !='application/octet-stream'  AND v1.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" !='application/octet-stream'  AND v1.\"form\"=\"accessionNumber\" ");
 
 
         /**
@@ -345,7 +345,7 @@ public class SQLFilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v3.0:date' AND v1.\"value\" <='2007-06-02 00:00:00'  AND v1.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v3.0:date' AND v1.\"value\" <='2007-06-02 00:00:00'  AND v1.\"form\"=\"accessionNumber\" ");
 
         /**
          * Test 3: a not Filter on PropertyIsGreaterThanOrEqualTo
@@ -373,7 +373,7 @@ public class SQLFilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v3.0:date' AND v1.\"value\" <'2007-06-02 00:00:00'  AND v1.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v3.0:date' AND v1.\"value\" <'2007-06-02 00:00:00'  AND v1.\"form\"=\"accessionNumber\" ");
 
         /**
          * Test 4: a not Filter on PropertyIsLessThanOrEqualTo
@@ -401,7 +401,7 @@ public class SQLFilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v3.0:date' AND v1.\"value\" >'2007-06-02 00:00:00'  AND v1.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v3.0:date' AND v1.\"value\" >'2007-06-02 00:00:00'  AND v1.\"form\"=\"accessionNumber\" ");
 
         /**
          * Test 5: a not Filter on PropertyIsLessThan
@@ -429,7 +429,7 @@ public class SQLFilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v3.0:date' AND v1.\"value\" >='2007-06-02 00:00:00'  AND v1.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v3.0:date' AND v1.\"value\" >='2007-06-02 00:00:00'  AND v1.\"form\"=\"accessionNumber\" ");
 
         /**
          * Test 6: a not Filter on PropertyIsNotEqualTo
@@ -458,8 +458,8 @@ public class SQLFilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 "
-                                        + "WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\" FROM \"Storage\".\"Records\"  , \"Storage\".\"TextValues\" v1 "
+                                        + "WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"accessionNumber\" ");
 
 
         pool.release(filterUnmarshaller);
