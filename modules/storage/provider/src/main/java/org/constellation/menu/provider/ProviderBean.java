@@ -87,7 +87,7 @@ public class ProviderBean extends I18NBean implements PropertyChangeListener{
         final int rowId = Integer.valueOf(strRowId);
 
         final UIOutline outline = (UIOutline) FacesUtils.findComponentById(FacesContext.getCurrentInstance().getViewRoot(), "layerPreview");
-        final TreeNode[] path = outline.getPath(rowId);
+        final TreeNode[] path = (TreeNode[]) outline.getPath(rowId);
 
         if(path != null){
             final DefaultMutableTreeNode node = ((DefaultMutableTreeNode)path[path.length-1]);

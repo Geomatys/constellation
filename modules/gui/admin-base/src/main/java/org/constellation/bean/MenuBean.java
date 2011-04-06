@@ -173,7 +173,7 @@ public class MenuBean extends I18NBean{
         final int rowId = Integer.valueOf(strRowId);
 
         final UIOutline outline = (UIOutline) FacesUtils.findComponentById(FacesContext.getCurrentInstance().getViewRoot(), "navTree");
-        final TreeNode[] path = outline.getPath(rowId);
+        final TreeNode[] path = (TreeNode[])outline.getPath(rowId);
 
         if(path != null){
             final String targetPage = ((I18NNode)path[path.length-1]).getTargetPage();
