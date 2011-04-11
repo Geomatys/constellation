@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009-2010, Geomatys
+ *    (C) 2009-2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,14 @@ import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.configuration.ProviderParameters;
 
 import org.opengis.feature.type.Name;
-import static org.constellation.provider.sml.SMLProvider.*;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+
+import static org.geotoolkit.data.sml.SMLDataStoreFactory.*;
+import static org.geotoolkit.parameter.Parameters.*;
 /**
  *
  * @version $Id: 
@@ -36,23 +40,30 @@ import static org.constellation.provider.sml.SMLProvider.*;
 public class SMLProviderService extends AbstractProviderService<Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
     private static final String ERROR_MSG = "[PROVIDER]> Invalid sensorML provider config";
+    private static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
+            ProviderParameters.createDescriptor(PARAMETERS_DESCRIPTOR);
 
     public SMLProviderService(){
         super("sensorML");
     }
 
     @Override
-    public LayerProvider createProvider(ProviderSource ps) {
+    public ParameterDescriptorGroup getDescriptor() {
+        return SERVICE_CONFIG_DESCRIPTOR;
+    }
+
+    @Override
+    public LayerProvider createProvider(final ParameterValueGroup ps) {
         try {
             final SMLProvider provider = new SMLProvider(this,ps);
             String msg = "[PROVIDER]> sensorML provider created :";
-            final String sgbdType = provider.getSource().parameters.get(KEY_SGBDTYPE);
+            final String sgbdType = value(SGBDTYPE,ps);
             if (sgbdType != null && sgbdType.equals("derby")) {
                 msg = msg + "java DB: > "
-                          + provider.getSource().parameters.get(KEY_DERBYURL);
+                          + value(DERBYURL,ps);
             } else {
-                msg = msg + provider.getSource().parameters.get(KEY_HOST) + " > "
-                          + provider.getSource().parameters.get(KEY_DATABASE);
+                msg = msg + value(HOST,ps) + " > "
+                          + value(DATABASE,ps);
             }
             getLogger().info(msg);
             return provider;

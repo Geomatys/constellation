@@ -80,10 +80,12 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         
         // Verifies that the test layer is present into the GetCapabilities response.
         final List<CoverageOfferingBriefType> offerings = getCaps.getContentMetadata().getCoverageOfferingBrief();
+        System.out.println(">>>>>>>>>>>>>>>> " + offerings.size());
         assertFalse(offerings.isEmpty());
         for (CoverageOfferingBriefType offering : offerings) {
+            System.out.println(">>>>>>>>>>>>> " + offering);
             for (JAXBElement<String> string : offering.getRest()) {
-                System.out.println("value:" + string.getValue());
+                System.out.println("+++++++++++++++ value:" + string.getValue());
                 if (string.getName().getLocalPart().equalsIgnoreCase("name") &&
                     string.getValue().equals(LAYER_TEST))
                 {

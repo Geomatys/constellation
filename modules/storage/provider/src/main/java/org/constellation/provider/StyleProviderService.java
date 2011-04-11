@@ -16,10 +16,9 @@
  */
 package org.constellation.provider;
 
-import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.style.MutableStyle;
-
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -30,6 +29,6 @@ import org.geotoolkit.style.MutableStyle;
 public interface StyleProviderService extends ProviderService<String,MutableStyle,StyleProvider>{
 
     @Override
-    StyleProvider createProvider(ProviderSource config);
+    StyleProvider createProvider(ParameterValueGroup config);
 
 }

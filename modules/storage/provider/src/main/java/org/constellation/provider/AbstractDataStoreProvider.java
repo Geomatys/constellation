@@ -17,15 +17,12 @@
 
 package org.constellation.provider;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import org.constellation.provider.configuration.ProviderLayer;
-import org.constellation.provider.configuration.ProviderSource;
+
 import org.geotoolkit.data.AbstractDataStoreFactory;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
@@ -34,7 +31,15 @@ import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.storage.DataStoreException;
+
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.geotoolkit.parameter.Parameters.*;
 
 /**
  * Abstract provider which handle a Datastore.
@@ -44,27 +49,35 @@ import org.opengis.feature.type.Name;
 public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
 
 
-    private final Map<String,Serializable> params;
+    private final ParameterValueGroup storeConfig;
     private final Set<Name> index = new LinkedHashSet<Name>();
     private final ExtendedDataStore store;
 
     public AbstractDataStoreProvider(final ProviderService service,
-            final ProviderSource config) throws DataStoreException {
+            final ParameterValueGroup config) throws DataStoreException {
         super(service,config);
 
-        params = prepareParameters(config.parameters);
+        storeConfig = getSourceConfiguration(source, getDatastoreDescriptor());
 
-        final String namespace = (String) params.get(AbstractDataStoreFactory.NAMESPACE.getName().getCode());
-
-        final DataStore candidate = DataStoreFinder.getDataStore(params);
+        final String namespace = value(AbstractDataStoreFactory.NAMESPACE, storeConfig);
+        final DataStore candidate = DataStoreFinder.getDataStore(storeConfig);
 
         if (candidate == null) {
             final StringBuilder sb = new StringBuilder("Could not create datastore for parameters : \n");
-            for (final Map.Entry<String,Serializable> entry : params.entrySet()){
-                if (entry.getKey().equals("passwd")){
-                    sb.append(entry.getKey()).append(" : *******").append('\n');
+
+            for(final GeneralParameterValue val : storeConfig.values()){
+                final String key = val.getDescriptor().getName().getCode();
+                final Object value;
+                if(val instanceof ParameterValue){
+                    value = ((ParameterValue)val).getValue();
+                }else{
+                    value = "~complex value~";
+                }
+
+                if (key.equals("passwd")){
+                    sb.append(key).append(" : *******").append('\n');
                 } else {
-                    sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
+                    sb.append(key).append(" : ").append(value).append('\n');
                 }
             }
             throw new DataStoreException(sb.toString());
@@ -73,9 +86,12 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
 
         store = new ExtendedDataStore(candidate);
 
-        for(final ProviderLayer layer : config.querylayers){
-            final Query query = QueryBuilder.language(layer.language, layer.statement);
-            final Name name = new DefaultName(namespace, layer.name);
+        for(final ParameterValueGroup queryLayer : getQueryLayers(source)){
+            final String layerName = value(LAYER_NAME_DESCRIPTOR, queryLayer);
+            final String language = value(LAYER_QUERY_LANGUAGE, queryLayer);
+            final String statement = value(LAYER_QUERY_STATEMENT, queryLayer);
+            final Query query = QueryBuilder.language(language, statement);
+            final Name name = new DefaultName(namespace, layerName);
             store.addQuery(query, name);
         }
 
@@ -83,13 +99,16 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
     }
 
     /**
+     * @return the descriptor used for this datastore source configuration.
+     */
+    protected abstract ParameterDescriptorGroup getDatastoreDescriptor();
+
+    /**
      * @return the datastore this provider encapsulate.
      */
     public ExtendedDataStore getDataStore(){
         return store;
     }
-
-    public abstract Map<String,Serializable> prepareParameters(Map<String,String> params);
 
     /**
      * {@inheritDoc }
@@ -110,15 +129,18 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
                 return null;
             }
         }
-        final ProviderLayer layer = source.getLayer(key.getLocalPart());
+        final ParameterValueGroup layer = getLayer(source, key.getLocalPart());
         if (layer == null) {
             return new DefaultDataStoreLayerDetails(key, store, null, null, null, null, null);
 
         } else {
-            final List<String> styles = layer.styles;
-            return new DefaultDataStoreLayerDetails(key, store, styles,
-                    layer.dateStartField, layer.dateEndField,
-                    layer.elevationStartField, layer.elevationEndField);
+            final List<String> styles = getLayerStyles(layer);
+            return new DefaultDataStoreLayerDetails(
+                    key, store, styles,
+                    value(LAYER_DATE_START_FIELD_DESCRIPTOR, layer),
+                    value(LAYER_DATE_END_FIELD_DESCRIPTOR, layer),
+                    value(LAYER_ELEVATION_START_FIELD_DESCRIPTOR, layer),
+                    value(LAYER_ELEVATION_END_FIELD_DESCRIPTOR, layer));
         }
     }
 
@@ -140,9 +162,6 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
     public void dispose() {
         synchronized(this){
             index.clear();
-            params.clear();
-            source.layers.clear();
-            source.parameters.clear();
         }
     }
 
@@ -150,7 +169,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
     protected void visit() {
         try {
             for (final Name name : store.getNames()) {
-                if (source.loadAll || source.containsLayer(name.getLocalPart())) {
+                if (isLoadAll(source) || containLayer(source, name.getLocalPart())) {
                     index.add(name);
                 }
             }

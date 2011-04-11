@@ -17,8 +17,8 @@
 
 package org.constellation.provider;
 
-import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.style.MutableStyle;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Abstract implementation of StyleProvider which only handle the
@@ -29,7 +29,7 @@ import org.geotoolkit.style.MutableStyle;
 public abstract class AbstractStyleProvider extends AbstractProvider<String,MutableStyle> implements StyleProvider{
 
     protected AbstractStyleProvider(final ProviderService service, 
-            final ProviderSource source){
+            final ParameterValueGroup source){
         super(service, source);
     }
 

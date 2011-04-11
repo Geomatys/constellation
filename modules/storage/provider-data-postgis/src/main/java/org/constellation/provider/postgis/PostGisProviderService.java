@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009-2010, Geomatys
+ *    (C) 2009-2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,11 +22,14 @@ import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.configuration.ProviderParameters;
 
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.provider.postgis.PostGisProvider.*;
+import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
+import static org.geotoolkit.parameter.Parameters.*;
 
 /**
  *
@@ -37,18 +40,24 @@ import static org.constellation.provider.postgis.PostGisProvider.*;
 public class PostGisProviderService extends AbstractProviderService<Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
     private static final String ERROR_MSG = "[PROVIDER]> Invalid postgis provider config";
+    private static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
+            ProviderParameters.createDescriptor(PARAMETERS_DESCRIPTOR);
 
     public PostGisProviderService(){
         super("postgis");
     }
 
     @Override
-    public LayerProvider createProvider(ProviderSource ps) {
+    public ParameterDescriptorGroup getDescriptor() {
+        return SERVICE_CONFIG_DESCRIPTOR;
+    }
+
+    @Override
+    public LayerProvider createProvider(final ParameterValueGroup ps) {
         try {
             final PostGisProvider provider = new PostGisProvider(this,ps);
             getLogger().log(Level.INFO, "[PROVIDER]> postgis provider created : {0} > {1}",
-                    new Object[]{provider.getSource().parameters.get(KEY_HOST),
-                                 provider.getSource().parameters.get(KEY_DATABASE)});
+                    new Object[]{value(HOST, ps),value(DATABASE, ps)});
             return provider;
         } catch (Exception ex) {
             // we should not catch exception, but here it's better to start all source we can

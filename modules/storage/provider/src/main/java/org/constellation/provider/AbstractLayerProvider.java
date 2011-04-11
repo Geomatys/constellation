@@ -22,15 +22,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import org.constellation.provider.configuration.ProviderLayer;
 
-import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.feature.DefaultName;
-
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.util.StringUtilities;
 
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterValueGroup;
+
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.geotoolkit.parameter.Parameters.*;
 
 /**
  * Abstract implementation of LayerProvider which only handle the
@@ -45,7 +46,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
 
 
     protected AbstractLayerProvider(final ProviderService service,
-            final ProviderSource config){
+            final ParameterValueGroup config){
         super(service,config);
     }
 
@@ -92,24 +93,25 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
      * is part of the child class.
      */
     protected void visit(){
-        final ProviderSource config = getSource();
+        final ParameterValueGroup config = getSource();
         final Set<Name> keys = getKeys();
 
         final List<String> missingLayers = new ArrayList<String>();
 
         loop:
-        for(final ProviderLayer declaredLayer : config.layers){
+        for(final ParameterValueGroup declaredLayer : getLayers(config)){
+            final String layerName = stringValue(LAYER_NAME_DESCRIPTOR, declaredLayer);
             for(Name n : keys){
-                if(DefaultName.match(n, declaredLayer.name)) continue loop;
+                if(DefaultName.match(n, layerName)) continue loop;
             }
 
-            missingLayers.add(declaredLayer.name);
+            missingLayers.add(layerName);
         }
 
         if(!missingLayers.isEmpty()){
             //log list of missing layers
             final StringBuilder sb = new StringBuilder("Provider ");
-            sb.append(source.id).append(" declares layers missing in the source\n");
+            sb.append(getSourceId(source)).append(" declares layers missing in the source\n");
             sb.append(StringUtilities.toStringTree(missingLayers));
             getLogger().log(Level.WARNING, sb.toString());
         }

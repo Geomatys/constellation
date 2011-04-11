@@ -17,6 +17,8 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import org.constellation.provider.shapefile.ShapeFileProviderService;
+import org.geotoolkit.data.om.OMDataStoreFactory;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.imageio.ImageReader;
@@ -35,12 +36,6 @@ import org.constellation.map.ws.WMSMapDecoration;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderLayer;
-import org.constellation.provider.configuration.ProviderSource;
-import org.constellation.provider.coveragesql.CoverageSQLProvider;
-import org.constellation.provider.om.OMProvider;
-import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.util.Util;
 
 // Geotoolkit dependencies
@@ -54,7 +49,12 @@ import org.geotoolkit.feature.DefaultName;
 
 // JUnit dependencies
 import org.junit.*;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+
 import static org.junit.Assume.*;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 
 /**
@@ -108,25 +108,26 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
         final Configurator config = new Configurator() {
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
 
-                final ProviderConfig config = new ProviderConfig();
+                final ParameterValueGroup config = desc.createValue();
 
                 if("coverage-sql".equals(serviceName)){
                     // Defines a PostGrid data provider
-                    final ProviderSource source = new ProviderSource();
-                    source.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
-                    source.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
-                    source.parameters.put(CoverageSQLProvider.KEY_PASSWORD, "test");
-                    source.parameters.put(CoverageSQLProvider.KEY_READONLY, "true");
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(DATABASE_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://db.geomatys.com/coverages-test");
+                    srcconfig.parameter(DRIVER_DESCRIPTOR.getName().getCode()).setValue("org.postgresql.Driver");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(READONLY_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    source.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
-                    source.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
-                    source.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
-                    source.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
-                    source.loadAll = true;
-                    source.id      = "coverageTestSrc";
-                    config.sources.add(source);
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+
                 }else if("observation".equals(serviceName)){
                     try{
                         final String url = "jdbc:derby:memory:TestWFSWorker";
@@ -139,27 +140,33 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
                             con.close();
                             datasourceCreated = true;
                         }
-                        final ProviderSource sourceOM = new ProviderSource();
-                        sourceOM.loadAll = true;
-                        sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
-                        sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
-                        sourceOM.id = "omSrc";
-                        config.sources.add(sourceOM);
+
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(OMDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                        srcconfig.parameter(OMDataStoreFactory.DBTYPE.getName().getCode()).setValue("derby");
+                        srcconfig.parameter(OMDataStoreFactory.DERBYURL.getName().getCode()).setValue(url);
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("osmSrc");
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }
                 }else if("shapefile".equals(serviceName)){
                     try{
                         final File outputDir = initDataDirectory();
-                        final ProviderSource sourceShape = new ProviderSource();
-                        sourceShape.loadAll = true;
-                        sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
-                                "/org/constellation/ws/embedded/wms111/shapefiles");
-                        sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "http://www.opengis.net/gml");
-                        sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
-                                               null, null, null, null, false, null));
-                        sourceShape.id = "shapeSrc";
-                        config.sources.add(sourceShape);
+                        
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
+                        srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
+                                .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
+                        srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
+                                .setValue("http://www.opengis.net/gml");
+                        
+                        ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                        layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
+                        layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
+
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }

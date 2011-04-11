@@ -17,6 +17,7 @@
 
 package org.constellation.menu.provider;
 
+import org.constellation.provider.configuration.ProviderParameters;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -32,15 +33,17 @@ import org.constellation.provider.AbstractDataStoreProvider;
 import org.constellation.provider.AbstractProviderProxy;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;
-import org.constellation.provider.configuration.ProviderLayer;
-import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.data.memory.ExtendedDataStore;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
 import org.mapfaces.i18n.I18NBean;
+import org.opengis.parameter.ParameterValueGroup;
+
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 /**
  * Abstract Datastore service configuration bean.
@@ -103,10 +106,11 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
         }
 
         //add all names from the configuration files
-        final ProviderSource config = provider.getSource();
-        for(ProviderLayer layer : config.layers){
-            if(!names.contains(layer.name)){
-                names.add(layer.name);
+        final ParameterValueGroup config = provider.getSource();
+        for(ParameterValueGroup layer : getLayers(config)){
+            final String layerName = Parameters.stringValue(LAYER_NAME_DESCRIPTOR, layer);
+            if(!names.contains(layerName)){
+                names.add(layerName);
             }
         }
 
@@ -133,7 +137,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
     public final class DataStoreSourceNode extends DefaultMutableTreeNode{
 
         private final AbstractDataStoreProvider provider;
-        private final ProviderSource config;
+        private final ParameterValueGroup config;
 
         public DataStoreSourceNode(final AbstractDataStoreProvider provider) {
             super(provider);
@@ -142,12 +146,12 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
         }
 
         public boolean isLoadAll(){
-            return config.loadAll;
+            return ProviderParameters.isLoadAll(config);
         }
 
         public void setLoadAll(final boolean loadAll){
-            if(loadAll != config.loadAll){
-                config.loadAll = loadAll;
+            if(loadAll != isLoadAll()){
+                config.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(loadAll);
                 saveSettings();
             }
         }
@@ -183,14 +187,14 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
                 return false;
             }
 
-            final boolean loadAll = provider.getSource().loadAll;
+            final boolean loadAll = ProviderParameters.isLoadAll(provider.getSource());
             if(loadAll){
                 //provider load everything to this one is visible
                 return true;
             }
 
             //last case, check it is declared
-            return provider.getSource().containsLayer(name.getLocalPart());
+            return ProviderParameters.containLayer(provider.getSource(),name.getLocalPart());
         }
 
         /**

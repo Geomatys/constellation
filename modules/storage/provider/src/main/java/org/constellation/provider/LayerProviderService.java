@@ -16,8 +16,8 @@
  */
 package org.constellation.provider;
 
-import org.constellation.provider.configuration.ProviderSource;
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
@@ -29,6 +29,6 @@ import org.opengis.feature.type.Name;
 public interface LayerProviderService extends ProviderService<Name,LayerDetails,LayerProvider>{
 
     @Override
-    LayerProvider createProvider(ProviderSource config);
+    LayerProvider createProvider(ParameterValueGroup config);
 
 }

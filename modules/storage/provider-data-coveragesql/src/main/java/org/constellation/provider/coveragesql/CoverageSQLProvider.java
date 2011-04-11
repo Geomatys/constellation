@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2010, Geomatys
+ *    (C) 2010-2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
  */
 package org.constellation.provider.coveragesql;
 
+import java.util.List;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -28,8 +29,6 @@ import javax.sql.DataSource;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.configuration.ProviderLayer;
-import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
@@ -40,9 +39,15 @@ import org.geotoolkit.jdbc.WrappedDataSource;
 import org.geotoolkit.map.MapBuilder;
 
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 import org.postgresql.ds.PGConnectionPoolDataSource;
 
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.geotoolkit.parameter.Parameters.*;
 
 /**
  *
@@ -50,29 +55,25 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
  */
 public class CoverageSQLProvider extends AbstractLayerProvider{
 
-    /**
-     * Keys to use in configuration file.
-     */
-    public static final String KEY_SERVER = "server";
-    public static final String KEY_PORT = "port";
-    public static final String KEY_DATABASE = "database";
-    public static final String KEY_SCHEMA = "schema";
-    public static final String KEY_USER = "user";
-    public static final String KEY_PASSWORD = "password";
-    public static final String KEY_READONLY = "readOnly";
-    public static final String KEY_DRIVER = "driver";
-    public static final String KEY_ROOT_DIRECTORY = "rootDirectory";
-    public static final String KEY_NAMESPACE = "namespace";
-
     private CoverageDatabase database;
 
     private final Set<Name> index = new HashSet<Name>();
 
     protected CoverageSQLProvider(final CoverageSQLProviderService service,
-            final ProviderSource source) throws IOException, SQLException {
+            final ParameterValueGroup source) throws IOException, SQLException {
         super(service,source);
         loadDataBase();
         visit();
+    }
+
+    private ParameterValueGroup getSourceConfiguration(){
+        final ParameterValueGroup params = getSource();
+
+        final List<ParameterValueGroup> groups = params.groups(COVERAGESQL_DESCRIPTOR.getName().getCode());
+        if(!groups.isEmpty()){
+            return groups.get(0);
+        }
+        return null;
     }
 
     /**
@@ -83,8 +84,15 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     private void loadDataBase() throws SQLException{
         final Properties properties = new Properties();
-        for(String key : source.parameters.keySet()){
-            properties.put(key, source.parameters.get(key));
+
+        for(GeneralParameterValue param : getSourceConfiguration().values()){
+            if(param instanceof ParameterValue){
+                final ParameterValue pmval = (ParameterValue) param;
+                final Object value = pmval.getValue();
+                if(value != null){
+                    properties.put(pmval.getDescriptor().getName().getCode(), value);
+                }
+            }
         }
 
         String server ="localhost";
@@ -92,7 +100,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         String dbName = "";
 
         //parse string if old format : exemple jdbc:postgresql://server/database
-        String oldDataBase = properties.getProperty(KEY_DATABASE);
+        String oldDataBase = properties.getProperty(DATABASE_DESCRIPTOR.getName().getCode());
         if(oldDataBase.contains("/")){
             int index = oldDataBase.lastIndexOf('/');
             dbName = oldDataBase.substring(index+1, oldDataBase.length());
@@ -110,8 +118,8 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
             }
 
         }else{
-            server = properties.getProperty(KEY_SERVER);
-            final String portTxt = properties.getProperty(KEY_PORT);
+            server = properties.getProperty(SERVER_DESCRIPTOR.getName().getCode());
+            final String portTxt = properties.getProperty(PORT_DESCRIPTOR.getName().getCode());
             if(server == null || server.trim().isEmpty()){
                 server = "localhost";
             }
@@ -122,7 +130,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
                 getLogger().log(Level.WARNING, "Port value for coverage-sql is not valid : {0}", portTxt);
                 port = 5432;
             }
-            dbName = properties.getProperty(KEY_DATABASE);
+            dbName = properties.getProperty(DATABASE_DESCRIPTOR.getName().getCode());
         }
 
 
@@ -130,8 +138,8 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         pool.setServerName(server);
         pool.setPortNumber(port);
         pool.setDatabaseName(dbName);
-        pool.setUser(properties.getProperty(KEY_USER));
-        pool.setPassword(properties.getProperty(KEY_PASSWORD));
+        pool.setUser(properties.getProperty(USER_DESCRIPTOR.getName().getCode()));
+        pool.setPassword(properties.getProperty(PASSWORD_DESCRIPTOR.getName().getCode()));
         pool.setLoginTimeout(5);
 
         final DataSource dataSource = new WrappedDataSource(pool);
@@ -168,13 +176,14 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
         if (reader != null) {
             final String name = key.getLocalPart();
-            final ProviderLayer layer = source.getLayer(name);
-            final Name em = (layer == null || layer.elevationModel == null) ? null : DefaultName.valueOf(layer.elevationModel);
+            final ParameterValueGroup layer = getLayer(source, name);
+            final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
+            final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
             if (layer == null) {
                 return new CoverageSQLLayerDetails(reader,null,em,key);
 
             } else {
-                return new CoverageSQLLayerDetails(reader,layer.styles,em,key);
+                return new CoverageSQLLayerDetails(reader,getLayerStyles(layer),em,key);
             }
         }
 
@@ -235,8 +244,8 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     private void test(final String candidate){
         final String name = candidate;
-        if (source.loadAll || source.containsLayer(name)){
-            String nmsp = source.parameters.get(KEY_NAMESPACE);
+        if (isLoadAll(source) || containLayer(source, name)){
+            String nmsp = value(NAMESPACE_DESCRIPTOR, getSourceConfiguration());
             if (nmsp == null) {
                 nmsp = DEFAULT_NAMESPACE;
             } else if (nmsp.equals(NO_NAMESPACE)){
@@ -249,8 +258,14 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     @Override
     public ElevationModel getElevationModel(Name name) {
 
-        final ProviderLayer layer = source.getLayer(name.getLocalPart());
-        if(layer != null && layer.isElevationModel){
+        final ParameterValueGroup layer = getLayer(source, name.getLocalPart());
+        if(layer != null){
+            Boolean isEleModel = value(LAYER_IS_ELEVATION_MODEL_DESCRIPTOR, layer);
+
+            if(!Boolean.TRUE.equals(isEleModel)){
+                return null;
+            }
+
             final CoverageSQLLayerDetails pgld = (CoverageSQLLayerDetails) getByIdentifier(name);
             if(pgld != null){
                 return MapBuilder.createElevationModel(pgld.getReader());

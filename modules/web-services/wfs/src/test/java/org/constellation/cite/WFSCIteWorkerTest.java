@@ -16,12 +16,7 @@
  */
 package org.constellation.cite;
 
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import javax.xml.bind.Marshaller;
-import org.constellation.configuration.Source;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.LayerContext;
-import org.geotoolkit.util.FileUtilities;
 import java.io.File;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -30,14 +25,16 @@ import java.util.List;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
+import org.constellation.configuration.Source;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.LayerContext;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderSource;
-import org.constellation.provider.postgis.PostGisProvider;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.DefaultWFSWorker;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
@@ -52,7 +49,13 @@ import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 
 import org.junit.*;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+
 import static org.junit.Assert.*;
+import static org.constellation.provider.postgis.PostGisProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 
 
 /**
@@ -188,23 +191,23 @@ public class WFSCIteWorkerTest {
          ****************************************/
 
         final Configurator config = new Configurator() {
+
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
-                final ProviderConfig config = new ProviderConfig();
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+                final ParameterValueGroup config = desc.createValue();
 
                 if("postgis".equals(serviceName)){
                     // Defines a PostGis data provider
-                    final ProviderSource sourcePostGis = new ProviderSource();
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_DATABASE, "cite-wfs");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "db.geomatys.com");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "test");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "test");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_NAMESPACE,"http://cite.opengeospatial.org/gmlsf");
-                    sourcePostGis.loadAll = true;
-                    sourcePostGis.id      = "src";
-
-                    config.sources.add(sourcePostGis);
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    srcconfig.parameter(HOST.getName().getCode()).setValue("db.geomatys.com");
+                    srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                    srcconfig.parameter(USER.getName().getCode()).setValue("test");
+                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");
+                    srcconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("src");
                 }
 
                 return config;

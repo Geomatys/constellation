@@ -18,13 +18,18 @@
 package org.constellation.provider;
 
 import java.util.Collection;
-import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderSource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import org.constellation.provider.configuration.Configurator;
+import org.geotoolkit.parameter.Parameters;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+
 import static org.junit.Assert.*;
+import static org.constellation.provider.MockLayerProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 /**
  *
@@ -60,15 +65,16 @@ public class ConfiguratorTest {
     public void testEmptyConfig(){
 
         final Configurator config = new Configurator() {
+
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
-                return new ProviderConfig();
+            public ParameterValueGroup getConfiguration(final String serviceName,
+                    final ParameterDescriptorGroup desc) {
+                return desc.createValue();
             }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
 
         assertEquals(0, LayerProviderProxy.getInstance().getProviders().size());
-
     }
 
     /**
@@ -78,14 +84,16 @@ public class ConfiguratorTest {
     public void testLayerConfig(){
 
         final Configurator config = new Configurator() {
+
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
-                final ProviderConfig config = new ProviderConfig();
+            public ParameterValueGroup getConfiguration(final String serviceName, final ParameterDescriptorGroup desc) {
+                final ParameterValueGroup config = desc.createValue();
 
                 if(serviceName.equals("mock")){
-                    final ProviderSource source = new ProviderSource();
-                    source.parameters.put("layers", "A,B,C");
-                    config.sources.add(source);
+                    ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C");
+                    System.out.println(config);
                 }
 
                 return config;
@@ -105,25 +113,26 @@ public class ConfiguratorTest {
     public void testLayersConfig(){
 
         final Configurator config = new Configurator() {
+            
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
-                final ProviderConfig config = new ProviderConfig();
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+                final ParameterValueGroup config = desc.createValue();
 
                 if(serviceName.equals("mock")){
-                    ProviderSource source = new ProviderSource();
-                    source.parameters.put("layers", "A,B,C,D");
-                    source.id = "id-0";
-                    config.sources.add(source);
+                    ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
 
-                    source = new ProviderSource();
-                    source.parameters.put("layers", "E,F");
-                    source.id = "id-1";
-                    config.sources.add(source);
+                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
 
-                    source = new ProviderSource();
-                    source.parameters.put("layers", "G,H,I");
-                    source.id = "id-2";
-                    config.sources.add(source);
+                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
                 }
 
                 return config;
@@ -148,26 +157,25 @@ public class ConfiguratorTest {
 
         final Configurator config = new Configurator() {
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
-                final ProviderConfig config = new ProviderConfig();
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+                final ParameterValueGroup config = desc.createValue();
 
                 if(serviceName.equals("mock")){
-                    ProviderSource source = new ProviderSource();
-                    source.parameters.put("layers", "A,B,C,D");
-                    source.id = "id-0";
-                    config.sources.add(source);
+                    ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
 
-                    //this one with crash in initialization
-                    source = new ProviderSource();
-                    source.parameters.put("layers", "E,F");
-                    source.parameters.put("crashOnCreate", "true");
-                    source.id = "id-1";
-                    config.sources.add(source);
+                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
+                    srcconfig.parameter(CRASH_CREATE.getName().getCode()).setValue(true);
 
-                    source = new ProviderSource();
-                    source.parameters.put("layers", "G,H,I");
-                    source.id = "id-2";
-                    config.sources.add(source);
+                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
                 }
 
                 return config;
@@ -192,26 +200,25 @@ public class ConfiguratorTest {
 
         final Configurator config = new Configurator() {
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
-                final ProviderConfig config = new ProviderConfig();
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+                final ParameterValueGroup config = desc.createValue();
 
                 if(serviceName.equals("mock")){
-                    ProviderSource source = new ProviderSource();
-                    source.parameters.put("layers", "A,B,C,D");
-                    source.id = "id-0";
-                    config.sources.add(source);
+                    ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
 
-                    //this one with crash on dispose
-                    source = new ProviderSource();
-                    source.parameters.put("layers", "E,F");
-                    source.parameters.put("crashOnDispose", "true");
-                    source.id = "id-1";
-                    config.sources.add(source);
+                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
+                    srcconfig.parameter(CRASH_DISPOSE.getName().getCode()).setValue(true);
 
-                    source = new ProviderSource();
-                    source.parameters.put("layers", "G,H,I");
-                    source.id = "id-2";
-                    config.sources.add(source);
+                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
+                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
                 }
 
                 return config;
@@ -232,7 +239,7 @@ public class ConfiguratorTest {
         //set an empty configuration and verify nothing remains
         LayerProviderProxy.getInstance().setConfigurator(new Configurator() {
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
                 return null;
             }
         });

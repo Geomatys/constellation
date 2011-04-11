@@ -56,6 +56,10 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-jaxp-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-filter</artifactId>
     </dependency>
     <dependency>

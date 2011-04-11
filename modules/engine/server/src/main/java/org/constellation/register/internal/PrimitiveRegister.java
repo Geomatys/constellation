@@ -17,7 +17,6 @@
 package org.constellation.register.internal;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -25,7 +24,6 @@ import org.constellation.ServiceDef;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
 import org.constellation.register.PrimitiveRegisterIF;
 import org.constellation.register.RegisterException;
 import org.opengis.feature.type.Name;
@@ -153,7 +151,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
         final List<String> rootDirectories = new ArrayList<String>();
         for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
-            final String s = p.getSource().parameters.get("rootDirectory");
+            final String s = p.getSource().parameter("rootDirectory").stringValue();
             if (s != null) {
                rootDirectories.add(s);
             }

@@ -27,10 +27,10 @@ import java.util.Set;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.provider.AbstractStyleProvider;
-import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
@@ -45,7 +45,10 @@ import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.util.logging.Logging;
 
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.FactoryException;
+
+import static org.constellation.provider.sld.SLDProviderService.*;
 
 /**
  * Style provider. index and cache MutableStyle within the given folder.
@@ -55,8 +58,6 @@ import org.opengis.util.FactoryException;
  * @author Johann Sorel (Geomatys)
  */
 public class SLDProvider extends AbstractStyleProvider{
-
-    public static final String KEY_FOLDER_PATH = "path";
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.sld");
     private static final MutableStyleFactory SF = (MutableStyleFactory)FactoryFinder.getStyleFactory(
@@ -74,9 +75,9 @@ public class SLDProvider extends AbstractStyleProvider{
     private final Cache<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
     
     
-    protected SLDProvider(final SLDProviderService service,final ProviderSource source){
+    protected SLDProvider(final SLDProviderService service, final ParameterValueGroup source){
         super(service,source);
-        folder = new File(source.parameters.get(KEY_FOLDER_PATH));
+        folder = new File(Parameters.stringValue(FOLDER_DESCRIPTOR, source));
 
         if(folder == null || !folder.exists() || !folder.isDirectory()){
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
@@ -113,7 +114,7 @@ public class SLDProvider extends AbstractStyleProvider{
                             final MutableStyledLayerDescriptor sld = sldParser.readSLD(f, StyledLayerDescriptor.V_1_1_0);
                             value = getFirstStyle(sld);
                             if(value != null){
-                                LOGGER.log(Level.FINE, baseErrorMsg + key + " is an SLD 1.1.0");
+                                LOGGER.log(Level.FINE, "{0}{1} is an SLD 1.1.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
                         } catch (JAXBException ex) { /* dont log*/ }
@@ -124,7 +125,7 @@ public class SLDProvider extends AbstractStyleProvider{
                             final MutableStyledLayerDescriptor sld = sldParser.readSLD(f, StyledLayerDescriptor.V_1_0_0);
                             value = getFirstStyle(sld);
                             if(value != null){
-                                LOGGER.log(Level.FINE, baseErrorMsg + key + " is an SLD 1.0.0");
+                                LOGGER.log(Level.FINE, "{0}{1} is an SLD 1.0.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
@@ -134,7 +135,7 @@ public class SLDProvider extends AbstractStyleProvider{
                         try {
                             value = sldParser.readStyle(f, SymbologyEncoding.V_1_1_0);
                             if(value != null){
-                                LOGGER.log(Level.FINE, baseErrorMsg + key + " is a UserStyle SLD 1.1.0");
+                                LOGGER.log(Level.FINE, "{0}{1} is a UserStyle SLD 1.1.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
@@ -144,7 +145,7 @@ public class SLDProvider extends AbstractStyleProvider{
                         try {
                             value = sldParser.readStyle(f, SymbologyEncoding.SLD_1_0_0);
                             if(value != null){
-                                LOGGER.log(Level.FINE, baseErrorMsg + key + " is a UserStyle SLD 1.0.0");
+                                LOGGER.log(Level.FINE, "{0}{1} is a UserStyle SLD 1.0.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
@@ -156,7 +157,7 @@ public class SLDProvider extends AbstractStyleProvider{
                             value = SF.style();
                             value.featureTypeStyles().add(fts);
                             if(value != null){
-                                LOGGER.log(Level.FINE, baseErrorMsg + key + " is FeatureTypeStyle SE 1.1");
+                                LOGGER.log(Level.FINE, "{0}{1} is FeatureTypeStyle SE 1.1", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
@@ -168,13 +169,13 @@ public class SLDProvider extends AbstractStyleProvider{
                             value = SF.style();
                             value.featureTypeStyles().add(fts);
                             if(value != null){
-                                LOGGER.log(Level.FINE, baseErrorMsg + key + " is an FeatureTypeStyle SLD 1.0");
+                                LOGGER.log(Level.FINE, "{0}{1} is an FeatureTypeStyle SLD 1.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
                         catch (FactoryException ex) { /* dont log*/ }
 
-                        LOGGER.log(Level.WARNING, baseErrorMsg + key + " could not be parsed");
+                        LOGGER.log(Level.WARNING, "{0}{1} could not be parsed", new Object[]{baseErrorMsg, key});
                     }
                 }
             } finally {

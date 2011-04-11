@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2010, Geomatys
+ *    (C) 2010-2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,8 @@
  */
 package org.constellation.provider.coveragefile;
 
+import java.util.List;
+import org.opengis.parameter.ParameterValueGroup;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -27,8 +29,6 @@ import java.util.logging.Level;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.configuration.ProviderLayer;
-import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
@@ -41,6 +41,10 @@ import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import static org.constellation.provider.coveragefile.CoverageMosaicProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.geotoolkit.parameter.Parameters.*;
 
 /**
  *
@@ -57,7 +61,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         @Override
         public Entry<TileManager,CoordinateReferenceSystem> get(Object key) {
             if(key instanceof Name && ((Name)key).isGlobal()){
-                String nmsp = source.parameters.get(KEY_NAMESPACE);
+                String nmsp = value(NAMESPACE_DESCRIPTOR, source);
                 if (nmsp == null) {
                     nmsp = DEFAULT_NAMESPACE;
                 } else if ("no namespace".equals(nmsp)) {
@@ -74,9 +78,9 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
     private final File folder;
 
     protected CoverageMosaicProvider(final CoverageMosaicProviderService service,
-            final ProviderSource source) throws IOException, SQLException {
+            final ParameterValueGroup source) throws IOException, SQLException {
         super(service,source);
-        final String path = source.parameters.get(KEY_FOLDER_PATH);
+        final String path = value(FOLDER_DESCRIPTOR, getSourceConfiguration(source));
 
         if (path == null) {
             throw new IllegalArgumentException("Found configuration file but a path parameter is not defined.");
@@ -89,6 +93,16 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         }
 
         reload();
+    }
+
+    private static ParameterValueGroup getSourceConfiguration(final ParameterValueGroup params){
+
+        final List<ParameterValueGroup> groups = params.groups(
+                CoverageMosaicProviderService.SOURCE_DESCRIPTOR.getName().getCode());
+        if(!groups.isEmpty()){
+            return groups.get(0);
+        }
+        return null;
     }
 
     /**
@@ -108,8 +122,9 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
 
         if (entry != null) {
             final String name = key.getLocalPart();
-            final ProviderLayer layer = source.getLayer(name);
-            final Name em = (layer == null || layer.elevationModel == null) ? null : DefaultName.valueOf(layer.elevationModel);
+            final ParameterValueGroup layer = getLayer(source, name);
+            final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
+            final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
             final GridCoverageReader reader;
             try {
                 reader = GridCoverageReaders.toCoverageReader(entry.getKey(), entry.getValue());
@@ -121,7 +136,8 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
                 return new GridCoverageReaderLayerDetails(reader,null,em, key);
 
             } else {
-                return new GridCoverageReaderLayerDetails(reader,layer.styles,em,key);
+                List<String> styles = getLayerStyles(layer);
+                return new GridCoverageReaderLayerDetails(reader,styles,em,key);
             }
         }
 
@@ -137,7 +153,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             index.clear();
 
             //find the namespace
-            String nmsp = source.parameters.get(KEY_NAMESPACE);
+            String nmsp = value(NAMESPACE_DESCRIPTOR, getSourceConfiguration(source));
             if (nmsp == null) {
                 nmsp = DEFAULT_NAMESPACE;
             } else if ("no namespace".equals(nmsp)) {
@@ -146,9 +162,10 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
 
             //find the layer name
             final Name name;
-            if(!source.layers.isEmpty()){
+            final List<ParameterValueGroup> layers = getLayers(source);
+            if(!layers.isEmpty()){
                 //we use the first layer name
-                name = new DefaultName(nmsp, source.layers.get(0).name);
+                name = new DefaultName(nmsp, value(LAYER_NAME_DESCRIPTOR, layers.get(0)));
             }else{
                 //the name is the folder name
                 name = new DefaultName(nmsp, folder.getName());
@@ -174,8 +191,6 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
     public void dispose() {
         synchronized(this){
             index.clear();
-            source.layers.clear();
-            source.parameters.clear();
         }
     }
 
@@ -185,8 +200,13 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
     @Override
     public ElevationModel getElevationModel(final Name name) {
 
-        final ProviderLayer layer = source.getLayer(name.getLocalPart());
-        if(layer != null && layer.isElevationModel){
+        final ParameterValueGroup layer = getLayer(source, name.getLocalPart());
+        if(layer != null){
+            Boolean isEleModel = value(LAYER_IS_ELEVATION_MODEL_DESCRIPTOR, layer);
+            if(!Boolean.TRUE.equals(isEleModel)){
+                return null;
+            }
+
             final GridCoverageReaderLayerDetails pgld = (GridCoverageReaderLayerDetails) getByIdentifier(name);
             if(pgld != null){
                 return MapBuilder.createElevationModel(pgld.getReader());

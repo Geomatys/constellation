@@ -23,9 +23,13 @@ import java.util.Collections;
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderService;
-import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.configuration.ProviderParameters;
 
+import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.style.MutableStyle;
+
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -39,6 +43,9 @@ public class GO2StyleProviderService extends AbstractProviderService
     private static final Collection<GO2StyleProvider> PROVIDERS = new ArrayList<GO2StyleProvider>();
     private static final Collection<GO2StyleProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
+    public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
+            new DefaultParameterDescriptorGroup(ProviderParameters.CONFIG_DESCRIPTOR_NAME);
+
     public GO2StyleProviderService() {
         super("go2style");
         PROVIDERS.clear();
@@ -47,13 +54,18 @@ public class GO2StyleProviderService extends AbstractProviderService
     }
 
     @Override
-    public StyleProvider createProvider(ProviderSource config) {
+    public StyleProvider createProvider(final ParameterValueGroup config) {
         return null;
     }
 
     @Override
     public Collection<? extends StyleProvider> getAdditionalProviders() {
         return IMMUTABLE;
+    }
+
+    @Override
+    public ParameterDescriptorGroup getDescriptor() {
+        return SERVICE_CONFIG_DESCRIPTOR;
     }
 
 }

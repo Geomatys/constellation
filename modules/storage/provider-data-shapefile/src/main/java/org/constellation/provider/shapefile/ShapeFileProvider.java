@@ -30,8 +30,6 @@ import java.util.Set;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.DefaultDataStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.configuration.ProviderLayer;
-import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
@@ -40,6 +38,12 @@ import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.storage.DataStoreException;
 
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterValueGroup;
+
+import static org.constellation.provider.shapefile.ShapeFileProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.geotoolkit.parameter.Parameters.*;
+import static org.geotoolkit.data.shapefile.ShapefileDataStoreFactory.*;
 
 
 /**
@@ -53,15 +57,6 @@ import org.opengis.feature.type.Name;
  */
 public class ShapeFileProvider extends AbstractLayerProvider {
 
-    /**
-     * Key for the path of the directory which contains shapefiles.
-     */
-    public static final String KEY_FOLDER_PATH = "path";
-
-    /**
-     * Key for the path of the directory which contains shapefiles.
-     */
-    public static final String KEY_NAMESPACE = "namespace";
     /**
      * Mask to select only shape files.
      */
@@ -80,9 +75,9 @@ public class ShapeFileProvider extends AbstractLayerProvider {
 
 
     protected ShapeFileProvider(final ShapeFileProviderService service,
-            final ProviderSource source) throws IllegalArgumentException {
+            final ParameterValueGroup source) throws IllegalArgumentException {
         super(service,source);
-        final String path = source.parameters.get(KEY_FOLDER_PATH);
+        final String path = stringValue(FOLDER_DESCRIPTOR, source);
 
         if (path == null) {
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
@@ -110,7 +105,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
      */
     @Override
     public Set<Name> getKeys(String sourceName) {
-        if (source.id.equals(sourceName)) {
+        if (sourceName.equals(getSourceId(source))) {
             return index.keySet();
         }
         return new HashSet();
@@ -130,7 +125,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             final File f = index.get(key);
             if (f != null) {
                 //we have this data source in the folder
-                store = loadDataStore(f, source.parameters.get(KEY_NAMESPACE));
+                store = loadDataStore(f, value(NAMESPACE, source));
                 if (store != null) {
                     //cache the datastore
                     cache.put(key, store);
@@ -144,15 +139,17 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         }
 
         if (store != null) {
-            final ProviderLayer layer = source.getLayer(key.getLocalPart());
+            final ParameterValueGroup layer = getLayer(source, key.getLocalPart());
             if (layer == null) {
                 return new DefaultDataStoreLayerDetails(key, store, null, null, null, null, null);
                 
             } else {
-                final List<String> styles = layer.styles;
+                final List<String> styles = getLayerStyles(layer);
                 return new DefaultDataStoreLayerDetails(key, store, styles,
-                        layer.dateStartField, layer.dateEndField,
-                        layer.elevationStartField, layer.elevationEndField);
+                        value(LAYER_DATE_START_FIELD_DESCRIPTOR, layer),
+                        value(LAYER_DATE_END_FIELD_DESCRIPTOR, layer),
+                        value(LAYER_ELEVATION_START_FIELD_DESCRIPTOR, layer),
+                        value(LAYER_ELEVATION_END_FIELD_DESCRIPTOR, layer));
             }
         }
 
@@ -179,8 +176,6 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         synchronized(this){
             index.clear();
             cache.clear();
-            source.layers.clear();
-            source.parameters.clear();
         }
     }
 
@@ -219,8 +214,8 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             final String fullName = candidate.getName();
             if (fullName.toLowerCase().endsWith(MASK)){
                 final String name = fullName.substring(0, fullName.length()-4);
-                if (source.loadAll || source.containsLayer(name)){
-                    String nmsp = source.parameters.get(KEY_NAMESPACE);
+                if (isLoadAll(source) || containLayer(source, name)){
+                    String nmsp = value(NAMESPACE, source);
                     if (nmsp == null) {
                         nmsp = DEFAULT_NAMESPACE;
                     } else if (nmsp.equals(NO_NAMESPACE)) {
@@ -240,7 +235,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         final Map<String,Serializable> params = new HashMap<String,Serializable>();
         try {
             params.put("url", f.toURI().toURL());
-            params.put(KEY_NAMESPACE, namespace);
+            params.put(NAMESPACE.getName().getCode(), namespace);
             return DataStoreFinder.getDataStore(params);
        } catch (DataStoreException ex) {
             getLogger().log(Level.WARNING, null, ex);

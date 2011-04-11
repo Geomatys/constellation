@@ -28,29 +28,26 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderLayer;
-import org.constellation.provider.configuration.ProviderSource;
-import org.constellation.provider.om.OMProvider;
-import org.constellation.provider.shapefile.ShapeFileProvider;
-import org.constellation.provider.sml.SMLProvider;
+import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.data.om.OMDataStoreFactory;
+import org.geotoolkit.data.sml.SMLDataStoreFactory;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.io.IOUtilities;
@@ -90,13 +87,17 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 import org.junit.*;
-import static org.junit.Assert.*;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 import org.xml.sax.SAXException;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.junit.Assert.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 
 /**
@@ -981,43 +982,71 @@ public class WFSWorkerTest {
          final File outputDir = initDataDirectory();
 
          final Configurator config = new Configurator() {
+
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
-                final ProviderConfig config = new ProviderConfig();
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+                final ParameterValueGroup config = desc.createValue();
 
                 if("shapefile".equals(serviceName)){
-                    final ProviderSource sourceShape = new ProviderSource();
-                    sourceShape.id = "shapeSrc";
-                    sourceShape.loadAll = true;
-                    sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
-                            "/org/constellation/ws/embedded/wms111/shapefiles");
-                    sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "http://www.opengis.net/gml");
-                    sourceShape.layers.add(new ProviderLayer("BasicPolygons", Collections.singletonList("cite_style_BasicPolygons"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Bridges", Collections.singletonList("cite_style_Bridges"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("BuildingCenters", Collections.singletonList("cite_style_BuildingCenters"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Buildings", Collections.singletonList("cite_style_Buildings"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("DividedRoutes", Collections.singletonList("cite_style_DividedRoutes"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Forests", Collections.singletonList("cite_style_Forests"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Lakes", Collections.singletonList("cite_style_Lakes"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("MapNeatline", Collections.singletonList("cite_style_MapNeatLine"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Ponds", Collections.singletonList("cite_style_Ponds"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("RoadSegments", Collections.singletonList("cite_style_RoadSegments"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Streams", Collections.singletonList("cite_style_Streams"),
-                                           null, null, null, null, false, null));
-                    config.sources.add(sourceShape);
 
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
+                    srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
+                            .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
+                    srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
+                            .setValue("http://www.opengis.net/gml");
+
+
+                    ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BasicPolygons");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BasicPolygons");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Bridges");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Bridges");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BuildingCenters");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BuildingCenters");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Buildings");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Buildings");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("DividedRoutes");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_DividedRoutes");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Forests");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Forests");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Lakes");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Lakes");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("MapNeatline");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_MapNeatLine");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Ponds");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Ponds");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("RoadSegments");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_RoadSegments");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Streams");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Streams");
+                    
                 }else if("observation".equals(serviceName)){
                     try{
                         final String url = "jdbc:derby:memory:TestWFSWorker";
@@ -1027,12 +1056,13 @@ public class WFSWorkerTest {
                         sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
                         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
                         con.close();
-                        final ProviderSource sourceOM = new ProviderSource();
-                        sourceOM.id      = "omSrc";
-                        sourceOM.loadAll = true;
-                        sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
-                        sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
-                        config.sources.add(sourceOM);
+
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(OMDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                        srcconfig.parameter(OMDataStoreFactory.DBTYPE.getName().getCode()).setValue("derby");
+                        srcconfig.parameter(OMDataStoreFactory.DERBYURL.getName().getCode()).setValue(url);
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("osmSrc");
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(), ex);
                     }
@@ -1052,12 +1082,12 @@ public class WFSWorkerTest {
                         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
                         con.close();
 
-                        final ProviderSource sourceSML = new ProviderSource();
-                        sourceSML.id      = "smlSrc";
-                        sourceSML.loadAll = true;
-                        sourceSML.parameters.put(SMLProvider.KEY_SGBDTYPE, "derby");
-                        sourceSML.parameters.put(SMLProvider.KEY_DERBYURL, url2);
-                        config.sources.add(sourceSML);
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(SMLDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("smlSrc");
+                        srcconfig.parameter(SMLDataStoreFactory.DBTYPE.getName().getCode()).setValue("derby");
+                        srcconfig.parameter(SMLDataStoreFactory.DERBYURL.getName().getCode()).setValue(url2);
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(), ex);
                     }

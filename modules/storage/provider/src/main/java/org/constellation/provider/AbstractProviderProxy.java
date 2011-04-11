@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2010, Geomatys
+ *    (C) 2010-2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,12 +26,13 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.util.NullArgumentException;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
- * Commun base class for LayerProviderProxy and StyleProviderProxy.
+ * Common base class for LayerProviderProxy and StyleProviderProxy.
  * Ensure correct thread-safe reloading of providers.
  *
  * @author Johann Sorel (Geomatys)
@@ -113,12 +114,13 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         final List<P> cache = new ArrayList<P>();
         for(final ProviderService factory : getServices()){
             final String serviceName = factory.getName();
+            final ParameterDescriptorGroup desc = factory.getDescriptor();
 
             //load configurable sources
             try{
-                final ProviderConfig config = configs.getConfiguration(serviceName);
+                final ParameterValueGroup config = configs.getConfiguration(serviceName,desc);
                 if(config != null){
-                    for(final ProviderSource src : config.sources){
+                    for(final ParameterValueGroup src : ProviderParameters.getSources(config)){
                         try{
                             final P prov = (P) factory.createProvider(src);
                             if(prov != null){

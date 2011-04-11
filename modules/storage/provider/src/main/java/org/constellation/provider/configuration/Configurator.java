@@ -21,13 +21,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 
 import org.constellation.configuration.ConfigDirectory;
-
 import org.geotoolkit.util.logging.Logging;
-
-import org.xml.sax.SAXException;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -37,7 +36,7 @@ public interface Configurator {
 
     public static final Configurator DEFAULT = new DefaultConfigurator();
 
-    ProviderConfig getConfiguration(String serviceName);
+    ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc);
 
 
     static class DefaultConfigurator implements Configurator{
@@ -47,23 +46,21 @@ public interface Configurator {
         private DefaultConfigurator(){}
 
         @Override
-        public ProviderConfig getConfiguration(String serviceName) {
+        public ParameterValueGroup getConfiguration(final String serviceName, final ParameterDescriptorGroup desc) {
 
             final String fileName = serviceName + ".xml";
             final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
 
             if(configFile == null || !configFile.exists()){
                 //return an empty configuration
-                return new ProviderConfig();
+                return desc.createValue();
             }
 
             //parse the configuration
-            ProviderConfig config = null;
+            ParameterValueGroup config = null;
             try {
-                config = ProviderConfig.read(configFile);
-            } catch (ParserConfigurationException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            } catch (SAXException ex) {
+                config = ProviderParameters.read(configFile, desc);
+            } catch (XMLStreamException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);

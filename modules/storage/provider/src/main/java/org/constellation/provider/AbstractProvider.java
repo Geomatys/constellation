@@ -22,8 +22,10 @@ import java.beans.PropertyChangeSupport;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.util.logging.Logging;
+import org.opengis.parameter.ParameterValueGroup;
+
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 /**
  *
@@ -34,11 +36,11 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
     private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
-    protected final ProviderSource source;
+    protected final ParameterValueGroup source;
     protected final ProviderService<K, V, Provider<K, V>> service;
     private long lastUpdateTime = System.currentTimeMillis();
 
-    public AbstractProvider(final ProviderService<K, V, Provider<K, V>> service, final ProviderSource source){
+    public AbstractProvider(final ProviderService<K, V, Provider<K, V>> service, final ParameterValueGroup source){
         this.source = source;
         this.service = service;
     }
@@ -55,14 +57,14 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
     }
 
     @Override
-    public ProviderSource getSource() {
+    public ParameterValueGroup getSource() {
         return source;
     }
 
     @Override
     public Set<K> getKeys(String sourceId) {
         if(sourceId != null && source != null){
-            if(sourceId.equals(source.id)){
+            if(sourceId.equals(getSourceId(source))){
                 return getKeys();
             }else{
                 return Collections.emptySet();
