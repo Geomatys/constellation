@@ -17,6 +17,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import org.constellation.provider.shapefile.ShapeFileProviderService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,18 +32,22 @@ import org.constellation.map.ws.WMSMapDecoration;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.configuration.ProviderConfig;
-import org.constellation.provider.configuration.ProviderLayer;
-import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.coveragesql.CoverageSQLProvider;
 import org.constellation.provider.postgis.PostGisProvider;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.sld.SLDProvider;
+import org.constellation.provider.sld.SLDProviderService;
 
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 
 
 /**
@@ -98,72 +103,96 @@ public final class GrizzlyServer {
 
         final Configurator layerConfig = new Configurator() {
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
-                final ProviderConfig config = new ProviderConfig();
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+                final ParameterValueGroup config = desc.createValue();
 
                 if("coverage-sql".equals(serviceName)){
-                    final ProviderSource sourcePostGrid = new ProviderSource();
-                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
-                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
-                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_PASSWORD, "test");
-                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_READONLY, "true");
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(DATABASE_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://db.geomatys.com/coverages-test");
+                    srcconfig.parameter(DRIVER_DESCRIPTOR.getName().getCode()).setValue("org.postgresql.Driver");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(READONLY_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
-                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
-                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
-                    sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
-                    sourcePostGrid.loadAll = true;
-                    sourcePostGrid.id = "postgridSrc";
-                    config.sources.add(sourcePostGrid);
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgridSrc");
 
                 }else if("shapefile".equals(serviceName)){
                     // Defines a ShapeFile data provider
-                    final ProviderSource sourceShape = new ProviderSource();
-                    sourceShape.loadAll = false;
-                    sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
-                            "/org/constellation/ws/embedded/wms111/shapefiles");
-                    sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "cite");
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.FALSE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
+                    srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
+                            .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
+                    srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
+                            .setValue("cite");
 
-                    sourceShape.layers.add(new ProviderLayer("BasicPolygons", Collections.singletonList("cite_style_BasicPolygons"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Bridges", Collections.singletonList("cite_style_Bridges"),
-                                           null, null, null, null, false, null));
-                    /*sourceShape.layers.add(new ProviderLayer("BuildingCenters", Collections.singletonList("cite_style_BuildingCenters"),
-                                           null, null, null, null, false, null));*/
-                    sourceShape.layers.add(new ProviderLayer("Buildings", Collections.singletonList("cite_style_Buildings"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("DividedRoutes", Collections.singletonList("cite_style_DividedRoutes"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Forests", Collections.singletonList("cite_style_Forests"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Lakes", Collections.singletonList("cite_style_Lakes"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("MapNeatline", Collections.singletonList("cite_style_MapNeatLine"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Ponds", Collections.singletonList("cite_style_Ponds"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("RoadSegments", Collections.singletonList("cite_style_RoadSegments"),
-                                           null, null, null, null, false, null));
-                    sourceShape.layers.add(new ProviderLayer("Streams", Collections.singletonList("cite_style_Streams"),
-                                           null, null, null, null, false, null));
-                    sourceShape.id = "shapeSrc";
-                    config.sources.add(sourceShape);
 
+                    ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BasicPolygons");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BasicPolygons");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Bridges");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Bridges");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("BuildingCenters");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_BuildingCenters");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Buildings");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Buildings");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("DividedRoutes");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_DividedRoutes");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Forests");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Forests");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Lakes");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Lakes");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("MapNeatline");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_MapNeatLine");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Ponds");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Ponds");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("RoadSegments");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_RoadSegments");
+
+                    layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Streams");
+                    layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Streams");
+                    
                 }else if("postgis".equals(serviceName)){
                     // Defines a PostGis data provider
-                    final ProviderSource sourcePostGis = new ProviderSource();
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_DATABASE, "cite-wfs");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "db.geomatys.com");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "test");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "test");
-                    sourcePostGis.parameters.put(PostGisProvider.KEY_NAMESPACE,"http://cite.opengeospatial.org/gmlsf");
-                    sourcePostGis.loadAll = true;
-                    sourcePostGis.id = "postgisSrc";
-
-                    config.sources.add(sourcePostGis);
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    srcconfig.parameter(HOST.getName().getCode()).setValue("db.geomatys.com");
+                    srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                    srcconfig.parameter(USER.getName().getCode()).setValue("test");
+                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");
+                    srcconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
                 }
 
                 return config;
@@ -173,17 +202,15 @@ public final class GrizzlyServer {
 
         final Configurator styleconfig = new Configurator() {
             @Override
-            public ProviderConfig getConfiguration(String serviceName) {
-                final ProviderConfig config = new ProviderConfig();
+            public ParameterValueGroup getConfiguration(final String serviceName, final ParameterDescriptorGroup desc) {
+                final ParameterValueGroup config = desc.createValue();
 
                 if("sld".equals(serviceName)){
-                    
-                    // Defines a Styles data provider
-                    final ProviderSource sourceStyle = new ProviderSource();
-                    sourceStyle.loadAll = true;
-                    sourceStyle.parameters.put(SLDProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
-                            "/org/constellation/ws/embedded/wms111/styles");
-                    config.sources.add(sourceStyle);
+
+                    final ParameterValueGroup source = config.addGroup(
+                            SLDProviderService.SOURCE_DESCRIPTOR.getName().getCode());
+                    source.parameter(SLDProviderService.FOLDER_DESCRIPTOR.getName().getCode()).setValue(
+                            outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/styles");
                 }
 
                 return config;
