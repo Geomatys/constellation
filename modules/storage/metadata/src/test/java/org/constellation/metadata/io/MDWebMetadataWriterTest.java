@@ -122,6 +122,9 @@ public class MDWebMetadataWriterTest {
         if (reader != null) {
             reader.destroy();
         }
+        if (writer != null) {
+            writer.destroy();
+        }
     }
 
     /**

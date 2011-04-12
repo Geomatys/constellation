@@ -184,7 +184,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             if (dataSource == null) {
                 throw new MetadataIoException("Unable to instanciate a dataSource.");
             }
-            mdReader = MD_IOFactory.getReaderInstance(dataSource, isPostgres);
+            mdReader = MD_IOFactory.getPooledInstance(dataSource, isPostgres);
             mdReader.setProperty("readProfile", false);
         } catch (SQLException ex) {
             throw new MetadataIoException("SQLException while initializing the MDWeb reader:" +'\n'+
@@ -1138,7 +1138,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         final List<Object> results = new ArrayList<Object>();
         try {
             final List<RecordSet> recordSets = mdReader.getRecordSets();
-            final List<Form> forms       = mdReader.getAllForm(recordSets);
+            final List<Form> forms           = mdReader.getAllForm(recordSets);
             for (Form f: forms) {
                 results.add(getObjectFromForm("no cache", f, -1));
             }
@@ -1157,20 +1157,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     }
     
     /**
-     * Add a metadata to the cache.
-     * @param identifier The metadata identifier.
-     * @param metadata The object to put in cache.
+     * {@inheritDoc }
      */
     @Override
     public void removeFromCache(String identifier) {
-        if (super.isCacheEnabled()) {
-            try {
-                mdReader.removeFormFromCache(identifier);
-            } catch (MD_IOException ex) {
-                LOGGER.log(Level.SEVERE, "SQLException while removing {0} from the cache", identifier);
-                return;
-            }
-            super.removeFromCache(identifier);
-        }
+        super.removeFromCache(identifier);
     }
 }

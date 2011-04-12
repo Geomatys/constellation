@@ -145,7 +145,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             final DataSource dataSource = db.getDataSource();
             final boolean isPostgres    = db.getClassName().equals("org.postgresql.Driver");
-            mdWriter                    = MD_IOFactory.getWriterInstance(dataSource, isPostgres);
+            mdWriter                    = MD_IOFactory.getPooledInstance(dataSource, isPostgres);
            
             mdRecordSet = getRecordSet(configuration.getDefaultRecordSet());
             defaultUser = mdWriter.getUser("admin");
