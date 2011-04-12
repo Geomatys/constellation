@@ -10,10 +10,12 @@
                 xmlns:cstl="http://constellation.org/taglib"
                 template="/pages/base.xhtml">
 
-    <ui:param name="pageTitle" value="WCS"/>
-
     <ui:define name="content">
-
+        <h:graphicImage url="org.constellation.menu.service.wcs100.png.mfRes"/>
+        &#160;&#160;
+        <h:graphicImage url="org.constellation.menu.service.wcs111.png.mfRes"/>
+        <br/>
+        <br/>
         <cstl:servicepreview bean="#{wcsBean}" />
 
     </ui:define>
