@@ -30,6 +30,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 import static org.geotoolkit.parameter.Parameters.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 /**
  *
@@ -53,9 +54,10 @@ public class PostGisProviderService extends AbstractProviderService<Name,LayerDe
     }
 
     @Override
-    public LayerProvider createProvider(final ParameterValueGroup ps) {
+    public LayerProvider createProvider(ParameterValueGroup ps) {
         try {
             final PostGisProvider provider = new PostGisProvider(this,ps);
+            ps = getOrCreate(PARAMETERS_DESCRIPTOR, ps);
             getLogger().log(Level.INFO, "[PROVIDER]> postgis provider created : {0} > {1}",
                     new Object[]{value(HOST, ps),value(DATABASE, ps)});
             return provider;

@@ -30,6 +30,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.data.sml.SMLDataStoreFactory.*;
 import static org.geotoolkit.parameter.Parameters.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
 /**
  *
  * @version $Id: 
@@ -53,9 +54,10 @@ public class SMLProviderService extends AbstractProviderService<Name,LayerDetail
     }
 
     @Override
-    public LayerProvider createProvider(final ParameterValueGroup ps) {
+    public LayerProvider createProvider(ParameterValueGroup ps) {
         try {
             final SMLProvider provider = new SMLProvider(this,ps);
+            ps = getOrCreate(PARAMETERS_DESCRIPTOR, ps);
             String msg = "[PROVIDER]> sensorML provider created :";
             final String sgbdType = value(SGBDTYPE,ps);
             if (sgbdType != null && sgbdType.equals("derby")) {

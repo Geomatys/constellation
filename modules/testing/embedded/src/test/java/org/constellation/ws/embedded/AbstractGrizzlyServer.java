@@ -143,10 +143,10 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
                         final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                         final ParameterValueGroup srcconfig = getOrCreate(OMDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                        srcconfig.parameter(OMDataStoreFactory.DBTYPE.getName().getCode()).setValue("derby");
+                        srcconfig.parameter(OMDataStoreFactory.SGBDTYPE.getName().getCode()).setValue("derby");
                         srcconfig.parameter(OMDataStoreFactory.DERBYURL.getName().getCode()).setValue(url);
                         source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("osmSrc");
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("omSrc");
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }

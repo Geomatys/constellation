@@ -43,8 +43,11 @@ public class GO2StyleProviderService extends AbstractProviderService
     private static final Collection<GO2StyleProvider> PROVIDERS = new ArrayList<GO2StyleProvider>();
     private static final Collection<GO2StyleProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
+    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR = new DefaultParameterDescriptorGroup(
+            Collections.singletonMap("name", ProviderParameters.SOURCE_DESCRIPTOR_NAME),
+            0,Integer.MAX_VALUE);
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup(ProviderParameters.CONFIG_DESCRIPTOR_NAME);
+            new DefaultParameterDescriptorGroup(ProviderParameters.CONFIG_DESCRIPTOR_NAME,SOURCE_DESCRIPTOR);
 
     public GO2StyleProviderService() {
         super("go2style");

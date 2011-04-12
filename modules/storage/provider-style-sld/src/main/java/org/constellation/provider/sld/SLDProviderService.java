@@ -16,6 +16,7 @@
  */
 package org.constellation.provider.sld;
 
+import java.util.Collections;
 import java.util.logging.Level;
 
 import org.constellation.provider.AbstractProviderService;
@@ -46,8 +47,9 @@ public class SLDProviderService extends AbstractProviderService
 
     public static final ParameterDescriptor<String> FOLDER_DESCRIPTOR =
              new DefaultParameterDescriptor<String>("path","Folder where style files can be found",String.class,null,true);
-    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup(ProviderParameters.SOURCE_DESCRIPTOR_NAME,FOLDER_DESCRIPTOR);
+    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR = new DefaultParameterDescriptorGroup(
+            Collections.singletonMap("name", ProviderParameters.SOURCE_DESCRIPTOR_NAME),
+            0,Integer.MAX_VALUE,FOLDER_DESCRIPTOR);
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             new DefaultParameterDescriptorGroup(ProviderParameters.CONFIG_DESCRIPTOR_NAME,SOURCE_DESCRIPTOR);
 

@@ -49,9 +49,9 @@ public class ShapeFileProviderService extends AbstractProviderService
     public static final ParameterDescriptor<String> NAMESPACE_DESCRIPTOR =
              new DefaultParameterDescriptor<String>("namespace","Namespace used for the datastore is the given folder",String.class,null,false);
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup(SOURCE_DESCRIPTOR_NAME,FOLDER_DESCRIPTOR,NAMESPACE_DESCRIPTOR);
+            new DefaultParameterDescriptorGroup("shapefileFolder",FOLDER_DESCRIPTOR,NAMESPACE_DESCRIPTOR);
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup(CONFIG_DESCRIPTOR_NAME,SOURCE_CONFIG_DESCRIPTOR);
+            createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
     public ShapeFileProviderService(){
         super("shapefile");
@@ -63,9 +63,10 @@ public class ShapeFileProviderService extends AbstractProviderService
     }
 
     @Override
-    public LayerProvider createProvider(final ParameterValueGroup ps) {
+    public LayerProvider createProvider(ParameterValueGroup ps) {
         try {
             final ShapeFileProvider provider = new ShapeFileProvider(this,ps);
+            ps = getOrCreate(SOURCE_CONFIG_DESCRIPTOR, ps);
             getLogger().log(Level.INFO, "[PROVIDER]> shapefile provider created : {0}", value(FOLDER_DESCRIPTOR, ps));
             return provider;
         } catch (Exception ex) {

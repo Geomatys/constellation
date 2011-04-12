@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.provider.AbstractStyleProvider;
+import org.constellation.provider.configuration.ProviderParameters;
 
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
@@ -77,6 +78,7 @@ public class SLDProvider extends AbstractStyleProvider{
     
     protected SLDProvider(final SLDProviderService service, final ParameterValueGroup source){
         super(service,source);
+        
         folder = new File(Parameters.stringValue(FOLDER_DESCRIPTOR, source));
 
         if(folder == null || !folder.exists() || !folder.isDirectory()){

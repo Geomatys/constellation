@@ -19,7 +19,6 @@ package org.constellation.provider.shapefile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.HashMap;
@@ -33,6 +32,7 @@ import org.constellation.provider.LayerDetails;
 
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
+import org.geotoolkit.data.shapefile.ShapefileDataStoreFactory;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.storage.DataStoreException;
@@ -77,7 +77,9 @@ public class ShapeFileProvider extends AbstractLayerProvider {
     protected ShapeFileProvider(final ShapeFileProviderService service,
             final ParameterValueGroup source) throws IllegalArgumentException {
         super(service,source);
-        final String path = stringValue(FOLDER_DESCRIPTOR, source);
+
+        final ParameterValueGroup config = getSourceConfiguration(source, SOURCE_CONFIG_DESCRIPTOR);
+        final String path = stringValue(FOLDER_DESCRIPTOR, config);
 
         if (path == null) {
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
@@ -125,7 +127,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             final File f = index.get(key);
             if (f != null) {
                 //we have this data source in the folder
-                store = loadDataStore(f, value(NAMESPACE, source));
+                store = loadDataStore(f, value(NAMESPACE, getSourceConfiguration(source, SOURCE_CONFIG_DESCRIPTOR)));
                 if (store != null) {
                     //cache the datastore
                     cache.put(key, store);
@@ -215,7 +217,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             if (fullName.toLowerCase().endsWith(MASK)){
                 final String name = fullName.substring(0, fullName.length()-4);
                 if (isLoadAll(source) || containLayer(source, name)){
-                    String nmsp = value(NAMESPACE, source);
+                    String nmsp = value(NAMESPACE, getSourceConfiguration(source, SOURCE_CONFIG_DESCRIPTOR));
                     if (nmsp == null) {
                         nmsp = DEFAULT_NAMESPACE;
                     } else if (nmsp.equals(NO_NAMESPACE)) {
@@ -232,10 +234,10 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             return null;
         }
 
-        final Map<String,Serializable> params = new HashMap<String,Serializable>();
+        final ParameterValueGroup params = ShapefileDataStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
         try {
-            params.put("url", f.toURI().toURL());
-            params.put(NAMESPACE.getName().getCode(), namespace);
+            params.parameter(URLP.getName().getCode()).setValue(f.toURI().toURL());
+            params.parameter(NAMESPACE.getName().getCode()).setValue(namespace);
             return DataStoreFinder.getDataStore(params);
        } catch (DataStoreException ex) {
             getLogger().log(Level.WARNING, null, ex);

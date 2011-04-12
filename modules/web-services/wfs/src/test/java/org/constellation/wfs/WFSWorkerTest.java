@@ -1059,10 +1059,10 @@ public class WFSWorkerTest {
 
                         final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                         final ParameterValueGroup srcconfig = getOrCreate(OMDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                        srcconfig.parameter(OMDataStoreFactory.DBTYPE.getName().getCode()).setValue("derby");
+                        srcconfig.parameter(OMDataStoreFactory.SGBDTYPE.getName().getCode()).setValue("derby");
                         srcconfig.parameter(OMDataStoreFactory.DERBYURL.getName().getCode()).setValue(url);
                         source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("osmSrc");
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("omSrc");
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(), ex);
                     }
@@ -1086,7 +1086,7 @@ public class WFSWorkerTest {
                         final ParameterValueGroup srcconfig = getOrCreate(SMLDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
                         source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                         source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("smlSrc");
-                        srcconfig.parameter(SMLDataStoreFactory.DBTYPE.getName().getCode()).setValue("derby");
+                        srcconfig.parameter(SMLDataStoreFactory.SGBDTYPE.getName().getCode()).setValue("derby");
                         srcconfig.parameter(SMLDataStoreFactory.DERBYURL.getName().getCode()).setValue(url2);
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(), ex);
