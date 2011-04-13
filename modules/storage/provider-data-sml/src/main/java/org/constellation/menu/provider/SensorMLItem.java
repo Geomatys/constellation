@@ -25,13 +25,15 @@ import org.constellation.bean.AbstractMenuItem;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class ProviderItem extends AbstractMenuItem{
+public class SensorMLItem extends AbstractMenuItem{
 
-    public ProviderItem() {
+    public SensorMLItem() {
         super(
-            new String[]{"/org/constellation/menu/provider/overview.xhtml"},
-            "org.constellation.menu.provider.overview",
-            new Path(PROVIDERS_PATH,"provider_overview_title", "/org/constellation/menu/provider/overview.xhtml", null,5000)
+            new String[]{
+                "/org/constellation/menu/provider/sensorml.xhtml",
+                "/org/constellation/menu/provider/sensormlConfig.xhtml"},
+            "org.constellation.menu.provider.sensorml",
+            new Path(PROVIDERS_PATH,"SensorML DB", "/org/constellation/menu/provider/sensorml.xhtml", null,300)
             );
     }
 
