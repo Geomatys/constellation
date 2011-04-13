@@ -111,7 +111,7 @@ public class MockLayerProviderService extends AbstractProviderService
         public void dispose() {
             super.dispose();
 
-            if(Boolean.TRUE.equals(Parameters.value(CRASH_DISPOSE, source))){
+            if(Boolean.TRUE.equals(Parameters.value(CRASH_DISPOSE, getSource()))){
                 throw new RuntimeException("Some error while dispose.");
             }
         }

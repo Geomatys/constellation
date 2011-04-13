@@ -29,7 +29,7 @@
                             <h:outputText value="#{node.userObject.name}"/>
                         </mf:case>
                         <mf:case condition="#{mf:isInstance(node.userObject,'Provider')}" fallthrought="false">
-                            <h:outputText value="#{node.userObject.source.id}"/>
+                            <h:outputText value="#{node.userObject.id}"/>
                         </mf:case>
                         <mf:case condition="#{mf:isInstance(node.userObject,'LayerDetails')}" fallthrought="false">
                             <h:outputText value="#{node.userObject.name.localPart}"/>
@@ -91,7 +91,7 @@
                             <h:outputText value="#{node.userObject.name}"/>
                         </mf:case>
                         <mf:case condition="#{mf:isInstance(node.userObject,'Provider')}" fallthrought="false">
-                            <h:outputText value="#{node.userObject.source.id}"/>
+                            <h:outputText value="#{node.userObject.id}"/>
                         </mf:case>
                         <mf:default>
                             <h:outputText value="#{node.userObject}"/>

@@ -22,6 +22,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
+import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -36,13 +37,20 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
     private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
-    protected final ParameterValueGroup source;
+    private ParameterValueGroup source;
     protected final ProviderService<K, V, Provider<K, V>> service;
     private long lastUpdateTime = System.currentTimeMillis();
 
     public AbstractProvider(final ProviderService<K, V, Provider<K, V>> service, final ParameterValueGroup source){
         this.source = source;
         this.service = service;
+    }
+
+    public String getId(){
+        if(source == null){
+            return null;
+        }
+        return ProviderParameters.getSourceId(source);
     }
 
     @Override
@@ -57,8 +65,17 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
     }
 
     @Override
-    public ParameterValueGroup getSource() {
+    public synchronized ParameterValueGroup getSource() {
         return source;
+    }
+
+    public synchronized void updateSource(ParameterValueGroup config){
+        if(!source.getDescriptor().equals(config.getDescriptor())){
+            throw new IllegalArgumentException("New parameters or not of the same type");
+        }
+        this.source = config;
+        reload();
+        fireUpdateEvent();
     }
 
     @Override

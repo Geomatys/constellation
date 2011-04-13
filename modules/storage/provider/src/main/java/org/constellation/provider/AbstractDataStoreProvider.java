@@ -27,6 +27,7 @@ import org.geotoolkit.data.AbstractDataStoreFactory;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.memory.ExtendedDataStore;
+import org.geotoolkit.data.memory.MemoryDataStore;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.DefaultName;
@@ -49,52 +50,13 @@ import static org.geotoolkit.parameter.Parameters.*;
 public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
 
 
-    private final ParameterValueGroup storeConfig;
     private final Set<Name> index = new LinkedHashSet<Name>();
-    private final ExtendedDataStore store;
+    private ExtendedDataStore store;
+    private ParameterValueGroup storeConfig;
 
     public AbstractDataStoreProvider(final ProviderService service,
             final ParameterValueGroup config) throws DataStoreException {
         super(service,config);
-
-        storeConfig = getSourceConfiguration(source, getDatastoreDescriptor());
-
-        final String namespace = value(AbstractDataStoreFactory.NAMESPACE, storeConfig);
-        final DataStore candidate = DataStoreFinder.getDataStore(storeConfig);
-
-        if (candidate == null) {
-            final StringBuilder sb = new StringBuilder("Could not create datastore for parameters : \n");
-
-            for(final GeneralParameterValue val : storeConfig.values()){
-                final String key = val.getDescriptor().getName().getCode();
-                final Object value;
-                if(val instanceof ParameterValue){
-                    value = ((ParameterValue)val).getValue();
-                }else{
-                    value = "~complex value~";
-                }
-
-                if (key.equals("passwd")){
-                    sb.append(key).append(" : *******").append('\n');
-                } else {
-                    sb.append(key).append(" : ").append(value).append('\n');
-                }
-            }
-            throw new DataStoreException(sb.toString());
-        }
-
-
-        store = new ExtendedDataStore(candidate);
-
-        for(final ParameterValueGroup queryLayer : getQueryLayers(source)){
-            final String layerName = value(LAYER_NAME_DESCRIPTOR, queryLayer);
-            final String language = value(LAYER_QUERY_LANGUAGE, queryLayer);
-            final String statement = value(LAYER_QUERY_STATEMENT, queryLayer);
-            final Query query = QueryBuilder.language(language, statement);
-            final Name name = new DefaultName(namespace, layerName);
-            store.addQuery(query, name);
-        }
-
         visit();
     }
 
@@ -129,7 +91,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
                 return null;
             }
         }
-        final ParameterValueGroup layer = getLayer(source, key.getLocalPart());
+        final ParameterValueGroup layer = getLayer(getSource(), key.getLocalPart());
         if (layer == null) {
             return new DefaultDataStoreLayerDetails(key, store, null, null, null, null, null);
 
@@ -167,9 +129,54 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
 
     @Override
     protected void visit() {
+        final ParameterValueGroup source = getSource();
+        storeConfig = getSourceConfiguration(source, getDatastoreDescriptor());
+
+        final String namespace = value(AbstractDataStoreFactory.NAMESPACE, storeConfig);
+        DataStore candidate = null;
+        try {
+            candidate = DataStoreFinder.getDataStore(storeConfig);
+        } catch (DataStoreException ex) {
+            getLogger().log(Level.WARNING, ex.getLocalizedMessage(),ex);
+        }
+
+        if (candidate == null) {
+            final StringBuilder sb = new StringBuilder("Could not create datastore for parameters : \n");
+
+            for(final GeneralParameterValue val : storeConfig.values()){
+                final String key = val.getDescriptor().getName().getCode();
+                final Object value;
+                if(val instanceof ParameterValue){
+                    value = ((ParameterValue)val).getValue();
+                }else{
+                    value = "~complex value~";
+                }
+
+                if (key.equals("passwd")){
+                    sb.append(key).append(" : *******").append('\n');
+                } else {
+                    sb.append(key).append(" : ").append(value).append('\n');
+                }
+            }
+
+            //use an empty datastore
+            candidate = new MemoryDataStore();
+        }
+        store = new ExtendedDataStore(candidate);
+
+        for(final ParameterValueGroup queryLayer : getQueryLayers(source)){
+            final String layerName = value(LAYER_NAME_DESCRIPTOR, queryLayer);
+            final String language = value(LAYER_QUERY_LANGUAGE, queryLayer);
+            final String statement = value(LAYER_QUERY_STATEMENT, queryLayer);
+            final Query query = QueryBuilder.language(language, statement);
+            final Name name = new DefaultName(namespace, layerName);
+            store.addQuery(query, name);
+        }
+
+
         try {
             for (final Name name : store.getNames()) {
-                if (isLoadAll(source) || containLayer(source, name.getLocalPart())) {
+                if (isLoadAll(getSource()) || containLayer(getSource(), name.getLocalPart())) {
                     index.add(name);
                 }
             }

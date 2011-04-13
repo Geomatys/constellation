@@ -61,7 +61,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         @Override
         public Entry<TileManager,CoordinateReferenceSystem> get(Object key) {
             if(key instanceof Name && ((Name)key).isGlobal()){
-                String nmsp = value(NAMESPACE_DESCRIPTOR, source);
+                String nmsp = value(NAMESPACE_DESCRIPTOR, getSource());
                 if (nmsp == null) {
                     nmsp = DEFAULT_NAMESPACE;
                 } else if ("no namespace".equals(nmsp)) {
@@ -98,7 +98,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
     private static ParameterValueGroup getSourceConfiguration(final ParameterValueGroup params){
 
         final List<ParameterValueGroup> groups = params.groups(
-                CoverageMosaicProviderService.SOURCE_DESCRIPTOR.getName().getCode());
+                CoverageMosaicProviderService.SOURCE_CONFIG_DESCRIPTOR.getName().getCode());
         if(!groups.isEmpty()){
             return groups.get(0);
         }
@@ -122,7 +122,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
 
         if (entry != null) {
             final String name = key.getLocalPart();
-            final ParameterValueGroup layer = getLayer(source, name);
+            final ParameterValueGroup layer = getLayer(getSource(), name);
             final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
             final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
             final GridCoverageReader reader;
@@ -153,7 +153,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             index.clear();
 
             //find the namespace
-            String nmsp = value(NAMESPACE_DESCRIPTOR, getSourceConfiguration(source));
+            String nmsp = value(NAMESPACE_DESCRIPTOR, getSourceConfiguration(getSource()));
             if (nmsp == null) {
                 nmsp = DEFAULT_NAMESPACE;
             } else if ("no namespace".equals(nmsp)) {
@@ -162,7 +162,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
 
             //find the layer name
             final Name name;
-            final List<ParameterValueGroup> layers = getLayers(source);
+            final List<ParameterValueGroup> layers = getLayers(getSource());
             if(!layers.isEmpty()){
                 //we use the first layer name
                 name = new DefaultName(nmsp, value(LAYER_NAME_DESCRIPTOR, layers.get(0)));
@@ -200,7 +200,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
     @Override
     public ElevationModel getElevationModel(final Name name) {
 
-        final ParameterValueGroup layer = getLayer(source, name.getLocalPart());
+        final ParameterValueGroup layer = getLayer(getSource(), name.getLocalPart());
         if(layer != null){
             Boolean isEleModel = value(LAYER_IS_ELEVATION_MODEL_DESCRIPTOR, layer);
             if(!Boolean.TRUE.equals(isEleModel)){

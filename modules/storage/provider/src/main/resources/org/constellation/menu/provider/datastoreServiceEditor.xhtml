@@ -7,12 +7,20 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
+    <h:outputText value="#{bean.i18n['newsource']}" />
+    <span/>
+    <h:inputText value="#{bean.newSourceName}" />
+    <span/>
+    <h:commandButton action="#{bean.createSource}" value="#{bean.i18n['add']}" />
+    <br/>
+    <br/>
+
     <mf:Outline id="storePreview" rootVisible="false" value="#{bean.layerModel}" var="node" width="100%">
 
         <mf:DataTableColumn>
             <mf:switch>
                 <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
-                    <h:outputText value="#{node.userObject.source.id}"/>
+                    <h:outputText value="#{node.userObject.id}"/>
                 </mf:case>
                 <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode')}" fallthrought="false">
                     <h:outputText value="#{node.userObject.localPart}"/>
@@ -20,29 +28,18 @@
             </mf:switch>
         </mf:DataTableColumn>
 
-        <mf:DataTableColumn width="50">
-            <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value="Load all"/></mf:CustomHtml></f:facet>
-
-            <mf:switch>
-                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
-                    <h:selectBooleanCheckbox value="#{node.loadAll}"/>
-                </mf:case>
-            </mf:switch>
-        </mf:DataTableColumn>
-
-        <mf:DataTableColumn >
-            <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value=""/></mf:CustomHtml></f:facet>
-
+        <mf:DataTableColumn width="48px">
             <mf:switch>
                 <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
 
-                    <h:outputLink>
-                        <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
-                    </h:outputLink>
-                    <h:outputLink>
+                    <a4j:commandLink action="#{node.config}">
                         <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
-                    </h:outputLink>
+                    </a4j:commandLink>
+                    <a4j:commandLink action="#{node.reload}" reRender="storePreview">
+                        <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
+                    </a4j:commandLink>
                 </mf:case>
+
                 <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode')}" fallthrought="false">
 
                     <mf:switch>
@@ -50,16 +47,10 @@
                             <h:outputLink>
                                 <h:graphicImage value="org.constellation.menu.provider.smallred.png.mfRes" style="border:none;"/>
                             </h:outputLink>
-                            <h:outputLink>
-                                <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
-                            </h:outputLink>
                         </mf:case>
                         <mf:case condition="#{!node.visible}" fallthrought="false">
                             <h:outputLink>
                                 <h:graphicImage value="org.constellation.menu.provider.smallgray.png.mfRes" style="border:none;"/>
-                            </h:outputLink>
-                            <h:outputLink>
-                                <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
                             </h:outputLink>
                             <h:outputLink>
                                 <h:graphicImage value="org.constellation.menu.provider.view.png.mfRes" style="border:none;"/>
@@ -70,9 +61,6 @@
                                 <h:graphicImage value="org.constellation.menu.provider.smallgreen.png.mfRes" style="border:none;"/>
                             </h:outputLink>
                             <h:outputLink>
-                                <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
-                            </h:outputLink>
-                            <h:outputLink>
                                 <h:graphicImage value="org.constellation.menu.provider.view.png.mfRes" style="border:none;"/>
                             </h:outputLink>
                         </mf:case>
@@ -82,26 +70,14 @@
             </mf:switch>
         </mf:DataTableColumn>
 
-        <mf:DataTableColumn width="16px">
-            <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value=""/></mf:CustomHtml></f:facet>
+        <mf:DataTableColumn width="24px">
 
             <mf:switch>
                 <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
-                    <h:outputLink>
+                    <a4j:commandLink action="#{node.delete}" reRender="storePreview">
                         <h:graphicImage value="org.constellation.menu.provider.remove.png.mfRes" style="border:none;"/>
-                    </h:outputLink>
-                </mf:case>
-                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode')}" fallthrought="false">
-
-                    <mf:switch>
-                        <mf:case condition="#{!node.exist}" fallthrought="false">
-                            <h:outputLink>
-                                <h:graphicImage value="org.constellation.menu.provider.remove.png.mfRes" style="border:none;"/>
-                            </h:outputLink>
-                        </mf:case>
-                    </mf:switch>
-
-                </mf:case>
+                    </a4j:commandLink>
+                </mf:case>                
             </mf:switch>
         </mf:DataTableColumn>
 

@@ -11,4 +11,9 @@
           <source>/org/constellation/menu/provider/datastoreServiceEditor.xhtml</source>
         </tag>
 
+        <tag>
+            <tag-name>compSourceConfig</tag-name>
+            <source>/org/constellation/menu/provider/compSourceConfig.xhtml</source>
+        </tag>
+
 </facelet-taglib>

@@ -175,21 +175,29 @@ public final class ConfigDirectory {
     }
 
     /**
+     * Return a folder named 'provider' at the root in the configuration directory.
+     */
+    public static File getProviderConfigDirectory() {
+        final File constellationDirectory = getConfigDirectory();
+
+        if(!constellationDirectory.exists()){
+            constellationDirectory.mkdirs();
+        }
+
+        final File providerDirectory = new File(constellationDirectory, "provider");
+        if (!providerDirectory.exists()) {
+            providerDirectory.mkdirs();
+        }
+
+        return providerDirectory;
+    }
+
+    /**
      * Return a file at the root in the configuration directory.
      */
     public static File getProviderConfigFile(final String fileName) {
-        final File constellationDirectory = getConfigDirectory();
-        if (constellationDirectory != null && constellationDirectory.exists()) {
-            final File providerDirectory = new File(constellationDirectory, "provider");
-            if (providerDirectory.exists() && providerDirectory.isDirectory()) {
-                return new File(providerDirectory, fileName);
-            } else {
-                LOGGER.warning("Unable to find a provider directory");
-            }
-        } else {
-            LOGGER.warning("Unable to find a configuration directory");
-        }
-        return null;
+        final File providerDirectory = getProviderConfigDirectory();
+        return new File(providerDirectory, fileName);
     }
 
     public static void setConfigDirectory(final File directory) {

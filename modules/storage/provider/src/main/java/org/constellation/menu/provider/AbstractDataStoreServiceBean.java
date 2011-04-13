@@ -17,6 +17,11 @@
 
 package org.constellation.menu.provider;
 
+import org.constellation.bean.MenuBean;
+import org.constellation.provider.LayerProviderService;
+import java.io.IOException;
+import javax.faces.context.FacesContext;
+import javax.faces.context.ExternalContext;
 import org.constellation.provider.configuration.ProviderParameters;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -41,6 +46,7 @@ import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
 import org.mapfaces.i18n.I18NBean;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
@@ -54,11 +60,20 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
 
     private static final Logger LOGGER = Logging.getLogger(AbstractDataStoreServiceBean.class);
 
+    private final LayerProviderService service;
+    private final String configPage;
+    private final String mainPage;
     private TreeModel layersModel = null;
+    private DataStoreSourceNode configuredInstance = null;
+    private ParameterValueGroup configuredParams = null;
+    private String newSourceName = "default";
 
-    public AbstractDataStoreServiceBean(){
+    public AbstractDataStoreServiceBean(final LayerProviderService service, final String mainPage, final String configPage){
         addBundle("org.constellation.menu.provider.overview");
         new WeakPropertyChangeListener(LayerProviderProxy.getInstance(), this);
+        this.service = service;
+        this.mainPage = MenuBean.toApplicationPath(mainPage);
+        this.configPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
     }
 
     protected abstract Class getProviderClass();
@@ -125,9 +140,70 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
         return node;
     }
 
-    private void saveSettings(){
-        //TODO, rely on parameters
+    ////////////////////////////////////////////////////////////////////////////
+    // CREATING NEW INSTANCE ///////////////////////////////////////////////////
+
+    /**
+     * @return String : name of the new service name to create.
+     */
+    public String getNewSourceName() {
+        return newSourceName;
     }
+
+    /**
+     * Set the name of the new service to create.
+     */
+    public void setNewSourceName(final String newSourceName) {
+        this.newSourceName = newSourceName;
+    }
+
+    /**
+     * Create a new instance of this service.
+     */
+    public void createSource(){
+        if(newSourceName == null || newSourceName.isEmpty()){
+            //unvalid name
+            return;
+        }
+
+        final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) service
+                .getDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
+        final ParameterValueGroup params = desc.createValue();
+        params.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(newSourceName);
+
+        LayerProviderProxy.getInstance().createProvider(service, params);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // CONFIGURE CURRENT INSTANCE //////////////////////////////////////////////
+
+    /**
+     * @return the main service page.
+     * this is used to return from the configuration page.
+     */
+    public String getMainPage(){
+        return mainPage;
+    }
+
+    /**
+     * @return the currently configured instance.
+     */
+    public DataStoreSourceNode getConfiguredInstance(){
+        return configuredInstance;
+    }
+
+    public ParameterValueGroup getConfiguredParameters(){
+        return configuredParams;
+    }
+
+    public void saveConfiguration(){
+        configuredInstance.provider.updateSource(configuredParams);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // EVENTS AND SUBCLASSES ///////////////////////////////////////////////////
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -137,31 +213,37 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
     public final class DataStoreSourceNode extends DefaultMutableTreeNode{
 
         private final AbstractDataStoreProvider provider;
-        private final ParameterValueGroup config;
 
         public DataStoreSourceNode(final AbstractDataStoreProvider provider) {
             super(provider);
             this.provider = provider;
-            this.config = provider.getSource();
-        }
-
-        public boolean isLoadAll(){
-            return ProviderParameters.isLoadAll(config);
-        }
-
-        public void setLoadAll(final boolean loadAll){
-            if(loadAll != isLoadAll()){
-                config.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(loadAll);
-                saveSettings();
-            }
         }
 
         public void delete(){
-            //TODO
+            LayerProviderProxy.getInstance().removeProvider(provider);
         }
 
         public void reload(){
             provider.reload();
+            layersModel = null;
+        }
+
+        /**
+         * Set this instance as the currently configured one in for the property dialog.
+         */
+        public void config(){
+            configuredInstance = this;
+            configuredParams = provider.getSource().clone();
+
+            if(configPage != null){
+                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+                try {
+                    //the session is not logged, redirect him to the authentication page
+                    context.redirect(configPage);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                }
+            }
         }
 
     }

@@ -17,11 +17,22 @@
 
 package org.constellation.provider.configuration;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.File;
+import java.io.Writer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.transform.Result;
+import java.io.OutputStream;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 import java.util.Collections;
 import java.util.StringTokenizer;
 import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
+import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.xml.stream.XMLStreamException;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -122,9 +133,9 @@ public final class ProviderParameters {
 
     public static void write(final Object output,
             final ParameterValueGroup parameters) throws IOException, XMLStreamException{
-        final ParameterValueWriter reader = new ParameterValueWriter();
-        reader.setOutput(output);
-        reader.write(parameters);
+        final ParameterValueWriter writer = new ParameterValueWriter();
+        writer.setOutput(toWriter(output));
+        writer.write(parameters);
     }
 
     public static String getSourceId(final ParameterValueGroup source){
@@ -132,7 +143,8 @@ public final class ProviderParameters {
     }
 
     public static boolean isLoadAll(final ParameterValueGroup source){
-        return (Boolean)value(SOURCE_LOADALL_DESCRIPTOR,source);
+        final Boolean val = (Boolean)value(SOURCE_LOADALL_DESCRIPTOR,source);
+        return val == null || val;
     }
 
     public static List<ParameterValueGroup> getLayers(final ParameterValueGroup source){
@@ -221,6 +233,34 @@ public final class ProviderParameters {
             return candidates.get(0);
         }
 
+    }
+
+    /**
+     * Create writer with indentation.
+     */
+    private static XMLStreamWriter toWriter(final Object output)
+            throws XMLStreamException{
+        final XMLOutputFactory XMLfactory = XMLOutputFactory.newInstance();
+        XMLfactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+
+        XMLStreamWriter writer;
+        if(output instanceof File){
+            try {
+                writer = XMLfactory.createXMLStreamWriter(new FileOutputStream((File) output));
+            } catch (FileNotFoundException ex) {
+                throw new XMLStreamException(ex.getLocalizedMessage(), ex);
+            }
+        }else if(output instanceof OutputStream){
+            writer = XMLfactory.createXMLStreamWriter((OutputStream)output);
+        }else if(output instanceof Result){
+            writer = XMLfactory.createXMLStreamWriter((Result)output);
+        }else if(output instanceof Writer){
+            writer = XMLfactory.createXMLStreamWriter((Writer)output);
+        }else{
+            throw new XMLStreamException("Output type is not supported : "+ output);
+        }
+
+        return new IndentingXMLStreamWriter(writer);
     }
 
 }

@@ -176,7 +176,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
         if (reader != null) {
             final String name = key.getLocalPart();
-            final ParameterValueGroup layer = getLayer(source, name);
+            final ParameterValueGroup layer = getLayer(getSource(), name);
             final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
             final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
             if (layer == null) {
@@ -244,7 +244,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     private void test(final String candidate){
         final String name = candidate;
-        if (isLoadAll(source) || containLayer(source, name)){
+        if (isLoadAll(getSource()) || containLayer(getSource(), name)){
             String nmsp = value(NAMESPACE_DESCRIPTOR, getSourceConfiguration());
             if (nmsp == null) {
                 nmsp = DEFAULT_NAMESPACE;
@@ -258,7 +258,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     @Override
     public ElevationModel getElevationModel(Name name) {
 
-        final ParameterValueGroup layer = getLayer(source, name.getLocalPart());
+        final ParameterValueGroup layer = getLayer(getSource(), name.getLocalPart());
         if(layer != null){
             Boolean isEleModel = value(LAYER_IS_ELEVATION_MODEL_DESCRIPTOR, layer);
 

@@ -1,0 +1,30 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib">
+
+    <center><a href="#{bean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
+    <br/>
+    <br/>
+    <b>#{bean.i18n['instance']}</b><br/>
+    <div class="rounded">
+        #{bean.configuredInstance.userObject.id}
+
+        &#160;
+        <h:commandLink action="#{bean.configuredInstance.reload}">
+            <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
+        </h:commandLink>
+        <br/>
+    </div>
+    <br/>
+    <mf:parametereditor value="#{bean.configuredParameters}"/>
+    
+    <div style="text-align: right;">
+        <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
+    </div>
+
+</ui:composition>

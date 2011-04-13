@@ -38,6 +38,7 @@ public interface Configurator {
 
     ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc);
 
+    void saveConfiguration(String serviceName, ParameterValueGroup params);
 
     static class DefaultConfigurator implements Configurator{
 
@@ -67,6 +68,26 @@ public interface Configurator {
             }
 
             return config;
+        }
+
+        @Override
+        public void saveConfiguration(final String serviceName, final ParameterValueGroup params) {
+            final String fileName = serviceName + ".xml";
+            final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+
+            if(configFile.exists()){
+                //make a backup
+                configFile.delete();
+            }
+
+            //write the configuration
+            try {
+                ProviderParameters.write(configFile, params);
+            } catch (XMLStreamException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
         }
 
     }

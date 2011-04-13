@@ -60,7 +60,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         @Override
         public File get(Object key) {
             if(key instanceof Name && ((Name)key).isGlobal()){
-                String nmsp = value(NAMESPACE_DESCRIPTOR, source);
+                String nmsp = value(NAMESPACE_DESCRIPTOR, getSource());
                 if (nmsp == null) {
                     nmsp = DEFAULT_NAMESPACE;
                 } else if ("no namespace".equals(nmsp)) {
@@ -80,7 +80,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         @Override
         public GridCoverageReader get(Object key) {
             if(key instanceof Name && ((Name)key).isGlobal()){
-                String nmsp = value(NAMESPACE_DESCRIPTOR, source);
+                String nmsp = value(NAMESPACE_DESCRIPTOR, getSource());
                 if (nmsp == null) {
                     nmsp = DEFAULT_NAMESPACE;
                 } else if ("no namespace".equals(nmsp)) {
@@ -117,7 +117,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
 
     private static ParameterValueGroup getSourceConfiguration(final ParameterValueGroup params){
 
-        final List<ParameterValueGroup> groups = params.groups(CoverageFileProviderService.SOURCE_DESCRIPTOR.getName().getCode());
+        final List<ParameterValueGroup> groups = params.groups(CoverageFileProviderService.SOURCE_CONFIG_DESCRIPTOR.getName().getCode());
         if(!groups.isEmpty()){
             return groups.get(0);
         }
@@ -161,7 +161,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
 
         if (reader != null) {
             final String name = key.getLocalPart();
-            final ParameterValueGroup layer = getLayer(source, name);
+            final ParameterValueGroup layer = getLayer(getSource(), name);
             final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
             final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
             if (layer == null) {
@@ -242,8 +242,8 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                 final String fullName = candidate.getName();
                 final int idx = fullName.lastIndexOf('.');
                 final String name = fullName.substring(0, idx);
-                if (isLoadAll(source) || containLayer(source, name)){
-                    String nmsp = value(NAMESPACE_DESCRIPTOR, getSourceConfiguration(source));
+                if (isLoadAll(getSource()) || containLayer(getSource(), name)){
+                    String nmsp = value(NAMESPACE_DESCRIPTOR, getSourceConfiguration(getSource()));
                     if (nmsp == null) {
                         nmsp = DEFAULT_NAMESPACE;
                     } else if ("no namespace".equals(nmsp)) {
@@ -260,7 +260,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
     @Override
     public ElevationModel getElevationModel(Name name) {
 
-        final ParameterValueGroup layer = getLayer(source, name.getLocalPart());
+        final ParameterValueGroup layer = getLayer(getSource(), name.getLocalPart());
         if(layer != null){
             Boolean isEleModel = value(LAYER_IS_ELEVATION_MODEL_DESCRIPTOR, layer);
             if(!Boolean.TRUE.equals(isEleModel)){

@@ -98,6 +98,11 @@
             <artifactId>mapfaces-map</artifactId>
             <version>${mapfaces.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mapfaces</groupId>
+            <artifactId>mapfaces-facelet-editor</artifactId>
+            <version>${mapfaces.version}</version>
+        </dependency>
 
 
         <dependency>

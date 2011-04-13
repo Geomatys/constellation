@@ -71,6 +71,11 @@ public class ConfiguratorTest {
                     final ParameterDescriptorGroup desc) {
                 return desc.createValue();
             }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
 
@@ -97,6 +102,11 @@ public class ConfiguratorTest {
                 }
 
                 return config;
+            }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
@@ -136,6 +146,11 @@ public class ConfiguratorTest {
                 }
 
                 return config;
+            }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
@@ -180,6 +195,11 @@ public class ConfiguratorTest {
 
                 return config;
             }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
 
@@ -223,6 +243,11 @@ public class ConfiguratorTest {
 
                 return config;
             }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
 
@@ -241,6 +266,11 @@ public class ConfiguratorTest {
             @Override
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
                 return null;
+            }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
         });
 

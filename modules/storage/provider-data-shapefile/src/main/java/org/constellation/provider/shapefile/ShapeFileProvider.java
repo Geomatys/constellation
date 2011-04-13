@@ -107,7 +107,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
      */
     @Override
     public Set<Name> getKeys(String sourceName) {
-        if (sourceName.equals(getSourceId(source))) {
+        if (sourceName.equals(getSourceId(getSource()))) {
             return index.keySet();
         }
         return new HashSet();
@@ -127,7 +127,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             final File f = index.get(key);
             if (f != null) {
                 //we have this data source in the folder
-                store = loadDataStore(f, value(NAMESPACE, getSourceConfiguration(source, SOURCE_CONFIG_DESCRIPTOR)));
+                store = loadDataStore(f, value(NAMESPACE, getSourceConfiguration(getSource(), SOURCE_CONFIG_DESCRIPTOR)));
                 if (store != null) {
                     //cache the datastore
                     cache.put(key, store);
@@ -141,7 +141,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         }
 
         if (store != null) {
-            final ParameterValueGroup layer = getLayer(source, key.getLocalPart());
+            final ParameterValueGroup layer = getLayer(getSource(), key.getLocalPart());
             if (layer == null) {
                 return new DefaultDataStoreLayerDetails(key, store, null, null, null, null, null);
                 
@@ -216,8 +216,8 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             final String fullName = candidate.getName();
             if (fullName.toLowerCase().endsWith(MASK)){
                 final String name = fullName.substring(0, fullName.length()-4);
-                if (isLoadAll(source) || containLayer(source, name)){
-                    String nmsp = value(NAMESPACE, getSourceConfiguration(source, SOURCE_CONFIG_DESCRIPTOR));
+                if (isLoadAll(getSource()) || containLayer(getSource(), name)){
+                    String nmsp = value(NAMESPACE, getSourceConfiguration(getSource(), SOURCE_CONFIG_DESCRIPTOR));
                     if (nmsp == null) {
                         nmsp = DEFAULT_NAMESPACE;
                     } else if (nmsp.equals(NO_NAMESPACE)) {

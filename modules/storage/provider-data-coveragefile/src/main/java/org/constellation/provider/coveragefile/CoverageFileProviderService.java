@@ -49,10 +49,10 @@ public class CoverageFileProviderService extends AbstractProviderService<Name,La
              new DefaultParameterDescriptor<String>("path","",String.class,null,true);
     public static final ParameterDescriptor<String> NAMESPACE_DESCRIPTOR =
              new DefaultParameterDescriptor<String>("namespace","",String.class,null,false);
-    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup(SOURCE_DESCRIPTOR_NAME,FOLDER_DESCRIPTOR,NAMESPACE_DESCRIPTOR);
+    public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR =
+            new DefaultParameterDescriptorGroup("coveragefile",FOLDER_DESCRIPTOR,NAMESPACE_DESCRIPTOR);
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup(CONFIG_DESCRIPTOR_NAME,SOURCE_DESCRIPTOR);
+            createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
 
     public CoverageFileProviderService(){
         super("coverage-file");
@@ -67,7 +67,7 @@ public class CoverageFileProviderService extends AbstractProviderService<Name,La
     public LayerProvider createProvider(ParameterValueGroup ps) {
         try {
             final CoverageFileProvider provider = new CoverageFileProvider(this,ps);
-            ps = ProviderParameters.getOrCreate(SOURCE_DESCRIPTOR, ps);
+            ps = ProviderParameters.getOrCreate(SOURCE_CONFIG_DESCRIPTOR, ps);
             getLogger().log(Level.INFO, "[PROVIDER]> File coverage provider created : {0}",
                     value(FOLDER_DESCRIPTOR, ps));
             return provider;

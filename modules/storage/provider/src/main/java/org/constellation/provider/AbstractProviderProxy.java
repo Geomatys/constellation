@@ -17,6 +17,8 @@
 
 package org.constellation.provider;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,7 +40,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Johann Sorel (Geomatys)
  */
 public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
-        extends ProviderService<K,V,P>> extends AbstractProvider<K, V>{
+        extends ProviderService<K,V,P>> extends AbstractProvider<K, V> implements PropertyChangeListener{
 
     //all loaded providers
     private Collection<P> PROVIDERS = null;
@@ -46,6 +48,19 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
 
     protected AbstractProviderProxy(){
         super(null,null);
+    }
+
+    @Override
+    public void propertyChange(final PropertyChangeEvent evt) {
+        //a provider has been updated
+        final Object source = evt.getSource();
+        if(source instanceof Provider){
+            //save changed configuration
+            final Provider provider = (Provider) source;
+            saveConfiguration((S) provider.getService());
+        }
+        //forward events
+        fireUpdateEvent();
     }
 
     /**
@@ -69,6 +84,44 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
 
     public synchronized Configurator getConfigurator() {
         return configurator;
+    }
+
+    public P createProvider(final S service, final ParameterValueGroup params){
+        final P provider = service.createProvider(params);
+
+        //add in the list our provider
+        provider.addPropertyListener(this);
+        PROVIDERS.add(provider);
+        saveConfiguration(service);
+        fireUpdateEvent();
+        return provider;
+    }
+
+    public P removeProvider(final P provider){
+        final boolean b = PROVIDERS.remove(provider);
+
+        if(b){
+            provider.removePropertyListener(this);
+            saveConfiguration((S) provider.getService());
+            fireUpdateEvent();
+        }
+
+        return provider;
+    }
+
+    /**
+     * Save configuration for the given provider service
+     */
+    private void saveConfiguration(final S service){
+        getLogger().log(Level.INFO, "Saving configuration for service : " + service.getName());
+        //save configuration
+        final ParameterValueGroup config = service.getDescriptor().createValue();
+        for(P candidate : PROVIDERS){
+            if(candidate.getService().equals(service)){
+                config.values().add(candidate.getSource());
+            }
+        }
+        getConfigurator().saveConfiguration(service.getName(), config);
     }
 
     /**
@@ -107,7 +160,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
 
     public synchronized Collection<P> getProviders(){
         if(PROVIDERS != null){
-            return PROVIDERS;
+            return Collections.unmodifiableCollection(PROVIDERS);
         }
 
         final Configurator configs = getConfigurator();
@@ -124,6 +177,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
                         try{
                             final P prov = (P) factory.createProvider(src);
                             if(prov != null){
+                                prov.addPropertyListener(this);
                                 cache.add(prov);
                             }
                         }catch(Exception ex){
@@ -146,9 +200,9 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
             }
         }
 
-        PROVIDERS = Collections.unmodifiableCollection(cache);
+        PROVIDERS = cache;
         fireUpdateEvent();
-        return PROVIDERS;
+        return Collections.unmodifiableCollection(PROVIDERS);
     }
 
     /**
@@ -174,6 +228,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
             //services were loaded, dispose each of them
             for(final Provider<K,V> provider : getProviders()){
                 try{
+                    provider.removePropertyListener(this);
                     provider.dispose();
                 }catch(Exception ex){
                     //we must not fail here in any case

@@ -111,7 +111,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
         if(!missingLayers.isEmpty()){
             //log list of missing layers
             final StringBuilder sb = new StringBuilder("Provider ");
-            sb.append(getSourceId(source)).append(" declares layers missing in the source\n");
+            sb.append(getSourceId(getSource())).append(" declares layers missing in the source\n");
             sb.append(StringUtilities.toStringTree(missingLayers));
             getLogger().log(Level.WARNING, sb.toString());
         }

@@ -17,6 +17,8 @@
 
 package org.constellation.menu.provider;
 
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.postgis.PostGisProvider;
 
 /**
@@ -26,7 +28,18 @@ import org.constellation.provider.postgis.PostGisProvider;
  */
 public class PostGISBean extends AbstractDataStoreServiceBean{
 
+    private static LayerProviderService getService(){
+        for(LayerProviderService service : LayerProviderProxy.getInstance().getServices()){
+            if(service.getName().equals("postgis")){
+                return service;
+            }
+        }
+        return null;
+    }
+
     public PostGISBean(){
+        super(getService(),"/org/constellation/menu/provider/postgis.xhtml",
+              "/org/constellation/menu/provider/postgisConfig.xhtml");
         addBundle("org.constellation.menu.provider.postgis");
     }
 
