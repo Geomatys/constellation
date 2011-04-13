@@ -197,6 +197,11 @@ public final class GrizzlyServer {
 
                 return config;
             }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
         };
         LayerProviderProxy.getInstance().setConfigurator(layerConfig);
 
@@ -214,6 +219,11 @@ public final class GrizzlyServer {
                 }
 
                 return config;
+            }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
         };
         StyleProviderProxy.getInstance().setConfigurator(styleconfig);
