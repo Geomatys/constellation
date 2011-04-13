@@ -175,6 +175,11 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
                 //empty configuration for others
                 return config;
             }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
         };
 
         LayerProviderProxy.getInstance().setConfigurator(config);

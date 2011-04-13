@@ -69,6 +69,7 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
         return source;
     }
 
+    @Override
     public synchronized void updateSource(ParameterValueGroup config){
         if(!source.getDescriptor().equals(config.getDescriptor())){
             throw new IllegalArgumentException("New parameters or not of the same type");

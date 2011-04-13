@@ -25,6 +25,9 @@
                 <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode')}" fallthrought="false">
                     <h:outputText value="#{node.userObject.localPart}"/>
                 </mf:case>
+                <mf:default>
+                    <h:outputText value="#{node.userObject}"/>
+                </mf:default>
             </mf:switch>
         </mf:DataTableColumn>
 

@@ -16,6 +16,7 @@
  */
 package org.constellation.provider.sld;
 
+import org.opengis.parameter.ParameterValue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.File;
@@ -27,7 +28,6 @@ import java.util.Set;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.provider.AbstractStyleProvider;
-import org.constellation.provider.configuration.ProviderParameters;
 
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
@@ -71,21 +71,13 @@ public class SLDProvider extends AbstractStyleProvider{
     }
     
     private final XMLUtilities sldParser = new XMLUtilities();
-    private final File folder;
+    private File folder;
     private final Map<String,File> index = new HashMap<String,File>();
     private final Cache<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
     
     
     protected SLDProvider(final SLDProviderService service, final ParameterValueGroup source){
         super(service,source);
-        
-        folder = new File(Parameters.stringValue(FOLDER_DESCRIPTOR, source));
-
-        if(folder == null || !folder.exists() || !folder.isDirectory()){
-            throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
-        }
-        
-        visit(folder);
     }
 
     /**
@@ -196,6 +188,21 @@ public class SLDProvider extends AbstractStyleProvider{
         synchronized(this){
             index.clear();
             cache.clear();
+
+            final ParameterValue param = getSource().parameter(FOLDER_DESCRIPTOR.getName().getCode());
+
+            if(param == null){
+                getLogger().log(Level.WARNING,"Provided File path is not defined.");
+                return;
+            }
+
+            folder = new File(Parameters.stringValue(FOLDER_DESCRIPTOR, getSource()));
+
+            if(folder == null || !folder.exists() || !folder.isDirectory()){
+                getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
+                return;
+            }
+
             visit(folder);
         }
     }

@@ -17,6 +17,8 @@
 
 package org.constellation.menu.provider;
 
+import java.util.Set;
+import org.constellation.provider.StyleProviderProxy;
 import org.constellation.bean.MenuBean;
 import org.constellation.provider.LayerProviderService;
 import java.io.IOException;
@@ -25,10 +27,7 @@ import javax.faces.context.ExternalContext;
 import org.constellation.provider.configuration.ProviderParameters;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -36,11 +35,13 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import org.constellation.provider.AbstractDataStoreProvider;
 import org.constellation.provider.AbstractProviderProxy;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;
-import org.geotoolkit.data.memory.ExtendedDataStore;
+import org.constellation.provider.ProviderService;
+import org.constellation.provider.StyleProvider;
+import org.constellation.provider.StyleProviderService;
 import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.geotoolkit.util.logging.Logging;
@@ -49,7 +50,6 @@ import org.mapfaces.i18n.I18NBean;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.provider.configuration.ProviderParameters.*;
 
 /**
  * Abstract Datastore service configuration bean.
@@ -60,7 +60,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
 
     private static final Logger LOGGER = Logging.getLogger(AbstractDataStoreServiceBean.class);
 
-    private final LayerProviderService service;
+    private final ProviderService service;
     private final String configPage;
     private final String mainPage;
     private TreeModel layersModel = null;
@@ -68,12 +68,18 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
     private ParameterValueGroup configuredParams = null;
     private String newSourceName = "default";
 
-    public AbstractDataStoreServiceBean(final LayerProviderService service, final String mainPage, final String configPage){
+    public AbstractDataStoreServiceBean(final ProviderService service, final String mainPage, final String configPage){
         addBundle("org.constellation.menu.provider.overview");
-        new WeakPropertyChangeListener(LayerProviderProxy.getInstance(), this);
+
         this.service = service;
         this.mainPage = MenuBean.toApplicationPath(mainPage);
         this.configPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
+
+        if(service instanceof LayerProviderService){
+            new WeakPropertyChangeListener(LayerProviderProxy.getInstance(), this);
+        }else if(service instanceof StyleProviderService){
+            new WeakPropertyChangeListener(StyleProviderProxy.getInstance(), this);
+        }
     }
 
     protected abstract Class getProviderClass();
@@ -83,7 +89,13 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
      */
     public synchronized TreeModel getLayerModel(){
         if(layersModel == null){
-            layersModel = buildModel(LayerProviderProxy.getInstance(),false);
+
+            if(service instanceof LayerProviderService){
+                layersModel = buildModel(LayerProviderProxy.getInstance(),false);
+            }else if(service instanceof StyleProviderService){
+                layersModel = buildModel(StyleProviderProxy.getInstance(),false);
+            }
+
         }
         return layersModel;
     }
@@ -95,49 +107,58 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
         final Collection<Provider> providers = proxy.getProviders();
         for(final Provider provider : providers){
             if(providerClazz.isInstance(provider)){
-                root.add(buildNode((AbstractDataStoreProvider) provider));
+                root.add(buildNode(provider));
             }
         }
 
         return new DefaultTreeModel(root);
     }
 
-    private DefaultMutableTreeNode buildNode(final AbstractDataStoreProvider provider){
+    private DefaultMutableTreeNode buildNode(final Provider provider){
         final DataStoreSourceNode node = new DataStoreSourceNode(provider);
 
+        final Set keys = provider.getKeys();
 
-        final List<String> names = new ArrayList<String>();
-
-        //add all names from the datastore
-        try {
-            final ExtendedDataStore store = provider.getDataStore();
-            for (String n : store.getTypeNames()) {
-                if(!names.contains(n)){
-                    names.add(n);
-                }
-            }
-        } catch (DataStoreException ex) {
-            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-        }
-
-        //add all names from the configuration files
-        final ParameterValueGroup config = provider.getSource();
-        for(ParameterValueGroup layer : getLayers(config)){
-            final String layerName = Parameters.stringValue(LAYER_NAME_DESCRIPTOR, layer);
-            if(!names.contains(layerName)){
-                names.add(layerName);
-            }
-        }
-
-        //sort them
-        Collections.sort(names);
-
-        for(String name : names){
-            final  TypeNode n = new TypeNode(provider,DefaultName.valueOf(name));
+        for(Object key : keys){
+            final  DefaultMutableTreeNode n = new DefaultMutableTreeNode(key);
             node.add(n);
         }
 
         return node;
+
+
+//        final List<String> names = new ArrayList<String>();
+//
+//        //add all names from the datastore
+//        try {
+//            final ExtendedDataStore store = provider.getDataStore();
+//            for (String n : store.getTypeNames()) {
+//                if(!names.contains(n)){
+//                    names.add(n);
+//                }
+//            }
+//        } catch (DataStoreException ex) {
+//            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+//        }
+//
+//        //add all names from the configuration files
+//        final ParameterValueGroup config = provider.getSource();
+//        for(ParameterValueGroup layer : getLayers(config)){
+//            final String layerName = Parameters.stringValue(LAYER_NAME_DESCRIPTOR, layer);
+//            if(!names.contains(layerName)){
+//                names.add(layerName);
+//            }
+//        }
+//
+//        //sort them
+//        Collections.sort(names);
+//
+//        for(String name : names){
+//            final  TypeNode n = new TypeNode(provider,DefaultName.valueOf(name));
+//            node.add(n);
+//        }
+//
+//        return node;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -171,7 +192,12 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
         final ParameterValueGroup params = desc.createValue();
         params.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(newSourceName);
 
-        LayerProviderProxy.getInstance().createProvider(service, params);
+        if(service instanceof LayerProviderService){
+            LayerProviderProxy.getInstance().createProvider((LayerProviderService)service, params);
+        }else if(service instanceof StyleProviderService){
+            StyleProviderProxy.getInstance().createProvider((StyleProviderService)service, params);
+        }
+        
     }
 
 
@@ -212,15 +238,22 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
 
     public final class DataStoreSourceNode extends DefaultMutableTreeNode{
 
-        private final AbstractDataStoreProvider provider;
+        private final Provider provider;
 
-        public DataStoreSourceNode(final AbstractDataStoreProvider provider) {
+        public DataStoreSourceNode(final Provider provider) {
             super(provider);
             this.provider = provider;
         }
 
         public void delete(){
-            LayerProviderProxy.getInstance().removeProvider(provider);
+            if(provider instanceof LayerProvider){
+                LayerProviderProxy.getInstance().removeProvider((LayerProvider)provider);
+            }else if(provider instanceof StyleProvider){
+                StyleProviderProxy.getInstance().removeProvider((StyleProvider)provider);
+            }else{
+                LOGGER.log(Level.WARNING, "Unexpected provider class : {0}", provider.getClass());
+            }
+            
         }
 
         public void reload(){

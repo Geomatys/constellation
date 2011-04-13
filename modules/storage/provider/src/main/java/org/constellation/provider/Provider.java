@@ -100,6 +100,13 @@ public interface Provider<K,V> {
     ParameterValueGroup getSource();
 
     /**
+     * Update the provider configuration.
+     * 
+     * @param config : new configuration
+     */
+    void updateSource(ParameterValueGroup config);
+
+    /**
      * Add a property listener.
      */
     void addPropertyListener(PropertyChangeListener listener);

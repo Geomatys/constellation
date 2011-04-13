@@ -87,6 +87,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     }
 
     public P createProvider(final S service, final ParameterValueGroup params){
+        getProviders();
         final P provider = service.createProvider(params);
 
         //add in the list our provider

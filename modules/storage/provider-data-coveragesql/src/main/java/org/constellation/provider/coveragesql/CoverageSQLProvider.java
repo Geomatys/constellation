@@ -62,7 +62,6 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     protected CoverageSQLProvider(final CoverageSQLProviderService service,
             final ParameterValueGroup source) throws IOException, SQLException {
         super(service,source);
-        loadDataBase();
         visit();
     }
 
@@ -101,7 +100,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
         //parse string if old format : exemple jdbc:postgresql://server/database
         String oldDataBase = properties.getProperty(DATABASE_DESCRIPTOR.getName().getCode());
-        if(oldDataBase.contains("/")){
+        if(oldDataBase != null && oldDataBase.contains("/")){
             int index = oldDataBase.lastIndexOf('/');
             dbName = oldDataBase.substring(index+1, oldDataBase.length());
             oldDataBase = oldDataBase.substring(0, index);
@@ -166,6 +165,11 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         if (!contains(key)) {
             return null;
         }
+
+        if(database == null){
+            return null;
+        }
+
         LayerCoverageReader reader = null;
         try {
             reader = database.createGridCoverageReader(key.getLocalPart());
@@ -214,14 +218,24 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     public void dispose() {
         synchronized(this){
             index.clear();
-            database.dispose();
+            if(database != null){
+                database.dispose();
+            }
         }
     }
 
     /**
      * Visit all layers detected from the database table {@code Layers}.
      */
+    @Override
     protected void visit() {
+        try {
+            loadDataBase();
+        } catch (SQLException ex) {
+            getLogger().log(Level.WARNING,ex.getLocalizedMessage(),ex);
+            return;
+        }
+
         try {
             final Set<String> layers = database.getLayers().result();
 

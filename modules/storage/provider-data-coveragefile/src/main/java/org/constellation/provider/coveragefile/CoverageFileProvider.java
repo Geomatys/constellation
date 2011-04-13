@@ -16,6 +16,7 @@
  */
 package org.constellation.provider.coveragefile;
 
+import org.opengis.parameter.ParameterValue;
 import java.util.List;
 import java.io.File;
 import java.io.IOException;
@@ -95,23 +96,11 @@ public class CoverageFileProvider extends AbstractLayerProvider{
 
     };
 
-    private final File folder;
+    private File folder;
 
     protected CoverageFileProvider(final CoverageFileProviderService service,
             final ParameterValueGroup source) throws IOException, SQLException {
         super(service,source);
-        final String path = value(FOLDER_DESCRIPTOR, getSourceConfiguration(source));
-
-        if (path == null) {
-            throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
-        }
-
-        folder = new File(path);
-
-        if (folder == null || !folder.exists() || !folder.isDirectory()) {
-            throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
-        }
-
         visit();
     }
 
@@ -205,6 +194,28 @@ public class CoverageFileProvider extends AbstractLayerProvider{
 
     @Override
     protected void visit() {
+
+        final ParameterValue<String> param = (ParameterValue<String>) getSourceConfiguration(getSource()).parameter(FOLDER_DESCRIPTOR.getName().getCode());
+
+        if(param == null){
+            getLogger().log(Level.WARNING,"Provided File path is not defined.");
+            return;
+        }
+
+        final String path = param.getValue();
+
+        if (path == null) {
+            getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
+            return;
+        }
+
+        folder = new File(path);
+
+        if (folder == null || !folder.exists() || !folder.isDirectory()) {
+            getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
+            return;
+        }
+
         visit(folder);
         super.visit();
     }
@@ -216,6 +227,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
      * @param file The starting file or folder.
      */
     private void visit(final File file) {
+
         if (file.isDirectory()) {
             final File[] list = file.listFiles();
             if (list != null) {

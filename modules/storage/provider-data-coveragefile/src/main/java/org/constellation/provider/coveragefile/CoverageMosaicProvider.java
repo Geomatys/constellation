@@ -16,6 +16,7 @@
  */
 package org.constellation.provider.coveragefile;
 
+import org.opengis.parameter.ParameterValue;
 import java.util.List;
 import org.opengis.parameter.ParameterValueGroup;
 import java.io.File;
@@ -75,23 +76,11 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         }
     };
 
-    private final File folder;
+    private File folder;
 
     protected CoverageMosaicProvider(final CoverageMosaicProviderService service,
             final ParameterValueGroup source) throws IOException, SQLException {
         super(service,source);
-        final String path = value(FOLDER_DESCRIPTOR, getSourceConfiguration(source));
-
-        if (path == null) {
-            throw new IllegalArgumentException("Found configuration file but a path parameter is not defined.");
-        }
-
-        folder = new File(path);
-
-        if (!folder.exists()) {
-            throw new IllegalArgumentException("Did not find a tile manager definition file or a mosaic directory for path: "+ path);
-        }
-
         reload();
     }
 
@@ -149,6 +138,28 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
      */
     @Override
     public void reload() {
+
+        final ParameterValue<String> param = (ParameterValue<String>) getSourceConfiguration(getSource()).parameter(FOLDER_DESCRIPTOR.getName().getCode());
+
+        if(param == null){
+            getLogger().log(Level.WARNING,"Provided File path is not defined.");
+            return;
+        }
+
+        final String path = param.getValue();
+
+        if (path == null) {
+            getLogger().log(Level.WARNING, "Found configuration file but a path parameter is not defined.");
+            return;
+        }
+
+        folder = new File(path);
+
+        if (!folder.exists()) {
+            getLogger().log(Level.WARNING, "Found configuration file but a path parameter is not defined.");
+            return;
+        }
+
         synchronized(this){
             index.clear();
 

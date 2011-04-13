@@ -38,6 +38,7 @@ import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.storage.DataStoreException;
 
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.shapefile.ShapeFileProviderService.*;
@@ -65,7 +66,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
     /**
      * Folder where are stored shape files.
      */
-    private final File folder;
+    private File folder;
 
     /**
      * Keeps a link between the file name and the file.
@@ -77,20 +78,6 @@ public class ShapeFileProvider extends AbstractLayerProvider {
     protected ShapeFileProvider(final ShapeFileProviderService service,
             final ParameterValueGroup source) throws IllegalArgumentException {
         super(service,source);
-
-        final ParameterValueGroup config = getSourceConfiguration(source, SOURCE_CONFIG_DESCRIPTOR);
-        final String path = stringValue(FOLDER_DESCRIPTOR, config);
-
-        if (path == null) {
-            throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
-        }
-
-        folder = new File(path);
-
-        if (folder == null || !folder.exists() || !folder.isDirectory()) {
-            throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
-        }
-
         visit();
     }
 
@@ -183,6 +170,30 @@ public class ShapeFileProvider extends AbstractLayerProvider {
 
     @Override
     protected void visit() {
+
+        final ParameterValueGroup config = getSourceConfiguration(getSource(), SOURCE_CONFIG_DESCRIPTOR);
+        final ParameterValue<String> param = (ParameterValue<String>) config.parameter(FOLDER_DESCRIPTOR.getName().getCode());
+
+        if(param == null){
+            LOGGER.log(Level.WARNING,"Provided File path is not defined.");
+            return;
+        }
+
+        final String path = param.getValue();
+
+        if (path == null) {
+            LOGGER.log(Level.WARNING,"Provided File does not exits or is not a folder.");
+            return;
+        }
+
+        folder = new File(path);
+
+        if (folder == null || !folder.exists() || !folder.isDirectory()) {
+            LOGGER.log(Level.WARNING,"Provided File does not exits or is not a folder.");
+            return;
+        }
+
+
         visit(folder);
         super.visit();
     }
@@ -194,6 +205,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
      * @param file The starting file or folder.
      */
     private void visit(final File file) {
+
         if (file.isDirectory()) {
             final File[] list = file.listFiles();
             if (list != null) {

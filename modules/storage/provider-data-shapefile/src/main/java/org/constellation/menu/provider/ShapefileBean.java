@@ -19,6 +19,7 @@ package org.constellation.menu.provider;
 
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.ProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 
 /**
@@ -28,7 +29,7 @@ import org.constellation.provider.shapefile.ShapeFileProvider;
  */
 public class ShapefileBean extends AbstractDataStoreServiceBean{
 
-    private static LayerProviderService getService(){
+    private static ProviderService getService(){
         for(LayerProviderService service : LayerProviderProxy.getInstance().getServices()){
             if(service.getName().equals("shapefile")){
                 return service;
