@@ -17,12 +17,10 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-import org.constellation.provider.shapefile.ShapeFileProviderService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,16 +30,14 @@ import org.constellation.map.ws.WMSMapDecoration;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.coveragesql.CoverageSQLProvider;
-import org.constellation.provider.postgis.PostGisProvider;
-import org.constellation.provider.shapefile.ShapeFileProvider;
-import org.constellation.provider.sld.SLDProvider;
 import org.constellation.provider.sld.SLDProviderService;
+import org.constellation.provider.shapefile.ShapeFileProviderService;
 
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
+
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 

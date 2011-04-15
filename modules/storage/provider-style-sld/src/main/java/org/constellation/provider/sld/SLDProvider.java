@@ -78,6 +78,7 @@ public class SLDProvider extends AbstractStyleProvider{
     
     protected SLDProvider(final SLDProviderService service, final ParameterValueGroup source){
         super(service,source);
+        reload();
     }
 
     /**

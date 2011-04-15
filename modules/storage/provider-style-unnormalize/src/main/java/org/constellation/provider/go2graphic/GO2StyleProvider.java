@@ -69,8 +69,6 @@ public class GO2StyleProvider extends AbstractStyleProvider{
      */
     @Override
     public void reload() {
-        index.clear();
-        visit();
     }
 
     /**
@@ -78,7 +76,6 @@ public class GO2StyleProvider extends AbstractStyleProvider{
      */
     @Override
     public void dispose() {
-        index.clear();
     }
     
     private void visit() {
