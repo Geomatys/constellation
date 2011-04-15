@@ -39,9 +39,11 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.SimpleFSDirectory;
 
 // constellation dependencies
+import org.apache.lucene.util.Version;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.AbstractCSWIndexer;
@@ -137,11 +139,11 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     public void createIndex() throws IndexingException {
         LOGGER.log(logLevel, "(light memory) Creating lucene index for Generic database please wait...");
         final long time = System.currentTimeMillis();
-        IndexWriter writer;
         int nbEntries = 0;
         try {
-            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
-            final String serviceID = getServiceID();
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_31, analyzer);
+            final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
+            final String serviceID       = getServiceID();
             
             // TODO getting the objects list and index avery item in the IndexWriter.
             final List<String> ids = reader.getAllIdentifiers();
@@ -167,8 +169,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             LOGGER.log(Level.SEVERE, "CstlServiceException while indexing document: {0}", ex.getMessage());
             throw new IndexingException("CstlServiceException while indexing documents.", ex);
         }
-        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\n" +
-                " documents indexed: " + nbEntries);
+        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\nDocuments indexed: " + nbEntries);
     }
 
     /**
@@ -178,11 +179,11 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     public void createIndex(final List<Object> toIndex) throws IndexingException {
         LOGGER.log(logLevel, "Creating lucene index for Generic database please wait...");
         final long time = System.currentTimeMillis();
-        IndexWriter writer;
         int nbEntries = 0;
         try {
-            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
-            final String serviceID = getServiceID();
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_31, analyzer);
+            final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
+            final String serviceID       = getServiceID();
             
             nbEntries = toIndex.size();
             for (Object entry : toIndex) {

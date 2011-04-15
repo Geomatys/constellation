@@ -115,7 +115,7 @@ public class GenericindexTest {
         /**
          * Test 1 simple search: title = 90008411.ctd
          */
-        SpatialQuery spatialQuery = new SpatialQuery("Title:90008411.ctd", nullFilter, SerialChainFilter.AND);
+        SpatialQuery spatialQuery = new SpatialQuery("Title:\"90008411.ctd\"", nullFilter, SerialChainFilter.AND);
         List<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
@@ -125,7 +125,6 @@ public class GenericindexTest {
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
-        //expectedResult.add("42292_9s_19900610041000");
 
         assertEquals(expectedResult, result);
 

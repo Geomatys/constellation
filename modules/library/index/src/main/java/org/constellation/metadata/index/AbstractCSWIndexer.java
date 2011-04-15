@@ -67,7 +67,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      * 
      * @param serviceID The identifier, if there is one, of the index/service.
      * @param configDirectory The directory where the files of the index will be stored.
-     * @param analyzer A lucene analyzer used in text values indexation (default is StandardAnalyzer).
+     * @param analyzer A lucene analyzer used in text values indexation (default is ClassicAnalyzer).
      * @param additionalQueryable  A map of additional queryable elements.
      */
     public AbstractCSWIndexer(String serviceID, File configDirectory, Analyzer analyzer, Map<String, List<String>> additionalQueryable) {

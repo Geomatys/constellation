@@ -33,7 +33,9 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 
 // constellation dependencies
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.util.Version;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.index.AbstractCSWIndexer;
@@ -131,12 +133,12 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     public void createIndex() throws IndexingException {
         LOGGER.log(logLevel, "(light memory) Creating lucene index for MDWeb database please wait...");
 
-        IndexWriter writer;
         final long time  = System.currentTimeMillis();
         int nbRecordSets = 0;
         int nbForms      = 0;
         try {
-            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_31, analyzer);
+            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
 
             // getting the objects list and index avery item in the IndexWriter.
             final List<RecordSet> cats = mdWebReader.getRecordSets();
@@ -184,11 +186,11 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         LOGGER.log(logLevel, "Creating lucene index for MDWeb database please wait...");
 
         final long time = System.currentTimeMillis();
-        IndexWriter writer;
         final int nbRecordSets = 0;
         int nbForms = 0;
         try {
-            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_31, analyzer);
+            final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
 
             nbForms = forms.size();
             for (Form form : forms) {
@@ -227,7 +229,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
         final String identifier = metadata.getIdentifier();
         doc.add(new Field("id",        identifier,           Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field("Title",     metadata.getTitle(),  Field.Store.YES, Field.Index.ANALYZED));
+        //doc.add(new Field("Title",     metadata.getTitle(),  Field.Store.YES, Field.Index.ANALYZED));
     }
 
     /**

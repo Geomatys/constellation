@@ -57,9 +57,9 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT), Level.FINER);
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StopAnalyzer(Version.LUCENE_31), Level.FINER);
         indexer.destroy();
-        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT));
+        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_31));
         indexSearcher.setLogLevel(Level.FINER);
     }
 
@@ -90,7 +90,7 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         /**
          * Test 1 simple search: title = 90008411.ctd
          */
-        SpatialQuery spatialQuery = new SpatialQuery("Title:90008411.ctd", nullFilter, SerialChainFilter.AND);
+        SpatialQuery spatialQuery = new SpatialQuery("Title:\"90008411\".ctd", nullFilter, SerialChainFilter.AND);
         List<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
@@ -101,9 +101,9 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         // the result we want are this
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
-        expectedResult.add("42292_9s_19900610041000");
 
         // ERROR: but with the stop Analyzer remove the number so we get all the results finishing by ctd (why???)
+        expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");

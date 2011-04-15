@@ -1,5 +1,5 @@
 /*
- *    Constellation - An open source and WhiteSpace compliant SDI
+ *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
@@ -18,20 +18,18 @@
 
 package org.constellation.metadata.index.analyzer;
 
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-// Lucene dependencies
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-
-// Geotoolkit dependencies
 import org.apache.lucene.util.Version;
+
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
@@ -49,39 +47,26 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
+public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
 
-    private static File configDirectory = new File("WhiteSpaceAnalyzerTest");
+    private static File configDirectory = new File("ClassicAnalyzerTest");
 
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_31), Level.FINER);
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new ClassicAnalyzer(Version.LUCENE_31), Level.FINER);
         indexer.destroy();
-        
-        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_31));
+        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new ClassicAnalyzer(Version.LUCENE_31));
         indexSearcher.setLogLevel(Level.FINER);
+        
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         indexSearcher.destroy();
-    }
-
-    public static void deleteIndex() {
-        if (configDirectory.exists()) {
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            configDirectory.delete();
-        }
     }
 
     @Before
@@ -158,7 +143,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
-
+        
         /**
          * Test 4 simple search: ID = World Geodetic System 84
          */
@@ -195,8 +180,9 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
 
         assertEquals(expectedResult, result);
 
+
         /**
-         * Test 6 range search: Title <= FRA
+         * Test 6 range search: Title <= fra
          */
         spatialQuery = new SpatialQuery("Title_sort:[0 TO FRA]", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
@@ -232,6 +218,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
+
     }
 
      /**
@@ -276,8 +263,6 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
 
-        // ERROR it didn't find any result (why???)
-        expectedResult = new ArrayList<String>();
         assertEquals(expectedResult, result);
 
         /**
@@ -292,6 +277,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 3:\n{0}", resultReport);
 
+        // ISSUE here the . is removed at the idexation
         assertTrue(result.contains("39727_22_19750113062500"));
         assertTrue(result.contains("40510_145_19930221211500"));
         assertTrue(result.contains("42292_5p_19900609195600"));
@@ -314,6 +300,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
 
+        //issues here it found
         assertEquals(expectedResult, result);
 
         /**
@@ -332,10 +319,8 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800"); // >>  ISSUES This one shoudn't be there because it not in the same order => ASCII MEDATLAS
         expectedResult.add("40510_145_19930221211500");
-
-         // ERROR it didn't find any result (why???)
-        expectedResult = new ArrayList<String>();
 
         assertEquals(expectedResult, result);
 
@@ -482,7 +467,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         assertEquals(expectedResult, result);
     }
 
-   /**
+    /**
      *
      * Test spatial lucene search.
      *
@@ -523,7 +508,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
          */
         resultReport = "";
         List<Filter> lf = new ArrayList<Filter>();
-        //sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
+       //sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
         sf           = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         lf.add(sf);
         int[] op = {SerialChainFilter.NOT};

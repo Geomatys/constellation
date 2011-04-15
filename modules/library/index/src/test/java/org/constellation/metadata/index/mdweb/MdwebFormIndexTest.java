@@ -153,7 +153,7 @@ public class MdwebFormIndexTest {
         /**
          * Test 1 simple search: title = title1
          */
-        SpatialQuery spatialQuery = new SpatialQuery("Title:title1", nullFilter, SerialChainFilter.AND);
+        SpatialQuery spatialQuery = new SpatialQuery("title:title1", nullFilter, SerialChainFilter.AND);
         List<String> result = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
@@ -170,7 +170,7 @@ public class MdwebFormIndexTest {
          * Test 2 simple search: title like tit*
          */
         resultReport = "";
-        spatialQuery = new SpatialQuery("Title:tit*", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("title:tit*", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
         
         for (String s: result)
@@ -181,7 +181,6 @@ public class MdwebFormIndexTest {
         expectedResult = new ArrayList<String>();
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
-        expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         expectedResult.add("test-5");
         expectedResult.add("test-6");
@@ -213,8 +212,8 @@ public class MdwebFormIndexTest {
          * Test 4 simple search: (identifier = 2345-aa453-ade456 AND title = title1 ) OR (NOT title= title4)
          */
         resultReport          = "";
-        spatialQuery          = new SpatialQuery("identifier:\"2345-aa453-ade456\" AND Title:\"title1\"", nullFilter, SerialChainFilter.OR);
-        SpatialQuery subQuery = new SpatialQuery("Title:\"title4\"", nullFilter, SerialChainFilter.NOT);
+        spatialQuery          = new SpatialQuery("identifier:\"2345-aa453-ade456\" AND title:\"title1\"", nullFilter, SerialChainFilter.OR);
+        SpatialQuery subQuery = new SpatialQuery("title:\"title4\"", nullFilter, SerialChainFilter.NOT);
         spatialQuery.addSubQuery(subQuery);
         result       = indexSearcher.doSearch(spatialQuery);
 
@@ -236,8 +235,8 @@ public class MdwebFormIndexTest {
          * Test 5 simple search: (identifier = 2345-aa453-ade456 OR title = title2 ) AND (NOT title= title4)
          */
         resultReport          = "";
-        spatialQuery          = new SpatialQuery("identifier:\"2345-aa453-ade456\" OR Title:\"title2\"", nullFilter, SerialChainFilter.AND);
-        subQuery = new SpatialQuery("Title:\"title4\"", nullFilter, SerialChainFilter.NOT);
+        spatialQuery          = new SpatialQuery("identifier:\"2345-aa453-ade456\" OR title:\"title2\"", nullFilter, SerialChainFilter.AND);
+        subQuery = new SpatialQuery("title:\"title4\"", nullFilter, SerialChainFilter.NOT);
         spatialQuery.addSubQuery(subQuery);
         result       = indexSearcher.doSearch(spatialQuery);
 
@@ -254,7 +253,7 @@ public class MdwebFormIndexTest {
          * Test 5 simple search: (identifier = 2345-aa453-ade456 OR title = title2 ) AND (NOT type=xirces)
          */
         resultReport          = "";
-        spatialQuery          = new SpatialQuery("identifier:\"2345-aa453-ade456\" OR Title:\"title2\"", nullFilter, SerialChainFilter.AND);
+        spatialQuery          = new SpatialQuery("identifier:\"2345-aa453-ade456\" OR title:\"title2\"", nullFilter, SerialChainFilter.AND);
         subQuery = new SpatialQuery("type:\"xirces\"", nullFilter, SerialChainFilter.NOT);
         spatialQuery.addSubQuery(subQuery);
         result       = indexSearcher.doSearch(spatialQuery);
@@ -277,7 +276,7 @@ public class MdwebFormIndexTest {
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
         subQuery     = new SpatialQuery("identifier:\"2345-aa453-ade456\"", nullFilter, SerialChainFilter.NOT);
         spatialQuery.addSubQuery(subQuery);
-        subQuery     = new SpatialQuery("Title:\"title2\"", nullFilter, SerialChainFilter.NOT);
+        subQuery     = new SpatialQuery("title:\"title2\"", nullFilter, SerialChainFilter.NOT);
         spatialQuery.addSubQuery(subQuery);
 
         result       = indexSearcher.doSearch(spatialQuery);
@@ -302,7 +301,7 @@ public class MdwebFormIndexTest {
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.OR);
         subQuery     = new SpatialQuery("identifier:\"2345-aa453-ade456\"", nullFilter, SerialChainFilter.NOT);
         spatialQuery.addSubQuery(subQuery);
-        subQuery     = new SpatialQuery("Title:\"title2\"", nullFilter, SerialChainFilter.NOT);
+        subQuery     = new SpatialQuery("title:\"title2\"", nullFilter, SerialChainFilter.NOT);
         spatialQuery.addSubQuery(subQuery);
 
         result       = indexSearcher.doSearch(spatialQuery);
@@ -329,7 +328,7 @@ public class MdwebFormIndexTest {
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.OR);
         subQuery     = new SpatialQuery("identifier:\"2345-aa453-ade456\"", nullFilter, SerialChainFilter.NOT);
         spatialQuery.addSubQuery(subQuery);
-        subQuery     = new SpatialQuery("Title:\"title1\"", nullFilter, SerialChainFilter.NOT);
+        subQuery     = new SpatialQuery("title:\"title1\"", nullFilter, SerialChainFilter.NOT);
         spatialQuery.addSubQuery(subQuery);
 
         result       = indexSearcher.doSearch(spatialQuery);
@@ -682,7 +681,7 @@ public class MdwebFormIndexTest {
         TextValue f2_ucxValue = new TextValue(upperCornPath, f2, 1, "-15", PrimitiveType.STRING, f2_bbox);
         TextValue f2_ucyValue = new TextValue(upperCornPath, f2, 2, "10", PrimitiveType.STRING, f2_bbox);
         
-        Form f3 = new Form(3, "09844e51-e5cd-52c3-737d-b3a61366d028", cat, "title3", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+        Form f3 = new Form(3, "09844e51-e5cd-52c3-737d-b3a61366d028", cat, "bo", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
         Value f3_rootValue    = new Value(recordPath, f3, 1, recordClass, null);
         Value f3_ident        = new Value(identifierPath, f3, 1, sLiteralClass, f3_rootValue);
         TextValue f3_idValue  = new TextValue(idenContentPath, f3, 1, "09844e51-e5cd-52c3-737d-b3a61366d028", PrimitiveType.STRING, f3_ident);
@@ -712,6 +711,8 @@ public class MdwebFormIndexTest {
 
         Form f5 = new Form(5, "test-5", cat, "title5", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
         Value f5_rootValue    = new Value(recordPath, f5, 1, recordClass, null);
+        Value f5_title        = new Value(titlePath, f5, 1, sLiteralClass, f5_rootValue);
+        TextValue f5_tiValue  = new TextValue(titContentPath, f5, 1, "title5", PrimitiveType.STRING, f4_title);
         Value f5_ident        = new Value(identifierPath, f5, 1, sLiteralClass, f5_rootValue);
         TextValue f5_idValue  = new TextValue(idenContentPath, f5, 1, "test-5", PrimitiveType.STRING, f5_ident);
         Value f5_type         = new Value(typePath, f5, 1, sLiteralClass, f5_rootValue);
@@ -724,6 +725,8 @@ public class MdwebFormIndexTest {
         TextValue f6_idValue  = new TextValue(idenContentPath, f6, 1, "test-6", PrimitiveType.STRING, f6_ident);
         Value f6_type         = new Value(typePath, f6, 1, sLiteralClass, f6_rootValue);
         TextValue f6_tyValue  = new TextValue(typContentPath, f6, 1, "Bou", PrimitiveType.STRING, f6_type);
+        Value f6_title        = new Value(titlePath, f6, 1, sLiteralClass, f6_rootValue);
+        TextValue f6_tiValue  = new TextValue(titContentPath, f6, 1, "title6", PrimitiveType.STRING, f6_title);
 
         
         writer.writeForm(f1, false, true);

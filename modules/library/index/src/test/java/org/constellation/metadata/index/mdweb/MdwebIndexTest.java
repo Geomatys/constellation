@@ -143,7 +143,7 @@ public class MdwebIndexTest {
         /**
          * Test 1 simple search: title = 90008411.ctd
          */
-        SpatialQuery spatialQuery = new SpatialQuery("Title:90008411.ctd", nullFilter, SerialChainFilter.AND);
+        SpatialQuery spatialQuery = new SpatialQuery("Title:\"90008411.ctd\"", nullFilter, SerialChainFilter.AND);
         List<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
@@ -229,7 +229,7 @@ public class MdwebIndexTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         
-
+        
         assertEquals(expectedResult, result);
 
         /**
@@ -268,7 +268,7 @@ public class MdwebIndexTest {
         assertTrue(result.contains("40510_145_19930221211500"));
         
 
-         /**
+        /**
          * Test 4 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
          */
         spatialQuery = new SpatialQuery("abstract:(*onnees CTD NEDIPROD VI 120)", nullFilter, SerialChainFilter.AND);

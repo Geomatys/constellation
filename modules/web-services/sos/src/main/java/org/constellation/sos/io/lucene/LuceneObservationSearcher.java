@@ -52,7 +52,7 @@ import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 
 /**
- *  A Lucene searcher for an index connected to an O&M Datasource.
+ *  A Lucene searcher for an index connected to an O&M DataSource.
  *
  * @author Guilhem Legal (Geomatys)
  */
@@ -68,13 +68,13 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
      * @throws IndexingException
      */
     public LuceneObservationSearcher(File configDir, String serviceID) throws IndexingException  {
-        super(configDir, serviceID, new WhitespaceAnalyzer());
+        super(configDir, serviceID, new WhitespaceAnalyzer(Version.LUCENE_31));
     }
 
     /**
      * This method proceed a lucene search and returns a list of ObservationResult.
      *
-     * @param spatialQuery The lucene query string with spatials filters.
+     * @param spatialQuery The lucene query string with spatial filters.
      *
      * @return A List of Observation result..
      */
@@ -91,7 +91,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
             }
 
             final String field       = "Title";
-            final QueryParser parser = new QueryParser(Version.LUCENE_CURRENT, field, analyzer);
+            final QueryParser parser = new QueryParser(Version.LUCENE_31, field, analyzer);
             parser.setDefaultOperator(Operator.AND);
 
             // we enable the leading wildcard mode if the first character of the query is a '*'
@@ -206,7 +206,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
      *
      * @param d A lucene document.
      *
-     * @return an observationResult containing the id and the timepriod of the observation.
+     * @return an observationResult containing the id and the time period of the observation.
      */
     private ObservationResult getObservationResult(final Document d) {
         Timestamp begin = null;

@@ -28,6 +28,7 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.util.Version;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
@@ -53,9 +54,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new SimpleAnalyzer(), Level.FINER);
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new SimpleAnalyzer(Version.LUCENE_31), Level.FINER);
         indexer.destroy();
-        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new SimpleAnalyzer());
+        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new SimpleAnalyzer(Version.LUCENE_31));
         indexSearcher.setLogLevel(Level.FINER);
     }
 
@@ -100,9 +101,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         // the result we want are this
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
-        expectedResult.add("42292_9s_19900610041000");
 
         // ERROR: but with the simple Analyzer remove the number so we get all the results finishing by ctd (why???)
+        expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");
