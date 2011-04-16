@@ -103,7 +103,6 @@
         <module>admin-page-tool</module>
         <module>adminjsf</module>
         <module>constellation</module>
-        <module>constellation-SOAP</module>
     </modules>
 
 </project>
