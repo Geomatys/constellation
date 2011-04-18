@@ -395,11 +395,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 throw new IllegalArgumentException(msg);
             }
 
-            if (profile == null) {
-                if  ("DefaultMetadata".equals(className)) {
-                    profile = mdWriter.getProfile("ISO_19115");
-                }
-            }
             final String identifier = Utils.findIdentifier(object);
             if (mdWriter.isAlreadyUsedIdentifier(identifier)) {
                 throw new MD_IOException("The identifier " + identifier + " is already used");
