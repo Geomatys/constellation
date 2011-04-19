@@ -192,12 +192,12 @@ public class SLDProvider extends AbstractStyleProvider{
 
             final ParameterValue param = getSource().parameter(FOLDER_DESCRIPTOR.getName().getCode());
 
-            if(param == null){
+            if(param == null || param.getValue() == null){
                 getLogger().log(Level.WARNING,"Provided File path is not defined.");
                 return;
             }
 
-            folder = new File(Parameters.stringValue(FOLDER_DESCRIPTOR, getSource()));
+            folder = new File(param.stringValue());
 
             if(folder == null || !folder.exists() || !folder.isDirectory()){
                 getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
