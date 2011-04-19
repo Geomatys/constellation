@@ -40,6 +40,9 @@ public class CstlBean extends I18NBean{
         // Set the new user directory
         if (path != null && !path.isEmpty()) {
             final File userDirectory = new File(path);
+            if (!userDirectory.isDirectory()) {
+                userDirectory.mkdir();
+            }
             ConfigDirectory.setConfigDirectory(userDirectory);
         }
 
