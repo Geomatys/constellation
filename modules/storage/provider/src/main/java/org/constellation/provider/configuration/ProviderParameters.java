@@ -21,8 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.File;
 import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.transform.Result;
 import java.io.OutputStream;
 import javax.xml.stream.XMLOutputFactory;
@@ -62,7 +60,7 @@ public final class ProviderParameters {
     public static final ParameterDescriptor<String> SOURCE_ID_DESCRIPTOR =
              new DefaultParameterDescriptor<String>("id","source id",String.class,null,true);
     public static final ParameterDescriptor<Boolean> SOURCE_LOADALL_DESCRIPTOR =
-             new DefaultParameterDescriptor<Boolean>("load_all","source load all datas",Boolean.class,true,false);
+             new DefaultParameterDescriptor<Boolean>("load_all","source load all datas",Boolean.class,true,true);
 
 
     ////////////////////////////////////////////////////////////////////////////
