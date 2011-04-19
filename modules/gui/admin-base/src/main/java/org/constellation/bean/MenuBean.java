@@ -76,8 +76,6 @@ public class MenuBean extends I18NBean{
     private final TreeModel model;
 
     public MenuBean() {
-        Setup.initialize(null);
-
         final Map<String,I18NNode> nodes = new HashMap<String, I18NNode>();
 
         addBundle("org.constellation.bundle.base");
