@@ -17,33 +17,35 @@
 
 package org.constellation.util;
 
-// JUnit dependencies
-import org.geotoolkit.metadata.iso.extent.DefaultExtent;
-import org.opengis.metadata.extent.TemporalExtent;
-import org.geotoolkit.metadata.iso.extent.DefaultTemporalExtent;
-import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.metadata.iso.identification.DefaultKeywords;
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import org.constellation.util.ReflectionUtilities;
+
+import org.geotoolkit.metadata.iso.extent.DefaultExtent;
+import org.geotoolkit.metadata.iso.extent.DefaultTemporalExtent;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.metadata.iso.identification.DefaultKeywords;
+import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.SimpleInternationalString;
-import org.junit.*;
+
+import org.opengis.metadata.extent.TemporalExtent;
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.KeywordType;
 import org.opengis.util.InternationalString;
+
+// JUnit dependencies
+import org.junit.*;
 import static org.junit.Assert.*;
 
 /**

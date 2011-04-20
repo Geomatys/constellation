@@ -16,10 +16,6 @@
  */
 package org.constellation.wfs;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.wfs.ws.WFSWorker;
-import org.constellation.wfs.ws.DefaultWFSWorker;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,6 +30,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+import org.constellation.wfs.ws.WFSWorker;
+import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
@@ -43,6 +41,8 @@ import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
@@ -86,18 +86,17 @@ import org.geotoolkit.xml.DomCompare;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
-
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
-import org.junit.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.xml.sax.SAXException;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+// JUnit dependencies
+import org.junit.*;
 import static org.junit.Assert.*;
-import static org.constellation.provider.configuration.ProviderParameters.*;
 
 
 /**
@@ -108,8 +107,6 @@ public class WFSWorkerTest {
 
     private static MarshallerPool pool;
     private static WFSWorker worker ;
-    
-
     
     private static DefaultDataSource ds = null;
 
@@ -187,7 +184,7 @@ public class WFSWorkerTest {
      *
      */
     @Test
-    public void getCapabilitiesTest() throws JAXBException, CstlServiceException, IOException, ParserConfigurationException, SAXException {
+    public void getCapabilitiesTest() throws Exception {
         final Marshaller marshaller = pool.acquireMarshaller();
 
         GetCapabilitiesType request = new GetCapabilitiesType("WFS");

@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.map.ws.rs;
+package org.constellation.test.utils;
 
 import java.net.URI;
 import java.util.List;
@@ -91,7 +91,7 @@ public class BasicUriInfo implements UriInfo{
 
     @Override
     public URI getBaseUri() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return URI.create("http://something.com");
     }
 
     @Override

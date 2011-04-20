@@ -57,14 +57,12 @@ import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.OGCWebService;
 
 import static org.constellation.query.Query.*;
 import static org.constellation.wfs.ws.WFSConstants.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
-import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
@@ -271,9 +269,8 @@ public class WFSService extends GridWebService<WFSWorker> {
                     if (serviceID != null && workersMap.containsKey(serviceID)) {
                         worker = workersMap.get(serviceID);
                     } else {
-                        LOGGER.log(Level.WARNING, "unknow service id:{0}", serviceID);
-                        //TODO return 404
-                        return Response.serverError().build();
+                        LOGGER.log(Level.WARNING, "Received request on undefined instance identifier:{0}", serviceID);
+                        return Response.status(Response.Status.NOT_FOUND).build();
                     }
                 } catch (CstlServiceException ex) {
                     return processExceptionResponse(ex, ServiceDef.WFS_1_1_0);

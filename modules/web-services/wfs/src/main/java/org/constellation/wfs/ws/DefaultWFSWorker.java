@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -153,11 +152,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * Current mapping between prefix and namespace << ISSUE multiThread
      */
     private Map<String, String> namespaceMapping;
-
-    /**
-     * Current outputFormat requested (default value is text/xml) << ISSUE multiThread
-     */
-    private String outputFormat = "text/xml";
 
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WFS);

@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.map.ws.rs;
+package org.constellation.test.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

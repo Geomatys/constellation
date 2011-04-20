@@ -17,7 +17,6 @@
 
 package org.constellation.map.ws.rs;
 
-import org.geotoolkit.referencing.CRS;
 import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.core.MultivaluedMap;
 import java.lang.reflect.Field;
@@ -26,20 +25,26 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+
 import org.constellation.map.ws.QueryContext;
 import org.constellation.ws.rs.WebService;
+import org.constellation.test.utils.BasicMultiValueMap;
+import org.constellation.test.utils.BasicUriInfo;
+
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 
-import org.junit.Test;
 import org.opengis.geometry.Envelope;
-import static org.junit.Assert.*;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * Testing wms service value parsing.
