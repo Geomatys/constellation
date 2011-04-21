@@ -21,7 +21,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.gui.swing.tree.Trees;
 
 /**
  *
@@ -115,8 +115,8 @@ public class LayerContext {
     
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("LayerContext");
-        sb.append(StringUtilities.toStringTree(getLayers()));
+        final StringBuilder sb = new StringBuilder();
+        sb.append(Trees.toString("LayerContext", getLayers()));
         if (security != null && !security.isEmpty()) {
             sb.append("Security=").append(security);
         }

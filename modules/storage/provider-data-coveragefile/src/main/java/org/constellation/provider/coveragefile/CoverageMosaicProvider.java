@@ -30,6 +30,7 @@ import java.util.logging.Level;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
+import org.geotoolkit.coverage.io.CoverageIO;
 
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
@@ -116,7 +117,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
             final GridCoverageReader reader;
             try {
-                reader = GridCoverageReaders.toCoverageReader(entry.getKey(), entry.getValue());
+                reader = CoverageIO.createMosaicReader(entry.getKey(), entry.getValue());
             } catch (CoverageStoreException ex) {
                 getLogger().log(Level.WARNING, "Failed to load coverage reader from tile manager.", ex);
                 return null;

@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -555,7 +556,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 marshallerPool.release(unmarshaller);
             }
         }
-        return StringUtilities.sortStringList(result);
+        
+        Collections.sort(result);
+        return result;
     }
 
     /**

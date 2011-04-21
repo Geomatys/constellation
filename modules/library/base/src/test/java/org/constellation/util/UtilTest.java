@@ -19,6 +19,7 @@
 package org.constellation.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.geotoolkit.util.StringUtilities;
@@ -232,7 +233,7 @@ public class UtilTest {
         toSort.add(s4);
         toSort.add(s5);
 
-        List<String> result = StringUtilities.sortStringList(toSort);
+        Collections.sort(toSort);
 
         List<String> expResult = new ArrayList<String>();
         expResult.add(s4);
@@ -241,7 +242,7 @@ public class UtilTest {
         expResult.add(s5);
         expResult.add(s3);
 
-        assertEquals(expResult, result);
+        assertEquals(expResult, toSort);
     }
 
     /**

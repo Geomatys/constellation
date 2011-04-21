@@ -24,8 +24,8 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.gui.swing.tree.Trees;
 import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.util.StringUtilities;
 
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
@@ -112,7 +112,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
             //log list of missing layers
             final StringBuilder sb = new StringBuilder("Provider ");
             sb.append(getSourceId(getSource())).append(" declares layers missing in the source\n");
-            sb.append(StringUtilities.toStringTree(missingLayers));
+            sb.append(Trees.toString("", missingLayers));
             getLogger().log(Level.WARNING, sb.toString());
         }
     }
