@@ -799,12 +799,11 @@ public class WFSWorkerTest {
          */
 
         QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
-        TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-
         List<PropertyType> properties = new ArrayList<PropertyType>();
         UpdateElementType update = new UpdateElementType(properties, null, typeName, null);
         update.setInputFormat("bad inputFormat");
-        request.getInsertOrUpdateOrDelete().add(update);
+        TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, update);
+        
 
         try {
             worker.transaction(request);
@@ -820,12 +819,11 @@ public class WFSWorkerTest {
          */
 
         typeName = new QName("http://www.opengis.net/gml", "Bridges");
-        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-
         properties = new ArrayList<PropertyType>();
         properties.add(new PropertyType(new QName("whatever"), new ValueType("someValue")));
-        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, null, typeName, null));
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(properties, null, typeName, null));
 
+        
         try {
             worker.transaction(request);
             fail("Should have raised an error.");
@@ -840,14 +838,13 @@ public class WFSWorkerTest {
          */
 
         typeName = new QName("http://www.opengis.net/gml", "Bridges");
-        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-
         properties = new ArrayList<PropertyType>();
         properties.add(new PropertyType(new QName("NAME"), new ValueType("someValue")));
         ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
         FilterType filter        = new FilterType(pe);
-        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(properties, filter, typeName, null));
 
+        
         try {
             worker.transaction(request);
             fail("Should have raised an error.");
@@ -861,15 +858,13 @@ public class WFSWorkerTest {
          */
 
         typeName = new QName("http://www.opengis.net/gml", "NamedPlaces");
-        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-
         properties = new ArrayList<PropertyType>();
         properties.add(new PropertyType(new QName("FID"), new ValueType("999")));
         pe     = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
         filter = new FilterType(pe);
-        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(properties, filter, typeName, null));
 
-
+        
         TransactionResponseType result = worker.transaction(request);
 
         TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0);
@@ -960,11 +955,9 @@ public class WFSWorkerTest {
          */
 
         final QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
-        final TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-
         final InsertElementType insert = new InsertElementType();
         insert.setInputFormat("bad inputFormat");
-        request.getInsertOrUpdateOrDelete().add(insert);
+        final TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, insert);
 
         try {
             worker.transaction(request);
