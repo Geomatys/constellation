@@ -30,6 +30,7 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
+import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 
 /**
@@ -38,12 +39,15 @@ import org.junit.*;
  */
 public class FileSystemCSWworkerTest extends CSWworkerTest {
 
+    private static final File configDir =  new File("FSCSWWorkerTest");
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
 
-
-        File configDir = new File("CSWWorkerTest");
+        if (configDir.exists()) {
+            FileUtilities.deleteDirectory(configDir);
+        }
+        
         if (!configDir.exists()) {
             configDir.mkdir();
 
@@ -88,26 +92,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        File configDirectory = new File("CSWWorkerTest");
-        if (configDirectory.exists()) {
-            File dataDirectory = new File(configDirectory, "data");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            File conf = new File(configDirectory, "config.xml");
-            conf.delete();
-            configDirectory.delete();
-        }
+        FileUtilities.deleteDirectory(configDir);
     }
 
     @Before

@@ -42,14 +42,13 @@ import org.junit.*;
  */
 public class MDwebCSWworkerTest extends CSWworkerTest {
 
-    private static File dbDirectory;
+    private static final File dbDirectory = new File("MDCSWWorkerTestDatabase");
+    
+    private static final File configDir = new File("MDCSWWorkerTest");
     
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        dbDirectory    = new File("CSWWorkerTestDatabase");
-
-        File configDir = new File("CSWWorkerTest");
         if (configDir.exists()) {
             FileUtilities.deleteDirectory(new File("CSWWorkerTest"));
         }
@@ -98,7 +97,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             worker.destroy();
         }
         FileUtilities.deleteDirectory(dbDirectory);
-        FileUtilities.deleteDirectory(new File("CSWWorkerTest"));
+        FileUtilities.deleteDirectory(configDir);
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();
