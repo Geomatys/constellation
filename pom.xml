@@ -15,7 +15,9 @@
          http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    
+    <prerequisites>
+        <maven>3.0.2</maven>
+    </prerequisites>
 
     <!--
     Description of the project, which includes the licence. This configuration
@@ -30,6 +32,7 @@
     <version>0.7-SNAPSHOT</version>
     <name>Constellation Spatial Data Infrastructure</name>
     <url>http://www.constellation-sdi.org</url>
+    
     <description>
         Open source and standard compliant Spatial Data Infrastructure
     </description>
@@ -161,8 +164,8 @@
     <properties>
         <!-- Define parent projects versions -->
         <geoapi.version>3.1-SNAPSHOT</geoapi.version>
-        <geotoolkit.version>SNAPSHOT</geotoolkit.version>
-        <geotoolkit-pending.version>SNAPSHOT</geotoolkit-pending.version>
+        <geotoolkit.version>3.x-SNAPSHOT</geotoolkit.version>
+        <geotoolkit-pending.version>3.x-SNAPSHOT</geotoolkit-pending.version>
         <mdweb-meta.version>2.2-SNAPSHOT</mdweb-meta.version>
         <mapfaces.version>0.5-SNAPSHOT</mapfaces.version>
         <!-- Define packages for GUI including -->
@@ -789,11 +792,71 @@
     http://repo1.maven.org/maven2/org/apache/maven/plugins/
   -->
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.1.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.8.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.0-beta-3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.geotoolkit.project</groupId>
+                    <artifactId>geotk-jar-collector</artifactId>
+                    <version>${geotoolkit.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>dashboard-maven-plugin</artifactId>
+                    <version>1.0.0-beta-1</version>
+                </plugin>
+                <plugin>
+                    <groupId>net.sf.alchim</groupId>
+                    <artifactId>yuicompressor-maven-plugin</artifactId>
+                    <version>0.7.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>net.sourceforge.maven-taglib</groupId>
+                    <artifactId>maven-taglib-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        
+        
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>        <!-- The -source argument for the Java compiler.   -->
                     <target>1.6</target>        <!-- The -target argument for the Java compiler.   -->
@@ -804,7 +867,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.5</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                     <nonFilteredFileExtensions>
@@ -818,7 +880,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -830,7 +891,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.8.1</version>
                 <configuration>
                     <useSystemClassLoader>true</useSystemClassLoader>
                 </configuration>
@@ -847,6 +907,134 @@
                     </execution>
                 </executions>
             </plugin>
+            
+            <!-- ======================================================= -->
+            <!--   Build: Web site.                                      -->
+            <!-- ======================================================= -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-descriptor</id>
+                        <goals>
+                            <goal>attach-descriptor</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <locales>en</locales>
+                    <inputEncoding>UTF-8</inputEncoding>
+                    <outputEncoding>UTF-8</outputEncoding>
+                    <reportPlugins>
+
+
+
+                        <!-- ======================================================= -->
+                        <!--     Javadoc generation.                                 -->
+                        <!-- ======================================================= -->
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>2.7</version>
+                            <reportSets>
+                                <reportSet>
+                                    <reports>
+                                        <report>javadoc</report>     <!-- We want API javadoc only, not tests javadoc. -->
+                                    </reports>
+                                </reportSet>
+                            </reportSets>
+                            <configuration>
+                                <source>1.6</source>             <!-- Enables javadoc to handle assertions present in J2SE 1.4.  -->
+                                <encoding>UTF-8</encoding>       <!-- The encoding of the source files.                          -->
+                                <docencoding>UTF-8</docencoding> <!-- The encoding of the generated HTML files.                  -->
+                                <charset>UTF-8</charset>         <!-- Specifies the HTML character set for this document.        -->
+                                <locale>en</locale>              <!-- Locale that javadoc uses when generating documentation.    -->
+                                <noqualifier>all</noqualifier>   <!-- Omit qualifying package name before class names in output. -->
+                                <aggregate>true</aggregate>      <!-- Build an aggregated report at the root.                    -->
+                                <maxmemory>512M</maxmemory>      <!-- maximum Java heap size to be used when launching the tool. -->
+                                <quiet>true</quiet>              <!-- Shuts off non-error and non-warning messages.              -->
+                                <keywords>true</keywords>        <!-- Adds HTML meta keyword tags to the generated files.        -->
+                                <breakiterator>true</breakiterator>
+                                <excludePackageNames>${javadoc.exclude}</excludePackageNames>
+
+                                <!-- Creates links to existing javadoc-generated   -->
+                                <!-- documentation of external referenced classes. -->
+                                <links>
+                                    <link>http://java.sun.com/javase/6/docs/api/</link>
+                                    <link>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs</link>
+                                    <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
+                                    <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
+                                    <link>http://javadoc.geotools.fr/snapshot</link>
+                                    <link>http://javadoc.geotoolkit.org</link>
+                                    <link>http://jscience.org/api/</link>
+                                </links>
+                                <excludePackageNames>org.constellation.resources</excludePackageNames>
+                                <!-- Separates packages on the overview page into whatever groups is specified. -->
+                                <groups>
+                                    <group>
+                                        <title>PostGrid</title>
+                                        <packages>org.constellation.catalog*:org.constellation.coverage*:org.constellation.image*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Web Services</title>
+                                        <packages>org.constellation.wms*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Graphical interfaces</title>
+                                        <packages>org.constellation.gui*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Numerical</title>
+                                        <packages>org.constellation.numeric*</packages>
+                                    </group>
+                                    <group>
+                                        <title>Observations</title>
+                                        <packages>org.constellation.observation*</packages>
+                                    </group>
+                                </groups>
+                                <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in
+                           doc comments. Note: <placement/> should be a combinaison of the letters Xaoptcmf. -->
+                                <tags>
+                                    <tag><name>todo</name><placement>tfmc</placement><head>TODO:</head></tag>
+                                </tags>
+                            </configuration>
+                        </plugin>
+
+
+
+                        <!-- ======================================================= -->
+                        <!-- Build: Web site: Various reports configuration.         -->
+                        <!-- ======================================================= -->
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-report-plugin</artifactId>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>taglist-maven-plugin</artifactId>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>cobertura-maven-plugin</artifactId>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>dashboard-maven-plugin</artifactId>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>taglist-maven-plugin</artifactId>
+                        </plugin>
+                    </reportPlugins>
+                </configuration>
+            </plugin>
+            
+            
         </plugins>
         <extensions>
             <extension>
@@ -863,136 +1051,7 @@
     </build>
 
 
-
-    <!--
-    Javadoc and web site building.
-
-    By principle, it is not necessary to declare the version numbre for Maven plugins.
-    In practical, these decalarations help keeping a stable and consistent "build" on
-    different computers. One can easily verify whether some new updaes are available
-    by browsing on this page :
-
-    http://maven.apache.org/plugins/index.html
-  -->
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <source>1.5</source>            <!-- Necessary to enable javadoc to handle J2SE 1.5 features.           -->
-                    <author>true</author>           <!-- Specifies whether or not the author text is included.              -->
-                    <version>false</version>        <!-- Includes or not the version text in the generated docs.            -->
-                    <linksource>false</linksource>  <!-- Creates an HTML version of each source file (with line numbers).   -->
-                    <sourcetab>4</sourcetab>        <!-- Specify the number of spaces each tab takes up in the source.      -->
-                    <noqualifier>all</noqualifier>  <!-- Omits qualifying package name from ahead of class names in output. -->
-                    <quiet>true</quiet>             <!-- Shuts off non-error and non-warning messages.                      -->
-                    <maxmemory>384M</maxmemory>     <!-- The maximum Java heap size to be used when launching the javadoc.  -->
-                    <encoding>UTF-8</encoding>      <!-- Specifies the encoding name of the source files.                   -->
-                    <charset>UTF-8</charset>        <!-- Specifies the HTML character set for this document.                -->
-                    <locale>en</locale>             <!-- The locale that javadoc uses when generating documentation.        -->
-                    <keywords>true</keywords>       <!-- Adds HTML meta keyword tags to the generated file for each class.  -->
-          <!-- Creates links to existing javadoc-generated documentation of external referenced classes. -->
-                    <links>
-                        <link>http://java.sun.com/javase/6/docs/api/</link>
-                        <link>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs</link>
-                        <link>http://java.sun.com/products/java-media/3D/forDevelopers/j3dapi</link>
-                        <link>http://geoapi.sourceforge.net/snapshot/javadoc</link>
-                        <link>http://javadoc.geotools.fr/snapshot</link>
-                        <link>http://javadoc.geotoolkit.org</link>
-                        <link>http://jscience.org/api/</link>
-                    </links>
-                    <excludePackageNames>org.constellation.resources</excludePackageNames>
-                    <!-- Separates packages on the overview page into whatever groups is specified. -->
-                    <groups>
-                        <group>
-                            <title>PostGrid</title>
-                            <packages>org.constellation.catalog*:org.constellation.coverage*:org.constellation.image*</packages>
-                        </group>
-                        <group>
-                            <title>Web Services</title>
-                            <packages>org.constellation.wms*</packages>
-                        </group>
-                        <group>
-                            <title>Graphical interfaces</title>
-                            <packages>org.constellation.gui*</packages>
-                        </group>
-                        <group>
-                            <title>Numerical</title>
-                            <packages>org.constellation.numeric*</packages>
-                        </group>
-                        <group>
-                            <title>Observations</title>
-                            <packages>org.constellation.observation*</packages>
-                        </group>
-                    </groups>
-                    <!-- Enables the Javadoc tool to interpret a simple, one-argument custom block tag tagname in
-               doc comments. Note: <placement/> should be a combinaison of the letters Xaoptcmf. -->
-                    <tags>
-                        <tag><name>todo</name><placement>tfmc</placement><head>TODO:</head></tag>
-                    </tags>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>javadoc</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-
-            <!-- Publish web site. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.0-beta-3</version>
-                <configuration>
-                    <locales>en</locales>
-                    <inputEncoding>UTF-8</inputEncoding>
-                    <outputEncoding>UTF-8</outputEncoding>
-                </configuration>
-            </plugin>
-
-            <!-- Publish project informations. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.3.1</version>
-            </plugin>
-
-            <!-- Publish test results. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.8.1</version>
-            </plugin>
-
-            <!-- Publish source code. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <inputEncoding>UTF-8</inputEncoding>
-                    <outputEncoding>UTF-8</outputEncoding>
-                </configuration>
-            </plugin>
-
-            <!-- Publish "TODO" tasks. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
-                <version>2.4</version>
-            </plugin>
-        </plugins>
-    </reporting>
-
-
-
-    <!--
-    Server where to deploy the web site.
-  -->
+    <!-- Server where to deploy the web site. -->
     <distributionManagement>
         <repository>
             <id>geomatys</id>
@@ -1002,11 +1061,7 @@
         </repository>
     </distributionManagement>
 
-
-
-    <!--
-    All Constellation modules.
-  -->
+    <!-- All Constellation modules. -->
     <modules>
         <module>modules</module>
     </modules>
