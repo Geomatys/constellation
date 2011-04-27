@@ -25,9 +25,15 @@ import java.util.logging.Logger;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
@@ -45,6 +51,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -60,6 +72,7 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.internal.io.Installation;
 import org.geotoolkit.lang.Setup;
+import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.xml.sax.SAXException;
 
 
@@ -363,7 +376,7 @@ public abstract class WebService {
                         LOGGER.warning("MalformedURL exception while adding the Validator to the JAXB unmarshaller");
                     }
                 }
-                request = unmarshaller.unmarshal(is);
+                request = unmarshallRequest(unmarshaller, is);
             } catch (UnmarshalException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
@@ -404,6 +417,19 @@ public abstract class WebService {
         } else {
             return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();
         }
+    }
+    
+    /**
+     * A method simply unmarshalling the request with the specified unmarshaller from the specified inputStream.
+     * can be overriden by child class in case of specific extractionfrom the stream.
+     * 
+     * @param unmarshaller A JAXB Unmarshaller correspounding to the service context.
+     * @param is The request input stream.
+     * @return
+     * @throws JAXBException 
+     */
+    protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException {
+        return unmarshaller.unmarshal(is);
     }
 
     /**
@@ -558,13 +584,41 @@ public abstract class WebService {
                     }
                 }
             }
-            final StringReader sr = new StringReader(list.get(0));
-            Object result = unmarshaller.unmarshal(sr);
+            final StringReader sr                   = new StringReader(list.get(0));
+            final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
+            final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(sr);
+            final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
+                    new Class[]{XMLEventReader.class}, new InvocationHandler() {
+
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    Object returnVal = method.invoke(rootEventReader, args);
+                    if (method.getName().equals("nextEvent")) {
+                        XMLEvent evt = (XMLEvent) returnVal;
+                        if (evt.isStartElement()) {
+                            StartElement startElem = evt.asStartElement();
+                            Iterator<Namespace> t = startElem.getNamespaces();
+                            while (t.hasNext()) {
+                                Namespace n = t.next();
+                                prefixMapping.put(n.getPrefix(), n.getNamespaceURI());
+                            }
+                        }
+                    }
+                    return returnVal;
+                }
+            });
+            Object result = unmarshaller.unmarshal(eventReader);
             if (result instanceof JAXBElement) {
                 result = ((JAXBElement)result).getValue();
             }
+            if (result instanceof FilterType) {
+                ((FilterType)result).setPrefixMapping(prefixMapping);
+            }
             return result;
         } catch (JAXBException ex) {
+             throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
+                            ex, INVALID_PARAMETER_VALUE);
+        } catch (XMLStreamException ex) {
              throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
                             ex, INVALID_PARAMETER_VALUE);
         } finally {

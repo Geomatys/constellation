@@ -49,10 +49,12 @@ import org.geotoolkit.data.FeatureCollection;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
 
+import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.om.OMDataStoreFactory;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.util.FileUtilities;
 
+import org.opengis.feature.Feature;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptorGroup;
 
@@ -158,7 +160,7 @@ public class WFSServiceTest {
         assertTrue(result.getEntity() instanceof FeatureCollection);
         FeatureCollection collection = (FeatureCollection) result.getEntity();
         assertEquals(2, collection.size());
-
+        
         /*
          * we insert the feature
          */
@@ -167,6 +169,46 @@ public class WFSServiceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
 
+        /*
+         * we verify that the features has been inserted
+         */
+        is = new FileInputStream(FileUtilities.getFileFromResource("org.constellation.wfs.request.xml.GetFeature.xml"));
+        result = service.doPOSTXml(is);
+
+        assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+
+        assertTrue(result.getEntity() instanceof FeatureCollection);
+        collection = (FeatureCollection) result.getEntity();
+        assertEquals(4, collection.size());
+        
+        /*
+         * we delete the features
+         */
+        is = new FileInputStream(FileUtilities.getFileFromResource("org.constellation.wfs.request.xml.DeleteFeature.xml"));
+        result = service.doPOSTXml(is);
+
+        assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+
+        /*
+         * we verify that the features has been deleted
+         */
+        is = new FileInputStream(FileUtilities.getFileFromResource("org.constellation.wfs.request.xml.GetFeature.xml"));
+        result = service.doPOSTXml(is);
+
+        assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+
+        assertTrue(result.getEntity() instanceof FeatureCollection);
+        collection = (FeatureCollection) result.getEntity();
+        assertEquals(2, collection.size());
+        
+        /*
+         * we insert the feature with another request
+         */
+        is = new FileInputStream(FileUtilities.getFileFromResource("org.constellation.wfs.request.xml.InsertFeature2.xml"));
+        result = service.doPOSTXml(is);
+
+        assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+        
         /*
          * we verify that the features has been inserted
          */

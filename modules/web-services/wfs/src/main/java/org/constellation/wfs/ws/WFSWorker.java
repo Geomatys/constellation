@@ -118,14 +118,6 @@ public interface WFSWorker extends Worker {
     Map<String, String> getSchemaLocations();
 
     /**
-     * Add mapping between prefix and namespace,
-     * used for transaction request where the feature are extracted by JAXP.
-     *
-     * @param namespaceMapping a map of prefix - namespace.
-     */
-    void setprefixMapping(Map<String, String> namespaceMapping);
-
-    /**
      * Return all the feature type that the service support.
      * @return all the feature type that the service support.
      */

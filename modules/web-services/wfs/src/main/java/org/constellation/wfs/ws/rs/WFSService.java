@@ -18,45 +18,47 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
+import java.util.HashMap;
+import org.geotoolkit.wfs.xml.v110.BaseRequestType;
+import javax.xml.stream.events.Namespace;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.lang.reflect.Method;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLEventReader;
 import org.constellation.ws.rs.GridWebService;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 
 // JAXB dependencies
-import javax.xml.bind.UnmarshalException;
-import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 // constellation dependencies
+import javax.xml.bind.JAXBElement;
 import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ServiceDef;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
 
 import static org.constellation.query.Query.*;
 import static org.constellation.wfs.ws.WFSConstants.*;
@@ -64,9 +66,6 @@ import static org.constellation.wfs.ws.WFSConstants.*;
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.client.util.RequestsUtilities;
-import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.feature.xml.XmlFeatureReader;
-import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.GmlObjectIdType;
@@ -76,14 +75,12 @@ import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.geotoolkit.util.Versioned;
 import org.geotoolkit.wfs.xml.v110.AllSomeType;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.GetGmlObjectType;
-import org.geotoolkit.wfs.xml.v110.InsertElementType;
 import org.geotoolkit.wfs.xml.v110.LockFeatureType;
 import org.geotoolkit.wfs.xml.v110.LockType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
@@ -91,7 +88,6 @@ import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.xml.MarshallerPool;
 
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.sort.SortOrder;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -122,7 +118,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             		  ":org.geotoolkit.ogc.xml.v110"  +
             		  ":org.geotoolkit.gml.xml.v311"  +
                           ":org.geotoolkit.xsd.xml.v2001" +
-                          ":org.geotoolkit.sampling.xml.v100" +
+                          //":org.geotoolkit.sampling.xml.v100" +
                          ":org.geotoolkit.internal.jaxb.geometry");
             setXMLContext(pool);
             LOGGER.log(Level.INFO, "WFS REST service running ({0} instances)\n", workersMap.size());
@@ -240,142 +236,52 @@ public class WFSService extends GridWebService<WFSWorker> {
     }
 
     /**
-     * Treat the incoming POST request encoded in xml.
-     *
-     * We have to redefine this method because we can't read the feature with JAXB.
-     * we have to use JAXP.
-     * TODO we must do something to treat this case in the super class.
+     * Override the parent method in order to extract namespace mapping
+     * during the unmarshall.
      * 
-     * @return an image or xml response.
-     * @throw JAXBException
+     * @param unmarshaller
+     * @param is
+     * @return
+     * @throws JAXBException 
      */
-    @POST
-    @Consumes("*/xml")
     @Override
-    public Response doPOSTXml(final InputStream is) throws JAXBException  {
-        final MarshallerPool marshallerPool = getMarshallerPool();
-        if (marshallerPool != null) {
-            Object request = null;
-            Unmarshaller unmarshaller = null;
-            final JAXBEventHandler handler = new JAXBEventHandler();
-            try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
-                unmarshaller.setEventHandler(handler);
-                
-                // with the new changes we have to choose a worker right now
-                final WFSWorker worker;
-                try {
-                    final String serviceID = getParameter("serviceId", false);
-                    if (serviceID != null && workersMap.containsKey(serviceID)) {
-                        worker = workersMap.get(serviceID);
-                    } else {
-                        LOGGER.log(Level.WARNING, "Received request on undefined instance identifier:{0}", serviceID);
-                        return Response.status(Response.Status.NOT_FOUND).build();
-                    }
-                } catch (CstlServiceException ex) {
-                    return processExceptionResponse(ex, ServiceDef.WFS_1_1_0);
-                }
+    protected Object unmarshallRequest(Unmarshaller unmarshaller, InputStream is) throws JAXBException {
+        try {
+            final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
+            final XMLEventReader rootEventReader       = XMLInputFactory.newInstance().createXMLEventReader(is);
+            final XMLEventReader eventReader           = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
+                    new Class[]{XMLEventReader.class}, new InvocationHandler() {
 
-                // we made a pre-reading to extract the feature to insert in transaction request.
-                // we also extract the namespace mapping
-                final BufferedReader in;
-                Object featuresToInsert = null;
-                try {
-                    in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                    in.mark(8192);
-                    final StringWriter sw = new StringWriter();
-                    final char[] buffer   = new char[1024];
-                    int size;
-                    while ((size = in.read(buffer, 0, 1024)) > 0) {
-                        sw.append(new String(buffer, 0, size));
-                    }
-                    in.reset();
-                    final String xml = sw.toString();
-                    try {
-                        final XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
-                        if (xml.contains("<wfs:Transaction")) {
-                            try {
-                                featuresToInsert = featureReader.read(xml);
-                            } catch (XMLStreamException ex) {
-                               LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    Object returnVal = method.invoke(rootEventReader, args);
+                    if (method.getName().equals("nextEvent")) {
+                        XMLEvent evt = (XMLEvent) returnVal;
+                        if (evt.isStartElement()) {
+                            StartElement startElem = evt.asStartElement();
+                            Iterator<Namespace> t = startElem.getNamespaces();
+                            while (t.hasNext()) {
+                                Namespace n = t.next();
+                                prefixMapping.put(n.getPrefix(), n.getNamespaceURI());
                             }
                         }
-                        worker.setprefixMapping(featureReader.extractNamespace(xml));
-                    } catch (IllegalArgumentException ex) {
-                        LOGGER.log(Level.INFO, "", ex);
-                        return launchException(ex.getMessage(), INVALID_PARAMETER_VALUE.name() ,null);
                     }
-
-                } catch (UnsupportedEncodingException ex) {
-                    return launchException("Error while pre-reading the request.\nCause:" + ex.getMessage(), "NO_APPLICABLE_CODE", null);
-                } catch (IOException ex) {
-                    return launchException("Error while pre-reading the request.\nCause:" + ex.getMessage(), "NO_APPLICABLE_CODE", null);
+                    return returnVal;
                 }
-
-                request = unmarshaller.unmarshal(in);
-                if (request instanceof JAXBElement) {
-                    request = ((JAXBElement<?>)request).getValue();
-                }
-
-                // we replace the feature to insert unmarshalled by JAXB with the feature read by JAXP.
-                if (request instanceof TransactionType && featuresToInsert != null) {
-                    final TransactionType transaction = (TransactionType) request;
-                    for (Object obj : transaction.getInsertOrUpdateOrDelete()) {
-                        if (obj instanceof InsertElementType) {
-                            final InsertElementType insert = (InsertElementType) obj;
-                            insert.getFeature().clear();
-
-                            if (featuresToInsert instanceof List) {
-                                insert.getFeature().addAll((List<SimpleFeature>)featuresToInsert);
-                            } else if (featuresToInsert instanceof FeatureCollection) {
-                                insert.getFeature().add(featuresToInsert);
-                            }
-                            break;
-                        }
-                    }
-                }
-            } catch (UnmarshalException e) {
-                String errorMsg = e.getMessage();
-                if (errorMsg == null) {
-                    if (e.getCause() != null && e.getCause().getMessage() != null) {
-                        errorMsg = e.getCause().getMessage();
-                    } else if (e.getLinkedException() != null && e.getLinkedException().getMessage() != null) {
-                        errorMsg = e.getLinkedException().getMessage();
-                    }
-                }
-                String codeName;
-                if (errorMsg != null && errorMsg.startsWith("unexpected element")) {
-                    if (handler.level == ValidationEvent.ERROR) {
-                        codeName = INVALID_PARAMETER_VALUE.name();
-                    } else {
-                        codeName = OPERATION_NOT_SUPPORTED.name();
-                    }
-                } else {
-                    codeName = INVALID_REQUEST.name();
-                }
-
-                return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, null);
-            } finally {
-                if (unmarshaller != null)  {
-                    marshallerPool.release(unmarshaller);
-                }
+            });
+            Object request =  unmarshaller.unmarshal(eventReader);
+            if (request instanceof JAXBElement) {
+                request = ((JAXBElement)request).getValue();
             }
-
-            if (request instanceof Versioned) {
-                final Versioned ar = (Versioned) request;
-                if (ar.getVersion() != null)
-                    getUriContext().getQueryParameters().add(VERSION, ar.getVersion().toString());
+            if (request instanceof BaseRequestType) {
+                ((BaseRequestType)request).setPrefixMapping(prefixMapping);
             }
-
-            if (request != null) {
-                LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
-            }
-            return treatIncomingRequest(request);
-        } else {
-            return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();
+            return request;
+        } catch (XMLStreamException ex) {
+            throw new JAXBException(ex);
         }
     }
-
+    
     private RequestBase adaptQuery(final String request) throws CstlServiceException {
         if (STR_GETCAPABILITIES.equalsIgnoreCase(request)) {
             return createNewGetCapabilitiesRequest();
@@ -508,9 +414,14 @@ public class WFSService extends GridWebService<WFSWorker> {
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
 
-        FilterType filter = null;
+        FilterType filter;
+        final Map<String, String> prefixMapping;
         if (xmlFilter instanceof FilterType) {
             filter = (FilterType) xmlFilter;
+            prefixMapping = filter.getPrefixMapping();
+        } else {
+            filter = null;
+            prefixMapping = new HashMap<String, String>();
         }
 
         final String bbox = getParameter("bbox", false);
@@ -580,7 +491,9 @@ public class WFSService extends GridWebService<WFSWorker> {
             query.getPropertyNameOrXlinkPropertyNameOrFunction().addAll(propertyNames);
         }
         
-        return new GetFeatureType(service, version, handle, maxFeature, Arrays.asList(query), resultType, outputFormat);
+        final GetFeatureType gf = new GetFeatureType(service, version, handle, maxFeature, Arrays.asList(query), resultType, outputFormat);
+        gf.setPrefixMapping(prefixMapping);
+        return gf;
     }
 
     private GetGmlObjectType createNewGetGmlObjectRequest() throws CstlServiceException {
@@ -623,17 +536,22 @@ public class WFSService extends GridWebService<WFSWorker> {
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
         final FilterType filter;
+        final Map<String, String> prefixMapping;
         if (xmlFilter instanceof FilterType) {
             filter = (FilterType) xmlFilter;
+            prefixMapping = filter.getPrefixMapping();
         } else {
             filter = null;
+            prefixMapping = new HashMap<String, String>();
         }
         
         // TODO
         final QName typeNamee = typeNames.get(0);
         final LockType lock = new LockType(filter, handle, typeNamee);
 
-        return new LockFeatureType(service, version, handle, Arrays.asList(lock), expiry, lockAction);
+        final LockFeatureType lf = new LockFeatureType(service, version, handle, Arrays.asList(lock), expiry, lockAction);
+        lf.setPrefixMapping(prefixMapping);
+        return lf;
     }
 
     private TransactionType createNewTransactionRequest() throws CstlServiceException {
@@ -654,17 +572,22 @@ public class WFSService extends GridWebService<WFSWorker> {
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
         final FilterType filter;
+        final Map<String, String> prefixMapping;
         if (xmlFilter instanceof FilterType) {
             filter = (FilterType) xmlFilter;
+            prefixMapping = filter.getPrefixMapping();
         } else {
             filter = null;
+            prefixMapping = new HashMap<String, String>();
         }
 
         // TODO
         final QName typeNamee = typeNames.get(0);
         final DeleteElementType delete = new DeleteElementType(filter, handle, typeNamee);
-        return new TransactionType(service, version, handle, releaseAction, delete);
-    }
+        final TransactionType t = new TransactionType(service, version, handle, releaseAction, delete);
+        t.setPrefixMapping(prefixMapping);
+        return t;
+     }
 
     /**
      * Extract proper QName from a String list of typeName.

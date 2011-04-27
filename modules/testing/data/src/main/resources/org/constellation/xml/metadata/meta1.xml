@@ -285,7 +285,7 @@
                         <gmx:Anchor xlink:href="SDN:P021:35:ATTN">Transmittance and attenuance of the water column</gmx:Anchor>
                     </gmd:keyword>
                     <gmd:type>
-                        <gmd:MD_KeywordTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="parameter"/>
+                        <gmd:MD_KeywordTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="parameter">Parameter</gmd:MD_KeywordTypeCode>
                     </gmd:type>
                     <gmd:thesaurusName>
                         <gmd:CI_Citation>

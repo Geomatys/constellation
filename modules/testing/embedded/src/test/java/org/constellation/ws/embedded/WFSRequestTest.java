@@ -176,8 +176,8 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         TransactionSummaryType sum        = new TransactionSummaryType(2, 0, 0);
         List<InsertedFeatureType> insertedFeatures = new ArrayList<InsertedFeatureType>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("sampling-point-3"), null));
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("sampling-point-4"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-003"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-004"), null));
         InsertResultsType insertResult    = new InsertResultsType(insertedFeatures);
         TransactionResponseType ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
 

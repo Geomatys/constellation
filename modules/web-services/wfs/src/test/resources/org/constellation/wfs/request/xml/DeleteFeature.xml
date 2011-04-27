@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<wfs:Transaction
+   version="1.1.0"
+   service="WFS"
+   xmlns:sampling="http://www.opengis.net/sampling/1.0"
+   xmlns:ogc="http://www.opengis.net/ogc"
+   xmlns:gml="http://www.opengis.net/gml"
+   xmlns:wfs="http://www.opengis.net/wfs"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.opengis.net/wfs ../wfs/1.1.0/WFS.xsd">
+    <wfs:Delete typeName="sampling:SamplingPoint">
+        <ogc:Filter>
+            <ogc:Or>
+                <ogc:PropertyIsEqualTo>
+                    <ogc:PropertyName>gml:name</ogc:PropertyName>
+                    <ogc:Literal>666-999</ogc:Literal>
+                </ogc:PropertyIsEqualTo>
+                <ogc:PropertyIsEqualTo>
+                    <ogc:PropertyName>gml:name</ogc:PropertyName>
+                    <ogc:Literal>r2d2-xoupi</ogc:Literal>
+                </ogc:PropertyIsEqualTo>
+            </ogc:Or>
+        </ogc:Filter>
+    </wfs:Delete>
+</wfs:Transaction>
