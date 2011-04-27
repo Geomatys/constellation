@@ -58,7 +58,12 @@ public enum ServiceDef {
     // MDWeb services definitions
     MDW(Specification.MDW, Organization.NONE, null, Profile.NONE, null, false),
     // Thesaurus services definitions
-    THW(Specification.THW, Organization.NONE, null, Profile.NONE, null, false);
+    THW(Specification.THW, Organization.NONE, null, Profile.NONE, null, false),
+
+    //WPS services definitions
+    WPS_1_0_0(Specification.WPS, Organization.OGC, "1.0.0", Profile.NONE, "1.0.0", true);
+
+
     /**
      * Name of the specification.
      */
@@ -160,6 +165,7 @@ public enum ServiceDef {
         CSW("Catalog Service for the Web"),
         SOS("Sensor Observation Service"),
         WCS("Web Coverage Service"),
+        WPS("Web Processing Service"),
         WFS("Web Feature Service"),
         WMS("Web Map Service"),
         WMTS("Web Map Tile Service"),
