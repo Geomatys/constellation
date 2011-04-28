@@ -635,7 +635,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                 featureObject = featureReader.read(featureObject);
 
                         } else if (featureObject instanceof FeatureCollectionType) {
-                            System.out.println("hereee:" + featureObject);
                             final FeatureCollectionType xmlCollection = (FeatureCollectionType) featureObject;
                             final String id = xmlCollection.getId();
                             final List<Feature> features = new ArrayList<Feature>();
@@ -649,6 +648,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                             collection.addAll(features);
                             featureObject = collection;
                         }
+                    } catch (IllegalArgumentException ex) {
+                        throw new CstlServiceException(ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
                     } catch (IOException ex) {
                         throw new CstlServiceException(ex);
                     } catch (XMLStreamException ex) {

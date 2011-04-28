@@ -49,6 +49,7 @@ import javax.xml.stream.XMLStreamException;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
+import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
@@ -247,14 +248,21 @@ public class WFSService extends GridWebService<WFSWorker> {
     @Override
     protected Object unmarshallRequest(Unmarshaller unmarshaller, InputStream is) throws JAXBException {
         try {
+            final JAXBEventHandler handler          = new JAXBEventHandler(); 
+            unmarshaller.setEventHandler(handler);
             final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
-            final XMLEventReader rootEventReader       = XMLInputFactory.newInstance().createXMLEventReader(is);
-            final XMLEventReader eventReader           = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
+            final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(is);
+            final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
                     new Class[]{XMLEventReader.class}, new InvocationHandler() {
 
                 @Override
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    Object returnVal = method.invoke(rootEventReader, args);
+                    Object returnVal = null;
+                    try {
+                        returnVal = method.invoke(rootEventReader, args);
+                    } catch (InvocationTargetException ex) {
+                        throw ex.getTargetException();
+                    }
                     if (method.getName().equals("nextEvent")) {
                         XMLEvent evt = (XMLEvent) returnVal;
                         if (evt.isStartElement()) {
