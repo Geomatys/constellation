@@ -47,6 +47,7 @@ import org.constellation.util.Util;
 
 // geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.geotoolkit.internal.jaxb.gco.AnchorType;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
@@ -79,9 +80,6 @@ import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DefaultVerticalCS;
 import org.geotoolkit.referencing.datum.DefaultVerticalDatum;
-import org.geotoolkit.temporal.object.DefaultInstant;
-import org.geotoolkit.temporal.object.DefaultPeriod;
-import org.geotoolkit.temporal.object.DefaultPosition;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.SimpleInternationalString;
 
@@ -505,12 +503,12 @@ public class MetadataUnmarshallTest {
         //temporal extent
         DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
 
-        Date start = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
+        /*Date start = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
         Date stop  = TemporalUtilities.parseDate("1990-07-02T00:00:00+0200");
 
-        DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
-        DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));
-        DefaultPeriod period = new DefaultPeriod(begin, end);
+        TimePosition Instant begin = new DefaultInstant(new DefaultPosition(start));
+        TimePosition end = new DefaultInstant(new DefaultPosition(stop));*/
+        TimePeriodType period = new TimePeriodType("1990-06-05", "1990-07-02");
         tempExtent.setExtent(period);
 
         set = new HashSet();
@@ -1330,12 +1328,12 @@ public class MetadataUnmarshallTest {
         //temporal extent
         DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
 
-        Date start = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
+        /*Date start = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
         Date stop  = TemporalUtilities.parseDate("1990-07-02T00:00:00+0200");
 
         DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
-        DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));
-        DefaultPeriod period = new DefaultPeriod(begin, end);
+        DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));*/
+        TimePeriodType period = new TimePeriodType("1990-06-05", "1990-07-02");
         tempExtent.setExtent(period);
 
         set = new HashSet();

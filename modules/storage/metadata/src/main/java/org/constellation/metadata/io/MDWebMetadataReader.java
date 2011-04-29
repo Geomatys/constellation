@@ -244,8 +244,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.geotoolkit.metadata.iso", "org.geotoolkit.referencing",
                                                                  "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
-                                                                 "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object",
-                                                                 "org.geotoolkit.util");
+                                                                 "org.geotoolkit.metadata.fra", "org.geotoolkit.util");
         this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
         this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
         this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311");
@@ -717,12 +716,6 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         attribName = "geographicElements";
                     } else if ("transformationParameterAvailability".equals(attribName)) {
                         attribName = "transformationParameterAvailable";
-                    } else if ("beginPosition".equals(attribName)) {
-                        attribName = "begining";
-                    } else if ("endPosition".equals(attribName)) {
-                        attribName = "ending";
-                    } else if ("value".equals(attribName) && "DefaultPosition".equals(classe.getSimpleName())) {
-                        attribName = "position";
                     } else if (attribName.equalsIgnoreCase("verticalCS")) {
                         attribName = "coordinateSystem";
                     } else if (attribName.equalsIgnoreCase("verticalDatum")) {
@@ -733,9 +726,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         attribName = "abbreviation";
                     } else if (attribName.equalsIgnoreCase("uom")) {
                         attribName = "unit";
-                    } /*else if (attribName.equalsIgnoreCase("codeSpace") && !(result instanceof DefaultIdentifier)) {
-                        attribName = "codespace";
-                    }*/
+                    } 
                 }
 
                 boolean putSuceed = false;
@@ -918,7 +909,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else if ("Sensor Web Enablement".equals(standardName)) {
             packagesName.addAll(swePackage);
 
-        } else if ("ISO 19108".equals(standardName) && mode == SENSORML) {
+        } else if ("ISO 19108".equals(standardName) && (mode == SENSORML || className.startsWith("Time"))) {
             packagesName.addAll(gmlPackage);
 
         } else if ("ISO 19115-2".equals(standardName)) {
@@ -1019,9 +1010,6 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         case 1: {
                             if (name.indexOf("Code") != -1 && name.indexOf("CodeSpace") == -1) {
                                 name = name.substring(0, name.indexOf("Code"));
-                            }
-                            if (name.startsWith("Time") && mode != SENSORML) {
-                                name = name.substring(4);
                             }
                             nameType = 2;
                             break;
