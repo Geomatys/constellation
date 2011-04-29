@@ -1,0 +1,112 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>web-services</artifactId>
+        <version>0.7-SNAPSHOT</version>
+    </parent>
+
+    <!--
+    Module description.
+     -->
+    <groupId>org.constellation.web-services</groupId>
+    <artifactId>cstl-web-wps</artifactId>
+    <packaging>jar</packaging>
+    <name>Web service for an OGC WPS</name>
+    <description>
+    HTTP facade to an OGC Web Processing Service (WPS).
+    </description>
+
+  <!--
+    Developers and contributors.
+  -->
+    <developers>
+        <developer>
+            <name>Quentin Boileau</name>
+            <id>Kite</id>
+            <email>quentin.boileau@gmail.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <timezone>+1</timezone>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+
+    <dependencies>
+
+        <!-- Process -->
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-processing-core</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-processing-vector</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-processing-raster</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-processing-coverage</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-processing-test</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Other -->
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-jaxp-gml</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.constellation.web-services</groupId>
+            <artifactId>cstl-web-map</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-xml-wps</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
+
+
+        <!-- Web interface -->
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-base</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Postgre SQL-->
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-epsg-javadb</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.0-801.jdbc4</version>
+        </dependency>
+        
+    </dependencies>
+</project>
