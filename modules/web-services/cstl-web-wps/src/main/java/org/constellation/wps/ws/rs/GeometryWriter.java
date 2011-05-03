@@ -29,26 +29,30 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
-import org.geotoolkit.data.DataStoreRuntimeException;
-import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
-import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.storage.DataStoreException;
+import javax.xml.bind.Marshaller;
+import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.xml.MarshallerPool;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 @Provider
-public class FeatureCollectionWriter<T extends FeatureCollection> implements MessageBodyWriter<T> {
+public class GeometryWriter<T extends AbstractGeometryType> implements MessageBodyWriter<T> {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.wps.ws.rs");
-
+    private static MarshallerPool pool;
+    static{
+        try {
+            pool = new MarshallerPool("org.geotoolkit.wps.xml.v100:org.geotoolkit.gml.xml.v311:org.geotoolkit.internal.jaxb.geometry");
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
     @Override
     public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
-        return FeatureCollection.class.isAssignableFrom(type);
+        return AbstractGeometryType.class.isAssignableFrom(type);
     }
 
     @Override
@@ -59,18 +63,18 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
     @Override
     public void writeTo(final T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt,
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
+        Marshaller m = null;
         try {
-            final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter();
-            featureWriter.write(t, out);
+            m = pool.acquireMarshaller();
+            m.marshal(t, out);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
-        } catch (XMLStreamException ex) {
-            LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);
-        } catch (DataStoreException ex) {
-            LOGGER.log(Level.SEVERE, "DataStore exception while writing the feature collection", ex);
-        } catch (DataStoreRuntimeException ex) {
-            LOGGER.log(Level.SEVERE, "DataStoreRuntimeException exception while writing the feature collection", ex);
+        } finally {
+            if(m!=null){
+                pool.release(m);
+            }
         }
+        
     }
 
 }

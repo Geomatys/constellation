@@ -16,9 +16,10 @@
  */
 package org.constellation.wps.ws;
 
+import javax.xml.parsers.ParserConfigurationException;
+import org.geotoolkit.storage.DataStoreException;
 import org.w3c.dom.Node;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -32,8 +33,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -123,8 +127,27 @@ import org.constellation.ServiceDef;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.data.FeatureIterator;
+import org.geotoolkit.data.FeatureWriter;
+import org.geotoolkit.feature.AttributeDescriptorBuilder;
+import org.geotoolkit.feature.AttributeTypeBuilder;
+import org.geotoolkit.feature.FeatureTypeBuilder;
+import org.geotoolkit.feature.FeatureUtilities;
+import org.geotoolkit.feature.type.DefaultFeatureType;
+import org.geotoolkit.feature.type.DefaultGeometryType;
+import org.geotoolkit.feature.type.DefaultPropertyDescriptor;
+import org.geotoolkit.feature.xml.jaxp.ElementFeatureWriter;
+import org.geotoolkit.geometry.isoonjts.GeometryUtils;
+import org.geotoolkit.geometry.jts.JTS;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
+import org.opengis.feature.Property;
+import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
+import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.w3c.dom.Element;
 
 import static org.constellation.query.Query.*;
 import static org.constellation.wps.ws.WPSConstant.*;
@@ -601,7 +624,7 @@ public class WPSWorker extends AbstractWorker {
 
             //Give a bief process description into the execute response
             response.setProcess(processBrief(processDesc));
-
+            
             if(isLineage){
                 //Inputs
                 response.setDataInputs(request.getDataInputs());
@@ -730,10 +753,19 @@ public class WPSWorker extends AbstractWorker {
                     final List<Double> upper = bBox.getUpperCorner();
                     final String crs = bBox.getCrs();
                     final int dimension = bBox.getDimensions();
-
+                    
+                    
+                    for (Double double1 : lower) {
+                        System.out.println("lower "+ double1);
+                    }
+                    for (Double double2 : upper) {
+                        System.out.println("upper "+ double2);
+                    }
+                    System.out.println("crs "+ crs);
+                    System.out.println("dimensions "+ dimension);
+                    
                     if(dimension != 2 || lower.size() != 2 || upper.size() != 2){
-                        throw new CstlServiceException("Invalid data input : Only 2 dimension boundingbox supported."
-                                , OPERATION_NOT_SUPPORTED, inputIdentifier);
+                        throw new CstlServiceException("Invalid data input : Only 2 dimension boundingbox supported.",OPERATION_NOT_SUPPORTED, inputIdentifier);
                     }
 
                     final double[] lowerArray = new double[dimension];
@@ -752,8 +784,9 @@ public class WPSWorker extends AbstractWorker {
                                 , OPERATION_NOT_SUPPORTED, inputIdentifier);
                     }
 
-                    final JTSEnvelope2D envelop = new JTSEnvelope2D(lowerArray[0], lowerArray[1], upperArray[0], upperArray[1], crsDecode);
-                   
+                   // final JTSEnvelope2D envelop = new JTSEnvelope2D(lowerArray[0], lowerArray[1], upperArray[0], upperArray[1], crsDecode);
+                    final Envelope envelop = GeometryUtils.createCRSEnvelope(crsDecode,lowerArray[0], lowerArray[1], upperArray[0], upperArray[1]);
+                    System.out.println("BBOX : "+envelop);
                     dataValue = envelop;
 
                 /* Complex data (XML, raster, ...) */
@@ -785,15 +818,18 @@ public class WPSWorker extends AbstractWorker {
                             throw new CstlServiceException("Invalid data input value.", INVALID_PARAMETER_VALUE, inputIdentifier);
                         }
                         
+                        /* Geometry */
                         if(expectedClass.equals(Geometry.class)){
                             System.out.println("Geometry !!!");
                             System.out.println("Object class : "+inputObject.getClass().getName());
                             try {
+                                System.out.println("INPUT OBJECT : "+inputObject);
                                 dataValue = GeometrytoJTS.toJTS((AbstractGeometryType) inputObject);
                             } catch (FactoryException ex) {
                                 throw new CstlServiceException("Invalid data input : Cannot convert GML geometry.", INVALID_PARAMETER_VALUE, inputIdentifier);
                             }
                             
+                        /* Feature/FeatureCollection */    
                         }else if(expectedClass.equals(Feature.class) || expectedClass.equals(FeatureCollection.class)){
                             List<FeatureType> ft = null;
                             if (schema != null) {
@@ -815,7 +851,7 @@ public class WPSWorker extends AbstractWorker {
                                     try {
                                         final XmlFeatureReader fcollReader = new JAXPStreamFeatureReader(ft);
                                         dataValue = fcollReader.read(c);
-                                        System.out.println("DATAVALUE : "+dataValue);
+                                       // System.out.println("DATAVALUE : "+dataValue);
                                     } catch (IOException ex) {
                                         throw new CstlServiceException("Unable to read feature from nodes.", ex, NO_APPLICABLE_CODE);
                                     } catch (XMLStreamException ex) {
@@ -825,6 +861,9 @@ public class WPSWorker extends AbstractWorker {
                                     }
                                 }
                             }
+                            dataValue = fixFeature(dataValue,ft);
+                            FeatureCollection feat = (FeatureCollection)dataValue;
+                            System.out.println("FIXED FEATURECOLLECTION :"+feat.getFeatureType()+" FEATURECOLLECTION : "+feat);
                         }
                     }
                     
@@ -880,26 +919,32 @@ public class WPSWorker extends AbstractWorker {
             /* Raw Data returned */
             if(isOutputRaw){
                 
-                //return raw wanted output value from process
-//                final Object outputValue = proc.getOutput().parameter(rawOutputID).getValue();
-//                final ComplexDataType complex = new ComplexDataType();
-//
-//                complex.setEncoding(rawOutputEncoding);
-//                complex.setMimeType(rawOutputMime);
-//                complex.setSchema(rawOutputSchema);
-//
-//                //convert Geometry from JTS to GML
-//                if(outputValue instanceof Geometry){
-//                    org.opengis.geometry.Geometry opengisGeometry =
-//                            GMLUtilities.getGMLFromISO(JTSUtils.toISO((Geometry)outputValue, null));
-//                    complex.getContent().add(opengisGeometry);
-//                }else{
-//                     complex.getContent().add(outputValue);
-//                }
-//
-//                return complex;
                 final Object outputValue = proc.getOutput().parameter(rawOutputID).getValue();
-                System.out.println("OUPUT : "+outputValue);
+                System.out.println("OUPUT RAW : "+outputValue);
+                
+                if(outputValue instanceof Geometry){
+                     org.opengis.geometry.Geometry isoGeom;
+                    try {
+                        Geometry jtsGeom = (Geometry)outputValue;
+                        System.out.println("JTS GEOM "+jtsGeom);
+                        CoordinateReferenceSystem crs = JTS.findCoordinateReferenceSystem(jtsGeom);
+                        System.out.println("CRS : "+crs);
+                        isoGeom = JTSUtils.toISO((Geometry)outputValue,crs);
+                        System.out.println("ISO GEOM "+isoGeom);
+                        AbstractGeometryType gmlGeom = GMLUtilities.getGMLFromISO(isoGeom);
+                        System.out.println("GML GEOM "+gmlGeom);
+                        return gmlGeom;
+                    } catch (NoSuchAuthorityCodeException ex) {
+                        Logger.getLogger(WPSWorker.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (FactoryException ex) {
+                        Logger.getLogger(WPSWorker.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                   
+                }
+                
+                if(outputValue instanceof Envelope){
+                    return new BoundingBoxType((Envelope)outputValue);
+                }
                 return outputValue;
                
             /* DocumentResponse returned */
@@ -920,6 +965,7 @@ public class WPSWorker extends AbstractWorker {
                     //get output value from process
                     final Object outputValue = proc.getOutput().parameter(outputIdentifier).getValue();
                     System.out.println("######### OUPUT : "+outputValue);
+                    
                     final DataType data = new DataType();
                     if (outputDescriptor instanceof ParameterDescriptor) {
 
@@ -949,31 +995,82 @@ public class WPSWorker extends AbstractWorker {
                             //convert Geometry from JTS to GML
                             if(outputValue instanceof Geometry){
                                 System.out.println("Output Complex Geometry");
-                                org.opengis.geometry.Geometry opengisGeometry = 
-                                        GMLUtilities.getGMLFromISO(JTSUtils.toISO((Geometry)outputValue, null));
-                                complex.getContent().add(opengisGeometry);
+                                org.opengis.geometry.Geometry isoGeom;
+                                AbstractGeometryType gmlGeom = null;
+                                try {
+                                    Geometry jtsGeom = (Geometry)outputValue;
+                                    System.out.println("JTS GEOM "+jtsGeom);
+                                    CoordinateReferenceSystem crs = JTS.findCoordinateReferenceSystem(jtsGeom);
+                                    System.out.println("CRS : "+crs);
+                                    isoGeom = JTSUtils.toISO((Geometry)outputValue,crs);
+                                    System.out.println("ISO GEOM "+isoGeom);
+                                    gmlGeom = GMLUtilities.getGMLFromISO(isoGeom);
+                                    System.out.println("GML GEOM "+gmlGeom);
+                                    return gmlGeom;
+                                } catch (NoSuchAuthorityCodeException ex) {
+                                    Logger.getLogger(WPSWorker.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (FactoryException ex) {
+                                    Logger.getLogger(WPSWorker.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                //complex.setSchema("http://schemas.opengis.net/gml/3.1.1/base/feature.xsd");//TODO
+                                complex.getContent().add(gmlGeom);
                                 
                             //FeatureCollection    
                             }else if(outputValue instanceof FeatureCollection){
                                 System.out.println("Output Complex FeatureCollection");
                                 FeatureCollection fc = (FeatureCollection) outputValue;
                                 FeatureType ft = fc.getFeatureType();
-                                complex.setSchema(null);//TODO convert FeatureType into schema
-                                complex.getContent().add(fc);
+                                
+                                Element elem = null;
+                                try {
+                                   
+                                    final ElementFeatureWriter efw = new ElementFeatureWriter();
+                                    elem = efw.writeFeatureCollection(fc, true, false);
+                                        
+                                } catch (JAXBException ex) {
+                                    throw new CstlServiceException("Can't write FeatureCollection into ResponseDocument",ex, 
+                                            NO_APPLICABLE_CODE, outputIdentifier);
+                                } catch (DataStoreException ex) {
+                                    throw new CstlServiceException("Can't write FeatureCollection into ResponseDocument",ex, 
+                                            NO_APPLICABLE_CODE, outputIdentifier);
+                                } catch (ParserConfigurationException ex) {
+                                     throw new CstlServiceException("Can't write FeatureCollection into ResponseDocument",ex, 
+                                            NO_APPLICABLE_CODE, outputIdentifier);
+                                }
+                               
+                                complex.getContent().add(elem);
                                 
                             //Feature
                             }else if(outputValue instanceof Feature){
                                 System.out.println("Output Complex Feature");
                                 Feature feat = (Feature) outputValue;
                                 FeatureType ft = feat.getType();
-                                complex.setSchema(null);//TODO convert FeatureType into schema
-                                complex.getContent().add(feat);
                                 
+                                Element elem = null;
+                                try {
+                                   
+                                    final ElementFeatureWriter efw = new ElementFeatureWriter();
+                                    elem = efw.writeFeature(feat, null, true);
+                                        
+                                } catch (JAXBException ex) {
+                                    throw new CstlServiceException("Can't write FeatureCollection into ResponseDocument",ex, 
+                                            NO_APPLICABLE_CODE, outputIdentifier);
+                                } catch (ParserConfigurationException ex) {
+                                     throw new CstlServiceException("Can't write FeatureCollection into ResponseDocument",ex, 
+                                            NO_APPLICABLE_CODE, outputIdentifier);
+                                }
+                                
+                                complex.getContent().add(elem);
+                                                                
                             }else{
                                 System.out.println("Output Complex "+outputValue.getClass().getName());
                                 complex.getContent().add(outputValue);
                             }
-                           
+                            System.out.println("Output Complex enco: "+complex.getEncoding());
+                            System.out.println("Output Complex mime: "+complex.getMimeType());
+                            System.out.println("Output Complex schema: "+complex.getSchema());
+                            System.out.println("Output Complex value: "+complex.getContent().get(0));
+                            
                             data.setComplexData(complex);
 
                         /* Literal */
@@ -1069,7 +1166,7 @@ public class WPSWorker extends AbstractWorker {
      * @return  converted object
      * @throws CstlServiceException if there is no match found
      */
-    private static <T> Object convertFromString(String data, Class binding) throws CstlServiceException {
+    private static <T> Object convertFromString(final String data, final Class binding) throws CstlServiceException {
 
         Object convertedData = null;
         try {
@@ -1118,8 +1215,7 @@ public class WPSWorker extends AbstractWorker {
      * @throws CstlServiceException if something went wrong
      */
     private Object reachReferencedData(String href, final String method, final String mime,
-            final String encoding, final String schema, final Class expectedClass, final String inputID)
-            throws CstlServiceException {
+            final String encoding, final String schema, final Class expectedClass, final String inputID) throws CstlServiceException {
 
         if(href == null || schema == null || mime == null){
             throw new CstlServiceException("Invalid reference input : href, schema and typeMime can't be null.", INVALID_PARAMETER_VALUE, inputID);
@@ -1167,7 +1263,18 @@ public class WPSWorker extends AbstractWorker {
                 }
                 
             }else {
-                 throw new CstlServiceException("Reference data is not supported", VERSION_NEGOTIATION_FAILED, inputID);
+                 throw new CstlServiceException("Reference data mime is not supported", VERSION_NEGOTIATION_FAILED, inputID);
+            }
+            
+       /*
+        * Geometry
+        */   
+        }else if(expectedClass.equals(Geometry.class)){
+            if(mime.equalsIgnoreCase(MimeType.TEXT_XML)){
+                return null;
+                //TODO get a geometry from a reference
+            }else{
+                 throw new CstlServiceException("Reference data mime is not supported", VERSION_NEGOTIATION_FAILED, inputID);
             }
         }else{
             throw new CstlServiceException("Requested format is not supported", VERSION_NEGOTIATION_FAILED, inputID);
@@ -1183,7 +1290,7 @@ public class WPSWorker extends AbstractWorker {
      * @return
      * @throws CstlServiceException
      */
-    private DomainMetadataType createDataType(Class clazz) throws CstlServiceException {
+    private DomainMetadataType createDataType(final Class clazz) throws CstlServiceException {
 
         if(LITERALTYPE_LIST.contains(clazz)){
             return new DomainMetadataType("String", "http://www.w3.org/TR/xmlschema-2/#string");
@@ -1206,4 +1313,68 @@ public class WPSWorker extends AbstractWorker {
         }
     }
 
+    private Object fixFeature(final Object dataValue, final List<FeatureType> type) throws CstlServiceException {
+        
+        if(dataValue instanceof  Feature){
+            
+            final Feature featureIN = (Feature)dataValue;
+            DefaultFeatureType ft = (DefaultFeatureType) featureIN.getType();
+            fixFeatureType(featureIN, ft);
+           
+            return featureIN;
+        }
+        
+        if(dataValue instanceof FeatureCollection){
+            final FeatureCollection featureColl = (FeatureCollection)dataValue;
+            
+            DefaultFeatureType ft = (DefaultFeatureType) featureColl.getFeatureType();
+            final FeatureIterator featureIter = featureColl.iterator();
+            if(featureIter.hasNext()){
+                final Feature feature = featureIter.next();
+                fixFeatureType(feature, ft);
+            }
+            featureIter.close();
+            return featureColl;
+        }
+        
+        throw new CstlServiceException("Invalid Feature");
+    }
+
+    private void fixFeatureType(final Feature featureIN, DefaultFeatureType type) throws CstlServiceException{
+        AttributeDescriptorBuilder descBuilder;
+        AttributeTypeBuilder typeBuilder;
+        
+        CoordinateReferenceSystem extractCRS = null;
+
+        final FeatureTypeBuilder ftb = new FeatureTypeBuilder();
+        ftb.copy(type);
+
+        //Fetch each geometry, get his CRS and 
+        for(Property property : featureIN.getProperties()){
+            if(property.getDescriptor() instanceof GeometryDescriptor){
+                try {
+                    final String propertyName = property.getName().getLocalPart();
+                    final Geometry propertyGeom = (Geometry) property.getValue();
+                    extractCRS = JTS.findCoordinateReferenceSystem(propertyGeom);
+
+                    final Iterator<PropertyDescriptor> ite = type.getDescriptors().iterator();
+
+                    while(ite.hasNext()){
+                        final DefaultPropertyDescriptor propertyDesc = (DefaultPropertyDescriptor)ite.next();
+                        
+                        if(propertyDesc.getName().getLocalPart().equals(propertyName)){
+                            final DefaultGeometryType geomType = (DefaultGeometryType) propertyDesc.getType();
+                            geomType.setCoordinateReferenceSystem(extractCRS);
+                            break;
+                        }
+                    }
+                } catch (NoSuchAuthorityCodeException ex) {
+                    throw new CstlServiceException("Can't find feature geometry CRS");
+                } catch (FactoryException ex) {
+                    throw new CstlServiceException("Can't find feature geometry CRS");
+                }
+            }
+        }
+    } 
+    
 }

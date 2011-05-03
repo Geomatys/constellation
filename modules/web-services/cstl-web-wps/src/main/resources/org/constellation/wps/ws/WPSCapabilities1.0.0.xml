@@ -39,23 +39,23 @@
 		<ows:Operation name="GetCapabilities">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Get xlink:href="http://wms1.agr.gc.ca/GeoPS/GeoPS?"/>
-                                        <ows:Post xlink:href="http://wms1.agr.gc.ca/GeoPS/GeoPS"/>
+					<ows:Get xlink:href=""/>
+                                        <ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 		</ows:Operation>
 		<ows:Operation name="DescribeProcess">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Get xlink:href="http://wms1.agr.gc.ca/GeoPS/GeoPS?"/>
-					<ows:Post xlink:href="http://wms1.agr.gc.ca/GeoPS/GeoPS"/>
+					<ows:Get xlink:href=""/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 		</ows:Operation>
 		<ows:Operation name="Execute">
 			<ows:DCP>
 				<ows:HTTP>
-					<ows:Post xlink:href="http://wms1.agr.gc.ca/GeoPS/GeoPS"/>
+					<ows:Post xlink:href=""/>
 				</ows:HTTP>
 			</ows:DCP>
 		</ows:Operation>

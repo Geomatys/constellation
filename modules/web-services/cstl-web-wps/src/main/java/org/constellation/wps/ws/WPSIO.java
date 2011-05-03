@@ -39,15 +39,15 @@ public class WPSIO {
 
      public final static List<InputClass> USEDCLASS = UnmodifiableArrayList.wrap(
              
-             new InputClass(Feature.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE), //XML
+             new InputClass(Feature.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1), //XML
              new InputClass(Feature.class, "application/octec-stream", Encoding.NULL, Schema.NULL),         //SHP
 
-             new InputClass(FeatureCollection.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE),  //XML
+             new InputClass(FeatureCollection.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1),  //XML
              new InputClass(FeatureCollection.class, "application/octec-stream",Encoding.NULL, Schema.NULL),           //SHP
 
-             new InputClass(Geometry.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE),
+             new InputClass(Geometry.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1),
 
-             new InputClass(FeatureType.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE)
+             new InputClass(FeatureType.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1)
              
              //new InputClass(Unit.class, Mime.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE),
 
@@ -80,7 +80,7 @@ public class WPSIO {
     public static enum Schema{
 
         NULL(null),
-        OGC_FEATURE("http://schemas.opengis.net/gml/3.1.1/base/feature.xsd");
+        OGC_FEATURE_3_1_1("http://schemas.opengis.net/gml/3.1.1/base/feature.xsd");
         public final String schema;
 
         private Schema(String schema) {
