@@ -237,6 +237,10 @@ public class BDD {
         return conec;
     }
 
+    public static void clearConnectionPool() {
+        CONNECTION_MAP.clear();
+    }
+    
     /**
      * Return a new connection to the database.
      *

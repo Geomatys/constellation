@@ -43,6 +43,7 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
+import org.constellation.generic.database.BDD;
 
 // Geotoolkit dependencies
 import org.geotoolkit.factory.FactoryNotFoundException;
@@ -373,6 +374,7 @@ public abstract class AbstractCSWConfigurer {
      */
     protected boolean restart() {
         if (containerNotifier != null) {
+            BDD.clearConnectionPool();
             containerNotifier.reload();
             return true;
         } else {

@@ -52,8 +52,8 @@ import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-
-
+import org.constellation.generic.database.BDD;
+        
 // Geotoolkit dependencies
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
@@ -341,12 +341,14 @@ public final class ConfigurationService extends WebService  {
 
         if (cn != null) {
             if (!indexing) {
+                BDD.clearConnectionPool();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
             } else if (!forced) {
                 return new AcknowlegementType("failed", "There is an indexation running use the parameter FORCED=true to bypass it.");
             } else {
                 AbstractIndexer.stopIndexation();
+                BDD.clearConnectionPool();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted (previous indexation was stopped)");
             }
