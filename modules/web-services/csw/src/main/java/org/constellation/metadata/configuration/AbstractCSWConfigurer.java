@@ -16,7 +16,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.configuration.ws.rs;
+package org.constellation.metadata.configuration;
 
 // J2SE dependencies
 import java.util.Arrays;

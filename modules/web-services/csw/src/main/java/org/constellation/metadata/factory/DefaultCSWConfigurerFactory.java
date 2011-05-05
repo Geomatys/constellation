@@ -15,18 +15,19 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.configuration.factory;
+package org.constellation.metadata.factory;
 
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.ws.rs.DefaultCSWConfigurer;
+import org.constellation.configuration.factory.AbstractConfigurerFactory;
+import org.constellation.metadata.configuration.DefaultCSWConfigurer;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
 /**
  *
  * @author Guilhem Legal
  */
-public class DefaultConfigurerFactory extends AbstractConfigurerFactory {
+public class DefaultCSWConfigurerFactory extends AbstractConfigurerFactory {
 
     @Override
     public AbstractConfigurer getConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {

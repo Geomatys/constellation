@@ -108,10 +108,10 @@ public final class ConfigurationService extends WebService  {
             LOGGER.log(Level.WARNING, "JAXBException while setting the JAXB context for configuration service: " + ex.getMessage(), ex);
             
         } catch (ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, "Specific CSW operation will not be available.\nCause:{0}", ex.getMessage());
+            LOGGER.log(Level.WARNING, "Specific operation will not be available.\nCause:{0}", ex.getMessage());
             
         } catch (FactoryNotFoundException ex) {
-            LOGGER.warning("Factory not found for CSWConfigurer, specific CSW operation will not be available.");
+            LOGGER.warning("Factory not found for Configurer, specific operation will not be available.");
             
         }
         LOGGER.info("Configuration service runing");

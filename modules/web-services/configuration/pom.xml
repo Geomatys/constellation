@@ -75,8 +75,29 @@
   <dependencies>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-csw</artifactId>
+      <artifactId>cstl-web-base</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- TODO remove this one-->
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-spatial-lucene</artifactId>
+      <version>${geotoolkit-pending.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-ows</artifactId>
+      <version>${geotoolkit-pending.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
