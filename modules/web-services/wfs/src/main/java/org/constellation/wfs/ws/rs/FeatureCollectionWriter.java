@@ -62,8 +62,6 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
         try {
             final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(WFSService.getSchemaLocations());
             featureWriter.write(t, out);
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);
         } catch (DataStoreException ex) {

@@ -312,12 +312,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, false, false);
 
-        final JAXBFeatureTypeWriter writer;
-        try {
-            writer = new JAXBFeatureTypeWriter();
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex);
-        }
+        final JAXBFeatureTypeWriter writer  = new JAXBFeatureTypeWriter();
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
         final List<QName> names             = request.getTypeName();
         final List<FeatureType> types       = new ArrayList<FeatureType>();
@@ -597,12 +592,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final List<Object> transactions            = request.getInsertOrUpdateOrDelete();
         final List<InsertedFeatureType> inserted   = new ArrayList<InsertedFeatureType>();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
-        final XmlFeatureReader featureReader;
-        try {
-            featureReader = new JAXPStreamFeatureReader(getFeatureTypes());
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex);
-        }
+        final XmlFeatureReader featureReader       = new JAXPStreamFeatureReader(getFeatureTypes());
+        
         for (Object transaction: transactions) {
 
             /**
