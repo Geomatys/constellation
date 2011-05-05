@@ -18,7 +18,6 @@ package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
 import javax.ws.rs.core.Context;
-import org.constellation.ws.rs.WebService;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,9 +37,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 // Constellation dependencies
+import org.constellation.ws.rs.WebService;
+import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.exception.ConfigurationException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerProviderProxy;

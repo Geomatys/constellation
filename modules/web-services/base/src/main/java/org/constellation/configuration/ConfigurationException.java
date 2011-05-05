@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.configuration.exception;
+package org.constellation.configuration;
 
 /**
  *

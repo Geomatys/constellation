@@ -17,8 +17,8 @@
 
 package org.constellation.configuration.factory;
 
-import org.constellation.configuration.exception.ConfigurationException;
-import org.constellation.configuration.ws.rs.AbstractConfigurer;
+import org.constellation.configuration.AbstractConfigurer;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.geotoolkit.factory.Factory;
 

@@ -22,7 +22,7 @@ import java.util.List;
 import java.io.File;
 
 // Constellation dependencies
-import org.constellation.configuration.exception.ConfigurationException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 

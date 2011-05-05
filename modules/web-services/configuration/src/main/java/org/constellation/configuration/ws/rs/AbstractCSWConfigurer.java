@@ -34,8 +34,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
+import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.exception.ConfigurationException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.factory.AbstractCSWFactory;
