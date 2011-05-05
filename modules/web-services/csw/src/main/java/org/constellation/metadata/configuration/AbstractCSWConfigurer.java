@@ -165,6 +165,11 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         return indexing;
     }
     
+    @Override
+    public void closeForced() {
+        AbstractIndexer.stopIndexation();
+    }
+    
     /**
      * Return true if the select service (identified by his ID) is currently indexing (CSW).
      * @param id

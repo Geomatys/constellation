@@ -114,4 +114,8 @@ public abstract class AbstractConfigurer {
     public boolean isLock() {
         return false;
     }
+    
+    public void closeForced() {
+        
+    }
 }

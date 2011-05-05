@@ -55,7 +55,6 @@ import org.constellation.generic.database.BDD;
 import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
-import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
@@ -218,14 +217,14 @@ public final class ConfigurationService extends WebService  {
         LayerProviderProxy.getInstance().dispose();
 
         if (cn != null) {
-            if (!configurer.isLock()) {
+            if (configurer == null || !configurer.isLock()) {
                 BDD.clearConnectionPool();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
             } else if (!forced) {
                 return new AcknowlegementType("failed", "There is an indexation running use the parameter FORCED=true to bypass it.");
             } else {
-                AbstractIndexer.stopIndexation();
+                configurer.closeForced();
                 BDD.clearConnectionPool();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted (previous indexation was stopped)");

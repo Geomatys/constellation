@@ -62,14 +62,47 @@
     </developer>
   </developers>
 
+  <profiles>
+   <profile>
+      <id>all</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>filter</module>
+        <module>index</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>wms</id>
+      <modules/>
+    </profile>
+    <profile>
+      <id>wcs</id>
+      <modules/>
+    </profile>
+    <profile>
+      <id>wmswcs</id>
+      <modules/>
+    </profile>
+    <profile>
+      <id>csw</id>
+      <modules>
+        <module>filter</module>
+        <module>index</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>sos</id>
+      <modules/>
+    </profile>
+  </profiles>
 
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
     <module>base</module>
-    <module>filter</module>
-    <module>index</module>
   </modules>
 
 </project>

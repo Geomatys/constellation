@@ -88,12 +88,6 @@
       <artifactId>cstl-xml-configuration</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- TODO remove this one-->
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-spatial-lucene</artifactId>
-      <version>${geotoolkit-pending.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-ows</artifactId>
