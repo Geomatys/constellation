@@ -16,8 +16,16 @@
  */
 package org.constellation.configuration.ws.rs;
 
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
+
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
+import static org.constellation.ws.ExceptionCode.*;
+
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -42,10 +50,68 @@ public abstract class AbstractConfigurer {
     }
     
     /**
+     * Extracts the value, for a parameter specified, from a query.
+     *
+     * @param parameterName The name of the parameter.
+     *
+     * @return the parameter, or {@code null} if not specified.
+     */
+    private List<String> getParameter(final String parameterName, final MultivaluedMap<String,String> parameters) {
+        List<String> values = parameters.get(parameterName);
+
+        //maybe the parameterName is case sensitive.
+        if (values == null) {
+            for(final Entry<String, List<String>> key : parameters.entrySet()){
+                if(key.getKey().equalsIgnoreCase(parameterName)){
+                    values = key.getValue();
+                    break;
+                }
+            }
+        }
+        return values;
+    }
+    
+    /**
+     * Extracts the value, for a parameter specified, from a query.
+     * If it is a mandatory one, and if it is {@code null}, it throws an exception.
+     * Otherwise returns {@code null} in the case of an optional parameter not found.
+     *
+     * @param parameterName The name of the parameter.
+     * @param mandatory true if this parameter is mandatory, false if its optional.
+      *
+     * @return the parameter, or {@code null} if not specified and not mandatory.
+     * @throw CstlServiceException
+     */
+    protected String getParameter(final String parameterName, final boolean mandatory, final MultivaluedMap<String,String> parameters) throws CstlServiceException {
+
+        final List<String> values = getParameter(parameterName, parameters);
+        if (values == null) {
+            if (mandatory) {
+                throw new CstlServiceException("The parameter " + parameterName + " must be specified",
+                        MISSING_PARAMETER_VALUE, parameterName.toLowerCase());
+            }
+            return null;
+        } else {
+            final String value = values.get(0);
+            if ((value == null || value.isEmpty()) && mandatory) {
+                throw new CstlServiceException("The parameter " + parameterName + " should have a value",
+                        MISSING_PARAMETER_VALUE, parameterName.toLowerCase());
+            } else {
+                return value;
+            }
+        }
+    }
+    
+    /**
      * destroy all the resource and close the connection.
      */
     public void destroy() {
        // do nothing must be overriden if needed 
     }
     
+    public abstract Object treatRequest(final String request, final MultivaluedMap<String,String> parameters) throws CstlServiceException;
+    
+    public boolean isLock() {
+        return false;
+    }
 }

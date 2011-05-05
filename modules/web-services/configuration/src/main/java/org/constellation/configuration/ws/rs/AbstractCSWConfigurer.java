@@ -19,6 +19,9 @@
 package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
+import java.util.Arrays;
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.StringTokenizer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,7 +77,17 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
      * A CSW factory
      */
     private AbstractCSWFactory cswfactory;
+    
+    /**
+     * A flag indicating if an indexation is going on.
+     */
+    public boolean indexing;
 
+    /**
+     * The list of service currently indexing.
+     */
+    private final List<String> SERVICE_INDEXING = new ArrayList<String>();
+    
     /**
      * Build a new CSW configurer.
      * 
@@ -83,7 +96,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
      */
     public AbstractCSWConfigurer(final ContainerNotifierImpl cn) throws ConfigurationException {
         this.containerNotifier = cn;
-
+        indexing = false;
         try {
             cswfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
 
@@ -94,8 +107,110 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         }
         refreshServiceConfiguration();
     }
+    
+    
+    @Override
+    public Object treatRequest(final String request, final MultivaluedMap<String,String> parameters) throws CstlServiceException {
+        
+        if ("RefreshIndex".equalsIgnoreCase(request)) {
+            final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false, parameters));
+            final String id = getParameter("ID", true, parameters);
+            final boolean forced = Boolean.parseBoolean((String) getParameter("FORCED", false, parameters));
+
+            if (isIndexing(id) && !forced) {
+                final AcknowlegementType refused = new AcknowlegementType("Failure",
+                        "An indexation is already started for this service:" + id);
+                return refused;
+            } else if (indexing && forced) {
+                AbstractIndexer.stopIndexation(Arrays.asList(id));
+            }
+
+            startIndexation(id);
+            AcknowlegementType ack;
+            try {
+                ack = refreshIndex(asynchrone, id);
+            } finally {
+                endIndexation(id);
+            }
+            return ack;
+        }
+        
+        if ("AddToIndex".equalsIgnoreCase(request)) {
+            
+            final String id = getParameter("ID", true, parameters);
+            final String identifierList = getParameter("IDENTIFIERS", true, parameters);
+            return addToIndex(id, identifierList);
+        }
+        
+        if ("stopIndex".equalsIgnoreCase(request)) {
+
+            final String id = getParameter("ID", false, parameters);
+            return stopIndexation(id);
+        }
+        
+        if ("UpdateVocabularies".equalsIgnoreCase(request)) {
+            return updateVocabularies();
+        }
+
+        if ("UpdateContacts".equalsIgnoreCase(request)) {
+            updateContacts();
+
+        }
+        return null;
+    }
+    
+    @Override
+    public boolean isLock() {
+        return indexing;
+    }
+    
+    /**
+     * Return true if the select service (identified by his ID) is currently indexing (CSW).
+     * @param id
+     * @return
+     */
+    public boolean isIndexing(final String id) {
+        return indexing && SERVICE_INDEXING.contains(id);
+    }
 
 
+    /**
+     * Add the specified service to the indexing service list.
+     * @param id
+     */
+    public void startIndexation(final String id) {
+        indexing  = true;
+        if (id != null) {
+            SERVICE_INDEXING.add(id);
+        }
+    }
+
+    /**
+     * remove the selected service from the indexing service list.
+     * @param id
+     */
+    public void endIndexation(final String id) {
+        indexing = false;
+        if (id != null) {
+            SERVICE_INDEXING.remove(id);
+        }
+    }
+    
+    /**
+     * Stop all the indexation going on.
+     *
+     * @return an Acknowledgment.
+     */
+    public AcknowlegementType stopIndexation(final String id) {
+        LOGGER.info("\n stop indexation requested \n");
+        if (isIndexing(id)) {
+            return new AcknowlegementType("Success", "There is no indexation to stop");
+        } else {
+            AbstractIndexer.stopIndexation(Arrays.asList(id));
+            return new AcknowlegementType("Success", "The indexation have been stopped");
+        }
+    }
+    
     /**
      * Build a new Indexer for the specified service ID.
      * 
@@ -321,9 +436,14 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
      * @return
      * @throws CstlServiceException
      */
-    public AcknowlegementType addToIndex(final String id, final List<String> identifiers) throws CstlServiceException {
+    public AcknowlegementType addToIndex(final String id, final String identifierList) throws CstlServiceException {
         LOGGER.info("Add to index requested");
-
+        final List<String> identifiers = new ArrayList<String>();
+        final StringTokenizer tokens = new StringTokenizer(identifierList, ",;");
+        while (tokens.hasMoreTokens()) {
+            final String token = tokens.nextToken().trim();
+            identifiers.add(token);
+        }
         AbstractIndexer indexer  = null;
         CSWMetadataReader reader = null;
         try {
@@ -398,14 +518,14 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
      * Update all the vocabularies SKOS files and the list of contact.
      */
     public AcknowlegementType updateVocabularies() throws CstlServiceException {
-        throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
+        throw new CstlServiceException("The method updateVocabularies is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
     }
 
     /**
      * Update all the contact retrieved from files and the list of contact.
      */
     public AcknowlegementType updateContacts() throws CstlServiceException {
-        throw new CstlServiceException("This method is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
+        throw new CstlServiceException("The method updateContacts is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
     }
 
     /*

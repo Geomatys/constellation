@@ -89,16 +89,71 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
     @Test
     public void testCSWRefreshIndex() throws Exception {
 
-        URL niUrl = new URL("http://localhost:9090/configuration?request=refreshIndex&id=default");
-
-        // for a POST request
+        /*
+         * try to get a missing parameter error
+         */
+        URL niUrl = new URL("http://localhost:9090/configuration?request=refreshIndex");
+        
         URLConnection conec = niUrl.openConnection();
 
         Object obj = unmarshallResponse(conec);
+        
+        assertTrue(obj instanceof ExceptionReport);
+        ExceptionReport exception = new ExceptionReport("The parameter ID must be specified",  
+                                                         OWSExceptionCode.MISSING_PARAMETER_VALUE.name(), 
+                                                         "id", 
+                                                         "1.0");
+        assertEquals(exception, obj);
+        
+        
+        // first we make a getRecords request to count the number of record
+        niUrl = new URL("http://localhost:9090/csw/default?request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+        
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+        
+        assertTrue(obj instanceof GetRecordsResponseType);
+        GetRecordsResponseType response = (GetRecordsResponseType) obj;
+        
+        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
+        
+        // build 2 new metadata file
+        RecordType record = new RecordType();
+        record.setIdentifier(new SimpleLiteral("urn_test00"));
+        File f = new File(ConfigDirectory.getConfigDirectory(), "CSW/default/data/urn_test00.xml");
+        RecordType record2 = new RecordType();
+        record2.setIdentifier(new SimpleLiteral("urn_test01"));
+        File f2 = new File(ConfigDirectory.getConfigDirectory(), "CSW/default/data/urn_test01.xml");
+        
+        
+        Marshaller m = pool.acquireMarshaller();
+        m.marshal(record, f);
+        m.marshal(record2, f2);
+        pool.release(m);
+        
+        
+        niUrl = new URL("http://localhost:9090/configuration?request=refreshIndex&id=default");
+
+        // for a POST request
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
         AcknowlegementType expResult = new AcknowlegementType("success",  "CSW index succefully recreated");
         assertEquals(expResult, obj);
+        
+        niUrl = new URL("http://localhost:9090/csw/default?request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+        
+        conec = niUrl.openConnection();
+
+        obj = unmarshallResponse(conec);
+        
+        assertTrue(obj instanceof GetRecordsResponseType);
+        response = (GetRecordsResponseType) obj;
+        
+        assertEquals(14, response.getSearchResults().getNumberOfRecordsMatched());
     }
     
     @Test
@@ -114,7 +169,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof GetRecordsResponseType);
         GetRecordsResponseType response = (GetRecordsResponseType) obj;
         
-        assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(14, response.getSearchResults().getNumberOfRecordsMatched());
         
         // build a new metadata file
         RecordType record = new RecordType();
@@ -154,6 +209,44 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof GetRecordsResponseType);
         response = (GetRecordsResponseType) obj;
         
-        assertEquals(13, response.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(15, response.getSearchResults().getNumberOfRecordsMatched());
+    }
+    
+    @Test
+    public void testUpdateVocabularies() throws Exception {
+
+        URL niUrl = new URL("http://localhost:9090/configuration?request=UpdateVocabularies");
+
+
+        // for a POST request
+        URLConnection conec = niUrl.openConnection();
+
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof ExceptionReport);
+        ExceptionReport expResult = new ExceptionReport("The method updateVocabularies is not supported by the current implementation.",  
+                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()), 
+                                                         null, 
+                                                         "1.0");
+        assertEquals(expResult, obj);
+    }
+    
+    @Test
+    public void testUpdateContacts() throws Exception {
+
+        URL niUrl = new URL("http://localhost:9090/configuration?request=UpdateContacts");
+
+
+        // for a POST request
+        URLConnection conec = niUrl.openConnection();
+
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof ExceptionReport);
+        ExceptionReport expResult = new ExceptionReport("The method updateContacts is not supported by the current implementation.",  
+                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()), 
+                                                         null, 
+                                                         "1.0");
+        assertEquals(expResult, obj);
     }
 }

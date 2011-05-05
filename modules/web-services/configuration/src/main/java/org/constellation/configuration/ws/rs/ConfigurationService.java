@@ -19,14 +19,10 @@ package org.constellation.configuration.ws.rs;
 // J2SE dependencies
 import javax.ws.rs.core.Context;
 import org.constellation.ws.rs.WebService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.logging.Level;
 
 // Jersey dependencies
@@ -55,6 +51,7 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.generic.database.BDD;
         
 // Geotoolkit dependencies
+import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
@@ -85,51 +82,36 @@ public final class ConfigurationService extends WebService  {
     protected volatile ContainerNotifierImpl cn;
     
     /**
-     * The implementation specific CSW configurer.
+     * The implementation specific configurer. TODO multiple
      */
-    private AbstractCSWConfigurer cswConfigurer;
+    private AbstractConfigurer configurer;
 
     /**
-     * The factory registry allowing to load the correct implementation specific CSW configurer.
+     * The factory registry allowing to load the correct implementation specific configurer.
      */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractConfigurerFactory.class);
 
-    /**
-     * A flag indicating if a CSW configuration have been found.
-     */
-    private boolean cswFunctionEnabled;
-
-    /**
-     * A flag indicating if an indexation is going on.
-     */
-    private static boolean indexing;
-
-    /**
-     * The list of service currently indexing.
-     */
-    private static final List<String> SERVICE_INDEXING = new ArrayList<String>();
 
     /**
      * Construct the ConfigurationService and configure its context.
      */
     public ConfigurationService() {
         super();
-        indexing = false;
         try {
             final MarshallerPool pool = new MarshallerPool("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml:org.geotoolkit.internal.jaxb.geometry");
             setXMLContext(pool);
             final AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
-            cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
-            cswFunctionEnabled = true;
+            configurer      = configurerfactory.getConfigurer(cn);
+            
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "JAXBException while setting the JAXB context for configuration service: " + ex.getMessage(), ex);
-            cswFunctionEnabled = false;
+            
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "Specific CSW operation will not be available.\nCause:{0}", ex.getMessage());
-            cswFunctionEnabled = false;
+            
         } catch (FactoryNotFoundException ex) {
             LOGGER.warning("Factory not found for CSWConfigurer, specific CSW operation will not be available.");
-            cswFunctionEnabled = false;
+            
         }
         LOGGER.info("Configuration service runing");
     }
@@ -145,8 +127,8 @@ public final class ConfigurationService extends WebService  {
             String request  = "";
             final StringWriter sw = new StringWriter();
 
-            if (cswConfigurer != null) {
-                cswConfigurer.setContainerNotifier(cn);
+            if (configurer != null) {
+                configurer.setContainerNotifier(cn);
             }
             
             if (objectRequest == null) {
@@ -159,7 +141,7 @@ public final class ConfigurationService extends WebService  {
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             
-            if ("Download".equalsIgnoreCase(request)) {    
+            else if ("Download".equalsIgnoreCase(request)) {    
                 final File f = downloadFile();
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
             }
@@ -167,87 +149,15 @@ public final class ConfigurationService extends WebService  {
             
             /* CSW specific operations */
             
-            if ("RefreshIndex".equalsIgnoreCase(request)) {
-                if (cswFunctionEnabled) {
-                    final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
-                    final String id          = getParameter("ID", true);
-                    final boolean forced     = Boolean.parseBoolean((String) getParameter("FORCED", false));
-
-                    if (isIndexing(id) && !forced) {
-                        final AcknowlegementType refused = new AcknowlegementType("Failure",
-                                "An indexation is already started for this service:" + id);
-                        marshaller.marshal(refused, sw);
-                        return Response.ok(sw.toString(), "text/xml").build();
-                    } else if (indexing && forced) {
-                        AbstractIndexer.stopIndexation(Arrays.asList(id));
+            else {
+                if (configurer != null) {
+                    final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters());
+                    if (response != null) {
+                        marshaller.marshal(response, sw);
+                        return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
                     }
-                    
-                    startIndexation(id);
-                    AcknowlegementType ack;
-                    try {
-                        ack = cswConfigurer.refreshIndex(asynchrone, id);
-                    } finally {
-                        endIndexation(id);
-                    }
-                    marshaller.marshal(ack, sw);
-                    return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
-                } else {
-                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
                 }
             }
-
-            if ("AddToIndex".equalsIgnoreCase(request)) {
-                if (cswFunctionEnabled) {
-                    final String id                = getParameter("ID", true);
-                    final List<String> identifiers = new ArrayList<String>();
-                    final String identifierList    = getParameter("IDENTIFIERS", true);
-                    final StringTokenizer tokens   = new StringTokenizer(identifierList, ",;");
-                    while (tokens.hasMoreTokens()) {
-                        final String token = tokens.nextToken().trim();
-                        identifiers.add(token);
-                    }
-
-                    marshaller.marshal(cswConfigurer.addToIndex(id, identifiers), sw);
-                    return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
-                } else {
-                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
-                }
-            }
-
-            if ("stopIndex".equalsIgnoreCase(request)) {
-                if (cswFunctionEnabled) {
-                    //final String service     = getParameter("SERVICE", false);
-                    final String id          = getParameter("ID", false);
-
-                    final AcknowlegementType ack= stopIndexation(id);
-                    marshaller.marshal(ack, sw);
-                    return Response.ok(sw.toString(), "text/xml").build();
-                } else {
-                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, "Request");
-                }
-            }
-            
-            if ("UpdateVocabularies".equalsIgnoreCase(request)) {    
-                if (cswFunctionEnabled) {
-                    return Response.ok(cswConfigurer.updateVocabularies(),MimeType.TEXT_XML).build();
-                } else {
-                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
-                }
-            }
-            
-            if ("UpdateContacts".equalsIgnoreCase(request)) {    
-                if (cswFunctionEnabled) {
-                    return Response.ok(cswConfigurer.updateContacts(),MimeType.TEXT_XML).build();
-                } else {
-                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
-                }
-            }
-            
             
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
@@ -261,7 +171,7 @@ public final class ConfigurationService extends WebService  {
             final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),
                                                                ServiceDef.CONFIG.exceptionVersion.toString());
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) && !ex.getExceptionCode().equals(ExceptionCode.MISSING_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
@@ -278,38 +188,6 @@ public final class ConfigurationService extends WebService  {
         
     }
 
-    /**
-     * Return true if the select service (identified by his ID) is currently indexing (CSW).
-     * @param id
-     * @return
-     */
-    private boolean isIndexing(final String id) {
-        return indexing && SERVICE_INDEXING.contains(id);
-    }
-
-    /**
-     * Add the specified service to the indexing service list.
-     * @param id
-     */
-    private void startIndexation(final String id) {
-        indexing  = true;
-        if (id != null) {
-            SERVICE_INDEXING.add(id);
-        }
-    }
-
-    /**
-     * remove the selected service from the indexing service list.
-     * @param id
-     */
-    private void endIndexation(final String id) {
-        indexing = false;
-        if (id != null) {
-            SERVICE_INDEXING.remove(id);
-        }
-    }
-
-    
     /**
      * Build a service ExceptionReport
      *
@@ -339,7 +217,7 @@ public final class ConfigurationService extends WebService  {
         LayerProviderProxy.getInstance().dispose();
 
         if (cn != null) {
-            if (!indexing) {
+            if (!configurer.isLock()) {
                 BDD.clearConnectionPool();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
@@ -355,21 +233,6 @@ public final class ConfigurationService extends WebService  {
             return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");
         }
         
-    }
-
-    /**
-     * Stop all the indexation going on.
-     *
-     * @return an Acknowledgment.
-     */
-    private AcknowlegementType stopIndexation(final String id) {
-        LOGGER.info("\n stop indexation requested \n");
-        if (!isIndexing(id)) {
-            return new AcknowlegementType("Success", "There is no indexation to stop");
-        } else {
-            AbstractIndexer.stopIndexation(Arrays.asList(id));
-            return new AcknowlegementType("Success", "The indexation have been stopped");
-        }
     }
 
     /**
@@ -422,8 +285,8 @@ public final class ConfigurationService extends WebService  {
         super.destroy();
         LOGGER.info("Shutting down the REST Configuration service facade. Disposing " +
                 "all datastore instances.");
-        if (cswConfigurer != null) {
-            cswConfigurer.destroy();
+        if (configurer != null) {
+            configurer.destroy();
         }
         /**
         try {

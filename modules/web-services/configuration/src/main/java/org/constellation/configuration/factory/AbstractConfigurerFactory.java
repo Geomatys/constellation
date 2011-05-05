@@ -18,7 +18,7 @@
 package org.constellation.configuration.factory;
 
 import org.constellation.configuration.exception.ConfigurationException;
-import org.constellation.configuration.ws.rs.AbstractCSWConfigurer;
+import org.constellation.configuration.ws.rs.AbstractConfigurer;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.geotoolkit.factory.Factory;
 
@@ -29,6 +29,6 @@ import org.geotoolkit.factory.Factory;
  */
 public abstract class AbstractConfigurerFactory extends Factory {
 
-    public abstract AbstractCSWConfigurer getCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException;
+    public abstract AbstractConfigurer getConfigurer(ContainerNotifierImpl cn) throws ConfigurationException;
 
 }
