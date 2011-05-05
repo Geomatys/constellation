@@ -37,6 +37,7 @@ import org.geotoolkit.util.logging.Logging;
 import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
 import com.sun.net.httpserver.HttpContext;
 import org.constellation.metadata.ws.soap.CSWService;
+import org.constellation.ws.rs.CstlServletContainer;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 
@@ -157,6 +158,7 @@ public class CstlEmbeddedService extends CommandLine {
             "org.constellation.coverage.ws.rs",
             "org.constellation.wfs.ws.rs",
             "org.constellation.sos.ws.rs",
+            "org.constellation.configuration.ws.rs",
             "org.constellation.metadata.ws.rs",
             "org.constellation.metadata.ws.rs.provider",
             "org.constellation.ws.rs.provider"
@@ -205,9 +207,9 @@ public class CstlEmbeddedService extends CommandLine {
         HttpServer threadSelector = null;
         try {
             if (grizzlyWebContainerProperties.isEmpty()) {
-                threadSelector = GrizzlyWebContainerFactory.create(uri);
+                threadSelector = GrizzlyWebContainerFactory.create(uri, CstlServletContainer.class);
             } else {
-                threadSelector = GrizzlyWebContainerFactory.create(uri, grizzlyWebContainerProperties);
+                threadSelector = GrizzlyWebContainerFactory.create(uri, CstlServletContainer.class, grizzlyWebContainerProperties);
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

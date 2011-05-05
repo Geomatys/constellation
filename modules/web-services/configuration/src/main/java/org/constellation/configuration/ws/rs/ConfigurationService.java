@@ -131,7 +131,7 @@ public final class ConfigurationService extends WebService  {
             LOGGER.warning("Factory not found for CSWConfigurer, specific CSW operation will not be available.");
             cswFunctionEnabled = false;
         }
-        LOGGER.info("\nConfiguration service runing\n");
+        LOGGER.info("Configuration service runing");
     }
     
     /**
@@ -199,7 +199,6 @@ public final class ConfigurationService extends WebService  {
 
             if ("AddToIndex".equalsIgnoreCase(request)) {
                 if (cswFunctionEnabled) {
-                    final String service           = getParameter("SERVICE", false);
                     final String id                = getParameter("ID", true);
                     final List<String> identifiers = new ArrayList<String>();
                     final String identifierList    = getParameter("IDENTIFIERS", true);
@@ -209,7 +208,7 @@ public final class ConfigurationService extends WebService  {
                         identifiers.add(token);
                     }
 
-                    marshaller.marshal(cswConfigurer.addToIndex(service, id, identifiers), sw);
+                    marshaller.marshal(cswConfigurer.addToIndex(id, identifiers), sw);
                     return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
@@ -263,8 +262,8 @@ public final class ConfigurationService extends WebService  {
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),
                                                                ServiceDef.CONFIG.exceptionVersion.toString());
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                    !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                    !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             } else {
                 LOGGER.info(ex.getMessage());
@@ -411,7 +410,7 @@ public final class ConfigurationService extends WebService  {
      *       download action for some users. Will probably be removed in a future version.
      */
     private File downloadFile() throws CstlServiceException {
-        throw new CstlServiceException("Not implemented", NO_APPLICABLE_CODE);
+        throw new CstlServiceException("Download operation not implemented", OPERATION_NOT_SUPPORTED);
     }
 
     /**

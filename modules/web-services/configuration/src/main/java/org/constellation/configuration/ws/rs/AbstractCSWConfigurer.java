@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBException;
@@ -51,7 +50,6 @@ import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.AbstractIndexer.IndexDirectoryFilter;
-import org.geotoolkit.util.logging.Logging;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -60,14 +58,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  *
  * @author Guilhem Legal
  */
-public abstract class AbstractCSWConfigurer {
-    
-    protected static final Logger LOGGER = Logging.getLogger("org.constellation.configuration.ws.rs");
-    
-    /**
-     * A container notifier allowing to restart the webService. 
-     */
-    private ContainerNotifierImpl containerNotifier;
+public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     
     /**
      * A Map of service configuration.
@@ -330,7 +321,7 @@ public abstract class AbstractCSWConfigurer {
      * @return
      * @throws CstlServiceException
      */
-    public AcknowlegementType addToIndex(final String service, final String id, final List<String> identifiers) throws CstlServiceException {
+    public AcknowlegementType addToIndex(final String id, final List<String> identifiers) throws CstlServiceException {
         LOGGER.info("Add to index requested");
 
         AbstractIndexer indexer  = null;
@@ -383,14 +374,6 @@ public abstract class AbstractCSWConfigurer {
     }
 
     /**
-     * Because the injectable fields are null at initialization time
-     * @param containerNotifier
-     */
-    public void setContainerNotifier(final ContainerNotifierImpl containerNotifier) {
-        this.containerNotifier = containerNotifier;
-    }
-
-    /**
      * Return the CSW configuration directory.
      * example for regular constellation configuration it return the file USER_DIRECTORY/.constellation/CSW
      *
@@ -436,9 +419,4 @@ public abstract class AbstractCSWConfigurer {
      */
     protected abstract List<File> getAllCswInstanceDirectory();
 
-    /**
-     * destroy all the resource and close the connection.
-     */
-    public void destroy() {
-    }
 }
