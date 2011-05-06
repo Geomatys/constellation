@@ -34,7 +34,6 @@ import java.util.StringTokenizer;
 import com.sun.jersey.spi.resource.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import org.apache.xml.serialize.XMLSerializer;
 
 //JAXB dependencies
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -45,6 +44,7 @@ import javax.xml.namespace.QName;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.generic.database.Automatic;
+import org.constellation.jaxb.CstlXMLSerializer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.utils.SerializerResponse;
@@ -95,7 +95,7 @@ import static org.constellation.metadata.CSWConstants.*;
 @Singleton
 public class CSWService extends OGCWebService<CSWworker> {
     
-    private final XMLSerializer serializer;
+    private final CstlXMLSerializer serializer;
     
     /**
      * Build a new Restful CSW service.
@@ -131,7 +131,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      * 
      * @return
      */
-    protected XMLSerializer getXMLSerializer() {
+    protected CstlXMLSerializer getXMLSerializer() {
         return null;
     }
 

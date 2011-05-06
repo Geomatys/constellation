@@ -69,6 +69,13 @@ public class CoverageSQLProviderService extends AbstractProviderService
             ProviderParameters.createDescriptor(COVERAGESQL_DESCRIPTOR);
     }
     
+    public static final GeneralParameterDescriptor PASSWORD_DESCRIPTOR = COVERAGESQL_DESCRIPTOR.descriptor(ConfigurationKey.PASSWORD.key);
+    public static final GeneralParameterDescriptor CATALOG_DESCRIPTOR = COVERAGESQL_DESCRIPTOR.descriptor(ConfigurationKey.CATALOG.key);
+    public static final GeneralParameterDescriptor ROOT_DIRECTORY_DESCRIPTOR = COVERAGESQL_DESCRIPTOR.descriptor(ConfigurationKey.ROOT_DIRECTORY.key);
+    public static final GeneralParameterDescriptor SCHEMA_DESCRIPTOR = COVERAGESQL_DESCRIPTOR.descriptor(ConfigurationKey.SCHEMA.key);
+    public static final GeneralParameterDescriptor USER_DESCRIPTOR = COVERAGESQL_DESCRIPTOR.descriptor(ConfigurationKey.USER.key);
+    public static final GeneralParameterDescriptor URL_DESCRIPTOR = COVERAGESQL_DESCRIPTOR.descriptor(ConfigurationKey.URL.key);
+    
     public CoverageSQLProviderService(){
         super("coverage-sql");
     }

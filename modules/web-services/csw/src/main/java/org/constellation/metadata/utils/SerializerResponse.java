@@ -18,7 +18,7 @@
 
 package org.constellation.metadata.utils;
 
-import org.apache.xml.serialize.XMLSerializer;
+import org.constellation.jaxb.CstlXMLSerializer;
 import org.geotoolkit.csw.xml.CSWResponse;
 
 /**
@@ -29,11 +29,11 @@ import org.geotoolkit.csw.xml.CSWResponse;
  */
 public class SerializerResponse implements CSWResponse {
 
-    private final XMLSerializer serializer;
+    private final CstlXMLSerializer serializer;
 
     private final CSWResponse response;
 
-    public SerializerResponse(CSWResponse response, XMLSerializer serializer) {
+    public SerializerResponse(CSWResponse response, CstlXMLSerializer serializer) {
         this.response   = response;
         this.serializer = serializer;
     }
@@ -41,7 +41,7 @@ public class SerializerResponse implements CSWResponse {
     /**
      * @return the serializer
      */
-    public XMLSerializer getSerializer() {
+    public CstlXMLSerializer getSerializer() {
         return serializer;
     }
 
