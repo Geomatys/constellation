@@ -16,34 +16,26 @@
  */
 package org.constellation.provider.coveragesql;
 
-import java.util.List;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
-import javax.sql.DataSource;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.configuration.ProviderParameters;
 
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
 import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.jdbc.WrappedDataSource;
 import org.geotoolkit.map.MapBuilder;
 
 import org.opengis.feature.type.Name;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-
-import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
@@ -60,19 +52,13 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     private final Set<Name> index = new HashSet<Name>();
 
     protected CoverageSQLProvider(final CoverageSQLProviderService service,
-            final ParameterValueGroup source) throws IOException, SQLException {
+            final ParameterValueGroup source) {
         super(service,source);
         visit();
     }
 
     private ParameterValueGroup getSourceConfiguration(){
-        final ParameterValueGroup params = getSource();
-
-        final List<ParameterValueGroup> groups = params.groups(COVERAGESQL_DESCRIPTOR.getName().getCode());
-        if(!groups.isEmpty()){
-            return groups.get(0);
-        }
-        return null;
+        return ProviderParameters.getSourceConfiguration(getSource(), COVERAGESQL_DESCRIPTOR);
     }
 
     /**
@@ -81,69 +67,16 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      *
      * @throws SQLException if the login attempt reaches the timeout (5s here).
      */
-    private void loadDataBase() throws SQLException{
-        final Properties properties = new Properties();
-
-        for(GeneralParameterValue param : getSourceConfiguration().values()){
-            if(param instanceof ParameterValue){
-                final ParameterValue pmval = (ParameterValue) param;
-                final Object value = pmval.getValue();
-                if(value != null){
-                    properties.put(pmval.getDescriptor().getName().getCode(), value);
-                }
-            }
+    private void loadDataBase() throws Exception{
+        if(database != null){
+            return;
         }
-
-        String server ="localhost";
-        int port = 5432;
-        String dbName = "";
-
-        //parse string if old format : exemple jdbc:postgresql://server/database
-        String oldDataBase = properties.getProperty(DATABASE_DESCRIPTOR.getName().getCode());
-        if(oldDataBase != null && oldDataBase.contains("/")){
-            int index = oldDataBase.lastIndexOf('/');
-            dbName = oldDataBase.substring(index+1, oldDataBase.length());
-            oldDataBase = oldDataBase.substring(0, index);
-            index = oldDataBase.lastIndexOf('/');
-            server = oldDataBase.substring(index+1, oldDataBase.length());
-
-            if(server.contains(":")){
-                final String[] split = server.split(":");
-                server = split[0];
-                port = Integer.valueOf(split[1]);
-
-            }else{
-                port = 5432;
-            }
-
-        }else{
-            server = properties.getProperty(SERVER_DESCRIPTOR.getName().getCode());
-            final String portTxt = properties.getProperty(PORT_DESCRIPTOR.getName().getCode());
-            if(server == null || server.trim().isEmpty()){
-                server = "localhost";
-            }
-            try{
-                port = Integer.parseInt(portTxt);
-            }catch(Exception nf){
-                //catch numberformat and nullpointer
-                getLogger().log(Level.WARNING, "Port value for coverage-sql is not valid : {0}", portTxt);
-                port = 5432;
-            }
-            dbName = properties.getProperty(DATABASE_DESCRIPTOR.getName().getCode());
-        }
-
-
-        final PGConnectionPoolDataSource pool = new PGConnectionPoolDataSource();
-        pool.setServerName(server);
-        pool.setPortNumber(port);
-        pool.setDatabaseName(dbName);
-        pool.setUser(properties.getProperty(USER_DESCRIPTOR.getName().getCode()));
-        pool.setPassword(properties.getProperty(PASSWORD_DESCRIPTOR.getName().getCode()));
-        pool.setLoginTimeout(5);
-
-        final DataSource dataSource = new WrappedDataSource(pool);
-
-        database = new CoverageDatabase(dataSource, properties);
+        
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><< LOADDDDDDD");
+        
+        final ParameterValueGroup params = getSourceConfiguration();
+        System.out.println(params);
+        database = new CoverageDatabase(params);
     }
 
     /**
@@ -202,11 +135,6 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         dispose();
         synchronized(this){
             index.clear();
-            try {
-                loadDataBase();
-            } catch (SQLException ex) {
-                getLogger().log(Level.WARNING, ex.getMessage(), ex);
-            }
             visit();
         }
     }
@@ -221,6 +149,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
             if(database != null){
                 database.dispose();
             }
+            database = null;
         }
     }
 
@@ -231,7 +160,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     protected void visit() {
         try {
             loadDataBase();
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             getLogger().log(Level.WARNING,ex.getLocalizedMessage(),ex);
             return;
         }
