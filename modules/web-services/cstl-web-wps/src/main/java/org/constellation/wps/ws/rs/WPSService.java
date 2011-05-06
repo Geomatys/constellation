@@ -43,12 +43,12 @@ import static org.constellation.query.Query.*;
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.geotoolkit.wps.xml.v100.DataInputsType;
 
-import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.ExceptionResponse;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
 import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.DataType;
 import org.geotoolkit.wps.xml.v100.DescribeProcess;
 import org.geotoolkit.wps.xml.v100.DocumentOutputDefinitionType;
@@ -78,13 +78,9 @@ public class WPSService extends OGCWebService<WPSWorker> {
         super(ServiceDef.WPS_1_0_0);
 
         setFullRequestLog(true);
-        try {
-            //we build the JAXB marshaller and unmarshaller to bind java/xml
-            setXMLContext(new MarshallerPool("org.geotoolkit.wps.xml.v100:org.geotoolkit.gml.xml.v311:org.geotoolkit.internal.jaxb.geometry"));
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
-
+       //we build the JAXB marshaller and unmarshaller to bind java/xml
+        setXMLContext(WPSMarshallerPool.getInstance());
+       
         LOGGER.log(Level.INFO, "WPS REST service running ({0} instances)\n", workersMap.size());
     }
 
@@ -200,7 +196,20 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 serviceDef = getVersionFromNumber(exec.getVersion());
 
                 final Object executeResponse = worker.execute(exec);
-                return Response.ok(executeResponse, MimeType.TEXT_XML).build(); //TODO providers and change MimeType
+                
+                boolean isTextPlain = false;
+                //if response is a literal
+                if(executeResponse instanceof String || executeResponse instanceof Double || 
+                        executeResponse instanceof Float || executeResponse instanceof Integer || 
+                        executeResponse instanceof Boolean){
+                    isTextPlain = true;
+                }
+                if(isTextPlain){
+                     return Response.ok(executeResponse.toString(), MimeType.TEXT_PLAIN).build(); 
+                }else{
+                     return Response.ok(executeResponse, MimeType.TEXT_XML).build(); 
+                }
+               
             }
 
             throw new CstlServiceException("This service can not handle the requested operation: " + objectRequest + ".",
@@ -507,6 +516,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
     		"    </p>\n" +
     		"  </body>\n" +
     		"</html>\n";
+        
     }
 
 

@@ -32,24 +32,17 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.wps.xml.WPSMarshallerPool;
 
 /**
  *
- * @author Guilhem Legal (Geomatys)
+ * @author Quentin Boileau
  */
 @Provider
 public class GeometryWriter<T extends AbstractGeometryType> implements MessageBodyWriter<T> {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.wps.ws.rs");
-    private static MarshallerPool pool;
-    static{
-        try {
-            pool = new MarshallerPool("org.geotoolkit.wps.xml.v100:org.geotoolkit.gml.xml.v311:org.geotoolkit.internal.jaxb.geometry");
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
-    }
+    
     @Override
     public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return AbstractGeometryType.class.isAssignableFrom(type);
@@ -65,13 +58,13 @@ public class GeometryWriter<T extends AbstractGeometryType> implements MessageBo
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         Marshaller m = null;
         try {
-            m = pool.acquireMarshaller();
+            m = WPSMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
         } finally {
             if(m!=null){
-                pool.release(m);
+                WPSMarshallerPool.getInstance().release(m);
             }
         }
         

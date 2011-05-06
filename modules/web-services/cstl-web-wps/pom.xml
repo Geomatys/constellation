@@ -87,7 +87,17 @@
             <version>3.x-SNAPSHOT</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-datastore-core</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-shapefile</artifactId>
+            <version>3.x-SNAPSHOT</version>
+        </dependency>
         <!-- Web interface -->
         <dependency>
             <groupId>org.constellation.gui</groupId>

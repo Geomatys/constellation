@@ -28,7 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
@@ -39,7 +38,7 @@ import org.geotoolkit.util.logging.Logging;
 
 /**
  *
- * @author Guilhem Legal (Geomatys)
+ * @author Quentin Boileau
  */
 @Provider
 public class FeatureCollectionWriter<T extends FeatureCollection> implements MessageBodyWriter<T> {
@@ -62,8 +61,7 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
         try {
             final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter();
             featureWriter.write(t, out);
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
+        
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);
         } catch (DataStoreException ex) {

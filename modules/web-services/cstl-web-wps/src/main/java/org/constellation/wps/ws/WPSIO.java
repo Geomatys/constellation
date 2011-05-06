@@ -39,15 +39,15 @@ public class WPSIO {
 
      public final static List<InputClass> USEDCLASS = UnmodifiableArrayList.wrap(
              
-             new InputClass(Feature.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1), //XML
-             new InputClass(Feature.class, "application/octec-stream", Encoding.NULL, Schema.NULL),         //SHP
+             new InputClass(Feature.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1,true), //XML
+             new InputClass(Feature.class, "application/octec-stream", Encoding.NULL, Schema.NULL,false),         //SHP
 
-             new InputClass(FeatureCollection.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1),  //XML
-             new InputClass(FeatureCollection.class, "application/octec-stream",Encoding.NULL, Schema.NULL),           //SHP
+             new InputClass(FeatureCollection.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1,true),  //XML
+             new InputClass(FeatureCollection.class, "application/octec-stream",Encoding.NULL, Schema.NULL,false),           //SHP
 
-             new InputClass(Geometry.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1),
+             new InputClass(Geometry.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1,true),
 
-             new InputClass(FeatureType.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1)
+             new InputClass(FeatureType.class, MimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1,true)
              
              //new InputClass(Unit.class, Mime.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE),
 
@@ -97,12 +97,14 @@ public class WPSIO {
         private String mime;
         private Encoding encoding;
         private Schema schema;
+        private Boolean defaultIN;
 
-        public InputClass(Class claz, String mime,Encoding enco, Schema sch) {
+        public InputClass(Class claz, String mime,Encoding enco, Schema sch,Boolean defaultIN) {
             this.clazz = claz;
             this.mime = mime;
             this.encoding = enco;
             this.schema = sch;
+            this.defaultIN = defaultIN;
         }
         public Class getClazz(){
             return clazz;
@@ -115,6 +117,9 @@ public class WPSIO {
         }
         public String getSchema(){
             return schema.getValue();
+        }
+        public Boolean isDefault(){
+            return defaultIN;
         }
     }
 

@@ -31,28 +31,23 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.wps.xml.WPSMarshallerPool;
+import org.geotoolkit.wps.xml.WPSResponse;
 import org.geotoolkit.wps.xml.v100.ExecuteResponse;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
  *
- * @author Guilhem Legal (Geomatys)
+ * @author Quentin Boileau
  */
 @Provider
-public class ExecuteWriter<T extends ExecuteResponse> implements MessageBodyWriter<T> {
+public class ExecuteWriter<T extends WPSResponse> implements MessageBodyWriter<T> {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.wps.ws.rs");
-    private static MarshallerPool pool;
-    static{
-        try {
-            pool = new MarshallerPool("org.geotoolkit.wps.xml.v100:org.geotoolkit.gml.xml.v311:org.geotoolkit.internal.jaxb.geometry");
-        } catch (JAXBException ex) {
-            Logger.getLogger(ExecuteWriter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+    
     @Override
     public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
-        return ExecuteResponse.class.isAssignableFrom(type);
+        return WPSResponse.class.isAssignableFrom(type);
     }
 
     @Override
@@ -65,13 +60,13 @@ public class ExecuteWriter<T extends ExecuteResponse> implements MessageBodyWrit
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         Marshaller m = null;
         try {
-            m = pool.acquireMarshaller();
+            m = WPSMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
         } finally {
             if(m!=null){
-                pool.release(m);
+                WPSMarshallerPool.getInstance().release(m);
             }
         }
         

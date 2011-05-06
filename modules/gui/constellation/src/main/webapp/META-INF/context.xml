@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/constellation-0.7-SNAPSHOT"/>
+<Context path="/constellation/WS/wps/default"/>
 <!-- here is a tag to use TOMCAT pooled connection datasource
    <Resource name="jdbc/observation"
           auth="Container"
