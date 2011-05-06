@@ -29,7 +29,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import org.constellation.bean.MenuItem.Path;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
-import org.geotoolkit.lang.Setup;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.i18n.I18NBean;
@@ -196,6 +195,7 @@ public class MenuBean extends I18NBean{
             this.icon = icon;
             this.targetPage = targetPage;
             this.priority = priority;
+            setUserObject(new Object[]{i18nKey,icon,targetPage,priority});
         }
 
         public String getTitle(){
@@ -210,6 +210,41 @@ public class MenuBean extends I18NBean{
             return targetPage;
         }
 
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 83 * hash + (this.i18nkey != null ? this.i18nkey.hashCode() : 0);
+            hash = 83 * hash + (this.icon != null ? this.icon.hashCode() : 0);
+            hash = 83 * hash + (this.targetPage != null ? this.targetPage.hashCode() : 0);
+            hash = 83 * hash + this.priority;
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final I18NNode other = (I18NNode) obj;
+            if ((this.i18nkey == null) ? (other.i18nkey != null) : !this.i18nkey.equals(other.i18nkey)) {
+                return false;
+            }
+            if ((this.icon == null) ? (other.icon != null) : !this.icon.equals(other.icon)) {
+                return false;
+            }
+            if ((this.targetPage == null) ? (other.targetPage != null) : !this.targetPage.equals(other.targetPage)) {
+                return false;
+            }
+            if (this.priority != other.priority) {
+                return false;
+            }
+            return true;
+        }
+
+        
     }
 
 }
