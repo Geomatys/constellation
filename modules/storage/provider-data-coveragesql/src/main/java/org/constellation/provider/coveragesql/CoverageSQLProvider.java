@@ -72,10 +72,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
             return;
         }
         
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><< LOADDDDDDD");
-        
         final ParameterValueGroup params = getSourceConfiguration();
-        System.out.println(params);
         database = new CoverageDatabase(params);
     }
 
