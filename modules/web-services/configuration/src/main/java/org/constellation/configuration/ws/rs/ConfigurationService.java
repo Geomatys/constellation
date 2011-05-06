@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,9 @@
 package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.core.Context;
 import java.io.File;
 import java.io.IOException;
@@ -43,9 +46,8 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
+import org.constellation.configuration.filter.ConfigurerFilter;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.ContainerNotifierImpl;
@@ -82,9 +84,9 @@ public final class ConfigurationService extends WebService  {
     protected volatile ContainerNotifierImpl cn;
     
     /**
-     * The implementation specific configurer. TODO multiple
+     * The implementation specific configurers.
      */
-    private AbstractConfigurer configurer;
+    private final List<AbstractConfigurer> configurers = new ArrayList<AbstractConfigurer>();
 
     /**
      * The factory registry allowing to load the correct implementation specific configurer.
@@ -100,14 +102,21 @@ public final class ConfigurationService extends WebService  {
         try {
             final MarshallerPool pool = new MarshallerPool("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml:org.geotoolkit.internal.jaxb.geometry");
             setXMLContext(pool);
-            final AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
-            configurer      = configurerfactory.getConfigurer(cn);
+            final Iterator<AbstractConfigurerFactory> ite = factory.getServiceProviders(AbstractConfigurerFactory.class, new ConfigurerFilter(), null, null);
+            while (ite.hasNext()) {
+                AbstractConfigurerFactory currentfactory = ite.next();
+                try {
+                    AbstractConfigurer ac = currentfactory.getConfigurer(cn);
+                    LOGGER.log(Level.INFO, "Found a configurer:{0}", ac.getClass().getName());
+                    configurers.add(ac);
+                } catch (ConfigurationException ex) {
+                    LOGGER.log(Level.WARNING, "Specific operation will not be available.\nCause:{0}", ex.getMessage());
+                }
+
+            }
             
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "JAXBException while setting the JAXB context for configuration service: " + ex.getMessage(), ex);
-            
-        } catch (ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, "Specific operation will not be available.\nCause:{0}", ex.getMessage());
             
         } catch (FactoryNotFoundException ex) {
             LOGGER.warning("Factory not found for Configurer, specific operation will not be available.");
@@ -127,7 +136,7 @@ public final class ConfigurationService extends WebService  {
             String request  = "";
             final StringWriter sw = new StringWriter();
 
-            if (configurer != null) {
+            for (AbstractConfigurer configurer: configurers) {
                 configurer.setContainerNotifier(cn);
             }
             
@@ -147,10 +156,10 @@ public final class ConfigurationService extends WebService  {
             }
             
             
-            /* CSW specific operations */
+            /* specific operations */
             
             else {
-                if (configurer != null) {
+                for (AbstractConfigurer configurer : configurers) {
                     final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters());
                     if (response != null) {
                         marshaller.marshal(response, sw);
@@ -213,18 +222,21 @@ public final class ConfigurationService extends WebService  {
     private AcknowlegementType restartService(final boolean forced) {
         LOGGER.info("\n restart requested \n");
         // clear cache
-        StyleProviderProxy.getInstance().dispose();
-        LayerProviderProxy.getInstance().dispose();
-
+        for (AbstractConfigurer configurer : configurers) {
+            configurer.beforeRestart();
+        }
+        
         if (cn != null) {
-            if (configurer == null || !configurer.isLock()) {
+            if (!configurerLock()) {
                 BDD.clearConnectionPool();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
             } else if (!forced) {
                 return new AcknowlegementType("failed", "There is an indexation running use the parameter FORCED=true to bypass it.");
             } else {
-                configurer.closeForced();
+                for (AbstractConfigurer configurer : configurers) {
+                    configurer.closeForced();
+                }
                 BDD.clearConnectionPool();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted (previous indexation was stopped)");
@@ -233,6 +245,13 @@ public final class ConfigurationService extends WebService  {
             return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");
         }
         
+    }
+    
+    private boolean configurerLock() {
+        for (AbstractConfigurer configurer : configurers) {
+            if (configurer.isLock()) return true;
+        }
+        return false;
     }
 
     /**
@@ -285,25 +304,9 @@ public final class ConfigurationService extends WebService  {
         super.destroy();
         LOGGER.info("Shutting down the REST Configuration service facade. Disposing " +
                 "all datastore instances.");
-        if (configurer != null) {
+        for (AbstractConfigurer configurer : configurers) {
             configurer.destroy();
         }
-        /**
-        try {
-            final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
-            if (spp != null) {
-                spp.dispose();
-            }
-            final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
-            if (lpp != null) {
-                lpp.dispose();
-            }
-        } catch (ExceptionInInitializerError ex) {
-            // Factory Registery cannot found MutableStyleFactory instance.
-            // shutdown is a bit late for looking for this factory.
-            // @TODO avoid this above block if StyleProviderProxy has never been initialized.
-            LOGGER.fine(ex.toString());
-        }**/
     }
 
     /**

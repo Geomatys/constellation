@@ -84,19 +84,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-configuration</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-ows</artifactId>
       <version>${geotoolkit-pending.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-provider</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

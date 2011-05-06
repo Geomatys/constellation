@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2011, Geomatys
+ *    (C) 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,22 +15,29 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.configuration.factory;
+package org.constellation.map.configuration;
 
+import javax.ws.rs.core.MultivaluedMap;
 import org.constellation.configuration.AbstractConfigurer;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.geotoolkit.factory.Factory;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProviderProxy;
+import org.constellation.ws.CstlServiceException;
 
 /**
- * An abstract factory for configurer.
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractConfigurerFactory extends Factory {
+public class DefaultMapConfigurer extends AbstractConfigurer {
 
-    public abstract Class getConfigurerClass();
+    @Override
+    public Object treatRequest(String request, MultivaluedMap<String, String> parameters) throws CstlServiceException {
+        return null;
+    }
     
-    public abstract AbstractConfigurer getConfigurer(ContainerNotifierImpl cn) throws ConfigurationException;
-
+    @Override
+    public void beforeRestart() {
+        StyleProviderProxy.getInstance().dispose();
+        LayerProviderProxy.getInstance().dispose();
+    }
+    
 }

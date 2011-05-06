@@ -103,7 +103,7 @@ public abstract class AbstractConfigurer {
     }
     
     /**
-     * destroy all the resource and close the connection.
+     * destroy all the resource and close the connections.
      */
     public void destroy() {
        // do nothing must be overriden if needed 
@@ -111,11 +111,24 @@ public abstract class AbstractConfigurer {
     
     public abstract Object treatRequest(final String request, final MultivaluedMap<String,String> parameters) throws CstlServiceException;
     
+    /**
+     * Return true if the restart must be refused.
+     */
     public boolean isLock() {
         return false;
     }
     
+    /**
+     * Stop operation going on because the service is going to be restarted.
+     */
     public void closeForced() {
-        
+        // do nothing must be overriden if needed 
+    }
+    
+    /**
+     * Do specific work before a service restart
+     */
+    public void beforeRestart() {
+        // do nothing must be overriden if needed 
     }
 }

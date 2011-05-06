@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,13 +25,18 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public class DefaultCSWConfigurerFactory extends AbstractConfigurerFactory {
 
     @Override
     public AbstractConfigurer getConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         return new DefaultCSWConfigurer(cn);
+    }
+
+    @Override
+    public Class getConfigurerClass() {
+        return DefaultCSWConfigurer.class;
     }
 
 }
