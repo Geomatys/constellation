@@ -512,8 +512,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         final String urlSLD          = getParameter(KEY_SLD,            false);
         final String strSldVersion   = getParameter(KEY_SLD_VERSION, (urlSLD != null) ? true : false);
         final String strAzimuth      = getParameter(KEY_AZIMUTH,        false);
-        final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null)
-                && (version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()))) ? false : fromGetMap);
+        final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null)) ? false : fromGetMap);
 
         final CoordinateReferenceSystem crs;
         boolean forceLongitudeFirst = false;
