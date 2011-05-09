@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2010, Geomatys
+ *    (C) 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,19 +14,21 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-
 package org.constellation.jaxb;
 
-import org.xml.sax.ContentHandler;
+import com.sun.xml.internal.bind.marshaller.CharacterEscapeHandler;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  *
- * @author Johann Sorel (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
-public interface CstlXMLSerializer extends ContentHandler{
+public class NoCharacterEscapeHandler implements CharacterEscapeHandler {
 
-    void setContentHandler(ContentHandler ch);
-
+    @Override
+    public void escape(char[] ch, int start, int length, boolean bln, Writer out) throws IOException {
+        out.write(ch, start, length);
+    }
+    
 }

@@ -17,8 +17,10 @@
 
 package org.constellation.metadata.ws.rs.provider;
 
+import com.sun.xml.internal.bind.marshaller.DataWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
@@ -33,6 +35,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.jaxb.CstlXMLSerializer;
 import org.constellation.jaxb.MarshallWarnings;
+import org.constellation.jaxb.NoCharacterEscapeHandler;
 import org.constellation.metadata.utils.SerializerResponse;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.CSWResponse;
@@ -70,8 +73,10 @@ public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWrit
                 final SerializerResponse response = (SerializerResponse) t;
                 final CstlXMLSerializer serializer    = response.getSerializer();
                 if (serializer != null) {
-                    serializer.setOutputByteStream(out);
-                    m.marshal(response.getResponse(), serializer.asContentHandler());
+                    DataWriter writer = new DataWriter(new OutputStreamWriter(out), "UTF-8", new NoCharacterEscapeHandler());
+                    writer.setIndentStep("   ");
+                    serializer.setContentHandler(writer);
+                    m.marshal(response.getResponse(), serializer);
                 } else  {
                     m.marshal(response.getResponse(), out);
                 }
