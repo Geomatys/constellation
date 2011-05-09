@@ -345,10 +345,14 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             throw new CstlServiceException(ex);
         }
         final List<File> cswInstanceDirectories = new ArrayList<File>();
-        if ("all".equals(id)) {
-            cswInstanceDirectories.addAll(getAllCswInstanceDirectory());
-        } else {
-            cswInstanceDirectories.add(getCswInstanceDirectory(id));
+        try  {
+            if ("all".equals(id)) {
+                cswInstanceDirectories.addAll(getAllCswInstanceDirectory());
+            } else {
+                cswInstanceDirectories.add(getCswInstanceDirectory(id));
+            }
+        } catch (ConfigurationException ex) {
+            throw new CstlServiceException(ex);
         }
         if (!asynchrone) {
             synchroneIndexRefresh(cswInstanceDirectories);
@@ -537,12 +541,31 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     /*
      * Return the configuration directory for the specified instance identifier.
      */
-    protected abstract File getCswInstanceDirectory(final String instanceId);
+    protected File getCswInstanceDirectory(String instanceId) throws ConfigurationException {
+        final File configDir = getConfigurationDirectory();
+        if (configDir != null && configDir.exists()) {
+            File instanceDir = new File(configDir, instanceId);
+            if (instanceDir.exists() && instanceDir.isDirectory()) {
+                return instanceDir;
+            }
+        }
+        return null;
+    }
 
     /**
      * Return the configuration directory for all the instances.
      * @return
      */
-    protected abstract List<File> getAllCswInstanceDirectory();
-
+    protected List<File> getAllCswInstanceDirectory() throws ConfigurationException {
+        final File configDir = getConfigurationDirectory();
+        final List<File> results = new ArrayList<File>();
+        if (configDir != null && configDir.exists()) {
+            for (File instanceDir : configDir.listFiles()) {
+                if (instanceDir.isDirectory()) {
+                    results.add(instanceDir);
+                }
+            }
+        }
+        return results;
+    }
 }
