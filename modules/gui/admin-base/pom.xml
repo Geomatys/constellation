@@ -53,28 +53,6 @@
             <artifactId>geotk-utility</artifactId>
         </dependency>
 
-        <!-- JSP, Servlet, portlet, Facelet-->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.facelets</groupId>
-            <artifactId>jsf-facelets</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
        <!-- Constellation dependencies -->
        <dependency>
            <groupId>org.constellation.xml-bindings</groupId>
@@ -86,22 +64,18 @@
         <dependency>
             <groupId>org.mapfaces</groupId>
             <artifactId>mapfaces-core</artifactId>
-            <version>${mapfaces.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mapfaces</groupId>
             <artifactId>mapfaces-base</artifactId>
-            <version>${mapfaces.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mapfaces</groupId>
             <artifactId>mapfaces-map</artifactId>
-            <version>${mapfaces.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mapfaces</groupId>
             <artifactId>mapfaces-facelet-editor</artifactId>
-            <version>${mapfaces.version}</version>
         </dependency>
 
 

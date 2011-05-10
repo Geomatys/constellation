@@ -76,7 +76,7 @@
     </servlet-mapping>
 
 
-    <!--servlet>
+    <servlet>
         <servlet-name>Mapfaces Resource Servlet</servlet-name>
         <servlet-class>org.mapfaces.servlet.ResourceServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
@@ -88,7 +88,7 @@
     <servlet-mapping>
         <servlet-name>Mapfaces Resource Servlet</servlet-name>
         <url-pattern>/mfRes/*</url-pattern>
-    </servlet-mapping-->
+    </servlet-mapping>
 
     <!-- REST Servlet for constellation web service -->
     <servlet>

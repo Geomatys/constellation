@@ -4,4 +4,3 @@
   <class-loader delegate="true"/>
   <property name="useBundledJsf" value="true"/>
 </sun-web-app>
-

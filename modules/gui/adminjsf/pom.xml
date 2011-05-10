@@ -160,7 +160,7 @@
         </dependency>
 
         <!-- administration pages -->
-        <!--dependency>
+        <dependency>
             <groupId>org.constellation.gui</groupId>
             <artifactId>admin-base</artifactId>
             <version>${project.version}</version>
@@ -189,7 +189,7 @@
             <groupId>org.constellation.gui</groupId>
             <artifactId>admin-page-tool</artifactId>
             <version>${project.version}</version>
-        </dependency-->
+        </dependency>
         
         <!-- The 4 xml bindings are added here, because the JSF interface uses
          those bindings to marshall capabilities. -->
@@ -231,6 +231,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.sun.facelets</groupId>
             <artifactId>jsf-facelets</artifactId>
         </dependency>
@@ -252,7 +256,7 @@
             <artifactId>richfaces-impl</artifactId>
             <version>3.3.3.Final</version>
         </dependency>
-
+        
     </dependencies>
 
     <properties>
