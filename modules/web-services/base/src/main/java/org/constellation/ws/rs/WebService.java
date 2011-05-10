@@ -35,7 +35,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
@@ -69,9 +68,6 @@ import static org.constellation.ws.ExceptionCode.*;
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.factory.Hints;
-import org.geotoolkit.internal.io.Installation;
-import org.geotoolkit.lang.Setup;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.xml.sax.SAXException;
 
@@ -137,24 +133,6 @@ public abstract class WebService {
      * The default debugging logger for all web services.
      */
     protected static final Logger LOGGER = Logging.getLogger(WebService.class);
-
-    static {
-        Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-
-        //Initialize geotoolkit
-        //TODO, this is not the best place since a service must be started
-        //to load everything, but what else do we have ?
-        Installation.allowSystemPreferences = false;
-        Setup.initialize(null);
-
-        ImageIO.scanForPlugins();
-        try {
-            Class.forName("javax.media.jai.JAI");
-        } catch (ClassNotFoundException ex) {
-            LOGGER.log(Level.SEVERE, "JAI librairies are not in the classpath. Please install it.\n "
-                    + ex.getLocalizedMessage(), ex);
-        }
-    }
 
     /**
      * Automatically set by Jersey.
@@ -279,7 +257,6 @@ public abstract class WebService {
      * This method is called at undeploy time
      */
     public void destroy(){
-        Setup.shutdown();
     }
 
     /**

@@ -20,7 +20,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,14 +33,12 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
 import javax.servlet.ServletContext;
 import org.geotoolkit.util.logging.Logging;
-import org.mapfaces.i18n.I18NBean;
-
 /**
  *
  * @author Leo Pratlong (Geomatys)
  * @author Johann sorel (Geomatys)
  */
-public final class NavigationBean extends I18NBean{
+public final class NavigationBean {
 
     private static final String LOGIN_FLAG = "cstl-logged";
 
@@ -46,9 +48,7 @@ public final class NavigationBean extends I18NBean{
     private String login = "";
     private String password = "";
 
-    public NavigationBean() {
-        addBundle("org.constellation.bundle.base");
-    }
+    public NavigationBean() {}
 
     public String authentify() {
         //TODO login authentification should be handle by services
@@ -119,6 +119,23 @@ public final class NavigationBean extends I18NBean{
                 .getSessionMap().remove(LOGIN_FLAG);
     }
 
+    public Map<String,String> getI18n(){
+        return new AbstractMap<String, String>() {
+
+            @Override
+            public Set<Entry<String, String>> entrySet() {
+                return entrySet();
+            }
+
+            @Override
+            public String get(Object key) {
+                return String.valueOf(key);
+            }
+            
+            
+        };
+    }
+    
     /**
      * Check if the session is logged in, if not redirect to authentication page.
      */

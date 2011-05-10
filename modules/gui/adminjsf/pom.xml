@@ -160,7 +160,7 @@
         </dependency>
 
         <!-- administration pages -->
-        <dependency>
+        <!--dependency>
             <groupId>org.constellation.gui</groupId>
             <artifactId>admin-base</artifactId>
             <version>${project.version}</version>
@@ -189,10 +189,10 @@
             <groupId>org.constellation.gui</groupId>
             <artifactId>admin-page-tool</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency-->
+        
         <!-- The 4 xml bindings are added here, because the JSF interface uses
-         those bindings to marshall capabilities.
-    -->
+         those bindings to marshall capabilities. -->
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-xml-wms</artifactId>
@@ -231,30 +231,26 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.sun.facelets</groupId>
             <artifactId>jsf-facelets</artifactId>
         </dependency>
         <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
+            <groupId>javax.faces</groupId>
+            <artifactId>jsf-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
+            <groupId>javax.faces</groupId>
+            <artifactId>jsf-impl</artifactId>
         </dependency>
         <dependency>
-            <groupId>poi</groupId>
-            <artifactId>poi</artifactId>
+            <groupId>org.richfaces.ui</groupId>
+            <artifactId>richfaces-ui</artifactId>
+            <version>3.3.3.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.richfaces.framework</groupId>
+            <artifactId>richfaces-impl</artifactId>
+            <version>3.3.3.Final</version>
         </dependency>
 
     </dependencies>
