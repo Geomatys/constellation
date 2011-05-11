@@ -91,17 +91,6 @@ public class ShapeFileProvider extends AbstractLayerProvider {
 
     /**
      * {@inheritDoc }
-     */
-    @Override
-    public Set<Name> getKeys(String sourceName) {
-        if (sourceName.equals(getSourceId(getSource()))) {
-            return index.keySet();
-        }
-        return new HashSet();
-    }
-
-    /**
-     * {@inheritDoc }
      *
      * @todo Should use {@code cache.getOrCreate(...)} for concurrent access.
      */
