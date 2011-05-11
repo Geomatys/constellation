@@ -33,7 +33,6 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import javax.xml.stream.XMLStreamException;
-import org.apache.xerces.dom.ElementNSImpl;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.FormatURL;
 import org.constellation.configuration.Layer;
@@ -123,6 +122,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.CodeList;
 
 // W3c dependencies
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -768,8 +768,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                             throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyValue, INVALID_PARAMETER_VALUE);
                         }
                         Object value;
-                        if (updateProperty.getValue() instanceof ElementNSImpl) {
-                            final String strValue = getXMLFromElementNSImpl((ElementNSImpl)updateProperty.getValue());
+                        if (updateProperty.getValue() instanceof Element) {
+                            final String strValue = getXMLFromElementNSImpl((Element)updateProperty.getValue());
                             value = null;
                             LOGGER.finer(">> updating : "+ updatePropertyValue +"   => " + strValue);
                         } else {
@@ -838,7 +838,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      *
      * @return a string containing the xml representation.
      */
-    private  String getXMLFromElementNSImpl(final ElementNSImpl elt) {
+    private  String getXMLFromElementNSImpl(final Element elt) {
         final StringBuilder s = new StringBuilder();
         s.append('<').append(elt.getLocalName()).append('>');
         final Node node = elt.getFirstChild();

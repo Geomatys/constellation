@@ -102,10 +102,6 @@
       <groupId>org.codehaus.woodstox</groupId>
       <artifactId>wstx-asl</artifactId>
     </dependency>
-    <dependency>
-      <groupId>xerces</groupId>
-      <artifactId>xercesImpl</artifactId>
-    </dependency>
 
     <!-- Web interface -->
     <dependency>
