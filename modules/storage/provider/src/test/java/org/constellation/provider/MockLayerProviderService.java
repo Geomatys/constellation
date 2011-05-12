@@ -60,7 +60,7 @@ public class MockLayerProviderService extends AbstractProviderService
     public ParameterDescriptorGroup getDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
-
+    
     @Override
     public LayerProvider createProvider(ParameterValueGroup config) {
         return new MockLayerProvider(config);

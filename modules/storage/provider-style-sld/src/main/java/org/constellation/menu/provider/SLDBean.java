@@ -20,6 +20,8 @@ package org.constellation.menu.provider;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.sld.SLDProvider;
+import org.constellation.provider.sld.SLDProviderService;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * SLD configuration bean.
@@ -46,6 +48,11 @@ public class SLDBean extends AbstractDataStoreServiceBean{
     @Override
     protected Class getProviderClass() {
         return SLDProvider.class;
+    }
+
+    @Override
+    protected GeneralParameterDescriptor getSourceDescriptor() {
+        return SLDProviderService.FOLDER_DESCRIPTOR;
     }
 
 }

@@ -20,6 +20,8 @@ package org.constellation.menu.provider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.postgis.PostGisProvider;
+import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * PostGIS configuration bean.
@@ -46,6 +48,11 @@ public class PostGISBean extends AbstractDataStoreServiceBean{
     @Override
     protected Class getProviderClass() {
         return PostGisProvider.class;
+    }
+
+    @Override
+    protected GeneralParameterDescriptor getSourceDescriptor() {
+        return PostgisNGDataStoreFactory.PARAMETERS_DESCRIPTOR;
     }
 
 }

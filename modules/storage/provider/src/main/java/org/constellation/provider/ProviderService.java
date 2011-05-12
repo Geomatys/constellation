@@ -31,7 +31,7 @@ public interface ProviderService<K,V,P extends Provider<K,V>> {
     String getName();
 
     ParameterDescriptorGroup getDescriptor();
-
+    
     /**
      * Create a provider for the given configuration.
      *

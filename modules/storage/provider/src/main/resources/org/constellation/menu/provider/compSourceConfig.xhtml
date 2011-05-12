@@ -12,19 +12,45 @@
     <br/>
     <b>#{bean.i18n['instance']}</b><br/>
     <div class="rounded">
-        #{bean.configuredInstance.userObject.id}
-
-        &#160;
-        <h:commandLink action="#{bean.configuredInstance.reload}">
-            <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
-        </h:commandLink>
-        <br/>
+        <table>
+            <tbody>
+                <tr>
+                    <td>
+                        <h:commandLink action="#{bean.configuredInstance.reload}">
+                            <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
+                        </h:commandLink>
+                    </td>
+                    <td>
+                        <mf:parametereditor value="#{bean.idParameter}" rootVisible="true"/>
+                    </td>
+                    <td>
+                        <div style="text-align: right;">
+                            <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>        
     </div>
     <br/>
-    <mf:parametereditor value="#{bean.configuredParameters}"/>
     
-    <div style="text-align: right;">
-        <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
-    </div>
-
+    <table width="100%">
+    <tbody>
+        <tr>
+            <td style="vertical-align:top;">
+            <mf:namer styleClass="rounded">
+                <mf:parametereditor value="#{bean.sourceParameters}" width="100%" rootVisible="false"/>
+            </mf:namer>
+            </td>
+            <td style="vertical-align:top;">
+            <mf:namer styleClass="rounded">
+                <mf:parametereditor value="#{bean.configuredParameters}" width="100%" rootVisible="false"
+                    adaptor="#{mf:constant('org.constellation.menu.provider.AbstractDataStoreServiceBean.LAYERS_ADAPTOR')}"/>
+            </mf:namer>
+            </td>
+        </tr>
+    
+    </tbody>
+    </table>
+    
 </ui:composition>

@@ -10,6 +10,12 @@
                 xmlns:mf="http://mapfaces.org/taglib"
                 template="/pages/slider.xhtml">
 
+    <ui:define name="header">
+        
+        <link rel="stylesheet" type="text/css" href="org.constellation.menu.provider.parameters.css.mfRes"/>
+        
+    </ui:define>
+    
     <ui:define name="content">
 
         <cstl:compSourceConfig bean="#{coveragesqlBean}" />

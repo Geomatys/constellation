@@ -28,6 +28,7 @@ import org.constellation.provider.configuration.ProviderParameters;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -44,9 +45,14 @@ import org.constellation.provider.StyleProviderService;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.WeakPropertyChangeListener;
+import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.logging.Logging;
+import org.mapfaces.facelet.parametereditor.ParameterModelAdaptor;
+import org.mapfaces.facelet.parametereditor.ParameterTreeModel;
 import org.opengis.feature.type.Name;
 import org.mapfaces.i18n.I18NBean;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -58,6 +64,16 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public abstract class AbstractDataStoreServiceBean extends I18NBean implements PropertyChangeListener{
 
+    /**
+     * Model adaptor, only display the layers parameters
+     */
+    public static final ParameterModelAdaptor LAYERS_ADAPTOR = new ParameterModelAdaptor(){
+        @Override
+        public ParameterTreeModel convert(final GeneralParameterValue s) throws NonconvertibleObjectException {
+            return new ParameterTreeModel(s,ProviderParameters.LAYER_DESCRIPTOR);
+        }
+    };
+    
     private static final Logger LOGGER = Logging.getLogger(AbstractDataStoreServiceBean.class);
 
     private final ProviderService service;
@@ -84,6 +100,8 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
 
     protected abstract Class getProviderClass();
 
+    protected abstract GeneralParameterDescriptor getSourceDescriptor();
+    
     /**
      * Build a tree model representation of all available layers.
      */
@@ -219,10 +237,32 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
         return configuredInstance;
     }
 
+    /**
+     * @return complete source configuration
+     */
     public ParameterValueGroup getConfiguredParameters(){
         return configuredParams;
     }
-
+    
+    /**
+     * @return the source id parameter
+     */
+    public GeneralParameterValue getIdParameter(){
+        return configuredParams.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode());
+    }
+    
+    /**
+     * @return the source store parameters
+     */
+    public GeneralParameterValue getSourceParameters(){
+        for(GeneralParameterValue val : configuredParams.values()){
+            if(val.getDescriptor().equals(getSourceDescriptor())){
+                return val;
+            }
+        }
+        return null;
+    }
+    
     public void saveConfiguration(){
         configuredInstance.provider.updateSource(configuredParams);
     }

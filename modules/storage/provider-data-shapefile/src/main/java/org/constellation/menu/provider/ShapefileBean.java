@@ -21,6 +21,9 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
+import org.constellation.provider.shapefile.ShapeFileProviderService;
+import org.geotoolkit.data.shapefile.ShapefileDataStoreFactory;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * Shapefile configuration bean.
@@ -47,6 +50,11 @@ public class ShapefileBean extends AbstractDataStoreServiceBean{
     @Override
     protected Class getProviderClass() {
         return ShapeFileProvider.class;
+    }
+
+    @Override
+    protected GeneralParameterDescriptor getSourceDescriptor() {
+        return ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR;
     }
 
 }

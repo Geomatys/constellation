@@ -20,6 +20,8 @@ package org.constellation.menu.provider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.coveragefile.CoverageFileProvider;
+import org.constellation.provider.coveragefile.CoverageFileProviderService;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * Coverage-File configuration bean.
@@ -46,6 +48,11 @@ public class CoverageFileBean extends AbstractDataStoreServiceBean{
     @Override
     protected Class getProviderClass() {
         return CoverageFileProvider.class;
+    }
+
+    @Override
+    protected GeneralParameterDescriptor getSourceDescriptor() {
+        return CoverageFileProviderService.SOURCE_CONFIG_DESCRIPTOR;
     }
 
 }
