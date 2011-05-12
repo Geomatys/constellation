@@ -5,157 +5,126 @@
 
 package org.constellation.menu.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Source;
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
+import org.geotoolkit.parameter.Parameters;
 
 /**
  *
- * @author jsorel
+ * @author Johann Sorel (Geomatys)
  */
-public class LayerContextTreeModel {
+public class LayerContextTreeModel extends DefaultTreeModel{
 
-//    public LayerContextTreeModel(LayerContext context){
-//        super(new javax.swing.tree.DefaultMutableTreeNode());
-//        final ValueNode node = new ValueNode(context);
-//        setRoot(node);
-//        refresh();
-//    }
-//
-//    public void refresh(){
-//        ((ValueNode)getRoot()).refresh();
-//    }
-//
-//    public void removeProperty(final TreePath path){
-//        final ValueNode node = (ValueNode) path.getLastPathComponent();
-//        final Object userObject = node.getUserObject();
-//
-//        //only works if the last node is a property
-//        if(!(userObject instanceof Property)){
-//            return;
-//        }
-//
-//        final Property prop = (Property) userObject;
-//        final ComplexAttribute att = getParent(node);
-//        ((Collection)att.getValue()).remove(prop);
-//
-//        //update the treenode
-//        final ValueNode parentNode = (ValueNode) node.getParent();
-//        final Object parentObject = parentNode.getUserObject();
-//
-//        if(parentObject instanceof ComplexAttribute){
-//            //we must replace this node user object by it's propertydescriptor
-//            node.setUserObject(prop.getDescriptor());
-//            nodeChanged(node); //fires event
-//        }else if(parentObject instanceof PropertyDescriptor){
-//            removeNodeFromParent(node); //fires event
-//        }
-//
-//    }
-//
-//    public void createProperty(final TreePath path){
-//        final ValueNode node = (ValueNode) path.getLastPathComponent();
-//        final Object userObject = node.getUserObject();
-//
-//        //only works if the last node is a property descriptor
-//        if(!(userObject instanceof PropertyDescriptor)){
-//            return;
-//        }
-//
-//        final PropertyDescriptor desc = (PropertyDescriptor) userObject;
-//        final int max = desc.getMaxOccurs();
-//        if(max == 1){
-//            //we must replace the descriptor by a real property
-//            final Property prop = FeatureUtilities.defaultProperty(desc);
-//            node.setUserObject(prop);
-//            nodeChanged(node);
-//
-//        }else{
-//
-//            //we must add a new child if there is space left
-//            if(node.getChildCount() < max){
-//                final ComplexAttribute parent = getParent(node);
-//                final Property prop = FeatureUtilities.defaultProperty(desc);
-//                //add in the feature
-//                ((Collection)parent.getValue()).add(prop);
-//                //insert the node
-//                final ValueNode n = new ValueNode(prop);
-//                insertNodeInto(n, node, node.getChildCount());
-//                n.refresh();
-//            }
-//        }
-//    }
-//
-//    public ComplexAttribute getParent(MutableTreeNode node){
-//        final MutableTreeNode parentNode = getParentNode((ValueNode) node);
-//        if(parentNode != null){
-//            return (ComplexAttribute) parentNode.getUserObject();
-//        }
-//        return null;
-//    }
-//
-//    public ValueNode getParentNode(ValueNode node){
-//        node = (ValueNode) node.getParent();
-//        if(node == null){
-//            return null;
-//        }
-//
-//        final Object userObject = node.getUserObject();
-//        if(userObject instanceof ComplexAttribute){
-//            return node;
-//        }else{
-//            return getParentNode(node);
-//        }
-//    }
-//
-//    private class ValueNode extends DefaultMutableTreeNode{
-//
-//        public ValueNode(Object obj) {
-//            super(obj);
-//        }
-//
-//        public synchronized void refresh(){
-//
-//            //todo not the best way but at least it's properly refreshed
-//            //remove all children
-//            for(int i=getChildCount()-1;i>=0;i--){
-//                removeNodeFromParent((ValueNode)getChildAt(i));
-//            }
-//
-//
-//            //create all children
-//            if(userObject instanceof ComplexAttribute){
-//                final ComplexAttribute catt = (ComplexAttribute) userObject;
-//                final ComplexType type = catt.getType();
-//
-//                for(PropertyDescriptor desc : type.getDescriptors()){
-//                    final Collection<Property> values = catt.getProperties(desc.getName());
-//
-//                    final boolean arrayType = desc.getMaxOccurs() > 1;
-//
-//                    if(values.isEmpty()){
-//                        final ValueNode n = new ValueNode(desc);
-//                        insertNodeInto(n, this, getChildCount()); //fires event
-//                    }else{
-//                        if(arrayType){
-//                            final ValueNode n = new ValueNode(desc);
-//                            insertNodeInto(n, this, getChildCount()); //fires event
-//                            for(Property val : values){
-//                                final ValueNode nc = new ValueNode(val);
-//                                insertNodeInto(nc, n, n.getChildCount()); //fires event
-//                                nc.refresh();
-//                            }
-//                        }else{
-//                            final ValueNode n = new ValueNode(values.iterator().next());
-//                            insertNodeInto(n, this, getChildCount()); //fires event
-//                            n.refresh();
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//    }
+    private final LayerContext layerContext;
+    
+    public LayerContextTreeModel(final LayerContext context){
+        super(new javax.swing.tree.DefaultMutableTreeNode());
+        this.layerContext = context;
+        final ValueNode node = new ValueNode(context);
+        setRoot(node);
+        refresh();
+    }
 
+    public void refresh(){
+        ((ValueNode)getRoot()).refresh();
+    }
+
+    public void removeProperty(final TreePath path){
+        final ValueNode node = (ValueNode) path.getLastPathComponent();
+        final Object userObject = node.getUserObject();
+
+        //only works if the last node is a source
+        if(!(userObject instanceof Source)){
+            return;
+        }
+
+        final Source src = (Source) userObject;
+        layerContext.getLayers().remove(src);
+        
+        //update the treenode
+        removeNodeFromParent(node); //fires event
+    }
+
+    private class ValueNode extends DefaultMutableTreeNode{
+
+        public ValueNode(Object obj) {
+            super(obj);
+        }
+
+        public synchronized void refresh(){
+
+            //todo not the best way but at least it's properly refreshed
+            //remove all children
+            for(int i=getChildCount()-1;i>=0;i--){
+                removeNodeFromParent((ValueNode)getChildAt(i));
+            }
+
+
+            //create all children
+            if(userObject instanceof LayerContext){
+                final LayerContext catt = (LayerContext) userObject;
+                
+                for(Source src : catt.getLayers()){
+                    final ValueNode n = new ValueNode(src);
+                    insertNodeInto(n, this, getChildCount()); //fires event
+                    n.refresh();
+                }                
+            }else if(userObject instanceof Source){
+                final Source src = (Source) userObject;                
+                final String id = src.getId();
+                
+                final boolean loadAll = Boolean.TRUE.equals(src.getLoadAll()); 
+                final List<String> included = new ArrayList<String>();
+                final List<String> excluded = new ArrayList<String>();
+                for(Layer l : src.getInclude()){
+                    included.add(l.getName().getLocalPart());
+                }
+                for(Layer l : src.getExclude()){
+                    excluded.add(l.getName().getLocalPart());
+                }
+                
+                final List<SourceElement> elements = new ArrayList<SourceElement>();
+                
+                for(LayerProvider provider : LayerProviderProxy.getInstance().getProviders()){
+                    final String name = Parameters.stringValue(ProviderParameters.SOURCE_ID_DESCRIPTOR, provider.getSource());
+                    if(!name.equals(id)){
+                        continue;
+                    }
+                    
+                    
+                    
+                }
+                
+                for(SourceElement ele : elements){
+                    
+                }
+                                
+            }
+        }
+
+    }
+
+    public static class SourceElement{
+        
+        private final String name;
+        private final boolean selected;
+
+        public SourceElement(String name, boolean selected) {
+            this.name = name;
+            this.selected = selected;
+        }
+        
+        
+        
+    }
+    
 }

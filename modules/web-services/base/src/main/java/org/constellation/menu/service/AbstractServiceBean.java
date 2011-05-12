@@ -25,11 +25,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+import javax.swing.tree.TreeModel;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ServiceAdministrator;
 import org.constellation.bean.MenuBean;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Source;
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.configuration.ProviderParameters;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.event.CloseEvent;
@@ -55,6 +63,8 @@ public class AbstractServiceBean extends I18NBean{
     private String newServiceName = "default";
     private ServiceInstance configuredInstance = null;
     private Object configurationObject = null;
+    private TreeModel treemodel = null;
+    private String selectedPotentialSource = null;
 
     public AbstractServiceBean(final Specification specification, final String mainPage, final String configPage) {
         ArgumentChecks.ensureNonNull("specification", specification);
@@ -133,6 +143,44 @@ public class AbstractServiceBean extends I18NBean{
     }
 
     ////////////////////////////////////////////////////////////////////////////
+    // ACTION TO ADD NEW SOURCE IN LAYER CONTEXT ///////////////////////////////
+    
+    public List<SelectItem> getPotentialSources(){
+        final List<SelectItem> items = new ArrayList<SelectItem>();
+        for(LayerProvider provider : LayerProviderProxy.getInstance().getProviders()){
+            final String name = Parameters.stringValue(ProviderParameters.SOURCE_ID_DESCRIPTOR, provider.getSource());
+            items.add(new SelectItem(name, name));
+        }
+        return items;
+    }
+    
+    public String getSelectedPotentialSource(){
+        return selectedPotentialSource;
+    }
+    
+    public void setSelectedPotentialSource(String selected){
+        selectedPotentialSource = selected;
+    }
+    
+    public void addSource(){
+        if(!(configurationObject instanceof LayerContext) ){
+            return;
+        }
+        
+        final LayerContext ctx = (LayerContext) configurationObject;
+        final Source src = new Source();
+        src.setId((selectedPotentialSource == null) ? "" : selectedPotentialSource );
+        ctx.getLayers().add(src);
+        
+        if(configurationObject instanceof LayerContext){
+            treemodel = new LayerContextTreeModel((LayerContext)configurationObject);
+        }else{
+            treemodel = null;
+        }
+        
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////
     // CONFIGURE CURRENT INSTANCE //////////////////////////////////////////////
 
     /**
@@ -166,7 +214,12 @@ public class AbstractServiceBean extends I18NBean{
         configuredInstance = null;
         configurationObject = null;
     }
-
+    
+    public TreeModel getLayerModel(){
+        return treemodel;
+    }
+    
+    
     /**
      * Save the currently edited instance.
      * Subclass should override this method to make the proper save.
@@ -212,6 +265,12 @@ public class AbstractServiceBean extends I18NBean{
             configuredInstance = this;
             configurationObject = getServiceAdministrator().getInstanceconfiguration(getSpecificationName(), instance.getName());
 
+            if(configurationObject instanceof LayerContext){
+                treemodel = new LayerContextTreeModel((LayerContext)configurationObject);
+            }else{
+                treemodel = null;
+            }
+            
             if(configPage != null){
                 final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
                 try {

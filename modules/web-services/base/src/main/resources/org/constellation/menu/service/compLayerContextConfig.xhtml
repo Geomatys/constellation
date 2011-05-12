@@ -36,8 +36,36 @@
     <h:outputText value="#{bean.i18n['security']} :"/><br/>
     <h:inputTextarea value="#{bean.configurationObject.security}" style="width:100%;" />
     <br/>
-    TODO, layer context configuration tree.
     <br/>
+    <b>#{bean.i18n['sources']}</b><br/>
+    <br/>
+    <h:selectOneListbox value="#{bean.selectedPotentialSource}" size="1">
+        <f:selectItems value="#{bean.potentialSources}" />
+    </h:selectOneListbox>
+    <h:commandLink action="#{bean.addSource}" class="logout">
+        <h:graphicImage value="org.constellation.menu.service.add24_bleu.png.mfRes" style="border:none;"/>
+        #{bean.i18n['add']}
+    </h:commandLink>
+    <br/>
+    <br/>
+    <mf:Outline id="sourceLayers" actionVisible="true" rootVisible="false"
+                value="#{bean.layerModel}" var="node" width="100%">
+        <!-- Name column -->
+        <h:column>
+            
+            <mf:switch>
+                <mf:case condition="#{mf:isInstance(node.userObject,'Source')}" fallthrought="false">
+                    <h:inputText value="#{node.userObject.id}" />
+                </mf:case>
+                <mf:case condition="#{mf:isInstance(node.userObject,'Layer')}" fallthrought="false">
+                    <h:outputText value="#{node.userObject.name}"/>
+                </mf:case>                
+            </mf:switch>
+            
+            
+        </h:column>
+    </mf:Outline>
+    
     
     <div style="text-align: right;">
         <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />

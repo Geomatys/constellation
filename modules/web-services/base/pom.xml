@@ -105,6 +105,11 @@
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-provider</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Web interface -->
     <dependency>
