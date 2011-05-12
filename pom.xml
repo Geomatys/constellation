@@ -326,6 +326,11 @@
                 <version>2.9.1</version>
             </dependency>
             <dependency>
+                <groupId>net.iharder</groupId>
+                <artifactId>base64</artifactId>
+                <version>2.3.8</version>
+            </dependency>
+            <dependency>
                 <groupId>net.java.dev.stax-utils</groupId>
                 <artifactId>stax-utils</artifactId>
                 <version>20060502</version>

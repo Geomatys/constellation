@@ -16,20 +16,18 @@
  */
 package org.constellation.bean;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
-import javax.servlet.ServletContext;
-import org.geotoolkit.util.logging.Logging;
+import javax.servlet.http.HttpServletRequest;
 
+import org.constellation.admin.service.ServiceAdministrator;
+import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.i18n.I18NBean;
 
 /**
@@ -39,10 +37,12 @@ import org.mapfaces.i18n.I18NBean;
  */
 public final class NavigationBean extends I18NBean{
 
-    private static final String LOGIN_FLAG = "cstl-logged";
-
+    /**
+     * When user is log in, a ServiceAdministrator object is added in the session map.
+     */
+    public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
+    
     private static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
-    static final String AUTH_FILE_PATH = "WEB-INF/authentication.properties";
     
     private String login = "";
     private String password = "";
@@ -52,51 +52,9 @@ public final class NavigationBean extends I18NBean{
     }
 
     public String authentify() {
-        //TODO login authentification should be handle by services
-        try{
-            final Properties properties = getProperties();
-            
-            if(password.equals(properties.getProperty(login))){
-                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(LOGIN_FLAG,LOGIN_FLAG);
-                return "login";
-            }
-        }catch(IOException ex){
-            LOGGER.log(Level.WARNING,"Failed to read authorization file.",ex);
-        }
-
-        return "failed";
-    }
-    
-    private static Properties getProperties() throws IOException {
-        final Properties properties = new Properties();
-        InputStream inputStream = null;
-        final FacesContext context = FacesContext.getCurrentInstance();
-        if (context != null) {
-            final ExternalContext externalContext = context.getExternalContext();
-            if (externalContext != null) {
-                final ServletContext sc = (ServletContext) externalContext.getContext();
-                if (sc != null) {
-                    try {
-                        inputStream = new FileInputStream(sc.getRealPath(AUTH_FILE_PATH));
-                    } catch (FileNotFoundException e) {
-                        LOGGER.log(Level.SEVERE, "No configuration file found.");
-                    }
-                }
-            }
-        }
-
-        if (inputStream == null) {
-            inputStream = NavigationBean.class.getResourceAsStream(AUTH_FILE_PATH);
-        }
-
-        if (inputStream != null) {
-            try {
-                properties.load(inputStream);
-            } finally {
-                inputStream.close();
-            }
-        }
-        return properties;
+        ServiceAdministrator serviceAdmin = ServiceAdministrator.login(getServiceURL(), login, password);
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(SERVICE_ADMIN_KEY, serviceAdmin);
+        return (serviceAdmin != null) ? "login" : "failed";
     }
     
     public String getLogin() {
@@ -116,8 +74,7 @@ public final class NavigationBean extends I18NBean{
     }
 
     public void logout(){
-        FacesContext.getCurrentInstance().getExternalContext()
-                .getSessionMap().remove(LOGIN_FLAG);
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove(SERVICE_ADMIN_KEY);
     }
     
     /**
@@ -126,7 +83,7 @@ public final class NavigationBean extends I18NBean{
     public void checkLogged(final PhaseEvent event){
 
         final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-        if(!context.getSessionMap().containsKey(LOGIN_FLAG)){
+        if(context.getSessionMap().get(SERVICE_ADMIN_KEY) == null){
             final String webapp = context.getRequestContextPath();
             try {
                 //the session is not logged, redirect him to the authentication page
@@ -136,5 +93,20 @@ public final class NavigationBean extends I18NBean{
             }
         }
     }
-
+    
+    /**
+     * Return the base URL of the web-services.
+     */
+    private static String getServiceURL() {
+        final HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String result = null;
+        try {
+            final String pathUrl = request.getRequestURL().toString();
+            final URL url = new URL(pathUrl);
+            result = url.getProtocol() + "://" + url.getAuthority() + request.getContextPath() + "/WS/";
+        } catch (MalformedURLException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return result;
+    }
 }

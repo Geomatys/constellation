@@ -17,65 +17,106 @@
 package org.constellation.admin.service;
 
 import java.io.IOException;
-import java.net.Authenticator;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
+import net.iharder.Base64;
+
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+
+import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
- *
+ * Convinient class to perform actions on constellation web services.
+ * 
  * @author Guilhem Legal (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
-public class ServiceAdministrator {
+public final class ServiceAdministrator {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
-
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
 
+    
+    private final String server;
+    private final String user;
+    private final String password;
+
+    private ServiceAdministrator(final String server, final String user, final String password) {
+        this.server = server;
+        this.user = user;
+        this.password = password;
+    }
+    
+    public static ServiceAdministrator login(final String serviceURL, 
+            final String login, final String password) {
+        ArgumentChecks.ensureNonNull("server url", serviceURL);
+        ArgumentChecks.ensureNonNull("user", login);
+        ArgumentChecks.ensureNonNull("password", password);
+        ServiceAdministrator serviceAdmin = new ServiceAdministrator(serviceURL, login, password);
+        
+        //check if the service and logins are valid
+        if(!serviceAdmin.authenticate()){
+            //unvalid configuration
+            serviceAdmin = null;
+        }
+        
+        return serviceAdmin;
+    }
+    
+    public String getServiceURL(){
+        return server;
+    }
+    
+    private void authentifyConnection(final URLConnection cnx){
+        final String userPassword = user + ":" + password;
+        final String encoding = Base64.encodeBytes(userPassword.getBytes());
+        cnx.setRequestProperty ("Authorization", "Basic " + encoding);
+    }
+    
     /**
      * Set the basic authentication for HTTP request.
-     *
-     * @param userName The login of the user.
-     * @param password The password of the user
+     * @return true if login/password are valid
      */
-    public static void authenticate(final String userName, final String password) {
-        Authenticator.setDefault(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(userName, password.toCharArray());
-            }
-        });
-    }
-
-    /**
-     * Return the base URL of the web-services.
-     */
-    public static String getServiceURL() {
-        final HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String result = null;
+    public boolean authenticate() {
+        final String str = server + "configuration";
+        InputStream stream = null;
+        HttpURLConnection cnx = null;
         try {
-            final String pathUrl = request.getRequestURL().toString();
-            final URL url = new URL(pathUrl);
-            result = url.getProtocol() + "://" + url.getAuthority() + request.getContextPath() + "/WS/";
-        } catch (MalformedURLException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            final URL url = new URL(str);
+            cnx = (HttpURLConnection) url.openConnection();
+            authentifyConnection(cnx);
+            stream = cnx.getInputStream();            
+        } catch (Exception ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage());
+            return false;
+        }finally{
+            if(stream != null){
+                try {
+                    stream.close();
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                }
+            }
+            if(cnx != null){
+                cnx.disconnect();
+            }
         }
-        return result;
+        return true;
     }
 
     /**
@@ -86,7 +127,7 @@ public class ServiceAdministrator {
      *
      * @return A complete URL for the specified service.
      */
-    public static String getInstanceURL(final String service, final String instanceId) {
+    public String getInstanceURL(final String service, final String instanceId) {
         return getServiceURL() + service.toLowerCase() + '/' + instanceId;
     }
 
@@ -95,7 +136,7 @@ public class ServiceAdministrator {
      *
      * @return true if the operation succeed
      */
-    public static boolean restartAll() {
+    public boolean restartAll() {
         try {
             final String url = getServiceURL() + "configuration?request=restart";
             final Object response = sendRequest(url, null);
@@ -121,7 +162,7 @@ public class ServiceAdministrator {
      * 
      * @return true if the operation succeed
      */
-    public static boolean restartAllInstance(final String service) {
+    public boolean restartAllInstance(final String service) {
         try {
             final String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart";
             final Object response = sendRequest(url, null);
@@ -148,7 +189,7 @@ public class ServiceAdministrator {
      * 
      * @return true if the operation succeed
      */
-    public static boolean restartInstance(final String service, final String instanceId) {
+    public boolean restartInstance(final String service, final String instanceId) {
         try {
             String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
             final Object response = sendRequest(url, null);
@@ -175,7 +216,7 @@ public class ServiceAdministrator {
      * 
      * @return true if the operation succeed
      */
-    public static boolean newInstance(String service, String instanceId) {
+    public boolean newInstance(String service, String instanceId) {
         try {
             String url = getServiceURL() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
             final Object response = sendRequest(url, null);
@@ -202,7 +243,7 @@ public class ServiceAdministrator {
      *
      * @return true if the operation succeed.
      */
-    public static boolean startInstance(final String service, final String instanceId) {
+    public boolean startInstance(final String service, final String instanceId) {
         try {
             String url = getServiceURL() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
             final Object response = sendRequest(url, null);
@@ -229,7 +270,7 @@ public class ServiceAdministrator {
      *
      * @return true if the operation succeed.
      */
-    public static boolean stopInstance(final String service, final String instanceId) {
+    public boolean stopInstance(final String service, final String instanceId) {
         try {
             String url = getServiceURL() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
             final Object response = sendRequest(url, null);
@@ -256,7 +297,7 @@ public class ServiceAdministrator {
      *
      * @return true if the operation succeed.
      */
-    public static boolean deleteInstance(final String service, final String instanceId) {
+    public boolean deleteInstance(final String service, final String instanceId) {
         try {
             String url = getServiceURL() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
             final Object response = sendRequest(url, null);
@@ -282,7 +323,7 @@ public class ServiceAdministrator {
      *
      * @return A {@link InstanceReport} about the specified service.
      */
-    public static InstanceReport listInstance(final String service) {
+    public InstanceReport listInstance(final String service) {
         try {
             String url = getServiceURL() + service.toLowerCase() + "/admin?request=listInstance";
             final Object response = sendRequest(url, null);
@@ -310,7 +351,7 @@ public class ServiceAdministrator {
      *
      * @return true if the operation succeed.
      */
-    public static boolean configureInstance(final String service, final String instanceId, final Object configuration) {
+    public boolean configureInstance(final String service, final String instanceId, final Object configuration) {
         try {
             String url = getServiceURL() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
             final Object response = sendRequest(url, configuration);
@@ -337,7 +378,7 @@ public class ServiceAdministrator {
      *
      * @return  A configuration object depending on the service type (for example WxS service return LayerContext object).
      */
-    public static Object getInstanceconfiguration(final String service, final String instanceId) {
+    public Object getInstanceconfiguration(final String service, final String instanceId) {
         try {
             String url = getServiceURL() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
             final Object response = sendRequest(url, null);
@@ -369,11 +410,12 @@ public class ServiceAdministrator {
      * @throws java.io.IOException
      * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private static Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
+    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
 
-        final URL source          = new URL(sourceURL);
+        final URL source = new URL(sourceURL);
         final URLConnection conec = source.openConnection();
-        Object response    = null;
+        authentifyConnection(conec);
+        Object response = null;
 
         try {
 

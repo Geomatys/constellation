@@ -3,4 +3,8 @@
 <sun-web-app error-url="">
   <class-loader delegate="true"/>
   <property name="useBundledJsf" value="true"/>
+  <security-role-mapping>
+    <role-name>cstladmin</role-name>
+    <group-name>administrator</group-name>
+  </security-role-mapping>
 </sun-web-app>

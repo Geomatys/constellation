@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
+import java.lang.ref.WeakReference;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -77,6 +78,8 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 @Singleton
 public final class ConfigurationService extends WebService  {
 
+    private static WeakReference<ConfigurationService> INSTANCE = null;
+    
     /**
      * A container notifier allowing to dynamically reload all the active service.
      */
@@ -123,6 +126,11 @@ public final class ConfigurationService extends WebService  {
             
         }
         LOGGER.info("Configuration service runing");
+        
+        if(INSTANCE == null || INSTANCE.get() == null){
+            INSTANCE = new WeakReference<ConfigurationService>(this);
+        }
+        
     }
     
     /**
