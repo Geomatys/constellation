@@ -49,7 +49,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
-import org.geotoolkit.internal.jaxb.gco.AnchorType;
+import org.geotoolkit.internal.jaxb.gmx.Anchor;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
@@ -188,7 +188,7 @@ public class MetadataUnmarshallTest {
         add.setDeliveryPoints(set);
         add.setCity(new SimpleInternationalString("PLOUZANE"));
         add.setPostalCode("29280");
-        add.setCountry(new AnchorType(URI.create("SDN:C320:2:FR"), "France"));
+        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
         set = new HashSet();
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
@@ -233,7 +233,7 @@ public class MetadataUnmarshallTest {
         set = new HashSet();
         set.add(new DefaultReferenceIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
         RScitation.setIdentifiers(set);
-        RScitation.setEdition(new AnchorType(new URI("SDN:C371:1:2"),"2"));
+        RScitation.setEdition(new Anchor(new URI("SDN:C371:1:2"),"2"));
 
         DefaultReferenceIdentifier Nidentifier = new DefaultReferenceIdentifier(RScitation, "L101", code);
         ReferenceSystemMetadata rs = new ReferenceSystemMetadata(Nidentifier);
@@ -325,7 +325,7 @@ public class MetadataUnmarshallTest {
         add.setDeliveryPoints(set);
         add.setCity(new SimpleInternationalString("Marseille cedex 9"));
         add.setPostalCode("13288");
-        add.setCountry(new AnchorType(URI.create("SDN:C320:2:FR"), "France"));
+        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
         set = new HashSet();
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
@@ -358,7 +358,7 @@ public class MetadataUnmarshallTest {
         add.setDeliveryPoints(set);
         add.setCity(new SimpleInternationalString("PLOUZANE"));
         add.setPostalCode("29280");
-        add.setCountry(new AnchorType(URI.create("SDN:C320:2:FR"), "France"));
+        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
         set = new HashSet();
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
@@ -417,7 +417,7 @@ public class MetadataUnmarshallTest {
         DefaultLegalConstraints constraint = new DefaultLegalConstraints();
         Set<Restriction> restrictions  = new HashSet<Restriction>();
         restrictions.add(Restriction.LICENSE);
-        
+
         constraint.setAccessConstraints(restrictions);
         set = new HashSet();
         set.add(constraint);
@@ -541,7 +541,7 @@ public class MetadataUnmarshallTest {
 
         // vertical coordinate system  TODO var 32 uom?
         HashMap<String, Object> propCoo = new HashMap<String, Object>();
-        
+
 
         propCoo.put(DefaultCoordinateSystemAxis.NAME_KEY, new DefaultReferenceIdentifier(null, null, "meters"));
 //        propCoo.put(DefaultCoordinateSystemAxis.ALIAS_KEY, "");
@@ -600,7 +600,7 @@ public class MetadataUnmarshallTest {
         add.setDeliveryPoints(set);
         add.setCity(new SimpleInternationalString("PLOUZANE"));
         add.setPostalCode("29280");
-        add.setCountry(new AnchorType(URI.create("SDN:C320:2:FR"), "France"));
+        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
         set = new HashSet();
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
@@ -620,7 +620,7 @@ public class MetadataUnmarshallTest {
 
         DefaultFormat format = new DefaultFormat();
         String name = "MEDATLAS ASCII";
-        format.setName(new AnchorType(new URI("SDN:L241:1:MEDATLAS"),name));
+        format.setName(new Anchor(new URI("SDN:L241:1:MEDATLAS"),name));
         format.setVersion(new SimpleInternationalString("1.0"));
         formats.add(format);
 
@@ -913,7 +913,7 @@ public class MetadataUnmarshallTest {
         if (values != null) {
             for (String value: values) {
                 if (value != null) {
-                    kws.add(new AnchorType(URI.create("SDN:P021:35:ATTN"), value));
+                    kws.add(new Anchor(URI.create("SDN:P021:35:ATTN"), value));
                 }
             }
         }
@@ -935,7 +935,7 @@ public class MetadataUnmarshallTest {
         set = new HashSet();
         set.add(revisionDate);
         citation.setDates(set);
-        citation.setEdition(new AnchorType(URI.create("SDN:C371:1:35"), version));
+        citation.setEdition(new Anchor(URI.create("SDN:C371:1:35"), version));
         set = new HashSet();
         set.add(new DefaultReferenceIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
         citation.setIdentifiers(set);
@@ -1013,7 +1013,7 @@ public class MetadataUnmarshallTest {
         add.setDeliveryPoints(set);
         add.setCity(new SimpleInternationalString("PLOUZANE"));
         add.setPostalCode("29280");
-        add.setCountry(new AnchorType(URI.create("SDN:C320:2:FR"), "France"));
+        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
         set = new HashSet();
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
@@ -1058,7 +1058,7 @@ public class MetadataUnmarshallTest {
         set = new HashSet();
         set.add(new DefaultReferenceIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
         RScitation.setIdentifiers(set);
-        RScitation.setEdition(new AnchorType(new URI("SDN:C371:1:2"),"2"));
+        RScitation.setEdition(new Anchor(new URI("SDN:C371:1:2"),"2"));
 
         DefaultReferenceIdentifier Nidentifier = new DefaultReferenceIdentifier(RScitation, "L101", code);
         ReferenceSystemMetadata rs = new ReferenceSystemMetadata(Nidentifier);
@@ -1150,7 +1150,7 @@ public class MetadataUnmarshallTest {
         add.setDeliveryPoints(set);
         add.setCity(new SimpleInternationalString("Marseille cedex 9"));
         add.setPostalCode("13288");
-        add.setCountry(new AnchorType(URI.create("SDN:C320:2:FR"), "France"));
+        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
         set = new HashSet();
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
@@ -1183,7 +1183,7 @@ public class MetadataUnmarshallTest {
         add.setDeliveryPoints(set);
         add.setCity(new SimpleInternationalString("PLOUZANE"));
         add.setPostalCode("29280");
-        add.setCountry(new AnchorType(URI.create("SDN:C320:2:FR"), "France"));
+        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
         set = new HashSet();
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
@@ -1242,7 +1242,7 @@ public class MetadataUnmarshallTest {
         DefaultLegalConstraints constraint = new DefaultLegalConstraints();
         Set<Restriction> restrictions  = new HashSet<Restriction>();
         restrictions.add(Restriction.LICENSE);
-        
+
         constraint.setAccessConstraints(restrictions);
         set = new HashSet();
         set.add(constraint);
@@ -1414,7 +1414,7 @@ public class MetadataUnmarshallTest {
         add.setDeliveryPoints(set);
         add.setCity(new SimpleInternationalString("PLOUZANE"));
         add.setPostalCode("29280");
-        add.setCountry(new AnchorType(URI.create("SDN:C320:2:FR"), "France"));
+        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
         set = new HashSet();
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
@@ -1434,7 +1434,7 @@ public class MetadataUnmarshallTest {
 
         DefaultFormat format = new DefaultFormat();
         String name = "MEDATLAS ASCII";
-        format.setName(new AnchorType(new URI("SDN:L241:1:MEDATLAS"), name));
+        format.setName(new Anchor(new URI("SDN:L241:1:MEDATLAS"), name));
         format.setVersion(new SimpleInternationalString("1.0"));
         formats.add(format);
 
@@ -1536,7 +1536,7 @@ public class MetadataUnmarshallTest {
 
         assertEquals(expResult7, result7);
 
-        
+
 
 
         startPosition     = startPosition + expResult7.length() + 40;
