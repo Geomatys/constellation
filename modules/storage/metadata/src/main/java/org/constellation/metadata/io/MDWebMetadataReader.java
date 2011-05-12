@@ -980,8 +980,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 packageName = "org.geotoolkit.metadata.fra";
             else if ("ReferenceSystemMetadata".equals(className))
                 packageName = "org.geotoolkit.internal.jaxb.metadata";
-            else if ("Anchor".equals(className))
-                packageName = "org.geotoolkit.internal.jaxb.gco";
+            else if ("Anchor".equals(className)) {
+                packageName = "org.geotoolkit.internal.jaxb.gmx";
+				className = "GMX_Anchor";
+			}
             String name  = className;
             int nameType = 0;
             while (nameType < 10) {
