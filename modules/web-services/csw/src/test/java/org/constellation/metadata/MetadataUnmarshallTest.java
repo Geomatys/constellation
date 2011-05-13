@@ -50,6 +50,7 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.geotoolkit.internal.jaxb.gmx.Anchor;
+import org.geotoolkit.internal.jaxb.gml.GMLAdapter;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
@@ -1334,6 +1335,7 @@ public class MetadataUnmarshallTest {
         DefaultInstant begin = new DefaultInstant(new DefaultPosition(start));
         DefaultInstant end = new DefaultInstant(new DefaultPosition(stop));*/
         TimePeriodType period = new TimePeriodType("1990-06-05", "1990-07-02");
+        GMLAdapter.IDs.setUUID(period, "extent");
         tempExtent.setExtent(period);
 
         set = new HashSet();
