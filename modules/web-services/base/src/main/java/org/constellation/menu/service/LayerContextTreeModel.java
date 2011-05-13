@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
 import org.constellation.provider.LayerProvider;
@@ -17,6 +16,7 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotoolkit.parameter.Parameters;
+import org.opengis.feature.type.Name;
 
 /**
  *
@@ -81,17 +81,7 @@ public class LayerContextTreeModel extends DefaultTreeModel{
             }else if(userObject instanceof Source){
                 final Source src = (Source) userObject;                
                 final String id = src.getId();
-                
-                final boolean loadAll = Boolean.TRUE.equals(src.getLoadAll()); 
-                final List<String> included = new ArrayList<String>();
-                final List<String> excluded = new ArrayList<String>();
-                for(Layer l : src.getInclude()){
-                    included.add(l.getName().getLocalPart());
-                }
-                for(Layer l : src.getExclude()){
-                    excluded.add(l.getName().getLocalPart());
-                }
-                
+                                
                 final List<SourceElement> elements = new ArrayList<SourceElement>();
                 
                 for(LayerProvider provider : LayerProviderProxy.getInstance().getProviders()){
@@ -100,31 +90,19 @@ public class LayerContextTreeModel extends DefaultTreeModel{
                         continue;
                     }
                     
-                    
-                    
+                    for(Name n : provider.getKeys()){
+                        elements.add(new SourceElement(src, n.getLocalPart()));
+                    }
                 }
                 
                 for(SourceElement ele : elements){
-                    
-                }
-                                
+                    final ValueNode n = new ValueNode(ele);
+                    insertNodeInto(n, this, getChildCount()); //fires event
+                    n.refresh();
+                }         
             }
         }
 
-    }
-
-    public static class SourceElement{
-        
-        private final String name;
-        private final boolean selected;
-
-        public SourceElement(String name, boolean selected) {
-            this.name = name;
-            this.selected = selected;
-        }
-        
-        
-        
     }
     
 }

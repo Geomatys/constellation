@@ -48,23 +48,40 @@
     </h:commandLink>
     <br/>
     <br/>
+    <div class="rounded">
     <mf:Outline id="sourceLayers" actionVisible="true" rootVisible="false"
                 value="#{bean.layerModel}" var="node" width="100%">
         <!-- Name column -->
-        <h:column>
-            
-            <mf:switch>
-                <mf:case condition="#{mf:isInstance(node.userObject,'Source')}" fallthrought="false">
-                    <h:inputText value="#{node.userObject.id}" />
-                </mf:case>
-                <mf:case condition="#{mf:isInstance(node.userObject,'Layer')}" fallthrought="false">
-                    <h:outputText value="#{node.userObject.name}"/>
-                </mf:case>                
-            </mf:switch>
-            
-            
+        <h:column>            
+            <h:inputText value="#{node.userObject.id}" rendered="#{mf:isInstance(node.userObject,'Source')}"/>
+            <h:commandLink action="#{bean.changeSourceLoadAll}" rendered="#{mf:isInstance(node.userObject,'Source')}">
+                <f:param name="NodeId" value="#{sourceLayers.nodeIndex}" />
+                <h:graphicImage value="org.constellation.menu.service.valid_on.png.mfRes" style="border:none;" rendered="#{node.userObject.loadAll != null and node.userObject.loadAll == true}"/>
+                <h:graphicImage value="org.constellation.menu.service.valid_off.png.mfRes" style="border:none;" rendered="#{node.userObject.loadAll == null or node.userObject.loadAll == false}"/>
+                #{bean.i18n['loadAll']}
+            </h:commandLink>
+                    
+            <h:outputText value="#{node.userObject.name}" rendered="#{mf:isInstance(node.userObject,'SourceElement')}"/>
         </h:column>
+        
+        <mf:DataTableColumn width="20">
+            <f:facet name="header">
+                <h:graphicImage value="org.constellation.menu.service.valid_on.png.mfRes" style="border:none;"/>
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{node.userObject.included}" 
+                rendered="#{mf:isInstance(node.userObject,'SourceElement') and node.userObject.included != null}"/>   
+        </mf:DataTableColumn>
+        
+        <mf:DataTableColumn width="20">
+            <f:facet name="header">
+                <h:graphicImage value="org.constellation.menu.service.unvalid_on.png.mfRes" style="border:none;"/>
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{node.userObject.excluded}" 
+                rendered="#{mf:isInstance(node.userObject,'SourceElement') and node.userObject.excluded != null}"/> 
+        </mf:DataTableColumn>
+        
     </mf:Outline>
+    </div>
     
     
     <div style="text-align: right;">
