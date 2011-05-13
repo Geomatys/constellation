@@ -16,6 +16,7 @@
  */
 package org.constellation.wps.ws;
 
+import java.util.Collection;
 import javax.xml.parsers.ParserConfigurationException;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.storage.DataStoreException;
@@ -26,7 +27,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import java.awt.geom.AffineTransform;
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -53,7 +55,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.geotoolkit.process.converters.StringToAffineTransformConverter;
 import org.geotoolkit.process.converters.StringToCRSConverter;
-import org.geotoolkit.process.converters.StringToFeatureTypeConverter;
 import org.geotoolkit.process.converters.StringToFilterConverter;
 import org.geotoolkit.process.converters.StringToGeometryConverter;
 import org.geotoolkit.process.converters.StringToSortByConverter;
@@ -103,8 +104,6 @@ import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
-import org.geotoolkit.geometry.isoonjts.JTSUtils;
-import org.geotoolkit.gml.GMLUtilities;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.wps.xml.v100.DocumentOutputDefinitionType;
@@ -155,7 +154,9 @@ import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
+import org.geotoolkit.xsd.xml.v2001.Schema;
 
 import static org.constellation.query.Query.*;
 import static org.constellation.wps.ws.WPSConstant.*;
@@ -177,32 +178,47 @@ public class WPSWorker extends AbstractWorker {
             StringToFilterConverter.getInstance(),
             StringToSortByConverter.getInstance());
 
+  
      /**
      * List of Complex input Class
      */
-    private static final List COMPLEXTYPE_LIST = UnmodifiableArrayList.wrap(
+    private static final List COMPLEX_INPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
+            Feature.class,
+            FeatureCollection.class,
+            Feature[].class,
+            FeatureCollection[].class,
+            FeatureType.class,
+            Geometry.class);
+
+    /**
+     * List of Complex output Class
+     */
+    private static final List COMPLEX_OUTPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
             Feature.class,
             FeatureCollection.class,
             Geometry.class);
-
+    
     /**
      * List of literal input Class which need a conversion from String
      */
     private static final List LITERALTYPE_LIST = UnmodifiableArrayList.wrap(
-            Double.class,Integer.class,Float.class,Boolean.class,String.class,
+            Number.class,Boolean.class,String.class,
             Unit.class,
-            FeatureExtend.class,
             AffineTransform.class,
-            Filter.class,
+            org.opengis.filter.Filter.class,
             CoordinateReferenceSystem.class,
-            SortBy.class);
+            SortBy[].class);
 
+    /*
+     * List of Reference input Class 
+     */
     private static final List REFERENCETYPE_LIST = UnmodifiableArrayList.wrap(
             Feature.class,
             FeatureCollection.class,
             Geometry.class,
             File.class,
             FeatureType.class,
+            FeatureExtend.class,
             GridCoverage2D.class,
             GridCoverageReader.class);
     
@@ -385,19 +401,19 @@ public class WPSWorker extends AbstractWorker {
             final ProcessDescriptionType.DataInputs dataInputs = new ProcessDescriptionType.DataInputs();
             for (GeneralParameterDescriptor param : input.descriptors()) {
                 final InputDescriptionType in = new InputDescriptionType();
-
-                //parameter informations
-                in.setIdentifier(new CodeType(param.getName().getCode()));
-                in.setTitle(new LanguageStringType(param.getName().getCode()));
-                in.setAbstract(new LanguageStringType(param.getRemarks().toString()));
-
-                //set occurs
-                in.setMaxOccurs(BigInteger.valueOf(param.getMaximumOccurs()));
-                in.setMinOccurs(BigInteger.valueOf(param.getMinimumOccurs()));
                 
                 // If the Parameter Descriptor isn't a GroupeParameterDescriptor
                 if (param instanceof ParameterDescriptor) {
                     final ParameterDescriptor paramDesc = (ParameterDescriptor) param;
+                    
+                    //parameter informations
+                    in.setIdentifier(new CodeType(paramDesc.getName().getCode()));
+                    in.setTitle(new LanguageStringType(paramDesc.getName().getCode()));
+                    in.setAbstract(new LanguageStringType(paramDesc.getRemarks().toString()));
+
+                    //set occurs
+                    in.setMaxOccurs(BigInteger.valueOf(paramDesc.getMaximumOccurs()));
+                    in.setMinOccurs(BigInteger.valueOf(paramDesc.getMinimumOccurs()));
                     //input class
                     final Class clazz = paramDesc.getValueClass();
 
@@ -405,7 +421,7 @@ public class WPSWorker extends AbstractWorker {
                     if (clazz.equals(Envelope.class)) {
                         final SupportedCRSsType crsList = new SupportedCRSsType();
                         final SupportedCRSsType.Default defaultCRS = new SupportedCRSsType.Default();
-                        defaultCRS.setCRS("EPSG:WGS84");                                             //TODO confirm the default CRS
+                        defaultCRS.setCRS("EPSG:4326");                                             //TODO confirm the default CRS
                         crsList.setDefault(defaultCRS);
                         final CRSsType supportedCRS = new CRSsType();
                         supportedCRS.getCRS().addAll(SUPPORTED_CRS);
@@ -413,7 +429,7 @@ public class WPSWorker extends AbstractWorker {
                         in.setBoundingBoxData(crsList);
 
                     } else //Complex type (XML, raster, ...)
-                    if (COMPLEXTYPE_LIST.contains(clazz)) {
+                    if (COMPLEX_INPUT_TYPE_LIST.contains(clazz)) {
                         final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
                         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
                         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
@@ -465,31 +481,33 @@ public class WPSWorker extends AbstractWorker {
             final ProcessDescriptionType.ProcessOutputs dataOutput = new ProcessDescriptionType.ProcessOutputs();
             for (GeneralParameterDescriptor param : output.descriptors()) {
                 final OutputDescriptionType out = new OutputDescriptionType();
-                //parameter informations
-                out.setIdentifier(new CodeType(param.getName().getCode()));
-                out.setTitle(new LanguageStringType(param.getName().getCode()));
-                out.setAbstract(new LanguageStringType(param.getRemarks().toString()));
 
                 //simple paramater
                 if (param instanceof ParameterDescriptor) {
                     final ParameterDescriptor paramDesc = (ParameterDescriptor) param;
+                    
+                     //parameter informations
+                    out.setIdentifier(new CodeType(paramDesc.getName().getCode()));
+                    out.setTitle(new LanguageStringType(paramDesc.getName().getCode()));
+                    out.setAbstract(new LanguageStringType(paramDesc.getRemarks().toString()));
+                    
                     //input class
                     final Class clazz = paramDesc.getValueClass();
-
+                    
                     //BoundingBox type
                     if (clazz.equals(JTSEnvelope2D.class)) {
 
                         final SupportedCRSsType crsList = new SupportedCRSsType();
                         final SupportedCRSsType.Default defaultCRS = new SupportedCRSsType.Default();
-                        defaultCRS.setCRS("EPSG:WGS84");                 //TODO confirm the default CRS
+                        defaultCRS.setCRS("EPSG:4326");                 //TODO confirm the default CRS
                         crsList.setDefault(defaultCRS);
                         final CRSsType supportedCRS = new CRSsType();
                         supportedCRS.getCRS().addAll(SUPPORTED_CRS);
                         crsList.setSupported(supportedCRS);
                         out.setBoundingBoxOutput(crsList);
 
-                    } else //Complex type (XML, raster, ...)
-                    if (COMPLEXTYPE_LIST.contains(clazz)) {
+                    //Complex type (XML, raster, ...)
+                    } else if (COMPLEX_INPUT_TYPE_LIST.contains(clazz)) {
                         final SupportedComplexDataType complex = new SupportedComplexDataType();
                         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
                         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
@@ -514,7 +532,7 @@ public class WPSWorker extends AbstractWorker {
                         complex.setSupported(complexCombs);
                         out.setComplexOutput(complex);
 
-                    } else {
+                    } else if(LITERALTYPE_LIST.contains(clazz)){
                         //Simple object (Integer, double) and Object which need a conversion from String like affineTransform or Geometry
                         final LiteralInputType literal = new LiteralInputType();
                         
@@ -526,6 +544,8 @@ public class WPSWorker extends AbstractWorker {
                         literal.setDataType(createDataType(clazz));
 
                         out.setLiteralOutput(literal);
+                    } else{
+                    
                     }
 
                 } else {
@@ -645,6 +665,7 @@ public class WPSWorker extends AbstractWorker {
             response.setProcess(processBrief(processDesc));
             
             if(isLineage){
+                System.out.println("LOG : Lineage True");
                 //Inputs
                 response.setDataInputs(request.getDataInputs());
                 final OutputDefinitionsType outputsDef = new OutputDefinitionsType();
@@ -654,12 +675,16 @@ public class WPSWorker extends AbstractWorker {
             }
 
             if(useStorage){
+                System.out.println("LOG : Storage True");
                 response.setStatusLocation(null); //Output data URL
             }
 
             if(useStatus){
+                System.out.println("LOG : Status True");
                 response.setStatus(status);
             }
+        }else{
+            
         }
         //Input temporary files used by the process. In order to delete them at the end of the process.
         List<File> files = null;
@@ -687,7 +712,7 @@ public class WPSWorker extends AbstractWorker {
                 // if the parameter is not found and if it's a mandatory parameter
                 if(!inputFound){
                     if(generalParameterDescriptor.getMinimumOccurs() != 0){
-                        throw new CstlServiceException("Mandatory input parameter "
+                        throw new CstlServiceException("Mandatory input parameter is"
                                 + "missing.", MISSING_PARAMETER_VALUE, processInputID);
                     }
                 }
@@ -707,7 +732,7 @@ public class WPSWorker extends AbstractWorker {
                 throw new CstlServiceException("Process parameter invalid", OPERATION_NOT_SUPPORTED);
             }
         }
-
+        
         //Each input from the request
         for (InputType inputRequest : requestInputData) {
 
@@ -737,7 +762,10 @@ public class WPSWorker extends AbstractWorker {
             } else {
                 throw new CstlServiceException("The input Identifier is invalid.", INVALID_PARAMETER_VALUE,inputIdentifier);
             }
-            //Get expected input Class from the process input
+            
+            /*
+             * Get expected input Class from the process input
+             */
             final Class expectedClass = inputDescriptor.getValueClass();
                       
 
@@ -748,10 +776,13 @@ public class WPSWorker extends AbstractWorker {
              * A referenced input data
              */
             if (inputRequest.getReference() != null) {
-                if(!(REFERENCETYPE_LIST.contains(expectedClass))){
+                
+                //Check if the expected class is supproted for literal using
+                if(!isSupportedClass("reference",expectedClass)){
                     throw new CstlServiceException("Reference value expected",INVALID_PARAMETER_VALUE,inputIdentifier); 
                 }
-                System.out.println("Reference");
+                
+                System.out.println("LOG : Input Reference");
                 final String href = inputRequest.getReference().getHref();
                 final String method = inputRequest.getReference().getMethod();
                 final String mime = inputRequest.getReference().getMimeType();
@@ -778,7 +809,7 @@ public class WPSWorker extends AbstractWorker {
                 
                 /* BoundingBox data */
                 if (inputRequest.getData().getBoundingBoxData() != null) {
-                    System.out.println("Boundingbox");
+                    System.out.println("LOG : Input Boundingbox");
                     final BoundingBoxType bBox = inputRequest.getData().getBoundingBoxData();
                     final List<Double> lower = bBox.getLowerCorner();
                     final List<Double> upper = bBox.getUpperCorner();
@@ -793,8 +824,8 @@ public class WPSWorker extends AbstractWorker {
                     try {
                         crsDecode = CRS.decode(crs);
                     } catch (FactoryException ex) {
-                         throw new CstlServiceException("Invalid data input : CRS not supported."
-                                , OPERATION_NOT_SUPPORTED, inputIdentifier);
+                         throw new CstlServiceException("Invalid data input : CRS not supported.",
+                               ex , OPERATION_NOT_SUPPORTED, inputIdentifier);
                     }
 
                     final Envelope envelop = GeometryUtils.createCRSEnvelope(crsDecode,lower.get(0), lower.get(1), upper.get(0),upper.get(1));
@@ -804,105 +835,57 @@ public class WPSWorker extends AbstractWorker {
                 /* Complex data (XML, raster, ...) */
                 } else if (inputRequest.getData().getComplexData() != null) {
                     
-                    if(!(COMPLEXTYPE_LIST.contains(expectedClass))){
+                    //Check if the expected class is supproted for literal using
+                    if(!isSupportedClass("complex",expectedClass)){
                         throw new CstlServiceException("Complex value expected",INVALID_PARAMETER_VALUE,inputIdentifier); 
                     }
-                    System.out.println("Complex Data");
+                    
+                    System.out.println("LOG : Complex Input");
 
                     final ComplexDataType complex = inputRequest.getData().getComplexData();
                     final String mime = complex.getMimeType();
                     final String encoding = complex.getEncoding();
                     final List<Object> content = complex.getContent();
                     final String schema = complex.getSchema();
-                    
-                    for(Object node : content){
-                        if(node == "" || node == null){
-                            System.out.println("null value");
-                        }
-                        System.out.println("Node :"+node);
-                    }
-                    
-                    
+                               
                     if(content.size() <= 0 ){
                         throw new CstlServiceException("Missing data input value.", INVALID_PARAMETER_VALUE, inputIdentifier);
                         
                     }else{
-                        Object inputObject = null;
+                   
+                        final List<Object> inputObject = new ArrayList<Object>();
                         for(Object obj : content){
                             if(obj != null){
-                                inputObject = obj;
+                                if(!(obj instanceof String)){
+                                    inputObject.add(obj);
+                                }
                             }
                         }
                         if(inputObject == null){
-                            throw new CstlServiceException("Invalid data input value.", INVALID_PARAMETER_VALUE, inputIdentifier);
+                            throw new CstlServiceException("Invalid data input value : Empty value.", INVALID_PARAMETER_VALUE, inputIdentifier);
                         }
+                        /*
+                         * Extract Data from inputObject array
+                         */
+                        dataValue = extractComplexInput(expectedClass, inputObject, schema, mime, encoding, inputIdentifier);
                         
-                        /* Geometry */
-                        if(expectedClass.equals(Geometry.class)){
-                            System.out.println("Geometry !!!");
-                            System.out.println("Object class : "+inputObject.getClass().getName());
-                            try {
-                                System.out.println("INPUT OBJECT : "+inputObject);
-                                dataValue = GeometrytoJTS.toJTS((AbstractGeometryType) inputObject);
-                            } catch (FactoryException ex) {
-                                throw new CstlServiceException("Invalid data input : Cannot convert GML geometry.", INVALID_PARAMETER_VALUE, inputIdentifier);
-                            }
-                            
-                        /* Feature/FeatureCollection */    
-                        }else if(expectedClass.equals(Feature.class) || expectedClass.equals(FeatureCollection.class)){
-                            List<FeatureType> ft = null;
-                            if (schema != null) {
-                                try {
-                                    final XmlFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
-                                    final URL schemaURL = new URL(schema);
-                                    ft = xsdReader.read(schemaURL.openStream());
-                                } catch (IOException ex) {
-                                    throw new CstlServiceException("Unable to read feature type from xsd.", ex, NO_APPLICABLE_CODE);
-                                } catch (JAXBException ex) {
-                                    throw new CstlServiceException("Unable to read feature type from xsd.", ex, NO_APPLICABLE_CODE);
-                                }
-                            }
-                            System.out.println("FeatureType : "+ft);
-                            System.out.println("Content size : "+content.size());
-                            for(Object c : content){
-                                System.out.println("DATA  = "+ c + " class:" + c.getClass().getName());
-                                if (c instanceof Node) {
-                                    try {
-                                        final XmlFeatureReader fcollReader = new JAXPStreamFeatureReader(ft);
-                                        dataValue = fcollReader.read(c);
-                                       // System.out.println("DATAVALUE : "+dataValue);
-                                    } catch (IOException ex) {
-                                        throw new CstlServiceException("Unable to read feature from nodes.", ex, NO_APPLICABLE_CODE);
-                                    } catch (XMLStreamException ex) {
-                                        throw new CstlServiceException("Unable to read feature from nodes.", ex, NO_APPLICABLE_CODE);
-                                    /*} catch (JAXBException ex) {
-                                        throw new CstlServiceException("Unable to read feature from nodes.", ex, NO_APPLICABLE_CODE);*/
-                                    }
-                                }
-                            }
-                            dataValue = fixFeature(dataValue);
-                            FeatureCollection feat = (FeatureCollection)dataValue;
-                            System.out.println("FIXED FEATURECOLLECTION :"+feat.getFeatureType()+" FEATURECOLLECTION : "+feat);
-                        }
                     }
                     
 
                 /* Literal data */
                 } else if (inputRequest.getData().getLiteralData() != null) {
-                    
-                    if(!(LITERALTYPE_LIST.contains(expectedClass))){
+                    //Check if the expected class is supproted for literal using
+                    if(!isSupportedClass("literal",expectedClass)){
                         throw new CstlServiceException("Literal value expected",INVALID_PARAMETER_VALUE,inputIdentifier); 
                     }
+                    
+                    
                     System.out.println("Literal");
                     final LiteralDataType literal = inputRequest.getData().getLiteralData();
                     final String data = literal.getValue();
                     
                     //convert String into expected type
                     dataValue = convertFromString(data, expectedClass);
-                    /*if(dataValue instanceof Float){
-                        dataValue = new Float((Float)dataValue).doubleValue();
-                        
-                    }*/
                     System.out.println("Value : "+dataValue);
 
                 } else {
@@ -924,9 +907,9 @@ public class WPSWorker extends AbstractWorker {
 
         //Give input parameter to the process
         proc.setInput(in);
-        ProcessStartedType started = new ProcessStartedType();
-
+        
         //Status
+        ProcessStartedType started = new ProcessStartedType();
         started.setValue("Process "+request.getIdentifier().getValue()+" is started");
         started.setPercentCompleted(0);
         //status.setProcessStarted(started);
@@ -934,9 +917,9 @@ public class WPSWorker extends AbstractWorker {
         //Run the process
         proc.run();
         
-        /*******************
-         * Process OUTPUT
-         *******************/
+        /******************
+         * Process OUTPUT *
+         ******************/
      
         /* Storage data */
         if(useStorage){
@@ -946,20 +929,16 @@ public class WPSWorker extends AbstractWorker {
         }else{
             /* Raw Data returned */
             if(isOutputRaw){
-                
+                System.out.println("LOG : Raw output");
                 final Object outputValue = proc.getOutput().parameter(rawOutputID).getValue();
                 System.out.println("OUPUT RAW : "+outputValue);
                 
                 if(outputValue instanceof Geometry){
                      org.opengis.geometry.Geometry isoGeom;
                     try {
-                        Geometry jtsGeom = (Geometry)outputValue;
+                        final Geometry jtsGeom = (Geometry)outputValue;
                         System.out.println("JTS GEOM "+jtsGeom);
-                        CoordinateReferenceSystem crs = JTS.findCoordinateReferenceSystem(jtsGeom);
-                        System.out.println("CRS : "+crs);
-                        isoGeom = JTSUtils.toISO((Geometry)outputValue,crs);
-                        System.out.println("ISO GEOM "+isoGeom);
-                        AbstractGeometryType gmlGeom = GMLUtilities.getGMLFromISO(isoGeom);
+                        final AbstractGeometryType gmlGeom = JTStoGeometry.toGML(jtsGeom);
                         System.out.println("GML GEOM "+gmlGeom);
                         return gmlGeom;
                     } catch (NoSuchAuthorityCodeException ex) {
@@ -977,7 +956,7 @@ public class WPSWorker extends AbstractWorker {
                
             /* DocumentResponse returned */
             }else{
-
+                System.out.println("LOG : Document output");
                 final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
                 //Process Outputs
                 for (GeneralParameterDescriptor outputDescriptor : processDesc.getOutputDescriptor().descriptors()) {
@@ -992,7 +971,7 @@ public class WPSWorker extends AbstractWorker {
 
                     //get output value from process
                     final Object outputValue = proc.getOutput().parameter(outputIdentifier).getValue();
-                   // System.out.println("######### OUPUT : "+outputValue);
+                    System.out.println("######### OUPUT : "+outputValue);
                     final DataType data = new DataType();
                     if (outputDescriptor instanceof ParameterDescriptor) {
 
@@ -1007,9 +986,7 @@ public class WPSWorker extends AbstractWorker {
                             data.setBoundingBoxData(new BoundingBoxType(envelop));
 
                         /* Complex */
-                        } else if (COMPLEXTYPE_LIST.contains(outClass)) {
-                            //IN :outputValue, 
-                            //out ComplexDataType
+                        } else if (isSupportedClassOutput("complex", outClass)) {
                             System.out.println("Complex output");
                             final ComplexDataType complex = new ComplexDataType();
 
@@ -1027,15 +1004,10 @@ public class WPSWorker extends AbstractWorker {
                                 org.opengis.geometry.Geometry isoGeom;
                                 AbstractGeometryType gmlGeom = null;
                                 try {
-                                    Geometry jtsGeom = (Geometry)outputValue;
+                                    final Geometry jtsGeom = (Geometry)outputValue;
                                     System.out.println("JTS GEOM "+jtsGeom);
-                                    CoordinateReferenceSystem crs = JTS.findCoordinateReferenceSystem(jtsGeom);
-                                    System.out.println("CRS : "+crs);
-                                    isoGeom = JTSUtils.toISO((Geometry)outputValue,crs);
-                                    System.out.println("ISO GEOM "+isoGeom);
-                                    gmlGeom = GMLUtilities.getGMLFromISO(isoGeom);
+                                    gmlGeom = JTStoGeometry.toGML(jtsGeom);
                                     System.out.println("GML GEOM "+gmlGeom);
-                                    return gmlGeom;
                                 } catch (NoSuchAuthorityCodeException ex) {
                                     Logger.getLogger(WPSWorker.class.getName()).log(Level.SEVERE, null, ex);
                                 } catch (FactoryException ex) {
@@ -1046,10 +1018,11 @@ public class WPSWorker extends AbstractWorker {
                                 
                             //FeatureCollection    
                             }else if(outputValue instanceof FeatureCollection){
-                                System.out.println("Output Complex FeatureCollection");
+                                System.out.println("LOG : Output Complex FeatureCollection");
                                 FeatureCollection fc = (FeatureCollection) outputValue;
                                 FeatureType ft = fc.getFeatureType();
-                                System.out.println("FeatureType : "+ft);
+                                System.out.println("DEBUG FeatureType: "+ft);
+                                System.out.println("DEBUG FeatureCollection: "+fc);
                                 Element elem = null;
                                 try {
                                    
@@ -1202,13 +1175,19 @@ public class WPSWorker extends AbstractWorker {
      */
     private static <T> Object convertFromString(final String data, final Class binding) throws CstlServiceException {
 
-        Object convertedData = null;
+        Object convertedData = null; //resulting Object
         try {
-            ObjectConverter<String, T> converter = null;
+            
+            ObjectConverter<String, T> converter = null;//converter
             try {
+                //try to convert into a primitive type
                 converter = ConverterRegistry.system().converter(String.class, binding);
             } catch (NonconvertibleObjectException ex) {
+                //try to convert with some specified converter
+                System.out.println("Binding "+binding);
                 for (ObjectConverter conv : (List<ObjectConverter>) CONVERTERS_LIST) {
+                    
+                    System.out.println("Convert from String to "+conv.getTargetClass().getSimpleName());
                     if (conv.getTargetClass().equals(binding)) {
                         converter = conv;
                     }
@@ -1237,8 +1216,195 @@ public class WPSWorker extends AbstractWorker {
         }
     }
 
+    
+    private Object extractComplexInput(final Class expectedClass,final List<Object> inputObject,
+            final String schema,final String mime,final String encoding, final String inputID) throws CstlServiceException{
+        
+        Object extractData = null;
+        System.out.println("LOG Extract Complex :");
+        System.out.println("    LOG Expected Class : "+expectedClass.getSimpleName());
+        System.out.println("    LOG Input Object :"+inputObject);
+        
+        
+        /* 
+         * Geometry and Geometry[]
+         */
+        if(expectedClass.equals(Geometry.class) || expectedClass.equals(Geometry[].class)){
+            System.out.println("LOG : Input Geometry");
+            System.out.println("LOG : Geometry TYpe : "+inputObject.getClass().getName());
+            
+            try {                
+                if(expectedClass.equals(Geometry.class)){
+                    if(inputObject.size() == 1){
+                        extractData = GeometrytoJTS.toJTS((AbstractGeometryType) inputObject.get(0));
+                    }else{
+                        throw new CstlServiceException("Invalid data input : Only one geometry expected.", INVALID_PARAMETER_VALUE, inputID);
+                    }
+                }else{ //Geometry Array
+                    List<Geometry> geoms = new ArrayList<Geometry>();
+                    for(int i = 0; i<inputObject.size(); i++){
+                        geoms.add(GeometrytoJTS.toJTS((AbstractGeometryType) inputObject.get(i)));
+                    }
+                    extractData = geoms.toArray(new Geometry[geoms.size()]);
+                }
+                
+            }catch(ClassCastException ex){
+                throw new CstlServiceException("Invalid data input : empty GML geometry.",ex, INVALID_PARAMETER_VALUE, inputID);
+            }catch (FactoryException ex) {
+                throw new CstlServiceException("Invalid data input : Cannot convert GML geometry.",ex, INVALID_PARAMETER_VALUE, inputID);
+            }
+
+        /* 
+         * Feature/FeatureCollection
+         */    
+        }else if(expectedClass.equals(Feature.class) || expectedClass.equals(FeatureCollection.class)){
+            
+            if(inputObject.size() > 1){
+               throw new CstlServiceException("Invalid data input : Only one Feature/FeatureCollection expected.", INVALID_PARAMETER_VALUE, inputID);
+            }
+            
+            //Get FeatureType
+            List<FeatureType> ft = null;
+            if (schema != null) {
+                try {
+                    final XmlFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
+                    final URL schemaURL = new URL(schema);
+                    ft = xsdReader.read(schemaURL.openStream());
+                } catch (IOException ex) {
+                    throw new CstlServiceException("Unable to read feature type from xsd.", ex, NO_APPLICABLE_CODE);
+                } catch (JAXBException ex) {
+                    throw new CstlServiceException("Unable to read feature type from xsd.", ex, NO_APPLICABLE_CODE);
+                }
+            }
+            System.out.println("FeatureType : "+ft);
+            System.out.println("Content size : "+inputObject.size());
+           
+            try {
+                final XmlFeatureReader fcollReader = new JAXPStreamFeatureReader(ft);
+                extractData = fcollReader.read(inputObject.get(0));
+               // System.out.println("DATAVALUE : "+dataValue);
+            } catch (IOException ex) {
+                throw new CstlServiceException("Unable to read feature from nodes.", ex, NO_APPLICABLE_CODE);
+            } catch (XMLStreamException ex) {
+                throw new CstlServiceException("Unable to read feature from nodes.", ex, NO_APPLICABLE_CODE);
+            }
+                
+            extractData = fixFeature(extractData);
+            FeatureCollection feat = (FeatureCollection)extractData;
+            System.out.println("FIXED FEATURECOLLECTION :"+feat.getFeatureType()+" FEATURECOLLECTION : "+feat);
+            
+        /*
+         * Feature Array/Collection and FeatureCollection Array/Collection
+         */
+        }else if(expectedClass.equals(Feature[].class) || expectedClass.equals(FeatureCollection[].class)){
+            
+            System.out.println("Content size : "+inputObject.size());
+            
+            try {
+                JAXPStreamFeatureReader fcollReader = null;
+                
+                if(expectedClass.equals(Feature[].class)){
+                    
+                    final List<Feature> features = new ArrayList<Feature>();
+                    for(int i = 0; i<inputObject.size(); i++){
+                        
+                        fcollReader = new JAXPStreamFeatureReader();
+                        //enable to read the FeatureType into the FeatureCollection schema
+                        fcollReader.setReadEmbeddedFeatureType(true); 
+                        Feature f = (Feature)fcollReader.read(inputObject.get(i));
+                        f = (Feature)fixFeature(f);
+                        features.add(f);
+                    }
+                    extractData = features.toArray(new Feature[features.size()]);
+                }else{
+                    
+                    final List<FeatureCollection> features = new ArrayList<FeatureCollection>();
+                    for(int i = 0; i<inputObject.size(); i++){
+                        
+                        fcollReader = new JAXPStreamFeatureReader();
+                        //enable to read the FeatureType into the FeatureCollection schema
+                        fcollReader.setReadEmbeddedFeatureType(true); 
+                        FeatureCollection f = (FeatureCollection)fcollReader.read(inputObject.get(i));
+                        f = (FeatureCollection) fixFeature(f);
+                        features.add(f);
+                    }
+                    System.out.println("DEBUG FeatureCollection Array Size :"+features.size());
+                    for (FeatureCollection fc : features) {
+                        System.out.println("DEBUG : FeatureType : "+fc.getFeatureType());
+                        System.out.println("DEBUG : FeatureCollection : "+fc);
+                    }
+                    extractData = features.toArray(new FeatureCollection[features.size()]);
+                }
+                
+               // System.out.println("DATAVALUE : "+dataValue);
+            } catch (IOException ex) {
+                throw new CstlServiceException("Unable to read feature from nodes.", ex, NO_APPLICABLE_CODE);
+            } catch (XMLStreamException ex) {
+                throw new CstlServiceException("Unable to read feature from nodes.", ex, NO_APPLICABLE_CODE);
+            }
+            
+        /*
+         * FeatureType
+         */
+        }else if(expectedClass.equals(FeatureType.class)){
+            System.out.println("LOG : FeatureType Input");
+            
+            if(inputObject.size() > 1){
+               throw new CstlServiceException("Invalid data input : Only one FeatureType expected.", INVALID_PARAMETER_VALUE, inputID);
+            }
+            
+            //Get FeatureType
+            List<FeatureType> ft = null;
+            try {
+                System.out.println("LOG Input Object : "+inputObject.get(0));
+                final JAXBFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
+                ft = xsdReader.read((Node)inputObject.get(0));
+                extractData = ft.get(0);
+
+            } catch (JAXBException ex) {
+                throw new CstlServiceException("Unable to read feature type from xsd.", ex, NO_APPLICABLE_CODE); 
+            }
+            System.out.println("FeatureType : "+ft);
+           
+        }else{
+            throw new CstlServiceException("Requested format is not supported", VERSION_NEGOTIATION_FAILED, inputID);
+        }
+        
+        return extractData;
+    }
+    
     /**
      * Get an convert data from a reference for an expected binding
+     * Supported binding and mime :
+     * <ul>
+     *      <li>Feature :
+     *          <ul>
+     *              <li>text/xml</li>
+     *              <li>application/octec-stream (Shp file) TODO fix midding CRS</li>
+     *          </ul>
+     *      </li>
+     *      <li>FeatureCollection :
+     *          <ul>
+     *              <li>text/xml</li>
+     *              <li>application/octec-stream (Shp file) TODO fix midding CRS</li>
+     *          </ul>
+     *      </li>
+     *      <li>Geometry :
+     *          <ul>
+     *              <li>text/xml</li>
+     *          </ul>
+     *      </li>
+     *      <li>File :
+     *          <ul>
+     *              <li>all text/binary (download and store in a tempFile)</li>
+     *          </ul>
+     *      </li>
+     *      <li>GridCoverageReader :
+     *          <ul>
+     *              <li>all text/binary (download and store in a tempFile)</li>
+     *          </ul>
+     *      </li>
+     * </ul>
      * @param href
      * @param method
      * @param mime
@@ -1266,7 +1432,7 @@ public class WPSWorker extends AbstractWorker {
         }
         
        /*
-        * Feature
+        * Feature/FeatureCollection
         */
         if(expectedClass.equals(Feature.class) || expectedClass.equals(FeatureCollection.class)){
             if (mime == null) {
@@ -1276,12 +1442,17 @@ public class WPSWorker extends AbstractWorker {
             if(mime.equalsIgnoreCase(MimeType.TEXT_XML)){
                  try {
                     final XmlFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
-                    final URL schemaURL = new URL(schema);
-                     System.out.println(" Schema  URL : "+schemaURL.getPath());
-                    final JAXPStreamFeatureReader fcollReader = new JAXPStreamFeatureReader(xsdReader.read(schemaURL.openStream()));
-                    if(schema == null){
-                        fcollReader.setReadEmbeddedFeatureType(true);
+                    JAXPStreamFeatureReader fcollReader;
+                    
+                    if(schema != null){
+                        System.out.println(" Schema  URL : "+schema);
+                        final URL schemaURL = new URL(schema);
+                        fcollReader = new JAXPStreamFeatureReader(xsdReader.read(schemaURL.openStream()));
+                    }else{
+                         fcollReader = new JAXPStreamFeatureReader();
+                         fcollReader.setReadEmbeddedFeatureType(true);
                     }
+                    
                     FeatureCollection fcoll = (FeatureCollection)fcollReader.read(new URL(href));
                     return fixFeature(fcoll);
 
@@ -1439,11 +1610,83 @@ public class WPSWorker extends AbstractWorker {
                 throw new CstlServiceException("Reference grid coverage invalid input : IO",ex, VERSION_NEGOTIATION_FAILED, inputID);
             }
             
+        /*
+         * FeatureType
+         */
+        }else if(expectedClass.equals(FeatureType.class)){
+            if (mime == null) {
+                throw new CstlServiceException("Invalid reference input : typeMime can't be null.", INVALID_PARAMETER_VALUE, inputID);
+            }
+            //XML
+            if(mime.equalsIgnoreCase(MimeType.TEXT_XML)){
+                 try {
+                    final XmlFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
+                    final URL schemaURL = new URL(href);
+                    final List<FeatureType> ft = xsdReader.read(schemaURL.openStream());
+                    
+                    if(ft.size() != 1){
+                        throw new CstlServiceException("Invalid reference input : More than one FeatureType in schema.", INVALID_PARAMETER_VALUE, inputID);
+                    }
+                    return ft.get(0);
+                } catch (JAXBException ex) {
+                    throw new CstlServiceException("Invalid reference input : can't read reference schema.",ex, NO_APPLICABLE_CODE, inputID);
+                }catch (MalformedURLException ex){
+                    throw new CstlServiceException("Invalid reference input : Malformed schema or resource.",ex, NO_APPLICABLE_CODE, inputID);
+                }catch (IOException ex){
+                    throw new CstlServiceException("Invalid reference input : IO.",ex, NO_APPLICABLE_CODE, inputID);
+                }
+            }else {
+                 throw new CstlServiceException("Reference data mime is not supported", VERSION_NEGOTIATION_FAILED, inputID);
+            }
         }else{
             throw new CstlServiceException("Requested format is not supported", VERSION_NEGOTIATION_FAILED, inputID);
         }
     }
 
+    private boolean isSupportedClass(String type, Class expectedClass ){
+        boolean supportedClass = false;
+        if(type.equals("literal")){
+            for(Object obj : LITERALTYPE_LIST){
+                Class clazz = (Class)obj;
+                if(clazz.isAssignableFrom(expectedClass)){
+                    supportedClass = true;
+                    break;
+                }
+            }
+        }else if(type.equals("complex")){
+            for(Object obj : COMPLEX_INPUT_TYPE_LIST){
+                Class clazz = (Class)obj;
+                if(clazz.isAssignableFrom(expectedClass)){
+                    supportedClass = true;
+                    break;
+                }
+            }
+        }else if(type.equals("reference")){
+            for(Object obj : REFERENCETYPE_LIST){
+                Class clazz = (Class)obj;
+                if(clazz.isAssignableFrom(expectedClass)){
+                    supportedClass = true;
+                    break;
+                }
+            }
+        }
+        return supportedClass;
+    }
+    
+    private boolean isSupportedClassOutput(String type, Class expectedClass ){
+        boolean supportedClass = false;
+        if(type.equals("complex")){
+            for(Object obj : COMPLEX_OUTPUT_TYPE_LIST){
+                Class clazz = (Class)obj;
+                if(clazz.isAssignableFrom(expectedClass)){
+                    supportedClass = true;
+                    break;
+                }
+            }
+        }
+        return supportedClass;
+    }
+    
     /**
      * Create the DomaineMetaData object for a literal
      * @param clazz
@@ -1452,27 +1695,27 @@ public class WPSWorker extends AbstractWorker {
      */
     private DomainMetadataType createDataType(final Class clazz) throws CstlServiceException {
 
-        if(LITERALTYPE_LIST.contains(clazz)){
-            return new DomainMetadataType("String", "http://www.w3.org/TR/xmlschema-2/#string");
-        }else{
-            if(clazz.equals(Double.class)){
-                return new DomainMetadataType("Double", "http://www.w3.org/TR/xmlschema-2/#double");
+        
+        if(clazz.equals(Double.class)){
+            return new DomainMetadataType("Double", "http://www.w3.org/TR/xmlschema-2/#double");
 
-            }else if(clazz.equals(Float.class)){
-                return new DomainMetadataType("Float", "http://www.w3.org/TR/xmlschema-2/#float");
+        }else if(clazz.equals(Float.class)){
+            return new DomainMetadataType("Float", "http://www.w3.org/TR/xmlschema-2/#float");
+        
+        }else if(clazz.equals(Boolean.class)){
+            return new DomainMetadataType("Boolean", "http://www.w3.org/TR/xmlschema-2/#boolean");
 
-            }else if(clazz.equals(String.class) || LITERALTYPE_LIST.contains(clazz)){
-                return new DomainMetadataType("String", "http://www.w3.org/TR/xmlschema-2/#string");
+        }else if(clazz.equals(Integer.class)){
+            return new DomainMetadataType("Integer", "http://www.w3.org/TR/xmlschema-2/#integer");
 
-            }else if(clazz.equals(Boolean.class)){
-                return new DomainMetadataType("Boolean", "http://www.w3.org/TR/xmlschema-2/#boolean");
-                
-            }else if(clazz.equals(Integer.class)){
-                return new DomainMetadataType("Integer", "http://www.w3.org/TR/xmlschema-2/#integer");
+        }else if(clazz.equals(Long.class)){
+            return new DomainMetadataType("Long", "http://www.w3.org/TR/xmlschema-2/#long");
             
-            }else {
-                throw new CstlServiceException("No supported literal type");
-            }
+        }else if(clazz.equals(String.class) || isSupportedClass("literal", clazz)){
+            return new DomainMetadataType("String", "http://www.w3.org/TR/xmlschema-2/#string");
+
+        }else {
+            throw new CstlServiceException("No supported literal type");
         }
     }
 

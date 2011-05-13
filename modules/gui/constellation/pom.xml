@@ -114,10 +114,6 @@
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>poi</groupId>
-            <artifactId>poi</artifactId>
-        </dependency>
 
     </dependencies>
 
