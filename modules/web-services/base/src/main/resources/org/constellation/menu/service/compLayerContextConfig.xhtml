@@ -32,11 +32,6 @@
         <br/>
     </div>
     <br/>
-
-    <h:outputText value="#{bean.i18n['security']} :"/><br/>
-    <h:inputTextarea value="#{bean.configurationObject.security}" style="width:100%;" />
-    <br/>
-    <br/>
     <b>#{bean.i18n['sources']}</b><br/>
     <br/>
     <h:selectOneListbox value="#{bean.selectedPotentialSource}" size="1">
@@ -50,15 +45,24 @@
     <br/>
     <div class="rounded">
     <mf:Outline id="sourceLayers" actionVisible="true" rootVisible="false"
-                value="#{bean.layerModel}" var="node" width="100%">
+                value="#{bean.layerModel}" var="node" width="100%" rowStyler="#{bean.rowStyler}">
         <!-- Name column -->
         <h:column>            
             <h:inputText value="#{node.userObject.id}" rendered="#{mf:isInstance(node.userObject,'Source')}"/>
-            <h:commandLink action="#{bean.changeSourceLoadAll}" rendered="#{mf:isInstance(node.userObject,'Source')}">
+            <h:commandLink action="#{bean.changeSourceLoadAll}" rendered="#{mf:isInstance(node.userObject,'Source')}" styleClass="logout">
                 <f:param name="NodeId" value="#{sourceLayers.nodeIndex}" />
-                <h:graphicImage value="org.constellation.menu.service.valid_on.png.mfRes" style="border:none;" rendered="#{node.userObject.loadAll != null and node.userObject.loadAll == true}"/>
-                <h:graphicImage value="org.constellation.menu.service.valid_off.png.mfRes" style="border:none;" rendered="#{node.userObject.loadAll == null or node.userObject.loadAll == false}"/>
+                &#160;
+                <h:graphicImage value="org.constellation.menu.service.valid_on.png.mfRes" style="border:none;vertical-align:middle;" rendered="#{node.userObject.loadAll != null and node.userObject.loadAll == true}"/>
+                <h:graphicImage value="org.constellation.menu.service.valid_off.png.mfRes" style="border:none;vertical-align:middle;" rendered="#{node.userObject.loadAll == null or node.userObject.loadAll == false}"/>
                 #{bean.i18n['loadAll']}
+                &#160;
+            </h:commandLink>
+            <h:commandLink action="#{bean.removeSource}" rendered="#{mf:isInstance(node.userObject,'Source')}" styleClass="logout">
+                <f:param name="NodeId" value="#{sourceLayers.nodeIndex}" />
+                &#160;
+                <h:graphicImage value="org.constellation.menu.service.cancel.png.mfRes" style="border:none;vertical-align:middle;" />
+                #{bean.i18n['remove']}
+                &#160;
             </h:commandLink>
                     
             <h:outputText value="#{node.userObject.name}" rendered="#{mf:isInstance(node.userObject,'SourceElement')}"/>
@@ -71,7 +75,7 @@
                     <h:outputText value="#{bean.i18n['include']}" />
                 </h:panelGrid>
             </f:facet>
-            <h:selectBooleanCheckbox value="#{node.userObject.included}" 
+            <h:selectBooleanCheckbox value="#{node.userObject.included}" rendered="#{mf:isInstance(node.userObject,'SourceElement')}"
                 style="#{(mf:isInstance(node.userObject,'SourceElement') and node.userObject.included != null) ? '' : 'display:none'}"/>   
         </mf:DataTableColumn>
         
@@ -82,13 +86,17 @@
                     <h:outputText value="#{bean.i18n['exclude']}" />
                 </h:panelGrid>
             </f:facet>
-            <h:selectBooleanCheckbox value="#{node.userObject.excluded}"
+            <h:selectBooleanCheckbox value="#{node.userObject.excluded}" rendered="#{mf:isInstance(node.userObject,'SourceElement')}"
                 style="#{(mf:isInstance(node.userObject,'SourceElement') and node.userObject.excluded != null) ? '' : 'display:none'}"/> 
         </mf:DataTableColumn>
         
     </mf:Outline>
     </div>
-    
+    <br/>
+    <b>#{bean.i18n['security']}</b><br/>
+    <h:inputTextarea value="#{bean.configurationObject.security}" style="width:100%;" />
+    <br/>
+    <br/>
     
     <div style="text-align: right;">
         <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />

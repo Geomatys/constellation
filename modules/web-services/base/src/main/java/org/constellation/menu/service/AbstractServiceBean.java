@@ -29,6 +29,7 @@ import javax.faces.model.SelectItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ServiceAdministrator;
 import org.constellation.bean.MenuBean;
@@ -42,11 +43,10 @@ import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
-import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.event.CloseEvent;
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineDataModel;
-import org.mapfaces.utils.FacesUtils;
+import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 
 /**
  * Abstract JSF Bean for service administration interface.
@@ -55,6 +55,30 @@ import org.mapfaces.utils.FacesUtils;
  */
 public class AbstractServiceBean extends I18NBean{
 
+    private static OutlineRowStyler STYLER = new OutlineRowStyler() {
+
+        @Override
+        public String getRowStyle(TreeNode node) {
+            final DefaultMutableTreeNode mn = (DefaultMutableTreeNode) node;
+            final Object obj = mn.getUserObject();
+            if(obj instanceof Source){
+                return "height:34px;";
+            }else{
+                int index = mn.getParent().getIndex(node);
+                if(index % 2 == 0){
+                    return "background-color:#DDEEFF";
+                }else{
+                    return "";
+                }
+            }
+        }
+
+        @Override
+        public String getRowClass(TreeNode node) {
+            return "";
+        }
+    };
+    
     /**
      * When user is log in, a ServiceAdministrator object is added in the session map.
      */
@@ -68,7 +92,7 @@ public class AbstractServiceBean extends I18NBean{
     private String newServiceName = "default";
     private ServiceInstance configuredInstance = null;
     private Object configurationObject = null;
-    private TreeModel treemodel = null;
+    private LayerContextTreeModel treemodel = null;
     private String selectedPotentialSource = null;
 
     public AbstractServiceBean(final Specification specification, final String mainPage, final String configPage) {
@@ -110,6 +134,10 @@ public class AbstractServiceBean extends I18NBean{
         return new ServiceInstance(inst);
     }
 
+    public OutlineRowStyler getRowStyler(){
+        return STYLER;
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     // CREATING NEW INSTANCE ///////////////////////////////////////////////////
 
@@ -185,6 +213,21 @@ public class AbstractServiceBean extends I18NBean{
         
     }
     
+    public void removeSource(){
+        if(!(configurationObject instanceof LayerContext) ){
+            return;
+        }
+                
+        final FacesContext context = FacesContext.getCurrentInstance();
+        final ExternalContext ext = context.getExternalContext();
+        final Integer index = Integer.valueOf(ext.getRequestParameterMap().get("NodeId"));
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) 
+                OutlineDataModel.getNode((TreeNode)getLayerModel().getRoot(), index);
+        
+        getLayerModel().removeProperty(new TreePath(OutlineDataModel.getTreePath(node)));
+    }
+    
+    
     public void changeSourceLoadAll(){
         final FacesContext context = FacesContext.getCurrentInstance();
         final ExternalContext ext = context.getExternalContext();
@@ -232,7 +275,7 @@ public class AbstractServiceBean extends I18NBean{
         configurationObject = null;
     }
     
-    public TreeModel getLayerModel(){
+    public LayerContextTreeModel getLayerModel(){
         return treemodel;
     }
     
