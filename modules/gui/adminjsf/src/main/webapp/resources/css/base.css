@@ -106,3 +106,16 @@ tr.navigationLeafClass:hover{
     font: normal;
 }
 
+table.mfoutline th {
+    border-top: 0px solid #000000;
+    color: #525c66;
+    font: bold 12px Arial,Helvetica,sans-serif;
+    padding: 4px;
+    text-align: center;
+    vertical-align: top;
+}
+
+table.mfoutline thead {
+    background-color: #EEEEFF;
+}
+

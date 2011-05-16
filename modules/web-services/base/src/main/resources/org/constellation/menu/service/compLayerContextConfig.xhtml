@@ -64,20 +64,26 @@
             <h:outputText value="#{node.userObject.name}" rendered="#{mf:isInstance(node.userObject,'SourceElement')}"/>
         </h:column>
         
-        <mf:DataTableColumn width="20">
+        <mf:DataTableColumn width="40">
             <f:facet name="header">
-                <h:graphicImage value="org.constellation.menu.service.valid_on.png.mfRes" style="border:none;"/>
+                <h:panelGrid columns="1">
+                    <h:graphicImage value="org.constellation.menu.service.valid_on.png.mfRes" style="border:none;"/>
+                    <h:outputText value="#{bean.i18n['include']}" />
+                </h:panelGrid>
             </f:facet>
             <h:selectBooleanCheckbox value="#{node.userObject.included}" 
-                rendered="#{mf:isInstance(node.userObject,'SourceElement') and node.userObject.included != null}"/>   
+                style="#{(mf:isInstance(node.userObject,'SourceElement') and node.userObject.included != null) ? '' : 'display:none'}"/>   
         </mf:DataTableColumn>
         
-        <mf:DataTableColumn width="20">
+        <mf:DataTableColumn width="40">
             <f:facet name="header">
-                <h:graphicImage value="org.constellation.menu.service.unvalid_on.png.mfRes" style="border:none;"/>
+                <h:panelGrid columns="1">
+                    <h:graphicImage value="org.constellation.menu.service.unvalid_on.png.mfRes" style="border:none;"/>
+                    <h:outputText value="#{bean.i18n['exclude']}" />
+                </h:panelGrid>
             </f:facet>
-            <h:selectBooleanCheckbox value="#{node.userObject.excluded}" 
-                rendered="#{mf:isInstance(node.userObject,'SourceElement') and node.userObject.excluded != null}"/> 
+            <h:selectBooleanCheckbox value="#{node.userObject.excluded}"
+                style="#{(mf:isInstance(node.userObject,'SourceElement') and node.userObject.excluded != null) ? '' : 'display:none'}"/> 
         </mf:DataTableColumn>
         
     </mf:Outline>
