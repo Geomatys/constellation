@@ -45,6 +45,7 @@ import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.event.CloseEvent;
 import org.mapfaces.i18n.I18NBean;
+import org.mapfaces.renderkit.html.outline.OutlineCellStyler;
 import org.mapfaces.renderkit.html.outline.OutlineDataModel;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 
@@ -55,7 +56,7 @@ import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
  */
 public class AbstractServiceBean extends I18NBean{
 
-    private static OutlineRowStyler STYLER = new OutlineRowStyler() {
+    private static final OutlineRowStyler ROW_STYLER = new OutlineRowStyler() {
 
         @Override
         public String getRowStyle(TreeNode node) {
@@ -78,6 +79,24 @@ public class AbstractServiceBean extends I18NBean{
             return "";
         }
     };
+    
+    private static final OutlineCellStyler CELL_STYLER = new OutlineCellStyler() {
+
+        @Override
+        public String getCellStyle(TreeNode node, int rowIndex, int columnIndex) {
+            if(columnIndex > 0){
+                return "border-left: 1px solid #A2ACB6;";
+            }else{
+                return "";
+            }
+        }
+
+        @Override
+        public String getCellClass(TreeNode node, int rowIndex, int columnIndex) {
+            return "";
+        }
+    };
+    
     
     /**
      * When user is log in, a ServiceAdministrator object is added in the session map.
@@ -135,7 +154,11 @@ public class AbstractServiceBean extends I18NBean{
     }
 
     public OutlineRowStyler getRowStyler(){
-        return STYLER;
+        return ROW_STYLER;
+    }
+    
+    public OutlineCellStyler getCellStyler(){
+        return CELL_STYLER;
     }
     
     ////////////////////////////////////////////////////////////////////////////
