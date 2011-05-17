@@ -68,6 +68,7 @@ import org.mdweb.model.users.User;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.MD_IOFactory;
 import org.mdweb.io.Writer;
+import org.mdweb.model.schemas.PrimitiveType;
 import org.mdweb.model.storage.FormInfo;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
 import org.opengis.annotation.UML;
@@ -909,7 +910,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         } else {
             return null;
         }
-        final Classe result = mdWriter.getClasse(mdwclassName, mdwStandard);
+        final Classe candidate = PrimitiveType.getPrimitiveTypeFromName(className, mdwStandard);
+        final Classe result;
+        if (candidate != null) {
+            result = candidate;
+        } else {
+            result = mdWriter.getClasse(mdwclassName, mdwStandard);
+        }
         if (result == null) {
             LOGGER.warning("The database does not conatins the primitive type:" + mdwclassName + " in the standard:" + mdwStandard.getName());
         }

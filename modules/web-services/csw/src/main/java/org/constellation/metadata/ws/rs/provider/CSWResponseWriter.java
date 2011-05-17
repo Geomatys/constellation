@@ -35,7 +35,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.jaxb.CstlXMLSerializer;
 import org.constellation.jaxb.MarshallWarnings;
-import org.constellation.jaxb.NoCharacterEscapeHandler;
 import org.constellation.metadata.utils.SerializerResponse;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.CSWResponse;
@@ -73,7 +72,7 @@ public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWrit
                 final SerializerResponse response = (SerializerResponse) t;
                 final CstlXMLSerializer serializer    = response.getSerializer();
                 if (serializer != null) {
-                    DataWriter writer = new DataWriter(new OutputStreamWriter(out), "UTF-8", new NoCharacterEscapeHandler());
+                    DataWriter writer = new DataWriter(new OutputStreamWriter(out), "UTF-8");
                     writer.setIndentStep("   ");
                     serializer.setContentHandler(writer);
                     m.marshal(response.getResponse(), serializer);
