@@ -883,8 +883,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         final String mdwclassName;
         final Standard mdwStandard;
         if ("String".equals(className) || "SimpleInternationalString".equals(className) || "BaseUnit".equals(className)) {
-            mdwclassName = "CharacterString";
-            mdwStandard  = Standard.ISO_19103;
+            return PrimitiveType.STRING;
         } else if ("DefaultInternationalString".equalsIgnoreCase(className)) {
             mdwclassName = "PT_FreeText";
             mdwStandard  = Standard.ISO_19115;
