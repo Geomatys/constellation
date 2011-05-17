@@ -39,7 +39,7 @@
         <tr>
             <td style="vertical-align:top;">
             <mf:namer styleClass="rounded">
-                <mf:parametereditor value="#{bean.sourceParameters}" width="100%" rootVisible="false"/>
+                <mf:parametereditor value="#{bean.sourceParameters}" width="100%" rootVisible="#{not mf:isInstance(bean.sourceParameters,'ParameterValueGroup')}"/>
             </mf:namer>
             </td>
             <td style="vertical-align:top;">
