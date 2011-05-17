@@ -19,7 +19,9 @@
             <h:commandButton action="#{providerBean.reloadLayerProviders}" value="Force reload"/>
             <br/>
             <br/>
-            <mf:Outline id="layerPreview" value="#{providerBean.layerModel}" var="node" width="100%">
+            <div class="rounded">
+            <mf:Outline id="layerPreview" value="#{providerBean.layerModel}" var="node" width="100%" rootVisible="false"
+                        rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
 
                 <h:column>
                     <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value=""/></mf:CustomHtml></f:facet>
@@ -72,7 +74,8 @@
 
 
             </mf:Outline>
-
+            </div>
+            
         </h:panelGroup>
 
         <!-- style providers -->
@@ -81,7 +84,9 @@
             <h:commandButton action="#{providerBean.reloadStyleProviders}" value="Force reload"/>
             <br/>
             <br/>
-            <mf:Outline id="stylePreview" value="#{providerBean.styleModel}" var="node">
+            <div class="rounded">
+            <mf:Outline id="stylePreview" value="#{providerBean.styleModel}" var="node" width="100%" rootVisible="false"
+                        rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
 
                 <h:column>
                     <f:facet name="header"><mf:CustomHtml tag="span" ><h:outputText value=""/></mf:CustomHtml></f:facet>
@@ -101,7 +106,7 @@
                 </h:column>
 
             </mf:Outline>
-
+            </div>
         </h:panelGroup>
 
 

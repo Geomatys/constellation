@@ -17,21 +17,17 @@
 
 package org.constellation.menu.system;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.media.jai.JAI;
+import javax.swing.tree.TreeNode;
 import org.geotoolkit.util.logging.Logging;
+import org.mapfaces.renderkit.html.outline.OutlineCellStyler;
 
 /**
  * Returns several information of available imagery readers and writers.
@@ -40,6 +36,24 @@ import org.geotoolkit.util.logging.Logging;
  */
 public class JAIBean {
 
+    public static final OutlineCellStyler CELL_STYLER = new OutlineCellStyler() {
+
+        @Override
+        public String getCellStyle(TreeNode node, int rowIndex, int columnIndex) {
+            if(columnIndex > 0){
+                return "border-left: 1px solid #A2ACB6; padding-left:20px;";
+            }
+            
+            return "";
+        }
+
+        @Override
+        public String getCellClass(TreeNode node, int rowIndex, int columnIndex) {
+            return "";
+        }
+
+    };
+    
     private static final Logger LOGGER = Logging.getLogger(JAIBean.class);
 
     private final Map<String,String> types;
@@ -61,10 +75,6 @@ public class JAIBean {
 
     public String getTileCacheMemory(){
         return String.valueOf(JAI.getDefaultInstance().getTileCache().getMemoryCapacity());
-    }
-
-    public List<String> getMimeTypes(){
-        return new ArrayList<String>(types.keySet());
     }
 
     public Map<String,String> getReaders(){

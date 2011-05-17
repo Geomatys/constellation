@@ -119,3 +119,14 @@ table.mfoutline thead {
     background-color: #FFFFFF;
 }
 
+/* mouseover highlight */
+tr.mouseHighLight{
+    color: #999999;
+}
+
+tr.mouseHighLight:hover{
+    background: #aecae4;
+    color: #FFFFFF;
+}
+
+

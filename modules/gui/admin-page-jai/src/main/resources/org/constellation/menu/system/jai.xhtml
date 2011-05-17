@@ -16,14 +16,23 @@
         <br/>
 
         <h3>Available readers</h3>
-        <table>
-            <tbody>
-                <tr jsfc="ui:repeat" value="#{jaiBean.mimeTypes}" var="key">
-                    <td>#{key}</td>
-                    <td>#{jaiBean.readers[key]}</td>
-                </tr>
-            </tbody>
-        </table>
+        
+        <div class="rounded">            
+            <mf:Outline id="mimeTypes" rootVisible="false" value="#{jaiBean.readers}" var="node" width="100%"
+                    adaptor="#{mf:constant('org.constellation.bean.DefaultAdaptor.INSTANCE')}"
+                    rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}"
+                    cellStyler="#{mf:constant('org.constellation.menu.system.JAIBean.CELL_STYLER')}">
+
+                <mf:DataTableColumn>
+                    <h:outputText value="#{node.userObject.key}"/>
+                </mf:DataTableColumn>
+
+                <mf:DataTableColumn>
+                    <h:outputText value="#{node.userObject.value}"/>
+                </mf:DataTableColumn>
+                
+            </mf:Outline>            
+        </div>
 
     </ui:define>
 

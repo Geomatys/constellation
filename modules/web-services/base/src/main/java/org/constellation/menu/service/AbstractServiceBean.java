@@ -56,7 +56,7 @@ import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
  */
 public class AbstractServiceBean extends I18NBean{
 
-    private static final OutlineRowStyler ROW_STYLER = new OutlineRowStyler() {
+    public static final OutlineRowStyler ROW_STYLER = new OutlineRowStyler() {
 
         @Override
         public String getRowStyle(TreeNode node) {
@@ -64,13 +64,15 @@ public class AbstractServiceBean extends I18NBean{
             final Object obj = mn.getUserObject();
             if(obj instanceof Source){
                 return "height:34px;";
-            }else{
+            }else if(obj instanceof SourceElement){
                 int index = mn.getParent().getIndex(node);
                 if(index % 2 == 0){
                     return "background-color:#DDEEFF";
                 }else{
                     return "";
                 }
+            }else{
+                return "";
             }
         }
 
@@ -80,7 +82,7 @@ public class AbstractServiceBean extends I18NBean{
         }
     };
     
-    private static final OutlineCellStyler CELL_STYLER = new OutlineCellStyler() {
+    public static final OutlineCellStyler CELL_STYLER = new OutlineCellStyler() {
 
         @Override
         public String getCellStyle(TreeNode node, int rowIndex, int columnIndex) {
@@ -152,11 +154,7 @@ public class AbstractServiceBean extends I18NBean{
     protected ServiceInstance toServiceInstance(Instance inst){
         return new ServiceInstance(inst);
     }
-
-    public OutlineRowStyler getRowStyler(){
-        return ROW_STYLER;
-    }
-    
+       
     public OutlineCellStyler getCellStyler(){
         return CELL_STYLER;
     }

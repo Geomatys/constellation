@@ -45,7 +45,9 @@
     <br/>
     <div class="rounded">
     <mf:Outline id="sourceLayers" actionVisible="true" rootVisible="false"
-                value="#{bean.layerModel}" var="node" width="100%" rowStyler="#{bean.rowStyler}" cellStyler="#{bean.cellStyler}">
+                value="#{bean.layerModel}" var="node" width="100%" 
+                rowStyler="#{mf:constant('org.constellation.menu.service.AbstractServiceBean.ROW_STYLER')}" 
+                cellStyler="#{mf:constant('org.constellation.menu.service.AbstractServiceBean.CELL_STYLER')}">
         <!-- Name column -->
         <h:column>            
             <h:inputText value="#{node.userObject.id}" rendered="#{mf:isInstance(node.userObject,'Source')}"/>

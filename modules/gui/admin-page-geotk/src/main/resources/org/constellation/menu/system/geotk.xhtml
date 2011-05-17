@@ -24,13 +24,15 @@
         <br/>
 
         <h3>Factories</h3><br/>
-        <mf:Outline id="factoryTree" actionVisible="false" rootVisible="true"
-                    value="#{geotkBean.factoryModel}" var="node" width="100%">
-            <!-- Name column -->
-            <h:column>
-                <h:outputText value="#{node}"/>
-            </h:column>
-        </mf:Outline>
+        <div class="rounded">
+            <mf:Outline id="factoryTree" actionVisible="false" rootVisible="true"
+                        value="#{geotkBean.factoryModel}" var="node" width="100%">
+                <!-- Name column -->
+                <h:column>
+                    <h:outputText value="#{node}"/>
+                </h:column>
+            </mf:Outline>
+        </div>
 
     </ui:define>
 

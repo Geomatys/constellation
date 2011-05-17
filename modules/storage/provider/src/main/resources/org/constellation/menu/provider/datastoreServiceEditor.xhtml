@@ -15,76 +15,48 @@
     <br/>
     <br/>
 
-    <mf:Outline id="storePreview" rootVisible="false" value="#{bean.layerModel}" var="node" width="100%">
+    <div class="rounded">
+        <mf:Outline id="storePreview" rootVisible="false" value="#{bean.instanceModel}" var="node" width="100%"
+                    rowStyler="#{bean.instanceRowStyler}">
 
-        <mf:DataTableColumn>
-            <mf:switch>
-                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
+            <mf:DataTableColumn>
+               <h:commandLink action="#{node.select}">
                     <h:outputText value="#{node.userObject.id}"/>
-                </mf:case>
-                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode')}" fallthrought="false">
-                    <h:outputText value="#{node.userObject.localPart}"/>
-                </mf:case>
-                <mf:default>
+                </h:commandLink>
+            </mf:DataTableColumn>
+
+            <mf:DataTableColumn width="24px">
+                 <a4j:commandLink action="#{node.config}">
+                    <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
+                </a4j:commandLink>
+            </mf:DataTableColumn>
+            
+            <mf:DataTableColumn width="24px">
+                <a4j:commandLink action="#{node.reload}" reRender="storePreview">
+                    <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
+                </a4j:commandLink>
+            </mf:DataTableColumn>
+
+            <mf:DataTableColumn width="24px">
+                <a4j:commandLink action="#{node.delete}" reRender="storePreview">
+                    <h:graphicImage value="org.constellation.menu.provider.remove.png.mfRes" style="border:none;"/>
+                </a4j:commandLink>
+            </mf:DataTableColumn>
+
+        </mf:Outline>
+    </div>
+    
+    <mf:Div styleClass="rounded" rendered="#{bean.configuredInstance != null}">
+        <mf:Outline id="layerPreview" rootVisible="false" value="#{bean.layerModel}" var="node" width="100%"
+                    rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
+
+            <mf:DataTableColumn>
                     <h:outputText value="#{node.userObject}"/>
-                </mf:default>
-            </mf:switch>
-        </mf:DataTableColumn>
+            </mf:DataTableColumn>
 
-        <mf:DataTableColumn width="48px">
-            <mf:switch>
-                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
-
-                    <a4j:commandLink action="#{node.config}">
-                        <h:graphicImage value="org.constellation.menu.provider.edit.png.mfRes" style="border:none;"/>
-                    </a4j:commandLink>
-                    <a4j:commandLink action="#{node.reload}" reRender="storePreview">
-                        <h:graphicImage value="org.constellation.menu.provider.reload.png.mfRes" style="border:none;"/>
-                    </a4j:commandLink>
-                </mf:case>
-
-                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode')}" fallthrought="false">
-
-                    <mf:switch>
-                        <mf:case condition="#{!node.exist}" fallthrought="false">
-                            <h:outputLink>
-                                <h:graphicImage value="org.constellation.menu.provider.smallred.png.mfRes" style="border:none;"/>
-                            </h:outputLink>
-                        </mf:case>
-                        <mf:case condition="#{!node.visible}" fallthrought="false">
-                            <h:outputLink>
-                                <h:graphicImage value="org.constellation.menu.provider.smallgray.png.mfRes" style="border:none;"/>
-                            </h:outputLink>
-                            <h:outputLink>
-                                <h:graphicImage value="org.constellation.menu.provider.view.png.mfRes" style="border:none;"/>
-                            </h:outputLink>
-                        </mf:case>
-                        <mf:case condition="#{node.visible}" fallthrought="false">
-                            <h:outputLink>
-                                <h:graphicImage value="org.constellation.menu.provider.smallgreen.png.mfRes" style="border:none;"/>
-                            </h:outputLink>
-                            <h:outputLink>
-                                <h:graphicImage value="org.constellation.menu.provider.view.png.mfRes" style="border:none;"/>
-                            </h:outputLink>
-                        </mf:case>
-                    </mf:switch>
-
-                </mf:case>
-            </mf:switch>
-        </mf:DataTableColumn>
-
-        <mf:DataTableColumn width="24px">
-
-            <mf:switch>
-                <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$DataStoreSourceNode')}" fallthrought="false">
-                    <a4j:commandLink action="#{node.delete}" reRender="storePreview">
-                        <h:graphicImage value="org.constellation.menu.provider.remove.png.mfRes" style="border:none;"/>
-                    </a4j:commandLink>
-                </mf:case>                
-            </mf:switch>
-        </mf:DataTableColumn>
-
-    </mf:Outline>
+        </mf:Outline>
+    </mf:Div>
+    
 
 </ui:composition>
 

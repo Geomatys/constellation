@@ -16,7 +16,8 @@
 
     <div class="rounded">
     <mf:Outline id="instancesOutline" actionVisible="true" rootVisible="false"
-                value="#{bean.instances}" var="node" width="100%">
+                value="#{bean.instances}" var="node" width="100%" 
+                rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
                 
         <mf:DataTableColumn width="16">
             <h:graphicImage value="#{node.userObject.statusIcon}" style="border:none;"/>
@@ -27,7 +28,7 @@
         </mf:DataTableColumn>
         
         <mf:DataTableColumn>
-            <a href="#{instance.path}" target="blank">#{node.userObject.path}</a>
+            <a href="#{node.userObject.path}" target="blank">#{node.userObject.path}</a>
         </mf:DataTableColumn>
                 
         <mf:DataTableColumn width="28">

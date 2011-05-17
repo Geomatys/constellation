@@ -18,8 +18,11 @@
 package org.constellation.menu.system;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.tree.TreeNode;
+import org.mapfaces.renderkit.html.outline.OutlineCellStyler;
 
 /**
  * Returns several information from the system jvm.
@@ -28,6 +31,24 @@ import java.util.Map;
  */
 public class JVMBean {
 
+    public static final OutlineCellStyler CELL_STYLER = new OutlineCellStyler() {
+
+        @Override
+        public String getCellStyle(TreeNode node, int rowIndex, int columnIndex) {
+            if(columnIndex > 0){
+                return "border-left: 1px solid #A2ACB6; padding-left:20px;";
+            }
+            
+            return "";
+        }
+
+        @Override
+        public String getCellClass(TreeNode node, int rowIndex, int columnIndex) {
+            return "";
+        }
+
+    };
+    
     /**
      * List of most interesting system keys.
      * We don't want to display all of them.
@@ -58,12 +79,15 @@ public class JVMBean {
             "os.version"
     };
 
-    public List<String> getSystemProperties(){
-        return Arrays.asList(SYSTEM_KEYS);
-    }
-
     public Map<Object, Object> getSystemMap(){
-        return System.getProperties();
+        final Map<Object,Object> params = new HashMap<Object, Object>();
+        
+        final Map<Object,Object> system = System.getProperties();
+        for(String key : SYSTEM_KEYS){
+            params.put(key, system.get(key));
+        }
+        
+        return params;
     }
 
     public void gc(){
