@@ -40,9 +40,9 @@ public class CoverageFileBean extends AbstractDataStoreServiceBean{
     }
 
     public CoverageFileBean(){
-        super(getService(),"/org/constellation/menu/provider/coveragefile.xhtml",
-              "/org/constellation/menu/provider/coveragefileConfig.xhtml");
-        addBundle("org.constellation.menu.provider.coveragefile");
+        super(getService(),"/provider/coveragefile.xhtml",
+              "/provider/coveragefileConfig.xhtml");
+        addBundle("provider.coveragefile");
     }
 
     @Override

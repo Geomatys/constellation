@@ -22,7 +22,6 @@ import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
-import org.geotoolkit.data.shapefile.ShapefileDataStoreFactory;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
@@ -42,9 +41,9 @@ public class ShapefileBean extends AbstractDataStoreServiceBean{
     }
 
     public ShapefileBean(){
-        super(getService(),"/org/constellation/menu/provider/shapefile.xhtml",
-              "/org/constellation/menu/provider/shapefileConfig.xhtml");
-        addBundle("org.constellation.menu.provider.shapefile");
+        super(getService(),"/provider/shapefile.xhtml",
+              "/provider/shapefileConfig.xhtml");
+        addBundle("provider.shapefile");
     }
 
     @Override

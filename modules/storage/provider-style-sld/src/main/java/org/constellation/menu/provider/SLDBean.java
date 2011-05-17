@@ -40,9 +40,9 @@ public class SLDBean extends AbstractDataStoreServiceBean{
     }
 
     public SLDBean(){
-        super(getService(),"/org/constellation/menu/provider/sld.xhtml",
-              "/org/constellation/menu/provider/sldConfig.xhtml");
-        addBundle("org.constellation.menu.provider.sld");
+        super(getService(),"/provider/sld.xhtml",
+              "/provider/sldConfig.xhtml");
+        addBundle("provider.sld");
     }
 
     @Override

@@ -29,9 +29,9 @@ public class JAIItem extends AbstractMenuItem{
 
     public JAIItem() {
         super(
-            new String[]{"/org/constellation/menu/system/jai.xhtml"},
+            new String[]{"/system/jai.xhtml"},
             null,
-            new Path(SYSTEMS_PATH,"JAI", "/org/constellation/menu/system/jai.xhtml", null,100)
+            new Path(SYSTEMS_PATH,"JAI", "/system/jai.xhtml", null,100)
             );
     }
 

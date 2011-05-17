@@ -30,10 +30,10 @@ public class SensorMLItem extends AbstractMenuItem{
     public SensorMLItem() {
         super(
             new String[]{
-                "/org/constellation/menu/provider/sensorml.xhtml",
-                "/org/constellation/menu/provider/sensormlConfig.xhtml"},
-            "org.constellation.menu.provider.sensorml",
-            new Path(PROVIDERS_PATH,"SensorML DB", "/org/constellation/menu/provider/sensorml.xhtml", null,300)
+                "/provider/sensorml.xhtml",
+                "/provider/sensormlConfig.xhtml"},
+            "provider.sensorml",
+            new Path(PROVIDERS_PATH,"SensorML DB", "/provider/sensorml.xhtml", null,300)
             );
     }
 

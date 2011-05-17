@@ -30,10 +30,10 @@ public class WMSItem extends AbstractMenuItem{
     public WMSItem() {
         super(
             new String[]{
-                "/org/constellation/menu/service/wms.xhtml",
-                "/org/constellation/menu/service/wmsConfig.xhtml"},
-            "org.constellation.menu.service.wms",
-            new Path(SERVICES_PATH,"WMS", "/org/constellation/menu/service/wms.xhtml", null,200)
+                "/service/wms.xhtml",
+                "/service/wmsConfig.xhtml"},
+            "service.wms",
+            new Path(SERVICES_PATH,"WMS", "/service/wms.xhtml", null,200)
             );
     }
 

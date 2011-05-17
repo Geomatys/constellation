@@ -17,9 +17,7 @@
 
 package org.constellation.menu.system;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.swing.tree.TreeNode;
 import org.mapfaces.renderkit.html.outline.OutlineCellStyler;

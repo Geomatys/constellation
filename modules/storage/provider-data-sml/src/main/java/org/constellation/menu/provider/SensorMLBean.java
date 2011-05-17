@@ -40,9 +40,9 @@ public class SensorMLBean extends AbstractDataStoreServiceBean{
     }
 
     public SensorMLBean(){
-        super(getService(),"/org/constellation/menu/provider/sensorml.xhtml",
-              "/org/constellation/menu/provider/sensormlConfig.xhtml");
-        addBundle("org.constellation.menu.provider.sensorml");
+        super(getService(),"/provider/sensorml.xhtml",
+              "/provider/sensormlConfig.xhtml");
+        addBundle("provider.sensorml");
     }
 
     @Override

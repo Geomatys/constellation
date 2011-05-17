@@ -8,12 +8,12 @@
 
         <tag>
           <tag-name>servicepreview</tag-name>
-          <source>/org/constellation/menu/service/compServiceConfig.xhtml</source>
+          <source>/service/compServiceConfig.xhtml</source>
         </tag>
 
         <tag>
             <tag-name>layerContextConfig</tag-name>
-            <source>/org/constellation/menu/service/compLayerContextConfig.xhtml</source>
+            <source>/service/compLayerContextConfig.xhtml</source>
         </tag>
 
 </facelet-taglib>

@@ -59,7 +59,7 @@ public class ProviderBean extends I18NBean implements PropertyChangeListener{
     private TreeModel stylesModel = null;
 
     public ProviderBean(){
-        addBundle("org.constellation.menu.provider.overview");
+        addBundle("provider.overview");
         new WeakPropertyChangeListener(LayerProviderProxy.getInstance(), this);
         new WeakPropertyChangeListener(StyleProviderProxy.getInstance(), this);
     }

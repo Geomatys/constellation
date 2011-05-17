@@ -40,9 +40,9 @@ public class PostGISBean extends AbstractDataStoreServiceBean{
     }
 
     public PostGISBean(){
-        super(getService(),"/org/constellation/menu/provider/postgis.xhtml",
-              "/org/constellation/menu/provider/postgisConfig.xhtml");
-        addBundle("org.constellation.menu.provider.postgis");
+        super(getService(),"/provider/postgis.xhtml",
+              "/provider/postgisConfig.xhtml");
+        addBundle("provider.postgis");
     }
 
     @Override

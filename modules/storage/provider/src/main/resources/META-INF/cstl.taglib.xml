@@ -8,12 +8,12 @@
 
         <tag>
           <tag-name>storepreview</tag-name>
-          <source>/org/constellation/menu/provider/datastoreServiceEditor.xhtml</source>
+          <source>/provider/datastoreServiceEditor.xhtml</source>
         </tag>
 
         <tag>
             <tag-name>compSourceConfig</tag-name>
-            <source>/org/constellation/menu/provider/compSourceConfig.xhtml</source>
+            <source>/provider/compSourceConfig.xhtml</source>
         </tag>
 
 </facelet-taglib>

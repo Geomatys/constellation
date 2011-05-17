@@ -40,9 +40,9 @@ public class CoverageSQLBean extends AbstractDataStoreServiceBean{
     }
 
     public CoverageSQLBean(){
-        super(getService(),"/org/constellation/menu/provider/coveragesql.xhtml",
-              "/org/constellation/menu/provider/coveragesqlConfig.xhtml");
-        addBundle("org.constellation.menu.provider.coveragesql");
+        super(getService(),"/provider/coveragesql.xhtml",
+              "/provider/coveragesqlConfig.xhtml");
+        addBundle("provider.coveragesql");
     }
 
     @Override

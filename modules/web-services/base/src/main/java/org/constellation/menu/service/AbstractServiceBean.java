@@ -122,7 +122,7 @@ public class AbstractServiceBean extends I18NBean{
         this.specification = specification;
         this.mainPage = MenuBean.toApplicationPath(mainPage);
         this.configPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
-        addBundle("org.constellation.menu.service.service");
+        addBundle("service.service");
     }
 
     public final String getSpecificationName(){
@@ -333,9 +333,9 @@ public class AbstractServiceBean extends I18NBean{
 
         public String getStatusIcon(){
             switch(instance.getStatus()){
-                case WORKING:   return "org.constellation.menu.provider.smallgreen.png.mfRes";
-                case ERROR:     return "org.constellation.menu.provider.smallred.png.mfRes";
-                default:        return "org.constellation.menu.provider.smallgray.png.mfRes";
+                case WORKING:   return "provider.smallgreen.png.mfRes";
+                case ERROR:     return "provider.smallred.png.mfRes";
+                default:        return "provider.smallgray.png.mfRes";
             }
         }
 

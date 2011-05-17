@@ -40,9 +40,9 @@ public class CoverageMosaicBean extends AbstractDataStoreServiceBean{
     }
 
     public CoverageMosaicBean(){
-        super(getService(),"/org/constellation/menu/provider/coveragemosaic.xhtml",
-              "/org/constellation/menu/provider/coveragemosaicConfig.xhtml");
-        addBundle("org.constellation.menu.provider.coveragemosaic");
+        super(getService(),"/provider/coveragemosaic.xhtml",
+              "/provider/coveragemosaicConfig.xhtml");
+        addBundle("provider.coveragemosaic");
     }
 
     @Override

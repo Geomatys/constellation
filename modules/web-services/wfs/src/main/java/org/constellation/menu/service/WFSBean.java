@@ -28,8 +28,8 @@ public class WFSBean extends AbstractServiceBean{
 
     public WFSBean() {
         super(Specification.WFS,
-                "/org/constellation/menu/service/wfs.xhtml",
-                "/org/constellation/menu/service/wfsConfig.xhtml");
+                "/service/wfs.xhtml",
+                "/service/wfsConfig.xhtml");
     }
 
     @Override

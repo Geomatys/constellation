@@ -30,10 +30,10 @@ public class OMItem extends AbstractMenuItem{
     public OMItem() {
         super(
             new String[]{
-                "/org/constellation/menu/provider/om.xhtml",
-                "/org/constellation/menu/provider/omConfig.xhtml"},
-            "org.constellation.menu.provider.om",
-            new Path(PROVIDERS_PATH,"O&M", "/org/constellation/menu/provider/om.xhtml", null,500)
+                "/provider/om.xhtml",
+                "/provider/omConfig.xhtml"},
+            "provider.om",
+            new Path(PROVIDERS_PATH,"O&M", "/provider/om.xhtml", null,500)
             );
     }
 

@@ -29,9 +29,9 @@ public class ProviderItem extends AbstractMenuItem{
 
     public ProviderItem() {
         super(
-            new String[]{"/org/constellation/menu/provider/overview.xhtml"},
-            "org.constellation.menu.provider.overview",
-            new Path(PROVIDERS_PATH,"provider_overview_title", "/org/constellation/menu/provider/overview.xhtml", null,5000)
+            new String[]{"/provider/overview.xhtml"},
+            "provider.overview",
+            new Path(PROVIDERS_PATH,"provider_overview_title", "/provider/overview.xhtml", null,5000)
             );
     }
 

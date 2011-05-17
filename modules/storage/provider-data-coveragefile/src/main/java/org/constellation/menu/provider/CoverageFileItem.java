@@ -30,10 +30,10 @@ public class CoverageFileItem extends AbstractMenuItem{
     public CoverageFileItem() {
         super(
             new String[]{
-                "/org/constellation/menu/provider/coveragefile.xhtml",
-                "/org/constellation/menu/provider/coveragefileConfig.xhtml"},
-            "org.constellation.menu.provider.coveragefile",
-            new Path(PROVIDERS_PATH,"Coverage-File", "/org/constellation/menu/provider/coveragefile.xhtml", null,700)
+                "/provider/coveragefile.xhtml",
+                "/provider/coveragefileConfig.xhtml"},
+            "provider.coveragefile",
+            new Path(PROVIDERS_PATH,"Coverage-File", "/provider/coveragefile.xhtml", null,700)
             );
     }
 

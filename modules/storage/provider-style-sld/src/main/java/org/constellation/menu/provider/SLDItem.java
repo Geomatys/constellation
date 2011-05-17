@@ -30,10 +30,10 @@ public class SLDItem extends AbstractMenuItem{
     public SLDItem() {
         super(
             new String[]{
-                "/org/constellation/menu/provider/sld.xhtml",
-                "/org/constellation/menu/provider/sldConfig.xhtml"},
-            "org.constellation.menu.provider.sld",
-            new Path(PROVIDERS_PATH,"SLD Styles", "/org/constellation/menu/provider/sld.xhtml", null,900)
+                "/provider/sld.xhtml",
+                "/provider/sldConfig.xhtml"},
+            "provider.sld",
+            new Path(PROVIDERS_PATH,"SLD Styles", "/provider/sld.xhtml", null,900)
             );
     }
 

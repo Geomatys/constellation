@@ -29,9 +29,9 @@ public class CstlItem extends AbstractMenuItem{
 
     public CstlItem() {
         super(
-            new String[]{"/org/constellation/menu/system/cstl.xhtml"},
+            new String[]{"/system/cstl.xhtml"},
             null,
-            new Path(SYSTEMS_PATH,"Constellation", "/org/constellation/menu/system/cstl.xhtml", null,400)
+            new Path(SYSTEMS_PATH,"Constellation", "/system/cstl.xhtml", null,400)
             );
     }
 

@@ -30,10 +30,10 @@ public class CoverageSQLItem extends AbstractMenuItem{
     public CoverageSQLItem() {
         super(
             new String[]{
-                "/org/constellation/menu/provider/coveragesql.xhtml",
-                "/org/constellation/menu/provider/coveragesqlConfig.xhtml"},
-            "org.constellation.menu.provider.coveragesql",
-            new Path(PROVIDERS_PATH,"Coverage-SQL", "/org/constellation/menu/provider/coveragesql.xhtml", null,600)
+                "/provider/coveragesql.xhtml",
+                "/provider/coveragesqlConfig.xhtml"},
+            "provider.coveragesql",
+            new Path(PROVIDERS_PATH,"Coverage-SQL", "/provider/coveragesql.xhtml", null,600)
             );
     }
 

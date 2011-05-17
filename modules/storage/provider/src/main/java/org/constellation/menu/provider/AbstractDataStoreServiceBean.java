@@ -101,7 +101,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
     private String newSourceName = "default";
 
     public AbstractDataStoreServiceBean(final ProviderService service, final String mainPage, final String configPage){
-        addBundle("org.constellation.menu.provider.overview");
+        addBundle("provider.overview");
 
         this.service = service;
         this.mainPage = MenuBean.toApplicationPath(mainPage);

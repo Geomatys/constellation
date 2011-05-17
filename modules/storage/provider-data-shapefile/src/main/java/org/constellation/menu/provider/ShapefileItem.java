@@ -30,10 +30,10 @@ public class ShapefileItem extends AbstractMenuItem{
     public ShapefileItem() {
         super(
             new String[]{
-                "/org/constellation/menu/provider/shapefile.xhtml",
-                "/org/constellation/menu/provider/shapefileConfig.xhtml"},
-            "org.constellation.menu.provider.shapefile",
-            new Path(PROVIDERS_PATH,"Shapefile", "/org/constellation/menu/provider/shapefile.xhtml", null,400)
+                "/provider/shapefile.xhtml",
+                "/provider/shapefileConfig.xhtml"},
+            "provider.shapefile",
+            new Path(PROVIDERS_PATH,"Shapefile", "/provider/shapefile.xhtml", null,400)
             );
     }
 

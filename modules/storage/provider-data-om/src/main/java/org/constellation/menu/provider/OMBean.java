@@ -40,9 +40,9 @@ public class OMBean extends AbstractDataStoreServiceBean{
     }
 
     public OMBean(){
-        super(getService(),"/org/constellation/menu/provider/om.xhtml",
-              "/org/constellation/menu/provider/omConfig.xhtml");
-        addBundle("org.constellation.menu.provider.om");
+        super(getService(),"/provider/om.xhtml",
+              "/provider/omConfig.xhtml");
+        addBundle("provider.om");
     }
 
     @Override

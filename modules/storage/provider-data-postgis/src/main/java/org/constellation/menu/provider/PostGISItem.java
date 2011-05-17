@@ -30,10 +30,10 @@ public class PostGISItem extends AbstractMenuItem{
     public PostGISItem() {
         super(
             new String[]{
-                "/org/constellation/menu/provider/postgis.xhtml",
-                "/org/constellation/menu/provider/postgisConfig.xhtml"},
-            "org.constellation.menu.provider.postgis",
-            new Path(PROVIDERS_PATH,"PostGIS", "/org/constellation/menu/provider/postgis.xhtml", null,200)
+                "/provider/postgis.xhtml",
+                "/provider/postgisConfig.xhtml"},
+            "provider.postgis",
+            new Path(PROVIDERS_PATH,"PostGIS", "/provider/postgis.xhtml", null,200)
             );
     }
 

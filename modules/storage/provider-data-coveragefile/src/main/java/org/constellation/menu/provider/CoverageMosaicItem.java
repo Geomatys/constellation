@@ -30,10 +30,10 @@ public class CoverageMosaicItem extends AbstractMenuItem{
     public CoverageMosaicItem() {
         super(
             new String[]{
-                "/org/constellation/menu/provider/coveragemosaic.xhtml",
-                "/org/constellation/menu/provider/coveragemosaicConfig.xhtml"},
-            "org.constellation.menu.provider.coveragemosaic",
-            new Path(PROVIDERS_PATH,"Coverage-Mosaic", "/org/constellation/menu/provider/coveragemosaic.xhtml", null,800)
+                "/provider/coveragemosaic.xhtml",
+                "/provider/coveragemosaicConfig.xhtml"},
+            "provider.coveragemosaic",
+            new Path(PROVIDERS_PATH,"Coverage-Mosaic", "/provider/coveragemosaic.xhtml", null,800)
             );
     }
 
