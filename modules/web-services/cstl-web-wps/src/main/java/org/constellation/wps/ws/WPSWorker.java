@@ -1022,7 +1022,10 @@ public class WPSWorker extends AbstractWorker {
                                 FeatureCollection fc = (FeatureCollection) outputValue;
                                 FeatureType ft = fc.getFeatureType();
                                 System.out.println("DEBUG FeatureType: "+ft);
-                                System.out.println("DEBUG FeatureCollection: "+fc);
+                                System.out.println("DEBUG FeatureCollection: ");
+                                //for (Object feat : fc) {
+                                    //System.out.println("Feature : "+feat);
+                                //}
                                 Element elem = null;
                                 try {
                                    
@@ -1258,7 +1261,7 @@ public class WPSWorker extends AbstractWorker {
          * Feature/FeatureCollection
          */    
         }else if(expectedClass.equals(Feature.class) || expectedClass.equals(FeatureCollection.class)){
-            
+            System.out.println("LOG : Extract Complexe Input Feature/FeatureCollection");
             if(inputObject.size() > 1){
                throw new CstlServiceException("Invalid data input : Only one Feature/FeatureCollection expected.", INVALID_PARAMETER_VALUE, inputID);
             }
@@ -1435,6 +1438,7 @@ public class WPSWorker extends AbstractWorker {
         * Feature/FeatureCollection
         */
         if(expectedClass.equals(Feature.class) || expectedClass.equals(FeatureCollection.class)){
+            System.out.println("LOG Extract Reference Input Feature/FeatureCollection");
             if (mime == null) {
                 throw new CstlServiceException("Invalid reference input : typeMime can't be null.", INVALID_PARAMETER_VALUE, inputID);
             }
@@ -1454,7 +1458,11 @@ public class WPSWorker extends AbstractWorker {
                     }
                     
                     FeatureCollection fcoll = (FeatureCollection)fcollReader.read(new URL(href));
-                    return fixFeature(fcoll);
+                     System.out.println("FeatureCollection Type : "+fcoll.getFeatureType());
+                     fcoll = (FeatureCollection) fixFeature(fcoll);
+                     System.out.println("Fixed FeatureType : "+fcoll.getFeatureType());
+                     System.out.println("FeatureCollec : "+fcoll);
+                    return fcoll;
 
                 } catch (JAXBException ex) {
                     throw new CstlServiceException("Invalid reference input : can't read reference schema.",ex, NO_APPLICABLE_CODE, inputID);
