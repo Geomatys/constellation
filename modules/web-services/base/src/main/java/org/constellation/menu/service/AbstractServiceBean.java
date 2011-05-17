@@ -136,14 +136,14 @@ public class AbstractServiceBean extends I18NBean{
      * @return List of all service instance of this specification.
      *      This list include both started and stopped instances.
      */
-    public final List<ServiceInstance> getInstances(){
+    public final TreeModel getInstances(){
         final InstanceReport report = getServiceAdministrator().listInstance(getSpecificationName());
         final List<ServiceInstance> instances = new ArrayList<ServiceInstance>();
         for(Instance instance : report.getInstances()){
             instances.add(new ServiceInstance(instance));
         }
         Collections.sort(instances);
-        return instances;
+        return new ListTreeModel(instances);
     }
 
     /**
