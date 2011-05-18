@@ -41,7 +41,8 @@ public class OMBean extends AbstractDataStoreServiceBean{
 
     public OMBean(){
         super(getService(),"/provider/om.xhtml",
-              "/provider/omConfig.xhtml");
+              "/provider/omConfig.xhtml",
+              "/provider/omLayerConfig.xhtml");
         addBundle("provider.om");
     }
 

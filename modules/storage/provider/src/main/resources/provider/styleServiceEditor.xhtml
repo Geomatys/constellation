@@ -50,28 +50,8 @@
         <mf:Outline id="layerPreview" rootVisible="false" value="#{bean.layerModel}" var="node" width="100%"
                     rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
 
-            <mf:DataTableColumn width="24px">
-                <h:graphicImage value="#{node.statusIcon}" style="border:none;"/>
-            </mf:DataTableColumn>
-            
             <mf:DataTableColumn>
-                    <h:outputText value="#{node.userObject}"/>
-            </mf:DataTableColumn>
-
-            <mf:DataTableColumn width="24px">
-                <a4j:commandLink action="#{node.config}">
-                    <h:graphicImage value="provider.edit.png.mfRes" style="border:none;"/>
-                </a4j:commandLink>
-            </mf:DataTableColumn>
-            
-            <mf:DataTableColumn width="24px">
-                <mf:switch>
-                    <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode') and not node.exist}" fallthrought="false">
-                        <a4j:commandLink action="#{node.delete}" reRender="layerPreview">
-                            <h:graphicImage value="provider.remove.png.mfRes" style="border:none;"/>
-                        </a4j:commandLink>
-                    </mf:case>
-                </mf:switch>
+                <h:outputText value="#{node.userObject}"/>
             </mf:DataTableColumn>
             
         </mf:Outline>

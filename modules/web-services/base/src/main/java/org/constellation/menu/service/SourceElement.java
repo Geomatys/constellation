@@ -42,6 +42,7 @@ public class SourceElement {
     }
 
     public void setIncluded(final Boolean included) {
+        System.out.println(name + " >>include>> " +  included);
         if (included == null) {
             return;
         }
@@ -79,6 +80,7 @@ public class SourceElement {
     }
 
     public void setExcluded(final Boolean excluded) {
+        System.out.println(name + " >>exclude>> " +  excluded);
         if (excluded == null) {
             return;
         }

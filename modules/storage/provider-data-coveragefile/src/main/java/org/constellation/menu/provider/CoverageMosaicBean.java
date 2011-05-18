@@ -41,7 +41,8 @@ public class CoverageMosaicBean extends AbstractDataStoreServiceBean{
 
     public CoverageMosaicBean(){
         super(getService(),"/provider/coveragemosaic.xhtml",
-              "/provider/coveragemosaicConfig.xhtml");
+              "/provider/coveragemosaicConfig.xhtml",
+              "/provider/coveragemosaicLayerConfig.xhtml");
         addBundle("provider.coveragemosaic");
     }
 

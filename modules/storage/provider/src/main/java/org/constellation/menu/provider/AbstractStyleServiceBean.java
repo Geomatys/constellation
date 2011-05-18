@@ -26,10 +26,8 @@ import javax.faces.context.ExternalContext;
 import org.constellation.provider.configuration.ProviderParameters;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -37,7 +35,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import org.constellation.bean.HighLightRowStyler;
-import org.constellation.provider.AbstractLayerProvider;
+import org.constellation.provider.AbstractDataStoreProvider;
 import org.constellation.provider.AbstractProviderProxy;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
@@ -46,7 +44,7 @@ import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderService;
 import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.logging.Logging;
@@ -66,7 +64,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractDataStoreServiceBean extends I18NBean implements PropertyChangeListener{
+public abstract class AbstractStyleServiceBean extends I18NBean implements PropertyChangeListener{
     
     /**
      * Model adaptor, only display the layers parameters
@@ -95,22 +93,19 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
     };
     
     private final ProviderService service;
-    private final String sourceConfigPage;
-    private final String layerConfigPage;
+    private final String configPage;
     private final String mainPage;
     private TreeModel layersModel = null;
     private DataStoreSourceNode configuredInstance = null;
     private ParameterValueGroup configuredParams = null;
     private String newSourceName = "default";
 
-    public AbstractDataStoreServiceBean(final ProviderService service, 
-            final String mainPage, final String configPage, final String layerConfigPage){
+    public AbstractStyleServiceBean(final ProviderService service, final String mainPage, final String configPage){
         addBundle("provider.overview");
 
         this.service = service;
         this.mainPage = MenuBean.toApplicationPath(mainPage);
-        this.sourceConfigPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
-        this.layerConfigPage = (layerConfigPage != null) ? MenuBean.toApplicationPath(layerConfigPage) : null;
+        this.configPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
 
         if(service instanceof LayerProviderService){
             new WeakPropertyChangeListener(LayerProviderProxy.getInstance(), this);
@@ -144,7 +139,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
             return new DefaultTreeModel(new DefaultMutableTreeNode());
         }
         
-        final DefaultMutableTreeNode root = buildNode((AbstractLayerProvider)configuredInstance.provider,true);
+        final DefaultMutableTreeNode root = buildNode(configuredInstance.provider,true);
         return new DefaultTreeModel(root);
     }
 
@@ -155,46 +150,26 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
         final Collection<Provider> providers = proxy.getProviders();
         for(final Provider provider : providers){
             if(providerClazz.isInstance(provider)){
-                root.add(buildNode((AbstractLayerProvider)provider,false));
+                root.add(buildNode(provider,false));
             }
         }
 
         return new DefaultTreeModel(root);
     }
 
-    private DefaultMutableTreeNode buildNode(final AbstractLayerProvider provider, boolean buildChildren){
-        final DataStoreSourceNode root = new DataStoreSourceNode(provider);
+    private DefaultMutableTreeNode buildNode(final Provider provider, boolean buildChildren){
+        final DataStoreSourceNode node = new DataStoreSourceNode(provider);
 
-        if(!buildChildren){
-            return root;
-        }
+        if(buildChildren){
+            final Set keys = provider.getKeys();
 
-        final List<String> names = new ArrayList<String>();
-
-        //add all names from the datastore
-        for (Name n : provider.getKeys()) {
-            names.add(n.getLocalPart());
-        }
-
-        //add all names from the configuration files
-        final ParameterValueGroup config = provider.getSource();
-        for(ParameterValueGroup layer : ProviderParameters.getLayers(config)){
-            final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
-            if(!names.contains(layerName)){
-                names.add(layerName);
+            for(Object key : keys){
+                final  DefaultMutableTreeNode n = new DefaultMutableTreeNode(key);
+                node.add(n);
             }
         }
 
-        //sort them
-        Collections.sort(names);
-
-        for(String name : names){
-            final TypeNode n = new TypeNode(provider,DefaultName.valueOf(name));
-            root.add(n);
-        }
-
-        return root;
-        
+        return node;        
     }
 
     public OutlineRowStyler getInstanceRowStyler() {
@@ -342,76 +317,15 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
         public void config(){
             select();
 
-            if(sourceConfigPage != null){
+            if(configPage != null){
                 final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
                 try {
-                    context.redirect(sourceConfigPage);
+                    //the session is not logged, redirect him to the authentication page
+                    context.redirect(configPage);
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, null, ex);
                 }
             }
-        }
-
-    }
-
-    public final class TypeNode extends DefaultMutableTreeNode{
-
-        private final AbstractLayerProvider provider;
-        private final Name name;
-
-        public TypeNode(final AbstractLayerProvider provider, final Name name) {
-            super(name);
-            this.provider = provider;
-            this.name = name;
-        }
-
-        public String getStatusIcon(){
-            if(isExist()){
-                return "provider.smallgreen.png.mfRes";
-            }else{
-                return "provider.smallred.png.mfRes";
-            }
-        }
-        
-        /**
-         * @return true if this configured layer is in the datastore
-         */
-        public boolean isExist(){
-            for(Name str : provider.getKeys()){
-                if(DefaultName.match(name, str)){
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public void config(){
-            configuredInstance = new DataStoreSourceNode(provider);
-            configuredParams = provider.getSource().clone();
-
-            if(layerConfigPage != null){
-                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                try {
-                    context.redirect(layerConfigPage);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
-                }
-            }
-        }
-        
-        public void delete(){
-            //add all names from the configuration files
-            final ParameterValueGroup config = configuredParams;
-            for(ParameterValueGroup layer : ProviderParameters.getLayers(config)){
-                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
-                if(DefaultName.match(name, layerName)){
-                    //we have found the layer to remove
-                    config.values().remove(layer);                    
-                    break;
-                }
-            }
-            
-            saveConfiguration();
         }
 
     }

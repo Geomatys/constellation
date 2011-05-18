@@ -41,7 +41,8 @@ public class PostGISBean extends AbstractDataStoreServiceBean{
 
     public PostGISBean(){
         super(getService(),"/provider/postgis.xhtml",
-              "/provider/postgisConfig.xhtml");
+              "/provider/postgisConfig.xhtml",
+              "/provider/postgisLayerConfig.xhtml");
         addBundle("provider.postgis");
     }
 

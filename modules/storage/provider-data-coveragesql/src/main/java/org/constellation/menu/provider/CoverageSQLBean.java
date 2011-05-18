@@ -41,7 +41,8 @@ public class CoverageSQLBean extends AbstractDataStoreServiceBean{
 
     public CoverageSQLBean(){
         super(getService(),"/provider/coveragesql.xhtml",
-              "/provider/coveragesqlConfig.xhtml");
+              "/provider/coveragesqlConfig.xhtml",
+              "/provider/coveragesqlLayerConfig.xhtml");
         addBundle("provider.coveragesql");
     }
 

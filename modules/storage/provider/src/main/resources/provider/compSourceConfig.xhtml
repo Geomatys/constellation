@@ -24,9 +24,6 @@
                         <mf:parametereditor value="#{bean.idParameter}" rootVisible="true"/>
                     </td>
                     <td>
-                        <div style="text-align: right;">
-                            <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
-                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -52,5 +49,9 @@
     
     </tbody>
     </table>
+    
+    <div style="text-align: right;">
+        <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
+    </div>
     
 </ui:composition>

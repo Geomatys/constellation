@@ -1,0 +1,23 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib">
+
+    <center><a href="#{bean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
+    <br/>
+    <br/>
+    <b>#{bean.i18n['instance']}</b><br/>    
+    <mf:namer styleClass="rounded">
+        <mf:parametereditor value="#{bean.configuredParameters}" width="100%" rootVisible="false"
+            adaptor="#{mf:constant('org.constellation.menu.provider.AbstractDataStoreServiceBean.LAYERS_ADAPTOR')}"/>
+    </mf:namer>
+    
+    <div style="text-align: right;">
+        <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
+    </div>
+    
+</ui:composition>

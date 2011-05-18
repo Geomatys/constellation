@@ -8,13 +8,18 @@
                 xmlns:c="http://java.sun.com/jstl/core"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib"
-                template="/pages/base.xhtml">
+                template="/pages/slider.xhtml">
 
-    <ui:param name="pageTitle" value="SLD Styles"/>
-
+    
+    <ui:define name="header">
+        
+        <link rel="stylesheet" type="text/css" href="provider.parameters.css.mfRes"/>
+        
+    </ui:define>
+    
     <ui:define name="content">
 
-        <cstl:stylepreview bean="#{sldBean}" />
+        <cstl:layerParameterConfig bean="#{coveragemosaicBean}" />
 
     </ui:define>
 

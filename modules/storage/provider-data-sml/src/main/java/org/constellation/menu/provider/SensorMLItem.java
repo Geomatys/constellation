@@ -31,7 +31,8 @@ public class SensorMLItem extends AbstractMenuItem{
         super(
             new String[]{
                 "/provider/sensorml.xhtml",
-                "/provider/sensormlConfig.xhtml"},
+                "/provider/sensormlConfig.xhtml",
+                "/provider/sensormlLayerConfig.xhtml"},
             "provider.sensorml",
             new Path(PROVIDERS_PATH,"SensorML DB", "/provider/sensorml.xhtml", null,300)
             );

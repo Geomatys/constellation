@@ -31,7 +31,8 @@ public class CoverageMosaicItem extends AbstractMenuItem{
         super(
             new String[]{
                 "/provider/coveragemosaic.xhtml",
-                "/provider/coveragemosaicConfig.xhtml"},
+                "/provider/coveragemosaicConfig.xhtml",
+                "/provider/coveragemosaicLayerConfig.xhtml"},
             "provider.coveragemosaic",
             new Path(PROVIDERS_PATH,"Coverage-Mosaic", "/provider/coveragemosaic.xhtml", null,800)
             );

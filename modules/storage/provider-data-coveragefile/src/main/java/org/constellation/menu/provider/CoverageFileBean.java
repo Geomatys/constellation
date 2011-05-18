@@ -41,7 +41,8 @@ public class CoverageFileBean extends AbstractDataStoreServiceBean{
 
     public CoverageFileBean(){
         super(getService(),"/provider/coveragefile.xhtml",
-              "/provider/coveragefileConfig.xhtml");
+              "/provider/coveragefileConfig.xhtml",
+              "/provider/coveragefileLayerConfig.xhtml");
         addBundle("provider.coveragefile");
     }
 

@@ -28,7 +28,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class SLDBean extends AbstractDataStoreServiceBean{
+public class SLDBean extends AbstractStyleServiceBean{
 
     private static StyleProviderService getService(){
         for(StyleProviderService service : StyleProviderProxy.getInstance().getServices()){

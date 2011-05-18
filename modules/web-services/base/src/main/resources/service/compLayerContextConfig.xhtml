@@ -77,8 +77,13 @@
                     <h:outputText value="#{bean.i18n['include']}" />
                 </h:panelGrid>
             </f:facet>
-            <h:selectBooleanCheckbox value="#{node.userObject.included}" rendered="#{mf:isInstance(node.userObject,'SourceElement')}"
-                style="#{(mf:isInstance(node.userObject,'SourceElement') and node.userObject.included != null) ? '' : 'display:none'}"/>   
+            <mf:switch>
+                <mf:case condition="#{mf:isInstance(node.userObject,'SourceElement') and node.userObject.included != null}">
+                    <h:selectBooleanCheckbox value="#{node.userObject.included}" />
+                </mf:case>
+            </mf:switch>
+            
+               
         </mf:DataTableColumn>
         
         <mf:DataTableColumn width="40">
@@ -88,8 +93,11 @@
                     <h:outputText value="#{bean.i18n['exclude']}" />
                 </h:panelGrid>
             </f:facet>
-            <h:selectBooleanCheckbox value="#{node.userObject.excluded}" rendered="#{mf:isInstance(node.userObject,'SourceElement')}"
-                style="#{(mf:isInstance(node.userObject,'SourceElement') and node.userObject.excluded != null) ? '' : 'display:none'}"/> 
+            <mf:switch>
+                <mf:case condition="#{mf:isInstance(node.userObject,'SourceElement') and node.userObject.excluded != null}">
+                    <h:selectBooleanCheckbox value="#{node.userObject.excluded}" />
+                </mf:case>
+            </mf:switch>
         </mf:DataTableColumn>
         
     </mf:Outline>

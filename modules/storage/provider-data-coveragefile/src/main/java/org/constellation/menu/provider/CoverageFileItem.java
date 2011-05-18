@@ -31,7 +31,8 @@ public class CoverageFileItem extends AbstractMenuItem{
         super(
             new String[]{
                 "/provider/coveragefile.xhtml",
-                "/provider/coveragefileConfig.xhtml"},
+                "/provider/coveragefileConfig.xhtml",
+                "/provider/coveragefileLayerConfig.xhtml"},
             "provider.coveragefile",
             new Path(PROVIDERS_PATH,"Coverage-File", "/provider/coveragefile.xhtml", null,700)
             );

@@ -41,7 +41,8 @@ public class SensorMLBean extends AbstractDataStoreServiceBean{
 
     public SensorMLBean(){
         super(getService(),"/provider/sensorml.xhtml",
-              "/provider/sensormlConfig.xhtml");
+              "/provider/sensormlConfig.xhtml",
+              "/provider/sensormlLayerConfig.xhtml");
         addBundle("provider.sensorml");
     }
 

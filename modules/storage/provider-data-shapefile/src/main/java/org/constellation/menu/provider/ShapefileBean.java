@@ -42,7 +42,8 @@ public class ShapefileBean extends AbstractDataStoreServiceBean{
 
     public ShapefileBean(){
         super(getService(),"/provider/shapefile.xhtml",
-              "/provider/shapefileConfig.xhtml");
+              "/provider/shapefileConfig.xhtml",
+              "/provider/shapefileLayerConfig.xhtml");
         addBundle("provider.shapefile");
     }
 

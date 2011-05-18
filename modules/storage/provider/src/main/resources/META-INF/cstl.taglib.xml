@@ -10,10 +10,20 @@
           <tag-name>storepreview</tag-name>
           <source>/provider/datastoreServiceEditor.xhtml</source>
         </tag>
+        
+        <tag>
+          <tag-name>stylepreview</tag-name>
+          <source>/provider/styleServiceEditor.xhtml</source>
+        </tag>
 
         <tag>
             <tag-name>compSourceConfig</tag-name>
             <source>/provider/compSourceConfig.xhtml</source>
+        </tag>
+        
+        <tag>
+            <tag-name>layerParameterConfig</tag-name>
+            <source>/provider/layerParameterConfig.xhtml</source>
         </tag>
 
 </facelet-taglib>

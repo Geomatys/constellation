@@ -31,7 +31,8 @@ public class ShapefileItem extends AbstractMenuItem{
         super(
             new String[]{
                 "/provider/shapefile.xhtml",
-                "/provider/shapefileConfig.xhtml"},
+                "/provider/shapefileConfig.xhtml",
+                "/provider/shapefileLayerConfig.xhtml"},
             "provider.shapefile",
             new Path(PROVIDERS_PATH,"Shapefile", "/provider/shapefile.xhtml", null,400)
             );
