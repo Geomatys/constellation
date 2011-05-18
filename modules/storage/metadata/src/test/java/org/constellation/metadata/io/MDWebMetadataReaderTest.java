@@ -104,34 +104,25 @@ public class MDWebMetadataReaderTest {
         configuration.setEnableThread("false");
         configuration.setEnablecache("true");
         configuration.setStoreMapping("false");
-        
+        reader = new MDWebMetadataReader(configuration);
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        
+        if (reader != null) {
+            reader.destroy();
+        }
         if (ds != null) {
             ds.shutdown();
         }
     }
 
-    /*
-     * TODO LOOK out for cache of CLasses in mdw meta reader
-     *
-     * SensorML timePeriod != iso timePeriod
-     *
-     */
-
     @Before
     public void setUp() throws Exception {
-        reader = new MDWebMetadataReader(configuration);
     }
 
     @After
     public void tearDown() throws Exception {
-        if (reader != null) {
-            reader.destroy();
-        }
     }
 
     /**

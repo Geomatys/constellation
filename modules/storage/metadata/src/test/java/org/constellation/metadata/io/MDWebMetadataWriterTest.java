@@ -103,6 +103,9 @@ public class MDWebMetadataWriterTest {
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
         configuration = new Automatic("mdweb", bdd);
+        
+        reader = new MDWebMetadataReader(configuration);
+        writer = new MDWebMetadataWriter(configuration);
 
     }
 
@@ -110,6 +113,9 @@ public class MDWebMetadataWriterTest {
     public static void tearDownClass() throws Exception {
         if (reader != null) {
             reader.destroy();
+        }
+        if (writer != null) {
+            writer.destroy();
         }
         if (ds != null) {
             ds.shutdown();
@@ -119,19 +125,10 @@ public class MDWebMetadataWriterTest {
 
     @Before
     public void setUp() throws Exception {
-        reader = new MDWebMetadataReader(configuration);
-        writer = new MDWebMetadataWriter(configuration);
-
     }
 
     @After
     public void tearDown() throws Exception {
-        if (reader != null) {
-            reader.destroy();
-        }
-        if (writer != null) {
-            writer.destroy();
-        }
     }
 
     /**
