@@ -337,6 +337,37 @@ public class StaticMetadata {
         "   </gmd:identificationInfo>" + '\n' +
         "</gmd:MD_Metadata>";
 
+        public static final String META_20 =
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:srv=\"http://www.isotc211.org/2005/srv\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>666-999-666</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
+        "   <gmd:identificationInfo>" + '\n' +
+        "       <srv:SV_ServiceIdentification>" + '\n' +
+        "           <srv:operatesOn xlink:href=\"http://test.com\">" + '\n' +
+        "               <gmd:MD_DataIdentification>" + '\n' +
+        "                   <gmd:abstract>" + '\n' +
+        "                       <gco:CharacterString>not empty</gco:CharacterString>" + '\n' +
+        "                   </gmd:abstract>" + '\n' +        
+        "               </gmd:MD_DataIdentification>" + '\n' +        
+        "           </srv:operatesOn>" + '\n' +
+        "       </srv:SV_ServiceIdentification>" + '\n' +
+        "    </gmd:identificationInfo>" + '\n' +
+        "</gmd:MD_Metadata>";
+        
+        public static final String META_21 =
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:srv=\"http://www.isotc211.org/2005/srv\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "   <gmd:fileIdentifier>" + '\n' +
+        "       <gco:CharacterString>999-666-999</gco:CharacterString>" + '\n' +
+        "   </gmd:fileIdentifier>" + '\n' +
+        "   <gmd:identificationInfo>" + '\n' +
+        "       <srv:SV_ServiceIdentification>" + '\n' +
+        "           <srv:operatesOn xlink:href=\"http://test2.com\"/>" + '\n' +
+        "       </srv:SV_ServiceIdentification>" + '\n' +
+        "    </gmd:identificationInfo>" + '\n' +
+        "</gmd:MD_Metadata>";
+
+        
         public static void fillPoolAnchor(AnchoredMarshallerPool pool) {
         try {
             pool.addAnchor("Common Data Index record", new URI("SDN:L231:3:CDI"));

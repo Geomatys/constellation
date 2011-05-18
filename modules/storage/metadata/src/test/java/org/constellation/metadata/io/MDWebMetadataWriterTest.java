@@ -19,6 +19,10 @@
 package org.constellation.metadata.io;
 
 
+import org.geotoolkit.xml.IdentifiedObject;
+import org.opengis.metadata.identification.DataIdentification;
+import java.net.URI;
+import org.geotoolkit.service.ServiceIdentificationImpl;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import javax.xml.bind.JAXBElement;
 import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
@@ -42,6 +46,9 @@ import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
+import org.geotoolkit.util.ComparisonMode;
+import org.geotoolkit.util.Utilities;
 
 import org.opengis.feature.catalog.FeatureCatalogue;
 
@@ -193,6 +200,47 @@ public class MDWebMetadataWriterTest {
 
         systemSMLEquals(expResult, result);
         
+    }
+    
+    /**
+     * Tests the storeMetadata method for ISO 19139 data with GML geometries
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void writeMetadataISOXlinkTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_20));
+        writer.storeMetadata(absExpResult);
+        Object absResult = reader.getMetadata("666-999-666", AbstractMetadataReader.ISO_19115);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        DefaultMetadata result = (DefaultMetadata) absResult;
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_20));
+
+        DataIdentification expId = ((ServiceIdentificationImpl)expResult.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
+        DataIdentification resId = ((ServiceIdentificationImpl)result.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
+        assertEquals(new URI("http://test.com"), ((IdentifiedObject)expId).getXLink().getHRef());
+        assertEquals(new URI("http://test.com"), ((IdentifiedObject)resId).getXLink().getHRef());
+        metadataEquals(expResult,result);
+        
+        
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_21));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("999-666-999", AbstractMetadataReader.ISO_19115);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_21));
+
+        expId = ((ServiceIdentificationImpl)expResult.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
+        resId = ((ServiceIdentificationImpl)result.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
+        assertEquals(new URI("http://test2.com"), ((IdentifiedObject)expId).getXLink().getHRef());
+        assertEquals(new URI("http://test2.com"), ((IdentifiedObject)resId).getXLink().getHRef());
+        
+        // TODO metadataEquals(expResult, result, ComparisonMode.BY_CONTRACT);
+        
+        pool.release(unmarshaller);
     }
 
     /**

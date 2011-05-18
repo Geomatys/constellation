@@ -244,7 +244,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.geotoolkit.metadata.iso", "org.geotoolkit.referencing",
                                                                  "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
-                                                                 "org.geotoolkit.metadata.fra", "org.geotoolkit.util");
+                                                                 "org.geotoolkit.metadata.fra", "org.geotoolkit.util", "org.geotoolkit.xml");
         this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
         this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
         this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311");
@@ -791,7 +791,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         break;
                     default:
 
-                        LOGGER.severe("unable to put " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
+                        LOGGER.finer("unable to put " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
                         tryAgain = false;
                 }
             } catch (ClassCastException ex) {
@@ -982,8 +982,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 packageName = "org.geotoolkit.internal.jaxb.metadata";
             else if ("Anchor".equals(className)) {
                 packageName = "org.geotoolkit.internal.jaxb.gmx";
-				className = "GMX_Anchor";
-			}
+                className = "GMX_Anchor";
+            }
             String name  = className;
             int nameType = 0;
             while (nameType < 10) {

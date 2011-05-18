@@ -40,6 +40,8 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.v100.SensorML;
+import org.geotoolkit.util.ComparisonMode;
+import org.geotoolkit.util.Utilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 
@@ -196,6 +198,32 @@ public class MDWebMetadataReaderTest {
         pool.release(unmarshaller);
     }
 
+    /**
+     * Tests the getMetadata method for ISO 19139 data with GML geometries
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getMetadataISOXlinkTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("666-999-666", AbstractMetadataReader.ISO_19115);
+
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_20));
+
+        assertTrue(result instanceof DefaultMetadata);
+        metadataEquals(expResult, (DefaultMetadata)result);
+        
+        /*result = reader.getMetadata("999-666-999", AbstractMetadataReader.ISO_19115);
+
+        expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_21));
+
+        assertTrue(result instanceof DefaultMetadata);
+        assertTrue(Utilities.deepEquals(expResult, (DefaultMetadata)result, ComparisonMode.BY_CONTRACT));
+        assertFalse(Utilities.equals(expResult, (DefaultMetadata)result));
+        
+        pool.release(unmarshaller);*/
+    }
+    
      /**
      * Tests the getMetadata method for ISO 19139 data with GML geometries
      *

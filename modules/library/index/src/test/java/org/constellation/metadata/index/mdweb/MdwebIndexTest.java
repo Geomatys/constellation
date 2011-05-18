@@ -182,6 +182,8 @@ public class MdwebIndexTest {
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
         expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
         expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
+        expectedResult.add("666-999-666");
+        expectedResult.add("999-666-999");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals(expectedResult, result);
@@ -443,7 +445,9 @@ public class MdwebIndexTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
+        expectedResult.add("666-999-666");
         expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
+        expectedResult.add("999-666-999");
         expectedResult.add("CTDF02");
         expectedResult.add("cat-1");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
@@ -470,7 +474,9 @@ public class MdwebIndexTest {
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("cat-1");
         expectedResult.add("CTDF02");
+        expectedResult.add("999-666-999");
         expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
+        expectedResult.add("666-999-666");
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
         expectedResult.add("42292_9s_19900610041000");
@@ -511,6 +517,8 @@ public class MdwebIndexTest {
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
         expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
         expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
+        expectedResult.add("666-999-666");
+        expectedResult.add("999-666-999");
 
         assertEquals(expectedResult, result);
 
@@ -534,6 +542,8 @@ public class MdwebIndexTest {
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
         expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
         expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
+        expectedResult.add("666-999-666");
+        expectedResult.add("999-666-999");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
@@ -613,6 +623,8 @@ public class MdwebIndexTest {
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
         expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
         expectedResult.add("937491cd-4bc4-43e4-9509-f6cc606f906e");
+        expectedResult.add("666-999-666");
+        expectedResult.add("999-666-999");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals("CRS URN are not working", expectedResult, result);

@@ -17,12 +17,14 @@
 
 package org.constellation.test.utils;
 
-import org.geotoolkit.csw.xml.v202.QueryType;
 import java.util.Iterator;
 import java.util.Collection;
 import javax.xml.bind.JAXBElement;
-import org.geotoolkit.csw.xml.v202.GetRecordsType;
 
+import org.geotoolkit.util.Utilities;
+import org.geotoolkit.util.ComparisonMode;
+import org.geotoolkit.csw.xml.v202.QueryType;
+import org.geotoolkit.csw.xml.v202.GetRecordsType;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
 import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
 import org.geotoolkit.sml.xml.v100.ComponentType;
@@ -75,6 +77,33 @@ public class MetadataUtilities {
 
     private MetadataUtilities() {}
 
+    public static void metadataEquals(final DefaultMetadata expResult, final DefaultMetadata result, ComparisonMode mode) {
+
+        assertTrue(Utilities.deepEquals(expResult.getFileIdentifier(), result.getFileIdentifier(), mode));
+        if (expResult.getIdentificationInfo() != null && result.getIdentificationInfo() != null) {
+            assertEquals(expResult.getIdentificationInfo().size(), result.getIdentificationInfo().size());
+            for (int i = 0; i < expResult.getIdentificationInfo().size(); i++) {
+                Identification expId = expResult.getIdentificationInfo().iterator().next();
+                Identification resId = result.getIdentificationInfo().iterator().next();
+                assertTrue(Utilities.deepEquals(expId.getAbstract(), resId.getAbstract(), mode));
+                assertTrue(Utilities.deepEquals(expId.getAggregationInfo(), resId.getAggregationInfo(), mode));
+                
+                
+                if (expId instanceof DefaultDataIdentification) {
+                    // TODO
+                } else if (expId instanceof ServiceIdentificationImpl) {
+                    ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;
+                    ServiceIdentificationImpl resService = (ServiceIdentificationImpl) result.getIdentificationInfo().iterator().next();
+                    String msg = "expected:\n" + expService.getOperatesOn() + "\nbut was:\n" + resService.getOperatesOn();
+                    assertTrue(msg, Utilities.deepEquals(expService.getOperatesOn(), resService.getOperatesOn(), mode));
+                    assertTrue(Utilities.deepEquals(expService, resService, mode));
+                }
+            }
+            assertTrue(Utilities.deepEquals(expResult.getIdentificationInfo(), result.getIdentificationInfo(), mode));
+        }
+        assertTrue(Utilities.deepEquals(expResult, result, mode));
+    }
+    
     public static void metadataEquals(final DefaultMetadata expResult, final DefaultMetadata result) {
 
         assertEquals(expResult.getAcquisitionInformation().size(), result.getAcquisitionInformation().size());

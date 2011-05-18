@@ -47,11 +47,13 @@ import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.Util;
 
 // Geotoolkit dependencies
+import org.geotoolkit.internal.jaxb.gco.ObjectReference;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription;
 import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.StringUtilities;
 
 // MDWeb dependencies
+import org.geotoolkit.xml.XLink;
 import org.mdweb.model.profiles.Profile;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
@@ -766,8 +768,22 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 return result;
             }
             
-            className   = object.getClass().getSimpleName();
-            packageName = object.getClass().getPackage().getName();
+            // special case for the sub classe of Xlink ObjectReference
+            if (object instanceof ObjectReference) {
+                return mdWriter.getClasse("XLink", mdWriter.getStandard("Xlink"));
+            }
+            
+            //special case for Proxy: we extract the GeoAPI interface, then we get the UML annotation for className
+            if (object.getClass().getSimpleName().startsWith("$Proxy")) {
+                final Class apiInterface =  object.getClass().getInterfaces()[0];
+                final UML a = (UML) apiInterface.getAnnotation(UML.class);
+                className =  a.identifier();
+                packageName = "";    
+                
+            } else {
+                className   = object.getClass().getSimpleName();
+                packageName = object.getClass().getPackage().getName();
+            }
             LOGGER.log(Level.FINER, "search for classe {0}", className);
             
         } else {

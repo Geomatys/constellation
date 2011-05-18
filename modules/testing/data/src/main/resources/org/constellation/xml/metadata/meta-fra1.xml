@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<gmd:MD_Metadata xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" xmlns:fra="http://www.cnig.gouv.fr/2005/fra" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:ows="http://www.opengis.net/ows" xmlns:ins="http://www.inspire.org" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dct="http://purl.org/dc/terms/" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ns16="http://www.opengis.net/ows/1.1" xmlns:cat="http://www.opengis.net/cat/csw" xmlns:dc2="http://www.purl.org/dc/elements/1.1/" xmlns:dct2="http://www.purl.org/dc/terms/" xmlns:gfc="http://www.isotc211.org/2005/gfc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<gmd:MD_Metadata xmlns:xlink="http://www.w3.org/1999/xlink" 
+                 xmlns:gmx="http://www.isotc211.org/2005/gmx" 
+                 xmlns:gco="http://www.isotc211.org/2005/gco" 
+                 xmlns:gmd="http://www.isotc211.org/2005/gmd" 
+                 xmlns:gmi="http://www.isotc211.org/2005/gmi" 
+                 xmlns:gml="http://www.opengis.net/gml" 
+                 xmlns:fra="http://www.cnig.gouv.fr/2005/fra" 
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.cnig.gouv.fr/2005/fra http://eden.ign.fr/xsd/fra/20060922/fra/fra.xsd">
     <gmd:fileIdentifier>
         <gco:CharacterString>MDweb-2064d5c7-80b5-4840-ba3d-4fa4e23be750</gco:CharacterString>
     </gmd:fileIdentifier>
