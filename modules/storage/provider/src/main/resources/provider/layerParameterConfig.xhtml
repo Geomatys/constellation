@@ -9,11 +9,9 @@
 
     <center><a href="#{bean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
     <br/>
-    <br/>
-    <b>#{bean.i18n['instance']}</b><br/>    
+    <br/>  
     <mf:namer styleClass="rounded">
-        <mf:parametereditor value="#{bean.configuredParameters}" width="100%" rootVisible="false"
-            adaptor="#{mf:constant('org.constellation.menu.provider.AbstractDataStoreServiceBean.LAYERS_ADAPTOR')}"/>
+        <mf:parametereditor value="#{bean.layerConfiguredParameters}" width="100%" rootVisible="false"/>
     </mf:namer>
     
     <div style="text-align: right;">

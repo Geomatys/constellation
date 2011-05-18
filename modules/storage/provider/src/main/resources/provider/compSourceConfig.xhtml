@@ -21,7 +21,9 @@
                         </h:commandLink>
                     </td>
                     <td>
-                        <mf:parametereditor value="#{bean.idParameter}" rootVisible="true"/>
+                        <mf:namer>
+                            <mf:parametereditor value="#{bean.idParameter}" rootVisible="true"/>
+                        </mf:namer>
                     </td>
                     <td>
                     </td>
@@ -31,25 +33,11 @@
     </div>
     <br/>
     
-    <table width="100%">
-    <tbody>
-        <tr>
-            <td style="vertical-align:top;">
-            <mf:namer styleClass="rounded">
-                <mf:parametereditor value="#{bean.sourceParameters}" width="100%" rootVisible="#{not mf:isInstance(bean.sourceParameters,'ParameterValueGroup')}"/>
-            </mf:namer>
-            </td>
-            <td style="vertical-align:top;">
-            <mf:namer styleClass="rounded">
-                <mf:parametereditor value="#{bean.configuredParameters}" width="100%" rootVisible="false"
-                    adaptor="#{mf:constant('org.constellation.menu.provider.AbstractDataStoreServiceBean.LAYERS_ADAPTOR')}"/>
-            </mf:namer>
-            </td>
-        </tr>
+    <div class="rounded">
+        <mf:parametereditor value="#{bean.sourceParameters}" width="100%" rootVisible="#{not mf:isInstance(bean.sourceParameters,'ParameterValueGroup')}"/>
+    </div>
     
-    </tbody>
-    </table>
-    
+    <br/>
     <div style="text-align: right;">
         <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
     </div>

@@ -101,6 +101,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
     private TreeModel layersModel = null;
     private DataStoreSourceNode configuredInstance = null;
     private ParameterValueGroup configuredParams = null;
+    private ParameterValueGroup layerParams = null;
     private String newSourceName = "default";
 
     public AbstractDataStoreServiceBean(final ProviderService service, 
@@ -285,6 +286,14 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
         return null;
     }
     
+    /**
+     * 
+     * @return the layer parameters
+     */
+    public GeneralParameterValue getLayerConfiguredParameters(){
+        return layerParams;
+    }
+    
     public void saveConfiguration(){
         configuredInstance.provider.updateSource(configuredParams);
     }
@@ -389,6 +398,25 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
             configuredInstance = new DataStoreSourceNode(provider);
             configuredParams = provider.getSource().clone();
 
+            layerParams = null;
+            for(ParameterValueGroup layer : ProviderParameters.getLayers(configuredParams)){
+                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
+                if(DefaultName.match(name, layerName)){
+                    //we have found the layer
+                    layerParams = layer;                
+                    break;
+                }
+            }
+            
+            if(layerParams == null){
+                //config does not exist, create it
+                layerParams = configuredParams.addGroup(
+                        ProviderParameters.LAYER_DESCRIPTOR.getName().getCode());
+                layerParams.parameter(ProviderParameters.LAYER_NAME_DESCRIPTOR.getName().getCode())
+                        .setValue(name.getLocalPart());
+            }
+            
+            
             if(layerConfigPage != null){
                 final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
                 try {
