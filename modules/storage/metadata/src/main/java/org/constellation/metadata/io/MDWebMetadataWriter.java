@@ -925,7 +925,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         } else {
             return null;
         }
-        final Classe candidate = PrimitiveType.getPrimitiveTypeFromName(className, mdwStandard);
+        final Classe candidate = PrimitiveType.getPrimitiveTypeFromName(mdwclassName, mdwStandard);
         final Classe result;
         if (candidate != null) {
             result = candidate;
