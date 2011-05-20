@@ -235,7 +235,7 @@ public class MDWebMetadataWriterTest {
         assertEquals(new URI("http://test2.com"), ((IdentifiedObject)expId).getXLink().getHRef());
         assertEquals(new URI("http://test2.com"), ((IdentifiedObject)resId).getXLink().getHRef());
         
-        // TODO metadataEquals(expResult, result, ComparisonMode.BY_CONTRACT);
+        metadataEquals(expResult, result, ComparisonMode.BY_CONTRACT);
         
         pool.release(unmarshaller);
     }

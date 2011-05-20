@@ -39,6 +39,7 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Convinient class to perform actions on constellation web services.
@@ -397,6 +398,17 @@ public final class ServiceAdministrator {
         return false;
     }
 
+    /**
+     * Add a new provider to the service.
+     * 
+     * @param serviceName The provider type (shapefile, coverage-sql, ...)
+     * @param config The configuration Object to add to the specific provider file.
+     * @return 
+     */
+    public boolean newSource(final String serviceName, final ParameterValueGroup config) {
+        String url = getServiceURL() + "/configuration?request=addSource&serviceName=" + serviceName;
+        return false;
+    }
 
     /**
      * Send a request to another service.

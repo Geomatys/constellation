@@ -204,7 +204,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
         
-        /*result = reader.getMetadata("999-666-999", AbstractMetadataReader.ISO_19115);
+        result = reader.getMetadata("999-666-999", AbstractMetadataReader.ISO_19115);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_21));
 
@@ -212,7 +212,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(Utilities.deepEquals(expResult, (DefaultMetadata)result, ComparisonMode.BY_CONTRACT));
         assertFalse(Utilities.equals(expResult, (DefaultMetadata)result));
         
-        pool.release(unmarshaller);*/
+        pool.release(unmarshaller);
     }
     
      /**

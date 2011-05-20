@@ -122,7 +122,34 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             }
             return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
             
+        } else if ("addLayer".equalsIgnoreCase(request)) {
+            final String sourceId = getParameter("id", true, parameters);
+            
+                final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
+                try {
+                    // we read the soruce parameter to add
+                    reader.setInput(objectRequest);
+                    ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
+                    reader.dispose();
+                    
+                    Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+                    for (LayerProvider p : providers) {
+                        if (p.getId().equals(sourceId)) {
+                            p.getSource().values().add(newLayer);
+                            p.updateSource(p.getSource());
+                            return new AcknowlegementType("Success", "The layer has been added");
+                        }
+                    }
+                    return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
+                    
+                    
+                } catch (XMLStreamException ex) {
+                    throw new CstlServiceException(ex);
+                } catch (IOException ex) {
+                    throw new CstlServiceException(ex);
+                }
         }
+        
         return null;
     }
     
