@@ -17,6 +17,8 @@
 
 package org.constellation.map.configuration;
 
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.GeneralParameterValue;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -148,6 +150,68 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 } catch (IOException ex) {
                     throw new CstlServiceException(ex);
                 }
+        } else if ("removeLayer".equalsIgnoreCase(request)) {
+            final String sourceId = getParameter("id", true, parameters);
+            final String layerName = getParameter("layerName", true, parameters);
+           
+            Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+            for (LayerProvider p : providers) {
+                if (p.getId().equals(sourceId)) {
+                    for (GeneralParameterValue param : p.getSource().values()) {
+                        if (param instanceof ParameterValueGroup) {
+                            ParameterValueGroup pvg = (ParameterValueGroup)param;
+                            if (param.getDescriptor().equals(ProviderParameters.LAYER_DESCRIPTOR)) {
+                                ParameterValue value = pvg.parameter("name");
+                                if (value.stringValue().equals(layerName)) {
+                                    p.getSource().values().remove(pvg);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    p.updateSource(p.getSource());
+                    return new AcknowlegementType("Success", "The layer has been removed");
+                }
+            }
+            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
+        
+        } else if ("modifyLayer".equalsIgnoreCase(request)) {
+            final String sourceId = getParameter("id", true, parameters);
+            final String layerName = getParameter("layerName", true, parameters);
+            
+            final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
+                try {
+                    // we read the soruce parameter to add
+                    reader.setInput(objectRequest);
+                    ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
+                    reader.dispose();
+                    
+                    Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+                    for (LayerProvider p : providers) {
+                        if (p.getId().equals(sourceId)) {
+                            for (GeneralParameterValue param : p.getSource().values()) {
+                                if (param instanceof ParameterValueGroup) {
+                                    ParameterValueGroup pvg = (ParameterValueGroup)param;
+                                    if (param.getDescriptor().equals(ProviderParameters.LAYER_DESCRIPTOR)) {
+                                        ParameterValue value = pvg.parameter("name");
+                                        if (value.stringValue().equals(layerName)) {
+                                            p.getSource().values().remove(pvg);
+                                            p.getSource().values().add(newLayer);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            p.updateSource(p.getSource());
+                            return new AcknowlegementType("Success", "The layer has been modified");
+                        }
+                    }
+                } catch (XMLStreamException ex) {
+                    throw new CstlServiceException(ex);
+                } catch (IOException ex) {
+                    throw new CstlServiceException(ex);
+                }
+            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
         }
         
         return null;
