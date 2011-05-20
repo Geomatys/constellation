@@ -109,7 +109,7 @@ public abstract class AbstractConfigurer {
        // do nothing must be overriden if needed 
     }
     
-    public abstract Object treatRequest(final String request, final MultivaluedMap<String,String> parameters) throws CstlServiceException;
+    public abstract Object treatRequest(final String request, final MultivaluedMap<String,String> parameters, final Object objectRequest) throws CstlServiceException;
     
     /**
      * Return true if the restart must be refused.

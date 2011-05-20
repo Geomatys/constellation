@@ -45,6 +45,7 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.service.ServiceIdentificationImpl;
 
+import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.content.ContentInformation;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.CitationDate;
@@ -377,6 +378,15 @@ public class MetadataUtilities {
                     assertEquals(expService.getCoupledResource(), resService.getCoupledResource());
                     assertEquals(expService.getCouplingType(), resService.getCouplingType());
                     extentsEquals(expService.getExtent(), resService.getExtent());
+                    assertEquals(expService.getOperatesOn().size(), resService.getOperatesOn().size());
+                    Iterator<DataIdentification> expItOo = expService.getOperatesOn().iterator();
+                    Iterator<DataIdentification> resItOo = resService.getOperatesOn().iterator();
+                    while (expItOo.hasNext()) {
+                        DefaultDataIdentification expOo = (DefaultDataIdentification) expItOo.next();
+                        DefaultDataIdentification resOo = (DefaultDataIdentification) resItOo.next();
+                        assertEquals(expOo.getXLink(), resOo.getXLink());
+                        assertEquals(expOo, resOo);
+                    }
                     assertEquals(expService.getOperatesOn(), resService.getOperatesOn());
                     assertEquals(expService.getRestrictions(), resService.getRestrictions());
                     assertEquals(expService.getServiceType(), resService.getServiceType());

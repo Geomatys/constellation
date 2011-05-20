@@ -62,6 +62,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -141,17 +142,13 @@ public final class ConfigurationService extends WebService  {
         Marshaller marshaller = null;
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
-            String request  = "";
+            String request  = request = (String) getParameter("REQUEST", true);
             final StringWriter sw = new StringWriter();
 
             for (AbstractConfigurer configurer: configurers) {
                 configurer.setContainerNotifier(cn);
             }
             
-            if (objectRequest == null) {
-                request = (String) getParameter("REQUEST", true);
-            }
-
             if ("Restart".equalsIgnoreCase(request)) {
                 final boolean force = Boolean.parseBoolean(getParameter("FORCED", false));
                 marshaller.marshal(restartService(force), sw);
@@ -162,13 +159,13 @@ public final class ConfigurationService extends WebService  {
                 final File f = downloadFile();
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
             }
-            
+                    
             
             /* specific operations */
             
             else {
                 for (AbstractConfigurer configurer : configurers) {
-                    final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters());
+                    final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters(), objectRequest);
                     if (response != null) {
                         marshaller.marshal(response, sw);
                         return Response.ok(sw.toString(), MimeType.TEXT_XML).build();

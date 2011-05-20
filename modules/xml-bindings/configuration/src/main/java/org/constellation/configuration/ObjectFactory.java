@@ -17,7 +17,10 @@
 
 package org.constellation.configuration;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -101,5 +104,13 @@ public class ObjectFactory {
 
     public ExceptionReport createExceptionReport() {
         return new ExceptionReport();
+    }
+    
+
+    private static final QName SOURCE_QNAME = new QName("http://www.geotoolkit.org/parameter", "source");
+            
+    @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")
+    public JAXBElement<Object> createSource(Object value) {
+        return new JAXBElement<Object>(SOURCE_QNAME, Object.class, null, value);
     }
 }

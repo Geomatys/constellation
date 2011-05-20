@@ -32,6 +32,8 @@ public interface Provider<K,V> {
 
     final String JNDI_GROUP = "Data Provider Properties";
 
+    String getId();
+            
     /**
      * @return the service which created this provider.
      */

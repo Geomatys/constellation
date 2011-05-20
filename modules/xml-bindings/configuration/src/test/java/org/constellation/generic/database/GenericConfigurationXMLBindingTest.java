@@ -17,11 +17,13 @@
 
 package org.constellation.generic.database;
 
+import org.w3c.dom.Node;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -466,6 +468,38 @@ public class GenericConfigurationXMLBindingTest {
         assertEquals(expResult, result);
     }
 
+    /*
+     * 
+     */
+    @Test
+    public void providerSourceUnMarshalingTest() throws Exception {
+        String xml = "<?xml version='1.0' encoding='UTF-8'?>" + '\n'
+                + "<source xmlns=\"http://www.geotoolkit.org/parameter\">" + '\n'
+                + "   <id>shp-tasmania</id>" + '\n'
+                + "   <shapefileFolder>" + '\n'
+                + "     <path>/home/guilhem/shapefile/Tasmania_shp</path>" + '\n'
+                + "     <namespace>shp</namespace>" + '\n'
+                + "   </shapefileFolder>" + '\n'
+                + "   <load_all>false</load_all>" + '\n'
+                + "  <Layer>" + '\n'
+                + "    <name>tasmania_cities</name>" + '\n'
+                + "    <style>PointCircleBlack12</style>" + '\n'
+                + "   </Layer>" + '\n'
+                + "   <Layer>" + '\n'
+                + "     <name>tasmania_roads</name>" + '\n'
+                + "     <style>LineRed2</style>" + '\n'
+                + "   </Layer>" + '\n'
+                + " </source>";
+        
+        Object obj = unmarshaller.unmarshal(new StringReader(xml));
+        
+        assertTrue(obj instanceof JAXBElement);
+        obj = ((JAXBElement)obj).getValue();
+        System.out.println(obj);
+        
+        assertTrue(obj instanceof Node);
+    }
+    
     public static String removeXmlns(String xml) {
         String s = xml;
         s = s.replaceAll("xmlns=\"[^\"]*\" ", "");

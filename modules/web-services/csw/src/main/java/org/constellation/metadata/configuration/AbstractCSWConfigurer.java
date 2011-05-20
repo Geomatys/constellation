@@ -111,7 +111,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     
     
     @Override
-    public Object treatRequest(final String request, final MultivaluedMap<String,String> parameters) throws CstlServiceException {
+    public Object treatRequest(final String request, final MultivaluedMap<String,String> parameters, final Object objectRequest) throws CstlServiceException {
         
         if ("RefreshIndex".equalsIgnoreCase(request)) {
             final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false, parameters));
