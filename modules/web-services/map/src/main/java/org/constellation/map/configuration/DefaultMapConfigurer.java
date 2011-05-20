@@ -112,6 +112,19 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             } else {
                 throw new CstlServiceException("No descriptor for: " + serviceName + " has been found");
             }
+            
+        } else if ("getSource".equalsIgnoreCase(request)) {
+            final String id          = getParameter("id", true, parameters);
+            
+            Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+            for (LayerProvider p : providers) {
+                if (p.getId().equals(id)) {
+                    return p.getSource();
+                }
+            }
+            
+            return new AcknowlegementType("Failure", "Unable to find a source named:" + id);
+            
         } else if ("removeSource".equalsIgnoreCase(request)) {
             
             final String sourceId = getParameter("id", true, parameters);

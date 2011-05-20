@@ -24,7 +24,6 @@ import javax.ws.rs.core.Context;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.logging.Level;
 
 // Jersey dependencies
@@ -62,7 +61,6 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -143,7 +141,6 @@ public final class ConfigurationService extends WebService  {
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
             String request  = request = (String) getParameter("REQUEST", true);
-            final StringWriter sw = new StringWriter();
 
             for (AbstractConfigurer configurer: configurers) {
                 configurer.setContainerNotifier(cn);
@@ -151,8 +148,7 @@ public final class ConfigurationService extends WebService  {
             
             if ("Restart".equalsIgnoreCase(request)) {
                 final boolean force = Boolean.parseBoolean(getParameter("FORCED", false));
-                marshaller.marshal(restartService(force), sw);
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                return Response.ok(restartService(force), MimeType.TEXT_XML).build();
             }
             
             else if ("Download".equalsIgnoreCase(request)) {    
@@ -167,8 +163,7 @@ public final class ConfigurationService extends WebService  {
                 for (AbstractConfigurer configurer : configurers) {
                     final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters(), objectRequest);
                     if (response != null) {
-                        marshaller.marshal(response, sw);
-                        return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                        return Response.ok(response, MimeType.TEXT_XML).build();
                     }
                 }
             }
