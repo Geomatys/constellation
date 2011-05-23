@@ -28,17 +28,23 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
 
 import net.iharder.Base64;
 
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.ObjectFactory;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.geotoolkit.xml.parameter.ParameterValueWriter;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -192,7 +198,7 @@ public final class ServiceAdministrator {
      */
     public boolean restartInstance(final String service, final String instanceId) {
         try {
-            String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
+            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -219,7 +225,7 @@ public final class ServiceAdministrator {
      */
     public boolean newInstance(String service, String instanceId) {
         try {
-            String url = getServiceURL() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
+            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -246,7 +252,7 @@ public final class ServiceAdministrator {
      */
     public boolean startInstance(final String service, final String instanceId) {
         try {
-            String url = getServiceURL() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
+            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -273,7 +279,7 @@ public final class ServiceAdministrator {
      */
     public boolean stopInstance(final String service, final String instanceId) {
         try {
-            String url = getServiceURL() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
+            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -300,7 +306,7 @@ public final class ServiceAdministrator {
      */
     public boolean deleteInstance(final String service, final String instanceId) {
         try {
-            String url = getServiceURL() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
+            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -326,7 +332,7 @@ public final class ServiceAdministrator {
      */
     public InstanceReport listInstance(final String service) {
         try {
-            String url = getServiceURL() + service.toLowerCase() + "/admin?request=listInstance";
+            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=listInstance";
             final Object response = sendRequest(url, null);
             if (response instanceof InstanceReport) {
                 return (InstanceReport) response;
@@ -354,7 +360,7 @@ public final class ServiceAdministrator {
      */
     public boolean configureInstance(final String service, final String instanceId, final Object configuration) {
         try {
-            String url = getServiceURL() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
+            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
             final Object response = sendRequest(url, configuration);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -381,7 +387,7 @@ public final class ServiceAdministrator {
      */
     public Object getInstanceconfiguration(final String service, final String instanceId) {
         try {
-            String url = getServiceURL() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
+            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
             final Object response = sendRequest(url, null);
             if (response instanceof ExceptionReport) {
                 LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
@@ -399,17 +405,183 @@ public final class ServiceAdministrator {
     }
 
     /**
-     * Add a new provider to the service.
+     * Add a new source provider to the service.
      * 
      * @param serviceName The provider type (shapefile, coverage-sql, ...)
      * @param config The configuration Object to add to the specific provider file.
      * @return 
      */
     public boolean newSource(final String serviceName, final ParameterValueGroup config) {
-        String url = getServiceURL() + "/configuration?request=addSource&serviceName=" + serviceName;
+        try {
+            final String url = getServiceURL() + "/configuration?request=addSource&serviceName=" + serviceName;
+            Object response = sendRequest(url, config);
+            if (response instanceof AcknowlegementType) {
+                return true;
+            } else if (response instanceof ExceptionReport) {
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
         return false;
     }
-
+    
+    /**
+     * Get the source provider configuration.
+     * 
+     * @param id The identifier of the source
+     * @return 
+     */
+    public GeneralParameterValue getSource(final String id, final ParameterDescriptorGroup descriptor) {
+        try {
+            final String url = getServiceURL() + "/configuration?request=getSource&id=" + id;
+            Object response = sendRequest(url, null, descriptor);
+            if (response instanceof GeneralParameterValue) {
+                return (GeneralParameterValue) response;
+            } else if (response instanceof ExceptionReport) {
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return null;
+    }
+    
+    /**
+     * Remove a source provider in the service.
+     * 
+     * @param id The identifier of the source
+     * @return 
+     */
+    public boolean removeSource(final String id) {
+        try {
+            final String url = getServiceURL() + "/configuration?request=removeSource&id=" + id;
+            Object response = sendRequest(url, null);
+            if (response instanceof AcknowlegementType) {
+                final AcknowlegementType ack = (AcknowlegementType) response;
+                if ("Success".equals(ack.getStatus())) {
+                    return true;
+                } else {
+                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                }
+            } else if (response instanceof ExceptionReport) {
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
+    
+    /**
+     * Modify a source provider in the service.
+     * 
+     * @param serviceName The provider type (shapefile, coverage-sql, ...)
+     * @param config The configuration Object to modify on the specific provider file.
+     * @return 
+     */
+    public boolean modifySource(final String serviceName, final ParameterValueGroup config) {
+        try {
+            final String url = getServiceURL() + "/configuration?request=modifySource&serviceName=" + serviceName;
+            final Object response = sendRequest(url, config);
+            if (response instanceof AcknowlegementType) {
+                final AcknowlegementType ack = (AcknowlegementType) response;
+                if ("Success".equals(ack.getStatus())) {
+                    return true;
+                } else {
+                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                }
+            } else if (response instanceof ExceptionReport) {
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
+    
+    /**
+     *Add a new layer to a source provider in the service.
+     * 
+     * @param id The identifier of the source
+     * @return 
+     */
+    public boolean addLayer(final String id, final ParameterValueGroup layer) {
+        try {
+            final String url = getServiceURL() + "/configuration?request=addLayer&id=" + id;
+            Object response = sendRequest(url, layer);
+            if (response instanceof AcknowlegementType) {
+                final AcknowlegementType ack = (AcknowlegementType) response;
+                if ("Success".equals(ack.getStatus())) {
+                    return true;
+                } else {
+                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                }
+            } else if (response instanceof ExceptionReport) {
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
+    
+    /**
+     * Remove a source provider in the service.
+     * 
+     * @param id The identifier of the source
+     * @return 
+     */
+    public boolean removeLayer(final String id, final String layerName) {
+        try {
+            final String url = getServiceURL() + "/configuration?request=removeLayere&id=" + id + "&layerName=" + layerName;
+            Object response = sendRequest(url, null);
+            if (response instanceof AcknowlegementType) {
+                final AcknowlegementType ack = (AcknowlegementType) response;
+                if ("Success".equals(ack.getStatus())) {
+                    return true;
+                } else {
+                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                }
+            } else if (response instanceof ExceptionReport) {
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
+    
+    /**
+     *Add a new layer to a source provider in the service.
+     * 
+     * @param id The identifier of the source
+     * @return 
+     */
+    public boolean modifyLayer(final String id, final String layerName, final ParameterValueGroup layer) {
+        try {
+            final String url = getServiceURL() + "/configuration?request=modifyLayer&id=" + id + "&layerName=" + layerName;
+            Object response = sendRequest(url, layer);
+            if (response instanceof AcknowlegementType) {
+                final AcknowlegementType ack = (AcknowlegementType) response;
+                if ("Success".equals(ack.getStatus())) {
+                    return true;
+                } else {
+                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                }
+            } else if (response instanceof ExceptionReport) {
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
+    
+     private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
+         return sendRequest(sourceURL, request, null);
+     }
+    
     /**
      * Send a request to another service.
      *
@@ -422,7 +594,7 @@ public final class ServiceAdministrator {
      * @throws java.io.IOException
      * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
+    private Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor) throws MalformedURLException, IOException {
 
         final URL source = new URL(sourceURL);
         final URLConnection conec = source.openConnection();
@@ -436,15 +608,25 @@ public final class ServiceAdministrator {
 
                 conec.setDoOutput(true);
                 conec.setRequestProperty("Content-Type", "text/xml");
-                Marshaller marshaller = null;
-                try {
-                    marshaller = POOL.acquireMarshaller();
-                    marshaller.marshal(request, conec.getOutputStream());
-                } catch (JAXBException ex) {
-                    LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
-                } finally {
-                    if (marshaller != null) {
-                        POOL.release(marshaller);
+                if (request instanceof GeneralParameterValue) {
+                    final ParameterValueWriter writer = new ParameterValueWriter();
+                    try {
+                        writer.setOutput(conec.getOutputStream());
+                        writer.write((GeneralParameterValue)request);
+                    } catch (XMLStreamException ex) {
+                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                    }
+                } else {
+                    Marshaller marshaller = null;
+                    try {
+                        marshaller = POOL.acquireMarshaller();
+                        marshaller.marshal(request, conec.getOutputStream());
+                    } catch (JAXBException ex) {
+                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                    } finally {
+                        if (marshaller != null) {
+                            POOL.release(marshaller);
+                        }
                     }
                 }
             }
@@ -453,10 +635,19 @@ public final class ServiceAdministrator {
                 unmarshaller = POOL.acquireUnmarshaller();
                 response = unmarshaller.unmarshal(conec.getInputStream());
                 if (response instanceof JAXBElement) {
-                    response = ((JAXBElement) response).getValue();
+                    JAXBElement element = (JAXBElement) response;
+                    if (element.getName().equals(ObjectFactory.SOURCE_QNAME) || element.getName().equals(ObjectFactory.LAYER_QNAME)) {
+                        final ParameterValueReader reader = new ParameterValueReader(descriptor);
+                        reader.setInput(element.getValue());
+                        response = reader.read();
+                    } else {
+                        response = ((JAXBElement) response).getValue();
+                    }
                 }
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
+            } catch (XMLStreamException ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read general parameter value in response document.\ncause: {0}", ex.getMessage());
             }  catch (IllegalAccessError ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             } finally {

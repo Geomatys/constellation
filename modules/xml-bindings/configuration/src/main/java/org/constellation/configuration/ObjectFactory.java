@@ -35,6 +35,10 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
+    public static final QName SOURCE_QNAME = new QName("http://www.geotoolkit.org/parameter", "source");
+    public static final QName LAYER_QNAME  = new QName("http://www.geotoolkit.org/parameter", "Layer");
+    
+    
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.constellation.configuration
      * 
@@ -106,15 +110,10 @@ public class ObjectFactory {
         return new ExceptionReport();
     }
     
-
-    private static final QName SOURCE_QNAME = new QName("http://www.geotoolkit.org/parameter", "source");
-            
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")
     public JAXBElement<Object> createSource(Object value) {
         return new JAXBElement<Object>(SOURCE_QNAME, Object.class, null, value);
     }
-    
-    private static final QName LAYER_QNAME = new QName("http://www.geotoolkit.org/parameter", "Layer");
             
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "Layer")
     public JAXBElement<Object> createLayer(Object value) {

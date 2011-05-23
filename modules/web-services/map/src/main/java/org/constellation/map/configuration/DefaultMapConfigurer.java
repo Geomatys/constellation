@@ -131,7 +131,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
             for (LayerProvider p : providers) {
                 if (p.getId().equals(sourceId)) {
-                     LayerProviderProxy.getInstance().removeProvider(p);
+                    LayerProviderProxy.getInstance().removeProvider(p);
                     return new AcknowlegementType("Success", "The source has been deleted");
                 }
             }
