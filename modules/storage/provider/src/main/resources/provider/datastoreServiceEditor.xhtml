@@ -7,6 +7,9 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
+    <!-- ensure providerBean is loaded -->
+    <h:outputText value="#{providerBean}" style="display:none;"/>
+    
     <h:outputText value="#{bean.i18n['newsource']}" />
     <span/>
     <h:inputText value="#{bean.newSourceName}" />
@@ -66,6 +69,17 @@
             
             <mf:DataTableColumn width="24px">
                 <mf:switch>
+                    <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode') and node.exist}" fallthrought="false">
+                        <a4j:commandLink action="#{node.show}" 
+                                         oncomplete="window.open('#{contextPath}/provider/mapview.jsf','maptab',config='height=600, width=800, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=yes');">
+                            <h:graphicImage value="provider.view.png.mfRes" style="border:none;"/>
+                        </a4j:commandLink>
+                    </mf:case>
+                </mf:switch>
+            </mf:DataTableColumn>
+            
+            <mf:DataTableColumn width="24px">
+                <mf:switch>
                     <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode') and not node.exist}" fallthrought="false">
                         <a4j:commandLink action="#{node.delete}" reRender="layerPreview">
                             <h:graphicImage value="provider.remove.png.mfRes" style="border:none;"/>
@@ -73,6 +87,7 @@
                     </mf:case>
                 </mf:switch>
             </mf:DataTableColumn>
+            
             
         </mf:Outline>
     </mf:Div>

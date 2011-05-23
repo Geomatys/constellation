@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.el.ELContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -39,13 +40,16 @@ import javax.swing.tree.TreeNode;
 import org.constellation.bean.HighLightRowStyler;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.AbstractProviderProxy;
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderService;
+import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.gui.swing.tree.Trees;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
@@ -442,6 +446,40 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean implements P
             saveConfiguration();
         }
 
+        public void show(){
+
+            final ELContext elContext = FacesContext.getCurrentInstance().getELContext();
+            ProviderBean providerBean = (ProviderBean) FacesContext.getCurrentInstance().getApplication()
+                .getExpressionFactory().createValueExpression(elContext, "#{providerBean}", ProviderBean.class).getValue(elContext);
+            
+            if(providerBean == null){
+                LOGGER.log(Level.WARNING, "ProviderBean not found.");
+                return;
+            }
+            
+            //find the exact name
+            Name layerName = null;
+            for(Name str : provider.getKeys()){
+                if(DefaultName.match(name, str)){
+                    layerName = str;
+                }
+            }
+            
+            if(layerName == null){
+                LOGGER.log(Level.WARNING, "Layer not found : {0}", name);
+                return;
+            }
+            
+            final LayerDetails details = provider.getByIdentifier(layerName);
+            
+            try {
+                providerBean.getMapContext().layers().add(details.getMapLayer(null, null));
+            } catch (PortrayalException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            } 
+                        
+        }
+        
     }
 
 }

@@ -78,7 +78,6 @@
             <artifactId>mapfaces-facelet-editor</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -87,6 +86,12 @@
         <dependency>
             <groupId>net.iharder</groupId>
             <artifactId>base64</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>el-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
