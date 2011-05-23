@@ -334,6 +334,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             //search only the given list
             for (final QName name : names) {
+                if (name == null) continue;
+                
                 final Name n = Utils.getNameFromQname(name);
                 if (layersContainsKey(n) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + name);
