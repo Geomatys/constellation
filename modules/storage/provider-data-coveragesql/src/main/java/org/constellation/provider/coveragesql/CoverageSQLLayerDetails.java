@@ -55,7 +55,6 @@ import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.MeasurementRange;
-import org.opengis.coverage.grid.RectifiedGrid;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -168,7 +167,9 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
             style = RANDOM_FACTORY.createRasterStyle();
         }
 
-        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
+        final String title = getName().getLocalPart();
+        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, title);
+        mapLayer.setDescription(STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style
         search_loop:

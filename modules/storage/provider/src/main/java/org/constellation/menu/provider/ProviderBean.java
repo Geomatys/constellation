@@ -73,7 +73,6 @@ public class ProviderBean extends I18NBean implements PropertyChangeListener{
     }
 
     public void show(){
-        this.context.layers().clear();
 
         final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         final String nodeId = context.getRequestParameterMap().get("currentNodeId");
@@ -97,7 +96,7 @@ public class ProviderBean extends I18NBean implements PropertyChangeListener{
             } catch (PortrayalException ex) {
                 Logger.getLogger(ProviderBean.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+        }        
     }
 
     public MapContext getMapContext() {

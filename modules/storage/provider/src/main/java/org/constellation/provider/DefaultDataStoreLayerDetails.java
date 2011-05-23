@@ -70,7 +70,9 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
         layer.setElevationRange(elevationStartField, elevationEndField);
         layer.setTemporalRange(dateStartField, dateEndField);
 
-        layer.setName(getName().getLocalPart());
+        final String title = getName().getLocalPart();
+        layer.setName(title);        
+        layer.setDescription(STYLE_FACTORY.description(title,title));
         
         return layer;
     }

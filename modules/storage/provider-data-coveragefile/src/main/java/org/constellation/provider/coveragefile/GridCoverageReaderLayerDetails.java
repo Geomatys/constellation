@@ -31,8 +31,8 @@ import org.constellation.provider.AbstractLayerDetails;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
-import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
@@ -45,7 +45,6 @@ import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
-import org.opengis.coverage.grid.RectifiedGrid;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -128,7 +127,9 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
             style = RANDOM_FACTORY.createRasterStyle();
         }
 
-        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
+        final String title = getName().getLocalPart();
+        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, title);
+        mapLayer.setDescription(STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style
         search_loop:
