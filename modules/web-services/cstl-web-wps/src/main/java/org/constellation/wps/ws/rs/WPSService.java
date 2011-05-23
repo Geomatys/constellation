@@ -47,6 +47,7 @@ import org.geotoolkit.ows.xml.ExceptionResponse;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
+import org.geotoolkit.ows.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.DataType;
@@ -167,7 +168,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
             if (objectRequest instanceof GetCapabilities){
                 final GetCapabilities getcaps = (GetCapabilities)objectRequest;
                 //serviceDef              = getVersionFromNumber(getcaps.getVersion());
-
+                final GetCapabilitiesType owsGetCap = new GetCapabilitiesType(getcaps.getAcceptVersions(), null, null, null, getcaps.getService());
                 final WPSCapabilitiesType capsResponse = worker.getCapabilities(getcaps);
                 return Response.ok(capsResponse, MimeType.TEXT_XML).build();
             }
