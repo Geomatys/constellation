@@ -41,8 +41,10 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -413,7 +415,7 @@ public final class ServiceAdministrator {
      */
     public boolean newSource(final String serviceName, final ParameterValueGroup config) {
         try {
-            final String url = getServiceURL() + "/configuration?request=addSource&serviceName=" + serviceName;
+            final String url = getServiceURL() + "configuration?request=addSource&serviceName=" + serviceName;
             Object response = sendRequest(url, config);
             if (response instanceof AcknowlegementType) {
                 return true;
@@ -434,7 +436,7 @@ public final class ServiceAdministrator {
      */
     public GeneralParameterValue getSource(final String id, final ParameterDescriptorGroup descriptor) {
         try {
-            final String url = getServiceURL() + "/configuration?request=getSource&id=" + id;
+            final String url = getServiceURL() + "configuration?request=getSource&id=" + id;
             Object response = sendRequest(url, null, descriptor);
             if (response instanceof GeneralParameterValue) {
                 return (GeneralParameterValue) response;
@@ -455,7 +457,7 @@ public final class ServiceAdministrator {
      */
     public boolean removeSource(final String id) {
         try {
-            final String url = getServiceURL() + "/configuration?request=removeSource&id=" + id;
+            final String url = getServiceURL() + "configuration?request=removeSource&id=" + id;
             Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ack = (AcknowlegementType) response;
@@ -482,7 +484,7 @@ public final class ServiceAdministrator {
      */
     public boolean modifySource(final String serviceName, final ParameterValueGroup config) {
         try {
-            final String url = getServiceURL() + "/configuration?request=modifySource&serviceName=" + serviceName;
+            final String url = getServiceURL() + "configuration?request=modifySource&serviceName=" + serviceName;
             final Object response = sendRequest(url, config);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ack = (AcknowlegementType) response;
@@ -508,7 +510,7 @@ public final class ServiceAdministrator {
      */
     public boolean addLayer(final String id, final ParameterValueGroup layer) {
         try {
-            final String url = getServiceURL() + "/configuration?request=addLayer&id=" + id;
+            final String url = getServiceURL() + "configuration?request=addLayer&id=" + id;
             Object response = sendRequest(url, layer);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ack = (AcknowlegementType) response;
@@ -534,7 +536,7 @@ public final class ServiceAdministrator {
      */
     public boolean removeLayer(final String id, final String layerName) {
         try {
-            final String url = getServiceURL() + "/configuration?request=removeLayere&id=" + id + "&layerName=" + layerName;
+            final String url = getServiceURL() + "configuration?request=removeLayere&id=" + id + "&layerName=" + layerName;
             Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ack = (AcknowlegementType) response;
@@ -560,7 +562,7 @@ public final class ServiceAdministrator {
      */
     public boolean modifyLayer(final String id, final String layerName, final ParameterValueGroup layer) {
         try {
-            final String url = getServiceURL() + "/configuration?request=modifyLayer&id=" + id + "&layerName=" + layerName;
+            final String url = getServiceURL() + "configuration?request=modifyLayer&id=" + id + "&layerName=" + layerName;
             Object response = sendRequest(url, layer);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ack = (AcknowlegementType) response;
@@ -576,6 +578,29 @@ public final class ServiceAdministrator {
             LOGGER.log(Level.WARNING, null, ex);
         }
         return false;
+    }
+    
+    /**
+     * Get the source provider configuration.
+     * 
+     * @param id The identifier of the source
+     * @return 
+     */
+    public GeneralParameterDescriptor getDescriptor(final String serviceName) {
+        try {
+            final String url = getServiceURL() + "configuration?request=getDescriptor&serviceName=" + serviceName;
+            Object response = sendDescriptorRequest(url, null);
+            if (response instanceof GeneralParameterDescriptor) {
+                return (GeneralParameterDescriptor) response;
+            } else if (response instanceof ExceptionReport) {
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+            } else {
+                LOGGER.warning("Unexpected response type :" + response);
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return null;
     }
     
      private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
@@ -654,6 +679,65 @@ public final class ServiceAdministrator {
                 if (unmarshaller != null) {
                     POOL.release(unmarshaller);
                 }
+            }
+        } catch (IOException ex) {
+            LOGGER.severe("The Distant service have made an error");
+            return null;
+        }
+        return response;
+    }
+    
+    /**
+     * Send a request to another service.
+     *
+     * @param sourceURL the URL of the distant web-service
+     * @param request The XML object to send in POST mode (if null the request is GET)
+     *
+     * @return The object corresponding to the XML response of the distant web-service
+     *
+     * @throws java.net.MalformedURLException
+     * @throws java.io.IOException
+     * @throws org.constellation.coverage.web.CstlServiceException
+     */
+    private Object sendDescriptorRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
+
+        final URL source = new URL(sourceURL);
+        final URLConnection conec = source.openConnection();
+        authentifyConnection(conec);
+        Object response = null;
+
+        try {
+
+            // for a POST request
+            if (request != null) {
+
+                conec.setDoOutput(true);
+                conec.setRequestProperty("Content-Type", "text/xml");
+                Marshaller marshaller = null;
+                try {
+                    marshaller = POOL.acquireMarshaller();
+                    marshaller.marshal(request, conec.getOutputStream());
+                } catch (JAXBException ex) {
+                    LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                } finally {
+                    if (marshaller != null) {
+                        POOL.release(marshaller);
+                    }
+                }
+                
+            }
+            try {
+                final ParameterDescriptorReader reader = new ParameterDescriptorReader();
+                reader.setInput(conec.getInputStream());
+                reader.read();
+                response = reader.getDescriptorsRoot();
+                
+            } catch (ClassNotFoundException ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read response document.\ncause: {0}", ex.getMessage());
+            } catch (XMLStreamException ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read general parameter descriptor in response document.\ncause: {0}", ex.getMessage());
+            }  catch (IllegalAccessError ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             }
         } catch (IOException ex) {
             LOGGER.severe("The Distant service have made an error");

@@ -51,6 +51,14 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
                                 + "org.geotoolkit.ows.xml.v100");
     }
     
+    @AfterClass
+    public static void finish() {
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
+    }
+    
     @Test
     public void testRestart() throws Exception {
      

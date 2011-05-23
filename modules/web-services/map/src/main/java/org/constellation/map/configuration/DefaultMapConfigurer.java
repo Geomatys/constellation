@@ -36,6 +36,7 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.ParameterValueGroup;
 
+import static org.constellation.ws.ExceptionCode.*;
 import static org.geotoolkit.parameter.Parameters.*;
 
 /**
@@ -75,7 +76,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     throw new CstlServiceException(ex);
                 }
             } else {
-                throw new CstlServiceException("No provider service for: " + serviceName + " has been found");
+                throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
             }
             
         } else if ("modifySource".equalsIgnoreCase(request)) {
@@ -110,7 +111,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     throw new CstlServiceException(ex);
                 }
             } else {
-                throw new CstlServiceException("No descriptor for: " + serviceName + " has been found");
+                throw new CstlServiceException("No descriptor for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
             }
             
         } else if ("getSource".equalsIgnoreCase(request)) {
@@ -225,7 +226,15 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     throw new CstlServiceException(ex);
                 }
             return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
-        }
+        
+        } else if ("getDescriptor".equalsIgnoreCase(request)) {
+            final String serviceName = getParameter("serviceName", true, parameters);
+            final LayerProviderService service = services.get(serviceName);
+            if (service != null) {
+                return service.getDescriptor();
+            }
+            throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
+        }        
         
         return null;
     }
