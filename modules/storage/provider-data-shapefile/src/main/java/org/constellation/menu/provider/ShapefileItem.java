@@ -34,7 +34,7 @@ public class ShapefileItem extends AbstractMenuItem{
                 "/provider/shapefileConfig.xhtml",
                 "/provider/shapefileLayerConfig.xhtml"},
             "provider.shapefile",
-            new Path(PROVIDERS_PATH,"Shapefile", "/provider/shapefile.xhtml", null,400)
+            new Path(PROVIDERS_DATA_PATH,"Shapefile", "/provider/shapefile.xhtml", null,400)
             );
     }
 

@@ -33,7 +33,7 @@ public class SLDItem extends AbstractMenuItem{
                 "/provider/sld.xhtml",
                 "/provider/sldConfig.xhtml"},
             "provider.sld",
-            new Path(PROVIDERS_PATH,"SLD Styles", "/provider/sld.xhtml", null,900)
+            new Path(PROVIDERS_STYLE_PATH,"SLD Styles", "/provider/sld.xhtml", null,900)
             );
     }
 

@@ -34,7 +34,7 @@ public class OMItem extends AbstractMenuItem{
                 "/provider/omConfig.xhtml",
                 "/provider/omLayerConfig.xhtml"},
             "provider.om",
-            new Path(PROVIDERS_PATH,"O&M", "/provider/om.xhtml", null,500)
+            new Path(PROVIDERS_DATA_PATH,"O&M", "/provider/om.xhtml", null,500)
             );
     }
 
