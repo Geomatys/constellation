@@ -379,7 +379,7 @@
 			<xsl:choose>
 				<xsl:when test="starts-with($schemaFile,'http')">
 					<parsers:XMLValidatingParser ignoreErrors="false">
-					<parsers:schema type="url">http://www.w3.org/2001/xml.xsd</parsers:schema>
+					<parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>
 					<xsl:if test="$schemaFile='http://schemas.opengis.net/om/1.0.0/om.xsd'">
 							<parsers:schema type="url">http://schemas.opengis.net/sampling/1.0.0/sampling.xsd</parsers:schema>						
 					</xsl:if>
@@ -393,7 +393,7 @@
 				<xsl:otherwise>
 					<parsers:XMLValidatingParser ignoreErrors="false">
 						<parsers:schemas>
-							<parsers:schema type="url">http://www.w3.org/2001/xml.xsd</parsers:schema>						
+							<parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>						
 							<parsers:schema type="file">
 								<xsl:value-of select="$schemaFile"/>
 							</parsers:schema>						
