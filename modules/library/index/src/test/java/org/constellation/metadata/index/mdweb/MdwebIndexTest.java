@@ -18,6 +18,7 @@
 package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
+import org.mdweb.model.storage.TextValue;
 import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -25,6 +26,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// MDWeb dependencies
+import org.mdweb.model.storage.Value;
+import org.mdweb.io.Reader;
+import org.mdweb.model.storage.Form;
+import org.mdweb.io.MD_IOFactory;
 
 // Constellation dependencies
 import org.constellation.util.Util;
@@ -204,6 +210,40 @@ public class MdwebIndexTest {
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
+        
+        /**
+         * Test 4 simple search: Title = 92005711.ctd
+         */
+        spatialQuery = new SpatialQuery("Title:\"92005711.ctd\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "SimpleSearch 4:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("40510_145_19930221211500");
+        
+
+        assertEquals(expectedResult, result);
+        
+        /**
+         * Test 5 simple search: creator = IFREMER / IDM/SISMER
+         */
+        spatialQuery = new SpatialQuery("creator:\"IFREMER / IDM/SISMER\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "SimpleSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("40510_145_19930221211500");
+        
+
+        assertEquals(expectedResult, result);
     }
 
      /**
@@ -253,7 +293,7 @@ public class MdwebIndexTest {
         assertEquals(expectedResult, result);
 
         /**
-         * Test 3 wildChar search: title like *.ctd
+         * Test 3 wildChar search: Title like *.ctd
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("Title:*.ctd", nullFilter, SerialChainFilter.AND);
@@ -269,9 +309,30 @@ public class MdwebIndexTest {
         assertTrue(result.contains("39727_22_19750113062500"));
         assertTrue(result.contains("40510_145_19930221211500"));
         
+        assertEquals(4, result.size());
+        
+        /**
+         * Test 4 wildChar search: title like *.ctd
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("title:*.ctd", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "wilCharSearch 4:\n{0}", resultReport);
+
+        assertTrue(result.contains("42292_5p_19900609195600"));
+        assertTrue(result.contains("42292_9s_19900610041000"));
+        assertTrue(result.contains("39727_22_19750113062500"));
+        assertTrue(result.contains("40510_145_19930221211500"));
+        
+        assertEquals(4, result.size());
+        
 
         /**
-         * Test 4 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
+         * Test 5 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
          */
         spatialQuery = new SpatialQuery("abstract:(*onnees CTD NEDIPROD VI 120)", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
@@ -280,7 +341,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
+        logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -718,5 +779,29 @@ public class MdwebIndexTest {
         assertEquals(expectedResult, result);
     }
 
+    @Test
+    public void extractValuesTest() throws Exception {
+        
+        Reader reader = MD_IOFactory.getReaderInstance(ds, false);
+        Form form = reader.getForm("40510_145_19930221211500");
+        
+        assertNotNull(form);
+        
+        List<Value> result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date", form);
+        assertEquals(0, result.size());
+        
+        
+        result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=revision:date", form);
+        assertEquals(1, result.size());
+        
+        result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=originator:organisationName:value", form);
+        assertEquals(1, result.size());
+        assertTrue(result.get(0) instanceof TextValue);
+        TextValue resultValue = (TextValue)result.get(0);
+        assertEquals("IFREMER / IDM/SISMER", resultValue.getValue());
+        
+        result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=custodian:organisationName:value", form);
+        assertEquals(0, result.size());
+    }
 }
 

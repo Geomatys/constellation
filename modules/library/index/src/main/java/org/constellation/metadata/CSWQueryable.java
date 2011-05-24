@@ -67,7 +67,9 @@ public final class CSWQueryable {
         //MANDATORY
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title:value");
         ISO_QUERYABLE.put("Title", paths);
         
         paths = new ArrayList<String>();
@@ -150,18 +152,18 @@ public final class CSWQueryable {
         ISO_QUERYABLE.put("AlternateTitle",   paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=revision");
-        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:date:date#dateType=revision");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=revision:date");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:date#dateType=revision:date");
         ISO_QUERYABLE.put("RevisionDate",  paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=creation");
-        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:date:date#dateType=creation");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:date#dateType=creation:date");
         ISO_QUERYABLE.put("CreationDate",  paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date:date#dateType=publication");
-        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:date:date#dateType=publication");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=publication:date");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:date#dateType=publication:date");
         ISO_QUERYABLE.put("PublicationDate",  paths);
       
         paths = new ArrayList<String>();
@@ -291,15 +293,19 @@ public final class CSWQueryable {
          */
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:title:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title:value");
         paths.add("Catalog Web Service:Record:title:content");
         paths.add("Ebrim v3.0:*:name:localizedString:value");
         paths.add("Ebrim v2.5:*:name:localizedString:value");
         DUBLIN_CORE_QUERYABLE.put("title", paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=originator");
-        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact:organisationName#role=originator");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=originator:organisationName:value");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=originator:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=originator:organisationName:value");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=originator:organisationName");
         paths.add("Catalog Web Service:Record:creator:content");
         DUBLIN_CORE_QUERYABLE.put("creator", paths);
         
@@ -324,14 +330,14 @@ public final class CSWQueryable {
         DUBLIN_CORE_QUERYABLE.put("abstract", paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=publisher");
-        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact:organisationName#role=publisher");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=publisher:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=publisher:organisationName");
         paths.add("Catalog Web Service:Record:publisher:content");
         DUBLIN_CORE_QUERYABLE.put("publisher", paths);
         
         paths = new ArrayList<String>();
-        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=author");
-        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact:organisationName#role=author");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=author:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=author:organisationName");
         paths.add("Catalog Web Service:Record:contributor:content");
         DUBLIN_CORE_QUERYABLE.put("contributor", paths);
         

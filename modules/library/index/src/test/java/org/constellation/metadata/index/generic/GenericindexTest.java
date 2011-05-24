@@ -18,9 +18,12 @@
 package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
+import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.util.logging.Logging;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,6 +50,9 @@ import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.geotoolkit.metadata.iso.citation.DefaultCitation;
+import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
@@ -55,6 +61,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 //Junit dependencies
 import org.junit.*;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.metadata.citation.DateType;
 import static org.junit.Assert.*;
 
 /**
@@ -169,6 +176,40 @@ public class GenericindexTest {
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
+        
+        /**
+         * Test 4 simple search: Title = 92005711.ctd
+         */
+        spatialQuery = new SpatialQuery("Title:\"92005711.ctd\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "SimpleSearch 4:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("40510_145_19930221211500");
+        
+
+        assertEquals(expectedResult, result);
+        
+        /**
+         * Test 5 simple search: creator = IFREMER / IDM/SISMER
+         */
+        spatialQuery = new SpatialQuery("creator:\"IFREMER / IDM/SISMER\"", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "SimpleSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("40510_145_19930221211500");
+        
+
+        assertEquals(expectedResult, result);
     }
 
      /**
@@ -217,7 +258,7 @@ public class GenericindexTest {
         assertEquals(expectedResult, result);
 
         /**
-         * Test 3 wildChar search: title like *.ctd
+         * Test 3 wildChar search: Title like *.ctd
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("Title:*.ctd", nullFilter, SerialChainFilter.AND);
@@ -232,9 +273,30 @@ public class GenericindexTest {
         assertTrue(result.contains("40510_145_19930221211500"));
         assertTrue(result.contains("42292_5p_19900609195600"));
         assertTrue(result.contains("42292_9s_19900610041000"));
+        
+        assertEquals(4, result.size());
+        
+        /**
+         * Test 4 wildChar search: title like *.ctd
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("title:*.ctd", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
 
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "wilCharSearch 4:\n{0}", resultReport);
+
+        assertTrue(result.contains("39727_22_19750113062500"));
+        assertTrue(result.contains("40510_145_19930221211500"));
+        assertTrue(result.contains("42292_5p_19900609195600"));
+        assertTrue(result.contains("42292_9s_19900610041000"));
+
+        assertEquals(4, result.size());
+        
          /**
-         * Test 4 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
+         * Test 5 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
          */
         spatialQuery = new SpatialQuery("abstract:(*onnees CTD NEDIPROD VI 120)", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
@@ -243,7 +305,7 @@ public class GenericindexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
+        logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -599,7 +661,7 @@ public class GenericindexTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void DeteteDocumentTest() throws Exception {
+    public void DeleteDocumentTest() throws Exception {
         indexer.removeDocument("CTDF02");
 
         indexSearcher.refresh();
@@ -629,6 +691,32 @@ public class GenericindexTest {
         expectedResult = null;
 
         assertEquals(expectedResult, result);
+    }
+    
+    
+    @Test
+    public void extractValuesTest() throws Exception {
+        DefaultMetadata meta = new DefaultMetadata();
+        DefaultDataIdentification ident = new DefaultDataIdentification();
+        DefaultCitation citation = new DefaultCitation();
+        Date d = new Date(0);
+        DefaultCitationDate date = new DefaultCitationDate(d, DateType.CREATION);
+        citation.setDates(Arrays.asList(date));
+        ident.setCitation(citation);
+        meta.setIdentificationInfo(Arrays.asList(ident));
+        String result = GenericIndexer.extractValues(meta, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date"));
+        assertEquals("19700101", result);
+        
+        DefaultMetadata meta2 = new DefaultMetadata();
+        DefaultDataIdentification ident2 = new DefaultDataIdentification();
+        DefaultCitation citation2 = new DefaultCitation();
+        Date d2 = new Date(0);
+        DefaultCitationDate date2 = new DefaultCitationDate(d2, DateType.REVISION);
+        citation2.setDates(Arrays.asList(date2));
+        ident2.setCitation(citation2);
+        meta2.setIdentificationInfo(Arrays.asList(ident2));
+        result = GenericIndexer.extractValues(meta2, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date"));
+        assertEquals("null", result);
     }
 
     public static List<Object> fillTestData() throws JAXBException {

@@ -351,8 +351,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      *
      * @throws MD_IOException
      */
-    private List<Value> getValuesFromPathID(String fullPathID, final Form form) throws MD_IOException {
-        final String pathID;
+    public static List<Value> getValuesFromPathID(String fullPathID, final Form form) throws MD_IOException {
+        String pathID            = null;
         String conditionalPathID = null;
         String conditionalValue  = null;
         int ordinal              = -1;
@@ -361,8 +361,12 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         final int separator = fullPathID.indexOf('#');
         if (separator != -1) {
             pathID            = fullPathID.substring(0, separator);
-            conditionalPathID = pathID.substring(0, pathID.lastIndexOf(':') + 1) + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
-            conditionalValue  = fullPathID.substring(fullPathID.indexOf('=') + 1);
+            conditionalPathID = fullPathID.substring(0, fullPathID.indexOf('='));
+            conditionalPathID = conditionalPathID.replace('#', ':');
+            final String temp = fullPathID.substring(fullPathID.indexOf('=') + 1);
+            conditionalValue  = temp.substring(0, temp.indexOf(':'));
+            pathID            = pathID + temp.substring(temp.indexOf(':'));
+            
             LOGGER.finer("pathID           : " + pathID + '\n'
                        + "conditionalPathID: " + conditionalPathID + '\n'
                        + "conditionalValue : " + conditionalValue);
@@ -396,7 +400,12 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             }
 
         } else {
-            values = Collections.singletonList(form.getConditionalValueFromPath(pathID, conditionalPathID, conditionalValue));
+            final Value v = form.getConditionalValueFromPath(pathID, conditionalPathID, conditionalValue);
+            if (v != null) {
+                values = Collections.singletonList(v);
+            } else {
+                values = new ArrayList<Value>();
+            }
         }
         return values;
     }

@@ -363,6 +363,13 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                     pathID               = fullPathID.substring(0, separator);
                     conditionalAttribute = fullPathID.substring(separator + 1, fullPathID.indexOf('='));
                     conditionalValue     = fullPathID.substring(fullPathID.indexOf('=') + 1);
+                    int nextSeparator    = conditionalValue.indexOf(':');
+                    if (nextSeparator == -1) {
+                        throw new IllegalArgumentException("A conditionnal path must be in the form ....:attribute#attibuteconditional=value:otherattribute");
+                    } else {
+                        pathID = pathID + conditionalValue.substring(nextSeparator);
+                        conditionalValue = conditionalValue.substring(0, nextSeparator);
+                    }
                     LOGGER.finer("pathID              : " + pathID               + '\n' +
                                  "conditionalAttribute: " + conditionalAttribute + '\n' +
                                  "conditionalValue    : " + conditionalValue); 
