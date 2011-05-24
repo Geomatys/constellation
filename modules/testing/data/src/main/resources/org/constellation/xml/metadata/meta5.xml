@@ -317,8 +317,13 @@
                     </gmd:citedResponsibleParty>
                 </gmd:CI_Citation>
             </gmd:citation>
-            <gmd:abstract>
+            <gmd:abstract xsi:type="gmd:PT_FreeText_PropertyType">
                 <gco:CharacterString>Donnees CTD COARE POI 165</gco:CharacterString>
+                <gmd:PT_FreeText>
+                    <gmd:textGroup>
+                        <gmd:LocalisedCharacterString locale="#locale-eng">Data CTD COARE POI 165</gmd:LocalisedCharacterString>
+                    </gmd:textGroup>
+                </gmd:PT_FreeText>
             </gmd:abstract>
             <gmd:pointOfContact>
                 <gmd:CI_ResponsibleParty>

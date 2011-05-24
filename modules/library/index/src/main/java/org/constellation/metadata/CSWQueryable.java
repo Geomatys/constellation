@@ -59,7 +59,9 @@ public final class CSWQueryable {
          */
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:topicCategory");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:topicCategory");
         ISO_QUERYABLE.put("Subject", paths);
@@ -74,7 +76,9 @@ public final class CSWQueryable {
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:abstract");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:abstract:value");
         ISO_QUERYABLE.put("Abstract", paths);
         
         /*MANDATORY
@@ -83,7 +87,9 @@ public final class CSWQueryable {
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");
+        paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name:value");
         paths.add("ISO 19115-2:MI_Metadata:distributionInfo:distributionFormat:name");
+        paths.add("ISO 19115-2:MI_Metadata:distributionInfo:distributionFormat:name:value");
         ISO_QUERYABLE.put("Format", paths);
         
         //MANDATORY
@@ -148,7 +154,9 @@ public final class CSWQueryable {
          */ 
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:alternateTitle");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:alternateTitle:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:alternateTitle");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:alternateTitle:value");
         ISO_QUERYABLE.put("AlternateTitle",   paths);
         
         paths = new ArrayList<String>();
@@ -168,16 +176,24 @@ public final class CSWQueryable {
       
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName:value");
         // TODO remove the following path are not normalized
         paths.add("ISO 19115:MD_Metadata:contact:organisationName");
+        paths.add("ISO 19115:MD_Metadata:contact:organisationName:value");
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName");
+        paths.add("ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName:value");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:organisationName");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:organisationName:value");
 
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact:organisationName:value");
         // TODO remove the following path are not normalized
         paths.add("ISO 19115-2:MI_Metadata:contact:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:contact:organisationName:value");
         paths.add("ISO 19115-2:MI_Metadata:distributionInfo:distributor:distributorContact:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:distributionInfo:distributor:distributorContact:organisationName:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:citedResponsibleParty:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:citedResponsibleParty:organisationName:value");
         ISO_QUERYABLE.put("OrganisationName", paths);
         
         //TODO If an instance of the class MD_SecurityConstraint exists for a resource, the “HasSecurityConstraints” is “true”, otherwise “false”
@@ -311,8 +327,10 @@ public final class CSWQueryable {
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:topicCategory");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:topicCategory");
         paths.add("Catalog Web Service:Record:subject:content");
         //TODO @name = “http://purl.org/dc/elements/1.1/subject”
@@ -323,7 +341,9 @@ public final class CSWQueryable {
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:abstract");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:abstract:value");
         paths.add("Catalog Web Service:Record:abstract:content");
         paths.add("Ebrim v3.0:*:description:localizedString:value");
         paths.add("Ebrim v2.5:*:description:localizedString:value");
@@ -331,13 +351,17 @@ public final class CSWQueryable {
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=publisher:organisationName");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=publisher:organisationName:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=publisher:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=publisher:organisationName:value");
         paths.add("Catalog Web Service:Record:publisher:content");
         DUBLIN_CORE_QUERYABLE.put("publisher", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=author:organisationName");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=author:organisationName:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=author:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:pointOfContact#role=author:organisationName:value");
         paths.add("Catalog Web Service:Record:contributor:content");
         DUBLIN_CORE_QUERYABLE.put("contributor", paths);
         
@@ -357,7 +381,9 @@ public final class CSWQueryable {
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");
+        paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name:value");
         paths.add("ISO 19115-2:MI_Metadata:distributionInfo:distributionFormat:name");
+        paths.add("ISO 19115-2:MI_Metadata:distributionInfo:distributionFormat:name:value");
         paths.add("Catalog Web Service:Record:format:content");
         paths.add("Ebrim v3.0:*:mimeType");
         paths.add("Ebrim v2.5:*:mimeType");
@@ -390,7 +416,9 @@ public final class CSWQueryable {
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:title");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:title:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:title");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:title:value");
         paths.add("Catalog Web Service:Record:relation:content");
         DUBLIN_CORE_QUERYABLE.put("relation", paths);
         
@@ -545,7 +573,9 @@ public final class CSWQueryable {
 
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:otherConstraints");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:otherConstraints:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:otherConstraints");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:otherConstraints:value");
         INSPIRE_QUERYABLE.put("OtherConstraints", paths);
 
         paths = new ArrayList<String>();
@@ -555,22 +585,30 @@ public final class CSWQueryable {
 
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:useLimitation");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:useLimitation:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:useLimitation");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraints:useLimitation:value");
         INSPIRE_QUERYABLE.put("ConditionApplyingToAccessAndUse", paths);
 
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:contact:organisationName");
+        paths.add("ISO 19115:MD_Metadata:contact:organisationName:value");
         paths.add("ISO 19115-2:MI_Metadata:contact:organisationName");
+        paths.add("ISO 19115-2:MI_Metadata:contact:organisationName:value");
         INSPIRE_QUERYABLE.put("MetadataPointOfContact", paths);
 
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:dataQualityInfo:lineage:statement");
+        paths.add("ISO 19115:MD_Metadata:dataQualityInfo:lineage:statement:value");
         paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:lineage:statement");
+        paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:lineage:statement:value");
         INSPIRE_QUERYABLE.put("Lineage", paths);
 
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:title");
+        paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:title:value");
         paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:report:result:specification:title");
+        paths.add("ISO 19115-2:MI_Metadata:dataQualityInfo:report:result:specification:title:value");
         INSPIRE_QUERYABLE.put("SpecificationTitle", paths);
 
         paths = new ArrayList<String>();
