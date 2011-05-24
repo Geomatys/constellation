@@ -19,6 +19,7 @@ package org.constellation.ws.embedded;
 import org.constellation.admin.service.ServiceAdministrator;
 import org.geotoolkit.xml.MarshallerPool;
 import javax.xml.bind.JAXBException;
+import java.io.File;
 import org.junit.*;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import static org.junit.Assert.*;
@@ -40,6 +41,14 @@ public class ServiceAdministratorTest extends AbstractTestRequest {
                                 + "org.geotoolkit.csw.xml.v202:"
                                 + "org.geotoolkit.internal.jaxb.geometry:"
                                 + "org.geotoolkit.ows.xml.v100");
+    }
+    
+    @AfterClass
+    public static void finish() {
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
     }
     
     @Test
