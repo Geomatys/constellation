@@ -80,22 +80,24 @@ public class GenericindexTest {
     private static AbstractIndexSearcher indexSearcher;
 
     private static GenericIndexer indexer;
+    
+    private static final File configDirectory  = new File("GenericIndexTest");
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        File configDirectory      = new File("GenericIndexTest");
-        FileUtilities.deleteDirectory(new File("GenericIndexTest"));
+        
+        FileUtilities.deleteDirectory(configDirectory);
         List<Object> object       = fillTestData();
         indexer                    = new GenericIndexer(object, null, configDirectory, "");
         indexSearcher               = new AbstractIndexSearcher(configDirectory, "");
-        indexer.setLogLevel(Level.FINER);
-        indexSearcher.setLogLevel(Level.FINER);
+        //indexer.setLogLevel(Level.FINER);
+        //indexSearcher.setLogLevel(Level.FINER);
         
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        FileUtilities.deleteDirectory(new File("GenericIndexTest"));
+        FileUtilities.deleteDirectory(configDirectory);
         indexer.destroy();
         indexSearcher.destroy();
     }

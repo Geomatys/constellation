@@ -36,6 +36,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ObjectFactory;
+import org.constellation.configuration.ProviderReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import org.geotoolkit.util.ArgumentChecks;
@@ -596,6 +597,25 @@ public final class ServiceAdministrator {
                 LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
             } else {
                 LOGGER.warning("Unexpected response type :" + response);
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return null;
+    }
+    
+    public ProviderReport listProviders() {
+        try {
+            final String url = getServiceURL() + "configuration?request=listProviders";
+            final Object response = sendRequest(url, null);
+            if (response instanceof ProviderReport) {
+                return (ProviderReport) response;
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return null;
+            } else {
+                LOGGER.warning("The service respond uncorrectly");
+                return null;
             }
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, null, ex);

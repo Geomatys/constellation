@@ -17,6 +17,9 @@
 
 package org.constellation.map.configuration;
 
+import org.constellation.configuration.Provider;
+import java.util.ArrayList;
+import java.util.List;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.GeneralParameterValue;
 import java.io.IOException;
@@ -27,6 +30,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.stream.XMLStreamException;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ProviderReport;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
@@ -195,7 +199,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             
             final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
                 try {
-                    // we read the soruce parameter to add
+                    // we read the source parameter to add
                     reader.setInput(objectRequest);
                     ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
                     reader.dispose();
@@ -234,6 +238,20 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 return service.getDescriptor();
             }
             throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
+        
+        } else if ("listProviders".equalsIgnoreCase(request)) {
+            List<Provider> providerDesc = new ArrayList<Provider>();
+            for (LayerProviderService service: services.values()) {
+                List<String> sources = new ArrayList<String>();
+                Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+                for (LayerProvider p : providers) {
+                    if (p.getService().equals(service)) {
+                        sources.add(p.getId());
+                    }
+                }
+                providerDesc.add(new Provider(service.getName(), sources));
+            }
+            return new ProviderReport(providerDesc);
         }        
         
         return null;
