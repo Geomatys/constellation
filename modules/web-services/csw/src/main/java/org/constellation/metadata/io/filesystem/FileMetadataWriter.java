@@ -156,7 +156,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      */
     @Override
     public boolean deleteMetadata(final String metadataID) throws MetadataIoException {
-        final File metadataFile = new File (dataDirectory,  metadataID + ".xml");
+        final File metadataFile = FileMetadataReader.getFileFromIdentifier(metadataID, dataDirectory);
         if (metadataFile.exists()) {
            final boolean suceed =  metadataFile.delete();
            if (suceed) {
@@ -181,6 +181,12 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         return storeMetadata(any);
     }
 
+    @Override
+    public boolean isAlreadyUsedIdentifier(String metadataID) throws MetadataIoException {
+        final File f = FileMetadataReader.getFileFromIdentifier(metadataID, dataDirectory);
+        return f != null;
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -541,7 +547,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * @throws org.constellation.ws.MetadataIoException
      */
     private Object getObjectFromFile(String identifier) throws MetadataIoException {
-        final File metadataFile = new File (dataDirectory,  identifier + ".xml");
+        final File metadataFile = FileMetadataReader.getFileFromIdentifier(identifier, dataDirectory);
         if (metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {

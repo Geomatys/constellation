@@ -29,15 +29,19 @@ public interface MetadataWriter {
      * @param obj The object to store in the datasource.
      * @return true if the storage succeed, false else.
      */
-    boolean storeMetadata(Object obj) throws MetadataIoException;
+    boolean storeMetadata(final Object obj) throws MetadataIoException;
 
     /**
      * Delete an object in the metadata database.
      * @param metadataID The identifier of the metadata to delete.
      * @return true if the delete succeed, false else.
      */
-    boolean deleteMetadata(String metadataID) throws MetadataIoException;
+    boolean deleteMetadata(final String metadataID) throws MetadataIoException;
 
+    /**
+     * Return true if the specified id is already used in the database.
+     */
+    boolean isAlreadyUsedIdentifier(final String metadataID) throws MetadataIoException;
 
     /**
      * Replace an object in the metadata datasource.

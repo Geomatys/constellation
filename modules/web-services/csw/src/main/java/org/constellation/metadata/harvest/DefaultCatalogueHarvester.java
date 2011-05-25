@@ -17,6 +17,7 @@
 package org.constellation.metadata.harvest;
 
 // J2SE dependencies
+import org.constellation.metadata.utils.Utils;
 import org.geotoolkit.csw.xml.AbstractRecord;
 import org.geotoolkit.csw.xml.SearchResults;
 import org.geotoolkit.csw.xml.GetRecordsResponse;
@@ -293,12 +294,14 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                             record = ((JAXBElement)record).getValue();
                         }
 
-                        //Temporary ugly patch TODO handle update in CSW
+                        final String metadataID = Utils.findIdentifier(record);
                         try {
-                            if (metadataWriter.storeMetadata(record)) {
-                                nbRecordInserted++;
+                            if (!metadataWriter.isAlreadyUsedIdentifier(metadataID)) {
+                                if (metadataWriter.storeMetadata(record)) {
+                                    nbRecordInserted++;
+                                } 
                             } else {
-                                if (metadataWriter.replaceMetadata(null, record)) {
+                                if (metadataWriter.replaceMetadata(metadataID, record)) {
                                     nbRecordUpdated++;
                                 }
                             }

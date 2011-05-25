@@ -35,6 +35,7 @@ import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 
@@ -53,7 +54,6 @@ import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.StringUtilities;
 
 // MDWeb dependencies
-import org.geotoolkit.xml.XLink;
 import org.mdweb.model.profiles.Profile;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
@@ -1086,6 +1086,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return storeMetadata(any);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isAlreadyUsedIdentifier(String metadataID) throws MetadataIoException {
+        try {
+            return mdWriter.isAlreadyUsedIdentifier(metadataID);
+        } catch (MD_IOException ex) {
+            throw new MetadataIoException(ex);
+        }
+    }
+    
     /**
      * Return an MDWeb path from a XPath.
      *

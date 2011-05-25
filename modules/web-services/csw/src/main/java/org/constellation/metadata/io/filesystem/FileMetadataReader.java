@@ -167,7 +167,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * @param directory The current directory to explore.
      * @return
      */
-    private File getFileFromIdentifier(final String identifier, final File directory) {
+    public static File getFileFromIdentifier(final String identifier, final File directory) {
         // 1) try to find the file in the current directory
         File metadataFile = new File (directory,  identifier + XML_EXT);
         // 2) trying without the extension
