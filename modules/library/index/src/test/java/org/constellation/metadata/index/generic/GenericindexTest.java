@@ -717,6 +717,30 @@ public class GenericindexTest {
         meta2.setIdentificationInfo(Arrays.asList(ident2));
         result = GenericIndexer.extractValues(meta2, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date"));
         assertEquals("null", result);
+        
+        Unmarshaller unmarshaller    = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+        DefaultMetadata meta3 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+        CSWMarshallerPool.getInstance().release(unmarshaller);
+        
+        List<String> paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:position");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:position");
+        result = GenericIndexer.extractValues(meta3, paths);
+        
+        assertEquals("19900605", result);
+        
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:endPosition");
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:position");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:endPosition");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:position");
+        result = GenericIndexer.extractValues(meta3, paths);
+        
+        assertEquals("19900702", result);
+        
     }
 
     public static List<Object> fillTestData() throws JAXBException {
