@@ -378,6 +378,7 @@ public class GenericindexTest {
         expectedResult = new ArrayList<String>();
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");
+        expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
 
         assertEquals(expectedResult, result);
 
