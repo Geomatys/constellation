@@ -1,0 +1,27 @@
+
+.dropdown-content{
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+}
+
+.styleeditor-dropdownmenu{
+    background-color: #FFFFFF;
+    padding: 0px 0px 0px 0px;    
+} 
+
+.styleeditor-dropdownmenu ul{
+    background-color: #FFFFFF;
+    list-style-type: none;
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+}
+.styleeditor-dropdownmenu li{
+    background-color: #FFFFFF;
+    padding: 1px 4px 1px 4px;
+    
+}
+
+.styleeditor-dropdownmenu li:hover{
+    background-color: #aecae4;
+    
+}

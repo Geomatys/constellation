@@ -31,7 +31,8 @@ public class SLDItem extends AbstractMenuItem{
         super(
             new String[]{
                 "/provider/sld.xhtml",
-                "/provider/sldConfig.xhtml"},
+                "/provider/sldConfig.xhtml",
+                "/provider/onesldeditor.xhtml"},
             "provider.sld",
             new Path(PROVIDERS_STYLE_PATH,"SLD Styles", "/provider/sld.xhtml", null,900)
             );

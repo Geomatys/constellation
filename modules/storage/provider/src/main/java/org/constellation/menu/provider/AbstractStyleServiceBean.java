@@ -35,7 +35,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import org.constellation.bean.HighLightRowStyler;
-import org.constellation.provider.AbstractDataStoreProvider;
 import org.constellation.provider.AbstractProviderProxy;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
@@ -43,14 +42,13 @@ import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderService;
-import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.storage.DataStoreException;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.StyleUtilities;
 import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.facelet.parametereditor.ParameterModelAdaptor;
 import org.mapfaces.facelet.parametereditor.ParameterTreeModel;
-import org.opengis.feature.type.Name;
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -95,17 +93,21 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
     private final ProviderService service;
     private final String configPage;
     private final String mainPage;
+    private final String styleConfigPage;
     private TreeModel layersModel = null;
-    private DataStoreSourceNode configuredInstance = null;
+    private SourceNode configuredInstance = null;
     private ParameterValueGroup configuredParams = null;
     private String newSourceName = "default";
+    private MutableStyle editedStyle = null;
 
-    public AbstractStyleServiceBean(final ProviderService service, final String mainPage, final String configPage){
+    public AbstractStyleServiceBean(final ProviderService service, final String mainPage, 
+            final String configPage, final String sldConfig){
         addBundle("provider.overview");
 
         this.service = service;
         this.mainPage = MenuBean.toApplicationPath(mainPage);
         this.configPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
+        this.styleConfigPage = (sldConfig != null) ? MenuBean.toApplicationPath(sldConfig) : null;
 
         if(service instanceof LayerProviderService){
             new WeakPropertyChangeListener(LayerProviderProxy.getInstance(), this);
@@ -158,13 +160,13 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
     }
 
     private DefaultMutableTreeNode buildNode(final Provider provider, boolean buildChildren){
-        final DataStoreSourceNode node = new DataStoreSourceNode(provider);
+        final SourceNode node = new SourceNode(provider);
 
         if(buildChildren){
             final Set keys = provider.getKeys();
 
             for(Object key : keys){
-                final  DefaultMutableTreeNode n = new DefaultMutableTreeNode(key);
+                final SLDNode n = new SLDNode(provider,key);
                 node.add(n);
             }
         }
@@ -230,7 +232,7 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
     /**
      * @return the currently configured instance.
      */
-    public DataStoreSourceNode getConfiguredInstance(){
+    public SourceNode getConfiguredInstance(){
         return configuredInstance;
     }
 
@@ -264,7 +266,19 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
         configuredInstance.provider.updateSource(configuredParams);
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // CONFIGURE SLD INSTANCE //////////////////////////////////////////////////
 
+    public MutableStyle getEditedSLD() {
+        return editedStyle;
+    }
+    
+    public void saveEditedSLD(){
+        //TODO
+    }
+    
+    
+    
     ////////////////////////////////////////////////////////////////////////////
     // EVENTS AND SUBCLASSES ///////////////////////////////////////////////////
 
@@ -273,11 +287,11 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
         layersModel = null;
     }
 
-    public final class DataStoreSourceNode extends DefaultMutableTreeNode{
+    public final class SourceNode extends DefaultMutableTreeNode{
 
         private final Provider provider;
 
-        public DataStoreSourceNode(final Provider provider) {
+        public SourceNode(final Provider provider) {
             super(provider);
             this.provider = provider;
         }
@@ -291,7 +305,7 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
                 LOGGER.log(Level.WARNING, "Unexpected provider class : {0}", provider.getClass());
             }
             
-            if(configuredInstance == DataStoreSourceNode.this){
+            if(configuredInstance == SourceNode.this){
                 configuredInstance = null;
                 configuredParams = null;
             }
@@ -328,6 +342,35 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
             }
         }
 
+    }
+    
+    public final class SLDNode extends DefaultMutableTreeNode{
+
+        private final Provider provider;
+        private final Object key;
+
+        public SLDNode(final Provider provider, final Object key) {
+            super(key);
+            this.provider = provider;
+            this.key = key;
+        }
+        
+        public void config(){
+            configuredInstance = new SourceNode(provider);
+            configuredParams = provider.getSource().clone();
+
+            editedStyle = StyleUtilities.copy( (MutableStyle) provider.get(key));
+                       
+            if(styleConfigPage != null){
+                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+                try {
+                    context.redirect(styleConfigPage);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                }
+            }
+        }
+                
     }
 
 }

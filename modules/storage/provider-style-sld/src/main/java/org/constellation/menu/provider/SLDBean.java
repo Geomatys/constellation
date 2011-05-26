@@ -41,7 +41,8 @@ public class SLDBean extends AbstractStyleServiceBean{
 
     public SLDBean(){
         super(getService(),"/provider/sld.xhtml",
-              "/provider/sldConfig.xhtml");
+              "/provider/sldConfig.xhtml",
+              "/provider/onesldeditor.xhtml");
         addBundle("provider.sld");
     }
 

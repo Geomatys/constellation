@@ -54,6 +54,12 @@
                 <h:outputText value="#{node.userObject}"/>
             </mf:DataTableColumn>
             
+            <mf:DataTableColumn width="24px">
+                <a4j:commandLink action="#{node.config}">
+                    <h:graphicImage value="provider.edit.png.mfRes" style="border:none;"/>
+                </a4j:commandLink>
+            </mf:DataTableColumn>
+            
         </mf:Outline>
     </mf:Div>
     

@@ -22,6 +22,11 @@
         </tag>
         
         <tag>
+            <tag-name>editSLD</tag-name>
+            <source>/provider/editSLD.xhtml</source>
+        </tag>
+        
+        <tag>
             <tag-name>layerParameterConfig</tag-name>
             <source>/provider/layerParameterConfig.xhtml</source>
         </tag>
