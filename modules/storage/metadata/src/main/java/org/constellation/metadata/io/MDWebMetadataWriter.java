@@ -860,7 +860,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
         
         availableStandardLabel = availableStandardLabel.substring(0, availableStandardLabel.length() - 1);
-        LOGGER.warning("class no found: " + className + " in the following standards: " + availableStandardLabel + "\n (" + object.getClass().getName() + ')');
+        LOGGER.warning("class not found: " + className + " in the following standards: " + availableStandardLabel + "\n (" + object.getClass().getName() + ')');
         return null;
     }
 

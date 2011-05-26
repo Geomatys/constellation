@@ -733,7 +733,7 @@
             <gmd:transferOptions>
                 <gmd:MD_DigitalTransferOptions>
                     <gmd:transferSize>
-                        <gco:Decimal>2.431640625</gco:Decimal>
+                        <gco:Real>2.431640625</gco:Real>
                     </gmd:transferSize>
                     <gmd:onLine>
                         <gmd:CI_OnlineResource>

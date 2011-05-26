@@ -387,6 +387,7 @@ public class MDWebMetadataReaderTest {
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/imageMetadata.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
+        pool.acquireMarshaller().marshal(expResult, System.out);
         metadataEquals(expResult, (DefaultMetadata)result);
 
         pool.release(unmarshaller);

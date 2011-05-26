@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<gmi:MI_Metadata xmlns="http://www.isotc211.org/2005/gmi" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmi Q:/users/mize.jacqueline/ISO/gmi/gmi.xsd">
+<gmi:MI_Metadata xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" 
+                 xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml" 
+                 xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gsr="http://www.isotc211.org/2005/gsr" 
+                 xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gts="http://www.isotc211.org/2005/gts" 
+                 xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://eden.ign.fr/xsd/isotc211/isofull/20090316/gmd/gmd.xsd
+                                     http://www.isotc211.org/2005/gmx http://eden.ign.fr/xsd/isotc211/isofull/20090316/gmx/gmx.xsd
+                                     http://www.isotc211.org/2005/gmi http://eden.ign.fr/xsd/isotc211/isofull/20090316/gmi/gmi.xsd">
     <gmd:fileIdentifier>
         <gco:CharacterString>gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX</gco:CharacterString>
     </gmd:fileIdentifier>
@@ -395,13 +402,13 @@
                             </gmd:northBoundLatitude>
                         </gmd:EX_GeographicBoundingBox>
                     </gmd:geographicElement>
-                    <!-- lost the whole temporal extent -->
                     <gmd:temporalElement>
                         <gmd:EX_TemporalExtent>
                             <gmd:extent>
+                                 <!-- lost all temporal extent -->
                                 <gml:TimePeriod gml:id="boundingTemporalExtent">
                                     <gml:description>ground condition</gml:description>
-                                    <gml:beginPosition/>
+                                    <gml:beginPosition>2010-01-27T08:26:10-05:00</gml:beginPosition>
                                     <gml:endPosition indeterminatePosition="now">2010-08-27T08:26:10-05:00</gml:endPosition>
                                 </gml:TimePeriod>
                             </gmd:extent>
@@ -1406,14 +1413,13 @@
                             </gmd:sourceCitation>
                             <gmd:sourceExtent>
                                 <gmd:EX_Extent>
-                                    <!-- lost all temporal extent -->
                                     <gmd:temporalElement>
                                         <gmd:EX_TemporalExtent>
-                                            <gmd:extent gco:nilReason="unknown">
+                                            <gmd:extent>
                                                 <gml:TimePeriod gml:id="sourceTemporalExtent">
-                                                    <gml:description>ground condition
-                                                    </gml:description>
-                                                    <gml:beginPosition/>
+                                                     <!-- lost the id and decription -->
+                                                    <gml:description>ground condition</gml:description>
+                                                    <gml:beginPosition>2010-01-27T08:26:10-05:00</gml:beginPosition>
                                                     <gml:endPosition indeterminatePosition="now">2010-08-27T08:26:10-05:00</gml:endPosition>
                                                 </gml:TimePeriod>
                                             </gmd:extent>

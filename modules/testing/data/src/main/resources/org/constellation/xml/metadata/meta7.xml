@@ -275,7 +275,7 @@
             <gmd:transferOptions>
                 <gmd:MD_DigitalTransferOptions>
                     <gmd:transferSize>
-                        <gco:Decimal>0.0050</gco:Decimal>
+                        <gco:Real>0.0050</gco:Real>
                     </gmd:transferSize>
                     <gmd:offLine>
                         <gmd:MD_Medium>
