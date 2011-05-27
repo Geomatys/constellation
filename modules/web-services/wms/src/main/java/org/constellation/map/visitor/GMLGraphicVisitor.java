@@ -313,10 +313,12 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
                 LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             }
             if (dates != null && !(dates.isEmpty())) {
-                final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                builder.append("\t\t\t<time>").append(df.format(dates.getMaxValue()))
-                       .append("</time>").append("\n");
+                if (dates.getMaxValue() != null) {
+                    final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    builder.append("\t\t\t<time>").append(df.format(dates.getMaxValue()))
+                           .append("</time>").append("\n");
+                }
             }
         }
         if (elevation != null) {
