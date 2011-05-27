@@ -51,7 +51,7 @@ public final class WMSConstant {
 
         final OperationType getCapabilities = new OperationType(Arrays.asList("text/xml", "application/vnd.ogc.wms_xml"), dcp);
         final OperationType getMap          = new OperationType(Arrays.asList("image/gif","image/png","image/jpeg","image/bmp","image/tiff","image/x-portable-pixmap"), dcp);
-        final OperationType getFeatureInfo  = new OperationType(Arrays.asList("text/xml","text/plain","text/html"), dcp);
+        final OperationType getFeatureInfo  = new OperationType(Arrays.asList("text/xml","text/plain","text/html", "application/vnd.ogc.gml", "application/vnd.ogc.xml", "xml", "gml", "gml3"), dcp);
 
         REQUEST_130 = new Request(getCapabilities, getMap, getFeatureInfo);
         
@@ -78,7 +78,7 @@ public final class WMSConstant {
 
         final GetCapabilities getCapabilities = new GetCapabilities(Arrays.asList("text/xml", "application/vnd.ogc.wms_xml"), dcp);
         final GetMap getMap                   = new GetMap(Arrays.asList("image/gif","image/png","image/jpeg","image/bmp","image/tiff","image/x-portable-pixmap"), dcp);
-        final GetFeatureInfo getFeatureInfo   = new GetFeatureInfo(Arrays.asList("text/xml","text/plain","text/html"), dcp);
+        final GetFeatureInfo getFeatureInfo   = new GetFeatureInfo(Arrays.asList("text/xml","text/plain","text/html","application/vnd.ogc.gml","application/vnd.ogc.xml", "xml", "gml", "gml3"), dcp);
 
          /*
          * Extended Operation
