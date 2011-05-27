@@ -167,8 +167,6 @@ public class WPSService extends OGCWebService<WPSWorker> {
 
             if (objectRequest instanceof GetCapabilities){
                 final GetCapabilities getcaps = (GetCapabilities)objectRequest;
-                //serviceDef              = getVersionFromNumber(getcaps.getVersion());
-                final GetCapabilitiesType owsGetCap = new GetCapabilitiesType(getcaps.getAcceptVersions(), null, null, null, getcaps.getService());
                 final WPSCapabilitiesType capsResponse = worker.getCapabilities(getcaps);
                 return Response.ok(capsResponse, MimeType.TEXT_XML).build();
             }
@@ -285,13 +283,28 @@ public class WPSService extends OGCWebService<WPSWorker> {
         if (serviceDef.equals(ServiceDef.WPS_1_0_0)) {
             final DescribeProcess describe = new DescribeProcess();
             final MultivaluedMap<String,String> paramaters = getParameters();
-            List<String> identifiers = paramaters.get("Identifier");
-            if(identifiers == null){
-                 identifiers = paramaters.get("identifier");
+            
+            List<String> buffIdentifiers = new ArrayList<String>();
+            if(paramaters.containsKey("IDENTIFIER")){
+                buffIdentifiers = paramaters.get("IDENTIFIER");
+            }else if(paramaters.containsKey("identifier")){
+                buffIdentifiers = paramaters.get("identifier");
+            }else if(paramaters.containsKey("Identifier")){
+                buffIdentifiers = paramaters.get("Identifier");
+            }else{
+                throw new CstlServiceException("The Identifier parameter is missing.", INVALID_REQUEST);
             }
-            if(identifiers == null){
-                 throw new CstlServiceException("The Identifier parameter is missing", INVALID_REQUEST, KEY_VERSION.toLowerCase());
+           
+            final List<String> identifiers = new ArrayList<String>() ;
+            
+            for(String str : buffIdentifiers){
+                String[] splitStr = str.split(",");
+                for(String str2 : splitStr){
+                    str2.equalsIgnoreCase(strVersion);
+                    identifiers.add(str2);
+                }
             }
+            
             for (String ident : identifiers) {
                 describe.getIdentifier().add(new CodeType(ident));
             }

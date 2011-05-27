@@ -48,4 +48,9 @@ public final class WPSConstant {
     public static final String EXECUTE = "Execute";
     public static final String GETCAPABILITIES = "GetCapabilities";
 
+    /* Maximum size in megabytes for a complex input */
+    public static final int MAX_MB_INPUT_COMPLEX = 10;
+    
+    /* Default Coordinate Reference System  */
+    public static final String DEFAULT_CRS = "EPSG:4326";
 }

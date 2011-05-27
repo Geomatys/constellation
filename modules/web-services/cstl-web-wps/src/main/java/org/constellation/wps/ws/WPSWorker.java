@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 
@@ -91,8 +90,6 @@ import org.geotoolkit.wps.xml.v100.ResponseFormType;
 import org.geotoolkit.wps.xml.v100.StatusType;
 import org.geotoolkit.wps.xml.v100.ProcessStartedType;
 import org.geotoolkit.data.FeatureIterator;
-import org.geotoolkit.feature.AttributeDescriptorBuilder;
-import org.geotoolkit.feature.AttributeTypeBuilder;
 import org.geotoolkit.feature.FeatureTypeBuilder;
 import org.geotoolkit.feature.type.DefaultFeatureType;
 import org.geotoolkit.feature.type.DefaultGeometryType;
@@ -146,18 +143,23 @@ import org.constellation.wps.converters.ReferenceToGridCoverage2DConverter;
 import org.constellation.wps.converters.ReferenceToGridCoverageReaderConverter;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.wps.xml.v100.LiteralOutputType;
+import org.geotoolkit.wps.xml.v100.SupportedUOMsType;
+import org.geotoolkit.wps.xml.v100.UOMsType;
 
 import static org.constellation.query.Query.*;
 import static org.constellation.wps.ws.WPSConstant.*;
 
 /**
+ * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests. 
  * 
  * @author Quentin Boileau
  */
 public class WPSWorker extends AbstractWorker {
 
     /**
-     * List of literal converters
+     * List of literal converters. Used to convert a String to an Object like
+     * AffineTransform, Coodinate Reference System, ...
      */
     private static final List LITERAL_CONVERTERS = UnmodifiableArrayList.wrap(
             StringToFeatureCollectionConverter.getInstance(),
@@ -170,7 +172,8 @@ public class WPSWorker extends AbstractWorker {
             StringToNumberRangeConverter.getInstance());
     
     /**
-     * List of reference converters
+     * List of reference converters.Used to extract an Object from a Reference like an URL.
+     * For example to a Feature or FeatureCollection, to a Geometry or a coverage.
      */
     private static final List REFERENCE_CONVERTERS = UnmodifiableArrayList.wrap(
             ReferenceToFeatureCollectionConverter.getInstance(),
@@ -204,7 +207,7 @@ public class WPSWorker extends AbstractWorker {
            FeatureCollectionToComplexConverter.getInstance());
   
      /**
-     * List of Complex input Class
+     * List of supported <b>input</b> Class for a Complex <b>input</b>.
      */
     private static final List COMPLEX_INPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
             Feature.class,
@@ -215,7 +218,7 @@ public class WPSWorker extends AbstractWorker {
             Geometry.class);
 
     /**
-     * List of Complex output Class
+     * List of supported <b>output</b> Class for a Complex <b>output</b>.
      */
     private static final List COMPLEX_OUTPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
             Feature.class,
@@ -224,7 +227,7 @@ public class WPSWorker extends AbstractWorker {
             Geometry[].class);
     
     /**
-     * List of literal input Class which need a conversion from String
+     * List of supported <b>input</b> Class for a Literal <b>input</b>.
      */
     private static final List LITERAL_INPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
             Number.class,Boolean.class,String.class,
@@ -236,7 +239,7 @@ public class WPSWorker extends AbstractWorker {
             NumberRange[].class);
     
     /**
-     * List of literal output Class supported by a toString
+     * List of supported <b>output</b> Class for a Literal <b>output</b>.
      */
     private static final List LITERAL_OUPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
             Number.class,Boolean.class,String.class,
@@ -245,7 +248,7 @@ public class WPSWorker extends AbstractWorker {
             CoordinateReferenceSystem.class);
 
     /*
-     * List of Reference input Class 
+     * List of supported <b>input</b> Class for a Reference <b>input</b>.
      */
     private static final List REFERENCE_INPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
             Feature.class,
@@ -258,7 +261,7 @@ public class WPSWorker extends AbstractWorker {
             GridCoverageReader.class);
     
     /*
-     * List of Reference output Class 
+     * List of supported <b>output</b> Class for a Reference <b>output</b>.
      */
     private static final List REFERENCE_OUTPUT_TYPE_LIST = UnmodifiableArrayList.wrap();
     
@@ -325,7 +328,7 @@ public class WPSWorker extends AbstractWorker {
     }
 
     /**
-     * GetCapabilities request for WPS 1.0
+     * GetCapabilities request for WPS 1.0.0
      * @param request
      * @return
      * @throws CstlServiceException
@@ -402,7 +405,7 @@ public class WPSWorker extends AbstractWorker {
     }
 
     /**
-     * Describe a process in WPS v1.0
+     * Describe a process in WPS v1.0.0
      * @param request
      * @return
      * @throws CstlServiceException
@@ -418,28 +421,28 @@ public class WPSWorker extends AbstractWorker {
         descriptions.setLang(WPS_LANG);
         descriptions.setService(WPS_SERVICE);
         descriptions.setVersion(WPS_1_0_0);
-
-        //final List<ProcessDescriptionType> processDescritionList = new ArrayList<ProcessDescriptionType>();
+        
         for (CodeType identifier : request.getIdentifier()) {
-
+            
             final ProcessDescriptionType descriptionType = new ProcessDescriptionType();
             descriptionType.setIdentifier(identifier);          //Process Identifier
 
-            descriptionType.setProcessVersion("1.0.0");         //TODO set a version to the process
+            descriptionType.setProcessVersion(WPS_1_0_0);       
             descriptionType.setWSDL(null);                      //TODO WSDL
             descriptionType.setStatusSupported(false);          //TODO support process status
             descriptionType.setStoreSupported(false);           //TODO support process storage
 
-            //find the process
+        // Find the process
             final ProcessDescriptor processDesc = getProcessDescriptor(identifier.getValue());
             if(!isSupportedProcess(processDesc)){
              throw new CstlServiceException("Process not supported by the service.",
                     OPERATION_NOT_SUPPORTED, identifier.getValue());
-        }
+            }
+            
             descriptionType.setTitle(new LanguageStringType(processDesc.getName().getCode()));          //Process Title
             descriptionType.setAbstract(new LanguageStringType(processDesc.getAbstract().toString()));  //Process abstract
 
-            //get process input and output descriptors
+        // Get process input and output descriptors
             final ParameterDescriptorGroup input = processDesc.getInputDescriptor();
             final ParameterDescriptorGroup output = processDesc.getOutputDescriptor();
 
@@ -454,7 +457,7 @@ public class WPSWorker extends AbstractWorker {
                 if (param instanceof ParameterDescriptor) {
                     final ParameterDescriptor paramDesc = (ParameterDescriptor) param;
                     
-                    //parameter informations
+                // Parameter informations
                     in.setIdentifier(new CodeType(paramDesc.getName().getCode()));
                     in.setTitle(new LanguageStringType(paramDesc.getName().getCode()));
                     in.setAbstract(new LanguageStringType(paramDesc.getRemarks().toString()));
@@ -462,56 +465,29 @@ public class WPSWorker extends AbstractWorker {
                     //set occurs
                     in.setMaxOccurs(BigInteger.valueOf(paramDesc.getMaximumOccurs()));
                     in.setMinOccurs(BigInteger.valueOf(paramDesc.getMinimumOccurs()));
-                    //input class
+                // Input class
                     final Class clazz = paramDesc.getValueClass();
 
-                    //BoundingBox type
+                // BoundingBox type
                     if (clazz.equals(Envelope.class)) {
-                        final SupportedCRSsType crsList = new SupportedCRSsType();
-                        final SupportedCRSsType.Default defaultCRS = new SupportedCRSsType.Default();
-                        defaultCRS.setCRS("EPSG:4326");                                             //TODO confirm the default CRS
-                        crsList.setDefault(defaultCRS);
-                        final CRSsType supportedCRS = new CRSsType();
-                        supportedCRS.getCRS().addAll(SUPPORTED_CRS);
-                        crsList.setSupported(supportedCRS); 
-                        in.setBoundingBoxData(crsList);
+                        in.setBoundingBoxData(getSupportedCRS());
 
-                    } else //Complex type (XML, raster, ...)
+                //Complex type (XML, ...)     
+                    } else 
                     if (COMPLEX_INPUT_TYPE_LIST.contains(clazz)) {
-                        final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
-                        final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
-                        final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
-                        ComplexDataDescriptionType complexDesc = null;
-
-                        for(WPSIO.InputClass inputClass : WPSIO.USEDCLASS){
-                            if(clazz.equals(inputClass.getClazz())){
-                                complexDesc = new ComplexDataDescriptionType();
-                                complexDesc.setEncoding(inputClass.getEncoding());   //Encoding
-                                complexDesc.setMimeType(inputClass.getMime());       //Mime
-                                complexDesc.setSchema(inputClass.getSchema());       //URL to xsd schema
-                                
-                                if(inputClass.isDefault()){
-                                     complexComb.setFormat(complexDesc);
-                                }
-                                complexCombs.getFormat().add(complexDesc);
-                            }
-                        }
-
-                        complex.setDefault(complexComb);
-                        complex.setSupported(complexCombs);
-                        complex.setMaximumMegabytes(BigInteger.valueOf(2));        // TODO define a maximum size by default 2Mb
-                        in.setComplexData(complex);
+                        in.setComplexData(describeComplex(clazz));
                         
+                  //Simple object (Integer, double, ...) and Object which need a conversion from String like affineTransform or Geometry
                     } else {
-                        //Simple object (Integer, double, ...) and Object which need a conversion from String like affineTransform or Geometry
                         final LiteralInputType literal = new LiteralInputType();
                         
-                        literal.setAnyValue(new AnyValue());
                         if(paramDesc.getDefaultValue() != null){
                             literal.setDefaultValue(paramDesc.getDefaultValue().toString()); //default value if enable
                         }
+                        literal.setAnyValue(new AnyValue());
                         literal.setDataType(createDataType(clazz));
-
+                        literal.setUOMs(getSupportedUOM());
+                        
                         in.setLiteralData(literal);
                     }
                     
@@ -533,63 +509,29 @@ public class WPSWorker extends AbstractWorker {
                 if (param instanceof ParameterDescriptor) {
                     final ParameterDescriptor paramDesc = (ParameterDescriptor) param;
                     
-                     //parameter informations
+                 //parameter informations
                     out.setIdentifier(new CodeType(paramDesc.getName().getCode()));
                     out.setTitle(new LanguageStringType(paramDesc.getName().getCode()));
                     out.setAbstract(new LanguageStringType(paramDesc.getRemarks().toString()));
                     
-                    //input class
+                //input class
                     final Class clazz = paramDesc.getValueClass();
                     
-                    //BoundingBox type
+                //BoundingBox type
                     if (clazz.equals(JTSEnvelope2D.class)) {
+                        out.setBoundingBoxOutput(getSupportedCRS());
 
-                        final SupportedCRSsType crsList = new SupportedCRSsType();
-                        final SupportedCRSsType.Default defaultCRS = new SupportedCRSsType.Default();
-                        defaultCRS.setCRS("EPSG:4326");                 //TODO confirm the default CRS
-                        crsList.setDefault(defaultCRS);
-                        final CRSsType supportedCRS = new CRSsType();
-                        supportedCRS.getCRS().addAll(SUPPORTED_CRS);
-                        crsList.setSupported(supportedCRS);
-                        out.setBoundingBoxOutput(crsList);
-
-                    //Complex type (XML, raster, ...)
-                    } else if (COMPLEX_INPUT_TYPE_LIST.contains(clazz)) {
-                        final SupportedComplexDataType complex = new SupportedComplexDataType();
-                        final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
-                        final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
-                        ComplexDataDescriptionType complexDesc = null;
-
-                        for(WPSIO.InputClass inputClass : WPSIO.USEDCLASS){
-                            if(clazz.equals(inputClass.getClazz())){
-                               
-                                complexDesc = new ComplexDataDescriptionType();
-                                complexDesc.setEncoding(inputClass.getEncoding());   //Encoding
-                                complexDesc.setMimeType(inputClass.getMime());       //Mime
-                                complexDesc.setSchema(inputClass.getSchema());       //URL to xsd schema
-                                
-                                if(inputClass.isDefault()){
-                                     complexComb.setFormat(complexDesc);
-                                }
-                                complexCombs.getFormat().add(complexDesc);
-                            }
-                        }
-                     
-                        complex.setDefault(complexComb);
-                        complex.setSupported(complexCombs);
-                        out.setComplexOutput(complex);
-
-                    } else if(LITERAL_INPUT_TYPE_LIST.contains(clazz)){
-                        //Simple object (Integer, double) and Object which need a conversion from String like affineTransform or Geometry
-                        final LiteralInputType literal = new LiteralInputType();
+                //Complex type (XML, raster, ...)
+                    } else if (COMPLEX_INPUT_TYPE_LIST.contains(clazz)) {     
+                        out.setComplexOutput((SupportedComplexDataType)describeComplex(clazz));
                         
-                        literal.setAnyValue(new AnyValue());
-                        if(paramDesc.getDefaultValue() != null){
-                            literal.setDefaultValue(paramDesc.getDefaultValue().toString()); //default value if enable
-                        }
-
+                //Simple object (Integer, double) and Object which need a conversion from String like affineTransform or Geometry
+                    } else if(LITERAL_INPUT_TYPE_LIST.contains(clazz)){
+                        
+                        final LiteralOutputType literal = new LiteralOutputType();
+                        literal.setUOMs(getSupportedUOM());
                         literal.setDataType(createDataType(clazz));
-
+                         
                         out.setLiteralOutput(literal);
                     }
 
@@ -600,7 +542,6 @@ public class WPSWorker extends AbstractWorker {
                 dataOutput.getOutput().add(out);
             }
             descriptionType.setProcessOutputs(dataOutput);
-
             descriptions.getProcessDescription().add(descriptionType);
         }
 
@@ -653,7 +594,6 @@ public class WPSWorker extends AbstractWorker {
         }
         final StatusType status = new StatusType();
         System.out.println("LOG -> Process : "+request.getIdentifier().getValue());
-        
         //Find the process
         final ProcessDescriptor processDesc = getProcessDescriptor(request.getIdentifier().getValue());
         
@@ -1064,7 +1004,7 @@ public class WPSWorker extends AbstractWorker {
                             data.setComplexData(complex);
 
                         /* Literal */
-                        } else if(isSupportedClassOutput("complex", outClass)){
+                        } else if(isSupportedClassOutput("literal", outClass)){
                             System.out.println("LOG -> Output -> Literal");
                             final LiteralDataType literal = new LiteralDataType();
                             literal.setDataType(outClass.getCanonicalName());
@@ -1366,7 +1306,7 @@ public class WPSWorker extends AbstractWorker {
             testBbox = isSupportedClass("boundingbox", expectedClass);
             System.out.println("DEBUG -> Is Supported INPUT : ExpectedClass="+expectedClass.getSimpleName()+" "
                     + "Literal="+testLiteral+" Complex="+testComplex+" Reference="+testReference+" Bbox="+testBbox);
-            if(testLiteral || testComplex || testReference ){
+            if(testLiteral || testComplex || testReference || testBbox){
                 return true;
             }
         }else if(type.equals("literal")){
@@ -1416,6 +1356,7 @@ public class WPSWorker extends AbstractWorker {
             testLiteral = isSupportedClassOutput("literal", expectedClass);
             testReference = isSupportedClassOutput("reference", expectedClass);
             testReference = isSupportedClassOutput("boundingbox", expectedClass);
+            
             System.out.println("DEBUG -> Is Supported OUTPUT : ExpectedClass="+expectedClass.getSimpleName()+" "
                     + "Literal="+testLiteral+" Complex="+testComplex+" Reference="+testReference+" Bbox="+testBbox);
 
@@ -1555,6 +1496,77 @@ public class WPSWorker extends AbstractWorker {
                 }
             }
         }
+    }
+
+    /**
+     * 
+     * @param attributeClass
+     * @return 
+     */
+    private SupportedComplexDataInputType describeComplex(final Class attributeClass) {
+        
+        final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
+        final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
+        final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
+        ComplexDataDescriptionType complexDesc = null;
+
+        for(WPSIO.InputClass inputClass : WPSIO.USEDCLASS){
+            if(attributeClass.equals(inputClass.getClazz())){
+
+                complexDesc = new ComplexDataDescriptionType();
+                complexDesc.setEncoding(inputClass.getEncoding());   //Encoding
+                complexDesc.setMimeType(inputClass.getMime());       //Mime
+                complexDesc.setSchema(inputClass.getSchema());       //URL to xsd schema
+
+                if(inputClass.isDefault()){
+                     complexComb.setFormat(complexDesc);
+                }
+                complexCombs.getFormat().add(complexDesc);
+            }
+        }
+
+        complex.setDefault(complexComb);
+        complex.setSupported(complexCombs);
+        complex.setMaximumMegabytes(BigInteger.valueOf(MAX_MB_INPUT_COMPLEX));
+        return complex;
+    }
+
+    /**
+     * Supported UOM for literal
+     * @return SupportedUOMsType
+     */
+    private SupportedUOMsType getSupportedUOM() {
+        
+        final SupportedUOMsType uom = new SupportedUOMsType();
+        final SupportedUOMsType.Default defaultUOM = new SupportedUOMsType.Default();
+        final UOMsType supportedUOM = new UOMsType(); 
+
+        defaultUOM.setUOM(new DomainMetadataType("m", null));
+
+        supportedUOM.getUOM().add(new DomainMetadataType("m", null));
+        supportedUOM.getUOM().add(new DomainMetadataType("km", null));
+        supportedUOM.getUOM().add(new DomainMetadataType("cm", null));
+        supportedUOM.getUOM().add(new DomainMetadataType("mm", null));
+        
+        uom.setDefault(defaultUOM);
+        uom.setSupported(supportedUOM);
+        
+        return uom;
+    }
+
+    /**
+     * Return Supported Coordinate Reference System
+     * @return SupportedCRSsType
+     */
+    private SupportedCRSsType getSupportedCRS() {
+        final SupportedCRSsType crsList = new SupportedCRSsType();
+        final SupportedCRSsType.Default defaultCRS = new SupportedCRSsType.Default();
+        defaultCRS.setCRS(DEFAULT_CRS);                 
+        crsList.setDefault(defaultCRS);
+        final CRSsType supportedCRS = new CRSsType();
+        supportedCRS.getCRS().addAll(SUPPORTED_CRS);
+        crsList.setSupported(supportedCRS);
+        return crsList;
     }
     
 }
