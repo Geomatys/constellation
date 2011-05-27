@@ -16,7 +16,7 @@
  */
 package org.constellation.provider.sld;
 
-import org.opengis.parameter.ParameterValue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.File;
@@ -31,7 +31,6 @@ import org.constellation.provider.AbstractStyleProvider;
 
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
@@ -44,8 +43,10 @@ import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
 
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.FactoryException;
 
@@ -72,7 +73,7 @@ public class SLDProvider extends AbstractStyleProvider{
     
     private final XMLUtilities sldParser = new XMLUtilities();
     private File folder;
-    private final Map<String,File> index = new HashMap<String,File>();
+    private final Map<String,File> index = new ConcurrentHashMap<String, File>();
     private final Cache<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
     
     
@@ -181,6 +182,59 @@ public class SLDProvider extends AbstractStyleProvider{
         return value;
     }
 
+    /**
+     * Create or replace an existing style.
+     * 
+     * @param key : key used for this style
+     * @param style : the style definition
+     */
+    public synchronized void set(final String key, final MutableStyle style){
+        
+        File f = index.get(key);
+        if(f == null){
+            //file doesnt exist, create it
+            f = new File(folder, key+".xml");
+        }
+        
+        final XMLUtilities util = new XMLUtilities();
+        try {
+            util.writeStyle(f, style, StyledLayerDescriptor.V_1_1_0);
+            index.put(key, f);
+            cache.clear();
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+        }
+        
+    }
+    
+    /**
+     * Change name of a Style.
+     */
+    public synchronized void rename(final String key, final String newName){
+        final File f = index.get(key);
+        if(index.containsKey(newName)){
+            throw new IllegalArgumentException("Style name "+ newName +" already used.");
+        }
+        if(f == null){
+            throw new IllegalArgumentException("Style "+ newName +" do not exist.");
+        }
+        
+        final File newFile = new File(f.getParentFile(), newName+".xml");
+        f.renameTo(newFile);
+        reload();
+    }
+    
+    /**
+     * @param key remove the related style and sld file associated.
+     */
+    public synchronized void remove(final String key){
+        final File f = index.get(key);
+        if(f != null){
+            f.delete();
+            reload();
+        }
+    }
+    
     /**
      * {@inheritDoc }
      */

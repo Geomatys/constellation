@@ -46,6 +46,15 @@
         </mf:Outline>
     </div>
     
+    <mf:Div rendered="#{bean.configuredInstance != null}">
+        <h:outputText value="#{bean.i18n['newstyle']}" />
+        <span/>
+        <h:inputText value="#{bean.newStyleName}" />
+        <span/>
+        <h:commandButton action="#{bean.createNewStyle}" value="#{bean.i18n['add']}" />
+    </mf:Div>
+    
+    
     <mf:Div styleClass="rounded" rendered="#{bean.configuredInstance != null}">
         <mf:Outline id="layerPreview" rootVisible="false" value="#{bean.layerModel}" var="node" width="100%"
                     rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
@@ -57,6 +66,12 @@
             <mf:DataTableColumn width="24px">
                 <a4j:commandLink action="#{node.config}">
                     <h:graphicImage value="provider.edit.png.mfRes" style="border:none;"/>
+                </a4j:commandLink>
+            </mf:DataTableColumn>
+            
+            <mf:DataTableColumn width="24px">
+                <a4j:commandLink action="#{node.delete}" reRender="layerPreview">
+                    <h:graphicImage value="provider.remove.png.mfRes" style="border:none;"/>
                 </a4j:commandLink>
             </mf:DataTableColumn>
             

@@ -42,13 +42,16 @@ import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderService;
+import org.constellation.provider.sld.SLDProvider;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.StyleUtilities;
 import org.geotoolkit.util.WeakPropertyChangeListener;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.facelet.parametereditor.ParameterModelAdaptor;
 import org.mapfaces.facelet.parametereditor.ParameterTreeModel;
+import org.mapfaces.facelet.styleeditor.StyleEditionConstants;
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -99,6 +102,7 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
     private ParameterValueGroup configuredParams = null;
     private String newSourceName = "default";
     private MutableStyle editedStyle = null;
+    private SLDNode editedSLDNode = null;
 
     public AbstractStyleServiceBean(final ProviderService service, final String mainPage, 
             final String configPage, final String sldConfig){
@@ -141,7 +145,7 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
             return new DefaultTreeModel(new DefaultMutableTreeNode());
         }
         
-        final DefaultMutableTreeNode root = buildNode(configuredInstance.provider,true);
+        final DefaultMutableTreeNode root = buildNode((SLDProvider)configuredInstance.provider,true);
         return new DefaultTreeModel(root);
     }
 
@@ -152,20 +156,19 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
         final Collection<Provider> providers = proxy.getProviders();
         for(final Provider provider : providers){
             if(providerClazz.isInstance(provider)){
-                root.add(buildNode(provider,false));
+                root.add(buildNode((SLDProvider)provider,false));
             }
         }
 
         return new DefaultTreeModel(root);
     }
 
-    private DefaultMutableTreeNode buildNode(final Provider provider, boolean buildChildren){
+    private DefaultMutableTreeNode buildNode(final SLDProvider provider, boolean buildChildren){
         final SourceNode node = new SourceNode(provider);
 
         if(buildChildren){
-            final Set keys = provider.getKeys();
 
-            for(Object key : keys){
+            for(String key : provider.getKeys()){
                 final SLDNode n = new SLDNode(provider,key);
                 node.add(n);
             }
@@ -269,15 +272,44 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
     ////////////////////////////////////////////////////////////////////////////
     // CONFIGURE SLD INSTANCE //////////////////////////////////////////////////
 
+    private String newStyleName = "newStyle";
+
+    public String getNewStyleName() {
+        return newStyleName;
+    }
+
+    public void setNewStyleName(final String newStyleName) {
+        this.newStyleName = newStyleName;
+    }
+    
+    public void createNewStyle(){
+        final MutableStyle style = StyleEditionConstants.SF.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
+        style.setName(newStyleName);
+        style.setDescription(StyleEditionConstants.SF.description(newStyleName, newStyleName));
+        style.featureTypeStyles().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
+        style.featureTypeStyles().get(0).rules().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
+        configuredInstance.provider.set(newStyleName, style);
+    }
+    
     public MutableStyle getEditedSLD() {
         return editedStyle;
     }
     
     public void saveEditedSLD(){
-        //TODO
+        editedSLDNode.provider.set(editedSLDNode.key, editedStyle);
+        
+        final String newName = editedSLDNode.getUserObject().toString();
+        if(!newName.equals(editedSLDNode.key)){
+            //name changed
+            editedSLDNode.provider.rename(editedSLDNode.key, newName);
+            editedSLDNode.key = newName;
+        }
+        
     }
-    
-    
+
+    public SLDNode getEditedSLDNode() {
+        return editedSLDNode;
+    }
     
     ////////////////////////////////////////////////////////////////////////////
     // EVENTS AND SUBCLASSES ///////////////////////////////////////////////////
@@ -289,21 +321,15 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
 
     public final class SourceNode extends DefaultMutableTreeNode{
 
-        private final Provider provider;
+        private final SLDProvider provider;
 
-        public SourceNode(final Provider provider) {
+        public SourceNode(final SLDProvider provider) {
             super(provider);
             this.provider = provider;
         }
 
         public void delete(){
-            if(provider instanceof LayerProvider){
-                LayerProviderProxy.getInstance().removeProvider((LayerProvider)provider);
-            }else if(provider instanceof StyleProvider){
-                StyleProviderProxy.getInstance().removeProvider((StyleProvider)provider);
-            }else{
-                LOGGER.log(Level.WARNING, "Unexpected provider class : {0}", provider.getClass());
-            }
+            StyleProviderProxy.getInstance().removeProvider((StyleProvider)provider);
             
             if(configuredInstance == SourceNode.this){
                 configuredInstance = null;
@@ -346,10 +372,10 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
     
     public final class SLDNode extends DefaultMutableTreeNode{
 
-        private final Provider provider;
-        private final Object key;
+        private final SLDProvider provider;
+        private String key;
 
-        public SLDNode(final Provider provider, final Object key) {
+        public SLDNode(final SLDProvider provider, final String key) {
             super(key);
             this.provider = provider;
             this.key = key;
@@ -360,6 +386,7 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
             configuredParams = provider.getSource().clone();
 
             editedStyle = StyleUtilities.copy( (MutableStyle) provider.get(key));
+            editedSLDNode = this;
                        
             if(styleConfigPage != null){
                 final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
@@ -369,6 +396,10 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
                     LOGGER.log(Level.WARNING, null, ex);
                 }
             }
+        }
+        
+        public void delete(){
+            provider.remove(key);            
         }
                 
     }

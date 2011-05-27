@@ -9,7 +9,12 @@
 
     <center><a href="#{bean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
     <br/>
-    <br/>    
+    <br/>
+    <div styleClass="rounded">
+    #{bean.i18n['name']}<h:inputText value="#{bean.editedSLDNode.userObject}" />
+    </div>
+    <br/>
+    <br/>
     <mf:styleeditor value="#{bean.editedSLD}"/>        
     <br/>
     <div style="text-align: right;">
