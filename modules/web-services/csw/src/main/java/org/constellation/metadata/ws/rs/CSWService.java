@@ -18,6 +18,7 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
+import org.constellation.generic.database.BDD;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import javax.xml.bind.JAXBException;
@@ -265,7 +266,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      */
     @Override
     protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
-        configureInstance(instanceDirectory, new Automatic());
+        configureInstance(instanceDirectory, new Automatic("filesystem", new BDD()));
     }
 
 

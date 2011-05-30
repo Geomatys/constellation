@@ -18,6 +18,7 @@
 package org.constellation.sos.ws.rs;
 
 // Jersey dependencies
+import org.constellation.configuration.ObservationWriterType;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import javax.xml.bind.Marshaller;
@@ -36,7 +37,12 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.configuration.DataSourceType;
+import org.constellation.configuration.ObservationFilterType;
+import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.SOSConfiguration;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -235,7 +241,12 @@ public class SOService extends OGCWebService<SOSworker> {
      */
     @Override
     protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
-        configureInstance(instanceDirectory, new SOSConfiguration());
+        final SOSConfiguration baseConfig = new SOSConfiguration(new Automatic(null, new BDD()), new Automatic(null, new BDD()));
+        baseConfig.setObservationReaderType(ObservationReaderType.FILESYSTEM);
+        baseConfig.setObservationFilterType(ObservationFilterType.LUCENE);
+        baseConfig.setObservationWriterType(ObservationWriterType.FILESYSTEM);
+        baseConfig.setSMLType(DataSourceType.FILE_SYSTEM);
+        configureInstance(instanceDirectory, baseConfig);
     }
 
     /**

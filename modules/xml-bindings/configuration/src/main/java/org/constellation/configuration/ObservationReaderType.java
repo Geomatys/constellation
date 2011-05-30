@@ -24,9 +24,31 @@ package org.constellation.configuration;
  */
 public enum ObservationReaderType {
     
-    GENERIC,
+    GENERIC("generic"),
 
-    DEFAULT,
+    DEFAULT("default"),
 
-    FILESYSTEM
+    FILESYSTEM("filesystem");
+    
+    private final String name;
+    
+    private ObservationReaderType(final String name) {
+        this.name = name;
+    }
+    
+    public static ObservationReaderType fromName(final String name) {
+        for (ObservationReaderType o : ObservationReaderType.values()) {
+            if (o.getName().equals(name)) {
+                return o;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
 }

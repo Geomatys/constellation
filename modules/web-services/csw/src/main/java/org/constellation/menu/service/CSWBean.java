@@ -61,7 +61,7 @@ public class CSWBean extends AbstractServiceBean {
     public List<SelectItem> getProfiles() {
         final List<SelectItem> selectItems = new ArrayList<SelectItem>();
         selectItems.add(new SelectItem("discovery"));
-        selectItems.add(new SelectItem("transactionnal"));
+        selectItems.add(new SelectItem("transactional"));
         return selectItems;
     }
 

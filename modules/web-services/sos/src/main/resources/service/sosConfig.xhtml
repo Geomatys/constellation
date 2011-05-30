@@ -15,6 +15,91 @@
         <br/>
 
         SOS Configuration
+        <br/>
+        O&amp;M configuration
+        <br/>
+       <h:selectOneMenu value="#{sosBean.omConfigType}">
+        	<f:selectItems value="#{sosBean.omConfigTypes}"/>
+                <a4j:support event="onchange" reRender="omComponent"/>
+        </h:selectOneMenu>
+
+        <mf:CustomHtml tag="table" id="omComponent">
+        <mf:switch>
+                 <mf:case condition="#{sosBean.omConfigType == 'filesystem'}" fallthrought="false">
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['dataDirectory']}"/></td>
+                                <td><h:inputText value="#{sosBean.omDataDirectory}"/></td>
+                       </tr>
+                 </mf:case>
+                 <mf:case condition="#{sosBean.omConfigType == 'default'}" fallthrought="false">
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['driverClass']}"/></td>
+                                <td><h:inputText value="#{sosBean.omDriverClass}"/></td>
+                       </tr>
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['dbURL']}"/></td>
+                                <td><h:inputText value="#{sosBean.omConnectURL}"/></td>
+                       </tr>
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['user']}"/></td>
+                                <td><h:inputText value="#{sosBean.omUserName}"/></td>
+                       </tr>
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['passwd']}"/></td>
+                                <td><h:inputSecret value="#{sosBean.omUserPass}"/></td>
+                       </tr>
+                 </mf:case>
+        </mf:switch>   
+                        
+        </mf:CustomHtml>
+        <br/>
+        SensorML configuration
+        <br/>
+        
+        <h:selectOneMenu value="#{sosBean.smlConfigType}">
+        	<f:selectItems value="#{sosBean.smlConfigTypes}"/>
+                <a4j:support event="onchange" reRender="smlComponent"/>
+        </h:selectOneMenu>
+
+        <mf:CustomHtml tag="table" id="smlComponent">
+        <mf:switch>
+                 <mf:case condition="#{sosBean.smlConfigType == 'filesystem'}" fallthrought="false">
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['dataDirectory']}"/></td>
+                                <td><h:inputText value="#{sosBean.omDataDirectory}"/></td>
+                       </tr>
+                 </mf:case>
+                 <mf:case condition="#{sosBean.smlConfigType == 'mdweb'}" fallthrought="false">
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['driverClass']}"/></td>
+                                <td><h:inputText value="#{sosBean.smlDriverClass}"/></td>
+                       </tr>
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['dbURL']}"/></td>
+                                <td><h:inputText value="#{sosBean.smlConnectURL}"/></td>
+                       </tr>
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['user']}"/></td>
+                                <td><h:inputText value="#{sosBean.smlUserName}"/></td>
+                       </tr>
+                       <tr>
+                                <td><h:outputText value="#{sosBean.i18n['passwd']}"/></td>
+                                <td><h:inputSecret value="#{sosBean.smlUserPass}"/></td>
+                       </tr>
+                 </mf:case>
+        </mf:switch>   
+                        <tr>
+                                <td><h:outputText value="#{sosBean.i18n['profile']}"/></td>
+                                <td><h:selectOneMenu value="#{sosBean.profile}">
+                                        <f:selectItems value="#{sosBean.profiles}"/>
+                                    </h:selectOneMenu>
+                                </td>
+                       </tr>     
+        </mf:CustomHtml>
+           
+        <div style="text-align: right;">
+            <h:commandButton action="#{sosBean.saveConfiguration}" value="#{sosBean.i18n['save']}" />
+        </div>
     </ui:define>
     
 

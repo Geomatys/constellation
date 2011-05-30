@@ -24,14 +24,35 @@ package org.constellation.configuration;
  */
 public enum DataSourceType {
 
-    FILE_SYSTEM,
+    FILE_SYSTEM("filesystem"),
 
-    MDWEB,
+    MDWEB("mdweb"),
 
-    POSTGRID_O_M,
+    POSTGRID_O_M("posgtgrid"),
 
-    GENERIC_O_M,
+    GENERIC_O_M("generic"),
 
-    NONE
+    NONE("none");
 
+    private final String name;
+    
+    private DataSourceType(final String name) {
+        this.name = name;
+    }
+    
+    public static DataSourceType fromName(final String name) {
+        for (DataSourceType o : DataSourceType.values()) {
+            if (o.getName().equals(name)) {
+                return o;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
 }

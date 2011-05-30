@@ -42,12 +42,12 @@ public class SOSConfiguration {
     private Automatic smlConfiguration;
 
     /**
-     * Implemetation type for observation filter.
+     * Implementation type for observation filter.
      */
     private ObservationFilterType observationFilterType;
 
     /**
-     * Implemetation type for observation reader.
+     * Implementation type for observation reader.
      */
     private ObservationReaderType observationReaderType;
 
@@ -332,6 +332,10 @@ public class SOSConfiguration {
         if ("transactional".equalsIgnoreCase(profile))
             return 1;
         return 0;
+    }
+    
+    public String getProfileValue() {
+        return profile;
     }
 
     /**
