@@ -56,7 +56,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public final class ServiceAdministrator {
+public final class ConstellationServer {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
@@ -67,18 +67,18 @@ public final class ServiceAdministrator {
     private final String user;
     private final String password;
 
-    private ServiceAdministrator(final String server, final String user, final String password) {
+    private ConstellationServer(final String server, final String user, final String password) {
         this.server = server;
         this.user = user;
         this.password = password;
     }
     
-    public static ServiceAdministrator login(final String serviceURL, 
+    public static ConstellationServer login(final String serviceURL, 
             final String login, final String password) {
         ArgumentChecks.ensureNonNull("server url", serviceURL);
         ArgumentChecks.ensureNonNull("user", login);
         ArgumentChecks.ensureNonNull("password", password);
-        ServiceAdministrator serviceAdmin = new ServiceAdministrator(serviceURL, login, password);
+        ConstellationServer serviceAdmin = new ConstellationServer(serviceURL, login, password);
         
         //check if the service and logins are valid
         if(!serviceAdmin.authenticate()){

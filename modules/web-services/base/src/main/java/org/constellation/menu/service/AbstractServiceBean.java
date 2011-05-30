@@ -31,7 +31,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.service.ServiceAdministrator;
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.MenuBean;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
@@ -129,8 +129,8 @@ public class AbstractServiceBean extends I18NBean{
         return specification.name();
     }
 
-    private ServiceAdministrator getServiceAdministrator(){
-        return (ServiceAdministrator) FacesContext.getCurrentInstance()
+    private ConstellationServer getServiceAdministrator(){
+        return (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
     }
     

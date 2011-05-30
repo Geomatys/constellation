@@ -26,7 +26,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
 import javax.servlet.http.HttpServletRequest;
 
-import org.constellation.admin.service.ServiceAdministrator;
+import org.constellation.admin.service.ConstellationServer;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.i18n.I18NBean;
 
@@ -52,7 +52,7 @@ public final class NavigationBean extends I18NBean{
     }
 
     public String authentify() {
-        final ServiceAdministrator serviceAdmin = ServiceAdministrator.login(getServiceURL(), login, password);
+        final ConstellationServer serviceAdmin = ConstellationServer.login(getServiceURL(), login, password);
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(SERVICE_ADMIN_KEY, serviceAdmin);
         return (serviceAdmin != null) ? "login" : "failed";
     }

@@ -19,7 +19,7 @@ package org.constellation.menu.system;
 
 import java.io.File;
 import javax.faces.context.FacesContext;
-import org.constellation.admin.service.ServiceAdministrator;
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.menu.service.AbstractServiceBean;
 import org.constellation.provider.LayerProviderProxy;
@@ -49,7 +49,7 @@ public class CstlBean extends I18NBean{
         }
 
         //reload services
-        final ServiceAdministrator admin = (ServiceAdministrator) FacesContext.getCurrentInstance()
+        final ConstellationServer admin = (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(AbstractServiceBean.SERVICE_ADMIN_KEY);
         admin.services.restartAll();
 

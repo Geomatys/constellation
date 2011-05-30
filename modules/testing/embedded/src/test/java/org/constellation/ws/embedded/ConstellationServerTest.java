@@ -16,7 +16,7 @@
  */
 package org.constellation.ws.embedded;
 
-import org.constellation.admin.service.ServiceAdministrator;
+import org.constellation.admin.service.ConstellationServer;
 import org.geotoolkit.xml.MarshallerPool;
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -28,9 +28,9 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class ServiceAdministratorTest extends AbstractTestRequest {
+public class ConstellationServerTest extends AbstractTestRequest {
     
-    private static final ServiceAdministrator administrator = ServiceAdministrator.login("http://localhost:9090/", "", "");
+    private static final ConstellationServer administrator = ConstellationServer.login("http://localhost:9090/", "", "");
             
     @BeforeClass
     public static void initPool() throws JAXBException {
