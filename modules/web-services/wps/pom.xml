@@ -43,36 +43,24 @@
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-processing-core</artifactId>
-            <version>3.x-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-processing-vector</artifactId>
-            <version>3.x-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-processing-raster</artifactId>
-            <version>3.x-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-processing-coverage</artifactId>
-            <version>3.x-SNAPSHOT</version>
         </dependency>
         
-        <!-- TEST PROCESS -->
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-processing-test</artifactId>
-            <version>3.x-SNAPSHOT</version>
-        </dependency>
-
         <!-- Other -->
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-jaxp-gml</artifactId>
-            <version>3.x-SNAPSHOT</version>
         </dependency>
         
         <dependency>
@@ -84,39 +72,35 @@
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-xml-wps</artifactId>
-            <version>3.x-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-datastore-core</artifactId>
-            <version>3.x-SNAPSHOT</version>
         </dependency>
         
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-shapefile</artifactId>
-            <version>3.x-SNAPSHOT</version>
-        </dependency>
-        <!-- Web interface -->
-        <dependency>
-            <groupId>org.constellation.gui</groupId>
-            <artifactId>admin-base</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Postgre SQL-->
         <dependency>
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-epsg-javadb</artifactId>
-            <version>3.x-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.0-801.jdbc4</version>
+        </dependency>
+        
+        <!-- Web interface -->
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-base</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         
     </dependencies>
