@@ -51,7 +51,7 @@ public class CstlBean extends I18NBean{
         //reload services
         final ServiceAdministrator admin = (ServiceAdministrator) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(AbstractServiceBean.SERVICE_ADMIN_KEY);
-        admin.restartAll();
+        admin.services.restartAll();
 
         //reload providers
         LayerProviderProxy.getInstance().reload();

@@ -52,7 +52,7 @@ public final class NavigationBean extends I18NBean{
     }
 
     public String authentify() {
-        ServiceAdministrator serviceAdmin = ServiceAdministrator.login(getServiceURL(), login, password);
+        final ServiceAdministrator serviceAdmin = ServiceAdministrator.login(getServiceURL(), login, password);
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(SERVICE_ADMIN_KEY, serviceAdmin);
         return (serviceAdmin != null) ? "login" : "failed";
     }

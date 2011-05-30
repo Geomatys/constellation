@@ -61,7 +61,8 @@ public final class ServiceAdministrator {
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
 
-    
+    public final Services services = new Services();
+    public final Providers providers = new Providers();
     private final String server;
     private final String user;
     private final String password;
@@ -102,7 +103,7 @@ public final class ServiceAdministrator {
      * Set the basic authentication for HTTP request.
      * @return true if login/password are valid
      */
-    public boolean authenticate() {
+    private boolean authenticate() {
         final String str = server + "configuration";
         InputStream stream = null;
         HttpURLConnection cnx = null;
@@ -129,501 +130,7 @@ public final class ServiceAdministrator {
         return true;
     }
 
-    /**
-     * Return a complete URL for the specified service  (wms, wfs, csw,...) and instance identifier.
-     *
-     * @param service The service name (wms, wfs, csw,...).
-     * @param instanceId The instance identifier.
-     *
-     * @return A complete URL for the specified service.
-     */
-    public String getInstanceURL(final String service, final String instanceId) {
-        return getServiceURL() + service.toLowerCase() + '/' + instanceId;
-    }
-
-    /**
-     * Restart all the web-service (wms, wfs, csw,...)
-     *
-     * @return true if the operation succeed
-     */
-    public boolean restartAll() {
-        try {
-            final String url = getServiceURL() + "configuration?request=restart";
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType)response).getStatus());
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-
-    /**
-     * Restart all the instance of a specific web-service (wms, wfs, csw,...)
-     * 
-     * @param service The service name to restart (wms, wfs, csw,...).
-     * 
-     * @return true if the operation succeed
-     */
-    public boolean restartAllInstance(final String service) {
-        try {
-            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart";
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType)response).getStatus());
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-
-    /**
-     * Restart a unique instance for the specified service  (wms, wfs, csw,...) and instance identifier.
-     * 
-     * @param service The service name to restart (wms, wfs, csw,...).
-     * @param instanceId The instance identifier to restart.
-     * 
-     * @return true if the operation succeed
-     */
-    public boolean restartInstance(final String service, final String instanceId) {
-        try {
-            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType)response).getStatus());
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-
-    /**
-     * Create a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
-     *
-     * @param service The service name to restart (wms, wfs, csw,...).
-     * @param instanceId The instance identifier to create.
-     * 
-     * @return true if the operation succeed
-     */
-    public boolean newInstance(String service, String instanceId) {
-        try {
-            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType)response).getStatus());
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-
-    /**
-     * Start a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
-     * 
-     * @param service The service name to restart (wms, wfs, csw,...).
-     * @param instanceId The instance identifier to create.
-     *
-     * @return true if the operation succeed.
-     */
-    public boolean startInstance(final String service, final String instanceId) {
-        try {
-            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType)response).getStatus());
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-
-    /**
-     * Stop a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
-     *
-     * @param service The service name to restart (wms, wfs, csw,...).
-     * @param instanceId The instance identifier to create.
-     *
-     * @return true if the operation succeed.
-     */
-    public boolean stopInstance(final String service, final String instanceId) {
-        try {
-            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType)response).getStatus());
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-
-    /**
-     * Delete a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
-     *
-     * @param service The service name to start (wms, wfs, csw,...).
-     * @param instanceId The instance identifier to create.
-     *
-     * @return true if the operation succeed.
-     */
-    public boolean deleteInstance(final String service, final String instanceId) {
-        try {
-            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType)response).getStatus());
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-
-    /**
-     * Ask for a report about the instances for the specified service  (wms, wfs, csw,...).
-     *
-     * @param service The service name to restart (wms, wfs, csw,...).
-     *
-     * @return A {@link InstanceReport} about the specified service.
-     */
-    public InstanceReport listInstance(final String service) {
-        try {
-            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=listInstance";
-            final Object response = sendRequest(url, null);
-            if (response instanceof InstanceReport) {
-                return (InstanceReport) response;
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return null;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return null;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return null;
-    }
-
-    /**
-     * Send a configuration object to the specified service and instance.
-     * 
-     * @param service The service name to restart (wms, wfs, csw,...).
-     * @param instanceId The instance identifier to configure.
-     * @param configuration A configuration object depending on the service type (for example WxS service take LayerContext object).
-     *
-     * @return true if the operation succeed.
-     */
-    public boolean configureInstance(final String service, final String instanceId, final Object configuration) {
-        try {
-            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
-            final Object response = sendRequest(url, configuration);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType)response).getStatus());
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-
-    /**
-     * Return the current configuration object for the specified service and instance.
-     *
-     * @param service The service name to restart (wms, wfs, csw,...).
-     * @param instanceId The instance identifier to configure.
-     *
-     * @return  A configuration object depending on the service type (for example WxS service return LayerContext object).
-     */
-    public Object getInstanceconfiguration(final String service, final String instanceId) {
-        try {
-            final String url = getServiceURL() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
-            final Object response = sendRequest(url, null);
-            if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return null;
-            } else if (response != null){
-                return response;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return null;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-
-    /**
-     * Add a new source provider to the service.
-     * 
-     * @param serviceName The provider type (shapefile, coverage-sql, ...)
-     * @param config The configuration Object to add to the specific provider file.
-     * @return 
-     */
-    public boolean newSource(final String serviceName, final ParameterValueGroup config) {
-        try {
-            final String url = getServiceURL() + "configuration?request=addSource&serviceName=" + serviceName;
-            Object response = sendRequest(url, config);
-            if (response instanceof AcknowlegementType) {
-                return true;
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-    
-    /**
-     * Get the source provider configuration.
-     * 
-     * @param id The identifier of the source
-     * @return 
-     */
-    public GeneralParameterValue getSource(final String id, final ParameterDescriptorGroup descriptor) {
-        try {
-            final String url = getServiceURL() + "configuration?request=getSource&id=" + id;
-            Object response = sendRequest(url, null, descriptor);
-            if (response instanceof GeneralParameterValue) {
-                return (GeneralParameterValue) response;
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return null;
-    }
-    
-    /**
-     * Remove a source provider in the service.
-     * 
-     * @param id The identifier of the source
-     * @return 
-     */
-    public boolean removeSource(final String id) {
-        try {
-            final String url = getServiceURL() + "configuration?request=removeSource&id=" + id;
-            Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                final AcknowlegementType ack = (AcknowlegementType) response;
-                if ("Success".equals(ack.getStatus())) {
-                    return true;
-                } else {
-                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                }
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-    
-    /**
-     * Modify a source provider in the service.
-     * 
-     * @param serviceName The provider type (shapefile, coverage-sql, ...)
-     * @param config The configuration Object to modify on the specific provider file.
-     * @return 
-     */
-    public boolean modifySource(final String serviceName, final ParameterValueGroup config) {
-        try {
-            final String url = getServiceURL() + "configuration?request=modifySource&serviceName=" + serviceName;
-            final Object response = sendRequest(url, config);
-            if (response instanceof AcknowlegementType) {
-                final AcknowlegementType ack = (AcknowlegementType) response;
-                if ("Success".equals(ack.getStatus())) {
-                    return true;
-                } else {
-                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                }
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-    
-    /**
-     *Add a new layer to a source provider in the service.
-     * 
-     * @param id The identifier of the source
-     * @return 
-     */
-    public boolean addLayer(final String id, final ParameterValueGroup layer) {
-        try {
-            final String url = getServiceURL() + "configuration?request=addLayer&id=" + id;
-            Object response = sendRequest(url, layer);
-            if (response instanceof AcknowlegementType) {
-                final AcknowlegementType ack = (AcknowlegementType) response;
-                if ("Success".equals(ack.getStatus())) {
-                    return true;
-                } else {
-                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                }
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-    
-    /**
-     * Remove a source provider in the service.
-     * 
-     * @param id The identifier of the source
-     * @return 
-     */
-    public boolean removeLayer(final String id, final String layerName) {
-        try {
-            final String url = getServiceURL() + "configuration?request=removeLayere&id=" + id + "&layerName=" + layerName;
-            Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                final AcknowlegementType ack = (AcknowlegementType) response;
-                if ("Success".equals(ack.getStatus())) {
-                    return true;
-                } else {
-                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                }
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-    
-    /**
-     *Add a new layer to a source provider in the service.
-     * 
-     * @param id The identifier of the source
-     * @return 
-     */
-    public boolean modifyLayer(final String id, final String layerName, final ParameterValueGroup layer) {
-        try {
-            final String url = getServiceURL() + "configuration?request=modifyLayer&id=" + id + "&layerName=" + layerName;
-            Object response = sendRequest(url, layer);
-            if (response instanceof AcknowlegementType) {
-                final AcknowlegementType ack = (AcknowlegementType) response;
-                if ("Success".equals(ack.getStatus())) {
-                    return true;
-                } else {
-                    LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                }
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return false;
-    }
-    
-    /**
-     * Get the source provider configuration.
-     * 
-     * @param id The identifier of the source
-     * @return 
-     */
-    public GeneralParameterDescriptor getDescriptor(final String serviceName) {
-        try {
-            final String url = getServiceURL() + "configuration?request=getDescriptor&serviceName=" + serviceName;
-            Object response = sendDescriptorRequest(url, null);
-            if (response instanceof GeneralParameterDescriptor) {
-                return (GeneralParameterDescriptor) response;
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-            } else {
-                LOGGER.warning("Unexpected response type :" + response);
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return null;
-    }
-    
-    public ProviderReport listProviders() {
-        try {
-            final String url = getServiceURL() + "configuration?request=listProviders";
-            final Object response = sendRequest(url, null);
-            if (response instanceof ProviderReport) {
-                return (ProviderReport) response;
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return null;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return null;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
-        return null;
-    }
-    
-     private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
+    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
          return sendRequest(sourceURL, request, null);
      }
     
@@ -766,5 +273,513 @@ public final class ServiceAdministrator {
         return response;
     }
 
+    /**
+     * Configuration methods for services
+     */
+    public final class Services{
+        
+        /**
+         * Restart all the web-service (wms, wfs, csw,...)
+         *
+         * @return true if the operation succeed
+         */
+        public boolean restartAll() {
+            try {
+                final String url = getServiceURL() + "configuration?request=restart";
+                final Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    return "Success".equals(((AcknowlegementType)response).getStatus());
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return false;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return false;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
 
+        /**
+         * Restart all the instance of a specific web-service (wms, wfs, csw,...)
+         * 
+         * @param service The service name to restart (wms, wfs, csw,...).
+         * 
+         * @return true if the operation succeed
+         */
+        public boolean restartAllInstance(final String service) {
+            try {
+                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart";
+                final Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    return "Success".equals(((AcknowlegementType)response).getStatus());
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return false;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return false;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Restart a unique instance for the specified service  (wms, wfs, csw,...) and instance identifier.
+         * 
+         * @param service The service name to restart (wms, wfs, csw,...).
+         * @param instanceId The instance identifier to restart.
+         * 
+         * @return true if the operation succeed
+         */
+        public boolean restartInstance(final String service, final String instanceId) {
+            try {
+                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
+                final Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    return "Success".equals(((AcknowlegementType)response).getStatus());
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return false;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return false;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Create a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
+         *
+         * @param service The service name to restart (wms, wfs, csw,...).
+         * @param instanceId The instance identifier to create.
+         * 
+         * @return true if the operation succeed
+         */
+        public boolean newInstance(String service, String instanceId) {
+            try {
+                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
+                final Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    return "Success".equals(((AcknowlegementType)response).getStatus());
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return false;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return false;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Start a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
+         * 
+         * @param service The service name to restart (wms, wfs, csw,...).
+         * @param instanceId The instance identifier to create.
+         *
+         * @return true if the operation succeed.
+         */
+        public boolean startInstance(final String service, final String instanceId) {
+            try {
+                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
+                final Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    return "Success".equals(((AcknowlegementType)response).getStatus());
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return false;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return false;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Stop a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
+         *
+         * @param service The service name to restart (wms, wfs, csw,...).
+         * @param instanceId The instance identifier to create.
+         *
+         * @return true if the operation succeed.
+         */
+        public boolean stopInstance(final String service, final String instanceId) {
+            try {
+                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
+                final Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    return "Success".equals(((AcknowlegementType)response).getStatus());
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return false;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return false;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Delete a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
+         *
+         * @param service The service name to start (wms, wfs, csw,...).
+         * @param instanceId The instance identifier to create.
+         *
+         * @return true if the operation succeed.
+         */
+        public boolean deleteInstance(final String service, final String instanceId) {
+            try {
+                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
+                final Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    return "Success".equals(((AcknowlegementType)response).getStatus());
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return false;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return false;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Ask for a report about the instances for the specified service  (wms, wfs, csw,...).
+         *
+         * @param service The service name to restart (wms, wfs, csw,...).
+         *
+         * @return A {@link InstanceReport} about the specified service.
+         */
+        public InstanceReport listInstance(final String service) {
+            try {
+                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=listInstance";
+                final Object response = sendRequest(url, null);
+                if (response instanceof InstanceReport) {
+                    return (InstanceReport) response;
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return null;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return null;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+
+        /**
+         * Send a configuration object to the specified service and instance.
+         * 
+         * @param service The service name to restart (wms, wfs, csw,...).
+         * @param instanceId The instance identifier to configure.
+         * @param configuration A configuration object depending on the service type (for example WxS service take LayerContext object).
+         *
+         * @return true if the operation succeed.
+         */
+        public boolean configureInstance(final String service, final String instanceId, final Object configuration) {
+            try {
+                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
+                final Object response = sendRequest(url, configuration);
+                if (response instanceof AcknowlegementType) {
+                    return "Success".equals(((AcknowlegementType)response).getStatus());
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return false;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return false;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Return the current configuration object for the specified service and instance.
+         *
+         * @param service The service name to restart (wms, wfs, csw,...).
+         * @param instanceId The instance identifier to configure.
+         *
+         * @return  A configuration object depending on the service type (for example WxS service return LayerContext object).
+         */
+        public Object getInstanceconfiguration(final String service, final String instanceId) {
+            try {
+                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
+                final Object response = sendRequest(url, null);
+                if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return null;
+                } else if (response != null){
+                    return response;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return null;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Return a complete URL for the specified service  (wms, wfs, csw,...) and instance identifier.
+         *
+         * @param service The service name (wms, wfs, csw,...).
+         * @param instanceId The instance identifier.
+         *
+         * @return A complete URL for the specified service.
+         */
+        public String getInstanceURL(final String service, final String instanceId) {
+            return getServiceURL() + service.toLowerCase() + '/' + instanceId;
+        }
+        
+    }
+    
+    /**
+     * Configuration methods for providers
+     */
+    public final class Providers{
+        
+        /**
+         * Add a new source provider to the service.
+         * 
+         * @param serviceName The provider type (shapefile, coverage-sql, ...)
+         * @param config The configuration Object to add to the specific provider file.
+         * @return 
+         */
+        public boolean newSource(final String serviceName, final ParameterValueGroup config) {
+            try {
+                final String url = getServiceURL() + "configuration?request=addSource&serviceName=" + serviceName;
+                Object response = sendRequest(url, config);
+                if (response instanceof AcknowlegementType) {
+                    return true;
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Get the source provider configuration.
+         * 
+         * @param id The identifier of the source
+         * @return 
+         */
+        public GeneralParameterValue getSource(final String id, final ParameterDescriptorGroup descriptor) {
+            try {
+                final String url = getServiceURL() + "configuration?request=getSource&id=" + id;
+                Object response = sendRequest(url, null, descriptor);
+                if (response instanceof GeneralParameterValue) {
+                    return (GeneralParameterValue) response;
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+
+        /**
+         * Remove a source provider in the service.
+         * 
+         * @param id The identifier of the source
+         * @return 
+         */
+        public boolean removeSource(final String id) {
+            try {
+                final String url = getServiceURL() + "configuration?request=removeSource&id=" + id;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Modify a source provider in the service.
+         * 
+         * @param serviceName The provider type (shapefile, coverage-sql, ...)
+         * @param config The configuration Object to modify on the specific provider file.
+         * @return 
+         */
+        public boolean modifySource(final String serviceName, final ParameterValueGroup config) {
+            try {
+                final String url = getServiceURL() + "configuration?request=modifySource&serviceName=" + serviceName;
+                final Object response = sendRequest(url, config);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         *Add a new layer to a source provider in the service.
+         * 
+         * @param id The identifier of the source
+         * @return 
+         */
+        public boolean addLayer(final String id, final ParameterValueGroup layer) {
+            try {
+                final String url = getServiceURL() + "configuration?request=addLayer&id=" + id;
+                Object response = sendRequest(url, layer);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Remove a source provider in the service.
+         * 
+         * @param id The identifier of the source
+         * @return 
+         */
+        public boolean removeLayer(final String id, final String layerName) {
+            try {
+                final String url = getServiceURL() + "configuration?request=removeLayere&id=" + id + "&layerName=" + layerName;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         *Add a new layer to a source provider in the service.
+         * 
+         * @param id The identifier of the source
+         * @return 
+         */
+        public boolean modifyLayer(final String id, final String layerName, final ParameterValueGroup layer) {
+            try {
+                final String url = getServiceURL() + "configuration?request=modifyLayer&id=" + id + "&layerName=" + layerName;
+                Object response = sendRequest(url, layer);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+
+        /**
+         * Get the source provider configuration.
+         * 
+         * @param id The identifier of the source
+         * @return 
+         */
+        public GeneralParameterDescriptor getDescriptor(final String serviceName) {
+            try {
+                final String url = getServiceURL() + "configuration?request=getDescriptor&serviceName=" + serviceName;
+                Object response = sendDescriptorRequest(url, null);
+                if (response instanceof GeneralParameterDescriptor) {
+                    return (GeneralParameterDescriptor) response;
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                } else {
+                    LOGGER.warning("Unexpected response type :" + response);
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+
+        public ProviderReport listProviders() {
+            try {
+                final String url = getServiceURL() + "configuration?request=listProviders";
+                final Object response = sendRequest(url, null);
+                if (response instanceof ProviderReport) {
+                    return (ProviderReport) response;
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return null;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return null;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+
+        
+    }
+    
 }

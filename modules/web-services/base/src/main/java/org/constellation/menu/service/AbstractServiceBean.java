@@ -139,7 +139,7 @@ public class AbstractServiceBean extends I18NBean{
      *      This list include both started and stopped instances.
      */
     public final TreeModel getInstances(){
-        final InstanceReport report = getServiceAdministrator().listInstance(getSpecificationName());
+        final InstanceReport report = getServiceAdministrator().services.listInstance(getSpecificationName());
         final List<ServiceInstance> instances = new ArrayList<ServiceInstance>();
         for(Instance instance : report.getInstances()){
             instances.add(new ServiceInstance(instance));
@@ -185,7 +185,7 @@ public class AbstractServiceBean extends I18NBean{
             return;
         }
 
-        final InstanceReport report = getServiceAdministrator().listInstance(getSpecificationName());
+        final InstanceReport report = getServiceAdministrator().services.listInstance(getSpecificationName());
         for(Instance instance : report.getInstances()){
             if(newServiceName.equals(instance.getName())){
                 //an instance with this already exist
@@ -193,7 +193,7 @@ public class AbstractServiceBean extends I18NBean{
             }
         }
 
-        getServiceAdministrator().newInstance(getSpecificationName(), newServiceName);
+        getServiceAdministrator().services.newInstance(getSpecificationName(), newServiceName);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -307,7 +307,7 @@ public class AbstractServiceBean extends I18NBean{
      */
     public void saveConfiguration(){
         if(configuredInstance != null){
-            getServiceAdministrator().configureInstance(getSpecificationName(), configuredInstance.getName(), configurationObject);
+            getServiceAdministrator().services.configureInstance(getSpecificationName(), configuredInstance.getName(), configurationObject);
             configuredInstance.restart();
         }
     }
@@ -328,7 +328,7 @@ public class AbstractServiceBean extends I18NBean{
          * @return URL path to the running service.
          */
         public String getPath(){
-            return getServiceAdministrator().getInstanceURL(getSpecificationName(), instance.getName());
+            return getServiceAdministrator().services.getInstanceURL(getSpecificationName(), instance.getName());
         }
 
         public String getStatusIcon(){
@@ -344,7 +344,7 @@ public class AbstractServiceBean extends I18NBean{
          */
         public void config(){
             configuredInstance = this;
-            configurationObject = getServiceAdministrator().getInstanceconfiguration(getSpecificationName(), instance.getName());
+            configurationObject = getServiceAdministrator().services.getInstanceconfiguration(getSpecificationName(), instance.getName());
 
             if(configurationObject instanceof LayerContext){
                 treemodel = new LayerContextTreeModel((LayerContext)configurationObject);
@@ -365,21 +365,21 @@ public class AbstractServiceBean extends I18NBean{
         }
 
         public void start(){
-            getServiceAdministrator().startInstance(getSpecificationName(), instance.getName());
+            getServiceAdministrator().services.startInstance(getSpecificationName(), instance.getName());
             refresh();
         }
         public void stop(){
-            getServiceAdministrator().stopInstance(getSpecificationName(), instance.getName());
+            getServiceAdministrator().services.stopInstance(getSpecificationName(), instance.getName());
             refresh();
         }
 
         public void delete(){
-            getServiceAdministrator().deleteInstance(getSpecificationName(), instance.getName());
+            getServiceAdministrator().services.deleteInstance(getSpecificationName(), instance.getName());
             refresh();
         }
 
         public void restart(){
-            getServiceAdministrator().restartInstance(getSpecificationName(), instance.getName());
+            getServiceAdministrator().services.restartInstance(getSpecificationName(), instance.getName());
             refresh();
         }
 
@@ -387,7 +387,7 @@ public class AbstractServiceBean extends I18NBean{
          * Refresh this instance.
          */
         private void refresh(){
-            final InstanceReport report = getServiceAdministrator().listInstance(getSpecificationName());
+            final InstanceReport report = getServiceAdministrator().services.listInstance(getSpecificationName());
             for(final Instance inst : report.getInstances()){
                 if(instance.getName().equals(inst.getName())){
                     instance = inst;

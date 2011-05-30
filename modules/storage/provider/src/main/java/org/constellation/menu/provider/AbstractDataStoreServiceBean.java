@@ -37,6 +37,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
+import org.constellation.admin.service.ServiceAdministrator;
 import org.constellation.bean.HighLightRowStyler;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.AbstractProviderProxy;

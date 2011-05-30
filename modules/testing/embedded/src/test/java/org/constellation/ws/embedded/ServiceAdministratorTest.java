@@ -54,7 +54,7 @@ public class ServiceAdministratorTest extends AbstractTestRequest {
     @Test
     public void testgetDescriptor() throws Exception {
         
-        GeneralParameterDescriptor desc = administrator.getDescriptor("shapefile");
+        GeneralParameterDescriptor desc = administrator.providers.getDescriptor("shapefile");
         assertNotNull(desc);
     }
     
