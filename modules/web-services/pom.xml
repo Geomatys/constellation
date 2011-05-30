@@ -85,6 +85,7 @@
         <module>wcs</module>
         <module>wfs</module>
         <module>map</module>
+        <module>wps</module>
       </modules>
     </profile>
     <profile>
