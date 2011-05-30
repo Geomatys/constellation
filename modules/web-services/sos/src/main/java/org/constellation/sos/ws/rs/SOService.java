@@ -250,7 +250,6 @@ public class SOService extends OGCWebService<SOSworker> {
                 unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(configurationFile);
                 if (obj instanceof SOSConfiguration) {
-                    ((SOSConfiguration)obj).hideSensibleField();
                     return obj;
                 } else {
                     throw new CstlServiceException("The config.xml file does not contain a SOSConfiguration object");

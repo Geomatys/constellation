@@ -13,8 +13,53 @@
         <center><a href="#{cswBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
         <br/>
         <br/>
-
         CSW Configuration
+        <br/>
+        <h:selectOneMenu value="#{cswBean.configType}">
+        	<f:selectItems value="#{cswBean.configTypes}"/>
+                <a4j:support event="onchange" reRender="specificComponent"/>
+        </h:selectOneMenu>
+
+        <mf:CustomHtml tag="table" id="specificComponent">
+        <mf:switch>
+                 <mf:case condition="#{cswBean.configType == 'filesystem'}" fallthrought="false">
+                       <tr>
+                                <td><h:outputText value="#{cswBean.i18n['dataDirectory']}"/></td>
+                                <td><h:inputText value="#{cswBean.dataDirectory}"/></td>
+                       </tr>
+                 </mf:case>
+                 <mf:case condition="#{cswBean.configType == 'mdweb'}" fallthrought="false">
+                       <tr>
+                                <td><h:outputText value="#{cswBean.i18n['driverClass']}"/></td>
+                                <td><h:inputText value="#{cswBean.driverClass}"/></td>
+                       </tr>
+                       <tr>
+                                <td><h:outputText value="#{cswBean.i18n['dbURL']}"/></td>
+                                <td><h:inputText value="#{cswBean.connectURL}"/></td>
+                       </tr>
+                       <tr>
+                                <td><h:outputText value="#{cswBean.i18n['user']}"/></td>
+                                <td><h:inputText value="#{cswBean.userName}"/></td>
+                       </tr>
+                       <tr>
+                                <td><h:outputText value="#{cswBean.i18n['passwd']}"/></td>
+                                <td><h:inputSecret value="#{cswBean.userPass}"/></td>
+                       </tr>
+                 </mf:case>
+        </mf:switch>   
+                        <tr>
+                                <td><h:outputText value="#{cswBean.i18n['profile']}"/></td>
+                                <td><h:selectOneMenu value="#{cswBean.profile}">
+                                        <f:selectItems value="#{cswBean.profiles}"/>
+                                    </h:selectOneMenu>
+                                </td>
+                       </tr>     
+        </mf:CustomHtml>
+
+        <div style="text-align: right;">
+            <h:commandButton action="#{cswBean.saveConfiguration}" value="#{cswBean.i18n['save']}" />
+        </div>
+
     </ui:define>
     
 

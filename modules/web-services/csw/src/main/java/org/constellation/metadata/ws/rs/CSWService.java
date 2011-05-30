@@ -281,7 +281,6 @@ public class CSWService extends OGCWebService<CSWworker> {
                 unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(configurationFile);
                 if (obj instanceof Automatic) {
-                    ((Automatic)obj).hideSensibleField();
                     return obj;
                 } else {
                     throw new CstlServiceException("The config.xml file does not contain a Automatic object");

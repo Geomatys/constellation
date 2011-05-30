@@ -112,7 +112,7 @@ public class AbstractServiceBean extends I18NBean{
     private final String mainPage;
     private String newServiceName = "default";
     private ServiceInstance configuredInstance = null;
-    private Object configurationObject = null;
+    protected Object configurationObject = null;
     private LayerContextTreeModel treemodel = null;
     private String selectedPotentialSource = null;
 

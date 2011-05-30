@@ -262,11 +262,15 @@ public class Automatic {
         File result = null;
         if (dataDirectory != null) {
             result = new File(dataDirectory);
-            if (!result.exists() && configurationDirectory.exists()) {
+            if (!result.exists() && configurationDirectory != null && configurationDirectory.exists()) {
                 result = new File(configurationDirectory, dataDirectory);
             }
         }
         return result;
+    }
+    
+    public String getDataDirectoryValue() {
+        return dataDirectory;
     }
 
     /**
@@ -323,6 +327,10 @@ public class Automatic {
         if ("discovery".equalsIgnoreCase(profile))
             return 0;
         return 1;
+    }
+    
+    public String getProfileValue() {
+        return profile;
     }
 
     /**
