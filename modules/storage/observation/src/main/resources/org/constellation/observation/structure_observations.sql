@@ -9,16 +9,16 @@ CREATE SCHEMA "sos";
 CREATE SCHEMA "observation";
 
 CREATE TABLE "observation"."Distributions" (
-    "name" character varying(20) NOT NULL,
-    "scale" real,
+    "name"   character varying(40) NOT NULL,
+    "scale"  real,
     "offset" real,
-    "log" boolean
+    "log"    boolean
 );
 
 CREATE TABLE "observation"."any_results" (
-    "id_result" integer DEFAULT nextval(('observation.any_results_id_result_seq'::text)::regclass) NOT NULL,
-    "reference" character varying,
-    "values" character varying,
+    "id_result"  integer DEFAULT nextval(('observation.any_results_id_result_seq'::text)::regclass) NOT NULL,
+    "reference"  character varying(40),
+    "values"     character varying(1000),
     "definition" character varying(20)
 );
 
@@ -29,142 +29,142 @@ CREATE SEQUENCE "any_results_id_result_seq"
     CACHE 1;
 
 CREATE TABLE "observation"."any_scalars" (
-    "id_datablock" character varying NOT NULL,
-    "id_datarecord" character varying NOT NULL,
-    "name" character varying NOT NULL,
-    "definition" character varying,
-    "type" character varying,
-    "uom_code" character varying,
-    "uom_href" character varying,
-    "value" boolean
+    "id_datablock"  character varying(40) NOT NULL,
+    "id_datarecord" character varying(40) NOT NULL,
+    "name"          character varying(40) NOT NULL,
+    "definition"    character varying(50),
+    "type"          character varying(40),
+    "uom_code"      character varying(40),
+    "uom_href"      character varying(40),
+    "value"         boolean
 );
 
 CREATE TABLE "observation"."components" (
-    "composite_phenomenon" character varying NOT NULL,
-    "component" character varying NOT NULL
+    "composite_phenomenon" character varying(40) NOT NULL,
+    "component"            character varying(40) NOT NULL
 );
 
 CREATE TABLE "observation"."composite_phenomenons" (
-    "id" character varying NOT NULL,
-    "name" character varying,
-    "description" character varying,
-    "dimension" integer
+    "id"          character varying(40) NOT NULL,
+    "name"        character varying(40),
+    "description" character varying(50),
+    "dimension"   integer
 );
 
 CREATE TABLE "observation"."data_array_definition" (
-    "id_array_definition" character varying(20) NOT NULL,
-    "element_count" smallint NOT NULL,
-    "elementType" character varying,
-    "encoding" character varying(20)
+    "id_array_definition" character varying(40) NOT NULL,
+    "element_count"       smallint NOT NULL,
+    "elementType"         character varying(40),
+    "encoding"            character varying(40)
 );
 
 CREATE TABLE "observation"."data_block_definitions" (
-    "id" character varying NOT NULL,
-    "encoding" character varying
+    "id"       character varying(40) NOT NULL,
+    "encoding" character varying(40)
 );
 
 CREATE TABLE "observation"."measurements" (
-    "name" character varying NOT NULL,
-    "description" character varying,
-    "feature_of_interest" character varying,
-    "procedure" character varying,
-    "sampling_time_begin" timestamp without time zone,
-    "sampling_time_end" timestamp without time zone,
-    "result_definition" character varying,
-    "observed_property" character varying,
-    "result" character varying,
-    "distribution" character varying,
-    "feature_of_interest_point" character varying,
-    "observed_property_composite" character varying
+    "name"                        character varying(50) NOT NULL,
+    "description"                 character varying(50),
+    "feature_of_interest"         character varying(40),
+    "procedure"                   character varying(40),
+    "sampling_time_begin"         timestamp without time zone,
+    "sampling_time_end"           timestamp without time zone,
+    "result_definition"           character varying(40),
+    "observed_property"           character varying(40),
+    "result"                      character varying(40),
+    "distribution"                character varying(40),
+    "feature_of_interest_point"   character varying(40),
+    "observed_property_composite" character varying(40)
 );
 
 CREATE TABLE "observation"."measures" (
-    "name" character varying NOT NULL,
-    "uom" character varying,
+    "name"  character varying(40) NOT NULL,
+    "uom"   character varying(40),
     "value" real
 );
 
 CREATE TABLE "observation"."observations" (
-    "name" character varying NOT NULL,
-    "description" character varying,
-    "feature_of_interest" character varying,
-    "procedure" character varying,
-    "sampling_time_begin" timestamp without time zone,
-    "sampling_time_end" timestamp without time zone,
-    "result_definition" character varying,
-    "observed_property" character varying,
-    "result" character varying,
-    "distribution" character varying,
-    "feature_of_interest_point" character varying,
-    "observed_property_composite" character varying
+    "name"                        character varying(50) NOT NULL,
+    "description"                 character varying(50),
+    "feature_of_interest"         character varying(40),
+    "procedure"                   character varying(40),
+    "sampling_time_begin"         timestamp without time zone,
+    "sampling_time_end"           timestamp without time zone,
+    "result_definition"           character varying(40),
+    "observed_property"           character varying(40),
+    "result"                      character varying(40),
+    "distribution"                character varying(40),
+    "feature_of_interest_point"   character varying(40),
+    "observed_property_composite" character varying(40)
 );
 
 CREATE TABLE "observation"."phenomenons" (
-    "id" character varying NOT NULL,
-    "name" character varying,
-    "description" character varying
+    "id"          character varying(40) NOT NULL,
+    "name"        character varying(40),
+    "description" character varying(40)
 );
 
 CREATE TABLE "observation"."process" (
-    "name" character varying NOT NULL,
-    "description" character varying
+    "name"        character varying(40) NOT NULL,
+    "description" character varying(40)
 );
 
 CREATE TABLE "observation"."references" (
-    "id_reference" character varying NOT NULL,
-    "actuate" character varying,
-    "arcrole" character varying,
-    "href" character varying,
-    "role" character varying,
-    "show" character varying,
-    "title" character varying,
-    "type" character varying,
-    "owns" boolean
+    "id_reference" character varying(40) NOT NULL,
+    "actuate"      character varying(40),
+    "arcrole"      character varying(40),
+    "href"         character varying(40),
+    "role"         character varying(40),
+    "show"         character varying(40),
+    "title"        character varying(40),
+    "type"         character varying(40),
+    "owns"         boolean
 );
 
 CREATE TABLE "observation"."sampling_features" (
-    "id" character varying NOT NULL,
-    "description" character varying,
-    "name" character varying,
-    "sampled_feature" character varying
+    "id"              character varying(40) NOT NULL,
+    "description"     character varying(40),
+    "name"            character varying(40),
+    "sampled_feature" character varying(40)
 );
 
 CREATE TABLE "observation"."sampling_points" (
-    "id" character varying NOT NULL,
-    "description" character varying,
-    "name" character varying,
-    "sampled_feature" character varying,
-    "point_id" character varying,
-    "point_srsname" character varying,
+    "id"                 character varying(40) NOT NULL,
+    "description"        character varying(50),
+    "name"               character varying(40),
+    "sampled_feature"    character varying(40),
+    "point_id"           character varying(40),
+    "point_srsname"      character varying(40),
     "point_srsdimension" integer,
-    "x_value" double precision,
-    "y_value" double precision
+    "x_value"            double precision,
+    "y_value"            double precision
 );
 
 CREATE TABLE "observation"."simple_data_records" (
-    "id_datablock" character varying NOT NULL,
-    "id_datarecord" character varying NOT NULL,
-    "definition" character varying,
-    "fixed" boolean
+    "id_datablock"  character varying(40) NOT NULL,
+    "id_datarecord" character varying(40) NOT NULL,
+    "definition"    character varying(40),
+    "fixed"         boolean
 );
 
 CREATE TABLE "observation"."text_block_encodings" (
-    "id_encoding" character varying NOT NULL,
-    "token_separator" character varying(3),
-    "block_separator" character varying(3),
-    "decimal_separator" "char"
+    "id_encoding"       character varying(40) NOT NULL,
+    "token_separator"   character varying(3),
+    "block_separator"   character varying(3),
+    "decimal_separator" char
 );
 
 CREATE TABLE "observation"."unit_of_measures" (
-    "id" character varying NOT NULL,
-    "name" character varying,
-    "quantity_type" character varying,
-    "unit_system" character varying
+    "id"            character varying(40) NOT NULL,
+    "name"          character varying(40),
+    "quantity_type" character varying(40),
+    "unit_system"   character varying(40)
 );
 
 CREATE TABLE "sos"."envelopes" (
-    "id" character varying NOT NULL,
-    "srs_name" character varying,
+    "id"             character varying(40) NOT NULL,
+    "srs_name"       character varying(40),
     "lower_corner_x" double precision,
     "lower_corner_y" double precision,
     "upper_corner_x" double precision,
@@ -172,48 +172,48 @@ CREATE TABLE "sos"."envelopes" (
 );
 
 CREATE TABLE "sos"."geographic_localisations" (
-    "id" character varying NOT NULL,
+    "id"       character varying(40) NOT NULL,
     "the_geom" postgis.geometry
 );
 
 CREATE TABLE "sos"."observation_offerings" (
-    "id" character varying NOT NULL,
-    "name" character varying,
-    "srs_name" character varying,
-    "description" character varying,
-    "event_time_begin" timestamp without time zone,
-    "event_time_end" timestamp without time zone,
-    "bounded_by" character varying,
-    "response_format" character varying,
-    "response_mode" character varying,
-    "result_model_namespace" character varying,
-    "result_model_localpart" character varying
+    "id"                     character varying(40) NOT NULL,
+    "name"                   character varying(40),
+    "srs_name"               character varying(40),
+    "description"            character varying(40),
+    "event_time_begin"       timestamp without time zone,
+    "event_time_end"         timestamp without time zone,
+    "bounded_by"             character varying(40),
+    "response_format"        character varying(40),
+    "response_mode"          character varying(40),
+    "result_model_namespace" character varying(40),
+    "result_model_localpart" character varying(40)
 );
 
 CREATE TABLE "sos"."offering_phenomenons" (
-    "id_offering" character varying,
-    "phenomenon" character varying,
-    "composite_phenomenon" character varying
+    "id_offering"          character varying(40),
+    "phenomenon"           character varying(40),
+    "composite_phenomenon" character varying(40)
 );
 
 CREATE TABLE "sos"."offering_procedures" (
-    "id_offering" character varying NOT NULL,
-    "procedure" character varying NOT NULL
+    "id_offering" character varying(40) NOT NULL,
+    "procedure"   character varying(40) NOT NULL
 );
 
 CREATE TABLE "sos"."offering_response_modes" (
-    "id_offering" character varying NOT NULL,
-    "mode" character varying NOT NULL
+    "id_offering" character varying(40) NOT NULL,
+    "mode"        character varying(40) NOT NULL
 );
 
 CREATE TABLE "sos"."offering_sampling_features" (
-    "id_offering" character varying NOT NULL,
-    "sampling_feature" character varying NOT NULL
+    "id_offering"      character varying(40) NOT NULL,
+    "sampling_feature" character varying(40) NOT NULL
 );
 
 CREATE TABLE "sos"."projected_localisations" (
-    "id" character varying NOT NULL,
-    "the_geom" postgis.geometry
+    "id" character varying(40) NOT NULL,
+    "the_geom"     postgis.geometry
 );
 
 ALTER TABLE "observation"."any_results" ADD CONSTRAINT any_pkey PRIMARY KEY ("id_result");

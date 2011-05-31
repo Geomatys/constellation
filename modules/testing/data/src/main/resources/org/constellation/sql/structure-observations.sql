@@ -11,7 +11,7 @@ CREATE TABLE "observation"."Distributions" (
 CREATE TABLE "observation"."any_results" (
     "id_result"  integer NOT NULL,
     "reference"  character varying(40),
-    "values"     character varying(300),
+    "values"     character varying(1000),
     "definition" character varying(40)
 );
 
