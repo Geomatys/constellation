@@ -636,12 +636,13 @@ public final class ConstellationServer {
          * Modify a source provider in the service.
          * 
          * @param serviceName The provider type (shapefile, coverage-sql, ...)
+         * @param id The identifier of the source to update.
          * @param config The configuration Object to modify on the specific provider file.
          * @return 
          */
-        public boolean modifySource(final String serviceName, final ParameterValueGroup config) {
+        public boolean modifySource(final String serviceName, final String id, final ParameterValueGroup config) {
             try {
-                final String url = getServiceURL() + "configuration?request=modifySource&serviceName=" + serviceName;
+                final String url = getServiceURL() + "configuration?request=modifySource&serviceName=" + serviceName + "&id=" + id;
                 final Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;

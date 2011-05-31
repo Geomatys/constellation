@@ -85,6 +85,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             
         } else if ("modifySource".equalsIgnoreCase(request)) {
             final String serviceName = getParameter("serviceName", true, parameters);
+            final String currentId = getParameter("id", true, parameters);
             final LayerProviderService service = services.get(serviceName);
             if (service != null) {
                 
@@ -94,20 +95,15 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     reader.setInput(objectRequest);
                     ParameterValueGroup sourceToModify = (ParameterValueGroup) reader.read();
                     reader.dispose();
-                    final String currentId = stringValue(ProviderParameters.SOURCE_ID_DESCRIPTOR,sourceToModify);
                     
-                    if (currentId != null) {
-                        Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-                        for (LayerProvider p : providers) {
-                            if (p.getId().equals(currentId)) {
-                                p.updateSource(sourceToModify);
-                                return new AcknowlegementType("Success", "The source has been modified");
-                            }
+                    Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+                    for (LayerProvider p : providers) {
+                        if (p.getId().equals(currentId)) {
+                            p.updateSource(sourceToModify);
+                            return new AcknowlegementType("Success", "The source has been modified");
                         }
-                        return new AcknowlegementType("Failure", "Unable to find a source named:" + currentId);
-                    } else {
-                        throw new CstlServiceException("there is no ID on the source");
                     }
+                    return new AcknowlegementType("Failure", "Unable to find a source named:" + currentId);   
                     
                 } catch (XMLStreamException ex) {
                     throw new CstlServiceException(ex);
