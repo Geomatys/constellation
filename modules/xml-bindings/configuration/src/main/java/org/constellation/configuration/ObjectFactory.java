@@ -101,6 +101,10 @@ public class ObjectFactory {
     public InstanceReport createInstanceReport() {
         return new InstanceReport();
     }
+    
+    public ServiceReport createServiceReport() {
+        return new ServiceReport();
+    }
 
     public ProviderReport createProviderReport() {
         return new ProviderReport();

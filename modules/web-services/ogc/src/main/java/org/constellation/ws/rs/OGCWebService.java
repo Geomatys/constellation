@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -108,7 +108,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             throw new IllegalArgumentException("It is compulsory for a web service to have " +
                     "at least one version specified.");
         }
-        LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", supportedVersions[0].specification.name());
+        final String serviceName = supportedVersions[0].specification.name();
+        LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
+        registerService(serviceName);
         
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
@@ -670,5 +672,5 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     protected MarshallerPool getConfigurationPool() {
         return GenericDatabaseMarshallerPool.getInstance();
     }
-
+    
 }

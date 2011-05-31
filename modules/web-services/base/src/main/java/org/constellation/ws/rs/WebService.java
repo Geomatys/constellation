@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -133,6 +134,8 @@ public abstract class WebService {
      * The default debugging logger for all web services.
      */
     protected static final Logger LOGGER = Logging.getLogger(WebService.class);
+    
+    protected static final List<String> REGISTERED_SERVICE = new ArrayList<String>();
 
     /**
      * Automatically set by Jersey.
@@ -646,4 +649,15 @@ public abstract class WebService {
      * @return
      */
     protected abstract MarshallerPool getConfigurationPool();
+    
+    /**
+     * Add a service type to the list of registered service if it is not already registred.
+     * 
+     * @param serviceName A service type (CSW, SOS, WMS, ...).
+     */
+    protected static void registerService(final String serviceName) {
+        if (!REGISTERED_SERVICE.contains(serviceName)) {
+            REGISTERED_SERVICE.add(serviceName);
+        }
+    }
 }

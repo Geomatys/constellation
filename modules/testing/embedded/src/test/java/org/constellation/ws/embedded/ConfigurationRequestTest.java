@@ -27,6 +27,7 @@ import java.net.URLConnection;
 import java.net.URL;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ServiceReport;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
@@ -256,5 +257,28 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
                                                          null, 
                                                          "1.0");
         assertEquals(expResult, obj);
+    }
+    
+    @Test
+    public void testListAvailableService() throws Exception {
+        URL niUrl = new URL("http://localhost:9090/configuration?request=ListAvailableService");
+
+
+        // for a POST request
+        URLConnection conec = niUrl.openConnection();
+
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof ServiceReport);
+        final ServiceReport result = (ServiceReport) obj;
+        assertTrue(result.getAvailableServices().contains("WMS"));
+        assertTrue(result.getAvailableServices().contains("SOS"));
+        assertTrue(result.getAvailableServices().contains("CSW"));
+        assertTrue(result.getAvailableServices().contains("WCS"));
+        assertTrue(result.getAvailableServices().contains("WFS"));
+        
+        assertEquals(result.getAvailableServices().toString(), 5, result.getAvailableServices().size());
+        
+        
     }
 }

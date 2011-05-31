@@ -45,6 +45,7 @@ import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.configuration.filter.ConfigurerFilter;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -154,6 +155,11 @@ public final class ConfigurationService extends WebService  {
             else if ("Download".equalsIgnoreCase(request)) {    
                 final File f = downloadFile();
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
+            }
+                    
+            else if ("ListAvailableService".equalsIgnoreCase(request)) {    
+                final ServiceReport response = new ServiceReport(REGISTERED_SERVICE);
+                return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
                     
             
