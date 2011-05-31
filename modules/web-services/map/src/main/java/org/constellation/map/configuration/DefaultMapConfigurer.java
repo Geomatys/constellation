@@ -42,7 +42,6 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.ws.ExceptionCode.*;
-import static org.geotoolkit.parameter.Parameters.*;
 
 /**
  *
@@ -53,14 +52,17 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     private Map<String, LayerProviderService> services = new HashMap<String, LayerProviderService>();
     
     public DefaultMapConfigurer() {
-        final Collection<LayerProviderService> services = LayerProviderProxy.getInstance().getServices();
-        for (LayerProviderService service: services) {
+        final Collection<LayerProviderService> availableServices = LayerProviderProxy.getInstance().getServices();
+        for (LayerProviderService service: availableServices) {
             this.services.put(service.getName(), service);
         }
     }
     
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public Object treatRequest(String request, MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
+    public Object treatRequest(final String request, final MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
         if ("addSource".equalsIgnoreCase(request)) {
             return addSource(parameters, objectRequest);
         } else if ("modifySource".equalsIgnoreCase(request)) {
@@ -83,12 +85,24 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         return null;
     }
     
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void beforeRestart() {
         StyleProviderProxy.getInstance().dispose();
         LayerProviderProxy.getInstance().dispose();
     }
     
+    /**
+     * Add a new source to the specified provider.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * @param objectRequest The POST parameters send in the request.
+     * 
+     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @throws CstlServiceException 
+     */
     private AcknowlegementType addSource(final MultivaluedMap<String, String> parameters,
             final Object objectRequest) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
@@ -114,6 +128,15 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
     }
     
+    /**
+     * Modify a source in the specified provider.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * @param objectRequest The POST parameters send in the request.
+     * 
+     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @throws CstlServiceException 
+     */
     private AcknowlegementType modifySource(final MultivaluedMap<String, String> parameters,
             final Object objectRequest) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
@@ -147,6 +170,14 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
     }
     
+    /**
+     * Return the configuration object  of the specified source.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * 
+     * @return The configuration object  of the specified source.
+     * @throws CstlServiceException 
+     */
     private Object getSource(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String id = getParameter("id", true, parameters);
             
@@ -160,6 +191,14 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         return new AcknowlegementType("Failure", "Unable to find a source named:" + id);
     }
     
+    /**
+     * Remove a source in the specified provider.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * 
+     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @throws CstlServiceException 
+     */
     private AcknowlegementType removeSource(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String sourceId = getParameter("id", true, parameters);
         Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
@@ -172,6 +211,15 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
     }
     
+    /**
+     * Add a layer to the specified provider.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * @param objectRequest The POST parameters send in the request.
+     * 
+     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @throws CstlServiceException 
+     */
     private AcknowlegementType addLayer(final MultivaluedMap<String, String> parameters, 
             final Object objectRequest) throws CstlServiceException{
         
@@ -201,6 +249,14 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
     }
     
+    /**
+     * Remove a layer in the specified provider.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * 
+     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @throws CstlServiceException 
+     */
     private AcknowlegementType removeLayer(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String sourceId = getParameter("id", true, parameters);
         final String layerName = getParameter("layerName", true, parameters);
@@ -227,6 +283,15 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
     }
     
+    /**
+     * Modify a layer to the specified provider.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * @param objectRequest The POST parameters send in the request.
+     * 
+     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @throws CstlServiceException 
+     */
     private AcknowlegementType modifyLayer(final MultivaluedMap<String, String> parameters, 
             final Object objectRequest) throws CstlServiceException{
         
@@ -268,6 +333,14 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
     }
     
+    /**
+     * Return the descriptor of the specified provider type.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * 
+     * @return The descriptor of the specified provider type.
+     * @throws CstlServiceException 
+     */
     private ParameterDescriptorGroup getDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
         final LayerProviderService service = services.get(serviceName);
@@ -277,6 +350,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
     }
     
+    /**
+     * Return a description of the available providers.
+     * 
+     * @return A description of the available providers.
+     */
     private ProviderReport listProviders(){
         final List<Provider> providerDesc = new ArrayList<Provider>();
         for (LayerProviderService service: services.values()) {
