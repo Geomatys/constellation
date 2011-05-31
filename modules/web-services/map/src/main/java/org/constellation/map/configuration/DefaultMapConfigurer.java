@@ -38,6 +38,7 @@ import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.ws.ExceptionCode.*;
@@ -61,113 +62,184 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     @Override
     public Object treatRequest(String request, MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
         if ("addSource".equalsIgnoreCase(request)) {
-            final String serviceName = getParameter("serviceName", true, parameters);
-            final LayerProviderService service = this.services.get(serviceName);
-            if (service != null) {
-                
-                final ParameterValueReader reader = new ParameterValueReader(service.getDescriptor());
-                try {
-                    // we read the soruce parameter to add
-                    reader.setInput(objectRequest);
-                    ParameterValueGroup sourceToAdd = (ParameterValueGroup) reader.read();
-                    reader.dispose();
-                    LayerProviderProxy.getInstance().createProvider(service, sourceToAdd);
-                    
-                    return new AcknowlegementType("Success", "The source has been added");
-                } catch (XMLStreamException ex) {
-                    throw new CstlServiceException(ex);
-                } catch (IOException ex) {
-                    throw new CstlServiceException(ex);
-                }
-            } else {
-                throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
-            }
-            
+            return addSource(parameters, objectRequest);
         } else if ("modifySource".equalsIgnoreCase(request)) {
-            final String serviceName = getParameter("serviceName", true, parameters);
-            final String currentId = getParameter("id", true, parameters);
-            final LayerProviderService service = services.get(serviceName);
-            if (service != null) {
-                
-                final ParameterValueReader reader = new ParameterValueReader(service.getDescriptor());
-                try {
-                    // we read the soruce parameter to add
-                    reader.setInput(objectRequest);
-                    ParameterValueGroup sourceToModify = (ParameterValueGroup) reader.read();
-                    reader.dispose();
-                    
-                    Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-                    for (LayerProvider p : providers) {
-                        if (p.getId().equals(currentId)) {
-                            p.updateSource(sourceToModify);
-                            return new AcknowlegementType("Success", "The source has been modified");
-                        }
-                    }
-                    return new AcknowlegementType("Failure", "Unable to find a source named:" + currentId);   
-                    
-                } catch (XMLStreamException ex) {
-                    throw new CstlServiceException(ex);
-                } catch (IOException ex) {
-                    throw new CstlServiceException(ex);
-                }
-            } else {
-                throw new CstlServiceException("No descriptor for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
-            }
-            
+            return modifySource(parameters, objectRequest);
         } else if ("getSource".equalsIgnoreCase(request)) {
-            final String id          = getParameter("id", true, parameters);
-            
-            Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-            for (LayerProvider p : providers) {
-                if (p.getId().equals(id)) {
-                    return p.getSource();
-                }
-            }
-            
-            return new AcknowlegementType("Failure", "Unable to find a source named:" + id);
-            
+            return getSource(parameters);
         } else if ("removeSource".equalsIgnoreCase(request)) {
+            return removeSource(parameters);
+        } else if ("addLayer".equalsIgnoreCase(request)) {
+            return addLayer(parameters, objectRequest);
+        } else if ("removeLayer".equalsIgnoreCase(request)) {
+            return removeLayer(parameters);
+        } else if ("modifyLayer".equalsIgnoreCase(request)) {
+            return modifyLayer(parameters, objectRequest);        
+        } else if ("getDescriptor".equalsIgnoreCase(request)) {
+            return getDescriptor(parameters);
+        } else if ("listProviders".equalsIgnoreCase(request)) {
+            return listProviders();
+        }
+        return null;
+    }
+    
+    @Override
+    public void beforeRestart() {
+        StyleProviderProxy.getInstance().dispose();
+        LayerProviderProxy.getInstance().dispose();
+    }
+    
+    private AcknowlegementType addSource(final MultivaluedMap<String, String> parameters,
+            final Object objectRequest) throws CstlServiceException{
+        final String serviceName = getParameter("serviceName", true, parameters);
+        final LayerProviderService service = this.services.get(serviceName);
+        if (service != null) {
+
+            final ParameterValueReader reader = new ParameterValueReader(service.getDescriptor());
+            try {
+                // we read the soruce parameter to add
+                reader.setInput(objectRequest);
+                final ParameterValueGroup sourceToAdd = (ParameterValueGroup) reader.read();
+                reader.dispose();
+                LayerProviderProxy.getInstance().createProvider(service, sourceToAdd);
+
+                return new AcknowlegementType("Success", "The source has been added");
+            } catch (XMLStreamException ex) {
+                throw new CstlServiceException(ex);
+            } catch (IOException ex) {
+                throw new CstlServiceException(ex);
+            }
+        } else {
+            throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
+        }
+    }
+    
+    private AcknowlegementType modifySource(final MultivaluedMap<String, String> parameters,
+            final Object objectRequest) throws CstlServiceException{
+        final String serviceName = getParameter("serviceName", true, parameters);
+        final String currentId = getParameter("id", true, parameters);
+        final LayerProviderService service = services.get(serviceName);
+        if (service != null) {
+
+            final ParameterValueReader reader = new ParameterValueReader(service.getDescriptor());
+            try {
+                // we read the soruce parameter to add
+                reader.setInput(objectRequest);
+                final ParameterValueGroup sourceToModify = (ParameterValueGroup) reader.read();
+                reader.dispose();
+
+                final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+                for (LayerProvider p : providers) {
+                    if (p.getId().equals(currentId)) {
+                        p.updateSource(sourceToModify);
+                        return new AcknowlegementType("Success", "The source has been modified");
+                    }
+                }
+                return new AcknowlegementType("Failure", "Unable to find a source named:" + currentId);   
+
+            } catch (XMLStreamException ex) {
+                throw new CstlServiceException(ex);
+            } catch (IOException ex) {
+                throw new CstlServiceException(ex);
+            }
+        } else {
+            throw new CstlServiceException("No descriptor for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
+        }
+    }
+    
+    private Object getSource(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String id = getParameter("id", true, parameters);
             
-            final String sourceId = getParameter("id", true, parameters);
-            Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        for (LayerProvider p : providers) {
+            if (p.getId().equals(id)) {
+                return p.getSource();
+            }
+        }
+
+        return new AcknowlegementType("Failure", "Unable to find a source named:" + id);
+    }
+    
+    private AcknowlegementType removeSource(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String sourceId = getParameter("id", true, parameters);
+        Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        for (LayerProvider p : providers) {
+            if (p.getId().equals(sourceId)) {
+                LayerProviderProxy.getInstance().removeProvider(p);
+                return new AcknowlegementType("Success", "The source has been deleted");
+            }
+        }
+        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
+    }
+    
+    private AcknowlegementType addLayer(final MultivaluedMap<String, String> parameters, 
+            final Object objectRequest) throws CstlServiceException{
+        
+        final String sourceId = getParameter("id", true, parameters);            
+        final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
+        try {
+            // we read the soruce parameter to add
+            reader.setInput(objectRequest);
+            final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
+            reader.dispose();
+
+            final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
             for (LayerProvider p : providers) {
                 if (p.getId().equals(sourceId)) {
-                    LayerProviderProxy.getInstance().removeProvider(p);
-                    return new AcknowlegementType("Success", "The source has been deleted");
+                    p.getSource().values().add(newLayer);
+                    p.updateSource(p.getSource());
+                    return new AcknowlegementType("Success", "The layer has been added");
                 }
             }
             return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
-            
-        } else if ("addLayer".equalsIgnoreCase(request)) {
-            final String sourceId = getParameter("id", true, parameters);
-            
-                final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
-                try {
-                    // we read the soruce parameter to add
-                    reader.setInput(objectRequest);
-                    ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
-                    reader.dispose();
-                    
-                    Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-                    for (LayerProvider p : providers) {
-                        if (p.getId().equals(sourceId)) {
-                            p.getSource().values().add(newLayer);
-                            p.updateSource(p.getSource());
-                            return new AcknowlegementType("Success", "The layer has been added");
+
+
+        } catch (XMLStreamException ex) {
+            throw new CstlServiceException(ex);
+        } catch (IOException ex) {
+            throw new CstlServiceException(ex);
+        }
+    }
+    
+    private AcknowlegementType removeLayer(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String sourceId = getParameter("id", true, parameters);
+        final String layerName = getParameter("layerName", true, parameters);
+
+        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        for (LayerProvider p : providers) {
+            if (p.getId().equals(sourceId)) {
+                for (GeneralParameterValue param : p.getSource().values()) {
+                    if (param instanceof ParameterValueGroup) {
+                        final ParameterValueGroup pvg = (ParameterValueGroup)param;
+                        if (param.getDescriptor().equals(ProviderParameters.LAYER_DESCRIPTOR)) {
+                            final ParameterValue value = pvg.parameter("name");
+                            if (value.stringValue().equals(layerName)) {
+                                p.getSource().values().remove(pvg);
+                                break;
+                            }
                         }
                     }
-                    return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
-                    
-                    
-                } catch (XMLStreamException ex) {
-                    throw new CstlServiceException(ex);
-                } catch (IOException ex) {
-                    throw new CstlServiceException(ex);
                 }
-        } else if ("removeLayer".equalsIgnoreCase(request)) {
-            final String sourceId = getParameter("id", true, parameters);
-            final String layerName = getParameter("layerName", true, parameters);
-           
+                p.updateSource(p.getSource());
+                return new AcknowlegementType("Success", "The layer has been removed");
+            }
+        }
+        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
+    }
+    
+    private AcknowlegementType modifyLayer(final MultivaluedMap<String, String> parameters, 
+            final Object objectRequest) throws CstlServiceException{
+        
+        final String sourceId = getParameter("id", true, parameters);
+        final String layerName = getParameter("layerName", true, parameters);
+
+        final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
+        try {
+            // we read the source parameter to add
+            reader.setInput(objectRequest);
+            ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
+            reader.dispose();
+
             Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
             for (LayerProvider p : providers) {
                 if (p.getId().equals(sourceId)) {
@@ -178,85 +250,46 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                                 ParameterValue value = pvg.parameter("name");
                                 if (value.stringValue().equals(layerName)) {
                                     p.getSource().values().remove(pvg);
+                                    p.getSource().values().add(newLayer);
                                     break;
                                 }
                             }
                         }
                     }
                     p.updateSource(p.getSource());
-                    return new AcknowlegementType("Success", "The layer has been removed");
+                    return new AcknowlegementType("Success", "The layer has been modified");
                 }
             }
-            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
-        
-        } else if ("modifyLayer".equalsIgnoreCase(request)) {
-            final String sourceId = getParameter("id", true, parameters);
-            final String layerName = getParameter("layerName", true, parameters);
-            
-            final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
-                try {
-                    // we read the source parameter to add
-                    reader.setInput(objectRequest);
-                    ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
-                    reader.dispose();
-                    
-                    Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-                    for (LayerProvider p : providers) {
-                        if (p.getId().equals(sourceId)) {
-                            for (GeneralParameterValue param : p.getSource().values()) {
-                                if (param instanceof ParameterValueGroup) {
-                                    ParameterValueGroup pvg = (ParameterValueGroup)param;
-                                    if (param.getDescriptor().equals(ProviderParameters.LAYER_DESCRIPTOR)) {
-                                        ParameterValue value = pvg.parameter("name");
-                                        if (value.stringValue().equals(layerName)) {
-                                            p.getSource().values().remove(pvg);
-                                            p.getSource().values().add(newLayer);
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            p.updateSource(p.getSource());
-                            return new AcknowlegementType("Success", "The layer has been modified");
-                        }
-                    }
-                } catch (XMLStreamException ex) {
-                    throw new CstlServiceException(ex);
-                } catch (IOException ex) {
-                    throw new CstlServiceException(ex);
-                }
-            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
-        
-        } else if ("getDescriptor".equalsIgnoreCase(request)) {
-            final String serviceName = getParameter("serviceName", true, parameters);
-            final LayerProviderService service = services.get(serviceName);
-            if (service != null) {
-                return service.getDescriptor();
-            }
-            throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
-        
-        } else if ("listProviders".equalsIgnoreCase(request)) {
-            List<Provider> providerDesc = new ArrayList<Provider>();
-            for (LayerProviderService service: services.values()) {
-                List<String> sources = new ArrayList<String>();
-                Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-                for (LayerProvider p : providers) {
-                    if (p.getService().equals(service)) {
-                        sources.add(p.getId());
-                    }
-                }
-                providerDesc.add(new Provider(service.getName(), sources));
-            }
-            return new ProviderReport(providerDesc);
-        }        
-        
-        return null;
+        } catch (XMLStreamException ex) {
+            throw new CstlServiceException(ex);
+        } catch (IOException ex) {
+            throw new CstlServiceException(ex);
+        }
+        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
     }
     
-    @Override
-    public void beforeRestart() {
-        StyleProviderProxy.getInstance().dispose();
-        LayerProviderProxy.getInstance().dispose();
+    private ParameterDescriptorGroup getDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String serviceName = getParameter("serviceName", true, parameters);
+        final LayerProviderService service = services.get(serviceName);
+        if (service != null) {
+            return service.getDescriptor();
+        }
+        throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
+    }
+    
+    private ProviderReport listProviders(){
+        final List<Provider> providerDesc = new ArrayList<Provider>();
+        for (LayerProviderService service: services.values()) {
+            final List<String> sources = new ArrayList<String>();
+            final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+            for (LayerProvider p : providers) {
+                if (p.getService().equals(service)) {
+                    sources.add(p.getId());
+                }
+            }
+            providerDesc.add(new Provider(service.getName(), sources));
+        }
+        return new ProviderReport(providerDesc);
     }
     
 }
