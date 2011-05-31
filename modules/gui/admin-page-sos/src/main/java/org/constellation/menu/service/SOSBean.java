@@ -29,6 +29,7 @@ import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
+import org.constellation.observation.sql.ObservationDatabaseCreator;
 import org.mdweb.sql.DatabaseCreator;
 
 /**
@@ -402,7 +403,7 @@ public class SOSBean extends AbstractServiceBean{
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
             try {
                 final DataSource ds = config.getOMConfiguration().getBdd().getDataSource();
-                LOGGER.info("TODO build OM database");
+                ObservationDatabaseCreator.createObservationDatabase(ds);
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while creating the database", ex);
             }
