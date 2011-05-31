@@ -1,9 +1,6 @@
 CREATE SCHEMA "sos";
 CREATE SCHEMA "observation";
 
-
-
-
 CREATE TABLE "observation"."Distributions" (
     "name"   character varying(40) NOT NULL,
     "scale"  real,
@@ -18,9 +15,6 @@ CREATE TABLE "observation"."any_results" (
     "definition" character varying(40)
 );
 
-
-
-
 CREATE TABLE "observation"."any_scalars" (
     "id_datablock"  character varying(40) NOT NULL,
     "id_datarecord" character varying(40) NOT NULL,
@@ -32,15 +26,10 @@ CREATE TABLE "observation"."any_scalars" (
     "value"         smallint
 );
 
-
-
 CREATE TABLE "observation"."components" (
     "composite_phenomenon" character varying(40) NOT NULL,
     "component"            character varying(40) NOT NULL
 );
-
-
-
 
 CREATE TABLE "observation"."composite_phenomenons" (
     "id"          character varying(40) NOT NULL,
@@ -49,9 +38,6 @@ CREATE TABLE "observation"."composite_phenomenons" (
     "dimension"   integer
 );
 
-
-
-
 CREATE TABLE "observation"."data_array_definition" (
     "id_array_definition" character varying(40) NOT NULL,
     "element_count"       smallint NOT NULL,
@@ -59,16 +45,10 @@ CREATE TABLE "observation"."data_array_definition" (
     "encoding"            character varying(40)
 );
 
-
-
-
 CREATE TABLE "observation"."data_block_definitions" (
     "id"       character varying(40) NOT NULL,
     "encoding" character varying(40)
 );
-
-
-
 
 CREATE TABLE "observation"."measurements" (
     "name"                        character varying(50) NOT NULL,
@@ -86,15 +66,11 @@ CREATE TABLE "observation"."measurements" (
     "feature_of_interest_curve"   character varying(40)
 );
 
-
-
-
 CREATE TABLE "observation"."measures" (
     "name"  character varying(40) NOT NULL,
     "uom"   character varying(40),
     "value" real
 );
-
 
 CREATE TABLE "observation"."observations" (
     "name"                        character varying(50) NOT NULL,
@@ -112,22 +88,16 @@ CREATE TABLE "observation"."observations" (
     "feature_of_interest_curve"   character varying(40)
 );
 
-
-
 CREATE TABLE "observation"."phenomenons" (
     "id"          character varying(40) NOT NULL,
     "name"        character varying(40),
     "description" character varying(40)
 );
 
-
-
 CREATE TABLE "observation"."process" (
     "name"        character varying(40) NOT NULL,
     "description" character varying(40)
 );
-
-
 
 CREATE TABLE "observation"."references" (
     "id_reference" character varying(40) NOT NULL,
@@ -141,18 +111,12 @@ CREATE TABLE "observation"."references" (
     "owns"         smallint
 );
 
-
-
-
 CREATE TABLE "observation"."sampling_features" (
     "id"              character varying(40) NOT NULL,
     "description"     character varying(40),
     "name"            character varying(40),
     "sampled_feature" character varying(40)
 );
-
-
-
 
 CREATE TABLE "observation"."sampling_points" (
     "id"                 character varying(40) NOT NULL,
@@ -185,16 +149,12 @@ CREATE TABLE "observation"."linestring" (
     "z"                  double precision
 );
 
-
 CREATE TABLE "observation"."simple_data_records" (
     "id_datablock"  character varying(40) NOT NULL,
     "id_datarecord" character varying(40) NOT NULL,
     "definition"    character varying(40),
     "fixed"         smallint
 );
-
-
-
 
 CREATE TABLE "observation"."text_block_encodings" (
     "id_encoding"       character varying(40) NOT NULL,
@@ -203,16 +163,12 @@ CREATE TABLE "observation"."text_block_encodings" (
     "decimal_separator" char
 );
 
-
-
 CREATE TABLE "observation"."unit_of_measures" (
     "id"            character varying(40) NOT NULL,
     "name"          character varying(40),
     "quantity_type" character varying(40),
     "unit_system"   character varying(40)
 );
-
-
 
 CREATE TABLE "sos"."envelopes" (
     "id"             character varying(40) NOT NULL,
@@ -223,14 +179,10 @@ CREATE TABLE "sos"."envelopes" (
     "upper_corner_y" double precision
 );
 
-
-
-
 CREATE TABLE "sos"."geographic_localisations" (
     "id"       character varying(40) NOT NULL,
     "the_geom" character varying(40)
 );
-
 
 CREATE TABLE "sos"."observation_offerings" (
     "id"                     character varying(40) NOT NULL,
@@ -246,40 +198,26 @@ CREATE TABLE "sos"."observation_offerings" (
     "result_model_localpart" character varying(40)
 );
 
-
-
 CREATE TABLE "sos"."offering_phenomenons" (
     "id_offering"          character varying(40) NOT NULL,
     "phenomenon"           character varying(40) NOT NULL,
     "composite_phenomenon" character varying(40) NOT NULL
 );
 
-
-
-
 CREATE TABLE "sos"."offering_procedures" (
     "id_offering" character varying(40) NOT NULL,
     "procedure"   character varying(40) NOT NULL
 );
-
-
-
 
 CREATE TABLE "sos"."offering_response_modes" (
     "id_offering" character varying(40) NOT NULL,
     "mode"        character varying(40) NOT NULL
 );
 
-
-
-
 CREATE TABLE "sos"."offering_sampling_features" (
     "id_offering"      character varying(40) NOT NULL,
     "sampling_feature" character varying(40) NOT NULL
 );
-
-
-
 
 CREATE TABLE "sos"."projected_localisations" (
     "id"       character varying(40) NOT NULL,
@@ -317,8 +255,6 @@ ALTER TABLE "observation"."sampling_features" ADD CONSTRAINT sampling_features_p
 ALTER TABLE "observation"."sampling_points" ADD CONSTRAINT sampling_points_pk PRIMARY KEY ("id");
 
 ALTER TABLE "observation"."sampling_curves" ADD CONSTRAINT sampling_curves_pk PRIMARY KEY ("id");
-
-
 
 ALTER TABLE "observation"."simple_data_records" ADD CONSTRAINT simple_data_record_pkey PRIMARY KEY ("id_datablock", "id_datarecord");
 
