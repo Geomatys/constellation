@@ -586,6 +586,11 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-xml-ogc</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-sensorML</artifactId>
                 <version>${geotoolkit-pending.version}</version>
             </dependency>

@@ -17,9 +17,9 @@
     Module description.
   -->
     <groupId>org.constellation.gui</groupId>
-    <artifactId>admin-page-csw</artifactId>
+    <artifactId>admin-page-services</artifactId>
     <packaging>jar</packaging>
-    <name>Web site : CSW informations</name>
+    <name>Web site : Services configuration</name>
 
 
     <!--
@@ -27,9 +27,9 @@
   -->
     <developers>
         <developer>
-            <id>glegal</id>
-            <name>Guilhem Legal</name>
-            <email>guilhem.legal@geomatys.com</email>
+            <id>jsorel</id>
+            <name>Johann Sorel</name>
+            <email>johann.sorel@geomatys.com</email>
             <organization>Geomatys</organization>
             <organizationUrl>http://www.geomatys.fr/</organizationUrl>
             <roles>
@@ -46,16 +46,35 @@
   -->
     <dependencies>
         <dependency>
-            <groupId>org.constellation.gui</groupId>
-            <artifactId>admin-base</artifactId>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-provider</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.constellation.gui</groupId>
-            <artifactId>admin-page-services</artifactId>
+            <artifactId>admin-base</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        
+        <!-- Web interface -->
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-base</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mapfaces</groupId>
+            <artifactId>mapfaces-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>el-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
     </dependencies>
 
 </project>

@@ -78,13 +78,13 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>map</module>
         <module>csw</module>
         <module>sos</module>
         <module>wms</module>
         <module>wmts</module>
         <module>wcs</module>
         <module>wfs</module>
-        <module>map</module>
         <module>wps</module>
       </modules>
     </profile>

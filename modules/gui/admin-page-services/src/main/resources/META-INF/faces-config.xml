@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config version="1.2" xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_1_2.xsd">
+    
+    <!-- WCS service -->
+    <managed-bean>
+        <managed-bean-name>wcsBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.service.WCSBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- WFS service -->
+    <managed-bean>
+        <managed-bean-name>wfsBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.service.WFSBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- WMS service -->
+    <managed-bean>
+        <managed-bean-name>wmsBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.service.WMSBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- WMTS service -->
+    <managed-bean>
+        <managed-bean-name>wmtsBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.service.WMTSBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+</faces-config>

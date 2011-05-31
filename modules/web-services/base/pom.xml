@@ -110,21 +110,10 @@
       <artifactId>cstl-store-provider</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <!-- Web interface -->
     <dependency>
-        <groupId>org.constellation.gui</groupId>
-        <artifactId>admin-base</artifactId>
-        <version>${project.version}</version>
-        <scope>provided</scope>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-ogc</artifactId>
     </dependency>
-    <dependency>
-        <groupId>org.mapfaces</groupId>
-        <artifactId>mapfaces-core</artifactId>
-        <version>${mapfaces.version}</version>
-        <scope>provided</scope>
-    </dependency>
-
   </dependencies>
 
 </project>
