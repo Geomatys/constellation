@@ -116,7 +116,10 @@ public final class ReflectionUtilities {
         } catch (IllegalArgumentException ex) {
             LOGGER.log(Level.WARNING, "Illegal Argument in string constructor for class: {0}", classe.getName());
         } catch (InvocationTargetException ex) {
-            LOGGER.warning("Invocation target exception in string constructor for class: " + classe.getName() + " for parameter: " + parameter);
+            // avoid to log when the parameter is empty
+            if (!parameter.isEmpty()) {
+                LOGGER.warning("Invocation target exception in string constructor for class: " + classe.getName() + " for parameter: " + parameter);
+            }
         } catch (NoSuchMethodException ex) {
             LOGGER.log(Level.WARNING, "No single string constructor in class: {0}", classe.getName());
         } catch (SecurityException ex) {

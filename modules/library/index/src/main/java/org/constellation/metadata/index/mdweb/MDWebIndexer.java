@@ -451,7 +451,11 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             try {
                 code = Integer.parseInt(tv.getValue());
             } catch (NumberFormatException ex) {
-                LOGGER.log(Level.WARNING, "NumberFormat Exception while parsing a codelist code: {0}", tv.getValue());
+                // don't log for empty values
+                if (!tv.getValue().isEmpty()) {
+                    LOGGER.log(Level.WARNING, "NumberFormat Exception while parsing a codelist code: {0}", tv.getValue());
+                }
+                // return null ?
             }
             final CodeListElement element = cl.getElementByCode(code);
 
