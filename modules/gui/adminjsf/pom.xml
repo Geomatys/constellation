@@ -195,6 +195,11 @@
             <artifactId>admin-page-tool</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-csw</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         
         <!-- The 4 xml bindings are added here, because the JSF interface uses
          those bindings to marshall capabilities. -->

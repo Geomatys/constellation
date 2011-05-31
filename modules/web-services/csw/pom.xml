@@ -131,14 +131,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- Web interface -->
-    <dependency>
-        <groupId>org.constellation.gui</groupId>
-        <artifactId>admin-base</artifactId>
-        <version>${project.version}</version>
-        <scope>provided</scope>
-    </dependency>
-
     <!-- Mailing API -->
     <dependency>
       <groupId>javax.mail</groupId>
