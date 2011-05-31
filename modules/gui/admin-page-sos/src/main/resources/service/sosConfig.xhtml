@@ -20,7 +20,7 @@
         <br/>
        <h:selectOneMenu value="#{sosBean.omConfigType}">
         	<f:selectItems value="#{sosBean.omConfigTypes}"/>
-                <a4j:support event="onchange" reRender="omComponent"/>
+                <a4j:support event="onchange" reRender="omComponent,createdbOM"/>
         </h:selectOneMenu>
 
         <mf:CustomHtml tag="table" id="omComponent">
@@ -52,13 +52,17 @@
         </mf:switch>   
                         
         </mf:CustomHtml>
+
+        <mf:CustomHtml tag="div" id="createdbOM" style="text-align: left;">
+            <h:commandButton action="#{sosBean.buildOMDatabase}" value="#{sosBean.i18n['buildOMDatabase']}" rendered="#{sosBean.omConfigType == 'default'}"/>
+        </mf:CustomHtml>
         <br/>
         SensorML configuration
         <br/>
         
         <h:selectOneMenu value="#{sosBean.smlConfigType}">
         	<f:selectItems value="#{sosBean.smlConfigTypes}"/>
-                <a4j:support event="onchange" reRender="smlComponent"/>
+                <a4j:support event="onchange" reRender="smlComponent,createdbSML"/>
         </h:selectOneMenu>
 
         <mf:CustomHtml tag="table" id="smlComponent">
@@ -95,6 +99,10 @@
                                     </h:selectOneMenu>
                                 </td>
                        </tr>     
+        </mf:CustomHtml>
+
+        <mf:CustomHtml tag="div" id="createdbSML" style="text-align: left;">
+            <h:commandButton action="#{sosBean.buildMDWDatabase}" value="#{sosBean.i18n['buildMDWDatabase']}" rendered="#{sosBean.smlConfigType == 'mdweb'}"/>
         </mf:CustomHtml>
            
         <div style="text-align: right;">

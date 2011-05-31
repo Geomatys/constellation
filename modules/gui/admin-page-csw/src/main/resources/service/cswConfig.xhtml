@@ -17,7 +17,7 @@
         <br/>
         <h:selectOneMenu value="#{cswBean.configType}">
         	<f:selectItems value="#{cswBean.configTypes}"/>
-                <a4j:support event="onchange" reRender="specificComponent"/>
+                <a4j:support event="onchange" reRender="specificComponent, createdb"/>
         </h:selectOneMenu>
 
         <mf:CustomHtml tag="table" id="specificComponent">
@@ -54,6 +54,10 @@
                                     </h:selectOneMenu>
                                 </td>
                        </tr>     
+        </mf:CustomHtml>
+
+        <mf:CustomHtml tag="div" id="createdb" style="text-align: left;">
+            <h:commandButton action="#{cswBean.buildDatabase}" value="#{cswBean.i18n['buildDatabase']}" rendered="#{cswBean.configType == 'mdweb'}"/>
         </mf:CustomHtml>
 
         <div style="text-align: right;">

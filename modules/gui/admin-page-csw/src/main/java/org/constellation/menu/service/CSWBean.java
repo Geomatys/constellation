@@ -17,11 +17,15 @@
 
 package org.constellation.menu.service;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.faces.model.SelectItem;
+import javax.sql.DataSource;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.generic.database.Automatic;
+import org.mdweb.sql.DatabaseCreator;
 
 /**
  *
@@ -70,7 +74,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public String getConfigType() {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             this.configType = config.getFormat();
         }
         return configType;
@@ -81,7 +85,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public void setConfigType(String configType) {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             config.setFormat(configType);
         }
         this.configType = configType;
@@ -92,7 +96,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public String getProfile() {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             this.profile = config.getProfileValue();
         }
         return profile;
@@ -103,7 +107,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public void setProfile(String profile) {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             config.setProfile(profile);
         }
         this.profile = profile;
@@ -114,7 +118,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public String getDataDirectory() {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             this.dataDirectory = config.getDataDirectoryValue();
         }
         return dataDirectory;
@@ -125,7 +129,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public void setDataDirectory(String dataDirectory) {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             config.setDataDirectory(dataDirectory);
         }
         this.dataDirectory = dataDirectory;
@@ -136,7 +140,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public String getDriverClass() {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             this.driverClass = config.getBdd().getClassName();
         }
         return driverClass;
@@ -147,7 +151,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public void setDriverClass(String driverClass) {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             config.getBdd().setClassName(driverClass);
         }
         this.driverClass = driverClass;
@@ -158,7 +162,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public String getConnectURL() {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             this.connectURL = config.getBdd().getConnectURL();
         }
         return connectURL;
@@ -169,7 +173,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public void setConnectURL(String connectURL) {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             config.getBdd().setConnectURL(connectURL);
         }
         this.connectURL = connectURL;
@@ -180,7 +184,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public String getUserName() {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             this.userName = config.getBdd().getUser();
         }
         return userName;
@@ -191,7 +195,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public void setUserName(String userName) {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             config.getBdd().setUser(userName);
         }
         this.userName = userName;
@@ -202,7 +206,7 @@ public class CSWBean extends AbstractServiceBean {
      */
     public String getUserPass() {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             this.userPass = config.getBdd().getPassword();
         }
         return userPass;
@@ -213,9 +217,23 @@ public class CSWBean extends AbstractServiceBean {
      */
     public void setUserPass(String userPass) {
         if (configurationObject instanceof Automatic) {
-            Automatic config = (Automatic) configurationObject;
+            final Automatic config = (Automatic) configurationObject;
             config.getBdd().setPassword(userPass);
         }
         this.userPass = userPass;
+    }
+    
+    public void buildDatabase() {
+        
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            try {
+                final DataSource ds    = config.getBdd().getDataSource();
+                DatabaseCreator.createPGMetadataDatabase(ds);
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "Error while creating the database", ex);
+            }
+        }
+        
     }
 }

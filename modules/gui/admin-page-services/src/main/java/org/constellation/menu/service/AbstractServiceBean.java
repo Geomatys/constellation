@@ -105,7 +105,7 @@ public class AbstractServiceBean extends I18NBean{
      */
     public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
     
-    private static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
 
     private final Specification specification;
     private final String configPage;

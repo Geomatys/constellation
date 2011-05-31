@@ -17,15 +17,19 @@
 
 package org.constellation.menu.service;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.faces.model.SelectItem;
+import javax.sql.DataSource;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
+import org.mdweb.sql.DatabaseCreator;
 
 /**
  *
@@ -92,7 +96,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getOmConfigType() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.omConfigType = config.getObservationReaderType().getName();
         }
         return omConfigType;
@@ -103,7 +107,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setOmConfigType(String omConfigType) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             final ObservationReaderType rType = ObservationReaderType.fromName(omConfigType);
             config.setObservationReaderType(rType);
             if (rType == ObservationReaderType.DEFAULT) {
@@ -122,7 +126,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getOmDataDirectory() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.omDataDirectory = config.getOMConfiguration().getDataDirectoryValue();
         }
         return omDataDirectory;
@@ -133,7 +137,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setOmDataDirectory(String omDataDirectory) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getOMConfiguration().setDataDirectory(omDataDirectory);
         }
         this.omDataDirectory = omDataDirectory;
@@ -144,7 +148,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getOmDriverClass() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.omDriverClass = config.getOMConfiguration().getBdd().getClassName();
         }
         return omDriverClass;
@@ -155,7 +159,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setOmDriverClass(String omDriverClass) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getOMConfiguration().getBdd().setClassName(omDriverClass);
         }
         this.omDriverClass = omDriverClass;
@@ -166,7 +170,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getOmConnectURL() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.omConnectURL = config.getOMConfiguration().getBdd().getConnectURL();
         }
         return omConnectURL;
@@ -177,7 +181,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setOmConnectURL(String omConnectURL) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getOMConfiguration().getBdd().setClassName(omDriverClass);
         }
         this.omConnectURL = omConnectURL;
@@ -188,7 +192,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getOmUserName() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.omUserName = config.getOMConfiguration().getBdd().getUser();
         }
         return omUserName;
@@ -199,7 +203,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setOmUserName(String omUserName) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getOMConfiguration().getBdd().setUser(omUserName);
         }
         this.omUserName = omUserName;
@@ -210,7 +214,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getOmUserPass() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.omUserPass = config.getOMConfiguration().getBdd().getPassword();
         }
         return omUserPass;
@@ -221,7 +225,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setOmUserPass(String omUserPass) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getOMConfiguration().getBdd().setPassword(omUserPass);
         }
         this.omUserPass = omUserPass;
@@ -232,7 +236,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getSmlConfigType() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.smlConfigType = config.getSMLType().getName();
         }
         return smlConfigType;
@@ -243,7 +247,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setSmlConfigType(String smlConfigType) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.setSMLType(DataSourceType.fromName(smlConfigType));
         }
         this.smlConfigType = smlConfigType;
@@ -254,7 +258,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getSmlDataDirectory() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.smlDataDirectory = config.getSMLConfiguration().getDataDirectoryValue();
         }
         return smlDataDirectory;
@@ -265,7 +269,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setSmlDataDirectory(String smlDataDirectory) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getSMLConfiguration().setDataDirectory(smlDataDirectory);
         }
         this.smlDataDirectory = smlDataDirectory;
@@ -276,7 +280,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getSmlDriverClass() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.smlDriverClass = config.getSMLConfiguration().getBdd().getClassName();
         }
         return smlDriverClass;
@@ -287,7 +291,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setSmlDriverClass(String smlDriverClass) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getSMLConfiguration().getBdd().setClassName(smlDriverClass);
         }
         this.smlDriverClass = smlDriverClass;
@@ -298,7 +302,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getSmlConnectURL() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.smlConnectURL= config.getSMLConfiguration().getBdd().getConnectURL();
         }
         return smlConnectURL;
@@ -309,7 +313,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setSmlConnectURL(String smlConnectURL) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getSMLConfiguration().getBdd().setConnectURL(smlConnectURL);
         }
         this.smlConnectURL = smlConnectURL;
@@ -320,7 +324,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getSmlUserName() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.smlUserName = config.getSMLConfiguration().getBdd().getUser();
         }
         return smlUserName;
@@ -331,7 +335,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setSmlUserName(String smlUserName) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getSMLConfiguration().getBdd().setUser(smlUserName);
         }
         this.smlUserName = smlUserName;
@@ -342,7 +346,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getSmlUserPass() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.smlUserPass = config.getOMConfiguration().getBdd().getPassword();
         }
         return smlUserPass;
@@ -353,7 +357,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setSmlUserPass(String smlUserPass) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.getSMLConfiguration().getBdd().setPassword(smlUserPass);
         }
         this.smlUserPass = smlUserPass;
@@ -364,7 +368,7 @@ public class SOSBean extends AbstractServiceBean{
      */
     public String getProfile() {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             this.profile = config.getProfileValue();
         }
         return profile;
@@ -375,10 +379,33 @@ public class SOSBean extends AbstractServiceBean{
      */
     public void setProfile(String profile) {
         if (configurationObject instanceof SOSConfiguration) {
-            SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
             config.setProfile(profile);
         }
         this.profile = profile;
     }
 
+    public void buildMDWDatabase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            try {
+                final DataSource ds = config.getSMLConfiguration().getBdd().getDataSource();
+                DatabaseCreator.createPGMetadataDatabase(ds);
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "Error while creating the database", ex);
+            }
+        }
+    }
+    
+    public void buildOMDatabase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            try {
+                final DataSource ds = config.getOMConfiguration().getBdd().getDataSource();
+                LOGGER.info("TODO build OM database");
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "Error while creating the database", ex);
+            }
+        }
+    }
 }
