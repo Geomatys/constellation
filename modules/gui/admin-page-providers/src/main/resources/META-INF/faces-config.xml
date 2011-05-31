@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config version="1.2" xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_1_2.xsd">
+
+    <managed-bean>
+        <managed-bean-name>providerBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.ProviderBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- coverage file provider -->
+    <managed-bean>
+        <managed-bean-name>coveragefileBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.CoverageFileBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>coveragemosaicBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.CoverageMosaicBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- coverage sql provider -->
+    <managed-bean>
+        <managed-bean-name>coveragesqlBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.CoverageSQLBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- om provider -->
+    <managed-bean>
+        <managed-bean-name>omBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.OMBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- postgis provider -->
+    <managed-bean>
+        <managed-bean-name>postgisBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.PostGISBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- sensorml provider -->
+    <managed-bean>
+        <managed-bean-name>sensormlBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.SensorMLBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- shapefile provider -->
+    <managed-bean>
+        <managed-bean-name>shapefileBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.ShapefileBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+    <!-- sld provider -->
+    <managed-bean>
+        <managed-bean-name>sldBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.SLDBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    
+</faces-config>

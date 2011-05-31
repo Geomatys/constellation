@@ -101,6 +101,7 @@
         <module>admin-page-jai</module>
         <module>admin-page-geotk</module>
         <module>admin-page-tool</module>
+        <module>admin-page-providers</module>
         <module>adminjsf</module>
         <module>constellation</module>
     </modules>

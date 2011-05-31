@@ -59,7 +59,7 @@
            <artifactId>cstl-xml-configuration</artifactId>
            <version>${project.version}</version>
        </dependency>
-       
+              
         <!-- Mapfaces library -->
         <dependency>
             <groupId>org.mapfaces</groupId>

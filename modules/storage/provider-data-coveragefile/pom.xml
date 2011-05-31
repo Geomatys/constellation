@@ -50,7 +50,6 @@
   -->
   <dependencies>
 
-
     <dependency>
         <groupId>org.constellation.storage</groupId>
         <artifactId>cstl-store-provider</artifactId>
@@ -64,15 +63,6 @@
     <dependency>
         <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-coverageio-geotiff</artifactId>
-    </dependency>
-
-
-    <!-- Web interface -->
-    <dependency>
-        <groupId>org.constellation.gui</groupId>
-        <artifactId>admin-base</artifactId>
-        <version>${project.version}</version>
-        <scope>provided</scope>
     </dependency>
 
   </dependencies>

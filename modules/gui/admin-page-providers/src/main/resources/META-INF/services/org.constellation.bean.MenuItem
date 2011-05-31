@@ -1,0 +1,9 @@
+org.constellation.menu.provider.ProviderItem
+org.constellation.menu.provider.CoverageFileItem
+org.constellation.menu.provider.CoverageMosaicItem
+org.constellation.menu.provider.CoverageSQLItem
+org.constellation.menu.provider.OMItem
+org.constellation.menu.provider.PostGISItem
+org.constellation.menu.provider.SensorMLItem
+org.constellation.menu.provider.ShapefileItem
+org.constellation.menu.provider.SLDItem

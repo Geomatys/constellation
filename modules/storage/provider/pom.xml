@@ -72,30 +72,6 @@
       <artifactId>stax-utils</artifactId>
     </dependency>
 
-    <!-- Web interface -->
-    <dependency>
-        <groupId>org.constellation.gui</groupId>
-        <artifactId>admin-base</artifactId>
-        <version>${project.version}</version>
-        <scope>provided</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.mapfaces</groupId>
-        <artifactId>mapfaces-core</artifactId>
-        <scope>provided</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.mapfaces</groupId>
-        <artifactId>mapfaces-facelet-editor</artifactId>
-        <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-        <groupId>javax.el</groupId>
-        <artifactId>el-api</artifactId>
-        <scope>provided</scope>
-    </dependency>
-    
   </dependencies>
 
 </project>
