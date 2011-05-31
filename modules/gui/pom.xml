@@ -103,6 +103,7 @@
         <module>admin-page-tool</module>
         <module>admin-page-providers</module>
         <module>admin-page-csw</module>
+        <module>admin-page-sos</module>
         <module>adminjsf</module>
         <module>constellation</module>
     </modules>
