@@ -17,7 +17,7 @@
 
 package org.constellation.map.configuration;
 
-import org.constellation.configuration.Provider;
+import org.constellation.configuration.ProviderServiceReport;
 import java.util.ArrayList;
 import java.util.List;
 import org.opengis.parameter.ParameterValue;
@@ -30,7 +30,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.stream.XMLStreamException;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ProviderReport;
+import org.constellation.configuration.ProvidersReport;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
@@ -49,7 +49,17 @@ import static org.constellation.ws.ExceptionCode.*;
  */
 public class DefaultMapConfigurer extends AbstractConfigurer {
 
-    private Map<String, LayerProviderService> services = new HashMap<String, LayerProviderService>();
+    public static final String REQUEST_ADD_SOURCE       = "addSource"; 
+    public static final String REQUEST_MODIFY_SOURCE    = "modifySource"; 
+    public static final String REQUEST_GET_SOURCE       = "getSource"; 
+    public static final String REQUEST_REMOVE_SOURCE    = "removeSource"; 
+    public static final String REQUEST_ADD_LAYER        = "addLayer"; 
+    public static final String REQUEST_REMOVE_LAYER     = "removeLayer"; 
+    public static final String REQUEST_MODIFY_LAYER     = "modifyLayer"; 
+    public static final String REQUEST_GET_DESCRIPTOR   = "getDescriptor"; 
+    public static final String REQUEST_LIST_SERVICES    = "listServices"; 
+    
+    private final Map<String, LayerProviderService> services = new HashMap<String, LayerProviderService>();
     
     public DefaultMapConfigurer() {
         final Collection<LayerProviderService> availableServices = LayerProviderProxy.getInstance().getServices();
@@ -63,24 +73,24 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     @Override
     public Object treatRequest(final String request, final MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
-        if ("addSource".equalsIgnoreCase(request)) {
+        if (REQUEST_ADD_SOURCE.equalsIgnoreCase(request)) {
             return addSource(parameters, objectRequest);
-        } else if ("modifySource".equalsIgnoreCase(request)) {
+        } else if (REQUEST_MODIFY_SOURCE.equalsIgnoreCase(request)) {
             return modifySource(parameters, objectRequest);
-        } else if ("getSource".equalsIgnoreCase(request)) {
+        } else if (REQUEST_GET_SOURCE.equalsIgnoreCase(request)) {
             return getSource(parameters);
-        } else if ("removeSource".equalsIgnoreCase(request)) {
+        } else if (REQUEST_REMOVE_SOURCE.equalsIgnoreCase(request)) {
             return removeSource(parameters);
-        } else if ("addLayer".equalsIgnoreCase(request)) {
+        } else if (REQUEST_ADD_LAYER.equalsIgnoreCase(request)) {
             return addLayer(parameters, objectRequest);
-        } else if ("removeLayer".equalsIgnoreCase(request)) {
+        } else if (REQUEST_REMOVE_LAYER.equalsIgnoreCase(request)) {
             return removeLayer(parameters);
-        } else if ("modifyLayer".equalsIgnoreCase(request)) {
+        } else if (REQUEST_MODIFY_LAYER.equalsIgnoreCase(request)) {
             return modifyLayer(parameters, objectRequest);        
-        } else if ("getDescriptor".equalsIgnoreCase(request)) {
+        } else if (REQUEST_GET_DESCRIPTOR.equalsIgnoreCase(request)) {
             return getDescriptor(parameters);
-        } else if ("listProviders".equalsIgnoreCase(request)) {
-            return listProviders();
+        } else if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
+            return listProviderServices();
         }
         return null;
     }
@@ -355,19 +365,22 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * 
      * @return A description of the available providers.
      */
-    private ProviderReport listProviders(){
-        final List<Provider> providerDesc = new ArrayList<Provider>();
-        for (LayerProviderService service: services.values()) {
-            final List<String> sources = new ArrayList<String>();
-            final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+    private ProvidersReport listProviderServices(){
+        final List<ProviderServiceReport> providerServ = new ArrayList<ProviderServiceReport>();
+        
+        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        for (LayerProviderService service : services.values()) {
+            
+            final List<String> layer = new ArrayList<String>();
             for (LayerProvider p : providers) {
                 if (p.getService().equals(service)) {
-                    sources.add(p.getId());
+                    layer.add(p.getId());
                 }
             }
-            providerDesc.add(new Provider(service.getName(), sources));
+            providerServ.add(new ProviderServiceReport(service.getName(), layer));
         }
-        return new ProviderReport(providerDesc);
+        
+        return new ProvidersReport(providerServ);
     }
     
 }

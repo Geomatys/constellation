@@ -36,7 +36,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ObjectFactory;
-import org.constellation.configuration.ProviderReport;
+import org.constellation.configuration.ProvidersReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import org.geotoolkit.util.ArgumentChecks;
@@ -45,10 +45,12 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
+
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+
 
 /**
  * Convinient class to perform actions on constellation web services.
@@ -58,6 +60,16 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public final class ConstellationServer {
 
+    public static final String REQUEST_ADD_SOURCE       = "addSource"; 
+    public static final String REQUEST_MODIFY_SOURCE    = "modifySource"; 
+    public static final String REQUEST_GET_SOURCE       = "getSource"; 
+    public static final String REQUEST_REMOVE_SOURCE    = "removeSource"; 
+    public static final String REQUEST_ADD_LAYER        = "addLayer"; 
+    public static final String REQUEST_REMOVE_LAYER     = "removeLayer"; 
+    public static final String REQUEST_MODIFY_LAYER     = "modifyLayer"; 
+    public static final String REQUEST_GET_DESCRIPTOR   = "getDescriptor"; 
+    public static final String REQUEST_LIST_SERVICES    = "listServices"; 
+    
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
 
@@ -572,7 +584,7 @@ public final class ConstellationServer {
          */
         public boolean newSource(final String serviceName, final ParameterValueGroup config) {
             try {
-                final String url = getServiceURL() + "configuration?request=addSource&serviceName=" + serviceName;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_ADD_SOURCE+"&serviceName=" + serviceName;
                 Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     return true;
@@ -593,7 +605,7 @@ public final class ConstellationServer {
          */
         public GeneralParameterValue getSource(final String id, final ParameterDescriptorGroup descriptor) {
             try {
-                final String url = getServiceURL() + "configuration?request=getSource&id=" + id;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_SOURCE+"&id=" + id;
                 Object response = sendRequest(url, null, descriptor);
                 if (response instanceof GeneralParameterValue) {
                     return (GeneralParameterValue) response;
@@ -614,7 +626,7 @@ public final class ConstellationServer {
          */
         public boolean removeSource(final String id) {
             try {
-                final String url = getServiceURL() + "configuration?request=removeSource&id=" + id;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_REMOVE_SOURCE+"&id=" + id;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -642,7 +654,7 @@ public final class ConstellationServer {
          */
         public boolean modifySource(final String serviceName, final String id, final ParameterValueGroup config) {
             try {
-                final String url = getServiceURL() + "configuration?request=modifySource&serviceName=" + serviceName + "&id=" + id;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_MODIFY_SOURCE+"&serviceName=" + serviceName + "&id=" + id;
                 final Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -668,7 +680,7 @@ public final class ConstellationServer {
          */
         public boolean addLayer(final String id, final ParameterValueGroup layer) {
             try {
-                final String url = getServiceURL() + "configuration?request=addLayer&id=" + id;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_ADD_LAYER+"&id=" + id;
                 Object response = sendRequest(url, layer);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -694,7 +706,7 @@ public final class ConstellationServer {
          */
         public boolean removeLayer(final String id, final String layerName) {
             try {
-                final String url = getServiceURL() + "configuration?request=removeLayere&id=" + id + "&layerName=" + layerName;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_REMOVE_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -720,7 +732,7 @@ public final class ConstellationServer {
          */
         public boolean modifyLayer(final String id, final String layerName, final ParameterValueGroup layer) {
             try {
-                final String url = getServiceURL() + "configuration?request=modifyLayer&id=" + id + "&layerName=" + layerName;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_MODIFY_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, layer);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -746,7 +758,7 @@ public final class ConstellationServer {
          */
         public GeneralParameterDescriptor getDescriptor(final String serviceName) {
             try {
-                final String url = getServiceURL() + "configuration?request=getDescriptor&serviceName=" + serviceName;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_DESCRIPTOR+"&serviceName=" + serviceName;
                 Object response = sendDescriptorRequest(url, null);
                 if (response instanceof GeneralParameterDescriptor) {
                     return (GeneralParameterDescriptor) response;
@@ -761,12 +773,12 @@ public final class ConstellationServer {
             return null;
         }
 
-        public ProviderReport listProviders() {
+        public ProvidersReport listProviders() {
             try {
                 final String url = getServiceURL() + "configuration?request=listProviders";
                 final Object response = sendRequest(url, null);
-                if (response instanceof ProviderReport) {
-                    return (ProviderReport) response;
+                if (response instanceof ProvidersReport) {
+                    return (ProvidersReport) response;
                 } else if (response instanceof ExceptionReport){
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                     return null;
@@ -780,7 +792,6 @@ public final class ConstellationServer {
             return null;
         }
 
-        
     }
     
 }

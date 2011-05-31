@@ -19,38 +19,56 @@ package org.constellation.configuration;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-@XmlRootElement(name ="ProviderReport")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ProviderReport {
+public class ProviderServiceReport {
     
-    @XmlElement(name = "provider")
-    private List<Provider> providers;
+    @XmlAttribute
+    private String type;
+    
+    @XmlElement(name = "source")
+    private List<String> sources;
 
-    public ProviderReport() {
+    public ProviderServiceReport() {
         
     }
-    
-    public ProviderReport(final List<Provider> providers) {
-        this.providers = providers;
+
+    public ProviderServiceReport(final String type, final List<String> sources) {
+        this.type = type;
+        this.sources = sources;
     }
+    
     /**
-     * @return the providers
+     * @return the type
      */
-    public List<Provider> getProviders() {
-        return providers;
+    public String getType() {
+        return type;
     }
 
     /**
-     * @param providers the providers to set
+     * @param type the type to set
      */
-    public void setProviders(List<Provider> providers) {
-        this.providers = providers;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * @return the sources
+     */
+    public List<String> getSources() {
+        return sources;
+    }
+
+    /**
+     * @param sources the sources to set
+     */
+    public void setSources(List<String> sources) {
+        this.sources = sources;
     }
 }

@@ -106,8 +106,8 @@ public class ObjectFactory {
         return new ServiceReport();
     }
 
-    public ProviderReport createProviderReport() {
-        return new ProviderReport();
+    public ProvidersReport createProviderReport() {
+        return new ProvidersReport();
     }
 
     
