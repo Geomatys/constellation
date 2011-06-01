@@ -117,7 +117,11 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
     public synchronized TreeModel getInstanceModel(){
         if(layersModel == null){
             final ProvidersReport report = getServer().providers.listProviders();
-            layersModel = buildModel(report,false);
+            if (report != null) {
+                layersModel = buildModel(report,false);
+            } else {
+                LOGGER.warning("Unable to get the provider service list.");
+            }
         }
         return layersModel;
     }

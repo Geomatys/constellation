@@ -768,7 +768,7 @@ public final class ConstellationServer {
                 } else if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 } else {
-                    LOGGER.warning("Unexpected response type :" + response);
+                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
                 }
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
@@ -791,7 +791,7 @@ public final class ConstellationServer {
                 } else if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 } else {
-                    LOGGER.warning("Unexpected response type :" + response);
+                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
                 }
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
