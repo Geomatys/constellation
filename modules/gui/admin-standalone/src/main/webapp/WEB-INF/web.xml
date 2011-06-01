@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+    <display-name>Constellation</display-name>
+
+    <context-param>
+        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>server</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.allowTextChildren</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.ajax4jsf.RESOURCE_URI_PREFIX</param-name>
+        <param-value>rfRes</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.richfaces.LoadStyleStrategy</param-name>
+        <param-value>NONE</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.ajax4jsf.COMPRESS_SCRIPT</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.ajax4jsf.COMPRESS_STYLE</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+        <param-value>.xhtml</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.ajax4jsf.VIEW_HANDLERS</param-name>
+        <param-value>com.sun.facelets.FaceletViewHandler</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.enableRestoreView11Compatibility</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+
+    <filter>
+        <display-name>Ajax4jsf Filter</display-name>
+        <filter-name>ajax4jsf</filter-name>
+        <filter-class>org.ajax4jsf.Filter</filter-class>
+    </filter>
+
+
+    <filter-mapping>
+        <filter-name>ajax4jsf</filter-name>
+        <servlet-name>Faces Servlet</servlet-name>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.jsf</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>/faces/*</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>Mapfaces Resource Servlet</servlet-name>
+        <servlet-class>org.mapfaces.servlet.ResourceServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Mapfaces Resource Servlet</servlet-name>
+        <url-pattern>*.mfRes</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Mapfaces Resource Servlet</servlet-name>
+        <url-pattern>/mfRes/*</url-pattern>
+    </servlet-mapping>
+    
+
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <login-config>
+        <auth-method>BASIC</auth-method>
+    </login-config>
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+    <!--
+        Security role name.
+        - In the case of sun-based application server (like glassfish), this fields is mapped
+          into the sun-web.xml file to the group name defined in the container.
+        - For Tomcat, this role name is directly tested against the realm.
+          The sun-web.xml is not used.
+    -->
+    <security-role>
+        <role-name>cstladmin</role-name>
+    </security-role>
+
+    <!-- Secured all GET and POST requests done on the configuration webservice -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Constellation secured service</web-resource-name>
+            <url-pattern>/WS/configuration</url-pattern>
+            <url-pattern>/WS/wms/admin</url-pattern>
+            <url-pattern>/WS/wmts/admin</url-pattern>
+            <url-pattern>/WS/wcs/admin</url-pattern>
+            <url-pattern>/WS/csw/admin</url-pattern>
+            <url-pattern>/WS/sos/admin</url-pattern>
+            <url-pattern>/WS/wfs/admin</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>User must be logged in as an administrator to use this service.</description>
+            <role-name>cstladmin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+</web-app>
