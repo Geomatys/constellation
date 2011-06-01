@@ -18,6 +18,7 @@
 package org.constellation.bean;
 
 import java.util.List;
+import org.constellation.admin.service.ConstellationServer;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
@@ -43,6 +44,11 @@ public abstract class AbstractMenuItem implements MenuItem {
         this.pages = UnmodifiableArrayList.wrap(pages);
         this.bundlePath = bundlePath;
         this.paths = UnmodifiableArrayList.wrap(paths);
+    }
+
+    @Override
+    public boolean isAvailable(ConstellationServer server) {
+        return true;
     }
 
     @Override

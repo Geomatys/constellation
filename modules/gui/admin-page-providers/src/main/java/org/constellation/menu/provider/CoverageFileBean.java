@@ -24,8 +24,10 @@ package org.constellation.menu.provider;
  */
 public class CoverageFileBean extends AbstractDataStoreServiceBean{
 
+    public static final String SERVICE_NAME = "coverage-file";
+    
     public CoverageFileBean(){
-        super("coverage-file",
+        super(SERVICE_NAME,
               "/provider/coveragefile.xhtml",
               "/provider/coveragefileConfig.xhtml",
               "/provider/coveragefileLayerConfig.xhtml");

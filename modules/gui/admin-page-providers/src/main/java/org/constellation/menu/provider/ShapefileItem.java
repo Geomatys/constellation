@@ -17,8 +17,9 @@
 
 package org.constellation.menu.provider;
 
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.AbstractMenuItem;
-
+import org.constellation.configuration.ProvidersReport;
 
 /**
  * Add an overview page for providers.
@@ -36,6 +37,14 @@ public class ShapefileItem extends AbstractMenuItem{
             "provider.shapefile",
             new Path(PROVIDERS_DATA_PATH,"Shapefile", "/provider/shapefile.xhtml", null,400)
             );
+    }
+    
+    @Override
+    public boolean isAvailable(final ConstellationServer server) {
+        if(server == null) return false;
+        final ProvidersReport report = server.providers.listProviders();
+        if(report == null) return false;
+        return report.getProviderService(ShapefileBean.SERVICE_NAME) != null;
     }
 
 }

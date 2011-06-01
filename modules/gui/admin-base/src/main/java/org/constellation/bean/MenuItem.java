@@ -18,6 +18,7 @@
 package org.constellation.bean;
 
 import java.util.List;
+import org.constellation.admin.service.ConstellationServer;
 
 /**
  * 
@@ -25,6 +26,13 @@ import java.util.List;
  */
 public interface MenuItem {
 
+    /**
+     * 
+     * @param server : Server to test
+     * @return true if this menu item is available for the given server.
+     */
+    public boolean isAvailable(ConstellationServer server);
+    
     /**
      * List of string path to xhtml pages that need to be copied in the web application.
      * 

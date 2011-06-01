@@ -17,7 +17,9 @@
 
 package org.constellation.menu.provider;
 
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.AbstractMenuItem;
+import org.constellation.configuration.ProvidersReport;
 
 
 /**
@@ -38,4 +40,12 @@ public class SensorMLItem extends AbstractMenuItem{
             );
     }
 
+    @Override
+    public boolean isAvailable(final ConstellationServer server) {
+        if(server == null) return false;
+        final ProvidersReport report = server.providers.listProviders();
+        if(report == null) return false;
+        return report.getProviderService(SensorMLBean.SERVICE_NAME) != null;
+    }
+    
 }

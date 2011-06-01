@@ -24,7 +24,7 @@
 
             <mf:DataTableColumn>
                <h:commandLink action="#{node.select}">
-                    <h:outputText value="#{node.userObject.id}"/>
+                    <h:outputText value="#{node.userObject}"/>
                 </h:commandLink>
             </mf:DataTableColumn>
 
@@ -67,6 +67,7 @@
                 </a4j:commandLink>
             </mf:DataTableColumn>
             
+            <!--
             <mf:DataTableColumn width="24px">
                 <mf:switch>
                     <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractDataStoreServiceBean$TypeNode') and node.exist}" fallthrought="false">
@@ -77,6 +78,7 @@
                     </mf:case>
                 </mf:switch>
             </mf:DataTableColumn>
+            -->
             
             <mf:DataTableColumn width="24px">
                 <mf:switch>

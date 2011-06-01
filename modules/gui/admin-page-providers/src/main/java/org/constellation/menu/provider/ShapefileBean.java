@@ -24,8 +24,10 @@ package org.constellation.menu.provider;
  */
 public class ShapefileBean extends AbstractDataStoreServiceBean{
 
+    public static final String SERVICE_NAME = "shapefile";
+    
     public ShapefileBean(){
-        super("shapefile",
+        super(SERVICE_NAME,
               "/provider/shapefile.xhtml",
               "/provider/shapefileConfig.xhtml",
               "/provider/shapefileLayerConfig.xhtml");

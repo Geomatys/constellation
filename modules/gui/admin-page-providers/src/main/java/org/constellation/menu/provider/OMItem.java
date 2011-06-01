@@ -17,7 +17,9 @@
 
 package org.constellation.menu.provider;
 
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.AbstractMenuItem;
+import org.constellation.configuration.ProvidersReport;
 
 
 /**
@@ -36,6 +38,14 @@ public class OMItem extends AbstractMenuItem{
             "provider.om",
             new Path(PROVIDERS_DATA_PATH,"O&M", "/provider/om.xhtml", null,500)
             );
+    }
+    
+    @Override
+    public boolean isAvailable(final ConstellationServer server) {
+        if(server == null) return false;
+        final ProvidersReport report = server.providers.listProviders();
+        if(report == null) return false;
+        return report.getProviderService(OMBean.SERVICE_NAME) != null;
     }
 
 }

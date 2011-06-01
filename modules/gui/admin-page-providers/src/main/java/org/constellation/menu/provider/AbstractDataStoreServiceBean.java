@@ -17,7 +17,10 @@
 
 package org.constellation.menu.provider;
 
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -41,6 +44,7 @@ import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 
@@ -135,9 +139,13 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
     private TreeModel buildModel(final ProvidersReport proxy, final boolean onlyKeys){
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
         
-        final ProviderServiceReport serviceReport = proxy.getProviderService(serviceName);
-        for(final String provider : serviceReport.getSources()){
-            root.add(buildNode(provider,false));
+        if(proxy != null){
+            final ProviderServiceReport serviceReport = proxy.getProviderService(serviceName);
+            if(serviceReport != null && serviceReport.getSources() != null){
+                for(final String provider : serviceReport.getSources()){
+                    root.add(buildNode(provider,false));
+                }
+            }
         }
 
         return new DefaultTreeModel(root);
@@ -291,21 +299,12 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
             super(provider);
             this.providerId = provider;
         }
-
+        
         public void delete(){
-//            if(providerId instanceof LayerProvider){
-//                LayerProviderProxy.getInstance().removeProvider((LayerProvider)providerId);
-//            }else if(providerId instanceof StyleProvider){
-//                StyleProviderProxy.getInstance().removeProvider((StyleProvider)providerId);
-//            }else{
-//                LOGGER.log(Level.WARNING, "Unexpected provider class : {0}", providerId.getClass());
-//            }
-//            
-//            if(configuredInstance == DataStoreSourceNode.this){
-//                configuredInstance = null;
-//                configuredParams = null;
-//            }
-            
+            getServer().providers.removeSource(providerId);
+            layersModel = null;
+            configuredInstance = null;
+            configuredParams = null;
         }
 
         public void reload(){
@@ -317,24 +316,27 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
          * Select this source to display layers
          */
         public void select(){
-//            configuredInstance = this;
-//            configuredParams = providerId.getSource().clone();
+            configuredInstance = this;
+            final ConstellationServer server = getServer();
+            configuredParams = (ParameterValueGroup)server.providers.getSource(providerId,
+                    (ParameterDescriptorGroup)((ParameterDescriptorGroup)server.providers.getServiceDescriptor(serviceName))
+                    .descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
         }
         
         /**
          * Set this instance as the currently configured one in for the property dialog.
          */
         public void config(){
-//            select();
-//
-//            if(sourceConfigPage != null){
-//                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-//                try {
-//                    context.redirect(sourceConfigPage);
-//                } catch (IOException ex) {
-//                    LOGGER.log(Level.WARNING, null, ex);
-//                }
-//            }
+            select();
+
+            if(sourceConfigPage != null){
+                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+                try {
+                    context.redirect(sourceConfigPage);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "Redirection to "+sourceConfigPage+" failed.", ex);
+                }
+            }
         }
 
     }

@@ -24,8 +24,10 @@ package org.constellation.menu.provider;
  */
 public class PostGISBean extends AbstractDataStoreServiceBean{
 
+    public static final String SERVICE_NAME = "postgis";
+    
     public PostGISBean(){
-        super("postgis",
+        super(SERVICE_NAME,
               "/provider/postgis.xhtml",
               "/provider/postgisConfig.xhtml",
               "/provider/postgisLayerConfig.xhtml");

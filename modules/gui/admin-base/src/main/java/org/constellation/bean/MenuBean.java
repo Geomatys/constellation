@@ -27,6 +27,7 @@ import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.MenuItem.Path;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotoolkit.util.logging.Logging;
@@ -41,6 +42,11 @@ import org.mapfaces.utils.FacesUtils;
  */
 public class MenuBean extends I18NBean{
 
+    /**
+     * When user is log in, a ServiceAdministrator object is added in the session map.
+     */
+    public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
+    
     private static final Logger LOGGER = Logging.getLogger(MenuBean.class);
 
     private static final OutlineRowStyler STYLER = new OutlineRowStyler() {
@@ -72,19 +78,31 @@ public class MenuBean extends I18NBean{
         }
     };
 
-    private final TreeModel model;
+    private TreeModel model = null;
+    private ConstellationServer oldServer = null;
 
     public MenuBean() {
-        final Map<String,I18NNode> nodes = new HashMap<String, I18NNode>();
-
         addBundle("org.constellation.bundle.base");
+    }
 
+    private ConstellationServer getServer(){
+        return (ConstellationServer) FacesContext.getCurrentInstance()
+                .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
+    }
+    
+    private TreeModel createMenuModel(){
+        final Map<String,I18NNode> nodes = new HashMap<String, I18NNode>();
         final I18NNode root = new I18NNode("root",null,null,0);
         nodes.put("root", root);
         model = new DefaultTreeModel(root);
 
+        ConstellationServer server = getServer();
+        
         for(final MenuItem page : MenuItems.getPages()){
-
+            if(!page.isAvailable(server)){
+                continue;
+            }
+            
             //load the extension bundle
             final String bundle = page.getResourceBundlePath();
             if(bundle != null){
@@ -96,9 +114,9 @@ public class MenuBean extends I18NBean{
                 create(root, nodes, path);
             }
         }
-
+        return model;
     }
-
+    
     private I18NNode create(final I18NNode root, final Map<String,I18NNode> cache, final Path path){
        
         //find the node where to insert this one
@@ -151,6 +169,12 @@ public class MenuBean extends I18NBean{
 
 
     public TreeModel getModel() {
+        final ConstellationServer currentServer = getServer();
+        if(model == null || oldServer==null || !oldServer.equals(currentServer)){
+            model = createMenuModel();
+            oldServer = currentServer;
+        }
+        
         return model;
     }
 

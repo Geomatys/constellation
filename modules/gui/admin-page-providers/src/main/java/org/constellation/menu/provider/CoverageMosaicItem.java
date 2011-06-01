@@ -17,7 +17,9 @@
 
 package org.constellation.menu.provider;
 
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.AbstractMenuItem;
+import org.constellation.configuration.ProvidersReport;
 
 
 /**
@@ -36,6 +38,14 @@ public class CoverageMosaicItem extends AbstractMenuItem{
             "provider.coveragemosaic",
             new Path(PROVIDERS_DATA_PATH,"Coverage-Mosaic", "/provider/coveragemosaic.xhtml", null,800)
             );
+    }
+    
+    @Override
+    public boolean isAvailable(final ConstellationServer server) {
+        if(server == null) return false;
+        final ProvidersReport report = server.providers.listProviders();
+        if(report == null) return false;
+        return report.getProviderService(CoverageMosaicBean.SERVICE_NAME) != null;
     }
 
 }

@@ -24,8 +24,10 @@ package org.constellation.menu.provider;
  */
 public class CoverageSQLBean extends AbstractDataStoreServiceBean{
 
+    public static final String SERVICE_NAME = "coverage-sql";
+    
     public CoverageSQLBean(){
-        super("coverage-sql",
+        super(SERVICE_NAME,
               "/provider/coveragesql.xhtml",
               "/provider/coveragesqlConfig.xhtml",
               "/provider/coveragesqlLayerConfig.xhtml");

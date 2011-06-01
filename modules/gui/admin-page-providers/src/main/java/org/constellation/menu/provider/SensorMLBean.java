@@ -24,8 +24,10 @@ package org.constellation.menu.provider;
  */
 public class SensorMLBean extends AbstractDataStoreServiceBean{
 
+    public static final String SERVICE_NAME = "sensorML";
+    
     public SensorMLBean(){
-        super("sensorML",
+        super(SERVICE_NAME,
               "/provider/sensorml.xhtml",
               "/provider/sensormlConfig.xhtml",
               "/provider/sensormlLayerConfig.xhtml");

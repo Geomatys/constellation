@@ -801,7 +801,7 @@ public final class ConstellationServer {
 
         public ProvidersReport listProviders() {
             try {
-                final String url = getServiceURL() + "configuration?request=listProviders";
+                final String url = getServiceURL() + "configuration?request="+REQUEST_LIST_SERVICES;
                 final Object response = sendRequest(url, null);
                 if (response instanceof ProvidersReport) {
                     return (ProvidersReport) response;

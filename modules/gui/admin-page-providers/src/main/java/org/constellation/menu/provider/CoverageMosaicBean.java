@@ -24,8 +24,10 @@ package org.constellation.menu.provider;
  */
 public class CoverageMosaicBean extends AbstractDataStoreServiceBean{
 
+    public static final String SERVICE_NAME = "coverage-mosaic";
+    
     public CoverageMosaicBean(){
-        super("coverage-mosaic",
+        super(SERVICE_NAME,
               "/provider/coveragemosaic.xhtml",
               "/provider/coveragemosaicConfig.xhtml",
               "/provider/coveragemosaicLayerConfig.xhtml");

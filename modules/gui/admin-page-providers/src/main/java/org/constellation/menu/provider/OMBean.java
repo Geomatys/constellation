@@ -24,8 +24,10 @@ package org.constellation.menu.provider;
  */
 public class OMBean extends AbstractDataStoreServiceBean{
 
+    public static final String SERVICE_NAME = "observation";
+    
     public OMBean(){
-        super("observation",
+        super(SERVICE_NAME,
               "/provider/om.xhtml",
               "/provider/omConfig.xhtml",
               "/provider/omLayerConfig.xhtml");
