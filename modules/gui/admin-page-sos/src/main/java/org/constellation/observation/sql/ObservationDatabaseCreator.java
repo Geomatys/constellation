@@ -1,3 +1,4 @@
+
 /*
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
@@ -16,6 +17,7 @@
  */
 package org.constellation.observation.sql;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.constellation.util.Util;
+import org.geotoolkit.internal.sql.PostgisInstaller;
 import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.util.logging.Logging;
 
@@ -43,17 +46,19 @@ public class ObservationDatabaseCreator {
      * @throws SQLException if an error occurs while filling the database.
      * @throws IllegalArgumentException if the dataSource is null.
      */
-    public static void createObservationDatabase(final DataSource dataSource) throws SQLException {
+    public static void createObservationDatabase(final DataSource dataSource, final File postgisInstall) throws SQLException, IOException {
         if (dataSource == null) {
             throw new IllegalArgumentException("The DataSource is null");
         }
         
-        // TODO  build postgis
-        
         final Connection con  = dataSource.getConnection();
+        
+        final PostgisInstaller pgInstaller = new PostgisInstaller(con);
+        pgInstaller.run("CREATE TRUSTED PROCEDURAL LANGUAGE 'plpgsql' HANDLER plpgsql_call_handler VALIDATOR plpgsql_validator;");
+        pgInstaller.run("CREATE SCHEMA postgis;");
+        pgInstaller.run(postgisInstall);
         final ScriptRunner sr = new ScriptRunner(con);
-        execute("org/constellation/observation/structure_observation.sql", sr);
-        execute("org/constellation/observation/update.sql", sr);
+        execute("org/constellation/observation/structure_observations.sql", sr);
         LOGGER.info("O&M database created");
 
         sr.close(false);

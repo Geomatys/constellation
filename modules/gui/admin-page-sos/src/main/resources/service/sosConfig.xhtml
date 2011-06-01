@@ -13,102 +13,123 @@
         <center><a href="#{sosBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
         <br/>
         <br/>
+        <div class="rounded">
+            SOS Configuration
+            <div class="rounded">
+		O&amp;M configuration
+                <br/><br/>
+                <h:selectOneMenu value="#{sosBean.omConfigType}">
+                    <f:selectItems value="#{sosBean.omConfigTypes}"/>
+                    <a4j:support event="onchange" reRender="omComponent,createdbOM"/>
+                </h:selectOneMenu>
 
-        SOS Configuration
-        <br/>
-        O&amp;M configuration
-        <br/>
-       <h:selectOneMenu value="#{sosBean.omConfigType}">
-        	<f:selectItems value="#{sosBean.omConfigTypes}"/>
-                <a4j:support event="onchange" reRender="omComponent,createdbOM"/>
-        </h:selectOneMenu>
-
-        <mf:CustomHtml tag="table" id="omComponent">
-        <mf:switch>
-                 <mf:case condition="#{sosBean.omConfigType == 'filesystem'}" fallthrought="false">
-                       <tr>
+                <mf:CustomHtml tag="table" id="omComponent" style="width:100%;">
+                    <colgroup>
+                        <col width="20%"/>
+                        <col width="80%"/>
+                    </colgroup>
+                    <tbody>
+                    <mf:switch>
+                        <mf:case condition="#{sosBean.omConfigType == 'filesystem'}" fallthrought="false">
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['dataDirectory']}"/></td>
-                                <td><h:inputText value="#{sosBean.omDataDirectory}"/></td>
-                       </tr>
-                 </mf:case>
-                 <mf:case condition="#{sosBean.omConfigType == 'default'}" fallthrought="false">
-                       <tr>
+                            <td><h:inputText value="#{sosBean.omDataDirectory}" style="width:50%;"/></td>
+                            </tr>
+                        </mf:case>
+                        <mf:case condition="#{sosBean.omConfigType == 'default'}" fallthrought="false">
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['driverClass']}"/></td>
-                                <td><h:inputText value="#{sosBean.omDriverClass}"/></td>
-                       </tr>
-                       <tr>
+                            <td><h:inputText value="#{sosBean.omDriverClass}" style="width:50%;"/></td>
+                            </tr>
+
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['dbURL']}"/></td>
-                                <td><h:inputText value="#{sosBean.omConnectURL}"/></td>
-                       </tr>
-                       <tr>
+                            <td><h:inputText value="#{sosBean.omConnectURL}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['user']}"/></td>
-                                <td><h:inputText value="#{sosBean.omUserName}"/></td>
-                       </tr>
-                       <tr>
+                            <td><h:inputText value="#{sosBean.omUserName}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['passwd']}"/></td>
-                                <td><h:inputSecret value="#{sosBean.omUserPass}"/></td>
-                       </tr>
-                 </mf:case>
-        </mf:switch>   
-                        
-        </mf:CustomHtml>
+                            <td><h:inputSecret value="#{sosBean.omUserPass}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="#{sosBean.i18n['postgisFolder']}"/></td>
+                            <td><h:inputText value="#{sosBean.omPostgisDir}" style="width:50%;"/></td>
+                            </tr>
+                        </mf:case>
+                    </mf:switch>   
+                    </tbody>          
+                </mf:CustomHtml>
 
-        <mf:CustomHtml tag="div" id="createdbOM" style="text-align: left;">
-            <h:commandButton action="#{sosBean.buildOMDatabase}" value="#{sosBean.i18n['buildOMDatabase']}" rendered="#{sosBean.omConfigType == 'default'}"/>
-        </mf:CustomHtml>
-        <br/>
-        SensorML configuration
-        <br/>
-        
-        <h:selectOneMenu value="#{sosBean.smlConfigType}">
-        	<f:selectItems value="#{sosBean.smlConfigTypes}"/>
-                <a4j:support event="onchange" reRender="smlComponent,createdbSML"/>
-        </h:selectOneMenu>
+                <mf:CustomHtml tag="div" id="createdbOM" style="text-align: left;">
+                    <h:commandButton action="#{sosBean.buildOMDatabase}" value="#{sosBean.i18n['buildOMDatabase']}" rendered="#{sosBean.omConfigType == 'default'}"/>
+                </mf:CustomHtml>
+            </div>
+            <div class="rounded">
+                SensorML configuration
+                <br/><br/>
 
-        <mf:CustomHtml tag="table" id="smlComponent">
-        <mf:switch>
-                 <mf:case condition="#{sosBean.smlConfigType == 'filesystem'}" fallthrought="false">
-                       <tr>
+                <h:selectOneMenu value="#{sosBean.smlConfigType}">
+                    <f:selectItems value="#{sosBean.smlConfigTypes}"/>
+                    <a4j:support event="onchange" reRender="smlComponent,createdbSML"/>
+                </h:selectOneMenu>
+
+                <mf:CustomHtml tag="table" id="smlComponent" style="width:100%;">
+                    <colgroup>
+                        <col width="20%"/>
+                        <col width="80%"/>
+                    </colgroup>
+                    <tbody>
+                    <mf:switch>
+                        <mf:case condition="#{sosBean.smlConfigType == 'filesystem'}" fallthrought="false">
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['dataDirectory']}"/></td>
-                                <td><h:inputText value="#{sosBean.omDataDirectory}"/></td>
-                       </tr>
-                 </mf:case>
-                 <mf:case condition="#{sosBean.smlConfigType == 'mdweb'}" fallthrought="false">
-                       <tr>
+                            <td><h:inputText value="#{sosBean.smlDataDirectory}" style="width:50%;"/></td>
+                            </tr>
+                        </mf:case>
+                        <mf:case condition="#{sosBean.smlConfigType == 'mdweb'}" fallthrought="false">
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['driverClass']}"/></td>
-                                <td><h:inputText value="#{sosBean.smlDriverClass}"/></td>
-                       </tr>
-                       <tr>
+                            <td><h:inputText value="#{sosBean.smlDriverClass}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['dbURL']}"/></td>
-                                <td><h:inputText value="#{sosBean.smlConnectURL}"/></td>
-                       </tr>
-                       <tr>
+                            <td><h:inputText value="#{sosBean.smlConnectURL}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['user']}"/></td>
-                                <td><h:inputText value="#{sosBean.smlUserName}"/></td>
-                       </tr>
-                       <tr>
+                            <td><h:inputText value="#{sosBean.smlUserName}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
                                 <td><h:outputText value="#{sosBean.i18n['passwd']}"/></td>
-                                <td><h:inputSecret value="#{sosBean.smlUserPass}"/></td>
-                       </tr>
-                 </mf:case>
-        </mf:switch>   
-                        <tr>
-                                <td><h:outputText value="#{sosBean.i18n['profile']}"/></td>
-                                <td><h:selectOneMenu value="#{sosBean.profile}">
-                                        <f:selectItems value="#{sosBean.profiles}"/>
-                                    </h:selectOneMenu>
-                                </td>
-                       </tr>     
-        </mf:CustomHtml>
+                            <td><h:inputSecret value="#{sosBean.smlUserPass}" style="width:50%;"/></td>
+                            </tr>
+                        </mf:case>
+                    </mf:switch>   
 
-        <mf:CustomHtml tag="div" id="createdbSML" style="text-align: left;">
-            <h:commandButton action="#{sosBean.buildMDWDatabase}" value="#{sosBean.i18n['buildMDWDatabase']}" rendered="#{sosBean.smlConfigType == 'mdweb'}"/>
-        </mf:CustomHtml>
-           
-        <div style="text-align: right;">
-            <h:commandButton action="#{sosBean.saveConfiguration}" value="#{sosBean.i18n['save']}" />
+                    </tbody>        
+                </mf:CustomHtml>
+
+                <mf:CustomHtml tag="div" id="createdbSML" style="text-align: left;">
+                    <h:commandButton action="#{sosBean.buildMDWDatabase}" value="#{sosBean.i18n['buildMDWDatabase']}" rendered="#{sosBean.smlConfigType == 'mdweb'}"/>
+                </mf:CustomHtml>
+            </div>   
+            <table> 
+                <tr>
+                    <td><h:outputText value="#{sosBean.i18n['profile']}"/></td>
+                <td><h:selectOneMenu value="#{sosBean.profile}">
+                    <f:selectItems value="#{sosBean.profiles}"/>
+                </h:selectOneMenu>
+                </td>
+                </tr> 
+            </table>
+            <div style="text-align: right;">
+                <h:commandButton action="#{sosBean.saveConfiguration}" value="#{sosBean.i18n['save']}" />
+            </div>
         </div>
     </ui:define>
-    
+
 
 </ui:composition>

@@ -13,58 +13,70 @@
         <center><a href="#{cswBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
         <br/>
         <br/>
-        CSW Configuration
-        <br/>
-        <h:selectOneMenu value="#{cswBean.configType}">
-        	<f:selectItems value="#{cswBean.configTypes}"/>
-                <a4j:support event="onchange" reRender="specificComponent, createdb"/>
-        </h:selectOneMenu>
+        <div class="rounded">
+            CSW Configuration
+            <div class="rounded">
+                <h:selectOneMenu value="#{cswBean.configType}">
+                    <f:selectItems value="#{cswBean.configTypes}"/>
+                    <a4j:support event="onchange" reRender="specificComponent, createdb"/>
+                </h:selectOneMenu>
 
-        <mf:CustomHtml tag="table" id="specificComponent">
-        <mf:switch>
-                 <mf:case condition="#{cswBean.configType == 'filesystem'}" fallthrought="false">
-                       <tr>
+                <mf:CustomHtml tag="table" id="specificComponent" style="width:100%;">
+                    <colgroup>
+                        <col width="20%"/>
+                        <col width="80%"/>
+                    </colgroup>
+                    <tbody>
+                    <mf:switch>
+                        <mf:case condition="#{cswBean.configType == 'filesystem'}" fallthrought="false">
+                            <tr>
                                 <td><h:outputText value="#{cswBean.i18n['dataDirectory']}"/></td>
-                                <td><h:inputText value="#{cswBean.dataDirectory}"/></td>
-                       </tr>
-                 </mf:case>
-                 <mf:case condition="#{cswBean.configType == 'mdweb'}" fallthrought="false">
-                       <tr>
+                            <td><h:inputText value="#{cswBean.dataDirectory}" style="width:50%;"/></td>
+                            </tr>
+                        </mf:case>
+                        <mf:case condition="#{cswBean.configType == 'mdweb'}" fallthrought="false">
+                            <tr>
                                 <td><h:outputText value="#{cswBean.i18n['driverClass']}"/></td>
-                                <td><h:inputText value="#{cswBean.driverClass}"/></td>
-                       </tr>
-                       <tr>
+                            <td><h:inputText value="#{cswBean.driverClass}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
                                 <td><h:outputText value="#{cswBean.i18n['dbURL']}"/></td>
-                                <td><h:inputText value="#{cswBean.connectURL}"/></td>
-                       </tr>
-                       <tr>
+                            <td><h:inputText value="#{cswBean.connectURL}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
                                 <td><h:outputText value="#{cswBean.i18n['user']}"/></td>
-                                <td><h:inputText value="#{cswBean.userName}"/></td>
-                       </tr>
-                       <tr>
+                            <td><h:inputText value="#{cswBean.userName}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
                                 <td><h:outputText value="#{cswBean.i18n['passwd']}"/></td>
-                                <td><h:inputSecret value="#{cswBean.userPass}"/></td>
-                       </tr>
-                 </mf:case>
-        </mf:switch>   
-                        <tr>
-                                <td><h:outputText value="#{cswBean.i18n['profile']}"/></td>
-                                <td><h:selectOneMenu value="#{cswBean.profile}">
-                                        <f:selectItems value="#{cswBean.profiles}"/>
-                                    </h:selectOneMenu>
-                                </td>
-                       </tr>     
-        </mf:CustomHtml>
+                            <td><h:inputSecret value="#{cswBean.userPass}" style="width:50%;"/></td>
+                            </tr>
+                        </mf:case>
+                    </mf:switch>   
 
-        <mf:CustomHtml tag="div" id="createdb" style="text-align: left;">
-            <h:commandButton action="#{cswBean.buildDatabase}" value="#{cswBean.i18n['buildDatabase']}" rendered="#{cswBean.configType == 'mdweb'}"/>
-        </mf:CustomHtml>
+                    </tbody>            
+                </mf:CustomHtml>
+                <mf:CustomHtml tag="div" id="createdb" style="text-align: left;">
+                    <h:commandButton action="#{cswBean.buildDatabase}" value="#{cswBean.i18n['buildDatabase']}" rendered="#{cswBean.configType == 'mdweb'}"/>
+                </mf:CustomHtml>
+            </div>
+            <table> 
+                <tr>
+                    <td><h:outputText value="#{cswBean.i18n['profile']}"/></td>
+                <td><h:selectOneMenu value="#{cswBean.profile}">
+                    <f:selectItems value="#{cswBean.profiles}"/>
+                </h:selectOneMenu>
+                </td>
+                </tr>     
+            </table> 
 
+
+        </div>
         <div style="text-align: right;">
             <h:commandButton action="#{cswBean.saveConfiguration}" value="#{cswBean.i18n['save']}" />
         </div>
 
     </ui:define>
-    
+
 
 </ui:composition>

@@ -19,7 +19,7 @@ CREATE TABLE "observation"."any_results" (
     "id_result"  integer DEFAULT nextval(('observation.any_results_id_result_seq'::text)::regclass) NOT NULL,
     "reference"  character varying(40),
     "values"     character varying(1000),
-    "definition" character varying(20)
+    "definition" character varying(40)
 );
 
 CREATE SEQUENCE "any_results_id_result_seq"
@@ -233,8 +233,8 @@ CREATE TABLE "sos"."offering_sampling_features" (
 );
 
 CREATE TABLE "sos"."projected_localisations" (
-    "id" character varying(40) NOT NULL,
-    "the_geom"     postgis.geometry
+    "id"       character varying(40) NOT NULL,
+    "the_geom" postgis.geometry
 );
 
 ALTER TABLE "observation"."any_results" ADD CONSTRAINT any_pkey PRIMARY KEY ("id_result");
@@ -291,7 +291,7 @@ ALTER TABLE "sos"."offering_sampling_features" ADD CONSTRAINT offering_sampling_
 
 ALTER TABLE "sos"."projected_localisations" ADD CONSTRAINT projected_pk PRIMARY KEY ("id");
 
-CREATE INDEX fki_data_array_encoding_fk ON data_array_definition USING btree ("encoding");
+CREATE INDEX fki_data_array_encoding_fk ON "observation"."data_array_definition" USING btree ("encoding");
 
 ALTER TABLE "observation"."components" ADD CONSTRAINT components_component_fkey FOREIGN KEY ("component") REFERENCES "observation"."phenomenons"("id");
 
@@ -345,5 +345,3 @@ ALTER TABLE "sos"."offering_sampling_features" ADD CONSTRAINT offering_sampling_
 
 INSERT INTO "observation"."phenomenons" VALUES ('', '', 'phenomenon null');
 INSERT INTO "observation"."composite_phenomenons" VALUES ('', '', 'composite phenomenon null', 0);
-
-

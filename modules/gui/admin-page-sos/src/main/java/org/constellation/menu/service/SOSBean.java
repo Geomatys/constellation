@@ -17,6 +17,8 @@
 
 package org.constellation.menu.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +51,8 @@ public class SOSBean extends AbstractServiceBean{
     private String omUserName;
     
     private String omUserPass;
+    
+    private String omPostgisDir;
     
     private String smlConfigType;
     
@@ -183,7 +187,7 @@ public class SOSBean extends AbstractServiceBean{
     public void setOmConnectURL(String omConnectURL) {
         if (configurationObject instanceof SOSConfiguration) {
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
-            config.getOMConfiguration().getBdd().setClassName(omDriverClass);
+            config.getOMConfiguration().getBdd().setConnectURL(omConnectURL);
         }
         this.omConnectURL = omConnectURL;
     }
@@ -385,6 +389,20 @@ public class SOSBean extends AbstractServiceBean{
         }
         this.profile = profile;
     }
+    
+    /**
+     * @return the omPostgisDir
+     */
+    public String getOmPostgisDir() {
+        return omPostgisDir;
+    }
+
+    /**
+     * @param omPostgisDir the omPostgisDir to set
+     */
+    public void setOmPostgisDir(String omPostgisDir) {
+        this.omPostgisDir = omPostgisDir;
+    }
 
     public void buildMDWDatabase() {
         if (configurationObject instanceof SOSConfiguration) {
@@ -403,8 +421,11 @@ public class SOSBean extends AbstractServiceBean{
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
             try {
                 final DataSource ds = config.getOMConfiguration().getBdd().getDataSource();
-                ObservationDatabaseCreator.createObservationDatabase(ds);
+                final File postgisInstall = new File(omPostgisDir);
+                ObservationDatabaseCreator.createObservationDatabase(ds, postgisInstall);
             } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "Error while creating the database", ex);
+            } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, "Error while creating the database", ex);
             }
         }
