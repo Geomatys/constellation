@@ -16,7 +16,7 @@
     Module description.
   -->
     <groupId>org.constellation.gui</groupId>
-    <artifactId>adminjsf</artifactId>
+    <artifactId>cstl-wrapper</artifactId>
     <packaging>war</packaging>
     <name>Constellation (services+admin)</name>
     <description>The WAR and GUI for Constellation.</description>
@@ -80,16 +80,14 @@
     <dependencies>
         <dependency>
             <groupId>org.constellation.gui</groupId>
-            <artifactId>constellation</artifactId>
+            <artifactId>cstl-admin</artifactId>
             <version>${project.version}</version>
-            <scope>runtime</scope>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.constellation.gui</groupId>
-            <artifactId>admin-standalone</artifactId>
+            <artifactId>cstl-services</artifactId>
             <version>${project.version}</version>
-            <scope>runtime</scope>
             <type>war</type>
         </dependency>        
     </dependencies>

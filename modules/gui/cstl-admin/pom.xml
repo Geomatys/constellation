@@ -16,7 +16,7 @@
     Module description.
   -->
     <groupId>org.constellation.gui</groupId>
-    <artifactId>admin-standalone</artifactId>
+    <artifactId>cstl-admin</artifactId>
     <packaging>war</packaging>
     <name>Constellation (admin)</name>
     <description>The GUI for Constellation.</description>

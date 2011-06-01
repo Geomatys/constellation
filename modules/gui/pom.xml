@@ -106,9 +106,9 @@
         <module>admin-page-services</module>
         <module>admin-page-csw</module>
         <module>admin-page-sos</module>
-		<module>admin-standalone</module>
-        <module>constellation</module>
-        <module>adminjsf</module>
+        <module>cstl-services</module>
+        <module>cstl-admin</module>
+        <module>cstl-wrapper</module>
     </modules>
 
 </project>

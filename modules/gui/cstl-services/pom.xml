@@ -16,7 +16,7 @@
     Module description.
   -->
     <groupId>org.constellation.gui</groupId>
-    <artifactId>constellation</artifactId>
+    <artifactId>cstl-services</artifactId>
     <packaging>war</packaging>
     <name>Constellation (services)</name>
     <description>The WAR for Constellation.</description>
