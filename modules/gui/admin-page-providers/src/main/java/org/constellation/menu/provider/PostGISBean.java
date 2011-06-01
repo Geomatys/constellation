@@ -17,12 +17,6 @@
 
 package org.constellation.menu.provider;
 
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.postgis.PostGisProvider;
-import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
-import org.opengis.parameter.GeneralParameterDescriptor;
-
 /**
  * PostGIS configuration bean.
  *
@@ -30,30 +24,12 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  */
 public class PostGISBean extends AbstractDataStoreServiceBean{
 
-    private static LayerProviderService getService(){
-        for(LayerProviderService service : LayerProviderProxy.getInstance().getServices()){
-            if(service.getName().equals("postgis")){
-                return service;
-            }
-        }
-        return null;
-    }
-
     public PostGISBean(){
-        super(getService(),"/provider/postgis.xhtml",
+        super("postgis",
+              "/provider/postgis.xhtml",
               "/provider/postgisConfig.xhtml",
               "/provider/postgisLayerConfig.xhtml");
         addBundle("provider.postgis");
-    }
-
-    @Override
-    protected Class getProviderClass() {
-        return PostGisProvider.class;
-    }
-
-    @Override
-    protected GeneralParameterDescriptor getSourceDescriptor() {
-        return PostgisNGDataStoreFactory.PARAMETERS_DESCRIPTOR;
     }
 
 }

@@ -67,7 +67,8 @@ public final class ConstellationServer {
     public static final String REQUEST_ADD_LAYER        = "addLayer"; 
     public static final String REQUEST_REMOVE_LAYER     = "removeLayer"; 
     public static final String REQUEST_MODIFY_LAYER     = "modifyLayer"; 
-    public static final String REQUEST_GET_DESCRIPTOR   = "getDescriptor"; 
+    public static final String REQUEST_GET_SERVICE_DESCRIPTOR   = "getServiceDescriptor"; 
+    public static final String REQUEST_GET_SOURCE_DESCRIPTOR   = "getSourceDescriptor"; 
     public static final String REQUEST_LIST_SERVICES    = "listServices"; 
     
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
@@ -751,14 +752,37 @@ public final class ConstellationServer {
         }
 
         /**
-         * Get the source provider configuration.
+         * Get the provider service configuration description.
          * 
-         * @param id The identifier of the source
+         * @param id The identifier of the service
          * @return 
          */
-        public GeneralParameterDescriptor getDescriptor(final String serviceName) {
+        public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_DESCRIPTOR+"&serviceName=" + serviceName;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_SERVICE_DESCRIPTOR+"&serviceName=" + serviceName;
+                Object response = sendDescriptorRequest(url, null);
+                if (response instanceof GeneralParameterDescriptor) {
+                    return (GeneralParameterDescriptor) response;
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                } else {
+                    LOGGER.warning("Unexpected response type :" + response);
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+        
+        /**
+         * Get the provider service source configuration description.
+         * 
+         * @param id The identifier of the service
+         * @return 
+         */
+        public GeneralParameterDescriptor getSourceDescriptor(final String serviceName) {
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_SOURCE_DESCRIPTOR+"&serviceName=" + serviceName;
                 Object response = sendDescriptorRequest(url, null);
                 if (response instanceof GeneralParameterDescriptor) {
                     return (GeneralParameterDescriptor) response;

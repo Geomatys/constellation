@@ -63,9 +63,28 @@
             <artifactId>admin-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <!-- services administration -->
         <dependency>
             <groupId>org.constellation.gui</groupId>
             <artifactId>admin-page-services</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-csw</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-sos</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <!-- providers administration -->
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-providers</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -57,13 +57,18 @@ public class MockLayerProviderService extends AbstractProviderService
     }
 
     @Override
-    public ParameterDescriptorGroup getDescriptor() {
+    public ParameterDescriptorGroup getServiceDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
     
     @Override
     public LayerProvider createProvider(ParameterValueGroup config) {
         return new MockLayerProvider(config);
+    }
+
+    @Override
+    public ParameterDescriptorGroup getSourceDescriptor() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private static class MockLayerProvider extends AbstractLayerProvider{

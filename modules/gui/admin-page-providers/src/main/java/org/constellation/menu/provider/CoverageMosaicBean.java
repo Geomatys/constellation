@@ -17,12 +17,6 @@
 
 package org.constellation.menu.provider;
 
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.coveragefile.CoverageMosaicProvider;
-import org.constellation.provider.coveragefile.CoverageMosaicProviderService;
-import org.opengis.parameter.GeneralParameterDescriptor;
-
 /**
  * Coverage-Mosaic configuration bean.
  *
@@ -30,30 +24,12 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  */
 public class CoverageMosaicBean extends AbstractDataStoreServiceBean{
 
-    private static LayerProviderService getService(){
-        for(LayerProviderService service : LayerProviderProxy.getInstance().getServices()){
-            if(service.getName().equals("coverage-mosaic")){
-                return service;
-            }
-        }
-        return null;
-    }
-
     public CoverageMosaicBean(){
-        super(getService(),"/provider/coveragemosaic.xhtml",
+        super("coverage-mosaic",
+              "/provider/coveragemosaic.xhtml",
               "/provider/coveragemosaicConfig.xhtml",
               "/provider/coveragemosaicLayerConfig.xhtml");
         addBundle("provider.coveragemosaic");
-    }
-
-    @Override
-    protected Class getProviderClass() {
-        return CoverageMosaicProvider.class;
-    }
-
-    @Override
-    protected GeneralParameterDescriptor getSourceDescriptor() {
-        return CoverageMosaicProviderService.SOURCE_CONFIG_DESCRIPTOR;
     }
 
 }

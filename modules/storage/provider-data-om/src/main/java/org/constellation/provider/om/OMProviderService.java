@@ -51,10 +51,15 @@ public class OMProviderService extends AbstractProviderService
     }
 
     @Override
-    public ParameterDescriptorGroup getDescriptor() {
+    public ParameterDescriptorGroup getServiceDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
 
+    @Override
+    public ParameterDescriptorGroup getSourceDescriptor() {
+        return PARAMETERS_DESCRIPTOR;
+    }
+    
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
         try {

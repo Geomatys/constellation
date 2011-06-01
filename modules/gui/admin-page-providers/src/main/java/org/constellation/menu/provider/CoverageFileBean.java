@@ -17,12 +17,6 @@
 
 package org.constellation.menu.provider;
 
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.coveragefile.CoverageFileProvider;
-import org.constellation.provider.coveragefile.CoverageFileProviderService;
-import org.opengis.parameter.GeneralParameterDescriptor;
-
 /**
  * Coverage-File configuration bean.
  *
@@ -30,30 +24,12 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  */
 public class CoverageFileBean extends AbstractDataStoreServiceBean{
 
-    private static LayerProviderService getService(){
-        for(LayerProviderService service : LayerProviderProxy.getInstance().getServices()){
-            if(service.getName().equals("coverage-file")){
-                return service;
-            }
-        }
-        return null;
-    }
-
     public CoverageFileBean(){
-        super(getService(),"/provider/coveragefile.xhtml",
+        super("coverage-file",
+              "/provider/coveragefile.xhtml",
               "/provider/coveragefileConfig.xhtml",
               "/provider/coveragefileLayerConfig.xhtml");
         addBundle("provider.coveragefile");
-    }
-
-    @Override
-    protected Class getProviderClass() {
-        return CoverageFileProvider.class;
-    }
-
-    @Override
-    protected GeneralParameterDescriptor getSourceDescriptor() {
-        return CoverageFileProviderService.SOURCE_CONFIG_DESCRIPTOR;
     }
 
 }

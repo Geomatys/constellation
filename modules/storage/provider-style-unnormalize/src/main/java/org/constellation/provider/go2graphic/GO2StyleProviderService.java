@@ -27,6 +27,7 @@ import org.constellation.provider.configuration.ProviderParameters;
 
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.style.MutableStyle;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -67,8 +68,13 @@ public class GO2StyleProviderService extends AbstractProviderService
     }
 
     @Override
-    public ParameterDescriptorGroup getDescriptor() {
+    public ParameterDescriptorGroup getServiceDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
+    }
+
+    @Override
+    public GeneralParameterDescriptor getSourceDescriptor() {
+        return SOURCE_DESCRIPTOR;
     }
 
 }

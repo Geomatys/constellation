@@ -12,20 +12,10 @@
         </tag>
         
         <tag>
-          <tag-name>stylepreview</tag-name>
-          <source>/provider/styleServiceEditor.xhtml</source>
-        </tag>
-
-        <tag>
             <tag-name>compSourceConfig</tag-name>
             <source>/provider/compSourceConfig.xhtml</source>
         </tag>
-        
-        <tag>
-            <tag-name>editSLD</tag-name>
-            <source>/provider/editSLD.xhtml</source>
-        </tag>
-        
+                
         <tag>
             <tag-name>layerParameterConfig</tag-name>
             <source>/provider/layerParameterConfig.xhtml</source>

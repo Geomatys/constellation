@@ -38,6 +38,7 @@ import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -56,7 +57,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     public static final String REQUEST_ADD_LAYER        = "addLayer"; 
     public static final String REQUEST_REMOVE_LAYER     = "removeLayer"; 
     public static final String REQUEST_MODIFY_LAYER     = "modifyLayer"; 
-    public static final String REQUEST_GET_DESCRIPTOR   = "getDescriptor"; 
+    public static final String REQUEST_GET_SERVICE_DESCRIPTOR   = "getServiceDescriptor"; 
+    public static final String REQUEST_GET_SOURCE_DESCRIPTOR   = "getSourceDescriptor"; 
     public static final String REQUEST_LIST_SERVICES    = "listServices"; 
     
     private final Map<String, LayerProviderService> services = new HashMap<String, LayerProviderService>();
@@ -87,8 +89,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             return removeLayer(parameters);
         } else if (REQUEST_MODIFY_LAYER.equalsIgnoreCase(request)) {
             return modifyLayer(parameters, objectRequest);        
-        } else if (REQUEST_GET_DESCRIPTOR.equalsIgnoreCase(request)) {
-            return getDescriptor(parameters);
+        } else if (REQUEST_GET_SERVICE_DESCRIPTOR.equalsIgnoreCase(request)) {
+            return getServiceDescriptor(parameters);
+        } else if (REQUEST_GET_SOURCE_DESCRIPTOR.equalsIgnoreCase(request)) {
+            return getSourceDescriptor(parameters);
         } else if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
             return listProviderServices();
         }
@@ -119,7 +123,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final LayerProviderService service = this.services.get(serviceName);
         if (service != null) {
 
-            final ParameterValueReader reader = new ParameterValueReader(service.getDescriptor());
+            final ParameterValueReader reader = new ParameterValueReader(service.getServiceDescriptor());
             try {
                 // we read the soruce parameter to add
                 reader.setInput(objectRequest);
@@ -154,7 +158,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final LayerProviderService service = services.get(serviceName);
         if (service != null) {
 
-            final ParameterValueReader reader = new ParameterValueReader(service.getDescriptor());
+            final ParameterValueReader reader = new ParameterValueReader(service.getServiceDescriptor());
             try {
                 // we read the soruce parameter to add
                 reader.setInput(objectRequest);
@@ -344,18 +348,35 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     }
     
     /**
-     * Return the descriptor of the specified provider type.
+     * Return the service descriptor of the specified type.
      * 
      * @param parameters The GET KVP parameters send in the request.
      * 
      * @return The descriptor of the specified provider type.
      * @throws CstlServiceException 
      */
-    private ParameterDescriptorGroup getDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+    private ParameterDescriptorGroup getServiceDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
         final LayerProviderService service = services.get(serviceName);
         if (service != null) {
-            return service.getDescriptor();
+            return service.getServiceDescriptor();
+        }
+        throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
+    }
+    
+    /**
+     * Return the service source descriptor of the specified type.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * 
+     * @return The descriptor of the specified provider type.
+     * @throws CstlServiceException 
+     */
+    private GeneralParameterDescriptor getSourceDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String serviceName = getParameter("serviceName", true, parameters);
+        final LayerProviderService service = services.get(serviceName);
+        if (service != null) {
+            return service.getSourceDescriptor();
         }
         throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
     }

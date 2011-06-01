@@ -17,12 +17,6 @@
 
 package org.constellation.menu.provider;
 
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.om.OMProvider;
-import org.geotoolkit.data.om.OMDataStoreFactory;
-import org.opengis.parameter.GeneralParameterDescriptor;
-
 /**
  * Observation & Measurement configuration bean.
  *
@@ -30,30 +24,12 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  */
 public class OMBean extends AbstractDataStoreServiceBean{
 
-    private static LayerProviderService getService(){
-        for(LayerProviderService service : LayerProviderProxy.getInstance().getServices()){
-            if(service.getName().equals("observation")){
-                return service;
-            }
-        }
-        return null;
-    }
-
     public OMBean(){
-        super(getService(),"/provider/om.xhtml",
+        super("observation",
+              "/provider/om.xhtml",
               "/provider/omConfig.xhtml",
               "/provider/omLayerConfig.xhtml");
         addBundle("provider.om");
-    }
-
-    @Override
-    protected Class getProviderClass() {
-        return OMProvider.class;
-    }
-
-    @Override
-    protected GeneralParameterDescriptor getSourceDescriptor() {
-        return OMDataStoreFactory.PARAMETERS_DESCRIPTOR;
     }
 
 }

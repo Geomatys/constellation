@@ -16,6 +16,7 @@
  */
 package org.constellation.provider.sld;
 
+import org.opengis.parameter.GeneralParameterDescriptor;
 import java.util.Collections;
 import java.util.logging.Level;
 
@@ -55,8 +56,13 @@ public class SLDProviderService extends AbstractProviderService
 
 
     @Override
-    public ParameterDescriptorGroup getDescriptor() {
+    public ParameterDescriptorGroup getServiceDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
+    }
+
+    @Override
+    public GeneralParameterDescriptor getSourceDescriptor() {
+        return FOLDER_DESCRIPTOR;
     }
 
     public SLDProviderService(){

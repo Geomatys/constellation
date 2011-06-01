@@ -17,6 +17,7 @@
 package org.constellation.provider;
 
 import java.util.Collection;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -30,7 +31,15 @@ public interface ProviderService<K,V,P extends Provider<K,V>> {
 
     String getName();
 
-    ParameterDescriptorGroup getDescriptor();
+    /**
+     * Description of the complete service parameters.
+     */
+    ParameterDescriptorGroup getServiceDescriptor();
+    
+    /**
+     * Description of the single source in the service parameters.
+     */
+    GeneralParameterDescriptor getSourceDescriptor();
     
     /**
      * Create a provider for the given configuration.

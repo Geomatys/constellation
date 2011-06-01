@@ -59,10 +59,15 @@ public class CoverageFileProviderService extends AbstractProviderService<Name,La
     }
 
     @Override
-    public ParameterDescriptorGroup getDescriptor() {
+    public ParameterDescriptorGroup getServiceDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
 
+    @Override
+    public ParameterDescriptorGroup getSourceDescriptor() {
+        return SOURCE_CONFIG_DESCRIPTOR;
+    }
+    
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
         try {

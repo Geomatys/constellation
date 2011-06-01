@@ -17,9 +17,9 @@
     Module description.
   -->
     <groupId>org.constellation.gui</groupId>
-    <artifactId>admin-page-providers</artifactId>
+    <artifactId>admin-page-sld</artifactId>
     <packaging>jar</packaging>
-    <name>Web site : Providers configuration</name>
+    <name>Web site : Provider SLD configuration</name>
 
 
     <!--
@@ -61,6 +61,12 @@
             <scope>provided</scope>
         </dependency>
         
+        <!-- providers -->
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-style-sld</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

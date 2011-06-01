@@ -55,5 +55,18 @@ public class ProvidersReport {
     public void setProviderServices(List<ProviderServiceReport> providerServices) {
         this.providerServices = providerServices;
     }
-        
+
+    /**
+     * @param id of the wanted provider service.
+     * @return ProviderServiceReport or null
+     */
+    public ProviderServiceReport getProviderService(final String id){
+        for(ProviderServiceReport report : getProviderServices()){
+            if(id.equals(report.getType())){
+                return report;
+            }
+        }
+        return null;
+    }
+    
 }

@@ -60,8 +60,13 @@ public class CoverageMosaicProviderService extends AbstractProviderService
     }
 
     @Override
-    public ParameterDescriptorGroup getDescriptor() {
+    public ParameterDescriptorGroup getServiceDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
+    }
+
+    @Override
+    public ParameterDescriptorGroup getSourceDescriptor() {
+        return SOURCE_CONFIG_DESCRIPTOR;
     }
     
     @Override

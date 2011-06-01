@@ -27,7 +27,6 @@ import org.constellation.provider.configuration.ProviderParameters;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -36,7 +35,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import org.constellation.bean.HighLightRowStyler;
 import org.constellation.provider.AbstractProviderProxy;
-import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
@@ -77,7 +75,7 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
         }
     };
     
-    private static final Logger LOGGER = Logging.getLogger(AbstractDataStoreServiceBean.class);
+    private static final Logger LOGGER = Logging.getLogger(AbstractStyleServiceBean.class);
 
     private final OutlineRowStyler ROW_STYLER = new HighLightRowStyler() {
         
@@ -208,7 +206,7 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
         }
 
         final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) service
-                .getDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
+                .getServiceDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
         final ParameterValueGroup params = desc.createValue();
         params.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(newSourceName);
 

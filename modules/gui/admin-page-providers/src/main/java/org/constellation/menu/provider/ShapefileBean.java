@@ -17,13 +17,6 @@
 
 package org.constellation.menu.provider;
 
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.ProviderService;
-import org.constellation.provider.shapefile.ShapeFileProvider;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
-import org.opengis.parameter.GeneralParameterDescriptor;
-
 /**
  * Shapefile configuration bean.
  *
@@ -31,30 +24,12 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  */
 public class ShapefileBean extends AbstractDataStoreServiceBean{
 
-    private static ProviderService getService(){
-        for(LayerProviderService service : LayerProviderProxy.getInstance().getServices()){
-            if(service.getName().equals("shapefile")){
-                return service;
-            }
-        }
-        return null;
-    }
-
     public ShapefileBean(){
-        super(getService(),"/provider/shapefile.xhtml",
+        super("shapefile",
+              "/provider/shapefile.xhtml",
               "/provider/shapefileConfig.xhtml",
               "/provider/shapefileLayerConfig.xhtml");
         addBundle("provider.shapefile");
-    }
-
-    @Override
-    protected Class getProviderClass() {
-        return ShapeFileProvider.class;
-    }
-
-    @Override
-    protected GeneralParameterDescriptor getSourceDescriptor() {
-        return ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR;
     }
 
 }

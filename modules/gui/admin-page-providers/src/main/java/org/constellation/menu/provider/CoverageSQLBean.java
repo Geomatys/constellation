@@ -17,12 +17,6 @@
 
 package org.constellation.menu.provider;
 
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.coveragesql.CoverageSQLProvider;
-import org.constellation.provider.coveragesql.CoverageSQLProviderService;
-import org.opengis.parameter.GeneralParameterDescriptor;
-
 /**
  * Coverage-SQL configuration bean.
  *
@@ -30,30 +24,12 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  */
 public class CoverageSQLBean extends AbstractDataStoreServiceBean{
 
-    private static LayerProviderService getService(){
-        for(LayerProviderService service : LayerProviderProxy.getInstance().getServices()){
-            if(service.getName().equals("coverage-sql")){
-                return service;
-            }
-        }
-        return null;
-    }
-
     public CoverageSQLBean(){
-        super(getService(),"/provider/coveragesql.xhtml",
+        super("coverage-sql",
+              "/provider/coveragesql.xhtml",
               "/provider/coveragesqlConfig.xhtml",
               "/provider/coveragesqlLayerConfig.xhtml");
         addBundle("provider.coveragesql");
-    }
-
-    @Override
-    protected Class getProviderClass() {
-        return CoverageSQLProvider.class;
-    }
-
-    @Override
-    protected GeneralParameterDescriptor getSourceDescriptor() {
-        return CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
     }
 
 }

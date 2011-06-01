@@ -17,12 +17,6 @@
 
 package org.constellation.menu.provider;
 
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.sml.SMLProvider;
-import org.geotoolkit.data.sml.SMLDataStoreFactory;
-import org.opengis.parameter.GeneralParameterDescriptor;
-
 /**
  * SensorML configuration bean.
  *
@@ -30,30 +24,12 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  */
 public class SensorMLBean extends AbstractDataStoreServiceBean{
 
-    private static LayerProviderService getService(){
-        for(LayerProviderService service : LayerProviderProxy.getInstance().getServices()){
-            if(service.getName().equals("sensorML")){
-                return service;
-            }
-        }
-        return null;
-    }
-
     public SensorMLBean(){
-        super(getService(),"/provider/sensorml.xhtml",
+        super("sensorML",
+              "/provider/sensorml.xhtml",
               "/provider/sensormlConfig.xhtml",
               "/provider/sensormlLayerConfig.xhtml");
         addBundle("provider.sensorml");
-    }
-
-    @Override
-    protected Class getProviderClass() {
-        return SMLProvider.class;
-    }
-
-    @Override
-    protected GeneralParameterDescriptor getSourceDescriptor() {
-        return SMLDataStoreFactory.PARAMETERS_DESCRIPTOR;
     }
 
 }

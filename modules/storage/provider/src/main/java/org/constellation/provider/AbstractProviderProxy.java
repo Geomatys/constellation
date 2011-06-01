@@ -116,7 +116,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     private void saveConfiguration(final S service){
         getLogger().log(Level.INFO, "Saving configuration for service : " + service.getName());
         //save configuration
-        final ParameterValueGroup config = service.getDescriptor().createValue();
+        final ParameterValueGroup config = service.getServiceDescriptor().createValue();
         for(P candidate : PROVIDERS){
             if(candidate.getService().equals(service)){
                 config.values().add(candidate.getSource());
@@ -168,7 +168,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         final List<P> cache = new ArrayList<P>();
         for(final ProviderService factory : getServices()){
             final String serviceName = factory.getName();
-            final ParameterDescriptorGroup desc = factory.getDescriptor();
+            final ParameterDescriptorGroup desc = factory.getServiceDescriptor();
 
             //load configurable sources
             try{
