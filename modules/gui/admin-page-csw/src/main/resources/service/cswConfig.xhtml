@@ -72,9 +72,20 @@
 
 
         </div>
-        <div style="text-align: right;">
-            <h:commandButton action="#{cswBean.saveConfiguration}" value="#{cswBean.i18n['save']}" />
-        </div>
+        
+        <table style="width:100%;"> 
+                <colgroup>
+                        <col width="80%"/>
+                        <col width="10%"/>
+                        <col width="10%"/>
+                </colgroup>
+                <tr>
+                    <td></td>
+                    <td><h:commandButton action="#{cswBean.refreshIndex}" value="#{cswBean.i18n['refreshIndex']}" /></td>
+                    <td><h:commandButton action="#{cswBean.saveConfiguration}" value="#{cswBean.i18n['save']}" /></td>
+                </tr>
+        </table>
+        
 
     </ui:define>
 

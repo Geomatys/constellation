@@ -25,6 +25,7 @@ import javax.faces.model.SelectItem;
 import javax.sql.DataSource;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.mdweb.sql.DatabaseCreator;
 
 /**
@@ -141,7 +142,9 @@ public class CSWBean extends AbstractServiceBean {
     public String getDriverClass() {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
-            this.driverClass = config.getBdd().getClassName();
+            if (config.getBdd() != null) {
+                this.driverClass = config.getBdd().getClassName();
+            }
         }
         return driverClass;
     }
@@ -152,6 +155,9 @@ public class CSWBean extends AbstractServiceBean {
     public void setDriverClass(String driverClass) {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
+            if (config.getBdd() == null) {
+                config.setBdd(new BDD());
+            }
             config.getBdd().setClassName(driverClass);
         }
         this.driverClass = driverClass;
@@ -163,7 +169,9 @@ public class CSWBean extends AbstractServiceBean {
     public String getConnectURL() {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
-            this.connectURL = config.getBdd().getConnectURL();
+            if (config.getBdd() != null) {
+                this.connectURL = config.getBdd().getConnectURL();
+            }
         }
         return connectURL;
     }
@@ -174,6 +182,9 @@ public class CSWBean extends AbstractServiceBean {
     public void setConnectURL(String connectURL) {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
+            if (config.getBdd() == null) {
+                config.setBdd(new BDD());
+            }
             config.getBdd().setConnectURL(connectURL);
         }
         this.connectURL = connectURL;
@@ -185,7 +196,9 @@ public class CSWBean extends AbstractServiceBean {
     public String getUserName() {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
-            this.userName = config.getBdd().getUser();
+            if (config.getBdd() != null) {
+                this.userName = config.getBdd().getUser();
+            }
         }
         return userName;
     }
@@ -196,6 +209,9 @@ public class CSWBean extends AbstractServiceBean {
     public void setUserName(String userName) {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
+            if (config.getBdd() == null) {
+                config.setBdd(new BDD());
+            }
             config.getBdd().setUser(userName);
         }
         this.userName = userName;
@@ -207,7 +223,9 @@ public class CSWBean extends AbstractServiceBean {
     public String getUserPass() {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
-            this.userPass = config.getBdd().getPassword();
+            if (config.getBdd() != null) {
+                this.userPass = config.getBdd().getPassword();
+            }
         }
         return userPass;
     }
@@ -218,22 +236,36 @@ public class CSWBean extends AbstractServiceBean {
     public void setUserPass(String userPass) {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
+            if (config.getBdd() == null) {
+                config.setBdd(new BDD());
+            }
             config.getBdd().setPassword(userPass);
         }
         this.userPass = userPass;
     }
     
+    /**
+     * Build an MDWeb Database
+     */
     public void buildDatabase() {
         
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
             try {
-                final DataSource ds    = config.getBdd().getDataSource();
-                DatabaseCreator.createPGMetadataDatabase(ds);
+                if (config.getBdd() != null) {
+                    final DataSource ds    = config.getBdd().getDataSource();
+                    DatabaseCreator.createPGMetadataDatabase(ds);
+                }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while creating the database", ex);
             }
         }
         
     }
+    
+     public void refreshIndex() {
+         final String instanceId = getConfiguredInstance().getName();
+         getServer().csws.refreshIndex(instanceId, true);
+         getServer().services.restartInstance("CSW", instanceId);
+     }
 }

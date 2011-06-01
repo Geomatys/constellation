@@ -129,7 +129,7 @@ public class AbstractServiceBean extends I18NBean{
         return specification.name();
     }
 
-    private ConstellationServer getServer(){
+    protected ConstellationServer getServer(){
         return (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
     }

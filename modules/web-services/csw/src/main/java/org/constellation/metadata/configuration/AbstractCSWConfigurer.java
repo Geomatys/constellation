@@ -349,7 +349,10 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             if ("all".equals(id)) {
                 cswInstanceDirectories.addAll(getAllCswInstanceDirectory());
             } else {
-                cswInstanceDirectories.add(getCswInstanceDirectory(id));
+                final File instanceDir = getCswInstanceDirectory(id);
+                if (instanceDir != null) {
+                    cswInstanceDirectories.add(instanceDir);
+                }
             }
         } catch (ConfigurationException ex) {
             throw new CstlServiceException(ex);
@@ -361,7 +364,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         }
 
         final String msg = "CSW index succefully recreated";
-        return new AcknowlegementType("success", msg);
+        return new AcknowlegementType("Success", msg);
     }
 
     /**
@@ -487,7 +490,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         }
         
         final String msg = "The specified record have been added to the CSW index";
-        return new AcknowlegementType("success", msg);
+        return new AcknowlegementType("Success", msg);
     }
 
     /**

@@ -70,12 +70,14 @@ public final class ConstellationServer {
     public static final String REQUEST_GET_SERVICE_DESCRIPTOR   = "getServiceDescriptor"; 
     public static final String REQUEST_GET_SOURCE_DESCRIPTOR   = "getSourceDescriptor"; 
     public static final String REQUEST_LIST_SERVICES    = "listServices"; 
+    public static final String REQUEST_REFRESH_INDEX    = "refreshIndex"; 
     
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
 
-    public final Services services = new Services();
+    public final Services services   = new Services();
     public final Providers providers = new Providers();
+    public final Csws csws           = new Csws();
     private final String server;
     private final String user;
     private final String password;
@@ -816,6 +818,32 @@ public final class ConstellationServer {
             return null;
         }
 
+    }
+    
+    /**
+     * Configuration methods for csw
+     */
+    public final class Csws {
+        
+        public boolean refreshIndex(final String id, final boolean asynchrone) {
+            try {
+                final String url = getServiceURL() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
     }
     
 }
