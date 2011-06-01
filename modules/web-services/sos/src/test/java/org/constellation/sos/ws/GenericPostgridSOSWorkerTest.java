@@ -34,6 +34,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.xml.MarshallerPool;
 
 import org.junit.*;
@@ -54,8 +55,8 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
         Connection con = ds.getConnection();
 
-        ScriptRunner sr = new ScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 
 

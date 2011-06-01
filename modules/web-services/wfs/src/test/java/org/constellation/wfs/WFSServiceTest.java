@@ -298,7 +298,7 @@ public class WFSServiceTest {
                         ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
                         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
                         con.close();
 

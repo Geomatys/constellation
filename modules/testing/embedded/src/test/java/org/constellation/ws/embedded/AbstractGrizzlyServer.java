@@ -17,6 +17,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.geotoolkit.data.om.OMDataStoreFactory;
 import java.awt.image.BufferedImage;
@@ -132,8 +133,8 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
                         ds = new DefaultDataSource(url + ";create=true");
                         if (!datasourceCreated) {
                             Connection con = ds.getConnection();
-                            ScriptRunner sr = new ScriptRunner(con);
-                            sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
+                            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+                            sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
                             sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
                             con.close();
                             datasourceCreated = true;

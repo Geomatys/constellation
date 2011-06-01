@@ -75,7 +75,8 @@ CREATE TABLE "observation"."measurements" (
     "result"                      character varying(40),
     "distribution"                character varying(40),
     "feature_of_interest_point"   character varying(40),
-    "observed_property_composite" character varying(40)
+    "observed_property_composite" character varying(40),
+    "feature_of_interest_curve"   character varying(40)
 );
 
 CREATE TABLE "observation"."measures" (
@@ -93,10 +94,11 @@ CREATE TABLE "observation"."observations" (
     "sampling_time_end"           timestamp without time zone,
     "result_definition"           character varying(40),
     "observed_property"           character varying(40),
-    "result"                      character varying(40),
+    "result"                      integer,
     "distribution"                character varying(40),
     "feature_of_interest_point"   character varying(40),
-    "observed_property_composite" character varying(40)
+    "observed_property_composite" character varying(40),
+    "feature_of_interest_curve"   character varying(40)
 );
 
 CREATE TABLE "observation"."phenomenons" (
@@ -139,6 +141,25 @@ CREATE TABLE "observation"."sampling_points" (
     "point_srsdimension" integer,
     "x_value"            double precision,
     "y_value"            double precision
+);
+
+CREATE TABLE "observation"."sampling_curves" (
+    "id"                 character varying(40) NOT NULL,
+    "description"        character varying(50),
+    "name"               character varying(40),
+    "boundedby"          character varying(40),
+    "sampled_feature"    character varying(40),
+    "length_uom"         character varying(40),
+    "length_value"       double precision,
+    "shape_id"           character varying(40),
+    "shape_srsname"      character varying(40)
+);
+
+CREATE TABLE "observation"."linestring" (
+    "id"                 character varying(40) NOT NULL,
+    "x"                  double precision,
+    "y"                  double precision,
+    "z"                  double precision
 );
 
 CREATE TABLE "observation"."simple_data_records" (
@@ -191,9 +212,9 @@ CREATE TABLE "sos"."observation_offerings" (
 );
 
 CREATE TABLE "sos"."offering_phenomenons" (
-    "id_offering"          character varying(40),
-    "phenomenon"           character varying(40),
-    "composite_phenomenon" character varying(40)
+    "id_offering"          character varying(40) NOT NULL,
+    "phenomenon"           character varying(40) NOT NULL,
+    "composite_phenomenon" character varying(40) NOT NULL
 );
 
 CREATE TABLE "sos"."offering_procedures" (
@@ -228,7 +249,7 @@ ALTER TABLE "observation"."data_block_definitions" ADD CONSTRAINT data_block_def
 
 ALTER TABLE "observation"."any_scalars" ADD CONSTRAINT data_record_fields_pkey PRIMARY KEY ("id_datarecord", "name", "id_datablock");
 
-ALTER TABLE "observation".""Distributions"" ADD CONSTRAINT distributions_pkey PRIMARY KEY ("name");
+ALTER TABLE "observation"."Distributions" ADD CONSTRAINT distributions_pkey PRIMARY KEY ("name");
 
 ALTER TABLE "observation"."measurements" ADD CONSTRAINT measurements_pkey PRIMARY KEY ("name");
 
@@ -240,11 +261,13 @@ ALTER TABLE "observation"."phenomenons" ADD CONSTRAINT phenomenons_pk PRIMARY KE
 
 ALTER TABLE "observation"."process" ADD CONSTRAINT process_pkey PRIMARY KEY ("name");
 
-ALTER TABLE "observation".""references"" ADD CONSTRAINT references_pkey PRIMARY KEY ("id_reference");
+ALTER TABLE "observation"."references" ADD CONSTRAINT references_pkey PRIMARY KEY ("id_reference");
 
 ALTER TABLE "observation"."sampling_features" ADD CONSTRAINT sampling_features_pk PRIMARY KEY ("id");
 
 ALTER TABLE "observation"."sampling_points" ADD CONSTRAINT sampling_points_pk PRIMARY KEY ("id");
+
+ALTER TABLE "observation"."sampling_curves" ADD CONSTRAINT sampling_curves_pk PRIMARY KEY ("id");
 
 ALTER TABLE "observation"."simple_data_records" ADD CONSTRAINT simple_data_record_pkey PRIMARY KEY ("id_datablock", "id_datarecord");
 
@@ -268,15 +291,15 @@ ALTER TABLE "sos"."offering_sampling_features" ADD CONSTRAINT offering_sampling_
 
 ALTER TABLE "sos"."projected_localisations" ADD CONSTRAINT projected_pk PRIMARY KEY ("id");
 
-CREATE INDEX fki_data_array_encoding_fk ON data_array_definition USING btree (""encoding"");
+CREATE INDEX fki_data_array_encoding_fk ON data_array_definition USING btree ("encoding");
 
 ALTER TABLE "observation"."components" ADD CONSTRAINT components_component_fkey FOREIGN KEY ("component") REFERENCES "observation"."phenomenons"("id");
 
 ALTER TABLE "observation"."components" ADD CONSTRAINT components_composite_phenomenon_fkey FOREIGN KEY ("composite_phenomenon") REFERENCES "observation"."composite_phenomenons"("id");
 
-ALTER TABLE "observation"."data_array_definition" ADD CONSTRAINT data_array_encoding_fk FOREIGN KEY (""encoding"") REFERENCES "observation"."text_block_encodings"("id_encoding");
+ALTER TABLE "observation"."data_array_definition" ADD CONSTRAINT data_array_encoding_fk FOREIGN KEY ("encoding") REFERENCES "observation"."text_block_encodings"("id_encoding");
 
-ALTER TABLE "observation"."data_block_definitions" ADD CONSTRAINT data_block_definitions_encoding_fkey FOREIGN KEY (""encoding"") REFERENCES "observation"."text_block_encodings"("id_encoding");
+ALTER TABLE "observation"."data_block_definitions" ADD CONSTRAINT data_block_definitions_encoding_fkey FOREIGN KEY ("encoding") REFERENCES "observation"."text_block_encodings"("id_encoding");
 
 ALTER TABLE "observation"."any_scalars" ADD CONSTRAINT data_record_fields_id_datablock_fkey FOREIGN KEY ("id_datablock", "id_datarecord") REFERENCES "observation"."simple_data_records"("id_datablock", "id_datarecord");
 
@@ -284,7 +307,7 @@ ALTER TABLE "observation"."measurements" ADD CONSTRAINT measurements_feature_of_
 
 ALTER TABLE "observation"."measurements" ADD CONSTRAINT measurements_observed_property_fkey FOREIGN KEY ("observed_property") REFERENCES "observation"."phenomenons"("id");
 
-ALTER TABLE "observation"."measurements" ADD CONSTRAINT measurements_procedure_fkey FOREIGN KEY (""procedure"") REFERENCES "observation"."process"("name");
+ALTER TABLE "observation"."measurements" ADD CONSTRAINT measurements_procedure_fkey FOREIGN KEY ("procedure") REFERENCES "observation"."process"("name");
 
 ALTER TABLE "observation"."measurements" ADD CONSTRAINT measurements_result_fkey FOREIGN KEY ("result") REFERENCES "observation"."measures"("name");
 
@@ -300,7 +323,7 @@ ALTER TABLE "observation"."observations" ADD CONSTRAINT observations_observed_pr
 
 ALTER TABLE "observation"."observations" ADD CONSTRAINT observations_observed_property_fkey FOREIGN KEY ("observed_property") REFERENCES "observation"."phenomenons"("id");
 
-ALTER TABLE "observation"."observations" ADD CONSTRAINT observations_procedure_fkey FOREIGN KEY (""procedure"") REFERENCES "observation"."process"("name");
+ALTER TABLE "observation"."observations" ADD CONSTRAINT observations_procedure_fkey FOREIGN KEY ("procedure") REFERENCES "observation"."process"("name");
 
 ALTER TABLE "observation"."observations" ADD CONSTRAINT observations_result_definition_fkey FOREIGN KEY ("result_definition") REFERENCES "observation"."data_block_definitions"("id");
 
