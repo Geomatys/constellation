@@ -150,7 +150,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
-        AcknowlegementType expResult = new AcknowlegementType("success",  "CSW index succefully recreated");
+        AcknowlegementType expResult = new AcknowlegementType("Success",  "CSW index succefully recreated");
         assertEquals(expResult, obj);
         
         niUrl = new URL("http://localhost:9090/csw/default?request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
@@ -198,7 +198,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         obj = unmarshallResponse(conec);
         
         assertTrue(obj instanceof AcknowlegementType);
-        AcknowlegementType expResult = new AcknowlegementType("success",  "The specified record have been added to the CSW index");
+        AcknowlegementType expResult = new AcknowlegementType("Success",  "The specified record have been added to the CSW index");
         assertEquals(expResult, obj);
         
         
