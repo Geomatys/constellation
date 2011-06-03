@@ -179,8 +179,12 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         
         final List<String> names = new ArrayList<String>();
         if(provider != null){
-            names.addAll(provider.getItems());
+            for(String str : provider.getItems()){
+                names.add(DefaultName.valueOf(str).getLocalPart());
+            }            
         }
+        
+        final List<String> sourceNames = new ArrayList<String>(names);
         
         //add all names from the configuration files
         final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
@@ -201,8 +205,8 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         Collections.sort(names);
 
         for(String name : names){
-            final TypeNode n = new TypeNode(provider.getId(),DefaultName.valueOf(name),
-                    (provider!=null)?provider.getItems().contains(name):false);
+            final TypeNode n = new TypeNode(provider,DefaultName.valueOf(name),
+                    sourceNames.contains(name));
             root.add(n);
         }
         
@@ -369,11 +373,11 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
 
     public final class TypeNode extends DefaultMutableTreeNode{
 
-        private final String provider;
+        private final ProviderReport provider;
         private final Name name;
         private final boolean exist;
 
-        public TypeNode(final String provider, final Name name, final boolean exist) {
+        public TypeNode(final ProviderReport provider, final Name name, final boolean exist) {
             super(name);
             this.provider = provider;
             this.name = name;
@@ -396,51 +400,51 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         }
 
         public void config(){
-//            configuredInstance = new DataStoreSourceNode(provider);
-//            configuredParams = provider.getSource().clone();
-//
-//            layerParams = null;
-//            for(ParameterValueGroup layer : ProviderParameters.getLayers(configuredParams)){
-//                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
-//                if(DefaultName.match(name, layerName)){
-//                    //we have found the layer
-//                    layerParams = layer;                
-//                    break;
-//                }
-//            }
-//            
-//            if(layerParams == null){
-//                //config does not exist, create it
-//                layerParams = configuredParams.addGroup(
-//                        ProviderParameters.LAYER_DESCRIPTOR.getName().getCode());
-//                layerParams.parameter(ProviderParameters.LAYER_NAME_DESCRIPTOR.getName().getCode())
-//                        .setValue(name.getLocalPart());
-//            }
-//            
-//            
-//            if(layerConfigPage != null){
-//                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-//                try {
-//                    context.redirect(layerConfigPage);
-//                } catch (IOException ex) {
-//                    LOGGER.log(Level.WARNING, null, ex);
-//                }
-//            }
+            configuredInstance = new DataStoreSourceNode(provider);
+            configuredInstance.select();
+
+            layerParams = null;
+            for(ParameterValueGroup layer : ProviderParameters.getLayers(configuredParams)){
+                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
+                if(DefaultName.match(name, layerName)){
+                    //we have found the layer
+                    layerParams = layer;                
+                    break;
+                }
+            }
+            
+            if(layerParams == null){
+                //config does not exist, create it
+                layerParams = configuredParams.addGroup(
+                        ProviderParameters.LAYER_DESCRIPTOR.getName().getCode());
+                layerParams.parameter(ProviderParameters.LAYER_NAME_DESCRIPTOR.getName().getCode())
+                        .setValue(name.getLocalPart());
+            }
+            
+            
+            if(layerConfigPage != null){
+                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+                try {
+                    context.redirect(layerConfigPage);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                }
+            }
         }
         
         public void delete(){
-//            //add all names from the configuration files
-//            final ParameterValueGroup config = configuredParams;
-//            for(ParameterValueGroup layer : ProviderParameters.getLayers(config)){
-//                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
-//                if(DefaultName.match(name, layerName)){
-//                    //we have found the layer to remove
-//                    config.values().remove(layer);                    
-//                    break;
-//                }
-//            }
-//            
-//            saveConfiguration();
+            //add all names from the configuration files
+            final ParameterValueGroup config = configuredParams;
+            for(ParameterValueGroup layer : ProviderParameters.getLayers(config)){
+                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
+                if(DefaultName.match(name, layerName)){
+                    //we have found the layer to remove
+                    config.values().remove(layer);                    
+                    break;
+                }
+            }
+            
+            saveConfiguration();
         }
 
         public void show(){
