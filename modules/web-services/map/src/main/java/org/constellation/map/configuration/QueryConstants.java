@@ -28,7 +28,6 @@ public final class QueryConstants {
     public static final String REQUEST_GET_SOURCE_DESCRIPTOR    = "getSourceDescriptor";
     
     //Provider operations
-    public static final String REQUEST_LIST_LAYERS          = "listLayers"; 
     public static final String REQUEST_CREATE_PROVIDER      = "createProvider"; 
     public static final String REQUEST_UPDATE_PROVIDER      = "updateProvider"; 
     public static final String REQUEST_GET_PROVIDER_CONFIG  = "getProviderConfiguration"; 

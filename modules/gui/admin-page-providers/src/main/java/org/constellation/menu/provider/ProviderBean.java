@@ -100,14 +100,14 @@ public class ProviderBean extends I18NBean {
      * Build a tree model representation of all available layers.
      */
     public synchronized TreeModel getLayerModel(){
-        return buildModel(false);
+        return buildModel(false,false);
     }
 
     public synchronized TreeModel getStyleModel(){
-        return null;
+        return buildModel(true,false);
     }
 
-    private static TreeModel buildModel(final boolean onlyKeys){
+    private static TreeModel buildModel(final boolean styleServices, final boolean onlyKeys){
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
 
         final ProvidersReport report = getServer().providers.listProviders();
@@ -124,20 +124,20 @@ public class ProviderBean extends I18NBean {
         map.addAll(report.getProviderServices());
 
         for(final ProviderServiceReport service : map){
+            if(service.isStyleService() != styleServices){
+                continue;
+            }
+            
             final DefaultMutableTreeNode n = new DefaultMutableTreeNode(service.getType());
             root.add(n);
             
-            for(final String lp : service.getSources()){
-                final DefaultMutableTreeNode lpn = new DefaultMutableTreeNode(lp);
+            for(final ProviderReport pr : service.getProviders()){
+                final DefaultMutableTreeNode lpn = new DefaultMutableTreeNode(pr.getId());
                 n.add(lpn);
-
-                final ProviderReport layers = getServer().providers.listLayers(lp);
                 
-                if(layers != null){
-                    for(String layer : layers.getLayers()){
-                        final DefaultMutableTreeNode ldn = new DefaultMutableTreeNode(layer);
-                        lpn.add(ldn);
-                    }
+                for(String layer : pr.getItems()){
+                    final DefaultMutableTreeNode ldn = new DefaultMutableTreeNode(layer);
+                    lpn.add(ldn);
                 }
                 
             }

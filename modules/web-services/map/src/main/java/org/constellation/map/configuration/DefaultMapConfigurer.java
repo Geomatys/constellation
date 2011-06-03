@@ -17,6 +17,8 @@
 
 package org.constellation.map.configuration;
 
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.constellation.configuration.ProviderReport;
 import org.opengis.feature.type.Name;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.DefaultName;
@@ -59,11 +62,15 @@ import static org.constellation.map.configuration.QueryConstants.*;
  */
 public class DefaultMapConfigurer extends AbstractConfigurer {
     
-    private final Map<String, LayerProviderService> services = new HashMap<String, LayerProviderService>();
+    private final Map<String, ProviderService> services = new HashMap<String, ProviderService>();
     
     public DefaultMapConfigurer() {
-        final Collection<LayerProviderService> availableServices = LayerProviderProxy.getInstance().getServices();
-        for (LayerProviderService service: availableServices) {
+        final Collection<LayerProviderService> availableLayerServices = LayerProviderProxy.getInstance().getServices();
+        for (LayerProviderService service: availableLayerServices) {
+            this.services.put(service.getName(), service);
+        }
+        final Collection<StyleProviderService> availableStyleServices = StyleProviderProxy.getInstance().getServices();
+        for (StyleProviderService service: availableStyleServices) {
             this.services.put(service.getName(), service);
         }
     }
@@ -84,9 +91,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
         
         //Provider operations
-        else if (REQUEST_LIST_LAYERS.equalsIgnoreCase(request)) {
-            return listLayers(parameters);
-        }else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
+        else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
             return createProvider(parameters, objectRequest);
         } else if (REQUEST_UPDATE_PROVIDER.equalsIgnoreCase(request)) {
             return updateProvider(parameters, objectRequest);
@@ -118,28 +123,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         StyleProviderProxy.getInstance().dispose();
         LayerProviderProxy.getInstance().dispose();
     }
-    
-    /**
-     * Return a list of layers for the given provider
-     * 
-     * @param parameters The GET KVP parameters send in the request.
-     * @throws CstlServiceException 
-     */
-    private Object listLayers(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String sourceId = getParameter("id", true, parameters);
-        Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-        for (LayerProvider p : providers) {
-            if (p.getId().equals(sourceId)) {
-                final List<String> keys = new ArrayList<String>();
-                for(Name n : p.getKeys()){
-                    keys.add(DefaultName.toJCRExtendedForm(n));
-                }
-                return new ProviderReport(keys);
-            }
-        }
-        throw new CstlServiceException("No provider id : " + sourceId + " has been found", INVALID_PARAMETER_VALUE);
-    }
-    
+        
     /**
      * Add a new source to the specified provider.
      * 
@@ -152,7 +136,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     private AcknowlegementType createProvider(final MultivaluedMap<String, String> parameters,
             final Object objectRequest) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
-        final LayerProviderService service = this.services.get(serviceName);
+        final ProviderService service = this.services.get(serviceName);
         if (service != null) {
 
             final ParameterValueReader reader = new ParameterValueReader(
@@ -162,7 +146,12 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 reader.setInput(objectRequest);
                 final ParameterValueGroup sourceToAdd = (ParameterValueGroup) reader.read();
                 reader.dispose();
-                LayerProviderProxy.getInstance().createProvider(service, sourceToAdd);
+                
+                if(service instanceof LayerProviderService){
+                    LayerProviderProxy.getInstance().createProvider((LayerProviderService)service, sourceToAdd);
+                }else if(service instanceof StyleProviderService){
+                    StyleProviderProxy.getInstance().createProvider((StyleProviderService)service, sourceToAdd);
+                }
 
                 return new AcknowlegementType("Success", "The source has been added");
             } catch (XMLStreamException ex) {
@@ -188,7 +177,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final Object objectRequest) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
         final String currentId = getParameter("id", true, parameters);
-        final LayerProviderService service = services.get(serviceName);
+        final ProviderService service = services.get(serviceName);
         if (service != null) {
 
             final ParameterValueReader reader = new ParameterValueReader(service.getServiceDescriptor());
@@ -198,13 +187,22 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 final ParameterValueGroup sourceToModify = (ParameterValueGroup) reader.read();
                 reader.dispose();
 
-                final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-                for (LayerProvider p : providers) {
+                Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
+                for (Provider p : providers) {
                     if (p.getId().equals(currentId)) {
                         p.updateSource(sourceToModify);
                         return new AcknowlegementType("Success", "The source has been modified");
                     }
                 }
+                
+                providers = LayerProviderProxy.getInstance().getProviders();
+                for (Provider p : providers) {
+                    if (p.getId().equals(currentId)) {
+                        p.updateSource(sourceToModify);
+                        return new AcknowlegementType("Success", "The source has been modified");
+                    }
+                }
+                
                 return new AcknowlegementType("Failure", "Unable to find a source named:" + currentId);   
 
             } catch (XMLStreamException ex) {
@@ -228,8 +226,14 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     private Object getProviderConfiguration(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String id = getParameter("id", true, parameters);
             
-        Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-        for (LayerProvider p : providers) {
+        Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
+        for (Provider p : providers) {
+            if (p.getId().equals(id)) {
+                return p.getSource();
+            }
+        }
+        providers = StyleProviderProxy.getInstance().getProviders();
+        for (Provider p : providers) {
             if (p.getId().equals(id)) {
                 return p.getSource();
             }
@@ -248,10 +252,17 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     private AcknowlegementType deleteProvider(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String sourceId = getParameter("id", true, parameters);
-        Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-        for (LayerProvider p : providers) {
+        Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
+        for (LayerProvider p : layerProviders) {
             if (p.getId().equals(sourceId)) {
                 LayerProviderProxy.getInstance().removeProvider(p);
+                return new AcknowlegementType("Success", "The source has been deleted");
+            }
+        }
+        Collection<StyleProvider> styleProviders = StyleProviderProxy.getInstance().getProviders();
+        for (StyleProvider p : styleProviders) {
+            if (p.getId().equals(sourceId)) {
+                StyleProviderProxy.getInstance().removeProvider(p);
                 return new AcknowlegementType("Success", "The source has been deleted");
             }
         }
@@ -416,7 +427,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     private ParameterDescriptorGroup getServiceDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
-        final LayerProviderService service = services.get(serviceName);
+        final ProviderService service = services.get(serviceName);
         if (service != null) {
             return service.getServiceDescriptor();
         }
@@ -433,7 +444,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     private GeneralParameterDescriptor getSourceDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
-        final LayerProviderService service = services.get(serviceName);
+        final ProviderService service = services.get(serviceName);
         if (service != null) {
             return service.getSourceDescriptor();
         }
@@ -448,16 +459,31 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     private ProvidersReport listProviderServices(){
         final List<ProviderServiceReport> providerServ = new ArrayList<ProviderServiceReport>();
         
-        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-        for (LayerProviderService service : services.values()) {
+        final Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
+        final Collection<StyleProvider> styleProviders = StyleProviderProxy.getInstance().getProviders();
+        for (ProviderService service : services.values()) {
             
-            final List<String> layer = new ArrayList<String>();
-            for (LayerProvider p : providers) {
+            final List<ProviderReport> providerReports = new ArrayList<ProviderReport>();
+            for (LayerProvider p : layerProviders) {
                 if (p.getService().equals(service)) {
-                    layer.add(p.getId());
+                    final List<String> keys = new ArrayList<String>();
+                    for(Name n : p.getKeys()){
+                        keys.add(DefaultName.toJCRExtendedForm(n));
+                    }
+                    
+                    providerReports.add(new ProviderReport(p.getId(),keys));
                 }
             }
-            providerServ.add(new ProviderServiceReport(service.getName(), layer));
+            for (StyleProvider p : styleProviders) {
+                if (p.getService().equals(service)) {
+                    final List<String> keys = new ArrayList<String>();
+                    for(String n : p.getKeys()){
+                        keys.add(n);
+                    }                    
+                    providerReports.add(new ProviderReport(p.getId(),keys));
+                }
+            }
+            providerServ.add(new ProviderServiceReport(service.getName(), false, providerReports));
         }
         
         return new ProvidersReport(providerServ);

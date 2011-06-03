@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -31,32 +32,50 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProviderReport {
     
-    @XmlElement(name = "layer")
-    private List<String> layers;
+    @XmlAttribute
+    private String id;
+    
+    @XmlElement(name = "item")
+    private List<String> items;
     
     public ProviderReport() {
         
     }
-    
-    public ProviderReport(final List<String> services) {
-        this.layers = services;
-    }
-    
+
     /**
-     * @return the provider layers
+     * @return id of the provider
      */
-    public List<String> getLayers() {
-        if(layers == null){
-            layers = new ArrayList<String>();
-        }
-        return layers;
+    public String getId() {
+        return id;
     }
 
     /**
-     * @param layers the provider layers to set
+     * @param id : provider id
      */
-    public void setLayers(List<String> layers) {
-        this.layers = layers;
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public ProviderReport(final String id,final List<String> items) {
+        this.id = id;
+        this.items = items;
+    }
+    
+    /**
+     * @return the provider items (styles or layers)
+     */
+    public List<String> getItems() {
+        if(items == null){
+            items = new ArrayList<String>();
+        }
+        return items;
+    }
+
+    /**
+     * @param items the provider items to set
+     */
+    public void setItems(List<String> items) {
+        this.items = items;
     }
     
 }

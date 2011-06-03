@@ -149,7 +149,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
             return new DefaultTreeModel(new DefaultMutableTreeNode());
         }
         
-        final DefaultMutableTreeNode root = buildNode(configuredInstance.providerId,true);
+        final DefaultMutableTreeNode root = buildNode(configuredInstance.provider,true);
         return new DefaultTreeModel(root);
     }
 
@@ -158,8 +158,8 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         
         if(proxy != null){
             final ProviderServiceReport serviceReport = proxy.getProviderService(serviceName);
-            if(serviceReport != null && serviceReport.getSources() != null){
-                for(final String provider : serviceReport.getSources()){
+            if(serviceReport != null && serviceReport.getProviders() != null){
+                for(final ProviderReport provider : serviceReport.getProviders()){
                     root.add(buildNode(provider,false));
                 }
             }
@@ -168,7 +168,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         return new DefaultTreeModel(root);
     }
 
-    private DefaultMutableTreeNode buildNode(final String provider, boolean buildChildren){
+    private DefaultMutableTreeNode buildNode(final ProviderReport provider, boolean buildChildren){
         final DataStoreSourceNode root = new DataStoreSourceNode(provider);
 
         if(!buildChildren){
@@ -176,11 +176,10 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         }
 
         final ConstellationServer server = getServer();
-        final ProviderReport report = server.providers.listLayers(provider);
         
         final List<String> names = new ArrayList<String>();
-        if(report != null){
-            names.addAll(report.getLayers());
+        if(provider != null){
+            names.addAll(provider.getItems());
         }
         
         //add all names from the configuration files
@@ -189,7 +188,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup)
                 serviceDesc.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
         final ParameterValueGroup config = (ParameterValueGroup)
-                server.providers.getProviderConfiguration(provider, sourceDesc);
+                server.providers.getProviderConfiguration(provider.getId(), sourceDesc);
         
         for(ParameterValueGroup layer : ProviderParameters.getLayers(config)){
             final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
@@ -202,8 +201,8 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         Collections.sort(names);
 
         for(String name : names){
-            final TypeNode n = new TypeNode(provider,DefaultName.valueOf(name),
-                    (report!=null)?report.getLayers().contains(name):false);
+            final TypeNode n = new TypeNode(provider.getId(),DefaultName.valueOf(name),
+                    (provider!=null)?provider.getItems().contains(name):false);
             root.add(n);
         }
         
@@ -307,7 +306,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
     
     public void saveConfiguration(){
         final ConstellationServer server = getServer();
-        server.providers.updateProvider(serviceName, configuredInstance.providerId, configuredParams);
+        server.providers.updateProvider(serviceName, configuredInstance.provider.getId(), configuredParams);
     }
 
 
@@ -317,22 +316,22 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
 
     public final class DataStoreSourceNode extends DefaultMutableTreeNode{
 
-        private final String providerId;
+        private final ProviderReport provider;
 
-        public DataStoreSourceNode(final String provider) {
+        public DataStoreSourceNode(final ProviderReport provider) {
             super(provider);
-            this.providerId = provider;
+            this.provider = provider;
         }
         
         public void delete(){
-            getServer().providers.deleteProvider(providerId);
+            getServer().providers.deleteProvider(provider.getId());
             layersModel = null;
             configuredInstance = null;
             configuredParams = null;
         }
 
         public void reload(){
-            getServer().providers.restartProvider(providerId);
+            getServer().providers.restartProvider(provider.getId());
             layersModel = null;
             configuredInstance = null;
             configuredParams = null;
@@ -345,7 +344,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
             layersModel = null;
             configuredInstance = this;
             final ConstellationServer server = getServer();
-            configuredParams = (ParameterValueGroup)server.providers.getProviderConfiguration(providerId,
+            configuredParams = (ParameterValueGroup)server.providers.getProviderConfiguration(provider.getId(),
                     (ParameterDescriptorGroup)((ParameterDescriptorGroup)server.providers.getServiceDescriptor(serviceName))
                     .descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
         }

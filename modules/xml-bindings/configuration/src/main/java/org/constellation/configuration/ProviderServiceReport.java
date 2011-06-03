@@ -33,16 +33,20 @@ public class ProviderServiceReport {
     @XmlAttribute
     private String type;
     
-    @XmlElement(name = "source")
-    private List<String> providers;
-
+    @XmlAttribute
+    private boolean styleService;
+    
+    @XmlElement(name = "provider")
+    private List<ProviderReport> providers;
+    
     public ProviderServiceReport() {
         
     }
 
-    public ProviderServiceReport(final String type, final List<String> sources) {
+    public ProviderServiceReport(final String type, final boolean styleService, final List<ProviderReport> providers) {
         this.type = type;
-        this.providers = sources;
+        this.styleService = styleService;
+        this.providers = providers;
     }
     
     /**
@@ -60,19 +64,33 @@ public class ProviderServiceReport {
     }
 
     /**
-     * @return the sources
+     * @return true if this service provider give style objects
      */
-    public List<String> getSources() {
+    public boolean isStyleService() {
+        return styleService;
+    }
+
+    /**
+     * @param stylingService 
+     */
+    public void setStyleService(boolean stylingService) {
+        this.styleService = stylingService;
+    }
+
+    /**
+     * @return the providers
+     */
+    public List<ProviderReport> getProviders() {
         if(providers == null){
-            providers = new ArrayList<String>();
+            providers = new ArrayList<ProviderReport>();
         }
         return providers;
     }
 
     /**
-     * @param sources the sources to set
+     * @param providers the sources to set
      */
-    public void setSources(List<String> sources) {
-        this.providers = sources;
+    public void setProviders(List<ProviderReport> providers) {
+        this.providers = providers;
     }
 }
