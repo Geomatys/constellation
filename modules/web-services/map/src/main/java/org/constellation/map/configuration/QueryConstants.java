@@ -23,11 +23,13 @@ package org.constellation.map.configuration;
 public final class QueryConstants {
     
     //Provider services operations
-    public static final String REQUEST_LIST_SERVICES            = "listServices"; 
-    public static final String REQUEST_GET_SERVICE_DESCRIPTOR   = "getServiceDescriptor";
-    public static final String REQUEST_GET_SOURCE_DESCRIPTOR    = "getSourceDescriptor";
+    public static final String REQUEST_LIST_SERVICES                = "listServices"; 
+    public static final String REQUEST_GET_SERVICE_DESCRIPTOR       = "getServiceDescriptor";
+    public static final String REQUEST_GET_SOURCE_DESCRIPTOR        = "getSourceDescriptor";
     
     //Provider operations
+    public static final String REQUEST_RESTART_ALL_LAYER_PROVIDERS  = "restartLayerProviders";
+    public static final String REQUEST_RESTART_ALL_STYLE_PROVIDERS  = "restartStyleProviders";
     public static final String REQUEST_CREATE_PROVIDER      = "createProvider"; 
     public static final String REQUEST_UPDATE_PROVIDER      = "updateProvider"; 
     public static final String REQUEST_GET_PROVIDER_CONFIG  = "getProviderConfiguration"; 

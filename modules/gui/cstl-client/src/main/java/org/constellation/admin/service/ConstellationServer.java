@@ -582,6 +582,52 @@ public final class ConstellationServer {
     public final class Providers{
                 
         /**
+         * Restart all layer providers.
+         */
+        public boolean restartAllLayerProviders() {
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_RESTART_ALL_LAYER_PROVIDERS;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        /**
+         * Restart all layer providers.
+         */
+        public boolean restartAllStyleProviders() {
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_RESTART_ALL_STYLE_PROVIDERS;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        /**
          * Add a new source provider to the service.
          * 
          * @param serviceName The provider service name (shapefile, coverage-sql, ...)

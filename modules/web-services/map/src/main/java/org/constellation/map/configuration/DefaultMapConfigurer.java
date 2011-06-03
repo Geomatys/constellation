@@ -91,7 +91,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
         
         //Provider operations
-        else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
+        else if (REQUEST_RESTART_ALL_LAYER_PROVIDERS.equalsIgnoreCase(request)) {
+            return restartLayerProviders();
+        }else if (REQUEST_RESTART_ALL_STYLE_PROVIDERS.equalsIgnoreCase(request)) {
+            return restartStyleProviders();
+        }else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
             return createProvider(parameters, objectRequest);
         } else if (REQUEST_UPDATE_PROVIDER.equalsIgnoreCase(request)) {
             return updateProvider(parameters, objectRequest);
@@ -124,6 +128,17 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         LayerProviderProxy.getInstance().dispose();
     }
         
+    private AcknowlegementType restartLayerProviders(){
+        LayerProviderProxy.getInstance().reload();
+        return new AcknowlegementType("Success", "All layer providers have been restarted.");
+    }
+    
+    private AcknowlegementType restartStyleProviders(){
+        StyleProviderProxy.getInstance().reload();
+        return new AcknowlegementType("Success", "All style providers have been restarted.");
+        
+    }
+    
     /**
      * Add a new source to the specified provider.
      * 
@@ -483,7 +498,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     providerReports.add(new ProviderReport(p.getId(),keys));
                 }
             }
-            providerServ.add(new ProviderServiceReport(service.getName(), false, providerReports));
+            providerServ.add(new ProviderServiceReport(service.getName(), 
+                    service instanceof StyleProviderService, providerReports));
         }
         
         return new ProvidersReport(providerServ);

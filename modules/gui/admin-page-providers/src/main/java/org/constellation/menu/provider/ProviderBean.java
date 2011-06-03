@@ -58,11 +58,11 @@ public class ProviderBean extends I18NBean {
     }
     
     public void reloadLayerProviders() {
-//        LayerProviderProxy.getInstance().reload();
+        getServer().providers.restartAllLayerProviders();
     }
 
     public void reloadStyleProviders() {
-//        StyleProviderProxy.getInstance().reload();
+        getServer().providers.restartAllStyleProviders();
     }
 
     public void show(){
