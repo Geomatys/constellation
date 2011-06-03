@@ -220,16 +220,15 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
             return;
         }
 
-//        final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) serviceName
-//                .getDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
-//        final ParameterValueGroup params = desc.createValue();
-//        params.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(newSourceName);
-//
-//        if(serviceName instanceof LayerProviderService){
-//            LayerProviderProxy.getInstance().createProvider((LayerProviderService)serviceName, params);
-//        }else if(serviceName instanceof StyleProviderService){
-//            StyleProviderProxy.getInstance().createProvider((StyleProviderService)serviceName, params);
-//        }
+        final ConstellationServer server = getServer();
+        final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
+                server.providers.getServiceDescriptor(serviceName);
+        
+        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup)
+                serviceDesc.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
+        final ParameterValueGroup params = sourceDesc.createValue();
+        params.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(newSourceName);
+        server.providers.createProvider(serviceName, configuredParams);
         
     }
 
@@ -287,7 +286,8 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
     }
     
     public void saveConfiguration(){
-//        configuredInstance.providerId.updateSource(configuredParams);
+        final ConstellationServer server = getServer();
+        server.providers.updateProvider(serviceName, configuredInstance.providerId, configuredParams);
     }
 
 
@@ -305,7 +305,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         }
         
         public void delete(){
-            getServer().providers.removeSource(providerId);
+            getServer().providers.deleteProvider(providerId);
             layersModel = null;
             configuredInstance = null;
             configuredParams = null;
@@ -322,7 +322,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         public void select(){
             configuredInstance = this;
             final ConstellationServer server = getServer();
-            configuredParams = (ParameterValueGroup)server.providers.getSource(providerId,
+            configuredParams = (ParameterValueGroup)server.providers.getProviderConfiguration(providerId,
                     (ParameterDescriptorGroup)((ParameterDescriptorGroup)server.providers.getServiceDescriptor(serviceName))
                     .descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
         }

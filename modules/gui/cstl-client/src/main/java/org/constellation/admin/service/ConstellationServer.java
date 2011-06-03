@@ -51,6 +51,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
+import static org.constellation.map.configuration.QueryConstants.*;
 
 /**
  * Convinient class to perform actions on constellation web services.
@@ -59,18 +60,6 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Johann Sorel (Geomatys)
  */
 public final class ConstellationServer {
-
-    public static final String REQUEST_ADD_SOURCE       = "addSource"; 
-    public static final String REQUEST_MODIFY_SOURCE    = "modifySource"; 
-    public static final String REQUEST_GET_SOURCE       = "getSource"; 
-    public static final String REQUEST_REMOVE_SOURCE    = "removeSource"; 
-    public static final String REQUEST_ADD_LAYER        = "addLayer"; 
-    public static final String REQUEST_REMOVE_LAYER     = "removeLayer"; 
-    public static final String REQUEST_MODIFY_LAYER     = "modifyLayer"; 
-    public static final String REQUEST_GET_SERVICE_DESCRIPTOR   = "getServiceDescriptor"; 
-    public static final String REQUEST_GET_SOURCE_DESCRIPTOR   = "getSourceDescriptor"; 
-    public static final String REQUEST_LIST_SERVICES    = "listServices"; 
-    public static final String REQUEST_REFRESH_INDEX    = "refreshIndex"; 
     
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
@@ -82,7 +71,21 @@ public final class ConstellationServer {
     private final String user;
     private final String password;
 
-    private ConstellationServer(final String server, final String user, final String password) {
+    private ConstellationServer(String server, final String user, final String password) {
+        ArgumentChecks.ensureNonNull("server", server);
+        ArgumentChecks.ensureNonNull("user", user);
+        ArgumentChecks.ensureNonNull("password", password);
+        
+        if(!server.endsWith("WS/")){            
+            if(server.endsWith("/")){
+                server += "WS/";
+            }else if(server.endsWith("WS")){
+                server += "/";
+            }else{
+                server += "/WS/";
+            }
+        }
+                
         this.server = server;
         this.user = user;
         this.password = password;
@@ -581,11 +584,11 @@ public final class ConstellationServer {
         /**
          * Add a new source provider to the service.
          * 
-         * @param serviceName The provider type (shapefile, coverage-sql, ...)
+         * @param serviceName The provider service name (shapefile, coverage-sql, ...)
          * @param config The configuration Object to add to the specific provider file.
          * @return 
          */
-        public boolean newSource(final String serviceName, final ParameterValueGroup config) {
+        public boolean createProvider(final String serviceName, final ParameterValueGroup config) {
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_ADD_SOURCE+"&serviceName=" + serviceName;
                 Object response = sendRequest(url, config);
@@ -606,7 +609,7 @@ public final class ConstellationServer {
          * @param id The identifier of the source
          * @return 
          */
-        public GeneralParameterValue getSource(final String id, final ParameterDescriptorGroup descriptor) {
+        public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_GET_SOURCE+"&id=" + id;
                 Object response = sendRequest(url, null, descriptor);
@@ -627,7 +630,7 @@ public final class ConstellationServer {
          * @param id The identifier of the source
          * @return 
          */
-        public boolean removeSource(final String id) {
+        public boolean deleteProvider(final String id) {
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_REMOVE_SOURCE+"&id=" + id;
                 Object response = sendRequest(url, null);
@@ -655,7 +658,7 @@ public final class ConstellationServer {
          * @param config The configuration Object to modify on the specific provider file.
          * @return 
          */
-        public boolean modifySource(final String serviceName, final String id, final ParameterValueGroup config) {
+        public boolean updateProvider(final String serviceName, final String id, final ParameterValueGroup config) {
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_MODIFY_SOURCE+"&serviceName=" + serviceName + "&id=" + id;
                 final Object response = sendRequest(url, config);
@@ -676,12 +679,38 @@ public final class ConstellationServer {
         }
 
         /**
-         *Add a new layer to a source provider in the service.
+         * Reload a source provider in the service.
          * 
          * @param id The identifier of the source
          * @return 
          */
-        public boolean addLayer(final String id, final ParameterValueGroup layer) {
+        public boolean reloadProvider(final String id){
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_REMOVE_SOURCE+"&id=" + id;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        /**
+         *Add a new layer to a source provider in the service.
+         * 
+         * @param id The identifier of the provider
+         * @return 
+         */
+        public boolean createLayer(final String id, final ParameterValueGroup layer) {
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_ADD_LAYER+"&id=" + id;
                 Object response = sendRequest(url, layer);
@@ -704,10 +733,10 @@ public final class ConstellationServer {
         /**
          * Remove a source provider in the service.
          * 
-         * @param id The identifier of the source
+         * @param id The identifier of the provider
          * @return 
          */
-        public boolean removeLayer(final String id, final String layerName) {
+        public boolean deleteLayer(final String id, final String layerName) {
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_REMOVE_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, null);
@@ -730,10 +759,10 @@ public final class ConstellationServer {
         /**
          *Add a new layer to a source provider in the service.
          * 
-         * @param id The identifier of the source
+         * @param id The identifier of the provider
          * @return 
          */
-        public boolean modifyLayer(final String id, final String layerName, final ParameterValueGroup layer) {
+        public boolean updateLayer(final String id, final String layerName, final ParameterValueGroup layer) {
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_MODIFY_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, layer);

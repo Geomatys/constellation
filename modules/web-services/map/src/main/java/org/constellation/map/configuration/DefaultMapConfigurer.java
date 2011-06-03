@@ -17,17 +17,16 @@
 
 package org.constellation.map.configuration;
 
-import org.constellation.configuration.ProviderServiceReport;
 import java.util.ArrayList;
 import java.util.List;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.GeneralParameterValue;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.stream.XMLStreamException;
+
+import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProvidersReport;
@@ -37,29 +36,23 @@ import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
+
 import org.geotoolkit.xml.parameter.ParameterValueReader;
+
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.ws.ExceptionCode.*;
+import static org.constellation.map.configuration.QueryConstants.*;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 public class DefaultMapConfigurer extends AbstractConfigurer {
-
-    public static final String REQUEST_ADD_SOURCE       = "addSource"; 
-    public static final String REQUEST_MODIFY_SOURCE    = "modifySource"; 
-    public static final String REQUEST_GET_SOURCE       = "getSource"; 
-    public static final String REQUEST_REMOVE_SOURCE    = "removeSource"; 
-    public static final String REQUEST_ADD_LAYER        = "addLayer"; 
-    public static final String REQUEST_REMOVE_LAYER     = "removeLayer"; 
-    public static final String REQUEST_MODIFY_LAYER     = "modifyLayer"; 
-    public static final String REQUEST_GET_SERVICE_DESCRIPTOR   = "getServiceDescriptor"; 
-    public static final String REQUEST_GET_SOURCE_DESCRIPTOR   = "getSourceDescriptor"; 
-    public static final String REQUEST_LIST_SERVICES    = "listServices"; 
     
     private final Map<String, LayerProviderService> services = new HashMap<String, LayerProviderService>();
     

@@ -95,6 +95,7 @@
   <!-- =========================================================== -->
 
     <modules>
+        <module>cstl-client</module>
         <module>admin-base</module>
         <module>admin-page-cstl</module>
         <module>admin-page-jvm</module>

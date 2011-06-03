@@ -17,10 +17,10 @@
     Module description.
   -->
     <groupId>org.constellation.gui</groupId>
-    <artifactId>admin-base</artifactId>
+    <artifactId>cstl-client</artifactId>
     <packaging>jar</packaging>
-    <name>Web site : base</name>
-    <description>Base GUI interface classes.</description>
+    <name>Constellation (client)</name>
+    <description>Client for constellation administration service.</description>
 
 
 
@@ -49,49 +49,44 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.geotoolkit</groupId>
-            <artifactId>geotk-utility</artifactId>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-jaxp-core</artifactId>
         </dependency>
 
        <!-- Constellation dependencies -->
        <dependency>
-           <groupId>org.constellation.gui</groupId>
-           <artifactId>cstl-client</artifactId>
+           <groupId>org.constellation.xml-bindings</groupId>
+           <artifactId>cstl-xml-configuration</artifactId>
            <version>${project.version}</version>
        </dependency>
-              
-        <!-- Mapfaces library -->
-        <dependency>
-            <groupId>org.mapfaces</groupId>
-            <artifactId>mapfaces-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mapfaces</groupId>
-            <artifactId>mapfaces-base</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mapfaces</groupId>
-            <artifactId>mapfaces-map</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mapfaces</groupId>
-            <artifactId>mapfaces-facelet-editor</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
+       <dependency>
+           <groupId>org.constellation.web-services</groupId>
+           <artifactId>cstl-web-map</artifactId>
+           <version>${project.version}</version>
+           <exclusions>
+                <exclusion>
+                    <groupId>org.constellation.engine</groupId>
+                    <artifactId>cstl-engine-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.geotoolkit.pending</groupId>
+                    <artifactId>geotk-xml-sld</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.geotoolkit.pending</groupId>
+                    <artifactId>geotk-clients-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-ogc</artifactId>
+                </exclusion>
+           </exclusions>
+       </dependency>
+       
         <!--for base64 enconding -->
         <dependency>
             <groupId>net.iharder</groupId>
             <artifactId>base64</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>el-api</artifactId>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
