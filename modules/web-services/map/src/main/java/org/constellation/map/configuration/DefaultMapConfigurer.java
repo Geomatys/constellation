@@ -17,6 +17,8 @@
 
 package org.constellation.map.configuration;
 
+import org.constellation.configuration.ProviderReport;
+import org.opengis.feature.type.Name;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
@@ -33,9 +35,11 @@ import org.constellation.configuration.ProvidersReport;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
@@ -51,6 +55,7 @@ import static org.constellation.map.configuration.QueryConstants.*;
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
 public class DefaultMapConfigurer extends AbstractConfigurer {
     
@@ -68,27 +73,40 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     @Override
     public Object treatRequest(final String request, final MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
-        if (REQUEST_ADD_SOURCE.equalsIgnoreCase(request)) {
-            return addSource(parameters, objectRequest);
-        } else if (REQUEST_MODIFY_SOURCE.equalsIgnoreCase(request)) {
-            return modifySource(parameters, objectRequest);
-        } else if (REQUEST_GET_SOURCE.equalsIgnoreCase(request)) {
-            return getSource(parameters);
-        } else if (REQUEST_REMOVE_SOURCE.equalsIgnoreCase(request)) {
-            return removeSource(parameters);
-        } else if (REQUEST_ADD_LAYER.equalsIgnoreCase(request)) {
-            return addLayer(parameters, objectRequest);
-        } else if (REQUEST_REMOVE_LAYER.equalsIgnoreCase(request)) {
-            return removeLayer(parameters);
-        } else if (REQUEST_MODIFY_LAYER.equalsIgnoreCase(request)) {
-            return modifyLayer(parameters, objectRequest);        
+        
+        //Provider services operations
+        if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
+            return listProviderServices();
         } else if (REQUEST_GET_SERVICE_DESCRIPTOR.equalsIgnoreCase(request)) {
             return getServiceDescriptor(parameters);
         } else if (REQUEST_GET_SOURCE_DESCRIPTOR.equalsIgnoreCase(request)) {
             return getSourceDescriptor(parameters);
-        } else if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
-            return listProviderServices();
         }
+        
+        //Provider operations
+        else if (REQUEST_LIST_LAYERS.equalsIgnoreCase(request)) {
+            return listLayers(parameters);
+        }else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
+            return createProvider(parameters, objectRequest);
+        } else if (REQUEST_UPDATE_PROVIDER.equalsIgnoreCase(request)) {
+            return updateProvider(parameters, objectRequest);
+        } else if (REQUEST_GET_PROVIDER_CONFIG.equalsIgnoreCase(request)) {
+            return getProviderConfiguration(parameters);
+        } else if (REQUEST_DELETE_PROVIDER.equalsIgnoreCase(request)) {
+            return deleteProvider(parameters);
+        } else if (REQUEST_RESTART_PROVIDER.equalsIgnoreCase(request)) {
+            return restartProvider(parameters);
+        }
+                
+        //Layer operations
+        else if (REQUEST_CREATE_LAYER.equalsIgnoreCase(request)) {
+            return createLayer(parameters, objectRequest);
+        } else if (REQUEST_UPDATE_LAYER.equalsIgnoreCase(request)) {
+            return updateLayer(parameters, objectRequest);        
+        } else if (REQUEST_DELETE_LAYER.equalsIgnoreCase(request)) {
+            return deleteLayer(parameters);
+        }
+        
         return null;
     }
     
@@ -102,21 +120,43 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     }
     
     /**
+     * Return a list of layers for the given provider
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * @throws CstlServiceException 
+     */
+    private Object listLayers(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String sourceId = getParameter("id", true, parameters);
+        Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        for (LayerProvider p : providers) {
+            if (p.getId().equals(sourceId)) {
+                final List<String> keys = new ArrayList<String>();
+                for(Name n : p.getKeys()){
+                    keys.add(DefaultName.toJCRExtendedForm(n));
+                }
+                return new ProviderReport(keys);
+            }
+        }
+        throw new CstlServiceException("No provider id : " + sourceId + " has been found", INVALID_PARAMETER_VALUE);
+    }
+    
+    /**
      * Add a new source to the specified provider.
      * 
      * @param parameters The GET KVP parameters send in the request.
      * @param objectRequest The POST parameters send in the request.
      * 
-     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @return An acknowledgement informing if the request have been succesfully treated or not.
      * @throws CstlServiceException 
      */
-    private AcknowlegementType addSource(final MultivaluedMap<String, String> parameters,
+    private AcknowlegementType createProvider(final MultivaluedMap<String, String> parameters,
             final Object objectRequest) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
         final LayerProviderService service = this.services.get(serviceName);
         if (service != null) {
 
-            final ParameterValueReader reader = new ParameterValueReader(service.getServiceDescriptor());
+            final ParameterValueReader reader = new ParameterValueReader(
+                    service.getServiceDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
             try {
                 // we read the soruce parameter to add
                 reader.setInput(objectRequest);
@@ -144,7 +184,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An akcnowledgement informing if the request have been succesfully treated or not.
      * @throws CstlServiceException 
      */
-    private AcknowlegementType modifySource(final MultivaluedMap<String, String> parameters,
+    private AcknowlegementType updateProvider(final MultivaluedMap<String, String> parameters,
             final Object objectRequest) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
         final String currentId = getParameter("id", true, parameters);
@@ -185,7 +225,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return The configuration object  of the specified source.
      * @throws CstlServiceException 
      */
-    private Object getSource(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+    private Object getProviderConfiguration(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String id = getParameter("id", true, parameters);
             
         Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
@@ -206,7 +246,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An akcnowledgement informing if the request have been succesfully treated or not.
      * @throws CstlServiceException 
      */
-    private AcknowlegementType removeSource(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+    private AcknowlegementType deleteProvider(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String sourceId = getParameter("id", true, parameters);
         Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
         for (LayerProvider p : providers) {
@@ -219,6 +259,32 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     }
     
     /**
+     * Restart a provider in the specified service.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * 
+     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @throws CstlServiceException 
+     */
+    private AcknowlegementType restartProvider(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String sourceId = getParameter("id", true, parameters);
+        for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
+            if (p.getId().equals(sourceId)) {
+                p.reload();
+                return new AcknowlegementType("Success", "The provider has been restarted");
+            }
+        }
+        for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
+            if (p.getId().equals(sourceId)) {
+                p.reload();
+                return new AcknowlegementType("Success", "The provider has been restarted");
+            }
+        }
+        return new AcknowlegementType("Failure", "Unable to find a provider named:" + sourceId);
+    }
+    
+    
+    /**
      * Add a layer to the specified provider.
      * 
      * @param parameters The GET KVP parameters send in the request.
@@ -227,7 +293,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An akcnowledgement informing if the request have been succesfully treated or not.
      * @throws CstlServiceException 
      */
-    private AcknowlegementType addLayer(final MultivaluedMap<String, String> parameters, 
+    private AcknowlegementType createLayer(final MultivaluedMap<String, String> parameters, 
             final Object objectRequest) throws CstlServiceException{
         
         final String sourceId = getParameter("id", true, parameters);            
@@ -264,7 +330,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An akcnowledgement informing if the request have been succesfully treated or not.
      * @throws CstlServiceException 
      */
-    private AcknowlegementType removeLayer(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+    private AcknowlegementType deleteLayer(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String sourceId = getParameter("id", true, parameters);
         final String layerName = getParameter("layerName", true, parameters);
 
@@ -299,7 +365,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An akcnowledgement informing if the request have been succesfully treated or not.
      * @throws CstlServiceException 
      */
-    private AcknowlegementType modifyLayer(final MultivaluedMap<String, String> parameters, 
+    private AcknowlegementType updateLayer(final MultivaluedMap<String, String> parameters, 
             final Object objectRequest) throws CstlServiceException{
         
         final String sourceId = getParameter("id", true, parameters);

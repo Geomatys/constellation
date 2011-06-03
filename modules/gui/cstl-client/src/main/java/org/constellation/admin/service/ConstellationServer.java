@@ -16,6 +16,7 @@
  */
 package org.constellation.admin.service;
 
+import org.constellation.configuration.ProviderReport;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -582,6 +583,29 @@ public final class ConstellationServer {
     public final class Providers{
         
         /**
+         * @param id : provider id
+         * @return report containing a list of layers name
+         */
+        public ProviderReport listLayers(final String id) {
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_LIST_LAYERS+"&id=" + id;;
+                final Object response = sendRequest(url, null);
+                if (response instanceof ProviderReport) {
+                    return (ProviderReport) response;
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return null;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return null;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+        
+        /**
          * Add a new source provider to the service.
          * 
          * @param serviceName The provider service name (shapefile, coverage-sql, ...)
@@ -589,8 +613,10 @@ public final class ConstellationServer {
          * @return 
          */
         public boolean createProvider(final String serviceName, final ParameterValueGroup config) {
+            ArgumentChecks.ensureNonNull("service name", serviceName);
+            ArgumentChecks.ensureNonNull("config", config);
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_ADD_SOURCE+"&serviceName=" + serviceName;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_CREATE_PROVIDER+"&serviceName=" + serviceName;
                 Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     return true;
@@ -611,7 +637,7 @@ public final class ConstellationServer {
          */
         public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_SOURCE+"&id=" + id;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_PROVIDER_CONFIG+"&id=" + id;
                 Object response = sendRequest(url, null, descriptor);
                 if (response instanceof GeneralParameterValue) {
                     return (GeneralParameterValue) response;
@@ -632,7 +658,7 @@ public final class ConstellationServer {
          */
         public boolean deleteProvider(final String id) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_REMOVE_SOURCE+"&id=" + id;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_DELETE_PROVIDER+"&id=" + id;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -660,7 +686,7 @@ public final class ConstellationServer {
          */
         public boolean updateProvider(final String serviceName, final String id, final ParameterValueGroup config) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_MODIFY_SOURCE+"&serviceName=" + serviceName + "&id=" + id;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_UPDATE_PROVIDER+"&serviceName=" + serviceName + "&id=" + id;
                 final Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -684,9 +710,9 @@ public final class ConstellationServer {
          * @param id The identifier of the source
          * @return 
          */
-        public boolean reloadProvider(final String id){
+        public boolean restartProvider(final String id){
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_REMOVE_SOURCE+"&id=" + id;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_RESTART_PROVIDER+"&id=" + id;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -710,10 +736,12 @@ public final class ConstellationServer {
          * @param id The identifier of the provider
          * @return 
          */
-        public boolean createLayer(final String id, final ParameterValueGroup layer) {
+        public boolean createLayer(final String id, final ParameterValueGroup config) {
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("config", config);
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_ADD_LAYER+"&id=" + id;
-                Object response = sendRequest(url, layer);
+                final String url = getServiceURL() + "configuration?request="+REQUEST_CREATE_LAYER+"&id=" + id;
+                Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
                     if ("Success".equals(ack.getStatus())) {
@@ -738,7 +766,7 @@ public final class ConstellationServer {
          */
         public boolean deleteLayer(final String id, final String layerName) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_REMOVE_LAYER+"&id=" + id + "&layerName=" + layerName;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_DELETE_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -764,7 +792,7 @@ public final class ConstellationServer {
          */
         public boolean updateLayer(final String id, final String layerName, final ParameterValueGroup layer) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_MODIFY_LAYER+"&id=" + id + "&layerName=" + layerName;
+                final String url = getServiceURL() + "configuration?request="+REQUEST_UPDATE_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, layer);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;

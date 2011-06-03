@@ -16,6 +16,7 @@
  */
 package org.constellation.configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -27,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-@XmlRootElement(name ="ProviderReport")
+@XmlRootElement(name ="ProvidersReport")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProvidersReport {
     
@@ -46,6 +47,9 @@ public class ProvidersReport {
      * @return the provider services
      */
     public List<ProviderServiceReport> getProviderServices() {
+        if(providerServices == null){
+            providerServices = new ArrayList<ProviderServiceReport>();
+        }
         return providerServices;
     }
 

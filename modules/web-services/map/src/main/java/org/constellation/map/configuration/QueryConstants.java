@@ -22,16 +22,25 @@ package org.constellation.map.configuration;
  */
 public final class QueryConstants {
     
-    public static final String REQUEST_ADD_SOURCE       = "addSource"; 
-    public static final String REQUEST_MODIFY_SOURCE    = "modifySource"; 
-    public static final String REQUEST_GET_SOURCE       = "getSource"; 
-    public static final String REQUEST_REMOVE_SOURCE    = "removeSource"; 
-    public static final String REQUEST_ADD_LAYER        = "addLayer"; 
-    public static final String REQUEST_REMOVE_LAYER     = "removeLayer"; 
-    public static final String REQUEST_MODIFY_LAYER     = "modifyLayer"; 
-    public static final String REQUEST_GET_SERVICE_DESCRIPTOR   = "getServiceDescriptor"; 
-    public static final String REQUEST_GET_SOURCE_DESCRIPTOR   = "getSourceDescriptor"; 
-    public static final String REQUEST_LIST_SERVICES    = "listServices"; 
+    //Provider services operations
+    public static final String REQUEST_LIST_SERVICES            = "listServices"; 
+    public static final String REQUEST_GET_SERVICE_DESCRIPTOR   = "getServiceDescriptor";
+    public static final String REQUEST_GET_SOURCE_DESCRIPTOR    = "getSourceDescriptor";
+    
+    //Provider operations
+    public static final String REQUEST_LIST_LAYERS          = "listLayers"; 
+    public static final String REQUEST_CREATE_PROVIDER      = "createProvider"; 
+    public static final String REQUEST_UPDATE_PROVIDER      = "updateProvider"; 
+    public static final String REQUEST_GET_PROVIDER_CONFIG  = "getProviderConfiguration"; 
+    public static final String REQUEST_DELETE_PROVIDER      = "deleteProvider"; 
+    public static final String REQUEST_RESTART_PROVIDER     = "restartProvider"; 
+    
+    //Layer operations
+    public static final String REQUEST_CREATE_LAYER = "createLayer"; 
+    public static final String REQUEST_UPDATE_LAYER = "updateLayer"; 
+    public static final String REQUEST_DELETE_LAYER = "deleteLayer";
+    
+    //Other
     public static final String REQUEST_REFRESH_INDEX    = "refreshIndex"; 
     
     private QueryConstants(){}

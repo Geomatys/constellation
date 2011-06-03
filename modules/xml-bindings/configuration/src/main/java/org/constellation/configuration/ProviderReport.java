@@ -20,59 +20,43 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Guilhem Legal (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
+@XmlRootElement(name ="ProviderReport")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ProviderServiceReport {
+public class ProviderReport {
     
-    @XmlAttribute
-    private String type;
+    @XmlElement(name = "layer")
+    private List<String> layers;
     
-    @XmlElement(name = "source")
-    private List<String> providers;
-
-    public ProviderServiceReport() {
+    public ProviderReport() {
         
     }
-
-    public ProviderServiceReport(final String type, final List<String> sources) {
-        this.type = type;
-        this.providers = sources;
+    
+    public ProviderReport(final List<String> services) {
+        this.layers = services;
     }
     
     /**
-     * @return the type
+     * @return the provider layers
      */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    /**
-     * @return the sources
-     */
-    public List<String> getSources() {
-        if(providers == null){
-            providers = new ArrayList<String>();
+    public List<String> getLayers() {
+        if(layers == null){
+            layers = new ArrayList<String>();
         }
-        return providers;
+        return layers;
     }
 
     /**
-     * @param sources the sources to set
+     * @param layers the provider layers to set
      */
-    public void setSources(List<String> sources) {
-        this.providers = sources;
+    public void setLayers(List<String> layers) {
+        this.layers = layers;
     }
+    
 }
