@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/adminjsf"/>
+<Context path="/cstl-wrapper"/>
 <!-- here is a tag to use TOMCAT pooled connection datasource
    <Resource name="jdbc/observation" 
           auth="Container"

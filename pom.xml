@@ -178,7 +178,19 @@
         <constellation.provider>org.constellation.ws.rs.provider</constellation.provider>
         <constellation.coverage>org.constellation.coverage.ws.rs</constellation.coverage>
         <constellation.sensor>org.constellation.sos.ws.rs</constellation.sensor>
-        <constellation.services.packages>${constellation.config};${constellation.map};${constellation.metadata};${constellation.provider};${constellation.coverage};${constellation.feature};${constellation.sensor};${constellation.tile};${constellation.metadata-provider}</constellation.services.packages>
+        <constellation.wps>org.constellation.wps.ws.rs</constellation.wps>
+        <constellation.services.packages>
+            ${constellation.config};
+            ${constellation.map};
+            ${constellation.metadata};
+            ${constellation.provider};
+            ${constellation.coverage};
+            ${constellation.feature};
+            ${constellation.sensor};
+            ${constellation.tile};
+            ${constellation.metadata-provider};
+            ${constellation.wps}
+        </constellation.services.packages>
         <!-- Defines the source encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

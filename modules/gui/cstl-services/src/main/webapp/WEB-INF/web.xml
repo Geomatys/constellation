@@ -125,6 +125,7 @@
             <url-pattern>/WS/csw/admin</url-pattern>
             <url-pattern>/WS/sos/admin</url-pattern>
             <url-pattern>/WS/wfs/admin</url-pattern>
+            <url-pattern>/WS/wps/admin</url-pattern>
             <http-method>GET</http-method>
             <http-method>POST</http-method>
         </web-resource-collection>

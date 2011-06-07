@@ -50,10 +50,6 @@
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-processing-raster</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-processing-coverage</artifactId>
         </dependency>
         
