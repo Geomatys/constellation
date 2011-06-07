@@ -22,7 +22,7 @@ package org.constellation.menu.provider;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class SensorMLBean extends AbstractDataStoreServiceBean{
+public class SensorMLBean extends AbstractProviderConfigBean{
 
     public static final String SERVICE_NAME = "sensorML";
     

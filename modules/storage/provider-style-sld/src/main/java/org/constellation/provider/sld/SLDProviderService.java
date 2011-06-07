@@ -17,7 +17,6 @@
 package org.constellation.provider.sld;
 
 import org.opengis.parameter.GeneralParameterDescriptor;
-import java.util.Collections;
 import java.util.logging.Level;
 
 import org.constellation.provider.AbstractProviderService;
@@ -48,11 +47,13 @@ public class SLDProviderService extends AbstractProviderService
 
     public static final ParameterDescriptor<String> FOLDER_DESCRIPTOR =
              new DefaultParameterDescriptor<String>("path","Folder where style files can be found",String.class,null,true);
-    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR = new DefaultParameterDescriptorGroup(
-            Collections.singletonMap("name", ProviderParameters.SOURCE_DESCRIPTOR_NAME),
-            0,Integer.MAX_VALUE,ProviderParameters.SOURCE_ID_DESCRIPTOR,FOLDER_DESCRIPTOR);
+    
+    public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR = 
+            new DefaultParameterDescriptorGroup("sldFolder",FOLDER_DESCRIPTOR);
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup(ProviderParameters.CONFIG_DESCRIPTOR_NAME,SOURCE_DESCRIPTOR);
+            ProviderParameters.createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
+    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR = (ParameterDescriptorGroup) 
+            SERVICE_CONFIG_DESCRIPTOR.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
 
 
     @Override
@@ -62,7 +63,7 @@ public class SLDProviderService extends AbstractProviderService
 
     @Override
     public GeneralParameterDescriptor getSourceDescriptor() {
-        return FOLDER_DESCRIPTOR;
+        return SOURCE_CONFIG_DESCRIPTOR;
     }
 
     public SLDProviderService(){
@@ -73,7 +74,8 @@ public class SLDProviderService extends AbstractProviderService
     public StyleProvider createProvider(final ParameterValueGroup ps) {
         try {
             final SLDProvider provider = new SLDProvider(this,ps);
-            getLogger().log(Level.INFO, "[PROVIDER]> SLD provider created : {0}", value(FOLDER_DESCRIPTOR, ps));
+            getLogger().log(Level.INFO, "[PROVIDER]> SLD provider created : {0}", 
+                    (provider.getFolder()==null) ? "no path" : provider.getFolder().getAbsolutePath());
             return provider;
         } catch (Exception ex) {
             // we should not catch exception, but here it's better to start all source we can

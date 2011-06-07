@@ -44,17 +44,26 @@ public class GO2StyleProviderService extends AbstractProviderService
     private static final Collection<GO2StyleProvider> PROVIDERS = new ArrayList<GO2StyleProvider>();
     private static final Collection<GO2StyleProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
-    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR = new DefaultParameterDescriptorGroup(
+    public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR = new DefaultParameterDescriptorGroup(
             Collections.singletonMap("name", ProviderParameters.SOURCE_DESCRIPTOR_NAME),
             0,Integer.MAX_VALUE);
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup(ProviderParameters.CONFIG_DESCRIPTOR_NAME,SOURCE_DESCRIPTOR);
+            ProviderParameters.createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
+    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR = (ParameterDescriptorGroup) 
+            SERVICE_CONFIG_DESCRIPTOR.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
 
+    private static ParameterValueGroup DEFAULT_SOURCE;
+    
+    static {
+        DEFAULT_SOURCE = SOURCE_DESCRIPTOR.createValue();
+        DEFAULT_SOURCE.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("GO2");
+    }
+    
     public GO2StyleProviderService() {
         super("go2style");
         PROVIDERS.clear();
         //GO2 Style are hard coded java objects with no property configuration
-        PROVIDERS.add(new GO2StyleProvider(this));
+        PROVIDERS.add(new GO2StyleProvider(this,DEFAULT_SOURCE));
     }
 
     @Override
@@ -74,7 +83,7 @@ public class GO2StyleProviderService extends AbstractProviderService
 
     @Override
     public GeneralParameterDescriptor getSourceDescriptor() {
-        return SOURCE_DESCRIPTOR;
+        return SOURCE_CONFIG_DESCRIPTOR;
     }
 
 }

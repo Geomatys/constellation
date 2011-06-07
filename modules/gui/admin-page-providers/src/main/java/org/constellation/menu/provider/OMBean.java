@@ -22,7 +22,7 @@ package org.constellation.menu.provider;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class OMBean extends AbstractDataStoreServiceBean{
+public class OMBean extends AbstractProviderConfigBean{
 
     public static final String SERVICE_NAME = "observation";
     

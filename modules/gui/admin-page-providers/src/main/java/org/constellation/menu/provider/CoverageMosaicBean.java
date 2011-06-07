@@ -22,7 +22,7 @@ package org.constellation.menu.provider;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageMosaicBean extends AbstractDataStoreServiceBean{
+public class CoverageMosaicBean extends AbstractProviderConfigBean{
 
     public static final String SERVICE_NAME = "coverage-mosaic";
     

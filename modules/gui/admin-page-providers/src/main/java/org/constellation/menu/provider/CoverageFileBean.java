@@ -22,7 +22,7 @@ package org.constellation.menu.provider;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageFileBean extends AbstractDataStoreServiceBean{
+public class CoverageFileBean extends AbstractProviderConfigBean{
 
     public static final String SERVICE_NAME = "coverage-file";
     

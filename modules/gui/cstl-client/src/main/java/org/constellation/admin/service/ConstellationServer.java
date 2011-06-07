@@ -39,6 +39,10 @@ import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
+import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
+import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
+import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
@@ -50,6 +54,8 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.style.Style;
+import org.opengis.util.FactoryException;
 
 import static org.constellation.map.configuration.QueryConstants.*;
 
@@ -149,7 +155,7 @@ public final class ConstellationServer {
     }
 
     private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
-         return sendRequest(sourceURL, request, null);
+         return sendRequest(sourceURL, request, null, null);
      }
     
     /**
@@ -164,7 +170,8 @@ public final class ConstellationServer {
      * @throws java.io.IOException
      * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor) throws MalformedURLException, IOException {
+    private Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor, 
+            MarshallerPool unmarshallerPool) throws MalformedURLException, IOException {
 
         final URL source = new URL(sourceURL);
         final URLConnection conec = source.openConnection();
@@ -186,6 +193,21 @@ public final class ConstellationServer {
                     } catch (XMLStreamException ex) {
                         LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
                     }
+                } else if (request instanceof Style) {
+                    final XMLUtilities util = new XMLUtilities();
+                    try {
+                        util.writeStyle(conec.getOutputStream(), (Style)request, StyledLayerDescriptor.V_1_1_0);
+                    } catch (JAXBException ex) {
+                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                    }
+                } else if (request instanceof org.opengis.sld.StyledLayerDescriptor) {
+                    final XMLUtilities util = new XMLUtilities();
+                    try {
+                        util.writeSLD(conec.getOutputStream(), 
+                                (org.opengis.sld.StyledLayerDescriptor)request, StyledLayerDescriptor.V_1_1_0);
+                    } catch (JAXBException ex) {
+                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                    }
                 } else {
                     Marshaller marshaller = null;
                     try {
@@ -200,9 +222,15 @@ public final class ConstellationServer {
                     }
                 }
             }
+            
+            if(unmarshallerPool == null){
+                //use default pool
+                unmarshallerPool = POOL;
+            }
+            
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = POOL.acquireUnmarshaller();
+                unmarshaller = unmarshallerPool.acquireUnmarshaller();
                 response = unmarshaller.unmarshal(conec.getInputStream());
                 if (response instanceof JAXBElement) {
                     JAXBElement element = (JAXBElement) response;
@@ -217,12 +245,12 @@ public final class ConstellationServer {
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             } catch (XMLStreamException ex) {
-                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read general parameter value in response document.\ncause: {0}", ex.getMessage());
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read xml response document.\ncause: {0}", ex.getMessage());
             }  catch (IllegalAccessError ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             } finally {
                 if (unmarshaller != null) {
-                    POOL.release(unmarshaller);
+                    unmarshallerPool.release(unmarshaller);
                 }
             }
         } catch (IOException ex) {
@@ -660,7 +688,7 @@ public final class ConstellationServer {
         public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_GET_PROVIDER_CONFIG+"&id=" + id;
-                Object response = sendRequest(url, null, descriptor);
+                Object response = sendRequest(url, null, descriptor, null);
                 if (response instanceof GeneralParameterValue) {
                     return (GeneralParameterValue) response;
                 } else if (response instanceof ExceptionReport) {
@@ -752,6 +780,9 @@ public final class ConstellationServer {
             return false;
         }
         
+        
+        // LAYER PROVIDERS ACTIONS /////////////////////////////////////////////
+        
         /**
          *Add a new layer to a source provider in the service.
          * 
@@ -832,6 +863,121 @@ public final class ConstellationServer {
             return false;
         }
 
+        // STYLE PROVIDERS ACTIONS /////////////////////////////////////////////
+        
+        public MutableStyle downloadStyle(final String id, final String styleName){
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("styleName", styleName);
+            
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_DOWNLOAD_STYLE+"&id=" + id + "&styleName=" + styleName;
+                Object response = sendRequest(url, null, null, XMLUtilities.getJaxbContext110());
+                
+                if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                } else {
+                    final XMLUtilities utils = new XMLUtilities();
+                    return utils.readStyle(response, SymbologyEncoding.V_1_1_0);
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            } catch (FactoryException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+        
+        /**
+         * 
+         * @param id
+         * @param style : SLD or other
+         * @return true if successful
+         */
+        public boolean createStyle(final String id, final String styleName, final Object style){
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("styleName", styleName);
+            ArgumentChecks.ensureNonNull("style", style);
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_CREATE_STYLE+"&id=" + id + "&styleName=" + styleName;
+                Object response = sendRequest(url, style);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        /**
+         * 
+         * @param id : provider id
+         * @param styleName : style id
+         * @return true if successful
+         */
+        public boolean deleteStyle(final String id, final String styleName){
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("styleName", styleName);
+            
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_DELETE_STYLE+"&id=" + id + "&styleName=" + styleName;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        /**
+         * Update a style
+         * 
+         * @param id The identifier of the provider
+         * @param styleName The identifier of the style
+         * @param style The new style definition
+         * @return 
+         */
+        public boolean updateStyle(final String id, final String styleName, final Object style) {
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("styleName", styleName);
+            ArgumentChecks.ensureNonNull("style", style);
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_UPDATE_STYLE+"&id=" + id + "&styleName=" + styleName;
+                Object response = sendRequest(url, style);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
         /**
          * Get the provider service configuration description.
          * 

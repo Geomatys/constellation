@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.bind.JAXBException;
@@ -43,7 +42,6 @@ import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.parameter.ParameterValue;
@@ -80,6 +78,10 @@ public class SLDProvider extends AbstractStyleProvider{
     protected SLDProvider(final SLDProviderService service, final ParameterValueGroup source){
         super(service,source);
         reload();
+    }
+
+    File getFolder() {
+        return folder;
     }
 
     /**
@@ -182,12 +184,7 @@ public class SLDProvider extends AbstractStyleProvider{
         return value;
     }
 
-    /**
-     * Create or replace an existing style.
-     * 
-     * @param key : key used for this style
-     * @param style : the style definition
-     */
+    @Override
     public synchronized void set(final String key, final MutableStyle style){
         
         File f = index.get(key);
@@ -207,9 +204,7 @@ public class SLDProvider extends AbstractStyleProvider{
         
     }
     
-    /**
-     * Change name of a Style.
-     */
+    @Override
     public synchronized void rename(final String key, final String newName){
         final File f = index.get(key);
         if(index.containsKey(newName)){
@@ -224,9 +219,7 @@ public class SLDProvider extends AbstractStyleProvider{
         reload();
     }
     
-    /**
-     * @param key remove the related style and sld file associated.
-     */
+    @Override
     public synchronized void remove(final String key){
         final File f = index.get(key);
         if(f != null){
@@ -244,7 +237,10 @@ public class SLDProvider extends AbstractStyleProvider{
             index.clear();
             cache.clear();
 
-            final ParameterValue param = getSource().parameter(FOLDER_DESCRIPTOR.getName().getCode());
+            final ParameterValueGroup srcConfig = getSource().groups(
+                    getService().getSourceDescriptor().getName().getCode()).get(0);
+            
+            final ParameterValue param = srcConfig.parameter(FOLDER_DESCRIPTOR.getName().getCode());
 
             if(param == null || param.getValue() == null){
                 getLogger().log(Level.WARNING,"Provided File path is not defined.");

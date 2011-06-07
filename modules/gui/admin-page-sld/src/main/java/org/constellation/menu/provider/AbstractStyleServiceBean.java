@@ -17,45 +17,17 @@
 
 package org.constellation.menu.provider;
 
-import org.constellation.provider.StyleProviderProxy;
-import org.constellation.bean.MenuBean;
-import org.constellation.provider.LayerProviderService;
 import java.io.IOException;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ExternalContext;
-import org.constellation.provider.configuration.ProviderParameters;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Collection;
+import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-import org.constellation.bean.HighLightRowStyler;
-import org.constellation.provider.AbstractProviderProxy;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
-import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderService;
-import org.constellation.provider.sld.SLDProvider;
+import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.ProviderReport;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
-import org.geotoolkit.style.StyleUtilities;
-import org.geotoolkit.util.WeakPropertyChangeListener;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.logging.Logging;
-import org.mapfaces.facelet.parametereditor.ParameterModelAdaptor;
-import org.mapfaces.facelet.parametereditor.ParameterTreeModel;
 import org.mapfaces.facelet.styleeditor.StyleEditionConstants;
-import org.mapfaces.i18n.I18NBean;
-import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
@@ -63,210 +35,22 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractStyleServiceBean extends I18NBean implements PropertyChangeListener{
-    
-    /**
-     * Model adaptor, only display the layers parameters
-     */
-    public static final ParameterModelAdaptor LAYERS_ADAPTOR = new ParameterModelAdaptor(){
-        @Override
-        public ParameterTreeModel convert(final GeneralParameterValue s) throws NonconvertibleObjectException {
-            return new ParameterTreeModel(s,ProviderParameters.LAYER_DESCRIPTOR);
-        }
-    };
-    
-    private static final Logger LOGGER = Logging.getLogger(AbstractStyleServiceBean.class);
-
-    private final OutlineRowStyler ROW_STYLER = new HighLightRowStyler() {
+public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBean {
         
-        @Override
-        public String getRowClass(TreeNode node) {
-            String candidate = super.getRowClass(node);
-       
-            if(node.equals(configuredInstance)){
-                candidate += " active";
-            }
-            
-            return candidate;
-        }
-    };
-    
-    private final ProviderService service;
-    private final String configPage;
-    private final String mainPage;
-    private final String styleConfigPage;
-    private TreeModel layersModel = null;
-    private SourceNode configuredInstance = null;
-    private ParameterValueGroup configuredParams = null;
-    private String newSourceName = "default";
     private MutableStyle editedStyle = null;
     private SLDNode editedSLDNode = null;
 
-    public AbstractStyleServiceBean(final ProviderService service, final String mainPage, 
+    public AbstractStyleServiceBean(final String serviceName, final String mainPage, 
             final String configPage, final String sldConfig){
-        addBundle("provider.overview");
-
-        this.service = service;
-        this.mainPage = MenuBean.toApplicationPath(mainPage);
-        this.configPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
-        this.styleConfigPage = (sldConfig != null) ? MenuBean.toApplicationPath(sldConfig) : null;
-
-        if(service instanceof LayerProviderService){
-            new WeakPropertyChangeListener(LayerProviderProxy.getInstance(), this);
-        }else if(service instanceof StyleProviderService){
-            new WeakPropertyChangeListener(StyleProviderProxy.getInstance(), this);
-        }
+        super(serviceName,mainPage,configPage,sldConfig);
     }
 
-    protected abstract Class getProviderClass();
-
-    protected abstract GeneralParameterDescriptor getSourceDescriptor();
-        
-    /**
-     * Build a tree model representation of all available layers.
-     */
-    public synchronized TreeModel getInstanceModel(){
-        if(layersModel == null){
-
-            if(service instanceof LayerProviderService){
-                layersModel = buildModel(LayerProviderProxy.getInstance(),false);
-            }else if(service instanceof StyleProviderService){
-                layersModel = buildModel(StyleProviderProxy.getInstance(),false);
-            }
-
-        }
-        return layersModel;
+    @Override
+    protected DefaultMutableTreeNode buildItemNode(ProviderReport provider, String name, List<String> sourceNames) {
+        final SLDNode n = new SLDNode(provider,name);
+        return n;
     }
     
-    public synchronized TreeModel getLayerModel(){
-        if(configuredInstance == null){
-            return new DefaultTreeModel(new DefaultMutableTreeNode());
-        }
-        
-        final DefaultMutableTreeNode root = buildNode((SLDProvider)configuredInstance.provider,true);
-        return new DefaultTreeModel(root);
-    }
-
-    private TreeModel buildModel(final AbstractProviderProxy proxy, final boolean onlyKeys){
-        final DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
-        final Class providerClazz = getProviderClass();
-
-        final Collection<Provider> providers = proxy.getProviders();
-        for(final Provider provider : providers){
-            if(providerClazz.isInstance(provider)){
-                root.add(buildNode((SLDProvider)provider,false));
-            }
-        }
-
-        return new DefaultTreeModel(root);
-    }
-
-    private DefaultMutableTreeNode buildNode(final SLDProvider provider, boolean buildChildren){
-        final SourceNode node = new SourceNode(provider);
-
-        if(buildChildren){
-
-            for(String key : provider.getKeys()){
-                final SLDNode n = new SLDNode(provider,key);
-                node.add(n);
-            }
-        }
-
-        return node;        
-    }
-
-    public OutlineRowStyler getInstanceRowStyler() {
-        return ROW_STYLER;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // CREATING NEW INSTANCE ///////////////////////////////////////////////////
-
-    /**
-     * @return String : name of the new service name to create.
-     */
-    public String getNewSourceName() {
-        return newSourceName;
-    }
-
-    /**
-     * Set the name of the new service to create.
-     */
-    public void setNewSourceName(final String newSourceName) {
-        this.newSourceName = newSourceName;
-    }
-
-    /**
-     * Create a new instance of this service.
-     */
-    public void createSource(){
-        if(newSourceName == null || newSourceName.isEmpty()){
-            //unvalid name
-            return;
-        }
-
-        final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) service
-                .getServiceDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
-        final ParameterValueGroup params = desc.createValue();
-        params.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(newSourceName);
-
-        if(service instanceof LayerProviderService){
-            LayerProviderProxy.getInstance().createProvider((LayerProviderService)service, params);
-        }else if(service instanceof StyleProviderService){
-            StyleProviderProxy.getInstance().createProvider((StyleProviderService)service, params);
-        }
-        
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////
-    // CONFIGURE CURRENT INSTANCE //////////////////////////////////////////////
-
-    /**
-     * @return the main service page.
-     * this is used to return from the configuration page.
-     */
-    public String getMainPage(){
-        return mainPage;
-    }
-
-    /**
-     * @return the currently configured instance.
-     */
-    public SourceNode getConfiguredInstance(){
-        return configuredInstance;
-    }
-
-    /**
-     * @return complete source configuration
-     */
-    public ParameterValueGroup getConfiguredParameters(){
-        return configuredParams;
-    }
-    
-    /**
-     * @return the source id parameter
-     */
-    public GeneralParameterValue getIdParameter(){
-        return configuredParams.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode());
-    }
-    
-    /**
-     * @return the source store parameters
-     */
-    public GeneralParameterValue getSourceParameters(){
-        for(GeneralParameterValue val : configuredParams.values()){
-            if(val.getDescriptor().equals(getSourceDescriptor())){
-                return val;
-            }
-        }
-        return null;
-    }
-    
-    public void saveConfiguration(){
-        configuredInstance.provider.updateSource(configuredParams);
-    }
-
     ////////////////////////////////////////////////////////////////////////////
     // CONFIGURE SLD INSTANCE //////////////////////////////////////////////////
 
@@ -286,7 +70,9 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
         style.setDescription(StyleEditionConstants.SF.description(newStyleName, newStyleName));
         style.featureTypeStyles().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
         style.featureTypeStyles().get(0).rules().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
-        configuredInstance.provider.set(newStyleName, style);
+        
+        getServer().providers.createStyle(configuredInstance.provider.getId(), newStyleName, style);
+        layersModel = null;
     }
     
     public MutableStyle getEditedSLD() {
@@ -294,14 +80,18 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
     }
     
     public void saveEditedSLD(){
-        editedSLDNode.provider.set(editedSLDNode.key, editedStyle);
+        final ConstellationServer server = getServer();
         
-        final String newName = editedSLDNode.getUserObject().toString();
-        if(!newName.equals(editedSLDNode.key)){
-            //name changed
-            editedSLDNode.provider.rename(editedSLDNode.key, newName);
-            editedSLDNode.key = newName;
-        }
+        server.providers.updateStyle(editedSLDNode.provider.getId(), editedSLDNode.key, editedStyle);
+        layersModel = null;
+        
+        //TODO, update service to allow renaming
+//        final String newName = editedSLDNode.getUserObject().toString();
+//        if(!newName.equals(editedSLDNode.key)){
+//            //name changed
+//            editedSLDNode.provider.rename(editedSLDNode.key, newName);
+//            editedSLDNode.key = newName;
+//        }
         
     }
 
@@ -310,86 +100,32 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
     }
     
     ////////////////////////////////////////////////////////////////////////////
-    // EVENTS AND SUBCLASSES ///////////////////////////////////////////////////
+    // SUBCLASSES //////////////////////////////////////////////////////////////
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        layersModel = null;
-    }
-
-    public final class SourceNode extends DefaultMutableTreeNode{
-
-        private final SLDProvider provider;
-
-        public SourceNode(final SLDProvider provider) {
-            super(provider);
-            this.provider = provider;
-        }
-
-        public void delete(){
-            StyleProviderProxy.getInstance().removeProvider((StyleProvider)provider);
-            
-            if(configuredInstance == SourceNode.this){
-                configuredInstance = null;
-                configuredParams = null;
-            }
-            
-        }
-
-        public void reload(){
-            provider.reload();
-            layersModel = null;
-        }
-
-        /**
-         * Select this source to display layers
-         */
-        public void select(){
-            configuredInstance = this;
-            configuredParams = provider.getSource().clone();
-        }
-        
-        /**
-         * Set this instance as the currently configured one in for the property dialog.
-         */
-        public void config(){
-            select();
-
-            if(configPage != null){
-                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                try {
-                    //the session is not logged, redirect him to the authentication page
-                    context.redirect(configPage);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
-                }
-            }
-        }
-
-    }
     
     public final class SLDNode extends DefaultMutableTreeNode{
 
-        private final SLDProvider provider;
+        private final ProviderReport provider;
         private String key;
 
-        public SLDNode(final SLDProvider provider, final String key) {
+        public SLDNode(final ProviderReport provider, final String key) {
             super(key);
             this.provider = provider;
             this.key = key;
         }
         
         public void config(){
-            configuredInstance = new SourceNode(provider);
-            configuredParams = provider.getSource().clone();
+            configuredInstance = new ProviderNode(provider);
+            configuredInstance.select();
 
-            editedStyle = StyleUtilities.copy( (MutableStyle) provider.get(key));
+            final ConstellationServer server = getServer();
+            editedStyle = server.providers.downloadStyle(provider.getId(), key);
             editedSLDNode = this;
                        
-            if(styleConfigPage != null){
+            if(itemConfigPage != null){
                 final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
                 try {
-                    context.redirect(styleConfigPage);
+                    context.redirect(itemConfigPage);
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, null, ex);
                 }
@@ -397,7 +133,8 @@ public abstract class AbstractStyleServiceBean extends I18NBean implements Prope
         }
         
         public void delete(){
-            provider.remove(key);            
+            getServer().providers.deleteStyle(provider.getId(), key);
+            layersModel = null;
         }
                 
     }

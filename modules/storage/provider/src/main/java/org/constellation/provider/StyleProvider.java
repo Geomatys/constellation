@@ -26,4 +26,22 @@ import org.geotoolkit.style.MutableStyle;
  */
 public interface StyleProvider extends Provider<String,MutableStyle> {
 
+    /**
+     * Create or replace an existing style.
+     * 
+     * @param key : key used for this style
+     * @param style : the style definition
+     */
+    void set(final String key, final MutableStyle style);
+    
+    /**
+     * Change name of a Style.
+     */
+    void rename(final String key, final String newName);
+    
+    /**
+     * @param key remove the related style and sld file associated.
+     */
+    void remove(final String key);
+    
 }

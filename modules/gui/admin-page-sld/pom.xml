@@ -46,13 +46,8 @@
   -->
     <dependencies>
         <dependency>
-            <groupId>org.constellation.storage</groupId>
-            <artifactId>cstl-store-provider</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.constellation.gui</groupId>
-            <artifactId>admin-base</artifactId>
+            <artifactId>admin-page-providers</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -61,12 +56,6 @@
             <scope>provided</scope>
         </dependency>
         
-        <!-- providers -->
-        <dependency>
-            <groupId>org.constellation.storage</groupId>
-            <artifactId>cstl-store-style-sld</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
 </project>

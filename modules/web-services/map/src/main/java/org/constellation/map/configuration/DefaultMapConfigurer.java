@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
 import org.constellation.configuration.ProviderServiceReport;
@@ -43,6 +44,9 @@ import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
+import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.style.MutableStyle;
 
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
@@ -51,6 +55,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.FactoryException;
 
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.map.configuration.QueryConstants.*;
@@ -114,6 +119,17 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             return updateLayer(parameters, objectRequest);        
         } else if (REQUEST_DELETE_LAYER.equalsIgnoreCase(request)) {
             return deleteLayer(parameters);
+        }
+        
+        //Style operations
+        else if (REQUEST_DOWNLOAD_STYLE.equalsIgnoreCase(request)) {
+            return downloadStyle(parameters);
+        } else if (REQUEST_CREATE_STYLE.equalsIgnoreCase(request)) {
+            return createStyle(parameters, objectRequest);
+        } else if (REQUEST_UPDATE_STYLE.equalsIgnoreCase(request)) {
+            return updateStyle(parameters, objectRequest);        
+        } else if (REQUEST_DELETE_STYLE.equalsIgnoreCase(request)) {
+            return deleteStyle(parameters);
         }
         
         return null;
@@ -210,7 +226,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     }
                 }
                 
-                providers = LayerProviderProxy.getInstance().getProviders();
+                providers = StyleProviderProxy.getInstance().getProviders();
                 for (Provider p : providers) {
                     if (p.getId().equals(currentId)) {
                         p.updateSource(sourceToModify);
@@ -431,6 +447,128 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
         return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
     }
+    
+    /**
+     * Download a complete style definition.
+     * 
+     * @param parameters
+     * @return
+     * @throws CstlServiceException 
+     */
+    private Object downloadStyle(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String id = getParameter("id", true, parameters);
+        final String styleId = getParameter("styleName", true, parameters);
+            
+        final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+        for (Provider p : providers) {
+            if (p.getId().equals(id)) {
+                Object style = p.get(styleId);
+                if(style != null){
+                    return style;
+                }
+                return new AcknowlegementType("Failure", "Unable to find a style named : " + id);
+            }
+        }
+
+        return new AcknowlegementType("Failure", "Unable to find a provider named : " + id);
+    }
+    
+    /**
+     * Add a style to the specified provider.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * @param objectRequest The POST parameters send in the request.
+     * 
+     * @return An acknowledgment informing if the request have been succesfully treated or not.
+     * @throws CstlServiceException 
+     */
+    private AcknowlegementType createStyle(final MultivaluedMap<String, String> parameters, 
+            final Object objectRequest) throws CstlServiceException{
+        
+        final String sourceId = getParameter("id", true, parameters);     
+        final String styleId = getParameter("styleName", true, parameters);
+        
+        final XMLUtilities utils = new XMLUtilities();
+        
+        try {
+            // we read the style to add
+            final MutableStyle style = utils.readStyle(objectRequest, SymbologyEncoding.V_1_1_0);
+
+            final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+            for (StyleProvider p : providers) {
+                if (p.getId().equals(sourceId)) {
+                    p.set(styleId, style);
+                    return new AcknowlegementType("Success", "The style has been added");
+                }
+            }
+            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
+
+        } catch (JAXBException ex) {
+            throw new CstlServiceException(ex);
+        } catch (FactoryException ex) {
+            throw new CstlServiceException(ex);
+        }
+    }
+    
+    /**
+     * Remove a style in the specified provider.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * 
+     * @return An acknowledgment informing if the request have been succesfully treated or not.
+     * @throws CstlServiceException 
+     */
+    private AcknowlegementType deleteStyle(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String sourceId = getParameter("id", true, parameters);
+        final String styleId = getParameter("styleName", true, parameters);
+
+        final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+        for (StyleProvider p : providers) {
+            if (p.getId().equals(sourceId)) {
+                p.remove(styleId);
+                return new AcknowlegementType("Success", "The style has been removed");
+            }
+        }
+        return new AcknowlegementType("Failure", "Unable to find a provider named:" + sourceId);
+    }
+    
+    /**
+     * Modify a Style to the specified provider.
+     * 
+     * @param parameters The GET KVP parameters send in the request.
+     * @param objectRequest The POST parameters send in the request.
+     * 
+     * @return An acknowledgment informing if the request have been successfully treated or not.
+     * @throws CstlServiceException 
+     */
+    private AcknowlegementType updateStyle(final MultivaluedMap<String, String> parameters, 
+            final Object objectRequest) throws CstlServiceException{
+        
+        final String sourceId = getParameter("id", true, parameters);
+        final String styleId = getParameter("styleName", true, parameters);
+        
+        final XMLUtilities utils = new XMLUtilities();
+
+        try {
+            // we read the style to update
+            final MutableStyle style = utils.readStyle(objectRequest, SymbologyEncoding.V_1_1_0);
+
+            final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+            for (StyleProvider p : providers) {
+                if (p.getId().equals(sourceId)) {
+                    p.set(styleId, style);
+                    return new AcknowlegementType("Success", "The style has been added");
+                }
+            }
+        } catch (JAXBException ex) {
+            throw new CstlServiceException(ex);
+        } catch (FactoryException ex) {
+            throw new CstlServiceException(ex);
+        }
+        return new AcknowlegementType("Failure", "Unable to find a provider named : " + sourceId);
+    }
+    
+    
     
     /**
      * Return the service descriptor of the specified type.

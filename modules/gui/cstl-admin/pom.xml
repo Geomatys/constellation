@@ -87,6 +87,11 @@
             <artifactId>admin-page-providers</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-sld</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
         <!-- Required only when creating the embedded EPSG database -->

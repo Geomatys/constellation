@@ -37,9 +37,9 @@ import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.provider.configuration.ProviderParameters;
+
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.parameter.Parameters;
-
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.logging.Logging;
 
@@ -47,8 +47,8 @@ import org.mapfaces.facelet.parametereditor.ParameterModelAdaptor;
 import org.mapfaces.facelet.parametereditor.ParameterTreeModel;
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
-import org.opengis.feature.type.Name;
 
+import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -60,7 +60,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractDataStoreServiceBean extends I18NBean {
+public abstract class AbstractProviderConfigBean extends I18NBean {
     
     /**
      * When user is log in, a ServiceAdministrator object is added in the session map.
@@ -77,7 +77,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         }
     };
     
-    private static final Logger LOGGER = Logging.getLogger(AbstractDataStoreServiceBean.class);
+    protected static final Logger LOGGER = Logging.getLogger(AbstractProviderConfigBean.class);
 
     private final OutlineRowStyler ROW_STYLER = new HighLightRowStyler() {
         
@@ -93,24 +93,24 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         }
     };
     
-    private final String serviceName;
-    private final String sourceConfigPage;
-    private final String layerConfigPage;
-    private final String mainPage;
-    private TreeModel layersModel = null;
-    private DataStoreSourceNode configuredInstance = null;
+    protected final String serviceName;
+    protected final String sourceConfigPage;
+    protected final String itemConfigPage;
+    protected final String mainPage;
+    protected TreeModel layersModel = null;
+    protected ProviderNode configuredInstance = null;
     private ParameterValueGroup configuredParams = null;
     private ParameterValueGroup layerParams = null;
     private String newSourceName = "default";
 
-    public AbstractDataStoreServiceBean(final String serviceName, 
+    public AbstractProviderConfigBean(final String serviceName, 
             final String mainPage, final String configPage, final String layerConfigPage){
         addBundle("provider.overview");
 
         this.serviceName = serviceName;
         this.mainPage = MenuBean.toApplicationPath(mainPage);
         this.sourceConfigPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
-        this.layerConfigPage = (layerConfigPage != null) ? MenuBean.toApplicationPath(layerConfigPage) : null;
+        this.itemConfigPage = (layerConfigPage != null) ? MenuBean.toApplicationPath(layerConfigPage) : null;
 
     }
 
@@ -133,7 +133,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         return layersModel;
     }
     
-    private ConstellationServer getServer(){
+    protected ConstellationServer getServer(){
         final ConstellationServer server = (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
         
@@ -149,7 +149,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
             return new DefaultTreeModel(new DefaultMutableTreeNode());
         }
         
-        final DefaultMutableTreeNode root = buildNode(configuredInstance.provider,true);
+        final DefaultMutableTreeNode root = buildProviderNode(configuredInstance.provider,true);
         return new DefaultTreeModel(root);
     }
 
@@ -160,7 +160,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
             final ProviderServiceReport serviceReport = proxy.getProviderService(serviceName);
             if(serviceReport != null && serviceReport.getProviders() != null){
                 for(final ProviderReport provider : serviceReport.getProviders()){
-                    root.add(buildNode(provider,false));
+                    root.add(buildProviderNode(provider,false));
                 }
             }
         }
@@ -168,8 +168,8 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         return new DefaultTreeModel(root);
     }
 
-    private DefaultMutableTreeNode buildNode(final ProviderReport provider, boolean buildChildren){
-        final DataStoreSourceNode root = new DataStoreSourceNode(provider);
+    private DefaultMutableTreeNode buildProviderNode(final ProviderReport provider, boolean buildChildren){
+        final ProviderNode root = new ProviderNode(provider);
 
         if(!buildChildren){
             return root;
@@ -194,10 +194,12 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         final ParameterValueGroup config = (ParameterValueGroup)
                 server.providers.getProviderConfiguration(provider.getId(), sourceDesc);
         
-        for(ParameterValueGroup layer : ProviderParameters.getLayers(config)){
-            final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
-            if(!names.contains(layerName)){
-                names.add(layerName);
+        if(config != null){
+            for(ParameterValueGroup layer : ProviderParameters.getLayers(config)){
+                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
+                if(!names.contains(layerName)){
+                    names.add(layerName);
+                }
             }
         }
         
@@ -205,12 +207,18 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         Collections.sort(names);
 
         for(String name : names){
-            final TypeNode n = new TypeNode(provider,DefaultName.valueOf(name),
-                    sourceNames.contains(name));
+            final DefaultMutableTreeNode n = buildItemNode(provider, name, sourceNames);
             root.add(n);
         }
         
         return root;        
+    }
+    
+    protected DefaultMutableTreeNode buildItemNode(final ProviderReport provider, 
+            final String name, final List<String> sourceNames){
+        final TypeNode n = new TypeNode(provider,DefaultName.valueOf(name),
+                    sourceNames.contains(name));
+        return n;
     }
 
     public OutlineRowStyler getInstanceRowStyler() {
@@ -270,7 +278,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
     /**
      * @return the currently configured instance.
      */
-    public DataStoreSourceNode getConfiguredInstance(){
+    public ProviderNode getConfiguredInstance(){
         return configuredInstance;
     }
 
@@ -318,11 +326,11 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
     // SUBCLASSES //////////////////////////////////////////////////////////////
 
 
-    public final class DataStoreSourceNode extends DefaultMutableTreeNode{
+    public final class ProviderNode extends DefaultMutableTreeNode{
 
-        private final ProviderReport provider;
+        protected final ProviderReport provider;
 
-        public DataStoreSourceNode(final ProviderReport provider) {
+        public ProviderNode(final ProviderReport provider) {
             super(provider);
             this.provider = provider;
         }
@@ -400,7 +408,7 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
         }
 
         public void config(){
-            configuredInstance = new DataStoreSourceNode(provider);
+            configuredInstance = new ProviderNode(provider);
             configuredInstance.select();
 
             layerParams = null;
@@ -422,10 +430,10 @@ public abstract class AbstractDataStoreServiceBean extends I18NBean {
             }
             
             
-            if(layerConfigPage != null){
+            if(itemConfigPage != null){
                 final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
                 try {
-                    context.redirect(layerConfigPage);
+                    context.redirect(itemConfigPage);
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, null, ex);
                 }

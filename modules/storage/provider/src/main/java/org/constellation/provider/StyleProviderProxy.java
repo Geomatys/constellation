@@ -98,4 +98,19 @@ public final class StyleProviderProxy extends AbstractProviderProxy
         return INSTANCE;
     }
 
+    @Override
+    public void set(String key, MutableStyle style) {
+        throw new UnsupportedOperationException("Not supported. Proxy class is immutable.");
+    }
+
+    @Override
+    public void rename(String key, String newName) {
+        throw new UnsupportedOperationException("Not supported yet. Proxy class is immutable.");
+    }
+
+    @Override
+    public void remove(String key) {
+        throw new UnsupportedOperationException("Not supported yet. Proxy class is immutable.");
+    }
+
 }

@@ -17,12 +17,6 @@
 
 package org.constellation.menu.provider;
 
-import org.constellation.provider.StyleProviderProxy;
-import org.constellation.provider.StyleProviderService;
-import org.constellation.provider.sld.SLDProvider;
-import org.constellation.provider.sld.SLDProviderService;
-import org.opengis.parameter.GeneralParameterDescriptor;
-
 /**
  * SLD configuration bean.
  *
@@ -30,30 +24,11 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  */
 public class SLDBean extends AbstractStyleServiceBean{
 
-    private static StyleProviderService getService(){
-        for(StyleProviderService service : StyleProviderProxy.getInstance().getServices()){
-            if(service.getName().equals("sld")){
-                return service;
-            }
-        }
-        return null;
-    }
-
     public SLDBean(){
-        super(getService(),"/provider/sld.xhtml",
+        super("sld","/provider/sld.xhtml",
               "/provider/sldConfig.xhtml",
               "/provider/onesldeditor.xhtml");
         addBundle("provider.sld");
-    }
-
-    @Override
-    protected Class getProviderClass() {
-        return SLDProvider.class;
-    }
-
-    @Override
-    protected GeneralParameterDescriptor getSourceDescriptor() {
-        return SLDProviderService.FOLDER_DESCRIPTOR;
     }
 
 }

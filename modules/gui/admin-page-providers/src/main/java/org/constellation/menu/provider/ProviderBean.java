@@ -48,7 +48,7 @@ public class ProviderBean extends I18NBean {
 
     private static ConstellationServer getServer(){
         final ConstellationServer server = (ConstellationServer) FacesContext.getCurrentInstance()
-                .getExternalContext().getSessionMap().get(AbstractDataStoreServiceBean.SERVICE_ADMIN_KEY);
+                .getExternalContext().getSessionMap().get(AbstractProviderConfigBean.SERVICE_ADMIN_KEY);
         
         if(server == null){
             throw new IllegalStateException("Distant server is null.");

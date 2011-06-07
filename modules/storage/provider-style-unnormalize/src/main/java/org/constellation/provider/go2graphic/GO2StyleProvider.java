@@ -30,6 +30,7 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.NumberRange;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.Symbolizer;
 
 /**
@@ -43,8 +44,8 @@ public class GO2StyleProvider extends AbstractStyleProvider{
     private final Map<String,MutableStyle> index = new HashMap<String,MutableStyle>();
     
     
-    protected GO2StyleProvider(final GO2StyleProviderService service){
-        super(service,null);
+    protected GO2StyleProvider(final GO2StyleProviderService service,ParameterValueGroup desc){
+        super(service,desc);
         visit();
     }
 
@@ -87,6 +88,21 @@ public class GO2StyleProvider extends AbstractStyleProvider{
         
         final Symbolizer symbol2 = new DimRangeSymbolizer(new MeasurementRange(NumberRange.create(10, 20), Unit.ONE));
         index.put("GO2:DimRange", sf.style(symbol2));
+    }
+
+    @Override
+    public void set(String key, MutableStyle style) {
+        throw new UnsupportedOperationException("Not supported. This provider is immutable.");
+    }
+
+    @Override
+    public void rename(String key, String newName) {
+        throw new UnsupportedOperationException("Not supported. This provider is immutable.");
+    }
+
+    @Override
+    public void remove(String key) {
+        throw new UnsupportedOperationException("Not supported. This provider is immutable.");
     }
 
 }
