@@ -80,6 +80,11 @@
             <artifactId>admin-page-sos</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-wps</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         
         <!-- providers administration -->
         <dependency>

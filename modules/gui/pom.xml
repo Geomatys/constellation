@@ -107,6 +107,7 @@
         <module>admin-page-services</module>
         <module>admin-page-csw</module>
         <module>admin-page-sos</module>
+        <module>admin-page-wps</module>
         <module>cstl-services</module>
         <module>cstl-admin</module>
         <module>cstl-wrapper</module>
