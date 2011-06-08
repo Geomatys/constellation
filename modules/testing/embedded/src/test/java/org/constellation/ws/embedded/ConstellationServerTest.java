@@ -53,7 +53,7 @@ public class ConstellationServerTest extends AbstractTestRequest {
     
     @Test
     public void testgetDescriptor() throws Exception {
-        
+        assertNotNull(administrator);
         GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("shapefile");
         assertNotNull(desc);
     }

@@ -82,14 +82,8 @@ public final class ConstellationServer {
         ArgumentChecks.ensureNonNull("user", user);
         ArgumentChecks.ensureNonNull("password", password);
         
-        if(!server.endsWith("WS/")){            
-            if(server.endsWith("/")){
-                server += "WS/";
-            }else if(server.endsWith("WS")){
-                server += "/";
-            }else{
-                server += "/WS/";
-            }
+        if(!server.endsWith("/")){            
+            server += "/";
         }
                 
         this.server = server;
