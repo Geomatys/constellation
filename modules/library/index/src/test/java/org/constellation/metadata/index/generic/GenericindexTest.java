@@ -46,6 +46,7 @@ import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
@@ -53,6 +54,8 @@ import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
+import org.geotoolkit.metadata.iso.extent.DefaultExtent;
+import org.geotoolkit.metadata.iso.extent.DefaultTemporalExtent;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
@@ -744,6 +747,26 @@ public class GenericindexTest {
         
         assertEquals("19900702", result);
         
+    }
+    
+    @Test
+    public void extractValuesTest2() throws Exception {
+        
+        DefaultMetadata meta4 = new DefaultMetadata();
+        DefaultDataIdentification ident4 = new DefaultDataIdentification();
+        
+        TimePeriodType tp1 = new TimePeriodType("2008-11-01", "2008-12-01");
+        tp1.setId("007-all");
+        DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
+        tempExtent.setExtent(tp1);
+        
+        DefaultExtent ext = new DefaultExtent();
+        ext.setTemporalElements(Arrays.asList(tempExtent));
+        ident4.setExtents(Arrays.asList(ext));
+                
+        meta4.setIdentificationInfo(Arrays.asList(ident4));
+        String result = GenericIndexer.extractValues(meta4, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent#id=[0-9]+-all:beginPosition"));
+        assertEquals("20081101", result);
     }
 
     public static List<Object> fillTestData() throws JAXBException {

@@ -118,11 +118,36 @@
             </div>   
             <table> 
                 <tr>
+                    <td><h:outputText value="#{sosBean.i18n['obsIdBase']}"/></td>
+                    <td><h:inputText value="#{sosBean.obsIdBase}" style="width:50%;"/></td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="#{sosBean.i18n['obsTmpIdBase']}"/></td>
+                    <td><h:inputText value="#{sosBean.obstmpIdBase}" style="width:50%;"/></td>
+                </tr> 
+                <tr>
+                    <td><h:outputText value="#{sosBean.i18n['sensorIdBase']}"/></td>
+                    <td><h:inputText value="#{sosBean.sensorIdBase}" style="width:50%;"/></td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="#{sosBean.i18n['phenIdBase']}"/></td>
+                    <td><h:inputText value="#{sosBean.phenIdBase}" style="width:50%;"/></td>
+                </tr> 
+                <tr>
+                    <td><h:outputText value="#{sosBean.i18n['maxObs']}"/></td>
+                    <td><h:inputText value="#{sosBean.maxObs}" style="width:50%;"/></td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="#{sosBean.i18n['tmpTime']}"/></td>
+                    <td><h:inputText value="#{sosBean.tmpTime}" style="width:50%;"/></td>
+                </tr> 
+                <tr>
                     <td><h:outputText value="#{sosBean.i18n['profile']}"/></td>
-                <td><h:selectOneMenu value="#{sosBean.profile}">
-                    <f:selectItems value="#{sosBean.profiles}"/>
-                </h:selectOneMenu>
-                </td>
+                    <td>
+                        <h:selectOneMenu value="#{sosBean.profile}">
+                          <f:selectItems value="#{sosBean.profiles}"/>
+                        </h:selectOneMenu>
+                    </td>
                 </tr> 
             </table>
             <div style="text-align: right;">

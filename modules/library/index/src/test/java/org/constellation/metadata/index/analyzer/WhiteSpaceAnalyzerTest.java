@@ -58,10 +58,10 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_31), Level.FINER);
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_32), Level.FINER);
         indexer.destroy();
         
-        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_31));
+        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_32));
         indexSearcher.setLogLevel(Level.FINER);
     }
 
