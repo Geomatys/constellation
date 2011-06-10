@@ -734,13 +734,13 @@
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derby</artifactId>
-                <version>10.6.2.1</version>
+                <version>10.7.1.1</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derbyLocale_fr</artifactId>
-                <version>10.6.2.1</version>
+                <version>10.7.1.1</version>
                 <scope>runtime</scope>
             </dependency>
         </dependencies>
