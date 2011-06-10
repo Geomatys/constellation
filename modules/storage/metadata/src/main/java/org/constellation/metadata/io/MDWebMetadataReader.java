@@ -252,7 +252,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         this.opengisPackage     = FileUtilities.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                                "org.opengis.service", "org.opengis.feature.catalog");
         this.cswPackage         = FileUtilities.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
-                                                               "org.geotoolkit.ogc.xml","org.geotoolkit.csw.xml");
+                                                               "org.geotoolkit.ogc.xml.v110","org.geotoolkit.csw.xml");
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
         this.geotkAcquisitionPackage = FileUtilities.searchSubPackage("org.geotoolkit.internal.jaxb.gmi", "org.geotoolkit.metadata.iso.acquisition",
