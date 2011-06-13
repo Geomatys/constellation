@@ -67,7 +67,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     /**
      * A Map of service configuration.
      */
-    private Map<String, Automatic> serviceConfiguration = new HashMap<String, Automatic>();
+    protected Map<String, Automatic> serviceConfiguration = new HashMap<String, Automatic>();
     
     /**
      * A generic factory to get the correct CSW Factory.
@@ -289,7 +289,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
      * 
      * @throws ConfigurationException
      */
-    private void refreshServiceConfiguration() throws ConfigurationException {
+    protected void refreshServiceConfiguration() throws ConfigurationException {
         serviceConfiguration    = new HashMap<String, Automatic>();
         final File cswConfigDir = getConfigurationDirectory();
         if (cswConfigDir != null && cswConfigDir.exists() && cswConfigDir.isDirectory()) {
