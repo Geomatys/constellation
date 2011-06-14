@@ -103,7 +103,10 @@ public final class ConfigurationService extends WebService  {
     public ConfigurationService() {
         super();
         try {
-            final MarshallerPool pool = new MarshallerPool("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml:org.geotoolkit.internal.jaxb.geometry");
+            final MarshallerPool pool = new MarshallerPool("org.geotoolkit.ows.xml.v110:"
+                                                         + "org.constellation.configuration:"
+                                                         + "org.geotoolkit.skos.xml:" // TODO do we still need skos ?
+                                                         + "org.geotoolkit.internal.jaxb.geometry");
             setXMLContext(pool);
             final Iterator<AbstractConfigurerFactory> ite = factory.getServiceProviders(AbstractConfigurerFactory.class, new ConfigurerFilter(), null, null);
             while (ite.hasNext()) {

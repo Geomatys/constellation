@@ -88,6 +88,12 @@
       <artifactId>geotk-xml-ows</artifactId>
       <version>${geotoolkit-pending.version}</version>
     </dependency>
+    <!-- TODO see if we still need to unmarshall skos -->
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-skos</artifactId>
+      <version>${geotoolkit-pending.version}</version>
+    </dependency>
   </dependencies>
 
 </project>
