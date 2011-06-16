@@ -35,7 +35,6 @@ import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 
@@ -812,6 +811,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 className = className.substring(0, className.length() - 4);
             }
         }
+        if (className.isEmpty()) {
+            return null;
+        }
         
         final List<Standard> availableStandards = standardMapping.get(mainStandard);
         if (availableStandards == null) {
@@ -820,7 +822,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         
         String availableStandardLabel = "";
         for (Standard standard : availableStandards) {
-            
+
             availableStandardLabel = availableStandardLabel + standard.getName() + ',';
             /* to avoid some confusion between to classes with the same name
              * we affect the standard in some special case
@@ -836,28 +838,28 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             String name = className;
             int nameType = 0;
             while (nameType < 2) {
-                
+
                 LOGGER.finer("searching: " + standard.getName() + ':' + name);
                 result = mdWriter.getClasse(name, standard);
                 if (result != null) {
                     LOGGER.finer("class found:" + standard.getName() + ':' + name);
                     classBinding.put(object.getClass().getName(), result);
                     return result;
-                } 
-                
+                }
+
                 switch (nameType) {
 
-                        case 0: {
-                            name = "Time" + className;
-                            nameType = 1;
-                            break;
-                        }
-                        default:
-                            nameType = 2;
-                            break;
+                    case 0: {
+                        name = "Time" + className;
+                        nameType = 1;
+                        break;
                     }
+                    default:
+                        nameType = 2;
+                        break;
                 }
             }
+        }
         
         availableStandardLabel = availableStandardLabel.substring(0, availableStandardLabel.length() - 1);
         LOGGER.warning("class not found: " + className + " in the following standards: " + availableStandardLabel + "\n (" + object.getClass().getName() + ')');
