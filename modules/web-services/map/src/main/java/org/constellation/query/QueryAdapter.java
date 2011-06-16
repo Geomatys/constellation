@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
+import net.jcip.annotations.Immutable;
 
-import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
@@ -47,7 +47,7 @@ public final class QueryAdapter {
     private static final Logger LOGGER = Logging.getLogger(QueryAdapter.class);
 
     private QueryAdapter() {}
-    
+
     /**
      * Verify that all layers are queryable for a {@code GetFeatureInfo}.
      *

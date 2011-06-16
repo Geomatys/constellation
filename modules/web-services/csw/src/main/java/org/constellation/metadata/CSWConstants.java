@@ -16,7 +16,7 @@
  */
 package org.constellation.metadata;
 
-import org.geotoolkit.lang.Immutable;
+import net.jcip.annotations.Immutable;
 
 
 /**
@@ -56,7 +56,7 @@ public abstract class CSWConstants {
     public static final String NOT_EXIST = " does not exist";
 
     public static final String MALFORMED = " is malformed";
-    
+
     private CSWConstants() {}
 
 }

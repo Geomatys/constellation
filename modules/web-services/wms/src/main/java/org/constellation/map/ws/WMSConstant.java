@@ -20,7 +20,7 @@ package org.constellation.map.ws;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.geotoolkit.lang.Immutable;
+import net.jcip.annotations.Immutable;
 import org.geotoolkit.wms.xml.v111.DescribeLayer;
 import org.geotoolkit.wms.xml.v111.GetCapabilities;
 import org.geotoolkit.wms.xml.v111.GetFeatureInfo;
@@ -54,12 +54,12 @@ public final class WMSConstant {
         final OperationType getFeatureInfo  = new OperationType(Arrays.asList("text/xml","text/plain","text/html", "application/vnd.ogc.gml", "application/vnd.ogc.xml", "xml", "gml", "gml3"), dcp);
 
         REQUEST_130 = new Request(getCapabilities, getMap, getFeatureInfo);
-        
+
         /*
          * Extended Operation
          */
         ObjectFactory factory = new ObjectFactory();
-        
+
         final OperationType describeLayer    = new OperationType(Arrays.asList("text/xml"), dcp);
         final OperationType getLegendGraphic = new OperationType(Arrays.asList("image/png","image/jpeg","image/gif","image/tiff"), dcp);
 

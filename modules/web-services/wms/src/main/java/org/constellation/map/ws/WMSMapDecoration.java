@@ -44,6 +44,7 @@ import javax.swing.SwingConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import net.jcip.annotations.ThreadSafe;
 
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.GO2Hints;
@@ -73,7 +74,6 @@ import org.geotoolkit.display2d.service.PortrayalExtension;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.image.jai.Registry;
-import org.geotoolkit.lang.ThreadSafe;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.Converters;
 import org.geotoolkit.util.logging.Logging;
@@ -91,7 +91,7 @@ import org.xml.sax.SAXException;
  * portrayal extension.
  * @author Johann Sorel (Geomatys)
  */
-@ThreadSafe(concurrent=false)
+@ThreadSafe
 public final class WMSMapDecoration {
 
     public static final PortrayalExtension EMPTY_EXTENSION = new DecorationExtension();
@@ -104,7 +104,7 @@ public final class WMSMapDecoration {
     private static final String TAG_PARAMETER   = "Parameter";
     private static final String TAG_MAIN        = "Main";
     private static final String TAG_SECOND      = "Second";
-    
+
     private static final String ATT_NAME = "name";
 
     private static final String PARAM_POSITION = "position";
@@ -194,7 +194,7 @@ public final class WMSMapDecoration {
 
     /**
      * First call to this method will parse the configuration file if there is one.
-     * 
+     *
      * @return PortrayalExtension
      */
     public PortrayalExtension getExtension() {
@@ -501,7 +501,7 @@ public final class WMSMapDecoration {
         }else if(type.equalsIgnoreCase(TYPE_IMAGE)){
 
             final URL source = parseURL(params.get(PARAM_SOURCE), null);
-            
+
             BufferedImage buffer;
             try {
                 buffer = ImageIO.read(source);
@@ -514,7 +514,7 @@ public final class WMSMapDecoration {
             parsed.put(ATT_NAME, TYPE_IMAGE);
             parsed.put(TYPE_IMAGE, template);
             parsed.put(PARAM_POSITION, parsePosition(params.get(PARAM_POSITION), SwingConstants.NORTH_WEST));
-            
+
 
 
 
@@ -638,7 +638,7 @@ public final class WMSMapDecoration {
             final int round = parseInteger(strRound, 12);
             final Stroke stroke = parseStroke(strWidth, strDashes);
             final Insets insets = parseInsets(strInsets, new Insets(5, 5, 5, 5));
-            
+
             return new DefaultBackgroundTemplate(stroke, strokePaint, fill, insets, round);
         }
 
@@ -827,7 +827,7 @@ public final class WMSMapDecoration {
                 }
 
             }
-            
+
         }
 
     }
