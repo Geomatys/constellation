@@ -61,12 +61,12 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             Connection con = ds.getConnection();
 
             DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/model/mdw_schema_2.3(derby).sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/users/creation_user.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/profiles/inputLevels.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));

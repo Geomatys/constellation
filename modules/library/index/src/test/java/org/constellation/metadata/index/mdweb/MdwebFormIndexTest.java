@@ -106,7 +106,7 @@ public class MdwebFormIndexTest {
         Connection con = ds.getConnection();
 
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/model/mdw_schema_2.3(derby).sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
 
         Writer writer = MD_IOFactory.getWriterInstance(ds, false);
