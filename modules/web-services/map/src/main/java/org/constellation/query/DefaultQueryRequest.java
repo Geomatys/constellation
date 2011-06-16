@@ -17,7 +17,7 @@
 
 package org.constellation.query;
 
-import org.geotoolkit.lang.Immutable;
+import net.jcip.annotations.Immutable;
 
 /**
  * Default Implementation of a QueryRequest.

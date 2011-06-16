@@ -17,10 +17,10 @@
 package org.constellation.query.wms;
 
 import javax.ws.rs.core.MultivaluedMap;
+import net.jcip.annotations.Immutable;
 import org.constellation.query.Query;
 import org.constellation.query.DefaultQueryRequest;
 import org.constellation.query.QueryRequest;
-import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.util.Version;
 
 

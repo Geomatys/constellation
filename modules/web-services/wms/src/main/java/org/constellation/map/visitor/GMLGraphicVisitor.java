@@ -47,7 +47,7 @@ import org.geotoolkit.geometry.isoonjts.JTSUtils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.internal.jaxb.ObjectFactory;
 import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.DateRange;
 import org.geotoolkit.util.MeasurementRange;
@@ -234,7 +234,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         }
         return "";
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -281,7 +281,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         builder.append("\t\t\t<gml:boundedBy>").append("\n");
         String crsName;
         try {
-            crsName = CRS.lookupIdentifier(crs, true);
+            crsName = IdentifiedObjects.lookupIdentifier(crs, true);
         } catch (FactoryException ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             crsName = crs.getName().getCode();

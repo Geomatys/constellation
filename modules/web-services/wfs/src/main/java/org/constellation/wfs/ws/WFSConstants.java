@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.xml.namespace.QName;
-import org.geotoolkit.lang.Immutable;
+import net.jcip.annotations.Immutable;
 import org.geotoolkit.ogc.xml.v110.ArithmeticOperatorsType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorsType;
@@ -44,7 +44,7 @@ import org.opengis.filter.capability.SpatialOperator;
 
 /**
  *  WFS Constants
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
 @Immutable
@@ -113,7 +113,7 @@ public final class WFSConstants {
 
         final IdCapabilitiesType idCapabilities = new IdCapabilitiesType(true, true);
         FILTER_CAPABILITIES = new FilterCapabilities(scalarCapabilities, spatialCapabilties, idCapabilities);
-        
+
     }
 
     public static final OperationsMetadata OPERATIONS_METADATA;
