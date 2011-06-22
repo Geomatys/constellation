@@ -40,6 +40,7 @@ import org.geotoolkit.util.Utilities;
     "statique",
     "select",
     "from",
+    "leftJoin",
     "where",
     "orderby",
     "groupby"
@@ -55,6 +56,7 @@ public class FilterQuery {
     private String option;
     @XmlElement(required = true)
     private List<FilterSelect> select;
+    private List<LeftJoin> leftJoin;
     @XmlElement(required = true)
     private List<From> from;
     private List<Where> where;
@@ -271,6 +273,7 @@ public class FilterQuery {
                sb = sb.delete(sb.length() - 3, sb.length());
         }
         if (from != null) {
+            sb.append('\n');
             sb.append(" FROM ");
             for (From s : from) {
                 sb.append(s.getvalue()).append(" , ");
@@ -278,8 +281,16 @@ public class FilterQuery {
             if (from.size() > 0)
                sb = sb.delete(sb.length() - 3, sb.length());
         }
+        if (leftJoin != null) {
+            sb.append('\n');
+            for (LeftJoin s : leftJoin) {
+                sb.append("LEFT JOIN ").append(s.getvalue()).append('\n');
+            }
+            if (leftJoin.size() > 0)
+               sb = sb.delete(sb.length() - 1, sb.length());
+        }
         if (where != null) {
-            sb.append(" WHERE ");
+            sb.append("\n WHERE ");
             boolean oRblock = false;
             for (int i = 0; i < where.size(); i++) {
                 final Where w = where.get(i);
@@ -309,12 +320,14 @@ public class FilterQuery {
             }
             
         }
+        sb.append('\n');
         if (orderby != null) {
             sb.append(" ORDER BY ");
             for (Orderby s : orderby) {
                 sb.append(s.getvalue()).append(" ");
             }
         }
+        sb.append('\n');
         if (groupby != null) {
             sb.append(" GROUP BY ");
             for (Groupby s : groupby) {
@@ -352,6 +365,12 @@ public class FilterQuery {
                 sb.append(s).append('\n');
             }
         }
+        if (leftJoin != null) {
+            sb.append("LEFT JOIN: ");
+            for (LeftJoin s : leftJoin) {
+                sb.append(s).append('\n');
+            }
+        }
         if (where != null) {
             sb.append("WHERE: ");
             for (Where s : where) {
@@ -386,6 +405,57 @@ public class FilterQuery {
     public void setStatique(QueryList statique) {
         this.statique = statique;
     }
+    
+    /**
+     * @return the leftJoin
+     */
+    public List<LeftJoin> getLeftJoin() {
+        if (leftJoin == null) {
+            leftJoin = new ArrayList<LeftJoin>();
+        }
+        return leftJoin;
+    }
+
+    /**
+     * @param leftJoin the leftJoin to set
+     */
+    public void setLeftJoin(List<LeftJoin> leftJoin) {
+        this.leftJoin = leftJoin;
+    }
+    
+    /**
+     * Gets the value of the where property for the specified group name.
+     */
+    public LeftJoin getLeftJoin(String group) {
+        for (LeftJoin s: getLeftJoin()) {
+            if (group != null && group.equals(s.getGroup())) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets all the value of the LeftJoin property for the specified group name.
+     */
+    public List<LeftJoin> getAllLeftJoin(String group) {
+        final List<LeftJoin> result = new ArrayList<LeftJoin>();
+        for (LeftJoin s: getLeftJoin()) {
+            if (group != null && group.equals(s.getGroup())) {
+                result.add(s);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Add a LeftJoin clause to the query.
+     *
+     * @param select a SQL LeftJoin clause
+     */
+    public void addLeftJoin(LeftJoin leftJoin) {
+        this.getLeftJoin().add(leftJoin);
+    }
 
     /**
      * Verify if this entry is identical to the specified object.
@@ -398,15 +468,16 @@ public class FilterQuery {
         if (object instanceof FilterQuery) {
             final FilterQuery that = (FilterQuery) object;
 
-            return Utilities.equals(this.from,    that.from) &&
-                   Utilities.equals(this.name,    that.name) &&
-                   Utilities.equals(this.groupby, that.groupby) &&
-                   Utilities.equals(this.select,  that.select) &&
-                   Utilities.equals(this.where,   that.where) &&
-                   Utilities.equals(this.option,  that.option) &&
-                   Utilities.equals(this.orderby,  that.orderby) &&
+            return Utilities.equals(this.from,       that.from) &&
+                   Utilities.equals(this.name,       that.name) &&
+                   Utilities.equals(this.groupby,    that.groupby) &&
+                   Utilities.equals(this.select,     that.select) &&
+                   Utilities.equals(this.where,      that.where) &&
+                   Utilities.equals(this.leftJoin,   that.leftJoin) &&
+                   Utilities.equals(this.option,     that.option) &&
+                   Utilities.equals(this.orderby,    that.orderby) &&
                    Utilities.equals(this.parameters, that.parameters) &&
-                   Utilities.equals(this.statique, that.statique);
+                   Utilities.equals(this.statique,   that.statique);
         }
         return false;
     }
@@ -421,6 +492,7 @@ public class FilterQuery {
         hash = 37 * hash + (this.select != null ? this.select.hashCode() : 0);
         hash = 37 * hash + (this.from != null ? this.from.hashCode() : 0);
         hash = 37 * hash + (this.where != null ? this.where.hashCode() : 0);
+        hash = 37 * hash + (this.leftJoin != null ? this.leftJoin.hashCode() : 0);
         hash = 37 * hash + (this.orderby != null ? this.orderby.hashCode() : 0);
         hash = 37 * hash + (this.groupby != null ? this.groupby.hashCode() : 0);
         return hash;
