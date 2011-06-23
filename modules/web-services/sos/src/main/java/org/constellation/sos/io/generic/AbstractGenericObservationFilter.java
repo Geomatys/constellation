@@ -18,6 +18,7 @@
 package org.constellation.sos.io.generic;
 
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -184,5 +185,12 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
             }
         }
         throw new CstlServiceException("The database connection has been lost, the service is trying to reconnect", NO_APPLICABLE_CODE);
+    }
+    
+    protected Connection acquireConnection() throws SQLException {
+        final Connection c = dataSource.getConnection();
+        c.setReadOnly(true);
+        c.setAutoCommit(false);
+        return c;
     }
 }

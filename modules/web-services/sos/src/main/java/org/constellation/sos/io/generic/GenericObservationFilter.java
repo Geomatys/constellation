@@ -280,7 +280,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         LOGGER.log(Level.INFO, "request:{0}", request);
         try {
             final List<ObservationResult> results = new ArrayList<ObservationResult>();
-            final Connection connection           = dataSource.getConnection();
+            final Connection connection           = acquireConnection();
             final Statement currentStatement      = connection.createStatement();
             final ResultSet result                = currentStatement.executeQuery(request);
             while (result.next()) {
@@ -290,6 +290,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             }
             result.close();
             currentStatement.close();
+            connection.close();
             return results;
 
         } catch (SQLException ex) {
@@ -309,7 +310,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         LOGGER.log(Level.INFO, "request:{0}", request);
         try {
             final List<String> results       = new ArrayList<String>();
-            final Connection connection      = dataSource.getConnection();
+            final Connection connection      = acquireConnection();
             final Statement currentStatement = connection.createStatement();
             final ResultSet result           = currentStatement.executeQuery(request);
             while (result.next()) {
@@ -317,6 +318,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             }
             result.close();
             currentStatement.close();
+            connection.close();
             return results;
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "SQLException while executing the query: {0}", request);
