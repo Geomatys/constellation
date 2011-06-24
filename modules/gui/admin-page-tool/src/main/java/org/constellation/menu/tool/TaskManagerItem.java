@@ -25,14 +25,14 @@ import org.constellation.bean.AbstractMenuItem;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class ExtractionItem extends AbstractMenuItem{
+public class TaskManagerItem extends AbstractMenuItem{
 
 
-    public ExtractionItem() {
+    public TaskManagerItem() {
         super(
-            new String[]{"/org/constellation/menu/tool/extraction.xhtml"},
-            null,
-            new Path(TOOLS_PATH,"extraction", "/org/constellation/menu/tool/extraction.xhtml", "org.constellation.icons.antenna.png.mfRes",100)
+            new String[]{"/tasks/quartzmanager.xhtml"},
+            "tasks.tasks",
+            new Path(TOOLS_PATH,"taskmanager", "/tasks/quartzmanager.xhtml", "tasks.kalarm.png.mfRes",100)
             );
     }
 

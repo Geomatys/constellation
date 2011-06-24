@@ -5,8 +5,8 @@
     
     <!-- Beans -->
     <managed-bean>
-        <managed-bean-name>extractBean</managed-bean-name>
-        <managed-bean-class>org.constellation.menu.tool.ExtractionBean</managed-bean-class>
+        <managed-bean-name>taskmanagerBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.tool.TaskManagerBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
     

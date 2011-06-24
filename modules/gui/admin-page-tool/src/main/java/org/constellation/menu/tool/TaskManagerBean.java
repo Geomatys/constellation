@@ -19,34 +19,47 @@ package org.constellation.menu.tool;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
-import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.lang.Setup;
-import org.geotoolkit.referencing.CRS;
 
-import org.geotoolkit.referencing.factory.FactoryDependencies;
+import org.mapfaces.i18n.I18NBean;
+import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 
 /**
- * Returns several information from the used GeotoolKit.
+ * Returns task manager and pages to add new values.
  *
  * @author Johann Sorel (Geomatys)
  */
-public class ExtractionBean {
+public class TaskManagerBean extends I18NBean{
 
-    private final TreeModel factoryModel;
+    public static final OutlineRowStyler ROW_STYLER = new OutlineRowStyler() {
 
-    public ExtractionBean(){
-        final FactoryDependencies depends = new FactoryDependencies(CRS.getAuthorityFactory(null));
-        depends.setAbridged(true);
-        final TreeNode root = depends.asTree();
-        factoryModel = new DefaultTreeModel(root);
+        @Override
+        public String getRowStyle(final TreeNode node) {
+            final DefaultMutableTreeNode mn = (DefaultMutableTreeNode) node;
+            final Object obj = mn.getUserObject();
+            return "";
+        }
+
+        @Override
+        public String getRowClass(final TreeNode node) {
+            return "";
+        }
+    };
+    
+    private final TreeModel taskModel;
+
+    public TaskManagerBean(){
+        addBundle("tasks.tasks");       
+        
+        taskModel = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
     }
 
-    public TreeModel getFactoryModel(){
-        return factoryModel;
+    public TreeModel getTaskModel(){
+        return taskModel;
     }
 
     public Hints getDefaultHints(){

@@ -19,7 +19,7 @@
     <groupId>org.constellation.gui</groupId>
     <artifactId>admin-page-tool</artifactId>
     <packaging>jar</packaging>
-    <name>Web site : Processing tools</name>
+    <name>Web site : Task manager</name>
 
 
     <!--
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.constellation.gui</groupId>
             <artifactId>admin-base</artifactId>
-            <version>0.8-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

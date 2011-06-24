@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib"
+                template="/pages/base.xhtml">
+
+    <ui:param name="pageTitle" value="#{taskmanagerBean.i18n['taskmanager']}"/>
+
+    <ui:define name="content">
+
+        <!-- scheduler status -->
+        <div class="rounded">
+            <h2>#{taskmanagerBean.i18n['quartzscheduler']}</h2>
+            
+        </div>
+        
+        <!-- tasks list -->
+        <div class="rounded">
+            
+            <mf:Outline id="sourceLayers" actionVisible="false" rootVisible="false"
+                value="#{taskmanagerBean.taskModel}" var="node" width="100%" 
+                rowStyler="#{mf:constant('org.constellation.menu.tool.TaskManagerBean.ROW_STYLER')}">
+                
+                <!-- Name column -->
+                <mf:DataTableColumn>
+                </mf:DataTableColumn>
+                
+                <!-- Last date run column -->
+                <mf:DataTableColumn>
+                </mf:DataTableColumn>
+                
+                <!-- Last status column -->
+                <mf:DataTableColumn>
+                </mf:DataTableColumn>
+                
+                <!-- Schedule column -->
+                <mf:DataTableColumn>
+                </mf:DataTableColumn>
+                
+                <!-- Play action column -->
+                <mf:DataTableColumn>
+                </mf:DataTableColumn>
+                                
+                <!-- Stop action column -->
+                <mf:DataTableColumn>
+                </mf:DataTableColumn>
+                                
+                <!-- Edit action column -->
+                <mf:DataTableColumn>
+                </mf:DataTableColumn>
+                                
+                <!-- Delete action column -->
+                <mf:DataTableColumn>
+                </mf:DataTableColumn>
+
+            </mf:Outline>
+            
+            
+        </div>
+        
+    </ui:define>
+
+</ui:composition>
