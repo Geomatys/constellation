@@ -56,6 +56,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>server</module>
+    <module>scheduler</module>
     <module>testing</module>
     <module>xacml</module>
   </modules>

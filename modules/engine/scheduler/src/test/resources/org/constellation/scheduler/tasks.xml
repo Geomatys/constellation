@@ -1,0 +1,24 @@
+
+<tasks xmlns="http://www.geotoolkit.org/parameter">
+    
+    <task authority="mymaths" code="add">        
+        <trigger step="150" />    
+        <parameters>
+            <InputParameters>
+                <first>15</first>
+                <second>5</second>
+            </InputParameters>
+        </parameters>
+    </task>
+    
+    <task authority="mymaths" code="add">        
+        <trigger step="60" />    
+        <parameters>
+            <InputParameters>
+                <first>21</first>
+                <second>13</second>
+            </InputParameters>
+        </parameters>
+    </task>
+
+</tasks>

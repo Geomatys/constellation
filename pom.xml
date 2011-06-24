@@ -673,6 +673,11 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-processing-quartz</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-vector</artifactId>
                 <version>${geotoolkit-pending.version}</version>
             </dependency>
@@ -702,8 +707,6 @@
                 <version>${geotoolkit-pending.version}</version>
                 <classifier>tests</classifier>
             </dependency>
-
-
 
             <!--
         Database drivers. They are usually needed only for testing purpose (see
@@ -743,6 +746,16 @@
                 <version>10.7.1.1</version>
                 <scope>runtime</scope>
             </dependency>
+            
+            <!--testing-->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.2</version>
+                <scope>test</scope>
+            </dependency>
+            
+            
         </dependencies>
     </dependencyManagement>
 
