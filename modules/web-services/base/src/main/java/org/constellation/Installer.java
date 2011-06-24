@@ -23,6 +23,7 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import org.constellation.scheduler.CstlScheduler;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.internal.io.Installation;
@@ -75,6 +76,9 @@ public final class Installer implements ServletContextListener{
         for(String jn : ImageIO.getWriterFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
         }
+        
+        //start constellation scheduler
+        CstlScheduler.getInstance();
         
     }
 

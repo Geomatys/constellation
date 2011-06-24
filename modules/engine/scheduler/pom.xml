@@ -49,6 +49,11 @@
   -->
   <dependencies>
     <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-jaxp-core</artifactId>
     </dependency>
@@ -56,7 +61,6 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-processing-quartz</artifactId>
     </dependency>
-    
     
     <dependency>
       <groupId>junit</groupId>

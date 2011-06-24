@@ -16,11 +16,15 @@
  */
 package org.constellation.scheduler;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.stream.XMLStreamException;
+import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.util.logging.Logging;
 
 import org.quartz.Scheduler;
@@ -39,38 +43,45 @@ import org.quartz.impl.StdSchedulerFactory;
 public class CstlScheduler {
     
     private static final Logger LOGGER = Logging.getLogger(CstlScheduler.class);
-    
-    private static final Scheduler SCHEDULER;
+    private static final String TASK_FILE = "scheduler-tasks.xml";    
     private static CstlScheduler INSTANCE = null;
-    
-    static {
         
-        Scheduler temp = null;
-        final SchedulerFactory schedFact = new StdSchedulerFactory();
-        try {
-            temp = schedFact.getScheduler();
-            temp.start();
-        } catch (SchedulerException ex) {
-            Logger.getLogger(CstlScheduler.class.getName()).log(Level.WARNING, null, ex);
-        }
-        
-        SCHEDULER = temp;
-    }
-    
     private final List<Task> tasks = new ArrayList<Task>();
+    private Scheduler quartzScheduler;
     
     private CstlScheduler(){
-        loadTasks();
+        
+        try {
+            loadTasks();
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+        } catch (XMLStreamException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+        }
+        
+        LOGGER.log(Level.WARNING, "=== Starting Constellation Scheduler ===");
+        final SchedulerFactory schedFact = new StdSchedulerFactory();
+        try {
+            quartzScheduler = schedFact.getScheduler();
+            quartzScheduler.start();
+        } catch (SchedulerException ex) {
+            LOGGER.log(Level.SEVERE, "=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);            
+            return;
+        }
+        LOGGER.log(Level.SEVERE, "=== Constellation Scheduler sucessfully started ===");    
         
         for(Task t : tasks){
             try {
                 registerTask(t);
             } catch (SchedulerException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             }
         }
     }
     
+    /**
+     * @return unmodifiable list of all tasks.
+     */
     public List<Task> listTasks(){
         return Collections.unmodifiableList(tasks);
     }
@@ -78,15 +89,31 @@ public class CstlScheduler {
     /**
      * Load tasks defined in the configuration file.
      */
-    private void loadTasks(){
+    private void loadTasks() throws IOException, XMLStreamException{
         //open configuration file
+        final File configDir = ConfigDirectory.getConfigDirectory();
+        final File taskFile = new File(configDir, TASK_FILE);
+        if(!taskFile.exists()){
+            return;
+        }
+        
+        final TasksReader reader = new TasksReader();
+        reader.setInput(taskFile);
+        final List<Task> candidates = reader.read();
+        if(candidates != null){
+            tasks.addAll(candidates);
+        }
     }
     
     /**
      * Add the given task in the scheduler.
      */
     private void registerTask(final Task task) throws SchedulerException{
-        SCHEDULER.scheduleJob(task.getDetail(), task.getTrigger());
+        LOGGER.log(Level.INFO, "Schedule task id :{0}   type : {1}.{2}", new Object[]{
+            task.getId(), 
+            task.getDetail().getFactoryIdentifier(), 
+            task.getDetail().getProcessIdentifier()});
+        quartzScheduler.scheduleJob(task.getDetail(), task.getTrigger());
     }
     
     /**

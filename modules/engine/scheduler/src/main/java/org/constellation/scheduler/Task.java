@@ -17,7 +17,10 @@
 package org.constellation.scheduler;
 
 import java.util.Date;
+import java.util.UUID;
+
 import org.geotoolkit.process.quartz.ProcessJobDetail;
+
 import org.quartz.SimpleTrigger;
 
 /**
@@ -27,19 +30,28 @@ import org.quartz.SimpleTrigger;
  */
 public class Task {
         
-    private ProcessJobDetail detail;
-    private SimpleTrigger trigger;
-    private Date lastExecutionDate;
-    private Exception lastFailedException;
+    private String id = UUID.randomUUID().toString();
+    private ProcessJobDetail detail = null;
+    private SimpleTrigger trigger = null;
+    private Date lastExecutionDate = null;
+    private Exception lastFailedException = null;
     
     public Task(){
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public ProcessJobDetail getDetail() {
         return detail;
     }
 
-    public void setDetail(ProcessJobDetail detail) {
+    public void setDetail(final ProcessJobDetail detail) {
         this.detail = detail;
     }
     
@@ -47,7 +59,7 @@ public class Task {
         return lastExecutionDate;
     }
 
-    public void setLastExecutionDate(Date lastExecutionDate) {
+    public void setLastExecutionDate(final Date lastExecutionDate) {
         this.lastExecutionDate = lastExecutionDate;
     }
     
@@ -55,7 +67,7 @@ public class Task {
         return lastFailedException;
     }
 
-    public void setLastFailedException(Exception lastFailedException) {
+    public void setLastFailedException(final Exception lastFailedException) {
         this.lastFailedException = lastFailedException;
     }
     
@@ -63,7 +75,7 @@ public class Task {
         return trigger;
     }
 
-    public void setTrigger(SimpleTrigger trigger) {
+    public void setTrigger(final SimpleTrigger trigger) {
         this.trigger = trigger;
     }
 
@@ -71,7 +83,5 @@ public class Task {
     public String toString() {
         return super.toString();
     }
-    
-    
     
 }
