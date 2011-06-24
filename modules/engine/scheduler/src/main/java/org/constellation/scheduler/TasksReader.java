@@ -17,39 +17,33 @@
 package org.constellation.scheduler;
 
 import org.quartz.SimpleTrigger;
+
 import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.xml.stream.XMLStreamException;
-import org.geotoolkit.process.ProcessFinder;
 
+import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.xml.StaxStreamReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
-import org.opengis.parameter.ParameterDescriptorGroup;
 
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 
 import static javax.xml.stream.XMLStreamReader.*;
+import static org.constellation.scheduler.TasksConstants.*;
 
 /**
- *
+ * Reader tasks from an xml file.
+ * 
  * @author Johann Sorel (Geomatys)
  * @module pending
  */
 public class TasksReader extends StaxStreamReader{
-    
-    private static final String TAG_TASKS = "tasks";
-    private static final String TAG_TASK = "task";
-    private static final String ATT_AUTHORITY = "authority";
-    private static final String ATT_CODE = "code";
-    
-    private static final String TAG_TRIGGER = "trigger";
-    private static final String ATT_STEP = "step";
-    
-    private static final String TAG_PARAMETERS = "parameters";
     
     public TasksReader(){
         
@@ -90,6 +84,7 @@ public class TasksReader extends StaxStreamReader{
     private Task readTask() throws XMLStreamException, IOException {
         final Task task = new Task();
         
+        final String id = reader.getAttributeValue(null, ATT_ID);
         final String authority = reader.getAttributeValue(null, ATT_AUTHORITY);
         final String code = reader.getAttributeValue(null, ATT_CODE);
         final ParameterDescriptorGroup inputDesc = ProcessFinder.getProcessDescriptor(authority, code).getInputDescriptor();
@@ -116,7 +111,7 @@ public class TasksReader extends StaxStreamReader{
                 
         
         final ProcessJobDetail detail = new ProcessJobDetail(authority, code, params);
-        
+        task.setId(id);
         task.setDetail(detail);
         task.setTrigger(trigger);        
         return task;

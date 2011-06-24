@@ -19,7 +19,9 @@ package org.constellation.scheduler;
 import java.util.List;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
+
 import org.junit.Test;
+
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
 import static org.junit.Assert.*;
@@ -47,6 +49,7 @@ public class TasksReaderTest {
         
         
         final Task one = tasks.get(0);
+        assertEquals("task1", one.getId());
         assertEquals("mymaths", one.getDetail().getFactoryIdentifier());
         assertEquals("add", one.getDetail().getProcessIdentifier());
         assertEquals(new Double(15), one.getDetail().getParameters().parameter("first").getValue());
@@ -54,12 +57,12 @@ public class TasksReaderTest {
         assertEquals(150000, ((SimpleTriggerImpl)one.getTrigger()).getRepeatInterval());
                 
         final Task two = tasks.get(1);
+        assertEquals("task2", two.getId());
         assertEquals("mymaths", two.getDetail().getFactoryIdentifier());
         assertEquals("add", two.getDetail().getProcessIdentifier());
         assertEquals(new Double(21), two.getDetail().getParameters().parameter("first").getValue());
         assertEquals(new Double(13), two.getDetail().getParameters().parameter("second").getValue());
         assertEquals(60000, ((SimpleTriggerImpl)two.getTrigger()).getRepeatInterval());
-        
         
     }
 }

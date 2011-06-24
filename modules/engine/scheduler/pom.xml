@@ -67,6 +67,10 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.project</groupId>
+      <artifactId>geotk-test</artifactId>
+    </dependency>
 
   </dependencies>
 
