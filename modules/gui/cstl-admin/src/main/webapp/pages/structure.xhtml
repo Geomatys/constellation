@@ -23,7 +23,7 @@
     </head>
 
     <body>
-        <h:form id="form">
+        <h:form id="form" enctype="#{mf:component('importFile') != null ? 'multipart/form-data' : 'application/x-www-form-urlencoded'}">
 
         <div class="maindiv">
 

@@ -17,6 +17,8 @@
 
 package org.constellation.menu.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,9 @@ import javax.sql.DataSource;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.geotoolkit.util.FileUtilities;
 import org.mdweb.sql.DatabaseCreator;
+import org.mapfaces.model.UploadedFile;
 
 /**
  *
@@ -48,6 +52,8 @@ public class CSWBean extends AbstractServiceBean {
     private String userName;
     
     private String userPass;
+    
+    private UploadedFile uploadedFile;
     
     public CSWBean() {
         super(Specification.CSW,
@@ -244,6 +250,14 @@ public class CSWBean extends AbstractServiceBean {
         this.userPass = userPass;
     }
     
+    public void setUploadedFile(UploadedFile uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+
+    public UploadedFile getUploadedFile() {
+        return uploadedFile;
+    }
+    
     /**
      * Build an MDWeb Database
      */
@@ -263,9 +277,45 @@ public class CSWBean extends AbstractServiceBean {
         
     }
     
+    /**
+     * Refresh the cSW instance lucene index.
+     */
      public void refreshIndex() {
          final String instanceId = getConfiguredInstance().getName();
          getServer().csws.refreshIndex(instanceId, true);
          getServer().services.restartInstance("CSW", instanceId);
      }
+     
+     /**
+     * Build an MDWeb Database
+     */
+    public void importRecord() {
+        if (uploadedFile != null) {
+            final String contentType = uploadedFile.getContentType();
+            if ("application/zip".equals(contentType)
+             || "application/octet-stream".equals(contentType)
+             || "application/x-download".equals(contentType)
+             || "application/download".equals(contentType)
+             || "text/xml".equals(contentType)
+             || "application/x-httpd-php".equals(contentType)
+             || "application/x-zip-compressed".equals(contentType)) {
+               
+                final String instanceId = getConfiguredInstance().getName();
+                try {
+                    final File importedfile = FileUtilities.buildFileFromStream(uploadedFile.getInputStream());
+                    getServer().csws.importFile(instanceId, importedfile);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
+                }
+                
+            } else {
+                LOGGER.log(Level.WARNING, "This content type can not be read : {0}", contentType);
+            }
+        } else {
+            LOGGER.log(Level.WARNING, "imported file is null");
+        }
+    }
+    
+    
+    
 }

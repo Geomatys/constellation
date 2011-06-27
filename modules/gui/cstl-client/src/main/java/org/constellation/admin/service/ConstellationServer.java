@@ -16,6 +16,9 @@
  */
 package org.constellation.admin.service;
 
+import java.io.OutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import org.constellation.configuration.StringList;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +42,6 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.map.configuration.QueryConstants;
 
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
@@ -204,6 +206,20 @@ public final class ConstellationServer {
                                 (org.opengis.sld.StyledLayerDescriptor)request, StyledLayerDescriptor.V_1_1_0);
                     } catch (JAXBException ex) {
                         LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                    }
+                } else if (request instanceof File) {
+                    final FileInputStream in = new FileInputStream((File)request);
+                    final OutputStream out = conec.getOutputStream();
+                    try {
+                        final byte[] buffer = new byte[4096];
+                        int bytesRead;
+
+                        while ((bytesRead = in.read(buffer)) != -1) {
+                            out.write(buffer, 0, bytesRead); // write
+                        }
+                    } finally {
+                        out.close();
+                        in.close();
                     }
                 } else {
                     Marshaller marshaller = null;
@@ -1095,6 +1111,25 @@ public final class ConstellationServer {
             }
             return false;
         }
-    }
     
+        public boolean importFile(final String id, final File importFile) {
+            try {
+                final String url = getServiceURL() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+    }
 }

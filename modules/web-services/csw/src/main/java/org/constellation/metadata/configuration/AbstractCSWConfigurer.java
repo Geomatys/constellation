@@ -149,6 +149,12 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             return stopIndexation(id);
         }
         
+        if ("importRecords".equalsIgnoreCase(request)) {
+
+            final String id = getParameter("ID", false, parameters);
+            return importRecords(id);
+        }
+        
         if ("UpdateVocabularies".equalsIgnoreCase(request)) {
             return updateVocabularies();
         }
@@ -490,6 +496,12 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         }
         
         final String msg = "The specified record have been added to the CSW index";
+        return new AcknowlegementType("Success", msg);
+    }
+    
+    private AcknowlegementType importRecords(final String id) {
+        LOGGER.info("Importing record");
+        final String msg = "The specified record have been imported in the CSW";
         return new AcknowlegementType("Success", msg);
     }
 

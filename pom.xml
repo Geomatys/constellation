@@ -378,6 +378,11 @@
                 <artifactId>mapfaces-facelet-editor</artifactId>
                 <version>${mapfaces.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.mapfaces</groupId>
+                <artifactId>mapfaces-io</artifactId>
+                <version>${mapfaces.version}</version>
+            </dependency>
             <!-- mdweb-metamodel -->
             <dependency>
                 <groupId>org.mdweb.metamodel</groupId>

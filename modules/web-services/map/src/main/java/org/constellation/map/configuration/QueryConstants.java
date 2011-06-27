@@ -30,16 +30,16 @@ public final class QueryConstants {
     //Provider operations
     public static final String REQUEST_RESTART_ALL_LAYER_PROVIDERS  = "restartLayerProviders";
     public static final String REQUEST_RESTART_ALL_STYLE_PROVIDERS  = "restartStyleProviders";
-    public static final String REQUEST_CREATE_PROVIDER      = "createProvider"; 
-    public static final String REQUEST_UPDATE_PROVIDER      = "updateProvider"; 
-    public static final String REQUEST_GET_PROVIDER_CONFIG  = "getProviderConfiguration"; 
-    public static final String REQUEST_DELETE_PROVIDER      = "deleteProvider"; 
-    public static final String REQUEST_RESTART_PROVIDER     = "restartProvider"; 
+    public static final String REQUEST_CREATE_PROVIDER              = "createProvider"; 
+    public static final String REQUEST_UPDATE_PROVIDER              = "updateProvider"; 
+    public static final String REQUEST_GET_PROVIDER_CONFIG          = "getProviderConfiguration"; 
+    public static final String REQUEST_DELETE_PROVIDER              = "deleteProvider"; 
+    public static final String REQUEST_RESTART_PROVIDER             = "restartProvider"; 
     
     //Layer operations
-    public static final String REQUEST_CREATE_LAYER = "createLayer"; 
-    public static final String REQUEST_UPDATE_LAYER = "updateLayer"; 
-    public static final String REQUEST_DELETE_LAYER = "deleteLayer";
+    public static final String REQUEST_CREATE_LAYER     = "createLayer"; 
+    public static final String REQUEST_UPDATE_LAYER     = "updateLayer"; 
+    public static final String REQUEST_DELETE_LAYER     = "deleteLayer";
     
     //Style operations
     public static final String REQUEST_DOWNLOAD_STYLE   = "downloadStyle";
@@ -55,8 +55,9 @@ public final class QueryConstants {
     public static final String REQUEST_UPDATE_TASK      = "updateTask";
     public static final String REQUEST_DELETE_TASK      = "deleteTask";
     
-    //Other
+    //CSW operations
     public static final String REQUEST_REFRESH_INDEX    = "refreshIndex"; 
+    public static final String REQUEST_IMPORT_RECORDS   = "importRecords"; 
     
     private QueryConstants(){}
     

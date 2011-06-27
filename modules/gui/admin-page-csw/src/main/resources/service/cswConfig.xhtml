@@ -63,10 +63,18 @@
             <table> 
                 <tr>
                     <td><h:outputText value="#{cswBean.i18n['profile']}"/></td>
-                <td><h:selectOneMenu value="#{cswBean.profile}">
-                    <f:selectItems value="#{cswBean.profiles}"/>
-                </h:selectOneMenu>
+                    <td>
+                        <h:selectOneMenu value="#{cswBean.profile}">
+                           <f:selectItems value="#{cswBean.profiles}"/>
+                        </h:selectOneMenu>
+                    </td> 
+                </tr>     
+                <tr>
+                <td><mf:FileUpload id="importFile" 
+                                       size="50"
+                                       uploadedFile="#{cswBean.uploadedFile}" />
                 </td>
+                <td><h:commandButton action="#{cswBean.importRecord}" value="#{cswBean.i18n['importFile']}"/></td>
                 </tr>     
             </table> 
 
