@@ -154,8 +154,8 @@ public final class ConstellationServer {
     }
 
     private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
-         return sendRequest(sourceURL, request, null, null);
-     }
+         return sendRequest(sourceURL, request, null, null, false);
+    }
     
     /**
      * Send a request to another service.
@@ -170,10 +170,10 @@ public final class ConstellationServer {
      * @throws org.constellation.coverage.web.CstlServiceException
      */
     private Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor, 
-            MarshallerPool unmarshallerPool) throws MalformedURLException, IOException {
+            MarshallerPool unmarshallerPool, boolean put) throws MalformedURLException, IOException {
 
         final URL source = new URL(sourceURL);
-        final URLConnection conec = source.openConnection();
+        final HttpURLConnection conec = (HttpURLConnection) source.openConnection();
         authentifyConnection(conec);
         Object response = null;
 
@@ -184,6 +184,10 @@ public final class ConstellationServer {
 
                 conec.setDoOutput(true);
                 conec.setRequestProperty("Content-Type", "text/xml");
+                if (put) {
+                    conec.setRequestMethod("PUT");
+                }
+
                 if (request instanceof GeneralParameterValue) {
                     final ParameterValueWriter writer = new ParameterValueWriter();
                     try {
@@ -701,7 +705,7 @@ public final class ConstellationServer {
         public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_GET_PROVIDER_CONFIG+"&id=" + id;
-                Object response = sendRequest(url, null, descriptor, null);
+                Object response = sendRequest(url, null, descriptor, null, false);
                 if (response instanceof GeneralParameterValue) {
                     return (GeneralParameterValue) response;
                 } else if (response instanceof ExceptionReport) {
@@ -884,7 +888,7 @@ public final class ConstellationServer {
             
             try {
                 final String url = getServiceURL() + "configuration?request="+REQUEST_DOWNLOAD_STYLE+"&id=" + id + "&styleName=" + styleName;
-                Object response = sendRequest(url, null, null, XMLUtilities.getJaxbContext110());
+                Object response = sendRequest(url, null, null, XMLUtilities.getJaxbContext110(), false);
                 
                 if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
@@ -1115,7 +1119,7 @@ public final class ConstellationServer {
         public boolean importFile(final String id, final File importFile) {
             try {
                 final String url = getServiceURL() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id;
-                Object response = sendRequest(url, null);
+                Object response = sendRequest(url, importFile, null, null, true);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
                     if ("Success".equals(ack.getStatus())) {

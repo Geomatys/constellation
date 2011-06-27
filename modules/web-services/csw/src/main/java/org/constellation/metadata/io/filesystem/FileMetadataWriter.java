@@ -121,12 +121,14 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             }
             f.createNewFile();
             marshaller.marshal(obj, f);
-            indexer.indexDocument(obj);
+            if (indexer != null) {
+                indexer.indexDocument(obj);
+            }
             
         } catch (JAXBException ex) {
-            throw new MetadataIoException("Unable to marshall the object: " + obj, NO_APPLICABLE_CODE);
+            throw new MetadataIoException("Unable to marshall the object: " + obj, ex, NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            throw new MetadataIoException("Unable to write the file: " + f.getPath(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("Unable to write the file: " + f.getPath(), ex, NO_APPLICABLE_CODE);
         } finally {
             if (marshaller != null) {
                 marshallerPool.release(marshaller);
@@ -160,7 +162,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         if (metadataFile.exists()) {
            final boolean suceed =  metadataFile.delete();
            if (suceed) {
-               indexer.removeDocument(metadataID);
+               if (indexer != null) {
+                   indexer.removeDocument(metadataID);
+               }
            } else {
                LOGGER.severe("unable to delete the matadata file");
            }

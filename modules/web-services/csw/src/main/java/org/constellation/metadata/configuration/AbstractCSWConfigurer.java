@@ -19,6 +19,7 @@
 package org.constellation.metadata.configuration;
 
 // J2SE dependencies
+import org.constellation.metadata.io.CSWMetadataWriter;
 import java.util.Arrays;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.StringTokenizer;
@@ -49,6 +50,7 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.generic.database.BDD;
 
 // Geotoolkit dependencies
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.lucene.IndexingException;
@@ -152,7 +154,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         if ("importRecords".equalsIgnoreCase(request)) {
 
             final String id = getParameter("ID", false, parameters);
-            return importRecords(id);
+            return importRecords(id, (File)objectRequest);
         }
         
         if ("UpdateVocabularies".equalsIgnoreCase(request)) {
@@ -271,7 +273,30 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             } catch (MetadataIoException ex) {
                 throw new CstlServiceException("JAXBException while initializing the reader!", NO_APPLICABLE_CODE);
             }
+        } else {
+            throw new CstlServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
+        }
+    }
+    
+    /**
+     * Build a new Metadata writer for the specified service ID.
+     *
+     * @param serviceID the service identifier (form multiple CSW) default: ""
+     *
+     * @return A metadata reader.
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    protected CSWMetadataWriter initWriter(final String serviceID) throws CstlServiceException {
 
+        // we get the CSW configuration file
+        final Automatic config = serviceConfiguration.get(serviceID);
+        if (config != null) {
+            try {
+                return cswfactory.getMetadataWriter(config, null);
+
+            } catch (MetadataIoException ex) {
+                throw new CstlServiceException("JAXBException while initializing the writer!", NO_APPLICABLE_CODE);
+            }
         } else {
             throw new CstlServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
         }
@@ -499,10 +524,26 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         return new AcknowlegementType("Success", msg);
     }
     
-    private AcknowlegementType importRecords(final String id) {
+    private AcknowlegementType importRecords(final String id, final File f) throws CstlServiceException {
         LOGGER.info("Importing record");
-        final String msg = "The specified record have been imported in the CSW";
-        return new AcknowlegementType("Success", msg);
+        CSWMetadataWriter writer = initWriter(id);
+        Unmarshaller u = null;
+        try {
+            u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+            final Object unmarshalled = u.unmarshal(f);
+            writer.storeMetadata(unmarshalled);
+            final String msg = "The specified record have been imported in the CSW";
+            return new AcknowlegementType("Success", msg);
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Exception while unmarshalling imported file", ex);
+        } catch (MetadataIoException ex) {
+            throw new CstlServiceException(ex);
+        } finally {
+            if (u != null) {
+                CSWMarshallerPool.getInstance().release(u);
+            }
+        }
+        return new AcknowlegementType("Error", "An error occurs during the process");
     }
 
     /**

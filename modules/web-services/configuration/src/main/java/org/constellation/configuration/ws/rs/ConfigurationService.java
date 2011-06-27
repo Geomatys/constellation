@@ -62,6 +62,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.util.FileUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -273,23 +274,18 @@ public final class ConfigurationService extends WebService  {
      *       download action for some users. Will probably be removed in a future version.
      */
     @PUT
-    public AcknowlegementType uploadFile(final InputStream in) {
+    public Response uploadFile(final InputStream in) {
         LOGGER.info("uploading");
         try  {
-            final String layer = getParameter("layer", false);
-            LOGGER.log(Level.INFO, "LAYER= {0}", layer);
-            // TODO: implement upload action here.
+            final File uploadedFile = FileUtilities.buildFileFromStream(in);
             in.close();
-        } catch (CstlServiceException ex) {
-            //must never happen in normal case
-            LOGGER.severe("Webservice exception while get the layer parameter");
-            return new AcknowlegementType("failed", "Webservice exception while get the layer parameter");
+            return treatIncomingRequest(uploadedFile);
+            
         } catch (IOException ex) {
             LOGGER.severe("IO exception while uploading file");
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return new AcknowlegementType("failed", "IO exception while performing upload");
         }
-        return new AcknowlegementType(Parameters.SUCCESS, "the file has been successfully uploaded");
+        return Response.ok("error while uploading the file", MimeType.TEXT_PLAIN).build();
     }
     
     /**
