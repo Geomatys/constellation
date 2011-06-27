@@ -17,6 +17,7 @@
 package org.constellation.metadata.utils;
 
 // J2SE dependencies
+import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import java.util.Arrays;
 
@@ -38,6 +39,7 @@ import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.internal.jaxb.gmi.MI_Metadata;
 
 // JUnit dependencies
+import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -72,7 +74,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void FindIdentifierDCTest() throws Exception {
+    public void findIdentifierDCTest() throws Exception {
 
         /*
          * DublinCore Record v202 with identifier
@@ -150,7 +152,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void FindIdentifierISO19115Test() throws Exception {
+    public void findIdentifierISO19115Test() throws Exception {
         /*
          * ISO 19139 Metadata
          */
@@ -179,11 +181,21 @@ public class UtilsTest {
         expResult = "unknow_identifier";
         result = Utils.findIdentifier(metadata);
         assertEquals(expResult, result);
+        
+        /*
+         * Responsible party
+         */
+        DefaultResponsibleParty party = new DefaultResponsibleParty();
+        party.setOrganisationName(new SimpleInternationalString("partyIdent"));
+        
+        expResult = "partyIdent";
+        result = Utils.findIdentifier(party);
+        assertEquals(expResult, result);
     }
 
     
     @Test
-    public void FindIdentifierISO19110Test() throws Exception {
+    public void findIdentifierISO19110Test() throws Exception {
         FeatureCatalogueImpl catalogue = new FeatureCatalogueImpl();
         catalogue.setId("someid");
 
@@ -205,7 +217,7 @@ public class UtilsTest {
 
 
     @Test
-    public void FindIdentifierEbrimTest() throws Exception {
+    public void findIdentifierEbrimTest() throws Exception {
         /*
          * Ebrim v 3.0
          */
@@ -231,7 +243,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void FindIdentifierSensorMLTest() throws Exception {
+    public void findIdentifierSensorMLTest() throws Exception {
         /*
          * SensorML 1.0.0
          */
@@ -290,7 +302,7 @@ public class UtilsTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void FindTitleTest() throws Exception {
+    public void findTitleTest() throws Exception {
 
         RecordType record = new RecordType();
         record.setIdentifier(new SimpleLiteral("42292_5p_19900609195600"));
@@ -346,7 +358,7 @@ public class UtilsTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void FindTitleTestDC() throws Exception {
+    public void findTitleTestDC() throws Exception {
 
         /*
          * DublinCore Record v202 with identifier and no title
@@ -433,7 +445,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void FindTitleTestISO() throws Exception {
+    public void findTitleTestISO() throws Exception {
         DefaultMetadata metadata = new DefaultMetadata();
         DefaultDataIdentification identification = new DefaultDataIdentification();
         DefaultCitation citation = new DefaultCitation();
@@ -462,7 +474,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void FindTitleTestEbrim() throws Exception {
+    public void findTitleTestEbrim() throws Exception {
         /*
          * Ebrim v 3.0
          */
@@ -632,6 +644,18 @@ public class UtilsTest {
 
         Utils.setIdentifier("ident-3", metadata);
         assertEquals("ident-3", metadata.getFileIdentifier());
+        
+        /*
+         * Responsible party
+         */
+        DefaultResponsibleParty party = new DefaultResponsibleParty();
+        party.setOrganisationName(new SimpleInternationalString("partyIdent"));
+        
+        Utils.setIdentifier("party-ident-2", party);
+        
+        String expResult = "party-ident-2";
+        String result = Utils.findIdentifier(party);
+        assertEquals(expResult, result);
 
     }
 

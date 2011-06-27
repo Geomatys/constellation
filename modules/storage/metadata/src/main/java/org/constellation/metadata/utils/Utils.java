@@ -25,7 +25,9 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.util.logging.Logging;
+import org.opengis.util.InternationalString;
 
 /**
  * Utility methods used in CSW object.
@@ -70,6 +72,7 @@ public final class Utils {
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
+        paths.add("ISO 19115:CI_ResponsibleParty:organisationName");
         paths.add("ISO 19110:FC_FeatureCatalogue:name");
         paths.add("Catalog Web Service:Record:title:content");
         paths.add("Catalog Web Service:Record:identifier:content");
@@ -149,6 +152,7 @@ public final class Utils {
         final List<String> paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
+        paths.add("ISO 19115:CI_ResponsibleParty:organisationName");
         paths.add("Catalog Web Service:Record:identifier:content");
         paths.add("Ebrim v3.0:*:id");
         paths.add("Ebrim v2.5:*:id"); 
@@ -157,9 +161,12 @@ public final class Utils {
 
         for (String path : paths) {
             Object value = ReflectionUtilities.getValuesFromPath(path, obj);
+            // we stop when we have found a response
             if (value instanceof String) {
                 identifier = (String) value;
-                // we stop when we have found a response
+                break;
+            } if (value instanceof InternationalString) {
+                identifier = value.toString();
                 break;
             } else if (value instanceof Collection) {
                 Collection c = (Collection) value;
@@ -193,6 +200,7 @@ public final class Utils {
         final List<String> paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
+        paths.add("ISO 19115:CI_ResponsibleParty:organisationName");
         paths.add("Catalog Web Service:Record:identifier:content");
         paths.add("Ebrim v3.0:*:id");
         paths.add("Ebrim v2.5:*:id");
@@ -250,11 +258,16 @@ public final class Utils {
                             }
                         }
 
-                    // when we are at the end of the path we call the set Method.
+                    /* 
+                     * when we are at the end of the path we call the set Method.
+                     *  TODO make it more generic
+                     */  
                     } else {
                         Class parameterClass;
                         if (attributeName.equals("content")) {
                             parameterClass = List.class;
+                        } else if (attributeName.equals("organisationName")) {
+                            parameterClass = InternationalString.class;
                         } else {
                             parameterClass = String.class;
                         }
@@ -263,6 +276,8 @@ public final class Utils {
                             // if the parameter is a string collection
                             if (parameterClass.equals(List.class)) {
                                 ReflectionUtilities.invokeMethod(setter, currentObject, Arrays.asList(identifier));
+                            } else if (parameterClass.equals(InternationalString.class)){
+                                ReflectionUtilities.invokeMethod(setter, currentObject, new SimpleInternationalString(identifier));
                             } else {
                                 ReflectionUtilities.invokeMethod(setter, currentObject, identifier);
                             }

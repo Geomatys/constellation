@@ -392,9 +392,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 
             // unkow types
             } else {
-                final String msg = "Can't register ths kind of object:" + object.getClass().getName();
-                LOGGER.severe(msg);
-                throw new IllegalArgumentException(msg);
+                mainStandard   = Standard.ISO_19115;
+                LOGGER.log(Level.WARNING, "Unknow object type:{0}, it may can''t be registered.", object.getClass().getName());
             }
 
             final String identifier = Utils.findIdentifier(object);
