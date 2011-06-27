@@ -19,14 +19,20 @@ package org.constellation.scheduler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import org.constellation.configuration.ConfigDirectory;
+import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.process.ProcessFactory;
+import org.geotoolkit.process.ProcessFinder;
 
 import org.geotoolkit.util.logging.Logging;
+import org.opengis.feature.type.Name;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -81,6 +87,30 @@ public class CstlScheduler {
             }
         }
     }
+    
+    /**
+     * The returned list is a subset of what can be found with ProcessFinder.
+     * But only process with simple types arguments are preserved.
+     * 
+     * @return List of all available process.
+     */
+    public List<Name> listProcess(){
+        final List<Name> names = new ArrayList<Name>();
+        
+        final Iterator<ProcessFactory> ite = ProcessFinder.getProcessFactories();
+        while(ite.hasNext()){
+            final ProcessFactory factory = ite.next();            
+            final String authorityCode = factory.getIdentification().getCitation()
+                              .getIdentifiers().iterator().next().getCode();
+            
+            for(String processCode : factory.getNames()){
+                names.add(new DefaultName(authorityCode, processCode));
+            }            
+        }
+        
+        return names;
+    }
+    
     
     /**
      * @return copied list of all tasks.

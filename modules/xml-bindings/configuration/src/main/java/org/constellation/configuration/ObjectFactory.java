@@ -122,6 +122,15 @@ public class ObjectFactory {
         return new ExceptionReport();
     }
     
+    public StringList createSimpleList(){
+        return new StringList();
+    }
+    
+    public StringMap createSimpleMap(){
+        return new StringMap();
+    }
+    
+    
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")
     public JAXBElement<Object> createSource(Object value) {
         return new JAXBElement<Object>(SOURCE_QNAME, Object.class, null, value);

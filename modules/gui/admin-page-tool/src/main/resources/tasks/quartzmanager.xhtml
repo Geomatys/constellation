@@ -60,8 +60,25 @@
 
             </mf:Outline>
             
+        </div>
+        
+        <!-- process list -->
+        <div class="rounded">
+            
+            <mf:Outline id="processTree" actionVisible="false" rootVisible="false"
+                value="#{taskmanagerBean.processModel}" var="node" width="100%" 
+                rowStyler="#{mf:constant('org.constellation.menu.tool.TaskManagerBean.ROW_STYLER')}">
+                
+                <!-- Name column -->
+                <mf:DataTableColumn>
+                    #{node.userObject}
+                </mf:DataTableColumn>
+                
+            </mf:Outline>
             
         </div>
+        
+        
         
     </ui:define>
 

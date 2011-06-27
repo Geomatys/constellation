@@ -16,6 +16,7 @@
  */
 package org.constellation.admin.service;
 
+import org.constellation.configuration.StringList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -38,6 +39,7 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.map.configuration.QueryConstants;
 
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
@@ -73,6 +75,7 @@ public final class ConstellationServer {
     public final Services services   = new Services();
     public final Providers providers = new Providers();
     public final Csws csws           = new Csws();
+    public final Tasks tasks         = new Tasks();
     private final String server;
     private final String user;
     private final String password;
@@ -1037,6 +1040,35 @@ public final class ConstellationServer {
             return null;
         }
 
+    }
+    
+    /**
+     * Configuration methods for task scheduler.
+     */
+    public final class Tasks{
+        
+        /**
+         * Ask for a list of all available process.
+         */
+        public StringList listProcess() {
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_LIST_PROCESS;
+                final Object response = sendRequest(url, null);
+                if (response instanceof StringList) {
+                    return (StringList) response;
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return null;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return null;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+        
     }
     
     /**

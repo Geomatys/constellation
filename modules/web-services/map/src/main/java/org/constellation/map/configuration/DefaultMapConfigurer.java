@@ -35,6 +35,7 @@ import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProvidersReport;
+import org.constellation.configuration.StringList;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
@@ -42,8 +43,10 @@ import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderParameters;
+import org.constellation.scheduler.CstlScheduler;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.style.MutableStyle;
@@ -130,6 +133,21 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             return updateStyle(parameters, objectRequest);        
         } else if (REQUEST_DELETE_STYLE.equalsIgnoreCase(request)) {
             return deleteStyle(parameters);
+        }
+        
+        //Tasks operations
+        else if (REQUEST_LIST_PROCESS.equalsIgnoreCase(request)) {
+            return ListProcess();
+        } else if (REQUEST_LIST_TASKS.equalsIgnoreCase(request)) {
+            return ListTasks();
+        } else if (REQUEST_GET_PROCESS_DESC.equalsIgnoreCase(request)) {
+            return createTask(parameters);
+        } else if (REQUEST_CREATE_TASK.equalsIgnoreCase(request)) {
+            return getProcessDescriptor(parameters);
+        } else if (REQUEST_UPDATE_TASK.equalsIgnoreCase(request)) {
+            return updateTask(parameters);
+        } else if (REQUEST_DELETE_TASK.equalsIgnoreCase(request)) {
+            return deleteTask(parameters);
         }
         
         return null;
@@ -641,6 +659,54 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
         
         return new ProvidersReport(providerServ);
+    }
+    
+    
+    /**
+     * Returns a list of all process available in the current factories.
+     */
+    private StringList ListProcess(){
+        final List<Name> names = CstlScheduler.getInstance().listProcess();
+        final StringList lst = new StringList();
+        for(Name n : names){
+            lst.getList().add(DefaultName.toJCRExtendedForm(n));
+        }
+        return lst;
+    }
+    
+    /**
+     * Returns a list of all tasks.
+     */
+    private AcknowlegementType ListTasks(){
+        return null;
+    }
+    
+    /**
+     * Returns a description of the process parameters.
+     */
+    private Object getProcessDescriptor(final MultivaluedMap<String, String> parameters){
+        return null;
+    }
+    
+    /**
+     * Create a new task.
+     */
+    private Object createTask(final MultivaluedMap<String, String> parameters){
+        return null;
+    }
+    
+    /**
+     * Update a task.
+     */
+    private Object updateTask(final MultivaluedMap<String, String> parameters){
+        return null;
+    }
+    
+    /**
+     * Delete a task;
+     */
+    private Object deleteTask(final MultivaluedMap<String, String> parameters){
+        return null;
     }
     
 }
