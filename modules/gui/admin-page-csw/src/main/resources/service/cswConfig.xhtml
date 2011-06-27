@@ -37,19 +37,27 @@
                         <mf:case condition="#{cswBean.configType == 'mdweb'}" fallthrought="false">
                             <tr>
                                 <td><h:outputText value="#{cswBean.i18n['driverClass']}"/></td>
-                            <td><h:inputText value="#{cswBean.driverClass}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{cswBean.driverClass}" style="width:50%;"/></td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{cswBean.i18n['dbURL']}"/></td>
-                            <td><h:inputText value="#{cswBean.connectURL}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{cswBean.connectURL}" style="width:50%;"/></td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{cswBean.i18n['user']}"/></td>
-                            <td><h:inputText value="#{cswBean.userName}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{cswBean.userName}" style="width:50%;"/></td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{cswBean.i18n['passwd']}"/></td>
-                            <td><h:inputSecret value="#{cswBean.userPass}" style="width:50%;"/></td>
+                                <td><h:inputSecret value="#{cswBean.userPass}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
+                    		<td><h:outputText value="#{cswBean.i18n['indexOnlyPublished']}"/></td>
+                                <td><h:selectBooleanCheckbox value="#{cswBean.indexOnlyPublished}"/></td> 
+                            </tr>
+                             <tr>
+                    		<td><h:outputText value="#{cswBean.i18n['indexInternalRecordset']}"/></td>
+                                <td><h:selectBooleanCheckbox value="#{cswBean.indexInternalRecordset}"/></td> 
                             </tr>
                         </mf:case>
                     </mf:switch>   

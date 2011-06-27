@@ -55,6 +55,10 @@ public class CSWBean extends AbstractServiceBean {
     
     private UploadedFile uploadedFile;
     
+    private boolean indexOnlyPublished;
+    
+    private boolean indexInternalRecordset;
+    
     public CSWBean() {
         super(Specification.CSW,
                 "/service/csw.xhtml",
@@ -250,6 +254,51 @@ public class CSWBean extends AbstractServiceBean {
         this.userPass = userPass;
     }
     
+    /**
+     * @return the indexOnlyPublished
+     */
+    public boolean getIndexOnlyPublished() {
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            this.indexOnlyPublished = config.getIndexOnlyPublishedMetadata();
+        }
+        return indexOnlyPublished;
+    }
+
+    /**
+     * @param indexOnlyPublished the indexOnlyPublished to set
+     */
+    public void setIndexOnlyPublished(boolean indexOnlyPublished) {
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            config.setIndexOnlyPublishedMetadata(indexOnlyPublished);
+        }
+        this.indexOnlyPublished = indexOnlyPublished;
+    }
+    
+    /**
+     * @return the indexInternalRecordset
+     */
+    public boolean getIndexInternalRecordset() {
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            this.indexInternalRecordset = config.getIndexInternalRecordset();
+        }
+        return indexInternalRecordset;
+    }
+
+    /**
+     * @param indexInternalRecordset the indexInternalRecordset to set
+     */
+    public void setIndexInternalRecordset(boolean indexInternalRecordset) {
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            config.setIndexInternalRecordset(indexInternalRecordset);
+        }
+        this.indexInternalRecordset = indexInternalRecordset;
+    }
+    
+    
     public void setUploadedFile(UploadedFile uploadedFile) {
         this.uploadedFile = uploadedFile;
     }
@@ -315,7 +364,5 @@ public class CSWBean extends AbstractServiceBean {
             LOGGER.log(Level.WARNING, "imported file is null");
         }
     }
-    
-    
-    
+
 }
