@@ -46,6 +46,7 @@ import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.scheduler.CstlScheduler;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.XMLUtilities;
@@ -684,8 +685,16 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Returns a description of the process parameters.
      */
-    private Object getProcessDescriptor(final MultivaluedMap<String, String> parameters){
-        return null;
+    private GeneralParameterDescriptor getProcessDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String authority = getParameter("authority", true, parameters);
+        final String code = getParameter("code", true, parameters);
+        
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(authority,code);
+        if(desc == null){
+            throw new CstlServiceException("No Process for id : {" + authority + "}"+code+" has been found", INVALID_PARAMETER_VALUE);
+        }
+        
+        return desc.getInputDescriptor();
     }
     
     /**

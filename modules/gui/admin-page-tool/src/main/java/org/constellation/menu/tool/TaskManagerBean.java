@@ -17,22 +17,34 @@
 
 package org.constellation.menu.tool;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
+
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.bean.MenuBean;
+
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.util.logging.Logging;
 
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
+
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Returns task manager and pages to add new values.
@@ -41,6 +53,7 @@ import org.opengis.feature.type.Name;
  */
 public class TaskManagerBean extends I18NBean{
 
+    private static final Logger LOGGER = Logging.getLogger(TaskManagerBean.class);
     
     /**
      * When user is log in, a ServiceAdministrator object is added in the session map.
@@ -62,6 +75,8 @@ public class TaskManagerBean extends I18NBean{
         }
     };
     
+    private final String mainPage;
+    private final String configPage;
     private final TreeModel taskModel;
     private TreeModel processModel;
 
@@ -69,8 +84,12 @@ public class TaskManagerBean extends I18NBean{
         addBundle("tasks.tasks");       
         
         taskModel = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
-        
-        
+        mainPage = MenuBean.toApplicationPath("/tasks/quartzmanager.xhtml");
+        configPage = MenuBean.toApplicationPath("/tasks/taskConfig.xhtml");
+    }
+
+    public String getMainPage() {
+        return mainPage;
     }
 
     protected ConstellationServer getServer(){
@@ -105,7 +124,7 @@ public class TaskManagerBean extends I18NBean{
                     authorities.put(ns, parent);
                 }
                 
-                final DefaultMutableTreeNode n = new DefaultMutableTreeNode(name.getLocalPart());
+                final DefaultMutableTreeNode n = new SeletableNode(value);
                 parent.add(n);
             }
             
@@ -115,12 +134,64 @@ public class TaskManagerBean extends I18NBean{
         return processModel;
     }
     
-    public Hints getDefaultHints(){
-        return new Hints();
+    ////////////////////////////////////////////////////////////////////////////
+    private int taskstep = 15;
+    private GeneralParameterValue parameters = null;
+    private String processid = "";
+
+    public int getTaskStep() {
+        return taskstep;
     }
 
-    public List<Object> getHintKeys(){
-        return new ArrayList<Object>(getDefaultHints().keySet());
+    public void setTaskStep(int taskstep) {
+        this.taskstep = taskstep;
     }
 
+    public String getProcessId() {
+        return processid;
+    }
+    
+    public void saveTask() {
+        System.out.println(">>>>>>>>>>>>>> saving task");
+    }
+
+    public GeneralParameterValue getTaskParameters() {
+        return parameters;
+    }
+    
+    public void createTask(){
+        
+        //reset values
+        parameters = null;
+        taskstep = 15;
+        if(configPage != null){
+            final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+            try {
+                context.redirect(configPage);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Redirection to "+configPage+" failed.", ex);
+            }
+        }
+    }
+    
+    
+    public final class SeletableNode extends DefaultMutableTreeNode{
+    
+        public SeletableNode(Object uo){
+            super(uo);
+        }
+        
+        public void select(){
+            if(!(userObject instanceof Name)) return;
+            
+            final Name name = (Name)userObject;            
+            processid = DefaultName.toJCRExtendedForm(name);
+            final GeneralParameterDescriptor desc = getServer().tasks.getProcessDescriptor(name.getNamespaceURI(), name.getLocalPart());
+            if(desc != null){
+                parameters = desc.createValue();
+            }
+        }
+    
+    }
+    
 }

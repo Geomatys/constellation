@@ -40,25 +40,71 @@ html {
     -moz-border-radius : 20px;
 }
 
-.logout{
-    font-size: 0.8em;
+input[type="submit"]:hover {  
     padding: 5px;
-    margin: 10px;
-    color: #A2AcB6;
+    color: #FFFFFF;
+    background: #aecae4;
+    border-color: #aecae4;
+    border-style: outset;
+    border-width: 2px;
+    border-radius : 20px;
+    -moz-border-radius : 20px;
+} 
+
+input[type="submit"] {  
+    padding: 5px;
+    color: #727c86;
+    background: #FFFFFF;
     border-color: #C2CcD6;
-    border-style: solid solid solid solid;
+    border-style: inset;
+    border-width: 2px;
+    border-radius : 20px;
+    -moz-border-radius : 20px;
+}  
+ 
+
+.titledBorder{
+    border-style: solid;
     border-width: 1px;
+    border-color: #C2CcD6;
+    border-radius : 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+}
+
+.titledBorder legend{
+    font-size: 1em;
+    background-color: #FFFFFF;
+    padding: 6px 10px 6px 10px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #C2CcD6;
     border-radius : 20px;
     -moz-border-radius : 20px;
 }
 
 .logout:hover{
+    margin: 4px;
+    font-size: 0.8em;
+    padding: 5px;
     color: #FFFFFF;
-    border-color: #FFFFFF;
-    border-style: solid solid solid solid;
-    border-width: 1px;
     background: #aecae4;
-    cursor: pointer;
+    border-color: #aecae4;
+    border-style: outset;
+    border-width: 2px;
+    border-radius : 20px;
+    -moz-border-radius : 20px;
+}
+
+.logout{
+    margin: 4px;
+    font-size: 0.8em;
+    padding: 5px;
+    color: #727c86;
+    background: #FFFFFF;
+    border-color: #C2CcD6;
+    border-style: inset;
+    border-width: 2px;
     border-radius : 20px;
     -moz-border-radius : 20px;
 }

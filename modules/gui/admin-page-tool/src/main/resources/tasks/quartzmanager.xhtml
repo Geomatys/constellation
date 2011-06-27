@@ -9,22 +9,22 @@
                 xmlns:mf="http://mapfaces.org/taglib"
                 template="/pages/base.xhtml">
 
-    <ui:param name="pageTitle" value="#{taskmanagerBean.i18n['taskmanager']}"/>
+    <ui:param name="pageTitle" value="#{taskmanagerBean.i18n['quartzscheduler']}"/>
 
     <ui:define name="content">
-
-        <!-- scheduler status -->
-        <div class="rounded">
-            <h2>#{taskmanagerBean.i18n['quartzscheduler']}</h2>
-            
-        </div>
+       
+        <h:outputText value="#{taskmanagerBean.i18n['newtask']}" />
+        <span/>
+        <h:commandButton action="#{taskmanagerBean.createTask}" value="#{taskmanagerBean.i18n['add']}" />
+        <br/>
+        <br/>
         
         <!-- tasks list -->
         <div class="rounded">
             
             <mf:Outline id="sourceLayers" actionVisible="false" rootVisible="false"
                 value="#{taskmanagerBean.taskModel}" var="node" width="100%" 
-                rowStyler="#{mf:constant('org.constellation.menu.tool.TaskManagerBean.ROW_STYLER')}">
+                rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
                 
                 <!-- Name column -->
                 <mf:DataTableColumn>
@@ -38,7 +38,7 @@
                 <mf:DataTableColumn>
                 </mf:DataTableColumn>
                 
-                <!-- Schedule column -->
+                <!-- Next action column -->
                 <mf:DataTableColumn>
                 </mf:DataTableColumn>
                 
@@ -61,24 +61,6 @@
             </mf:Outline>
             
         </div>
-        
-        <!-- process list -->
-        <div class="rounded">
-            
-            <mf:Outline id="processTree" actionVisible="false" rootVisible="false"
-                value="#{taskmanagerBean.processModel}" var="node" width="100%" 
-                rowStyler="#{mf:constant('org.constellation.menu.tool.TaskManagerBean.ROW_STYLER')}">
-                
-                <!-- Name column -->
-                <mf:DataTableColumn>
-                    #{node.userObject}
-                </mf:DataTableColumn>
-                
-            </mf:Outline>
-            
-        </div>
-        
-        
         
     </ui:define>
 

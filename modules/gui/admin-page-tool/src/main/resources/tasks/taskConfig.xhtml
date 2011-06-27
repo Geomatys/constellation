@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:cstl="http://constellation.org/taglib"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib"
+                template="/pages/slider.xhtml">
+
+    
+    <ui:define name="header">
+        
+        <link rel="stylesheet" type="text/css" href="provider.parameters.css.mfRes"/>
+        
+    </ui:define>
+    
+    <ui:define name="content">
+
+        <center><a href="#{taskmanagerBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
+        <br/>
+        <br/>
+        <table width="100%">
+            <colgroup>
+                <col width="30%"/>
+                <col width="70%"/>
+            </colgroup>
+            <tbody>
+                <tr>
+                    <td>
+                        <!-- process list -->
+                        <div class="rounded">
+
+                            <mf:Outline id="processTree" actionVisible="false" rootVisible="false"
+                                value="#{taskmanagerBean.processModel}" var="node" width="100%" 
+                                rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
+
+                                <!-- Name column -->
+                                <mf:DataTableColumn>
+                                    <mf:switch>
+                                        <mf:case condition="#{mf:isInstance(node.userObject,'Name')}" fallthrought="false">
+                                            <a4j:commandLink action="#{node.select}" reRender="params">
+                                                 #{node.userObject.localPart}
+                                            </a4j:commandLink>
+                                        </mf:case>
+                                        <mf:default>
+                                            <b>#{node.userObject}</b>
+                                        </mf:default>
+                                    </mf:switch>
+                                </mf:DataTableColumn>
+
+                            </mf:Outline>
+
+                        </div>
+                    </td>
+                    <td style="vertical-align:top;">
+                        <mf:Div id="params">
+                            <fieldset class="titledBorder" style="width:100%;" >
+                                <legend>#{taskmanagerBean.i18n['schedule']}</legend>
+                                #{taskmanagerBean.i18n['timestep']}
+                                <mf:Spinner value="#{taskmanagerBean.taskStep}" minLimit="1">
+                                    <f:converter converterId="javax.faces.Integer"/>
+                                </mf:Spinner>
+                            </fieldset>
+                            <br/>
+                            <fieldset class="titledBorder" style="width:100%;">
+                                <legend>#{taskmanagerBean.i18n['parameters']} : #{taskmanagerBean.processId}</legend>                                
+                                <br/>
+                                <mf:parametereditor value="#{taskmanagerBean.taskParameters}" width="100%" 
+                                                    rootVisible="#{not mf:isInstance(taskmanagerBean.taskParameters,'ParameterValueGroup')}"/>
+    
+                            </fieldset>
+                        </mf:Div>
+                    </td>
+                    
+                </tr>
+            </tbody>
+        </table>
+        <br/>
+        <div style="text-align: right;">
+            <h:commandButton action="#{taskmanagerBean.saveTask}" value="#{taskmanagerBean.i18n['save']}" />
+        </div>
+        
+    </ui:define>
+
+</ui:composition>

@@ -30,7 +30,9 @@ public class TaskManagerItem extends AbstractMenuItem{
 
     public TaskManagerItem() {
         super(
-            new String[]{"/tasks/quartzmanager.xhtml"},
+            new String[]{
+                "/tasks/quartzmanager.xhtml",
+                "/tasks/taskConfig.xhtml"},
             "tasks.tasks",
             new Path(TOOLS_PATH,"taskmanager", "/tasks/quartzmanager.xhtml", "tasks.kalarm.png.mfRes",100)
             );

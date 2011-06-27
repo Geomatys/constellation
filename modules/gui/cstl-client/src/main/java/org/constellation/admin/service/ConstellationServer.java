@@ -1089,6 +1089,27 @@ public final class ConstellationServer {
             return null;
         }
         
+        /**
+         * Get the parameters description for the given process.
+         */
+        public GeneralParameterDescriptor getProcessDescriptor(final String authority, final String code) {
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_PROCESS_DESC+"&authority="+authority+"&code="+code;
+                Object response = sendDescriptorRequest(url, null);
+                if (response instanceof GeneralParameterDescriptor) {
+                    return (GeneralParameterDescriptor) response;
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                } else {
+                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+        
+        
     }
     
     /**
