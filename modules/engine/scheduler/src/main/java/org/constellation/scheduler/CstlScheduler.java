@@ -62,10 +62,8 @@ public class CstlScheduler {
         try {
             loadTasks();
         } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             LOGGER.log(Level.SEVERE, "=== Failed to read tasks ===\n"+ex.getLocalizedMessage(), ex); 
         } catch (XMLStreamException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             LOGGER.log(Level.SEVERE, "=== Failed to read tasks ===\n"+ex.getLocalizedMessage(), ex); 
         }
         
@@ -77,7 +75,7 @@ public class CstlScheduler {
             LOGGER.log(Level.SEVERE, "=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);            
             return;
         }
-        LOGGER.log(Level.SEVERE, "=== Constellation Scheduler sucessfully started ===");    
+        LOGGER.log(Level.WARNING, "=== Constellation Scheduler sucessfully started ===");    
         
         for(Task t : tasks){
             try {
@@ -273,6 +271,17 @@ public class CstlScheduler {
             INSTANCE = new CstlScheduler();
         }
         return INSTANCE;
+    }
+
+    public void stop() {        
+        LOGGER.log(Level.WARNING, "=== Stopping Scheduler ===");
+        try {
+            quartzScheduler.shutdown();
+        } catch (SchedulerException ex) {
+            LOGGER.log(Level.SEVERE, "=== Failed to stop quartz scheduler ===");
+            return;
+        }
+        LOGGER.log(Level.WARNING, "=== Scheduler sucessfully stopped ===");    
     }
     
 }

@@ -84,6 +84,10 @@ public final class Installer implements ServletContextListener{
 
     @Override
     public synchronized void contextDestroyed(ServletContextEvent sce) {
+        
+        //stop constellation scheduler
+        CstlScheduler.getInstance().stop();
+        
         LOGGER.log(Level.WARNING, "=== Stopping GeotoolKit ===");
         try{
             Setup.shutdown();
@@ -92,7 +96,7 @@ public final class Installer implements ServletContextListener{
             LOGGER.log(Level.WARNING, "=== GeotoolKit sucessfully stopped ===");
         }catch(Exception ex){
             LOGGER.log(Level.WARNING, "=== GeotoolKit failed to stop ===\n"+ex.getLocalizedMessage(), ex);            
-        }
+        }        
     }
     
 }
