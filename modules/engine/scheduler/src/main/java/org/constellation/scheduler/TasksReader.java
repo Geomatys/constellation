@@ -82,12 +82,15 @@ public class TasksReader extends StaxStreamReader{
     }
     
     private Task readTask() throws XMLStreamException, IOException {
-        final Task task = new Task();
         
         final String id = reader.getAttributeValue(null, ATT_ID);
         final String authority = reader.getAttributeValue(null, ATT_AUTHORITY);
         final String code = reader.getAttributeValue(null, ATT_CODE);
+        final String title = reader.getAttributeValue(null, ATT_TITLE);
         final ParameterDescriptorGroup inputDesc = ProcessFinder.getProcessDescriptor(authority, code).getInputDescriptor();
+        
+        final Task task = new Task(id);
+        task.setTitle(title);
         
         ParameterValueGroup params = null;
         SimpleTrigger trigger = null;
@@ -111,7 +114,6 @@ public class TasksReader extends StaxStreamReader{
                 
         
         final ProcessJobDetail detail = new ProcessJobDetail(authority, code, params);
-        task.setId(id);
         task.setDetail(detail);
         task.setTrigger(trigger);        
         return task;

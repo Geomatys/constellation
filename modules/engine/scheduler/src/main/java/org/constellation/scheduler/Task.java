@@ -30,23 +30,45 @@ import org.quartz.SimpleTrigger;
  */
 public class Task {
         
-    private String id = UUID.randomUUID().toString();
+    private String id;
+    private String title;
     private ProcessJobDetail detail = null;
     private SimpleTrigger trigger = null;
     private Date lastExecutionDate = null;
     private Exception lastFailedException = null;
     
     public Task(){
+        this((String)null);
     }
-
-    public void setId(final String id) {
+    
+    public Task(final String id){
         this.id = id;
+        if(this.id == null){
+            //generate one
+            this.id = UUID.randomUUID().toString();
+        }
+    }
+    
+    public Task(final Task t){
+        this.id = t.id;
+        this.detail = t.detail;
+        this.trigger = t.trigger;
+        this.lastExecutionDate = (t.lastExecutionDate!=null) ? (Date)t.lastExecutionDate.clone() : null;
+        this.lastFailedException = t.lastFailedException;
     }
 
     public String getId() {
         return id;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
     public ProcessJobDetail getDetail() {
         return detail;
     }

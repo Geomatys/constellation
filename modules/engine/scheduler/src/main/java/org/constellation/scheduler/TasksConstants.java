@@ -27,6 +27,7 @@ final class TasksConstants {
     public static final String TAG_TASKS = "tasks";
     public static final String TAG_TASK = "task";
     public static final String ATT_ID = "id";
+    public static final String ATT_TITLE = "title";
     public static final String ATT_AUTHORITY = "authority";
     public static final String ATT_CODE = "code";
     

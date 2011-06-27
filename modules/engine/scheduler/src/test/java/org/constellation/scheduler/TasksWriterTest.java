@@ -56,8 +56,8 @@ public class TasksWriterTest {
         
         final Collection<Task> tasks = new ArrayList<Task>();
         
-        Task task = new Task();
-        task.setId("task1");
+        Task task = new Task("task1");
+        task.setTitle("do something");
         task.setTrigger(TriggerBuilder.newTrigger()
                 .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(150))
                 .build());
@@ -68,8 +68,8 @@ public class TasksWriterTest {
         task.setDetail(detail);
         tasks.add(task);
         
-        task = new Task();
-        task.setId("task2");
+        task = new Task("task2");
+        task.setTitle("do something else");
         task.setTrigger(TriggerBuilder.newTrigger()
                 .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(60))
                 .build());

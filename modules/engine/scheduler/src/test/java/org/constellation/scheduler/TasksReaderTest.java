@@ -50,6 +50,7 @@ public class TasksReaderTest {
         
         final Task one = tasks.get(0);
         assertEquals("task1", one.getId());
+        assertEquals("do something", one.getTitle());
         assertEquals("mymaths", one.getDetail().getFactoryIdentifier());
         assertEquals("add", one.getDetail().getProcessIdentifier());
         assertEquals(new Double(15), one.getDetail().getParameters().parameter("first").getValue());
@@ -58,6 +59,7 @@ public class TasksReaderTest {
                 
         final Task two = tasks.get(1);
         assertEquals("task2", two.getId());
+        assertEquals("do something else", two.getTitle());
         assertEquals("mymaths", two.getDetail().getFactoryIdentifier());
         assertEquals("add", two.getDetail().getProcessIdentifier());
         assertEquals(new Double(21), two.getDetail().getParameters().parameter("first").getValue());

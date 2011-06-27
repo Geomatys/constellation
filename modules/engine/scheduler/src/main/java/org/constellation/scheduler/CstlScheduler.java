@@ -19,12 +19,13 @@ package org.constellation.scheduler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
+
 import org.constellation.configuration.ConfigDirectory;
+
 import org.geotoolkit.util.logging.Logging;
 
 import org.quartz.Scheduler;
@@ -51,15 +52,17 @@ public class CstlScheduler {
     
     private CstlScheduler(){
         
+        LOGGER.log(Level.WARNING, "=== Starting Constellation Scheduler ===");
         try {
             loadTasks();
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            LOGGER.log(Level.SEVERE, "=== Failed to read tasks ===\n"+ex.getLocalizedMessage(), ex); 
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            LOGGER.log(Level.SEVERE, "=== Failed to read tasks ===\n"+ex.getLocalizedMessage(), ex); 
         }
         
-        LOGGER.log(Level.WARNING, "=== Starting Constellation Scheduler ===");
         final SchedulerFactory schedFact = new StdSchedulerFactory();
         try {
             quartzScheduler = schedFact.getScheduler();
@@ -80,16 +83,90 @@ public class CstlScheduler {
     }
     
     /**
-     * @return unmodifiable list of all tasks.
+     * @return copied list of all tasks.
      */
-    public List<Task> listTasks(){
-        return Collections.unmodifiableList(tasks);
+    public synchronized List<Task> listTasks(){
+        //return a copy, since tasks object are mutable
+        final List<Task> copy = new ArrayList<Task>();
+        for(Task t : tasks){
+            copy.add(new Task(t));
+        }
+        return copy;
+    }
+    
+    /**
+     * Add a new task.
+     */
+    public synchronized void addTask(Task task){
+        
+        tasks.add(new Task(task)); //defense copy
+        try {
+            registerTask(task);
+        } catch (SchedulerException ex) {
+            LOGGER.log(Level.WARNING, "Failed to register task :"+task.getId()+","+task.getTitle()+" in scheduler.",ex);
+        }
+        
+        try {
+            saveTasks();
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
+        } catch (XMLStreamException ex) {
+            LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
+        }
+    }
+    
+    /**
+     * Update a task.
+     */
+    public synchronized void updateTask(Task task){
+        
+        tasks.remove(task);
+        tasks.add(task);
+    }
+    
+    /**
+     * Remove a task.
+     */
+    public synchronized void removeTask(Task task){
+        removeTask(task.getId());
+    }
+    
+    /**
+     * Remove task for the given id.
+     */
+    public synchronized void removeTask(final String id){
+        
+        Task task = null;
+        for(int i=0,n=tasks.size(); i<n; i++){
+            final Task t = tasks.get(i);
+            
+            if(t.getId().equals(id)){
+                task = tasks.remove(i);
+                break;
+            }
+        }
+        
+        if(task != null){
+            try {
+                saveTasks();
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
+            } catch (XMLStreamException ex) {
+                LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
+            }
+            try {
+                unregisterTask(task);
+            } catch (SchedulerException ex) {
+                LOGGER.log(Level.WARNING, "Failed to unregister task:"+task.getId()+","+task.getTitle()+" from scheduler",ex);
+            }
+        }
+        
     }
     
     /**
      * Load tasks defined in the configuration file.
      */
-    private void loadTasks() throws IOException, XMLStreamException{
+    private synchronized void loadTasks() throws IOException, XMLStreamException{
         //open configuration file
         final File configDir = ConfigDirectory.getConfigDirectory();
         final File taskFile = new File(configDir, TASK_FILE);
@@ -106,15 +183,57 @@ public class CstlScheduler {
     }
     
     /**
+     * save tasks in the configuration file.
+     */
+    private synchronized void saveTasks() throws IOException, XMLStreamException{
+        final File configDir = ConfigDirectory.getConfigDirectory();
+        if(!configDir.exists()){
+            configDir.mkdirs();
+        }
+        
+        final File taskFile = new File(configDir, TASK_FILE);
+        
+        final TasksWriter writer = new TasksWriter();
+        writer.setOutput(taskFile);
+        writer.write(tasks);
+        writer.dispose();
+    }
+    
+    /**
      * Add the given task in the scheduler.
      */
     private void registerTask(final Task task) throws SchedulerException{
-        LOGGER.log(Level.INFO, "Schedule task id :{0}   type : {1}.{2}", new Object[]{
-            task.getId(), 
+        quartzScheduler.scheduleJob(task.getDetail(), task.getTrigger());
+        LOGGER.log(Level.INFO, "Scheduler task added : {0}, {1}   type : {2}.{3}", new Object[]{
+            task.getId(),
+            task.getTitle(),
             task.getDetail().getFactoryIdentifier(), 
             task.getDetail().getProcessIdentifier()});
-        quartzScheduler.scheduleJob(task.getDetail(), task.getTrigger());
     }
+    
+    /**
+     * Add the given task in the scheduler.
+     */
+    private void unregisterTask(final Task task) throws SchedulerException{
+        quartzScheduler.interrupt(task.getDetail().getKey());
+        final boolean removed = quartzScheduler.deleteJob(task.getDetail().getKey());
+        
+        if(removed){
+            LOGGER.log(Level.INFO, "Scheduler task removed : {0}, {1}   type : {2}.{3}", new Object[]{
+                task.getId(),
+                task.getTitle(),
+                task.getDetail().getFactoryIdentifier(), 
+                task.getDetail().getProcessIdentifier()});
+        }else{
+            LOGGER.log(Level.WARNING, "Scheduler failed to remove task : {0}, {1}   type : {2}.{3}", new Object[]{
+                task.getId(),
+                task.getTitle(),
+                task.getDetail().getFactoryIdentifier(), 
+                task.getDetail().getProcessIdentifier()});
+        }
+        
+    }
+    
     
     /**
      * @return Singleton instance of Constellation scheduler.

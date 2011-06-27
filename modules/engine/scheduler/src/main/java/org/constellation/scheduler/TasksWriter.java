@@ -56,6 +56,7 @@ public class TasksWriter extends StaxStreamWriter{
         
         writer.writeStartElement(TAG_TASK);
         writer.writeAttribute(ATT_ID, task.getId());
+        writer.writeAttribute(ATT_TITLE, task.getTitle());
         writer.writeAttribute(ATT_AUTHORITY, detail.getFactoryIdentifier());
         writer.writeAttribute(ATT_CODE, detail.getProcessIdentifier());
         
