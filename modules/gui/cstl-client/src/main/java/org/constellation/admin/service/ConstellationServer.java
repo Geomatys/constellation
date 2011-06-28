@@ -19,7 +19,6 @@ package org.constellation.admin.service;
 import java.io.OutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import org.constellation.configuration.StringList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -34,15 +33,17 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 
-import net.iharder.Base64;
-
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ProvidersReport;
+import org.constellation.configuration.StringList;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
+import org.geotoolkit.client.AbstractRequest;
+import org.geotoolkit.client.AbstractServer;
+import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.XMLUtilities;
@@ -69,7 +70,7 @@ import static org.constellation.map.configuration.QueryConstants.*;
  * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public final class ConstellationServer{
+public final class ConstellationServer extends AbstractServer{
     
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
@@ -78,22 +79,8 @@ public final class ConstellationServer{
     public final Providers providers = new Providers();
     public final Csws csws           = new Csws();
     public final Tasks tasks         = new Tasks();
-    private final String server;
-    private final String user;
-    private final String password;
-
-    private ConstellationServer(String server, final String user, final String password) {
-        ArgumentChecks.ensureNonNull("server", server);
-        ArgumentChecks.ensureNonNull("user", user);
-        ArgumentChecks.ensureNonNull("password", password);
-        
-        if(!server.endsWith("/")){            
-            server += "/";
-        }
-                
-        this.server = server;
-        this.user = user;
-        this.password = password;
+    private ConstellationServer(final URL server, final String user, final String password) {
+        super(server,new BasicAuthenticationSecurity(user, password));
     }
     
     public static ConstellationServer login(final String serviceURL, 
@@ -101,7 +88,16 @@ public final class ConstellationServer{
         ArgumentChecks.ensureNonNull("server url", serviceURL);
         ArgumentChecks.ensureNonNull("user", login);
         ArgumentChecks.ensureNonNull("password", password);
-        ConstellationServer serviceAdmin = new ConstellationServer(serviceURL, login, password);
+        
+        final URL url;
+        try {
+            url = new URL(serviceURL);
+        } catch (MalformedURLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return null;
+        }
+        
+        ConstellationServer serviceAdmin = new ConstellationServer(url, login, password);
         
         //check if the service and logins are valid
         if(!serviceAdmin.authenticate()){
@@ -112,29 +108,19 @@ public final class ConstellationServer{
         return serviceAdmin;
     }
     
-    public String getServiceURL(){
-        return server;
-    }
-    
-    private void authentifyConnection(final URLConnection cnx){
-        final String userPassword = user + ":" + password;
-        final String encoding = Base64.encodeBytes(userPassword.getBytes());
-        cnx.setRequestProperty ("Authorization", "Basic " + encoding);
-    }
-    
     /**
      * Set the basic authentication for HTTP request.
      * @return true if login/password are valid
      */
     private boolean authenticate() {
-        final String str = server + "configuration";
+        final String str = this.serverURL.toString() + "configuration";
         InputStream stream = null;
         HttpURLConnection cnx = null;
         try {
             final URL url = new URL(str);
             cnx = (HttpURLConnection) url.openConnection();
-            authentifyConnection(cnx);
-            stream = cnx.getInputStream();            
+            getClientSecurity().secure(cnx);
+            stream = AbstractRequest.openRichException(cnx, securityManager);            
         } catch (Exception ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage());
             return false;
@@ -174,7 +160,7 @@ public final class ConstellationServer{
 
         final URL source = new URL(sourceURL);
         final HttpURLConnection conec = (HttpURLConnection) source.openConnection();
-        authentifyConnection(conec);
+        getClientSecurity().secure(conec);
         Object response = null;
 
         try {
@@ -248,7 +234,8 @@ public final class ConstellationServer{
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = unmarshallerPool.acquireUnmarshaller();
-                response = unmarshaller.unmarshal(conec.getInputStream());
+                final InputStream responseStream = AbstractRequest.openRichException(conec, securityManager);  
+                response = unmarshaller.unmarshal(responseStream);
                 if (response instanceof JAXBElement) {
                     JAXBElement element = (JAXBElement) response;
                     if (element.getName().equals(ObjectFactory.SOURCE_QNAME) || element.getName().equals(ObjectFactory.LAYER_QNAME)) {
@@ -293,7 +280,7 @@ public final class ConstellationServer{
 
         final URL source = new URL(sourceURL);
         final URLConnection conec = source.openConnection();
-        authentifyConnection(conec);
+        getClientSecurity().secure(conec);
         Object response = null;
 
         try {
@@ -318,7 +305,8 @@ public final class ConstellationServer{
             }
             try {
                 final ParameterDescriptorReader reader = new ParameterDescriptorReader();
-                reader.setInput(conec.getInputStream());
+                final InputStream responseStream = AbstractRequest.openRichException(conec, securityManager);  
+                reader.setInput(responseStream);
                 reader.read();
                 response = reader.getDescriptorsRoot();
                 
@@ -348,7 +336,7 @@ public final class ConstellationServer{
          */
         public boolean restartAll() {
             try {
-                final String url = getServiceURL() + "configuration?request=restart";
+                final String url = getURL() + "configuration?request=restart";
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -374,7 +362,7 @@ public final class ConstellationServer{
          */
         public boolean restartAllInstance(final String service) {
             try {
-                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart";
+                final String url = getURL() + service.toLowerCase() + "/admin?request=restart";
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -401,7 +389,7 @@ public final class ConstellationServer{
          */
         public boolean restartInstance(final String service, final String instanceId) {
             try {
-                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
+                final String url = getURL() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -428,7 +416,7 @@ public final class ConstellationServer{
          */
         public boolean newInstance(String service, String instanceId) {
             try {
-                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
+                final String url = getURL() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -455,7 +443,7 @@ public final class ConstellationServer{
          */
         public boolean startInstance(final String service, final String instanceId) {
             try {
-                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
+                final String url = getURL() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -482,7 +470,7 @@ public final class ConstellationServer{
          */
         public boolean stopInstance(final String service, final String instanceId) {
             try {
-                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
+                final String url = getURL() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -509,7 +497,7 @@ public final class ConstellationServer{
          */
         public boolean deleteInstance(final String service, final String instanceId) {
             try {
-                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
+                final String url = getURL() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -535,7 +523,7 @@ public final class ConstellationServer{
          */
         public InstanceReport listInstance(final String service) {
             try {
-                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=listInstance";
+                final String url = getURL() + service.toLowerCase() + "/admin?request=listInstance";
                 final Object response = sendRequest(url, null);
                 if (response instanceof InstanceReport) {
                     return (InstanceReport) response;
@@ -563,7 +551,7 @@ public final class ConstellationServer{
          */
         public boolean configureInstance(final String service, final String instanceId, final Object configuration) {
             try {
-                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
+                final String url = getURL() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
                 final Object response = sendRequest(url, configuration);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -590,7 +578,7 @@ public final class ConstellationServer{
          */
         public Object getInstanceconfiguration(final String service, final String instanceId) {
             try {
-                final String url = getServiceURL() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
+                final String url = getURL() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
@@ -616,7 +604,7 @@ public final class ConstellationServer{
          * @return A complete URL for the specified service.
          */
         public String getInstanceURL(final String service, final String instanceId) {
-            return getServiceURL() + service.toLowerCase() + '/' + instanceId;
+            return getURL() + service.toLowerCase() + '/' + instanceId;
         }
         
     }
@@ -631,7 +619,7 @@ public final class ConstellationServer{
          */
         public boolean restartAllLayerProviders() {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_RESTART_ALL_LAYER_PROVIDERS;
+                final String url = getURL() + "configuration?request="+REQUEST_RESTART_ALL_LAYER_PROVIDERS;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -654,7 +642,7 @@ public final class ConstellationServer{
          */
         public boolean restartAllStyleProviders() {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_RESTART_ALL_STYLE_PROVIDERS;
+                final String url = getURL() + "configuration?request="+REQUEST_RESTART_ALL_STYLE_PROVIDERS;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -683,7 +671,7 @@ public final class ConstellationServer{
             ArgumentChecks.ensureNonNull("service name", serviceName);
             ArgumentChecks.ensureNonNull("config", config);
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_CREATE_PROVIDER+"&serviceName=" + serviceName;
+                final String url = getURL() + "configuration?request="+REQUEST_CREATE_PROVIDER+"&serviceName=" + serviceName;
                 Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     return true;
@@ -704,7 +692,7 @@ public final class ConstellationServer{
          */
         public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_PROVIDER_CONFIG+"&id=" + id;
+                final String url = getURL() + "configuration?request="+REQUEST_GET_PROVIDER_CONFIG+"&id=" + id;
                 Object response = sendRequest(url, null, descriptor, null, false);
                 if (response instanceof GeneralParameterValue) {
                     return (GeneralParameterValue) response;
@@ -725,7 +713,7 @@ public final class ConstellationServer{
          */
         public boolean deleteProvider(final String id) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_DELETE_PROVIDER+"&id=" + id;
+                final String url = getURL() + "configuration?request="+REQUEST_DELETE_PROVIDER+"&id=" + id;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -753,7 +741,7 @@ public final class ConstellationServer{
          */
         public boolean updateProvider(final String serviceName, final String id, final ParameterValueGroup config) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_UPDATE_PROVIDER+"&serviceName=" + serviceName + "&id=" + id;
+                final String url = getURL() + "configuration?request="+REQUEST_UPDATE_PROVIDER+"&serviceName=" + serviceName + "&id=" + id;
                 final Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -779,7 +767,7 @@ public final class ConstellationServer{
          */
         public boolean restartProvider(final String id){
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_RESTART_PROVIDER+"&id=" + id;
+                final String url = getURL() + "configuration?request="+REQUEST_RESTART_PROVIDER+"&id=" + id;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -810,7 +798,7 @@ public final class ConstellationServer{
             ArgumentChecks.ensureNonNull("id", id);
             ArgumentChecks.ensureNonNull("config", config);
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_CREATE_LAYER+"&id=" + id;
+                final String url = getURL() + "configuration?request="+REQUEST_CREATE_LAYER+"&id=" + id;
                 Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -836,7 +824,7 @@ public final class ConstellationServer{
          */
         public boolean deleteLayer(final String id, final String layerName) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_DELETE_LAYER+"&id=" + id + "&layerName=" + layerName;
+                final String url = getURL() + "configuration?request="+REQUEST_DELETE_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -862,7 +850,7 @@ public final class ConstellationServer{
          */
         public boolean updateLayer(final String id, final String layerName, final ParameterValueGroup layer) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_UPDATE_LAYER+"&id=" + id + "&layerName=" + layerName;
+                final String url = getURL() + "configuration?request="+REQUEST_UPDATE_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, layer);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -887,7 +875,7 @@ public final class ConstellationServer{
             ArgumentChecks.ensureNonNull("styleName", styleName);
             
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_DOWNLOAD_STYLE+"&id=" + id + "&styleName=" + styleName;
+                final String url = getURL() + "configuration?request="+REQUEST_DOWNLOAD_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, null, null, XMLUtilities.getJaxbContext110(), false);
                 
                 if (response instanceof ExceptionReport) {
@@ -917,7 +905,7 @@ public final class ConstellationServer{
             ArgumentChecks.ensureNonNull("styleName", styleName);
             ArgumentChecks.ensureNonNull("style", style);
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_CREATE_STYLE+"&id=" + id + "&styleName=" + styleName;
+                final String url = getURL() + "configuration?request="+REQUEST_CREATE_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, style);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -946,7 +934,7 @@ public final class ConstellationServer{
             ArgumentChecks.ensureNonNull("styleName", styleName);
             
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_DELETE_STYLE+"&id=" + id + "&styleName=" + styleName;
+                final String url = getURL() + "configuration?request="+REQUEST_DELETE_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -977,7 +965,7 @@ public final class ConstellationServer{
             ArgumentChecks.ensureNonNull("styleName", styleName);
             ArgumentChecks.ensureNonNull("style", style);
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_UPDATE_STYLE+"&id=" + id + "&styleName=" + styleName;
+                final String url = getURL() + "configuration?request="+REQUEST_UPDATE_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, style);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1003,7 +991,7 @@ public final class ConstellationServer{
          */
         public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_SERVICE_DESCRIPTOR+"&serviceName=" + serviceName;
+                final String url = getURL() + "configuration?request="+REQUEST_GET_SERVICE_DESCRIPTOR+"&serviceName=" + serviceName;
                 Object response = sendDescriptorRequest(url, null);
                 if (response instanceof GeneralParameterDescriptor) {
                     return (GeneralParameterDescriptor) response;
@@ -1026,7 +1014,7 @@ public final class ConstellationServer{
          */
         public GeneralParameterDescriptor getSourceDescriptor(final String serviceName) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_SOURCE_DESCRIPTOR+"&serviceName=" + serviceName;
+                final String url = getURL() + "configuration?request="+REQUEST_GET_SOURCE_DESCRIPTOR+"&serviceName=" + serviceName;
                 Object response = sendDescriptorRequest(url, null);
                 if (response instanceof GeneralParameterDescriptor) {
                     return (GeneralParameterDescriptor) response;
@@ -1043,7 +1031,7 @@ public final class ConstellationServer{
 
         public ProvidersReport listProviders() {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_LIST_SERVICES;
+                final String url = getURL() + "configuration?request="+REQUEST_LIST_SERVICES;
                 final Object response = sendRequest(url, null);
                 if (response instanceof ProvidersReport) {
                     return (ProvidersReport) response;
@@ -1072,7 +1060,7 @@ public final class ConstellationServer{
          */
         public StringList listProcess() {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_LIST_PROCESS;
+                final String url = getURL() + "configuration?request="+REQUEST_LIST_PROCESS;
                 final Object response = sendRequest(url, null);
                 if (response instanceof StringList) {
                     return (StringList) response;
@@ -1094,7 +1082,7 @@ public final class ConstellationServer{
          */
         public StringList listTasks(){
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_LIST_TASKS;
+                final String url = getURL() + "configuration?request="+REQUEST_LIST_TASKS;
                 final Object response = sendRequest(url, null);
                 if (response instanceof StringList) {
                     return (StringList) response;
@@ -1116,7 +1104,7 @@ public final class ConstellationServer{
          */
         public GeneralParameterDescriptor getProcessDescriptor(final String authority, final String code) {
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_GET_PROCESS_DESC+"&authority="+authority+"&code="+code;
+                final String url = getURL() + "configuration?request="+REQUEST_GET_PROCESS_DESC+"&authority="+authority+"&code="+code;
                 Object response = sendDescriptorRequest(url, null);
                 if (response instanceof GeneralParameterDescriptor) {
                     return (GeneralParameterDescriptor) response;
@@ -1150,7 +1138,7 @@ public final class ConstellationServer{
             ArgumentChecks.ensureNonNull("step", step);
             ArgumentChecks.ensureNonNull("parameters", parameters);
             try {
-                final String url = getServiceURL() + "configuration?request="+REQUEST_CREATE_TASK
+                final String url = getURL() + "configuration?request="+REQUEST_CREATE_TASK
                         +"&authority=" + authority 
                         +"&code=" + code
                         +"&id=" + id
@@ -1183,7 +1171,7 @@ public final class ConstellationServer{
         
         public boolean refreshIndex(final String id, final boolean asynchrone) {
             try {
-                final String url = getServiceURL() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
+                final String url = getURL() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1203,7 +1191,7 @@ public final class ConstellationServer{
     
         public boolean importFile(final String id, final File importFile) {
             try {
-                final String url = getServiceURL() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id;
+                final String url = getURL() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id;
                 Object response = sendRequest(url, importFile, null, null, true);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
