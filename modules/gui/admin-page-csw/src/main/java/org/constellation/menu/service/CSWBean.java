@@ -351,8 +351,9 @@ public class CSWBean extends AbstractServiceBean {
                
                 final String instanceId = getConfiguredInstance().getName();
                 try {
-                    final File importedfile = FileUtilities.buildFileFromStream(uploadedFile.getInputStream());
-                    getServer().csws.importFile(instanceId, importedfile);
+                    final File tmp = File.createTempFile("cstl", null);
+                    final File importedfile = FileUtilities.buildFileFromStream(uploadedFile.getInputStream(), tmp);
+                    getServer().csws.importFile(instanceId, importedfile, uploadedFile.getFileName());
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
                 }

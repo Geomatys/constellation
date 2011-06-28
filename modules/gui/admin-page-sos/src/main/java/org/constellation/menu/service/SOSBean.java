@@ -527,7 +527,7 @@ public class SOSBean extends AbstractServiceBean{
                 int n = Integer.parseInt(maxObs);
                 config.setMaxObservationByRequest(n);
             } catch (NumberFormatException ex) {
-                LOGGER.warning("unable to parse the number of maxObservation:" + maxObs);
+                LOGGER.log(Level.WARNING, "unable to parse the number of maxObservation:{0}", maxObs);
             }
         }
         this.maxObs = maxObs;

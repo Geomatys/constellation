@@ -1189,9 +1189,9 @@ public final class ConstellationServer extends AbstractServer{
             return false;
         }
     
-        public boolean importFile(final String id, final File importFile) {
+        public boolean importFile(final String id, final File importFile, final String fileName) {
             try {
-                final String url = getURL() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id;
+                final String url = getURL() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id + "&filename=" + fileName;
                 Object response = sendRequest(url, importFile, null, null, true);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;

@@ -42,12 +42,12 @@ import javax.xml.bind.Marshaller;
 // Constellation dependencies
 import org.constellation.ws.rs.WebService;
 import org.constellation.configuration.AbstractConfigurer;
-import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.configuration.filter.ConfigurerFilter;
+import org.constellation.configuration.ExceptionReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -61,7 +61,6 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.util.FileUtilities;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -104,11 +103,7 @@ public final class ConfigurationService extends WebService  {
     public ConfigurationService() {
         super();
         try {
-            final MarshallerPool pool = new MarshallerPool("org.geotoolkit.ows.xml.v110:"
-                                                         + "org.constellation.configuration:"
-                                                         + "org.geotoolkit.skos.xml:" // TODO do we still need skos ?
-                                                         + "org.geotoolkit.internal.jaxb.geometry");
-            setXMLContext(pool);
+            setXMLContext(GenericDatabaseMarshallerPool.getInstance());
             final Iterator<AbstractConfigurerFactory> ite = factory.getServiceProviders(AbstractConfigurerFactory.class, new ConfigurerFilter(), null, null);
             while (ite.hasNext()) {
                 AbstractConfigurerFactory currentfactory = ite.next();
@@ -121,9 +116,6 @@ public final class ConfigurationService extends WebService  {
                 }
 
             }
-            
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "JAXBException while setting the JAXB context for configuration service: " + ex.getMessage(), ex);
             
         } catch (FactoryNotFoundException ex) {
             LOGGER.warning("Factory not found for Configurer, specific operation will not be available.");
@@ -188,8 +180,7 @@ public final class ConfigurationService extends WebService  {
 
         } catch (CstlServiceException ex) {
             final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),
-                                                               ServiceDef.CONFIG.exceptionVersion.toString());
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), code);
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) && !ex.getExceptionCode().equals(ExceptionCode.MISSING_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
@@ -217,8 +208,7 @@ public final class ConfigurationService extends WebService  {
     @Override
     protected Response launchException(final String message, final String codeName, final String locator) {
         final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-        final ExceptionReport report = new ExceptionReport(message, code.name(), locator,
-                                                       ServiceDef.CONFIG.exceptionVersion.toString());
+        final ExceptionReport report = new ExceptionReport(message, code.name());
         return Response.ok(report, MimeType.TEXT_XML).build();
     }
 
@@ -277,7 +267,8 @@ public final class ConfigurationService extends WebService  {
     public Response uploadFile(final InputStream in) {
         LOGGER.info("uploading");
         try  {
-            final File uploadedFile = FileUtilities.buildFileFromStream(in);
+            final File tmp = File.createTempFile("cstl-", null);
+            final File uploadedFile = FileUtilities.buildFileFromStream(in, tmp);
             in.close();
             return treatIncomingRequest(uploadedFile);
             

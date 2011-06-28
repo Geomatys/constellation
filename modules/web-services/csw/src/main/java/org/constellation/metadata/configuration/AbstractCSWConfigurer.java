@@ -19,6 +19,9 @@
 package org.constellation.metadata.configuration;
 
 // J2SE dependencies
+import org.geotoolkit.util.FileUtilities;
+import java.io.IOException;
+import java.io.FileInputStream;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import java.util.Arrays;
 import javax.ws.rs.core.MultivaluedMap;
@@ -153,8 +156,9 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         
         if ("importRecords".equalsIgnoreCase(request)) {
 
-            final String id = getParameter("ID", false, parameters);
-            return importRecords(id, (File)objectRequest);
+            final String id       = getParameter("ID", false, parameters);
+            final String fileName = getParameter("fileName", true, parameters);
+            return importRecords(id, (File)objectRequest, fileName);
         }
         
         if ("UpdateVocabularies".equalsIgnoreCase(request)) {
@@ -524,14 +528,30 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         return new AcknowlegementType("Success", msg);
     }
     
-    private AcknowlegementType importRecords(final String id, final File f) throws CstlServiceException {
+    private AcknowlegementType importRecords(final String id, final File f, final String fileName) throws CstlServiceException {
         LOGGER.info("Importing record");
-        CSWMetadataWriter writer = initWriter(id);
+        final CSWMetadataWriter writer = initWriter(id);
+        final List<File> files;
+        if (fileName.endsWith("zip")) {
+            try  {
+                final FileInputStream fis = new FileInputStream(f);
+                files = FileUtilities.unZipFileList(fis);
+                fis.close();
+            } catch (IOException ex) {
+                throw new CstlServiceException(ex);
+            }
+        } else if (fileName.endsWith("xml")) {
+            files = Arrays.asList(f);
+        } else {
+            throw new CstlServiceException("Unexpected file extension, accepting zip or xml");
+        }
         Unmarshaller u = null;
         try {
             u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
-            final Object unmarshalled = u.unmarshal(f);
-            writer.storeMetadata(unmarshalled);
+            for (File importedFile: files) {
+                final Object unmarshalled = u.unmarshal(importedFile);
+                writer.storeMetadata(unmarshalled);
+            }
             final String msg = "The specified record have been imported in the CSW";
             return new AcknowlegementType("Success", msg);
         } catch (JAXBException ex) {
