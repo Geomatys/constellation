@@ -17,6 +17,7 @@
 package org.constellation.ws.embedded;
 
 // JUnit dependencies
+import org.constellation.configuration.ExceptionReport;
 import javax.xml.bind.Marshaller;
 import java.io.File;
 import org.geotoolkit.csw.xml.v202.RecordType;
@@ -31,7 +32,6 @@ import org.constellation.configuration.ServiceReport;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -89,9 +89,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport expResult = new ExceptionReport("Download operation not implemented",  
-                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()), 
-                                                         null, 
-                                                         "1.0");
+                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()));
         assertEquals(expResult, obj);
     }
     
@@ -109,9 +107,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport exception = new ExceptionReport("The parameter ID must be specified",  
-                                                         OWSExceptionCode.MISSING_PARAMETER_VALUE.name(), 
-                                                         "id", 
-                                                         "1.0");
+                                                         OWSExceptionCode.MISSING_PARAMETER_VALUE.name());
         assertEquals(exception, obj);
         
         
@@ -234,9 +230,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport expResult = new ExceptionReport("The method updateVocabularies is not supported by the current implementation.",  
-                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()), 
-                                                         null, 
-                                                         "1.0");
+                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()));
         assertEquals(expResult, obj);
     }
     
@@ -253,9 +247,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport expResult = new ExceptionReport("The method updateContacts is not supported by the current implementation.",  
-                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()), 
-                                                         null, 
-                                                         "1.0");
+                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()));
         assertEquals(expResult, obj);
     }
     

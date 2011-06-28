@@ -18,16 +18,17 @@
 package org.constellation.sos.ws;
 
 import java.io.File;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -151,9 +152,10 @@ public class SOSWorkerInitialisationTest {
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
 
-        Marshaller marshaller = JAXBContext.newInstance("org.geotoolkit.sos.xml.v100:org.geotoolkit.internal.jaxb.geometry").createMarshaller();
+        Marshaller marshaller = SOSMarshallerPool.getInstance().acquireMarshaller();
         marshaller.marshal(request, configFile);
-
+        SOSMarshallerPool.getInstance().release(marshaller);
+        
         worker = new SOSworker("", configurationDirectory);
 
         exceptionLaunched = false;
@@ -166,8 +168,9 @@ public class SOSWorkerInitialisationTest {
             assertEquals(ex.getMessage(), "The service is not running!");
             exceptionLaunched = true;
         }
+        
 
-        marshaller = JAXBContext.newInstance(SOSConfiguration.class).createMarshaller();
+        marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
 
         /**
          * Test 4: A malformed configuration file (bad unrecognized type).
@@ -289,6 +292,8 @@ public class SOSWorkerInitialisationTest {
         }
 
         assertTrue(exceptionLaunched);
+        
+        GenericDatabaseMarshallerPool.getInstance().release(marshaller);
     }
 
 }

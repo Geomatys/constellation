@@ -43,7 +43,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -57,6 +56,7 @@ import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
@@ -317,9 +317,9 @@ public class SOSworker extends AbstractWorker {
         SOSConfiguration configuration = null;
 
         // Database configuration
+        Unmarshaller configUM = null;
         try {
-
-            final Unmarshaller configUM = JAXBContext.newInstance(SOSConfiguration.class).createUnmarshaller();
+            configUM = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             final File configFile = new File(configurationDirectory, "config.xml");
             if (configFile.exists()) {
                 final Object object = configUM.unmarshal(configFile);
@@ -456,6 +456,10 @@ public class SOSworker extends AbstractWorker {
         } catch (CstlServiceException ex) {
             LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause:{0}", ex.getMessage());
             isStarted = false;
+        } finally {
+            if (configUM != null) {
+                GenericDatabaseMarshallerPool.getInstance().release(configUM);
+            }
         }
     }
 
@@ -513,17 +517,24 @@ public class SOSworker extends AbstractWorker {
     private void cacheCapabilities(final File configurationDirectory) throws JAXBException {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
-        final Unmarshaller capaUM = JAXBContext.newInstance(Capabilities.class, org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class).createUnmarshaller();
-        final File configFile = new File(configurationDirectory, "cached-offerings.xml");
-        if (configFile.exists()) {
-            Object object = capaUM.unmarshal(configFile);
-            if (object instanceof JAXBElement) {
-                object = ((JAXBElement)object).getValue();
+        Unmarshaller capaUM = null; 
+        try {
+            capaUM = SOSMarshallerPool.getInstance().acquireUnmarshaller();
+            final File configFile = new File(configurationDirectory, "cached-offerings.xml");
+            if (configFile.exists()) {
+                Object object = capaUM.unmarshal(configFile);
+                if (object instanceof JAXBElement) {
+                    object = ((JAXBElement)object).getValue();
+                }
+                if (object instanceof Capabilities) {
+                    cachedCapabilities = (Capabilities) object;
+                } else {
+                    LOGGER.severe("cached capabilities file does not contains Capablities object.");
+                }
             }
-            if (object instanceof Capabilities) {
-                cachedCapabilities = (Capabilities) object;
-            } else {
-                LOGGER.severe("cached capabilities file does not contains Capablities object.");
+        } finally {
+            if (capaUM != null) {
+                SOSMarshallerPool.getInstance().release(capaUM);
             }
         }
     }
