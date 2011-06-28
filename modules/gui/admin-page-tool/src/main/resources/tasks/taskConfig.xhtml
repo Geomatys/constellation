@@ -33,14 +33,14 @@
                         <!-- process list -->
                         <div class="rounded">
 
-                            <mf:Outline id="processTree" actionVisible="false" rootVisible="false"
+                            <mf:Outline id="processTree" actionVisible="true" rootVisible="false"
                                 value="#{taskmanagerBean.processModel}" var="node" width="100%" 
                                 rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
 
                                 <!-- Name column -->
                                 <mf:DataTableColumn>
                                     <mf:switch>
-                                        <mf:case condition="#{mf:isInstance(node.userObject,'Name')}" fallthrought="false">
+                                        <mf:case condition="#{mf:isInstance(node.userObject,'DefaultName')}" fallthrought="false">
                                             <a4j:commandLink action="#{node.select}" reRender="params">
                                                  #{node.userObject.localPart}
                                             </a4j:commandLink>

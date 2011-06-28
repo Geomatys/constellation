@@ -142,9 +142,9 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         } else if (REQUEST_LIST_TASKS.equalsIgnoreCase(request)) {
             return ListTasks();
         } else if (REQUEST_GET_PROCESS_DESC.equalsIgnoreCase(request)) {
-            return createTask(parameters);
-        } else if (REQUEST_CREATE_TASK.equalsIgnoreCase(request)) {
             return getProcessDescriptor(parameters);
+        } else if (REQUEST_CREATE_TASK.equalsIgnoreCase(request)) {
+            return createTask(parameters);
         } else if (REQUEST_UPDATE_TASK.equalsIgnoreCase(request)) {
             return updateTask(parameters);
         } else if (REQUEST_DELETE_TASK.equalsIgnoreCase(request)) {

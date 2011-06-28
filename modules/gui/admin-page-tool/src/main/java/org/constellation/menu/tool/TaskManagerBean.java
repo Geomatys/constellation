@@ -124,7 +124,7 @@ public class TaskManagerBean extends I18NBean{
                     authorities.put(ns, parent);
                 }
                 
-                final DefaultMutableTreeNode n = new SeletableNode(value);
+                final DefaultMutableTreeNode n = new SeletableNode(name);
                 parent.add(n);
             }
             
