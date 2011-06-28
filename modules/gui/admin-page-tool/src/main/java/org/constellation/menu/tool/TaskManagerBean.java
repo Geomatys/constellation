@@ -105,7 +105,7 @@ public class TaskManagerBean extends I18NBean{
     public TreeModel getTaskModel(){
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
         
-        final List<String> values = getServer().tasks.listProcess().getList();
+        final List<String> values = getServer().tasks.listTasks().getList();
         for(String value : values){
             final DefaultMutableTreeNode n = new DefaultMutableTreeNode(value);
             root.add(n);
@@ -148,6 +148,14 @@ public class TaskManagerBean extends I18NBean{
     private GeneralParameterValue parameters = null;
     private Name processid;
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
     public int getTaskStep() {
         return taskstep;
     }

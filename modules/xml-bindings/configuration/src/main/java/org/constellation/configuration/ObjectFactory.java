@@ -129,8 +129,7 @@ public class ObjectFactory {
     public StringMap createSimpleMap(){
         return new StringMap();
     }
-    
-    
+        
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")
     public JAXBElement<Object> createSource(Object value) {
         return new JAXBElement<Object>(SOURCE_QNAME, Object.class, null, value);
@@ -140,4 +139,10 @@ public class ObjectFactory {
     public JAXBElement<Object> createLayer(Object value) {
         return new JAXBElement<Object>(LAYER_QNAME, Object.class, null, value);
     }
+    
+    @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "input")
+    public JAXBElement<Object> createInput(Object value) {
+        return new JAXBElement<Object>(LAYER_QNAME, Object.class, null, value);
+    }
+    
 }

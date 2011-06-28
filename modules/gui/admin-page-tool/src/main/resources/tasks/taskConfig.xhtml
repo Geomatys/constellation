@@ -59,6 +59,9 @@
                         <mf:Div id="params">
                             <fieldset class="titledBorder" style="width:100%;" >
                                 <legend>#{taskmanagerBean.i18n['schedule']}</legend>
+                                #{taskmanagerBean.i18n['title']}
+                                <h:inputText value="#{taskmanagerBean.title}" />
+                                <br/>
                                 #{taskmanagerBean.i18n['timestep']}
                                 <mf:Spinner value="#{taskmanagerBean.taskStep}" minLimit="1">
                                     <f:converter converterId="javax.faces.Integer"/>

@@ -50,6 +50,7 @@ import org.constellation.scheduler.CstlScheduler;
 import org.constellation.scheduler.Task;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
@@ -703,7 +704,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             throw new CstlServiceException("No Process for id : {" + authority + "}"+code+" has been found", INVALID_PARAMETER_VALUE);
         }
         
-        return desc.getInputDescriptor();
+        //change the description, always encapsulate in the same namespace and name
+        //jaxb object factory can not reconize changing names without a namespace
+        ParameterDescriptorGroup idesc = desc.getInputDescriptor();
+        idesc = new DefaultParameterDescriptorGroup("input", idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
+        return idesc;
     }
     
     /**
@@ -720,11 +725,12 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         if(title == null || title.trim().isEmpty()){
             title = id;
         }
+             
+        final GeneralParameterDescriptor retypedDesc = getProcessDescriptor(parameters);   
         
-        final GeneralParameterDescriptor desc = getProcessDescriptor(parameters);
         
         final ParameterValueGroup params;
-        final ParameterValueReader reader = new ParameterValueReader(desc);
+        final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
         try {
             reader.setInput(objectRequest);
             params = (ParameterValueGroup) reader.read();
@@ -735,13 +741,18 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             throw new CstlServiceException(ex);
         }
         
+        //rebuild original values since we have changed the namespace
+        final ParameterDescriptorGroup originalDesc = ProcessFinder.getProcessDescriptor(authority,code).getInputDescriptor();
+        final ParameterValueGroup orig = originalDesc.createValue();
+        orig.values().addAll(params.values());
+        
         
         final Task task = new Task(id);
         task.setTitle(title);
         task.setTrigger(TriggerBuilder.newTrigger()
                 .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(step*60))
                 .build());
-        ProcessJobDetail detail = new ProcessJobDetail(authority, code, params);
+        ProcessJobDetail detail = new ProcessJobDetail(authority, code, orig);
         task.setDetail(detail);
         CstlScheduler.getInstance().addTask(task);
         

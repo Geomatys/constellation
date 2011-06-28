@@ -51,6 +51,7 @@ public class Task {
     
     public Task(final Task t){
         this.id = t.id;
+        this.title = t.title;
         this.detail = t.detail;
         this.trigger = t.trigger;
         this.lastExecutionDate = (t.lastExecutionDate!=null) ? (Date)t.lastExecutionDate.clone() : null;

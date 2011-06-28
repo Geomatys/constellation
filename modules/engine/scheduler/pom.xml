@@ -61,6 +61,10 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-processing-quartz</artifactId>
     </dependency>
+    <dependency>
+      <groupId>net.java.dev.stax-utils</groupId>
+      <artifactId>stax-utils</artifactId>
+    </dependency>
     
     <dependency>
       <groupId>junit</groupId>

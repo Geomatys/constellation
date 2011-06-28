@@ -17,14 +17,19 @@
 package org.constellation.scheduler;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javanet.staxutils.IndentingXMLStreamWriter;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.feature.DefaultName;
@@ -32,6 +37,7 @@ import org.geotoolkit.process.ProcessFactory;
 import org.geotoolkit.process.ProcessFinder;
 
 import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.xml.StaxStreamWriter;
 import org.opengis.feature.type.Name;
 
 import org.quartz.Scheduler;
@@ -221,10 +227,24 @@ public class CstlScheduler {
         
         final File taskFile = new File(configDir, TASK_FILE);
         
-        final TasksWriter writer = new TasksWriter();
-        writer.setOutput(taskFile);
-        writer.write(tasks);
-        writer.dispose();
+        XMLStreamWriter xmlWriter = null;
+        final XMLOutputFactory XMLfactory = XMLOutputFactory.newInstance();
+        XMLfactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+        try {
+            xmlWriter = XMLfactory.createXMLStreamWriter(new FileOutputStream(taskFile));
+        } catch (FileNotFoundException ex) {
+            throw new XMLStreamException(ex.getLocalizedMessage(), ex);
+        }
+        xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
+        
+        try{
+            final TasksWriter taskWriter = new TasksWriter();
+            taskWriter.setOutput(xmlWriter);
+            taskWriter.write(tasks);
+            taskWriter.dispose();
+        }finally{
+            xmlWriter.close();
+        }
     }
     
     /**
