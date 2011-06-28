@@ -351,7 +351,7 @@ public class ObservationTable extends SingletonTable<ObservationType> implements
                     result.close();
                     release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier(lc, "urn:object:observation:BRGM");
+                    id = searchFreeIdentifier(lc, "urn:object:observation:");
                 }
                 final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.name),         id);

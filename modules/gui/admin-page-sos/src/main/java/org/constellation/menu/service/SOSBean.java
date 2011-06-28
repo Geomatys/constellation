@@ -68,6 +68,20 @@ public class SOSBean extends AbstractServiceBean{
     
     private String profile;
     
+    private String obsIdBase;
+    
+    private String obstmpIdBase;
+    
+    private String sensorIdBase;
+    
+    private String phenIdBase;
+    
+    private String maxObs;
+    
+    private String tmpTime;
+    
+    
+    
     public SOSBean() {
         super(Specification.SOS,
                 "/service/sos.xhtml",
@@ -403,6 +417,144 @@ public class SOSBean extends AbstractServiceBean{
     public void setOmPostgisDir(String omPostgisDir) {
         this.omPostgisDir = omPostgisDir;
     }
+    
+    /**
+     * @return the obsIdBase
+     */
+    public String getObsIdBase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            this.obsIdBase = config.getObservationIdBase();
+        }
+        return obsIdBase;
+    }
+
+    /**
+     * @param obsIdBase the obsIdBase to set
+     */
+    public void setObsIdBase(String obsIdBase) {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            config.setObservationIdBase(obsIdBase);
+        }
+        this.obsIdBase = obsIdBase;
+    }
+
+    /**
+     * @return the obstmpIdBase
+     */
+    public String getObstmpIdBase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            this.obstmpIdBase = config.getObservationTemplateIdBase();
+        }
+        return obstmpIdBase;
+    }
+
+    /**
+     * @param obstmpIdBase the obstmpIdBase to set
+     */
+    public void setObstmpIdBase(String obstmpIdBase) {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            config.setObservationTemplateIdBase(obstmpIdBase);
+        }
+        this.obstmpIdBase = obstmpIdBase;
+    }
+
+    /**
+     * @return the sensorIdBase
+     */
+    public String getSensorIdBase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            this.sensorIdBase = config.getSensorIdBase();
+        }
+        return sensorIdBase;
+    }
+
+    /**
+     * @param sensorIdBase the sensorIdBase to set
+     */
+    public void setSensorIdBase(String sensorIdBase) {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            config.setSensorIdBase(sensorIdBase);
+        }
+        this.sensorIdBase = sensorIdBase;
+    }
+
+    /**
+     * @return the phenIdBase
+     */
+    public String getPhenIdBase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            this.phenIdBase = config.getPhenomenonIdBase();
+        }
+        return phenIdBase;
+    }
+
+    /**
+     * @param phenIdBase the phenIdBase to set
+     */
+    public void setPhenIdBase(String phenIdBase) {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            config.setPhenomenonIdBase(phenIdBase);
+        }
+        this.phenIdBase = phenIdBase;
+    }
+
+    /**
+     * @return the maxObs
+     */
+    public String getMaxObs() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            this.maxObs = config.getMaxObservationByRequest() + "";
+        }
+        return maxObs;
+    }
+
+    /**
+     * @param maxObs the maxObs to set
+     */
+    public void setMaxObs(String maxObs) {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            try {
+                int n = Integer.parseInt(maxObs);
+                config.setMaxObservationByRequest(n);
+            } catch (NumberFormatException ex) {
+                LOGGER.warning("unable to parse the number of maxObservation:" + maxObs);
+            }
+        }
+        this.maxObs = maxObs;
+    }
+
+    /**
+     * @return the tmpTime
+     */
+    public String getTmpTime() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            this.tmpTime = config.getTemplateValidTime();
+        }
+        return tmpTime;
+    }
+
+    /**
+     * @param tmpTime the tmpTime to set
+     */
+    public void setTmpTime(String tmpTime) {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            config.setTemplateValidTime(tmpTime);
+        }
+        this.tmpTime = tmpTime;
+    }
+    
 
     public void buildMDWDatabase() {
         if (configurationObject instanceof SOSConfiguration) {

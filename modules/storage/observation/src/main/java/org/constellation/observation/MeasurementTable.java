@@ -256,7 +256,7 @@ public class MeasurementTable extends SingletonTable<MeasurementType> implements
                     result.close();
                     release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier(lc, "urn:BRGM:measurement:");
+                    id = searchFreeIdentifier(lc, "urn:ogc:object:measurement:");
                 }
                 final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.name),         id);

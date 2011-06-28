@@ -106,14 +106,23 @@ public class Automatic {
 
     /**
      * Enable the indexation of published/all metadata.
+     * -- MDWeb specific flag
      */
     private Boolean indexOnlyPublishedMetadata;
 
     /**
      * Enable the indexation of internal recordSet.
+     *  -- MDWeb specific flag
      */
     private Boolean indexInternalRecordset;
 
+    /**
+     * In the case of a MDWeb implementation,
+     * this flag allow to send all the metadata in the specified RecordSet.
+     *  -- MDWeb specific flag
+     */
+    private String defaultRecordSet;
+    
     /**
      * Allow to store the mapping between MDWeb classes and GEOTK classes
      * in a properties file at the shutdown of the reader.
@@ -129,14 +138,9 @@ public class Automatic {
     /**
      * In the case of a fileSystem implementation,
      * this attribute contains the path of the directory containing the data.
+     *  -- FileSystem specific flag
      */
     private String dataDirectory;
-
-    /**
-     * In the case of a MDWeb implementation,
-     * this flag allow to send all the metadata in the specified RecordSet.
-     */
-    private String defaultRecordSet;
 
     /**
      * In the case of a CSW configuration,

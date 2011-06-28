@@ -302,7 +302,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                     result.close();
                     release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier(lc, "urn:BRGM:offering:");
+                    id = searchFreeIdentifier(lc, "urn:ogc:object:offering:");
                 }
                 final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.name), off.getName());

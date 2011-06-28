@@ -63,7 +63,7 @@
                     </tbody>          
                 </mf:CustomHtml>
 
-                <mf:CustomHtml tag="div" id="createdbOM" style="text-align: left;">
+                <mf:CustomHtml tag="div" id="createdbOM" style="text-align: right;">
                     <h:commandButton action="#{sosBean.buildOMDatabase}" value="#{sosBean.i18n['buildOMDatabase']}" rendered="#{sosBean.omConfigType == 'default'}"/>
                 </mf:CustomHtml>
             </div>
@@ -112,11 +112,16 @@
                     </tbody>        
                 </mf:CustomHtml>
 
-                <mf:CustomHtml tag="div" id="createdbSML" style="text-align: left;">
+                <mf:CustomHtml tag="div" id="createdbSML" style="text-align: right;">
                     <h:commandButton action="#{sosBean.buildMDWDatabase}" value="#{sosBean.i18n['buildMDWDatabase']}" rendered="#{sosBean.smlConfigType == 'mdweb'}"/>
                 </mf:CustomHtml>
             </div>   
-            <table> 
+            <table style="width:100%;"> 
+                <colgroup>
+                        <col width="20%"/>
+                        <col width="80%"/>
+                </colgroup>
+                <tbody>
                 <tr>
                     <td><h:outputText value="#{sosBean.i18n['obsIdBase']}"/></td>
                     <td><h:inputText value="#{sosBean.obsIdBase}" style="width:50%;"/></td>
@@ -149,6 +154,7 @@
                         </h:selectOneMenu>
                     </td>
                 </tr> 
+                </tbody>    
             </table>
             <div style="text-align: right;">
                 <h:commandButton action="#{sosBean.saveConfiguration}" value="#{sosBean.i18n['save']}" />

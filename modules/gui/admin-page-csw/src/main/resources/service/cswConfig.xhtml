@@ -64,7 +64,7 @@
 
                     </tbody>            
                 </mf:CustomHtml>
-                <mf:CustomHtml tag="div" id="createdb" style="text-align: left;">
+                <mf:CustomHtml tag="div" id="createdb" style="text-align: right;">
                     <h:commandButton action="#{cswBean.buildDatabase}" value="#{cswBean.i18n['buildDatabase']}" rendered="#{cswBean.configType == 'mdweb'}"/>
                 </mf:CustomHtml>
             </div>
@@ -76,7 +76,10 @@
                            <f:selectItems value="#{cswBean.profiles}"/>
                         </h:selectOneMenu>
                     </td> 
-                </tr>     
+                </tr>
+                <tr>
+                    <td><h:outputText value="#{cswBean.i18n['importRecord']}"/></td>     
+                </tr>
                 <tr>
                 <td><mf:FileUpload id="importFile" 
                                        size="30"
