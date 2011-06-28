@@ -17,6 +17,9 @@
 
 package org.constellation.map.configuration;
 
+import org.geotoolkit.process.quartz.ProcessJobDetail;
+import org.quartz.TriggerBuilder;
+import org.quartz.SimpleScheduleBuilder;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.configuration.ProviderReport;
@@ -44,6 +47,7 @@ import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.scheduler.CstlScheduler;
+import org.constellation.scheduler.Task;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -144,7 +148,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         } else if (REQUEST_GET_PROCESS_DESC.equalsIgnoreCase(request)) {
             return getProcessDescriptor(parameters);
         } else if (REQUEST_CREATE_TASK.equalsIgnoreCase(request)) {
-            return createTask(parameters);
+            return createTask(parameters, objectRequest);
         } else if (REQUEST_UPDATE_TASK.equalsIgnoreCase(request)) {
             return updateTask(parameters);
         } else if (REQUEST_DELETE_TASK.equalsIgnoreCase(request)) {
@@ -678,8 +682,13 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Returns a list of all tasks.
      */
-    private AcknowlegementType ListTasks(){
-        return null;
+    private StringList ListTasks(){
+        final List<Task> tasks = CstlScheduler.getInstance().listTasks();
+        final StringList lst = new StringList();
+        for(Task t : tasks){
+            lst.getList().add(t.getId() +" "+ t.getTitle());
+        }
+        return lst;
     }
     
     /**
@@ -700,8 +709,43 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Create a new task.
      */
-    private Object createTask(final MultivaluedMap<String, String> parameters){
-        return null;
+    private AcknowlegementType createTask(final MultivaluedMap<String, String> parameters,
+            final Object objectRequest) throws CstlServiceException{
+        final String authority = getParameter("authority", true, parameters);
+        final String code = getParameter("code", true, parameters);
+        String title = getParameter("title", false, parameters);
+        final int step = Integer.valueOf(getParameter("step", true, parameters));
+        final String id = getParameter("id", true, parameters);
+        
+        if(title == null || title.trim().isEmpty()){
+            title = id;
+        }
+        
+        final GeneralParameterDescriptor desc = getProcessDescriptor(parameters);
+        
+        final ParameterValueGroup params;
+        final ParameterValueReader reader = new ParameterValueReader(desc);
+        try {
+            reader.setInput(objectRequest);
+            params = (ParameterValueGroup) reader.read();
+            reader.dispose();
+        } catch (XMLStreamException ex) {
+            throw new CstlServiceException(ex);
+        } catch (IOException ex) {
+            throw new CstlServiceException(ex);
+        }
+        
+        
+        final Task task = new Task(id);
+        task.setTitle(title);
+        task.setTrigger(TriggerBuilder.newTrigger()
+                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(step*60))
+                .build());
+        ProcessJobDetail detail = new ProcessJobDetail(authority, code, params);
+        task.setDetail(detail);
+        CstlScheduler.getInstance().addTask(task);
+        
+        return new AcknowlegementType("Success", "The task has been created");
     }
     
     /**

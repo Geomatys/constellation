@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.context.ExternalContext;
@@ -77,13 +78,11 @@ public class TaskManagerBean extends I18NBean{
     
     private final String mainPage;
     private final String configPage;
-    private final TreeModel taskModel;
     private TreeModel processModel;
 
     public TaskManagerBean(){
         addBundle("tasks.tasks");       
         
-        taskModel = new DefaultTreeModel(new DefaultMutableTreeNode("root"));
         mainPage = MenuBean.toApplicationPath("/tasks/quartzmanager.xhtml");
         configPage = MenuBean.toApplicationPath("/tasks/taskConfig.xhtml");
     }
@@ -104,7 +103,15 @@ public class TaskManagerBean extends I18NBean{
     }
     
     public TreeModel getTaskModel(){
-        return taskModel;
+        final DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        
+        final List<String> values = getServer().tasks.listProcess().getList();
+        for(String value : values){
+            final DefaultMutableTreeNode n = new DefaultMutableTreeNode(value);
+            root.add(n);
+        }
+        
+        return new DefaultTreeModel(root);
     }
 
     public TreeModel getProcessModel() {
@@ -135,9 +142,11 @@ public class TaskManagerBean extends I18NBean{
     }
     
     ////////////////////////////////////////////////////////////////////////////
+    private String id = null;
+    private String title = "";
     private int taskstep = 15;
     private GeneralParameterValue parameters = null;
-    private String processid = "";
+    private Name processid;
 
     public int getTaskStep() {
         return taskstep;
@@ -147,12 +156,17 @@ public class TaskManagerBean extends I18NBean{
         this.taskstep = taskstep;
     }
 
-    public String getProcessId() {
+    public Name getProcessId() {
         return processid;
     }
     
     public void saveTask() {
-        System.out.println(">>>>>>>>>>>>>> saving task");
+        final ConstellationServer server = getServer();
+        if(server == null) return;
+        
+        server.tasks.createTask(processid.getNamespaceURI(), processid.getLocalPart(), 
+                id, title, taskstep, parameters);
+        
     }
 
     public GeneralParameterValue getTaskParameters() {
@@ -162,6 +176,7 @@ public class TaskManagerBean extends I18NBean{
     public void createTask(){
         
         //reset values
+        id = UUID.randomUUID().toString();
         parameters = null;
         taskstep = 15;
         if(configPage != null){
@@ -185,7 +200,7 @@ public class TaskManagerBean extends I18NBean{
             if(!(userObject instanceof Name)) return;
             
             final Name name = (Name)userObject;            
-            processid = DefaultName.toJCRExtendedForm(name);
+            processid = name;
             final GeneralParameterDescriptor desc = getServer().tasks.getProcessDescriptor(name.getNamespaceURI(), name.getLocalPart());
             if(desc != null){
                 parameters = desc.createValue();

@@ -682,6 +682,11 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-processing-math</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-processing-vector</artifactId>
                 <version>${geotoolkit-pending.version}</version>
             </dependency>

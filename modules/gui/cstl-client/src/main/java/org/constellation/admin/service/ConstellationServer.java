@@ -69,7 +69,7 @@ import static org.constellation.map.configuration.QueryConstants.*;
  * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public final class ConstellationServer {
+public final class ConstellationServer{
     
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
@@ -1090,6 +1090,28 @@ public final class ConstellationServer {
         }
         
         /**
+         * Ask for a list of all tasks.
+         */
+        public StringList listTasks(){
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_LIST_TASKS;
+                final Object response = sendRequest(url, null);
+                if (response instanceof StringList) {
+                    return (StringList) response;
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return null;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return null;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+        
+        /**
          * Get the parameters description for the given process.
          */
         public GeneralParameterDescriptor getProcessDescriptor(final String authority, final String code) {
@@ -1107,6 +1129,48 @@ public final class ConstellationServer {
                 LOGGER.log(Level.WARNING, null, ex);
             }
             return null;
+        }
+        
+        /**
+         * Create a new task.
+         * 
+         * @param authority
+         * @param code
+         * @param title
+         * @param step
+         * @param parameters
+         * @return 
+         */
+        public boolean createTask(final String authority, final String code, final String id, 
+                final String title, final int step, final GeneralParameterValue parameters){
+            ArgumentChecks.ensureNonNull("authority", authority);
+            ArgumentChecks.ensureNonNull("code", code);
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("title", title);
+            ArgumentChecks.ensureNonNull("step", step);
+            ArgumentChecks.ensureNonNull("parameters", parameters);
+            try {
+                final String url = getServiceURL() + "configuration?request="+REQUEST_CREATE_TASK
+                        +"&authority=" + authority 
+                        +"&code=" + code
+                        +"&id=" + id
+                        +"&title=" + title 
+                        +"&step=" + step;
+                Object response = sendRequest(url, parameters);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
         }
         
         
