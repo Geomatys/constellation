@@ -17,7 +17,9 @@
 
 package org.constellation.configuration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -28,21 +30,35 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Johann Sorel (Geomatys)
  * @since 0.8
  */
-@XmlRootElement(name="StringMap")
+@XmlRootElement(name="StringTreeNode")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class StringMap {
+public class StringTreeNode {
 
-    private HashMap<String,String> map;
+    private HashMap<String,String> properties;
+    
+    @XmlElement(name="Child")
+    private List<StringTreeNode> children;
 
-    public HashMap<String, String> getMap() {
-        if(map == null){
-            map = new HashMap<String, String>();
+    public HashMap<String, String> getProperties() {
+        if(properties == null){
+            properties = new HashMap<String, String>();
         }
-        return map;
+        return properties;
     }
 
-    public void setMap(HashMap<String, String> map) {
-        this.map = map;
+    public void setProperties(HashMap<String, String> properties) {
+        this.properties = properties;
+    }
+    
+    public List<StringTreeNode> getChildren() {
+        if(children == null){
+            children = new ArrayList<StringTreeNode>();
+        }
+        return children;
+    }
+
+    public void setChildren(List<StringTreeNode> children) {
+        this.children = children;
     }
 
 }

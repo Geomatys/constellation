@@ -28,35 +28,31 @@
                 
                 <!-- Name column -->
                 <mf:DataTableColumn>
-                    #{node.userObject}
+                    #{node.userObject.properties['title']}
                 </mf:DataTableColumn>
                 
                 <!-- Last date run column -->
                 <mf:DataTableColumn>
+                    #{node.userObject.properties['lastRun']}
                 </mf:DataTableColumn>
                 
                 <!-- Last status column -->
                 <mf:DataTableColumn>
+                    #{node.userObject.properties['lastError']}
                 </mf:DataTableColumn>
-                
-                <!-- Next action column -->
-                <mf:DataTableColumn>
-                </mf:DataTableColumn>
-                
-                <!-- Play action column -->
-                <mf:DataTableColumn>
-                </mf:DataTableColumn>
-                                
-                <!-- Stop action column -->
-                <mf:DataTableColumn>
-                </mf:DataTableColumn>
-                                
+                                                
                 <!-- Edit action column -->
-                <mf:DataTableColumn>
+                <mf:DataTableColumn width="16px">
+                    <a4j:commandLink action="#{node.edit}" reRender="sourceLayers">
+                        <h:graphicImage value="provider.edit.png.mfRes" style="border:none;"/>
+                    </a4j:commandLink>
                 </mf:DataTableColumn>
                                 
                 <!-- Delete action column -->
-                <mf:DataTableColumn>
+                <mf:DataTableColumn width="30px">
+                    <a4j:commandLink action="#{node.delete}" reRender="sourceLayers">
+                        <h:graphicImage value="provider.remove.png.mfRes" style="border:none;"/>
+                    </a4j:commandLink>
                 </mf:DataTableColumn>
 
             </mf:Outline>

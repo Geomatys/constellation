@@ -39,6 +39,7 @@ import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.StringList;
+import org.constellation.configuration.StringTreeNode;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
@@ -148,10 +149,12 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             return ListTasks();
         } else if (REQUEST_GET_PROCESS_DESC.equalsIgnoreCase(request)) {
             return getProcessDescriptor(parameters);
+        } else if (REQUEST_GET_TASK_PARAMS.equalsIgnoreCase(request)) {
+            return getTaskParameters(parameters);
         } else if (REQUEST_CREATE_TASK.equalsIgnoreCase(request)) {
             return createTask(parameters, objectRequest);
         } else if (REQUEST_UPDATE_TASK.equalsIgnoreCase(request)) {
-            return updateTask(parameters);
+            return updateTask(parameters, objectRequest);
         } else if (REQUEST_DELETE_TASK.equalsIgnoreCase(request)) {
             return deleteTask(parameters);
         }
@@ -683,13 +686,29 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Returns a list of all tasks.
      */
-    private StringList ListTasks(){
+    private StringTreeNode ListTasks(){
         final List<Task> tasks = CstlScheduler.getInstance().listTasks();
-        final StringList lst = new StringList();
+        final StringTreeNode node = new StringTreeNode();
         for(Task t : tasks){
-            lst.getList().add(t.getId() +" "+ t.getTitle());
+            final StringTreeNode n = new StringTreeNode();
+            n.getProperties().put("id", t.getId());
+            n.getProperties().put("title", t.getTitle());
+            
+            n.getProperties().put("lastRun", String.valueOf(t.getLastExecutionDate()));
+            if(t.getLastFailedException() != null){
+                n.getProperties().put("lastError", t.getLastFailedException().getMessage());
+            }else{
+                n.getProperties().put("lastError", "");
+            }
+            
+            //return value in minutes
+            n.getProperties().put("step", String.valueOf(t.getTrigger().getRepeatInterval()/60000));            
+            n.getProperties().put("authority", t.getDetail().getFactoryIdentifier());
+            n.getProperties().put("code", t.getDetail().getProcessIdentifier());
+            
+            node.getChildren().add(n);
         }
-        return lst;
+        return node;
     }
     
     /**
@@ -709,6 +728,30 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         ParameterDescriptorGroup idesc = desc.getInputDescriptor();
         idesc = new DefaultParameterDescriptorGroup("input", idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
         return idesc;
+    }
+    
+    /**
+     * Returns task parameters.
+     */
+    private Object getTaskParameters(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String id = getParameter("id", true, parameters);
+        
+        final Task task = CstlScheduler.getInstance().getTask(id);
+        
+        if(task == null){
+            return new AcknowlegementType("Failure", "Could not find task for given id.");
+        }
+        
+        final ParameterValueGroup origParam = task.getDetail().getParameters();
+        
+        //change the description, always encapsulate in the same namespace and name
+        //jaxb object factory can not reconize changing names without a namespace
+        ParameterDescriptorGroup idesc = origParam.getDescriptor();
+        idesc = new DefaultParameterDescriptorGroup("input", idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
+        final ParameterValueGroup iparams = idesc.createValue();
+        iparams.values().addAll(origParam.values());
+        
+        return iparams;
     }
     
     /**
@@ -762,15 +805,66 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Update a task.
      */
-    private Object updateTask(final MultivaluedMap<String, String> parameters){
-        return null;
+    private Object updateTask(final MultivaluedMap<String, String> parameters,
+            final Object objectRequest) throws CstlServiceException{
+        final String authority = getParameter("authority", true, parameters);
+        final String code = getParameter("code", true, parameters);
+        String title = getParameter("title", false, parameters);
+        final int step = Integer.valueOf(getParameter("step", true, parameters));
+        final String id = getParameter("id", true, parameters);
+        
+        if(title == null || title.trim().isEmpty()){
+            title = id;
+        }
+             
+        final GeneralParameterDescriptor retypedDesc = getProcessDescriptor(parameters);   
+        
+        
+        final ParameterValueGroup params;
+        final ParameterValueReader reader = new ParameterValueReader(retypedDesc);
+        try {
+            reader.setInput(objectRequest);
+            params = (ParameterValueGroup) reader.read();
+            reader.dispose();
+        } catch (XMLStreamException ex) {
+            throw new CstlServiceException(ex);
+        } catch (IOException ex) {
+            throw new CstlServiceException(ex);
+        }
+        
+        //rebuild original values since we have changed the namespace
+        final ParameterDescriptorGroup originalDesc = ProcessFinder.getProcessDescriptor(authority,code).getInputDescriptor();
+        final ParameterValueGroup orig = originalDesc.createValue();
+        orig.values().addAll(params.values());
+        
+        
+        final Task task = new Task(id);
+        task.setTitle(title);
+        task.setTrigger(TriggerBuilder.newTrigger()
+                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(step*60))
+                .build());
+        ProcessJobDetail detail = new ProcessJobDetail(authority, code, orig);
+        task.setDetail(detail);
+        
+        if(CstlScheduler.getInstance().updateTask(task)){
+            return new AcknowlegementType("Success", "The task has been updated.");
+        }else{
+            return new AcknowlegementType("Failure", "Could not find task for given id.");
+        }
     }
     
     /**
      * Delete a task;
      */
-    private Object deleteTask(final MultivaluedMap<String, String> parameters){
-        return null;
+    private Object deleteTask(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String id = getParameter("id", true, parameters);     
+        
+        
+        if( CstlScheduler.getInstance().removeTask(id)){
+            return new AcknowlegementType("Success", "The task has been deleted");
+        }else{
+            return new AcknowlegementType("Failure", "Could not find task for given id.");
+        }
     }
     
 }

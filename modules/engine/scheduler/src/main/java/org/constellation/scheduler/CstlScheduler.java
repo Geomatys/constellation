@@ -128,6 +128,15 @@ public class CstlScheduler {
         return copy;
     }
     
+    public synchronized Task getTask(final String id){
+        for(Task t : listTasks()){
+            if(t.getId().equals(id)){
+                return t;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Add a new task.
      */
@@ -152,23 +161,25 @@ public class CstlScheduler {
     /**
      * Update a task.
      */
-    public synchronized void updateTask(Task task){
-        
-        tasks.remove(task);
-        tasks.add(task);
+    public synchronized boolean updateTask(final Task task){
+        if(removeTask(task)){
+            addTask(task);
+            return true;
+        }
+        return false;
     }
     
     /**
      * Remove a task.
      */
-    public synchronized void removeTask(Task task){
-        removeTask(task.getId());
+    public synchronized boolean removeTask(Task task){
+        return removeTask(task.getId());
     }
     
     /**
      * Remove task for the given id.
      */
-    public synchronized void removeTask(final String id){
+    public synchronized boolean removeTask(final String id){
         
         Task task = null;
         for(int i=0,n=tasks.size(); i<n; i++){
@@ -195,6 +206,7 @@ public class CstlScheduler {
             }
         }
         
+        return task != null;
     }
     
     /**

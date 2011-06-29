@@ -19,19 +19,17 @@
     
     <ui:define name="content">
 
-        <center><a href="#{taskmanagerBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
-        <br/>
         <br/>
         <table width="100%">
             <colgroup>
-                <col width="30%"/>
-                <col width="70%"/>
+                <col width="#{taskmanagerBean.id == null ? '30%' : '0%' }"/>
+                <col width="#{taskmanagerBean.id == null ? '70%' : '100%' }"/>
             </colgroup>
             <tbody>
                 <tr>
                     <td>
                         <!-- process list -->
-                        <div class="rounded">
+                        <mf:Div styleClass="rounded" rendered="#{taskmanagerBean.id == null}">
 
                             <mf:Outline id="processTree" actionVisible="true" rootVisible="false"
                                 value="#{taskmanagerBean.processModel}" var="node" width="100%" 
@@ -53,7 +51,7 @@
 
                             </mf:Outline>
 
-                        </div>
+                        </mf:Div>
                     </td>
                     <td style="vertical-align:top;">
                         <mf:Div id="params">
@@ -82,7 +80,10 @@
             </tbody>
         </table>
         <br/>
+        
         <div style="text-align: right;">
+            <a href="#{taskmanagerBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a>
+            &#160;&#160;
             <h:commandButton action="#{taskmanagerBean.saveTask}" value="#{taskmanagerBean.i18n['save']}" />
         </div>
         

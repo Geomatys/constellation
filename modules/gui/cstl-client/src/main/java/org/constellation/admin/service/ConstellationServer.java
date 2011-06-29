@@ -16,6 +16,7 @@
  */
 package org.constellation.admin.service;
 
+import org.constellation.configuration.StringTreeNode;
 import java.io.OutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -238,7 +239,9 @@ public final class ConstellationServer extends AbstractServer{
                 response = unmarshaller.unmarshal(responseStream);
                 if (response instanceof JAXBElement) {
                     JAXBElement element = (JAXBElement) response;
-                    if (element.getName().equals(ObjectFactory.SOURCE_QNAME) || element.getName().equals(ObjectFactory.LAYER_QNAME)) {
+                    if (element.getName().equals(ObjectFactory.SOURCE_QNAME) 
+                     || element.getName().equals(ObjectFactory.LAYER_QNAME)
+                     || element.getName().equals(ObjectFactory.INPUT_QNAME)) {
                         final ParameterValueReader reader = new ParameterValueReader(descriptor);
                         reader.setInput(element.getValue());
                         response = reader.read();
@@ -1080,12 +1083,12 @@ public final class ConstellationServer extends AbstractServer{
         /**
          * Ask for a list of all tasks.
          */
-        public StringList listTasks(){
+        public StringTreeNode listTasks(){
             try {
                 final String url = getURL() + "configuration?request="+REQUEST_LIST_TASKS;
                 final Object response = sendRequest(url, null);
-                if (response instanceof StringList) {
-                    return (StringList) response;
+                if (response instanceof StringTreeNode) {
+                    return (StringTreeNode) response;
                 } else if (response instanceof ExceptionReport){
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                     return null;
@@ -1108,6 +1111,28 @@ public final class ConstellationServer extends AbstractServer{
                 Object response = sendDescriptorRequest(url, null);
                 if (response instanceof GeneralParameterDescriptor) {
                     return (GeneralParameterDescriptor) response;
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                } else {
+                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return null;
+        }
+        
+        /**
+         * Get the parameters for the given task
+         * @param id
+         * @return 
+         */
+        public GeneralParameterValue getTaskParameters(final String id, ParameterDescriptorGroup desc){
+            try {
+                final String url = getURL() + "configuration?request="+REQUEST_GET_TASK_PARAMS+"&id="+id;
+                Object response = sendRequest(url, null, desc, null, false);
+                if (response instanceof GeneralParameterValue) {
+                    return (GeneralParameterValue) response;
                 } else if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 } else {
@@ -1161,6 +1186,74 @@ public final class ConstellationServer extends AbstractServer{
             return false;
         }
         
+        
+        /**
+         * Update a task.
+         * 
+         * @param authority
+         * @param code
+         * @param title
+         * @param step
+         * @param parameters
+         * @return 
+         */
+        public boolean updateTask(final String authority, final String code, final String id, 
+                final String title, final int step, final GeneralParameterValue parameters){
+            ArgumentChecks.ensureNonNull("authority", authority);
+            ArgumentChecks.ensureNonNull("code", code);
+            ArgumentChecks.ensureNonNull("id", id);
+            ArgumentChecks.ensureNonNull("title", title);
+            ArgumentChecks.ensureNonNull("step", step);
+            ArgumentChecks.ensureNonNull("parameters", parameters);
+            try {
+                final String url = getURL() + "configuration?request="+REQUEST_UPDATE_TASK
+                        +"&authority=" + authority 
+                        +"&code=" + code
+                        +"&id=" + id
+                        +"&title=" + title 
+                        +"&step=" + step;
+                Object response = sendRequest(url, parameters);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
+        
+        
+        /**
+         * Delete an existing task.
+         */
+        public boolean deleteTask(final String id){
+            ArgumentChecks.ensureNonNull("id", id);
+            try {
+                final String url = getURL().toString() + "configuration?request="+REQUEST_DELETE_TASK+"&id="+id;
+                Object response = sendRequest(url,null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
         
     }
     

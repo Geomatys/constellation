@@ -51,6 +51,7 @@ public final class QueryConstants {
     public static final String REQUEST_LIST_PROCESS     = "listProcess";
     public static final String REQUEST_LIST_TASKS       = "listTasks"; 
     public static final String REQUEST_GET_PROCESS_DESC = "getProcessDescriptor"; 
+    public static final String REQUEST_GET_TASK_PARAMS  = "getTaskConfiguration";
     public static final String REQUEST_CREATE_TASK      = "createTask";
     public static final String REQUEST_UPDATE_TASK      = "updateTask";
     public static final String REQUEST_DELETE_TASK      = "deleteTask";

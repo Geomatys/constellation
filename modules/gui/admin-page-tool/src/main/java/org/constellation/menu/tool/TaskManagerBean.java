@@ -34,8 +34,8 @@ import javax.swing.tree.TreeNode;
 
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.MenuBean;
+import org.constellation.configuration.StringTreeNode;
 
-import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.util.logging.Logging;
 
@@ -45,7 +45,7 @@ import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.parameter.ParameterDescriptorGroup;
 
 /**
  * Returns task manager and pages to add new values.
@@ -105,9 +105,9 @@ public class TaskManagerBean extends I18NBean{
     public TreeModel getTaskModel(){
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
         
-        final List<String> values = getServer().tasks.listTasks().getList();
-        for(String value : values){
-            final DefaultMutableTreeNode n = new DefaultMutableTreeNode(value);
+        final List<StringTreeNode> values = getServer().tasks.listTasks().getChildren();
+        for(StringTreeNode value : values){
+            final DefaultMutableTreeNode n = new SeletableNode(value);
             root.add(n);
         }
         
@@ -148,6 +148,10 @@ public class TaskManagerBean extends I18NBean{
     private GeneralParameterValue parameters = null;
     private Name processid;
 
+    public String getId() {
+        return id;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -172,8 +176,16 @@ public class TaskManagerBean extends I18NBean{
         final ConstellationServer server = getServer();
         if(server == null) return;
         
-        server.tasks.createTask(processid.getNamespaceURI(), processid.getLocalPart(), 
+        if(id != null){
+            //update task
+            server.tasks.updateTask(processid.getNamespaceURI(), processid.getLocalPart(), 
                 id, title, taskstep, parameters);
+        }else{
+            //create a task
+            id = UUID.randomUUID().toString();
+            server.tasks.createTask(processid.getNamespaceURI(), processid.getLocalPart(), 
+                id, title, taskstep, parameters);
+        }
         
     }
 
@@ -184,7 +196,7 @@ public class TaskManagerBean extends I18NBean{
     public void createTask(){
         
         //reset values
-        id = UUID.randomUUID().toString();
+        id = null;
         parameters = null;
         taskstep = 15;
         if(configPage != null){
@@ -213,6 +225,43 @@ public class TaskManagerBean extends I18NBean{
             if(desc != null){
                 parameters = desc.createValue();
             }
+        }
+        
+        public void edit(){
+            if(!(userObject instanceof StringTreeNode)){
+                return;
+            }
+            
+            final StringTreeNode n = (StringTreeNode) userObject;
+            id = n.getProperties().get("id");            
+            title = n.getProperties().get("title");            
+            final String auto = n.getProperties().get("authority");
+            final String code = n.getProperties().get("code");            
+            processid = new DefaultName(auto, code);
+            taskstep = Integer.valueOf(n.getProperties().get("step"));
+            
+            final ParameterDescriptorGroup desc = (ParameterDescriptorGroup)
+                    getServer().tasks.getProcessDescriptor(auto,code);
+            parameters = getServer().tasks.getTaskParameters(id,desc);
+            
+            if(configPage != null){
+                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+                try {
+                    context.redirect(configPage);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                }
+            }
+        }
+        
+        public void delete(){
+            if(!(userObject instanceof StringTreeNode)){
+                return;
+            }
+            
+            final StringTreeNode n = (StringTreeNode) userObject;
+            final String nid = n.getProperties().get("id");
+            getServer().tasks.deleteTask(nid);
         }
     
     }

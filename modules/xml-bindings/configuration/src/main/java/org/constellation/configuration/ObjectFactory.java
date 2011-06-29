@@ -37,6 +37,7 @@ public class ObjectFactory {
 
     public static final QName SOURCE_QNAME = new QName("http://www.geotoolkit.org/parameter", "source");
     public static final QName LAYER_QNAME  = new QName("http://www.geotoolkit.org/parameter", "Layer");
+    public static final QName INPUT_QNAME  = new QName("http://www.geotoolkit.org/parameter", "input");
     
     
     /**
@@ -130,6 +131,10 @@ public class ObjectFactory {
         return new StringMap();
     }
         
+    public StringTreeNode createStringTreeNode(){
+        return new StringTreeNode();
+    }
+    
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")
     public JAXBElement<Object> createSource(Object value) {
         return new JAXBElement<Object>(SOURCE_QNAME, Object.class, null, value);
