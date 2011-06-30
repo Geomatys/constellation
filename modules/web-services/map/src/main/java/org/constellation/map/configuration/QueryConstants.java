@@ -60,6 +60,9 @@ public final class QueryConstants {
     public static final String REQUEST_REFRESH_INDEX    = "refreshIndex"; 
     public static final String REQUEST_IMPORT_RECORDS   = "importRecords"; 
     
+    //Service operations
+    public static final String REQUEST_UPDATE_CAPABILITIES = "updateCapabilities"; 
+    
     private QueryConstants(){}
     
 }

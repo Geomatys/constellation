@@ -79,13 +79,17 @@
                 </tr>
                 <tr>
                     <td><h:outputText value="#{cswBean.i18n['importRecord']}"/></td>     
+                    <td><mf:FileUpload id="importFile" 
+                                       size="30"
+                                       uploadedFile="#{cswBean.uploadedRecord}" /></td>
+	            <td><h:commandButton action="#{cswBean.importRecord}" value="#{cswBean.i18n['importFile']}"/></td>
                 </tr>
                 <tr>
-                <td><mf:FileUpload id="importFile" 
+                    <td><h:outputText value="#{cswBean.i18n['customCapabilities']}"/></td>     
+                    <td><mf:FileUpload id="customCapabilities" 
                                        size="30"
-                                       uploadedFile="#{cswBean.uploadedFile}" />
-                </td>
-                <td><h:commandButton action="#{cswBean.importRecord}" value="#{cswBean.i18n['importFile']}"/></td>
+                                       uploadedFile="#{cswBean.uploadedCapabilities}" /></td>
+                    <td><h:commandButton action="#{cswBean.updateCapabilities}" value="#{cswBean.i18n['importFile']}"/></td>
                 </tr>     
             </table> 
 

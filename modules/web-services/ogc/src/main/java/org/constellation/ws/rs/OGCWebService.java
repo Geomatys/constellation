@@ -19,6 +19,8 @@ package org.constellation.ws.rs;
 
 // J2SE dependencies
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
+import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
 
 // Constellation dependencies
@@ -440,6 +443,39 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
                 final InstanceReport report = new InstanceReport(instances);
                 return Response.ok(report, "text/xml").build();
+                
+            } else if ("updateCapabilities".equalsIgnoreCase(request)) {
+                LOGGER.info("updating instance capabilities");
+                final String identifier = getParameter("id", true);
+                final String fileName   = getParameter("fileName", true);
+                final File serviceDirectory = getServiceDirectory();
+                final AcknowlegementType response;
+                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                    File instanceDirectory     = new File (serviceDirectory, identifier);
+                    if (instanceDirectory.isDirectory()) {
+                        // recup the file 
+                        if (objectRequest instanceof File) {
+                            try {
+                                final File newCapabilitiesFile = new File(instanceDirectory, fileName);
+                                if (!newCapabilitiesFile.exists()) {
+                                    newCapabilitiesFile.createNewFile();
+                                }
+                                FileUtilities.copy((File)objectRequest, newCapabilitiesFile);
+                                response = new AcknowlegementType("Success", "Instance Capabilities correctly updated");
+                            } catch (IOException ex) {
+                                throw new CstlServiceException("An IO exception occurs when creating the new Capabilities File.", ex, NO_APPLICABLE_CODE);
+                            }
+                        } else {
+                            throw new CstlServiceException("Unable to find the specified File.", NO_APPLICABLE_CODE);
+                        }
+                    } else {
+                        throw new CstlServiceException("Unable to find an instance:" + identifier, NO_APPLICABLE_CODE);
+                    }
+                } else {
+                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+                }
+                return Response.ok(response, "text/xml").build();
+                
             } else {
                 throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
                         INVALID_PARAMETER_VALUE, "request");
@@ -451,6 +487,42 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
     }
 
+    /**
+     * Receive a file and write it into the static file path.
+     * 
+     * @param in The input stream.
+     * @return an Acknowledgment indicating if the operation succeed or not.
+     *
+     * @todo Not implemented. This is just a placeholder where we can customize the
+     *       download action for some users. Will probably be removed in a future version.
+     */
+    @PUT
+    public Response uploadFile(final InputStream in) {
+        try  {
+            final String serviceID = getParameter("serviceId", false);
+            // allow this method only for admin
+            if ("admin".equals(serviceID)) {
+                final File tmp          = File.createTempFile("cstl-", null);
+                final File uploadedFile = FileUtilities.buildFileFromStream(in, tmp);
+                in.close();
+                return treatAdminRequest(uploadedFile);
+            } else {
+                LOGGER.log(Level.WARNING, "Received a PUT request on a not admin instance identifier:{0}", serviceID);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            
+        } catch (IOException ex) {
+            LOGGER.severe("IO exception while uploading file");
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            launchException("error while uploading the file", NO_APPLICABLE_CODE.name(), null);
+            // should never happen
+            return null;
+        } catch (CstlServiceException ex) {
+            final ServiceDef mainVersion = supportedVersions.get(0);
+            return processExceptionResponse(ex, mainVersion);
+        }
+    }
+    
     /**
      * Service specific task which has to be executed when a restart is asked.
      * 

@@ -59,10 +59,6 @@
             <artifactId>admin-page-services</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mapfaces</groupId>
-            <artifactId>mapfaces-io</artifactId>
-        </dependency>
     </dependencies>
 
 </project>

@@ -154,6 +154,13 @@
                         </h:selectOneMenu>
                     </td>
                 </tr> 
+                <tr>
+                    <td><h:outputText value="#{sosBean.i18n['customCapabilities']}"/></td>     
+                    <td><mf:FileUpload id="customCapabilities" 
+                                       size="30"
+                                       uploadedFile="#{sosBean.uploadedCapabilities}" /></td>
+                    <td><h:commandButton action="#{sosBean.updateCapabilities}" value="#{sosBean.i18n['importFile']}"/></td>
+                </tr>
                 </tbody>    
             </table>
             <div style="text-align: right;">

@@ -53,7 +53,7 @@ public class CSWBean extends AbstractServiceBean {
     
     private String userPass;
     
-    private UploadedFile uploadedFile;
+    private UploadedFile uploadedRecord;
     
     private boolean indexOnlyPublished;
     
@@ -299,12 +299,12 @@ public class CSWBean extends AbstractServiceBean {
     }
     
     
-    public void setUploadedFile(UploadedFile uploadedFile) {
-        this.uploadedFile = uploadedFile;
+    public void setUploadedRecord(UploadedFile uploadedRecord) {
+        this.uploadedRecord = uploadedRecord;
     }
 
-    public UploadedFile getUploadedFile() {
-        return uploadedFile;
+    public UploadedFile getUploadedRecord() {
+        return uploadedRecord;
     }
     
     /**
@@ -339,8 +339,8 @@ public class CSWBean extends AbstractServiceBean {
      * Build an MDWeb Database
      */
     public void importRecord() {
-        if (uploadedFile != null) {
-            final String contentType = uploadedFile.getContentType();
+        if (uploadedRecord != null) {
+            final String contentType = uploadedRecord.getContentType();
             if ("application/zip".equals(contentType)
              || "application/octet-stream".equals(contentType)
              || "application/x-download".equals(contentType)
@@ -352,8 +352,8 @@ public class CSWBean extends AbstractServiceBean {
                 final String instanceId = getConfiguredInstance().getName();
                 try {
                     final File tmp = File.createTempFile("cstl", null);
-                    final File importedfile = FileUtilities.buildFileFromStream(uploadedFile.getInputStream(), tmp);
-                    getServer().csws.importFile(instanceId, importedfile, uploadedFile.getFileName());
+                    final File importedfile = FileUtilities.buildFileFromStream(uploadedRecord.getInputStream(), tmp);
+                    getServer().csws.importFile(instanceId, importedfile, uploadedRecord.getFileName());
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
                 }

@@ -615,6 +615,26 @@ public final class ConstellationServer extends AbstractServer{
             return false;
         }
 
+        public boolean updateCapabilities(final String service, final String instanceId, final File importFile, final String fileName) {
+            try {
+                final String url = getURL() + service.toLowerCase() + "/admin?request=" + REQUEST_UPDATE_CAPABILITIES + "&id=" + instanceId + "&filename=" + fileName;
+                Object response = sendRequest(url, importFile, null, null, true);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return true;
+                    } else {
+                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
         /**
          * Return a complete URL for the specified service  (wms, wfs, csw,...) and instance identifier.
          *

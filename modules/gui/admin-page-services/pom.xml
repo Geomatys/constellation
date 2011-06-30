@@ -68,6 +68,10 @@
             <artifactId>mapfaces-core</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mapfaces</groupId>
+            <artifactId>mapfaces-io</artifactId>
+        </dependency>
         
         <dependency>
             <groupId>javax.el</groupId>

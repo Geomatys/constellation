@@ -17,6 +17,7 @@
 
 package org.constellation.menu.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,9 +43,11 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.util.ArgumentChecks;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.event.CloseEvent;
 import org.mapfaces.i18n.I18NBean;
+import org.mapfaces.model.UploadedFile;
 import org.mapfaces.renderkit.html.outline.OutlineCellStyler;
 import org.mapfaces.renderkit.html.outline.OutlineDataModel;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
@@ -115,6 +118,7 @@ public class AbstractServiceBean extends I18NBean{
     protected Object configurationObject = null;
     private LayerContextTreeModel treemodel = null;
     private String selectedPotentialSource = null;
+    private UploadedFile uploadedCapabilities;
 
     public AbstractServiceBean(final Specification specification, final String mainPage, final String configPage) {
         ArgumentChecks.ensureNonNull("specification", specification);
@@ -310,6 +314,44 @@ public class AbstractServiceBean extends I18NBean{
             getServer().services.configureInstance(getSpecificationName(), configuredInstance.getName(), configurationObject);
             configuredInstance.restart();
         }
+    }
+    
+    public void updateCapabilities() {
+         if (uploadedCapabilities != null) {
+            final String contentType = uploadedCapabilities.getContentType();
+            if ("application/xml".equals(contentType)
+             || "text/xml".equals(contentType)
+             || "application/x-httpd-php".equals(contentType)){
+               
+                final String instanceId = getConfiguredInstance().getName();
+                try {
+                    final File tmp = File.createTempFile("cstl", null);
+                    final File importedfile = FileUtilities.buildFileFromStream(uploadedCapabilities.getInputStream(), tmp);
+                    getServer().services.updateCapabilities(getSpecificationName(), instanceId, importedfile, uploadedCapabilities.getFileName());
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
+                }
+                
+            } else {
+                LOGGER.log(Level.WARNING, "This content type can not be read : {0}", contentType);
+            }
+        } else {
+            LOGGER.log(Level.WARNING, "imported file is null");
+        }
+    }
+
+    /**
+     * @return the uploadedCapabilities
+     */
+    public UploadedFile getUploadedCapabilities() {
+        return uploadedCapabilities;
+    }
+
+    /**
+     * @param uploadedCapabilities the uploadedCapabilities to set
+     */
+    public void setUploadedCapabilities(UploadedFile uploadedCapabilities) {
+        this.uploadedCapabilities = uploadedCapabilities;
     }
 
     public class ServiceInstance implements Comparable<ServiceInstance>{
