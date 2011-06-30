@@ -16,6 +16,9 @@
  */
 package org.constellation.admin.service;
 
+import org.opengis.parameter.ParameterDescriptor;
+import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
+import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.constellation.configuration.StringTreeNode;
 import java.io.OutputStream;
 import java.io.File;
@@ -44,6 +47,7 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
@@ -66,12 +70,18 @@ import org.opengis.util.FactoryException;
 import static org.constellation.map.configuration.QueryConstants.*;
 
 /**
- * Convinient class to perform actions on constellation web services.
+ * convenient class to perform actions on constellation web services.
  * 
  * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
 public final class ConstellationServer extends AbstractServer{
+    
+    public static final ParameterDescriptor<String> URL_PARAMETER = new DefaultParameterDescriptor("Url","",String.class,null,true);
+    public static final ParameterDescriptor<String> USER_PARAMETER = new DefaultParameterDescriptor("User","",String.class,null,true);
+    public static final ParameterDescriptor<String> PASSWORD_PARAMETER = new DefaultParameterDescriptor("Password","",String.class,null,true);
+    public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP =
+            new DefaultParameterDescriptorGroup("Constellation",URL_PARAMETER,USER_PARAMETER,PASSWORD_PARAMETER);
     
     private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
@@ -80,7 +90,14 @@ public final class ConstellationServer extends AbstractServer{
     public final Providers providers = new Providers();
     public final Csws csws           = new Csws();
     public final Tasks tasks         = new Tasks();
-    private ConstellationServer(final URL server, final String user, final String password) {
+    
+    public ConstellationServer(final ParameterValueGroup value) throws MalformedURLException {
+        this(new URL(Parameters.value(URL_PARAMETER, value)),
+             Parameters.stringValue(USER_PARAMETER, value),
+             Parameters.stringValue(PASSWORD_PARAMETER, value));
+    }
+    
+    public ConstellationServer(final URL server, final String user, final String password) {
         super(server,new BasicAuthenticationSecurity(user, password));
     }
     
