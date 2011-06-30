@@ -65,7 +65,10 @@ public class FileSensorReader implements SensorReader {
         if (dataDirectory == null) {
             throw new MetadataIoException("cause: The data directory is null", NO_APPLICABLE_CODE);
         } else if (!dataDirectory.exists()) {
-            dataDirectory.mkdir();
+            boolean sucess = dataDirectory.mkdir();
+            if (!sucess) {
+                throw new MetadataIoException("cause: unable to build the directory:" + dataDirectory.getPath(), NO_APPLICABLE_CODE);
+            }
         }
     }
 

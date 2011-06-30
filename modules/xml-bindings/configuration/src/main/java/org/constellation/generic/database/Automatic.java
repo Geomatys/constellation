@@ -266,8 +266,13 @@ public class Automatic {
         File result = null;
         if (dataDirectory != null) {
             result = new File(dataDirectory);
-            if (!result.exists() && configurationDirectory != null && configurationDirectory.exists()) {
-                result = new File(configurationDirectory, dataDirectory);
+            if (!result.exists()){
+                // TODO find a way for windows
+                if (dataDirectory.startsWith("/")) {
+                    return result;
+                } else if (configurationDirectory != null && configurationDirectory.exists()){
+                    result = new File(configurationDirectory, dataDirectory);
+                }
             }
         }
         return result;

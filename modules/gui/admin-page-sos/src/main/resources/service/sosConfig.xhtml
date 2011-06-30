@@ -13,6 +13,26 @@
         <center><a href="#{sosBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
         <br/>
         <br/>
+        <b>#{sosBean.i18n['instance']}</b><br/>
+        <div class="rounded">
+           <h:graphicImage value="#{sosBean.configuredInstance.statusIcon}" style="border:none;"/>
+           <a href="#{sosBean.configuredInstance.path}" target="blank">#{cswBean.configuredInstance.name}</a>
+        
+           &#160;
+           <h:commandLink action="#{sosBean.configuredInstance.restart}">
+               <h:graphicImage value="provider.reload.png.mfRes" style="border:none;"/>
+           </h:commandLink>
+           &#160;
+           <h:commandLink action="#{sosBean.configuredInstance.stop}">
+              <h:graphicImage value="service.stop.png.mfRes" style="border:none;"/>
+           </h:commandLink>
+           &#160;
+           <h:commandLink action="#{sosBean.configuredInstance.start}">
+              <h:graphicImage value="service.start.png.mfRes" style="border:none;"/>
+           </h:commandLink>
+           <br/>
+       </div>
+       <br/>
         <div class="rounded">
             SOS Configuration
             <div class="rounded">

@@ -13,6 +13,26 @@
         <center><a href="#{cswBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
         <br/>
         <br/>
+        <b>#{cswBean.i18n['instance']}</b><br/>
+        <div class="rounded">
+           <h:graphicImage value="#{cswBean.configuredInstance.statusIcon}" style="border:none;"/>
+           <a href="#{cswBean.configuredInstance.path}" target="blank">#{cswBean.configuredInstance.name}</a>
+        
+           &#160;
+           <h:commandLink action="#{cswBean.configuredInstance.restart}">
+               <h:graphicImage value="provider.reload.png.mfRes" style="border:none;"/>
+           </h:commandLink>
+           &#160;
+           <h:commandLink action="#{cswBean.configuredInstance.stop}">
+              <h:graphicImage value="service.stop.png.mfRes" style="border:none;"/>
+           </h:commandLink>
+           &#160;
+           <h:commandLink action="#{cswBean.configuredInstance.start}">
+              <h:graphicImage value="service.start.png.mfRes" style="border:none;"/>
+           </h:commandLink>
+           <br/>
+       </div>
+       <br/>
         <div class="rounded">
             CSW Configuration
             <div class="rounded">

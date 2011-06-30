@@ -102,6 +102,21 @@
         
     </mf:Outline>
     </div>
+    <table style="width:100%;"> 
+       <colgroup>
+          <col width="20%"/>
+          <col width="80%"/>
+       </colgroup>
+       <tbody>
+                <tr>
+                   <td><h:outputText value="#{bean.i18n['customCapabilities']}"/></td>     
+                   <td><mf:FileUpload id="customCapabilities" 
+                                       size="30"
+                                       uploadedFile="#{bean.uploadedCapabilities}" /></td>
+                    <td><h:commandButton action="#{bean.updateCapabilities}" value="#{bean.i18n['importFile']}"/></td>
+                </tr>
+       </tbody>    
+    </table>
     <br/>
     <b>#{bean.i18n['security']}</b><br/>
     <h:inputTextarea value="#{bean.configurationObject.security}" style="width:100%;" />
