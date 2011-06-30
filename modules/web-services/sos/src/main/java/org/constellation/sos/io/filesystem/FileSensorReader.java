@@ -19,6 +19,7 @@ package org.constellation.sos.io.filesystem;
 
 // J2SE dependencies
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -51,10 +52,7 @@ public class FileSensorReader implements SensorReader {
     /**
      * A JAXB unmarshaller used to unmarshall the xml files.
      */
-    private static final MarshallerPool MARSHALLER_POOL;
-    static {
-        MARSHALLER_POOL = SensorMLMarshallerPool.getInstance();
-    }
+    private static final MarshallerPool MARSHALLER_POOL = SensorMLMarshallerPool.getInstance();
 
     /**
      * The directory where the data file are stored
@@ -64,9 +62,11 @@ public class FileSensorReader implements SensorReader {
     public FileSensorReader(final Automatic configuration) throws MetadataIoException  {
         //we initialize the unmarshaller
         dataDirectory  = configuration.getDataDirectory();
-        if (MARSHALLER_POOL == null) {
-            throw new MetadataIoException("JAXBException while starting the file system Sensor reader", NO_APPLICABLE_CODE);
-        } 
+        if (dataDirectory == null) {
+            throw new MetadataIoException("cause: The data directory is null", NO_APPLICABLE_CODE);
+        } else if (!dataDirectory.exists()) {
+            dataDirectory.mkdir();
+        }
     }
 
     /**
@@ -128,12 +128,14 @@ public class FileSensorReader implements SensorReader {
     @Override
     public List<String> getSensorNames() throws CstlServiceException {
         final List<String> result = new ArrayList<String>();
-        for (File sensorFile : dataDirectory.listFiles()) {
-            String sensorID = sensorFile.getName();
-            final int suffixPos = sensorID.indexOf(".xml");
-            if (suffixPos != -1){
-                sensorID = sensorID.substring(0, suffixPos);
-                result.add(sensorID);
+        if (dataDirectory.isDirectory()) {
+            for (File sensorFile : dataDirectory.listFiles()) {
+                String sensorID = sensorFile.getName();
+                final int suffixPos = sensorID.indexOf(".xml");
+                if (suffixPos != -1){
+                    sensorID = sensorID.substring(0, suffixPos);
+                    result.add(sensorID);
+                }
             }
         }
         return result;
