@@ -69,7 +69,6 @@ import static org.constellation.ws.ExceptionCode.*;
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.xml.sax.SAXException;
 
 
@@ -564,41 +563,13 @@ public abstract class WebService {
                     }
                 }
             }
-            final StringReader sr                   = new StringReader(list.get(0));
-            final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
-            final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(sr);
-            final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
-                    new Class[]{XMLEventReader.class}, new InvocationHandler() {
-
-                @Override
-                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    Object returnVal = method.invoke(rootEventReader, args);
-                    if (method.getName().equals("nextEvent")) {
-                        XMLEvent evt = (XMLEvent) returnVal;
-                        if (evt.isStartElement()) {
-                            StartElement startElem = evt.asStartElement();
-                            Iterator<Namespace> t = startElem.getNamespaces();
-                            while (t.hasNext()) {
-                                Namespace n = t.next();
-                                prefixMapping.put(n.getPrefix(), n.getNamespaceURI());
-                            }
-                        }
-                    }
-                    return returnVal;
-                }
-            });
-            Object result = unmarshaller.unmarshal(eventReader);
+            final StringReader sr = new StringReader(list.get(0));
+            Object result = unmarshaller.unmarshal(sr);
             if (result instanceof JAXBElement) {
                 result = ((JAXBElement)result).getValue();
             }
-            if (result instanceof FilterType) {
-                ((FilterType)result).setPrefixMapping(prefixMapping);
-            }
             return result;
         } catch (JAXBException ex) {
-             throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
-                            ex, INVALID_PARAMETER_VALUE);
-        } catch (XMLStreamException ex) {
              throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
                             ex, INVALID_PARAMETER_VALUE);
         } finally {

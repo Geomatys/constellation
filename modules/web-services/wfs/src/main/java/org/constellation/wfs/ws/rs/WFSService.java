@@ -18,6 +18,8 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
+import java.io.StringReader;
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.HashMap;
 import org.geotoolkit.wfs.xml.v110.BaseRequestType;
 import javax.xml.stream.events.Namespace;
@@ -635,5 +637,73 @@ public class WFSService extends GridWebService<WFSWorker> {
 
     public static Map<String, String> getSchemaLocations() {
         return schemaLocations;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * overriden for extract namespace mapping.
+     */
+    @Override
+    protected Object getComplexParameter(final String parameterName, final boolean mandatory)
+                                                                  throws CstlServiceException
+    {
+        Unmarshaller unmarshaller = null;
+        try {
+            unmarshaller = getMarshallerPool().acquireUnmarshaller();
+            final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
+            List<String> list = parameters.get(parameterName);
+            if (list == null) {
+                list = parameters.get(parameterName.toLowerCase());
+                if (list == null) {
+                    if (!mandatory) {
+                        return null;
+                    } else {
+                        throw new CstlServiceException("The parameter " + parameterName + " must be specified",
+                                       MISSING_PARAMETER_VALUE);
+                    }
+                }
+            }
+            final StringReader sr                   = new StringReader(list.get(0));
+            final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
+            final XMLEventReader rootEventReader    = XMLInputFactory.newInstance().createXMLEventReader(sr);
+            final XMLEventReader eventReader        = (XMLEventReader) Proxy.newProxyInstance(getClass().getClassLoader(),
+                    new Class[]{XMLEventReader.class}, new InvocationHandler() {
+
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    Object returnVal = method.invoke(rootEventReader, args);
+                    if (method.getName().equals("nextEvent")) {
+                        XMLEvent evt = (XMLEvent) returnVal;
+                        if (evt.isStartElement()) {
+                            StartElement startElem = evt.asStartElement();
+                            Iterator<Namespace> t = startElem.getNamespaces();
+                            while (t.hasNext()) {
+                                Namespace n = t.next();
+                                prefixMapping.put(n.getPrefix(), n.getNamespaceURI());
+                            }
+                        }
+                    }
+                    return returnVal;
+                }
+            });
+            Object result = unmarshaller.unmarshal(eventReader);
+            if (result instanceof JAXBElement) {
+                result = ((JAXBElement)result).getValue();
+            }
+            if (result instanceof FilterType) {
+                ((FilterType)result).setPrefixMapping(prefixMapping);
+            }
+            return result;
+        } catch (JAXBException ex) {
+             throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
+                            ex, INVALID_PARAMETER_VALUE);
+        } catch (XMLStreamException ex) {
+             throw new CstlServiceException("The xml object for parameter " + parameterName + " is not well formed:" + '\n' +
+                            ex, INVALID_PARAMETER_VALUE);
+        } finally {
+            if (unmarshaller != null) {
+                getMarshallerPool().release(unmarshaller);
+            }
+        }
     }
 }

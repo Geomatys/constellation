@@ -110,10 +110,6 @@
       <artifactId>cstl-engine-scheduler</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-ogc</artifactId>
-    </dependency>
   </dependencies>
 
 </project>
