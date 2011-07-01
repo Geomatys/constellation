@@ -34,7 +34,6 @@ import org.geotoolkit.coverage.io.CoverageIO;
 
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.coverage.io.GridCoverageReaders;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.mosaic.TileManager;
 import org.geotoolkit.map.ElevationModel;
@@ -58,10 +57,10 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
     public static final String KEY_FOLDER_PATH = "path";
     public static final String KEY_NAMESPACE = "namespace";
 
-    private final Map<Name,Entry<TileManager,CoordinateReferenceSystem>> index =
-            new HashMap<Name,Entry<TileManager,CoordinateReferenceSystem>>(){
+    private final Map<Name,GridCoverageReader> index =
+            new HashMap<Name,GridCoverageReader>(){
         @Override
-        public Entry<TileManager,CoordinateReferenceSystem> get(Object key) {
+        public GridCoverageReader get(Object key) {
             if(key instanceof Name && ((Name)key).isGlobal()){
                 String nmsp = value(NAMESPACE_DESCRIPTOR, getSource());
                 if (nmsp == null) {
@@ -108,20 +107,13 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
      */
     @Override
     public LayerDetails get(final Name key) {
-        final Entry<TileManager,CoordinateReferenceSystem> entry = index.get(key);
+        final GridCoverageReader reader = index.get(key);
 
-        if (entry != null) {
+        if (reader != null) {
             final String name = key.getLocalPart();
             final ParameterValueGroup layer = getLayer(getSource(), name);
             final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
             final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
-            final GridCoverageReader reader;
-            try {
-                reader = CoverageIO.createMosaicReader(entry.getKey(), entry.getValue());
-            } catch (CoverageStoreException ex) {
-                getLogger().log(Level.WARNING, "Failed to load coverage reader from tile manager.", ex);
-                return null;
-            }
             if (layer == null) {
                 return new GridCoverageReaderLayerDetails(reader,null,em, key);
 
@@ -184,11 +176,9 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             }
 
             try{
-                final Entry<TileManager,CoordinateReferenceSystem> entry = GridCoverageReaders.openTileManager(folder);
+                final GridCoverageReader entry = CoverageIO.writeOrReuseMosaic(folder); //GridCoverageReaders.openTileManager(folder);
                 index.put(name, entry);
                 visit(); //will log errors if any
-            }catch(IOException ex){
-                Logging.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
             }catch(CoverageStoreException ex){
                 Logging.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
             }

@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.coverage.io.GridCoverageReaders;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.converter.SimpleConverter;
 
@@ -70,7 +70,7 @@ public class ReferenceToGridCoverageReaderConverter extends SimpleConverter<Map<
                     
         try {
             final URL url = new URL(source.get("href"));
-            return GridCoverageReaders.createMosaicReader(url);
+            return CoverageIO.createSimpleReader(url);
         } catch (MalformedURLException ex) {
             throw new NonconvertibleObjectException("Reference grid coverage invalid input : Malformed url",ex);
         } catch (CoverageStoreException ex) {
