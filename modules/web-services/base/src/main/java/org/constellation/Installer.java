@@ -19,13 +19,9 @@ package org.constellation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.spi.ImageWriterSpi;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import org.constellation.scheduler.CstlScheduler;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.internal.io.Installation;
 import org.geotoolkit.lang.Setup;
 import org.geotoolkit.util.logging.Logging;
@@ -48,8 +44,6 @@ public final class Installer implements ServletContextListener{
             Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 
             //Initialize geotoolkit
-            //TODO, this is not the best place since a service must be started
-            //to load everything, but what else do we have ?
             Installation.allowSystemPreferences = false;
             Setup.initialize(null);
 
@@ -60,33 +54,14 @@ public final class Installer implements ServletContextListener{
                 LOGGER.log(Level.SEVERE, "JAI librairies are not in the classpath. Please install it.\n "
                         + ex.getLocalizedMessage(), ex);
             }
-            Setup.initialize(null);
             LOGGER.log(Level.WARNING, "=== GeotoolKit sucessfully started ===");
-        }catch(Exception ex){
+        } catch(Exception ex) {
             LOGGER.log(Level.WARNING, "=== GeotoolKit failed to start ===\n"+ex.getLocalizedMessage(), ex);
         }
-        
-        
-        //reset values, only allow pure java readers
-        for(String jn : ImageIO.getReaderFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
-        }
-
-        //reset values, only allow pure java writers
-        for(String jn : ImageIO.getWriterFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
-        }
-        
-        //start constellation scheduler
-        CstlScheduler.getInstance();
-        
     }
 
     @Override
     public synchronized void contextDestroyed(ServletContextEvent sce) {
-        
-        //stop constellation scheduler
-        CstlScheduler.getInstance().stop();
         
         LOGGER.log(Level.WARNING, "=== Stopping GeotoolKit ===");
         try{
