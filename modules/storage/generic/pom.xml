@@ -58,10 +58,10 @@
       <artifactId>cstl-xml-configuration</artifactId>
       <version>${project.version}</version>
     </dependency>
-      <dependency>
-        <groupId>org.geotoolkit</groupId>
-        <artifactId>geotk-metadata-sql</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-metadata-sql</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

@@ -80,7 +80,7 @@
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>com.sun.xml.ws</groupId>
       <artifactId>jaxws-rt</artifactId>
       <exclusions>
@@ -99,7 +99,7 @@
           <artifactId>jaxb-api</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency-->
     <dependency>
       <groupId>org.constellation.library</groupId>
       <artifactId>cstl-lib-base</artifactId>

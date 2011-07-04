@@ -107,7 +107,10 @@
         <url-pattern>/mfRes/*</url-pattern>
     </servlet-mapping>
 
+    <!--                                            --> 
     <!-- REST Servlet for constellation web service -->
+    <!--                                            -->
+
     <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
         <servlet-class>org.constellation.ws.rs.CstlServletContainer</servlet-class>
@@ -134,6 +137,63 @@
         <url-pattern>/WS/*</url-pattern>
     </servlet-mapping>
     
+    <!--                                                        --> 
+    <!-- SOAP servlet for constellation web service for Tomcat  -->
+    
+    <!-- In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in the web-app tag (at the top of this document)
+         In Tomcat   : 1) Uncomment the WSServletContextListener listener.
+                       2) Enable each service by uncommenting the servlet block. 
+                       3) Rename the file sun-jaxws.xml.backup  in sun-jaxws.xml and uncomment the endpoint you want to enable.
+           
+     -->
+
+    <!--                                       --> 
+    <!-- If using SOAP uncomment this listener -->
+    <!--                                       --> 
+    <!--listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener-->
+
+    <!--                                                                            --> 
+    <!-- to enable the SOS service SOAP (in tomcat) uncomment the following servlet -->
+    <!--                                                                            --> 
+    <!--servlet>
+        <servlet-name>SOService</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SOService</servlet-name>
+        <url-pattern>/WS-SOAP/sos/*</url-pattern>
+    </servlet-mapping-->
+
+    <!--                                                                            --> 
+    <!-- to enable the CSW service SOAP (in tomcat) uncomment the following servlet -->
+    <!--                                                                            --> 
+    <!--servlet>
+        <servlet-name>CSWService</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CSWService</servlet-name>
+        <url-pattern>/WS-SOAP/csw/*</url-pattern>
+    </servlet-mapping-->
+
+    <!--                                                                             --> 
+    <!-- to enable the WMTS service SOAP (in tomcat) uncomment the following servlet -->
+    <!--                                                                             --> 
+    <!--servlet>
+        <servlet-name>WMTSService</servlet-name>
+        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WMTSService</servlet-name>
+        <url-pattern>/WS-SOAP/wmts/*</url-pattern>
+    </servlet-mapping-->
+
+
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
