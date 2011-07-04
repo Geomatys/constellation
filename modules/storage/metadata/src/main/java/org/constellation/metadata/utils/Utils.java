@@ -123,6 +123,7 @@ public final class Utils {
 
         final List<String> paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:metadataStandardName");
+        paths.add("ISO 19115:CI_ResponsibleParty:xLink:href");
         
         for (String path : paths) {
             Object value = ReflectionUtilities.getValuesFromPath(path, obj);
