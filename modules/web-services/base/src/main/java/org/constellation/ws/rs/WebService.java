@@ -25,16 +25,10 @@ import java.util.logging.Logger;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -50,13 +44,6 @@ import javax.ws.rs.POST;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.UnmarshalException;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -329,7 +316,7 @@ public abstract class WebService {
      */
     @POST
     @Consumes("*/xml")
-    public Response doPOSTXml(InputStream is) throws JAXBException  {
+    public Response doPOSTXml(InputStream is) {
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
@@ -356,7 +343,7 @@ public abstract class WebService {
                     }
                 }
                 request = unmarshallRequest(unmarshaller, is);
-            } catch (UnmarshalException e) {
+            } catch (JAXBException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
                     if (e.getCause() != null && e.getCause().getMessage() != null) {
@@ -373,6 +360,9 @@ public abstract class WebService {
                 }
 
                 return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, null);
+            } catch (CstlServiceException e) {
+                
+                return launchException(e.getMessage(), e.getExceptionCode().identifier(), e.getLocator());
             } finally {
                 if (unmarshaller != null)  {
                     pool.release(unmarshaller);
@@ -407,7 +397,7 @@ public abstract class WebService {
      * @return
      * @throws JAXBException 
      */
-    protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException {
+    protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException, CstlServiceException {
         return unmarshaller.unmarshal(is);
     }
 
