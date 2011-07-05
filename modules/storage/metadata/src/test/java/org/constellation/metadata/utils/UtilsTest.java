@@ -191,6 +191,15 @@ public class UtilsTest {
         expResult = "partyIdent";
         result = Utils.findIdentifier(party);
         assertEquals(expResult, result);
+        
+        
+        party = new DefaultResponsibleParty();
+        party.setOrganisationName(new SimpleInternationalString("partyIdent"));
+        party.setIndividualName("myName");
+        
+        expResult = "myName";
+        result = Utils.findIdentifier(party);
+        assertEquals(expResult, result);
     }
 
     

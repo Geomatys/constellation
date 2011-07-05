@@ -72,6 +72,7 @@ public final class Utils {
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:citation:title");
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
+        paths.add("ISO 19115:CI_ResponsibleParty:individualName");
         paths.add("ISO 19115:CI_ResponsibleParty:organisationName");
         paths.add("ISO 19110:FC_FeatureCatalogue:name");
         paths.add("Catalog Web Service:Record:title:content");
@@ -84,7 +85,7 @@ public final class Utils {
 
         for (String path : paths) {
             Object value = ReflectionUtilities.getValuesFromPath(path, obj);
-            if (value instanceof String) {
+            if (value instanceof String && !((String)value).isEmpty()) {
                 title = (String) value;
                 // we stop when we have found a response
                 break;
@@ -153,6 +154,7 @@ public final class Utils {
         final List<String> paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:fileIdentifier");
         paths.add("ISO 19115-2:MI_Metadata:fileIdentifier");
+        paths.add("ISO 19115:CI_ResponsibleParty:individualName");
         paths.add("ISO 19115:CI_ResponsibleParty:organisationName");
         paths.add("Catalog Web Service:Record:identifier:content");
         paths.add("Ebrim v3.0:*:id");
@@ -163,7 +165,7 @@ public final class Utils {
         for (String path : paths) {
             Object value = ReflectionUtilities.getValuesFromPath(path, obj);
             // we stop when we have found a response
-            if (value instanceof String) {
+            if (value instanceof String && !((String)value).isEmpty()) {
                 identifier = (String) value;
                 break;
             } if (value instanceof InternationalString) {
@@ -192,9 +194,8 @@ public final class Utils {
     /**
      * This method try to set an identifier for this object.
      *
-     * @param obj the object for which we want a identifier.
+     * @param obj the object for which we want to set identifier.
      *
-     * @return the founded identifier or UNKNOW_IDENTIFIER
      */
     public static void setIdentifier(final String identifier, final Object object) {
 

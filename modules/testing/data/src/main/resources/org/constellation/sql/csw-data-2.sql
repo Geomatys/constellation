@@ -1,5 +1,5 @@
 INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (7, 'CSWCat', 'urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd', 'urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd', 'admin', NULL, NULL, '2009-10-14', 1, 1, 'NORMALFORM');
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (8, 'CSWCat', 'CTDF02', 'FRENCH CTD DATA - VERTICAL PROFILES', 'admin', NULL, 'ISO_19115', '2009-10-14', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (8, 'CSWCat', 'CTDF02', 'FRENCH CTD DATA - VERTICAL PROFILES', 'admin', NULL, NULL, '2009-10-14', 1, 1, 'NORMALFORM');
 
 INSERT INTO "Storage"."Values" VALUES (7, 'Catalog Web Service:Record', 1, 'Record', 'Catalog Web Service', 'Catalog Web Service:Record.1'),
                                       (7, 'Catalog Web Service:Record:subject', 1, 'SimpleLiteral', 'DublinCore', 'Catalog Web Service:Record.1:subject.1'),

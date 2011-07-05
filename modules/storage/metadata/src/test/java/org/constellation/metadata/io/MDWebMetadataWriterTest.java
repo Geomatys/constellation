@@ -94,6 +94,7 @@ public class MDWebMetadataWriterTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/users/creation_user.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/profiles/inputLevels.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/profiles/user_profile.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
