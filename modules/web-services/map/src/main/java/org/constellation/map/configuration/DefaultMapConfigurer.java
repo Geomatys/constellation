@@ -17,13 +17,7 @@
 
 package org.constellation.map.configuration;
 
-import org.geotoolkit.process.quartz.ProcessJobDetail;
-import org.quartz.TriggerBuilder;
-import org.quartz.SimpleScheduleBuilder;
-import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
-import org.constellation.configuration.ProviderReport;
-import org.opengis.feature.type.Name;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
@@ -34,9 +28,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
+import org.quartz.TriggerBuilder;
+import org.quartz.SimpleScheduleBuilder;
+
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
@@ -47,19 +45,24 @@ import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderParameters;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderService;
 import org.constellation.scheduler.CstlScheduler;
 import org.constellation.scheduler.Task;
 import org.constellation.ws.CstlServiceException;
+
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.style.MutableStyle;
-
+import org.geotoolkit.util.converter.Classes;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
+import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -89,6 +92,38 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             this.services.put(service.getName(), service);
         }
     }
+
+    @Override
+    public boolean needCustomUnmarshall(final String request, MultivaluedMap<String, String> parameters) {
+        
+        if ( REQUEST_CREATE_STYLE.equalsIgnoreCase(request)
+          || REQUEST_UPDATE_STYLE.equalsIgnoreCase(request)) {
+            return true;
+        }
+        
+        return super.needCustomUnmarshall(request,parameters);
+    }
+
+    @Override
+    public Object unmarshall(final String request, final MultivaluedMap<String, String> parameters, 
+            final InputStream stream) throws JAXBException, CstlServiceException {
+        
+        if ( REQUEST_CREATE_STYLE.equalsIgnoreCase(request)
+          || REQUEST_UPDATE_STYLE.equalsIgnoreCase(request)) {
+            
+            final XMLUtilities util = new XMLUtilities();
+            try {
+                return util.readStyle(stream, SymbologyEncoding.V_1_1_0);
+            } catch (FactoryException ex) {
+                throw new JAXBException(ex.getMessage(),ex);
+            }
+        }
+        
+        return super.unmarshall(request, parameters, stream);
+    }
+    
+    
+    
     
     /**
      * {@inheritDoc }
@@ -515,11 +550,9 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final String sourceId = getParameter("id", true, parameters);     
         final String styleId = getParameter("styleName", true, parameters);
         
-        final XMLUtilities utils = new XMLUtilities();
-        
-        try {
+        if(objectRequest instanceof MutableStyle){
             // we read the style to add
-            final MutableStyle style = utils.readStyle(objectRequest, SymbologyEncoding.V_1_1_0);
+            final MutableStyle style = (MutableStyle) objectRequest;
 
             final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
             for (StyleProvider p : providers) {
@@ -529,12 +562,9 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 }
             }
             return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
-
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex);
-        } catch (FactoryException ex) {
-            throw new CstlServiceException(ex);
         }
+        return new AcknowlegementType("Failure", "Passed object is not a style:" + Classes.getShortClassName(objectRequest));
+
     }
     
     /**
@@ -574,11 +604,9 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final String sourceId = getParameter("id", true, parameters);
         final String styleId = getParameter("styleName", true, parameters);
         
-        final XMLUtilities utils = new XMLUtilities();
-
-        try {
-            // we read the style to update
-            final MutableStyle style = utils.readStyle(objectRequest, SymbologyEncoding.V_1_1_0);
+        if(objectRequest instanceof MutableStyle){
+            // we read the style to add
+            final MutableStyle style = (MutableStyle) objectRequest;
 
             final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
             for (StyleProvider p : providers) {
@@ -587,14 +615,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     return new AcknowlegementType("Success", "The style has been added");
                 }
             }
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex);
-        } catch (FactoryException ex) {
-            throw new CstlServiceException(ex);
+            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
         }
-        return new AcknowlegementType("Failure", "Unable to find a provider named : " + sourceId);
+        
+        return new AcknowlegementType("Failure", "Passed object is not a style:" + Classes.getShortClassName(objectRequest));
     }
-    
     
     
     /**

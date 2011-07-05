@@ -16,14 +16,17 @@
  */
 package org.constellation.configuration;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.bind.JAXBException;
 
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
+import org.constellation.ws.rs.WebService;
 import static org.constellation.ws.ExceptionCode.*;
 
 import org.geotoolkit.util.logging.Logging;
@@ -103,19 +106,34 @@ public abstract class AbstractConfigurer {
     }
     
     /**
-     * destroy all the resource and close the connections.
+     * Check if the configurer can handle the given request.
+     * 
+     * @param request : request name
+     * @return true if the request is supported
      */
-    public void destroy() {
-       // do nothing must be overriden if needed 
+    public boolean needCustomUnmarshall(final String request, final MultivaluedMap<String,String> parameters){
+        return false;
+    }
+    
+    public Object unmarshall(final String request, final MultivaluedMap<String,String> parameters, InputStream stream) 
+            throws JAXBException, CstlServiceException{
+        return null;
     }
     
     public abstract Object treatRequest(final String request, final MultivaluedMap<String,String> parameters, final Object objectRequest) throws CstlServiceException;
-    
+        
     /**
      * Return true if the restart must be refused.
      */
     public boolean isLock() {
         return false;
+    }
+        
+    /**
+     * destroy all the resource and close the connections.
+     */
+    public void destroy() {
+       // do nothing must be overriden if needed 
     }
     
     /**

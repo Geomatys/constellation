@@ -36,10 +36,12 @@ import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
 import java.lang.ref.WeakReference;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 // Constellation dependencies
+import javax.xml.bind.Unmarshaller;
 import org.constellation.ws.rs.WebService;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
@@ -312,4 +314,18 @@ public final class ConfigurationService extends WebService  {
     protected MarshallerPool getConfigurationPool() {
         return GenericDatabaseMarshallerPool.getInstance();
     }
+
+    @Override
+    protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException, CstlServiceException {
+        
+        final String request = (String) getParameter("REQUEST", true);
+        final MultivaluedMap<String,String> parameters = getParameters();
+        for (AbstractConfigurer configurer: configurers) {
+            if(configurer.needCustomUnmarshall(request,parameters)){
+                return configurer.unmarshall(request,parameters, is);
+            };
+        }
+        return super.unmarshallRequest(unmarshaller, is);
+    }
+    
 }
