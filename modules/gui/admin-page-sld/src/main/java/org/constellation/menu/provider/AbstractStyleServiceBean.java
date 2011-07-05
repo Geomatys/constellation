@@ -25,6 +25,8 @@ import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
+import org.constellation.configuration.ProviderServiceReport;
+import org.constellation.configuration.ProvidersReport;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
 import org.mapfaces.facelet.styleeditor.StyleEditionConstants;
@@ -72,6 +74,15 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
         style.featureTypeStyles().get(0).rules().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
         
         getServer().providers.createStyle(configuredInstance.provider.getId(), newStyleName, style);
+        
+        //update the provider report
+        final ProvidersReport reports = getServer().providers.listProviders();
+        final ProviderServiceReport serviceReport = reports.getProviderService(this.serviceName);
+        if(serviceReport != null){
+            final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());
+            configuredInstance = new ProviderNode(report);
+        }
+        
         layersModel = null;
     }
     
@@ -134,6 +145,15 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
         
         public void delete(){
             getServer().providers.deleteStyle(provider.getId(), key);
+            
+            //update the provider report
+            final ProvidersReport reports = getServer().providers.listProviders();
+            final ProviderServiceReport serviceReport = reports.getProviderService(AbstractStyleServiceBean.this.serviceName);
+            if(serviceReport != null){
+                final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());
+                configuredInstance = new ProviderNode(report);
+            }
+            
             layersModel = null;
         }
                 

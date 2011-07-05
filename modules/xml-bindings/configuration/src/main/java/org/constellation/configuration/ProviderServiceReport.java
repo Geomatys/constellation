@@ -93,4 +93,18 @@ public class ProviderServiceReport {
     public void setProviders(List<ProviderReport> providers) {
         this.providers = providers;
     }
+    
+    /**
+     * Return report for the given Id.
+     * null if it doesn't exist.
+     */
+    public ProviderReport getProvider(final String id){
+        for(ProviderReport report : getProviders()){
+            if(report.getId().equals(id)){
+                return report;
+            }
+        }
+        return null;
+    }
+    
 }

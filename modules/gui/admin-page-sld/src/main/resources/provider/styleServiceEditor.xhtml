@@ -51,7 +51,9 @@
         <span/>
         <h:inputText value="#{bean.newStyleName}" />
         <span/>
-        <h:commandButton action="#{bean.createNewStyle}" value="#{bean.i18n['add']}" />
+        <a4j:commandLink styleClass="logout" action="#{bean.createNewStyle}" reRender="layerPreview">
+            #{bean.i18n['add']}
+        </a4j:commandLink>
     </mf:Div>
     
     
