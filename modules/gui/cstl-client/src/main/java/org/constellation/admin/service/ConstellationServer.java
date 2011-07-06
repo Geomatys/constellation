@@ -707,21 +707,27 @@ public final class ConstellationServer extends AbstractServer{
          * @param config The configuration Object to add to the specific provider file.
          * @return 
          */
-        public boolean createProvider(final String serviceName, final ParameterValueGroup config) {
+        public AcknowlegementType createProvider(final String serviceName, final ParameterValueGroup config) {
             ArgumentChecks.ensureNonNull("service name", serviceName);
             ArgumentChecks.ensureNonNull("config", config);
             try {
                 final String url = getURL() + "configuration?request="+REQUEST_CREATE_PROVIDER+"&serviceName=" + serviceName;
                 Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
-                    return true;
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equals(ack.getStatus())) {
+                        return null;
+                    } else {
+                        return ack;
+                    }
                 } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return new AcknowlegementType("Failure", ((ExceptionReport)response).getMessage() );
                 }
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
+                return new AcknowlegementType("Failure", ex.getMessage() );
             }
-            return false;
+            return null;
         }
 
         /**
@@ -938,7 +944,7 @@ public final class ConstellationServer extends AbstractServer{
          * 
          * @param id
          * @param style : SLD or other
-         * @return true if successful
+         * @return null if successful, AcknowlegementType if failed
          */
         public boolean createStyle(final String id, final String styleName, final Object style){
             ArgumentChecks.ensureNonNull("id", id);

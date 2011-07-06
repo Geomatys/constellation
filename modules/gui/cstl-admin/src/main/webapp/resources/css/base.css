@@ -114,6 +114,10 @@ a{
     text-decoration: none;
 }
 
+.errorMessage{
+    color: #cd0a0a;
+}
+
 .col1{
     border-color: #999999;
     border-width: 1px;

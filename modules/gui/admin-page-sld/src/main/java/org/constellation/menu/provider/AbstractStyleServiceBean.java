@@ -77,6 +77,7 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
         
         //update the provider report
         final ProvidersReport reports = getServer().providers.listProviders();
+        refreshUsedIds(reports);
         final ProviderServiceReport serviceReport = reports.getProviderService(this.serviceName);
         if(serviceReport != null){
             final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());
@@ -147,7 +148,8 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
             getServer().providers.deleteStyle(provider.getId(), key);
             
             //update the provider report
-            final ProvidersReport reports = getServer().providers.listProviders();
+            final ProvidersReport reports = getServer().providers.listProviders();            
+            refreshUsedIds(reports);
             final ProviderServiceReport serviceReport = reports.getProviderService(AbstractStyleServiceBean.this.serviceName);
             if(serviceReport != null){
                 final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());

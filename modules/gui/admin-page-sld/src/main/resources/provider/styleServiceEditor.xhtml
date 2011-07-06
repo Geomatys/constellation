@@ -10,10 +10,13 @@
     <h:outputText value="#{bean.i18n['newsource']}" />
     <span/>
     <h:inputText value="#{bean.newSourceName}" />
+    <!-- TODO validation client side -->
+    <!-- h:inputText value="#{bean.newSourceName}" onkeyup="matchesKeyword(this.value,'#{bean.usedIds}');"/ -->
     <span/>
     <h:commandButton action="#{bean.createSource}" value="#{bean.i18n['add']}" />
     <br/>
     <br/>
+    <h:messages errorClass="errorMessage" />
 
     <div class="rounded">
         <mf:Outline id="storePreview" rootVisible="false" value="#{bean.instanceModel}" var="node" width="100%"

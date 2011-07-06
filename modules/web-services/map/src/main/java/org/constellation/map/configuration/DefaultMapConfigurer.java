@@ -122,9 +122,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         return super.unmarshall(request, parameters, stream);
     }
     
-    
-    
-    
     /**
      * {@inheritDoc }
      */
@@ -238,6 +235,20 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 // we read the soruce parameter to add
                 reader.setInput(objectRequest);
                 final ParameterValueGroup sourceToAdd = (ParameterValueGroup) reader.read();
+                
+                //check no other provider with this id exist
+                final String id = ProviderParameters.getSourceId(sourceToAdd);
+                for(Provider p : LayerProviderProxy.getInstance().getProviders()){
+                    if(id.equals(p.getId())){
+                        return new AcknowlegementType("Failure", "Provider ID is already used : " + id);
+                    }
+                }
+                for(Provider p : StyleProviderProxy.getInstance().getProviders()){
+                    if(id.equals(p.getId())){
+                        return new AcknowlegementType("Failure", "Provider ID is already used : " + id);
+                    }
+                }
+                
                 reader.dispose();
                 
                 if(service instanceof LayerProviderService){

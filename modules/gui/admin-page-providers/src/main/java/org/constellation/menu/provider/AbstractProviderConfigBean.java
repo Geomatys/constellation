@@ -20,9 +20,12 @@ package org.constellation.menu.provider;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -33,6 +36,7 @@ import javax.swing.tree.TreeNode;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.HighLightRowStyler;
 import org.constellation.bean.MenuBean;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
@@ -40,6 +44,7 @@ import org.constellation.provider.configuration.ProviderParameters;
 
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.logging.Logging;
 
@@ -47,6 +52,7 @@ import org.mapfaces.facelet.parametereditor.ParameterModelAdaptor;
 import org.mapfaces.facelet.parametereditor.ParameterTreeModel;
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
+import org.mapfaces.utils.FacesUtils;
 
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -93,6 +99,12 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
     };
     
+    /**
+     * Store a list of all used ids.
+     * Must be refresh when a providerReport is available using method
+     * refreshIds(reports);
+     */
+    protected final Set<String> usedIds = new HashSet<String>();
     protected final String serviceName;
     protected final String sourceConfigPage;
     protected final String itemConfigPage;
@@ -114,6 +126,25 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
 
     }
 
+    public String getUsedIds() {
+        return StringUtilities.toCommaSeparatedValues(usedIds);
+    }
+
+    protected void refreshUsedIds(final ProvidersReport reports){
+        usedIds.clear();
+        
+        if(reports == null){
+            return;
+        }
+        
+        for(ProviderServiceReport sr : reports.getProviderServices()){
+            for(ProviderReport r : sr.getProviders()){
+                usedIds.add(r.getId());
+            }
+        }
+        
+    } 
+    
     private GeneralParameterDescriptor getSourceDescriptor(){
         return getServer().providers.getSourceDescriptor(serviceName);
     }
@@ -124,6 +155,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     public synchronized TreeModel getInstanceModel(){
         if(layersModel == null){
             final ProvidersReport report = getServer().providers.listProviders();
+            refreshUsedIds(report);
             if (report != null) {
                 layersModel = buildModel(report,false);
             } else {
@@ -259,7 +291,14 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                 serviceDesc.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
         final ParameterValueGroup params = sourceDesc.createValue();
         params.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(newSourceName);
-        server.providers.createProvider(serviceName, params);
+        
+        AcknowlegementType type = server.providers.createProvider(serviceName, params);
+        
+        if(type != null){
+            FacesContext.getCurrentInstance().addMessage("Error", 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, type.getMessage(), ""));
+        }
+        
         layersModel = null;
     }
 

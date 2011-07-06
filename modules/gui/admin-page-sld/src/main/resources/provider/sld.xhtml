@@ -12,6 +12,10 @@
 
     <ui:param name="pageTitle" value="SLD Styles"/>
 
+    <ui:define name="header">
+        <script type="text/javascript" src="provider.providers.js.mfRes" />        
+    </ui:define>
+    
     <ui:define name="content">
 
         <cstl:stylepreview bean="#{sldBean}" />
