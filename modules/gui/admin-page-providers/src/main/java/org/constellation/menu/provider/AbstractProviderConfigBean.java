@@ -153,7 +153,11 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
      * Build a tree model representation of all available layers.
      */
     public synchronized TreeModel getInstanceModel(){
-        if(layersModel == null){
+        
+        //TODO, changing constellation config path makes this cache obsolete
+        //but we don't have any event system yet to handle this, so we make the query each time
+        //for know.
+        //if(layersModel == null){
             final ProvidersReport report = getServer().providers.listProviders();
             refreshUsedIds(report);
             if (report != null) {
@@ -161,7 +165,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             } else {
                 LOGGER.warning("Unable to get the provider service list.");
             }
-        }
+        //}
         return layersModel;
     }
     

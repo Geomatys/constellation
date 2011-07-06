@@ -104,6 +104,11 @@
             <artifactId>admin-page-tool</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-cstl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
         <!-- Required only when creating the embedded EPSG database -->

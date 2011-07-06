@@ -17,6 +17,8 @@
 
 package org.constellation.map.configuration;
 
+import java.io.File;
+import org.constellation.configuration.ConfigDirectory;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,8 +130,15 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     @Override
     public Object treatRequest(final String request, final MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
         
+        //general configuration
+        if (REQUEST_GET_CONFIG_PATH.equalsIgnoreCase(request)) {
+            return getConfigPath(parameters);
+        } else if (REQUEST_SET_CONFIG_PATH.equalsIgnoreCase(request)) {
+            return setConfigPath(parameters);
+        }
+        
         //Provider services operations
-        if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
+        else if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
             return listProviderServices();
         } else if (REQUEST_GET_SERVICE_DESCRIPTOR.equalsIgnoreCase(request)) {
             return getServiceDescriptor(parameters);
@@ -140,9 +149,9 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         //Provider operations
         else if (REQUEST_RESTART_ALL_LAYER_PROVIDERS.equalsIgnoreCase(request)) {
             return restartLayerProviders();
-        }else if (REQUEST_RESTART_ALL_STYLE_PROVIDERS.equalsIgnoreCase(request)) {
+        } else if (REQUEST_RESTART_ALL_STYLE_PROVIDERS.equalsIgnoreCase(request)) {
             return restartStyleProviders();
-        }else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
+        } else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
             return createProvider(parameters, objectRequest);
         } else if (REQUEST_UPDATE_PROVIDER.equalsIgnoreCase(request)) {
             return updateProvider(parameters, objectRequest);
@@ -212,6 +221,26 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         StyleProviderProxy.getInstance().reload();
         return new AcknowlegementType("Success", "All style providers have been restarted.");
         
+    }
+    
+    
+    private AcknowlegementType getConfigPath(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String path = ConfigDirectory.getConfigDirectory().getPath();
+        return new AcknowlegementType("Success", path);
+    }
+    
+    private AcknowlegementType setConfigPath(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
+        final String path = getParameter("path", true, parameters);
+        // Set the new user directory
+        if (path != null && !path.isEmpty()) {
+            final File userDirectory = new File(path);
+            if (!userDirectory.isDirectory()) {
+                userDirectory.mkdir();
+            }
+            ConfigDirectory.setConfigDirectory(userDirectory);
+        }
+
+        return new AcknowlegementType("Success", path);
     }
     
     /**

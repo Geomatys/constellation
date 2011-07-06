@@ -17,13 +17,8 @@
 
 package org.constellation.menu.system;
 
-import java.io.File;
 import javax.faces.context.FacesContext;
 import org.constellation.admin.service.ConstellationServer;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.menu.service.AbstractServiceBean;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
 import org.mapfaces.i18n.I18NBean;
 
 /**
@@ -33,29 +28,41 @@ import org.mapfaces.i18n.I18NBean;
  */
 public class CstlBean extends I18NBean{
 
+    /**
+     * When user is log in, a ServiceAdministrator object is added in the session map.
+     */
+    public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
+    
+    
+    protected ConstellationServer getServer(){
+        final ConstellationServer server = (ConstellationServer) FacesContext.getCurrentInstance()
+                .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
+        
+        if(server == null){
+            throw new IllegalStateException("Distant server is null.");
+        }
+        
+        return server;
+    }
+    
     public String getConfigurationDirectory(){
-        return ConfigDirectory.getConfigDirectory().getPath();
+        return getServer().getConfigurationPath();
     }
 
     public void setConfigurationDirectory(final String path){
         
         // Set the new user directory
         if (path != null && !path.isEmpty()) {
-            final File userDirectory = new File(path);
-            if (!userDirectory.isDirectory()) {
-                userDirectory.mkdir();
-            }
-            ConfigDirectory.setConfigDirectory(userDirectory);
+            //reload services
+            final ConstellationServer admin = (ConstellationServer) FacesContext.getCurrentInstance()
+                    .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
+
+            admin.setConfigurationPath(path);
+            admin.services.restartAll();
+            admin.providers.restartAllLayerProviders();
+            admin.providers.restartAllStyleProviders();
         }
 
-        //reload services
-        final ConstellationServer admin = (ConstellationServer) FacesContext.getCurrentInstance()
-                .getExternalContext().getSessionMap().get(AbstractServiceBean.SERVICE_ADMIN_KEY);
-        admin.services.restartAll();
-
-        //reload providers
-        LayerProviderProxy.getInstance().reload();
-        StyleProviderProxy.getInstance().reload();
     }
 
 }

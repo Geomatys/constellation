@@ -22,6 +22,10 @@ package org.constellation.map.configuration;
  */
 public final class QueryConstants {
     
+    //Constellation configuration itself
+    public static final String REQUEST_GET_CONFIG_PATH = "getConfigurationPath"; 
+    public static final String REQUEST_SET_CONFIG_PATH = "setConfigurationPath"; 
+    
     //Provider services operations
     public static final String REQUEST_LIST_SERVICES                = "listServices"; 
     public static final String REQUEST_GET_SERVICE_DESCRIPTOR       = "getServiceDescriptor";

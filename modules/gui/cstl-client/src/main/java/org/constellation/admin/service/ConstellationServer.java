@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
@@ -157,193 +158,59 @@ public final class ConstellationServer extends AbstractServer{
         return true;
     }
 
-    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
-         return sendRequest(sourceURL, request, null, null, false);
+    /**
+     * @return configuration path used by constellation, null if failed to get path.
+     */
+    public String getConfigurationPath(){
+        try {
+            final String url = getURL() + "configuration?request="+REQUEST_GET_CONFIG_PATH;
+            final Object response = sendRequest(url, null);
+            if (response instanceof AcknowlegementType) {
+                final AcknowlegementType ak = (AcknowlegementType) response;
+                if("Success".equalsIgnoreCase(ak.getStatus())){
+                    return ak.getMessage();
+                }else{
+                    return null;
+                }
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return null;
+            } else {
+                LOGGER.warning("The service respond uncorrectly");
+                return null;
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return null;
     }
     
     /**
-     * Send a request to another service.
-     *
-     * @param sourceURL the URL of the distant web-service
-     * @param request The XML object to send in POST mode (if null the request is GET)
-     *
-     * @return The object corresponding to the XML response of the distant web-service
-     *
-     * @throws java.net.MalformedURLException
-     * @throws java.io.IOException
-     * @throws org.constellation.coverage.web.CstlServiceException
+     * 
+     * @param path
+     * @return true if succeed
      */
-    private Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor, 
-            MarshallerPool unmarshallerPool, boolean put) throws MalformedURLException, IOException {
-
-        final URL source = new URL(sourceURL);
-        final HttpURLConnection conec = (HttpURLConnection) source.openConnection();
-        getClientSecurity().secure(conec);
-        Object response = null;
-
+    public boolean setConfigurationPath(final String path){
         try {
-
-            // for a POST request
-            if (request != null) {
-
-                conec.setDoOutput(true);
-                conec.setRequestProperty("Content-Type", "text/xml");
-                if (put) {
-                    conec.setRequestMethod("PUT");
-                }
-
-                if (request instanceof GeneralParameterValue) {
-                    final ParameterValueWriter writer = new ParameterValueWriter();
-                    try {
-                        writer.setOutput(conec.getOutputStream());
-                        writer.write((GeneralParameterValue)request);
-                    } catch (XMLStreamException ex) {
-                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
-                    }
-                } else if (request instanceof Style) {
-                    final XMLUtilities util = new XMLUtilities();
-                    try {
-                        util.writeStyle(conec.getOutputStream(), (Style)request, StyledLayerDescriptor.V_1_1_0);
-                    } catch (JAXBException ex) {
-                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
-                    }
-                } else if (request instanceof org.opengis.sld.StyledLayerDescriptor) {
-                    final XMLUtilities util = new XMLUtilities();
-                    try {
-                        util.writeSLD(conec.getOutputStream(), 
-                                (org.opengis.sld.StyledLayerDescriptor)request, StyledLayerDescriptor.V_1_1_0);
-                    } catch (JAXBException ex) {
-                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
-                    }
-                } else if (request instanceof File) {
-                    final FileInputStream in = new FileInputStream((File)request);
-                    final OutputStream out = conec.getOutputStream();
-                    try {
-                        final byte[] buffer = new byte[4096];
-                        int bytesRead;
-
-                        while ((bytesRead = in.read(buffer)) != -1) {
-                            out.write(buffer, 0, bytesRead); // write
-                        }
-                    } finally {
-                        out.close();
-                        in.close();
-                    }
-                } else {
-                    Marshaller marshaller = null;
-                    try {
-                        marshaller = POOL.acquireMarshaller();
-                        marshaller.marshal(request, conec.getOutputStream());
-                    } catch (JAXBException ex) {
-                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
-                    } finally {
-                        if (marshaller != null) {
-                            POOL.release(marshaller);
-                        }
-                    }
-                }
-            }
             
-            if(unmarshallerPool == null){
-                //use default pool
-                unmarshallerPool = POOL;
-            }
-            
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = unmarshallerPool.acquireUnmarshaller();
-                final InputStream responseStream = AbstractRequest.openRichException(conec, securityManager);  
-                response = unmarshaller.unmarshal(responseStream);
-                if (response instanceof JAXBElement) {
-                    JAXBElement element = (JAXBElement) response;
-                    if (element.getName().equals(ObjectFactory.SOURCE_QNAME) 
-                     || element.getName().equals(ObjectFactory.LAYER_QNAME)
-                     || element.getName().equals(ObjectFactory.INPUT_QNAME)) {
-                        final ParameterValueReader reader = new ParameterValueReader(descriptor);
-                        reader.setInput(element.getValue());
-                        response = reader.read();
-                    } else {
-                        response = ((JAXBElement) response).getValue();
-                    }
-                }
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-            } catch (XMLStreamException ex) {
-                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read xml response document.\ncause: {0}", ex.getMessage());
-            }  catch (IllegalAccessError ex) {
-                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-            } finally {
-                if (unmarshaller != null) {
-                    unmarshallerPool.release(unmarshaller);
-                }
+            final String url = getURL() + "configuration?request="+REQUEST_SET_CONFIG_PATH+"&path=" + URLEncoder.encode(path);
+            final Object response = sendRequest(url, null);
+            if (response instanceof AcknowlegementType) {
+                return "Success".equals(((AcknowlegementType)response).getStatus());
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
+            } else {
+                LOGGER.warning("The service respond uncorrectly");
+                return false;
             }
         } catch (IOException ex) {
-            LOGGER.severe("The Distant service have made an error");
-            return null;
+            LOGGER.log(Level.WARNING, null, ex);
         }
-        return response;
+        return false;
     }
     
-    /**
-     * Send a request to another service.
-     *
-     * @param sourceURL the URL of the distant web-service
-     * @param request The XML object to send in POST mode (if null the request is GET)
-     *
-     * @return The object corresponding to the XML response of the distant web-service
-     *
-     * @throws java.net.MalformedURLException
-     * @throws java.io.IOException
-     * @throws org.constellation.coverage.web.CstlServiceException
-     */
-    private Object sendDescriptorRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
-
-        final URL source = new URL(sourceURL);
-        final URLConnection conec = source.openConnection();
-        getClientSecurity().secure(conec);
-        Object response = null;
-
-        try {
-
-            // for a POST request
-            if (request != null) {
-
-                conec.setDoOutput(true);
-                conec.setRequestProperty("Content-Type", "text/xml");
-                Marshaller marshaller = null;
-                try {
-                    marshaller = POOL.acquireMarshaller();
-                    marshaller.marshal(request, conec.getOutputStream());
-                } catch (JAXBException ex) {
-                    LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
-                } finally {
-                    if (marshaller != null) {
-                        POOL.release(marshaller);
-                    }
-                }
-                
-            }
-            try {
-                final ParameterDescriptorReader reader = new ParameterDescriptorReader();
-                final InputStream responseStream = AbstractRequest.openRichException(conec, securityManager);  
-                reader.setInput(responseStream);
-                reader.read();
-                response = reader.getDescriptorsRoot();
-                
-            } catch (ClassNotFoundException ex) {
-                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read response document.\ncause: {0}", ex.getMessage());
-            } catch (XMLStreamException ex) {
-                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read general parameter descriptor in response document.\ncause: {0}", ex.getMessage());
-            }  catch (IllegalAccessError ex) {
-                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
-            }
-        } catch (IOException ex) {
-            LOGGER.severe("The Distant service have made an error");
-            return null;
-        }
-        return response;
-    }
-
+    
     /**
      * Configuration methods for services
      */
@@ -1345,4 +1212,196 @@ public final class ConstellationServer extends AbstractServer{
             return false;
         }
     }
+    
+    
+    // convinient methods //////////////////////////////////////////////////////
+    
+    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
+         return sendRequest(sourceURL, request, null, null, false);
+    }
+    
+    /**
+     * Send a request to another service.
+     *
+     * @param sourceURL the URL of the distant web-service
+     * @param request The XML object to send in POST mode (if null the request is GET)
+     *
+     * @return The object corresponding to the XML response of the distant web-service
+     *
+     * @throws java.net.MalformedURLException
+     * @throws java.io.IOException
+     * @throws org.constellation.coverage.web.CstlServiceException
+     */
+    private Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor, 
+            MarshallerPool unmarshallerPool, boolean put) throws MalformedURLException, IOException {
+
+        final URL source = new URL(sourceURL);
+        final HttpURLConnection conec = (HttpURLConnection) source.openConnection();
+        getClientSecurity().secure(conec);
+        Object response = null;
+
+        try {
+
+            // for a POST request
+            if (request != null) {
+
+                conec.setDoOutput(true);
+                conec.setRequestProperty("Content-Type", "text/xml");
+                if (put) {
+                    conec.setRequestMethod("PUT");
+                }
+
+                if (request instanceof GeneralParameterValue) {
+                    final ParameterValueWriter writer = new ParameterValueWriter();
+                    try {
+                        writer.setOutput(conec.getOutputStream());
+                        writer.write((GeneralParameterValue)request);
+                    } catch (XMLStreamException ex) {
+                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                    }
+                } else if (request instanceof Style) {
+                    final XMLUtilities util = new XMLUtilities();
+                    try {
+                        util.writeStyle(conec.getOutputStream(), (Style)request, StyledLayerDescriptor.V_1_1_0);
+                    } catch (JAXBException ex) {
+                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                    }
+                } else if (request instanceof org.opengis.sld.StyledLayerDescriptor) {
+                    final XMLUtilities util = new XMLUtilities();
+                    try {
+                        util.writeSLD(conec.getOutputStream(), 
+                                (org.opengis.sld.StyledLayerDescriptor)request, StyledLayerDescriptor.V_1_1_0);
+                    } catch (JAXBException ex) {
+                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                    }
+                } else if (request instanceof File) {
+                    final FileInputStream in = new FileInputStream((File)request);
+                    final OutputStream out = conec.getOutputStream();
+                    try {
+                        final byte[] buffer = new byte[4096];
+                        int bytesRead;
+
+                        while ((bytesRead = in.read(buffer)) != -1) {
+                            out.write(buffer, 0, bytesRead); // write
+                        }
+                    } finally {
+                        out.close();
+                        in.close();
+                    }
+                } else {
+                    Marshaller marshaller = null;
+                    try {
+                        marshaller = POOL.acquireMarshaller();
+                        marshaller.marshal(request, conec.getOutputStream());
+                    } catch (JAXBException ex) {
+                        LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                    } finally {
+                        if (marshaller != null) {
+                            POOL.release(marshaller);
+                        }
+                    }
+                }
+            }
+            
+            if(unmarshallerPool == null){
+                //use default pool
+                unmarshallerPool = POOL;
+            }
+            
+            Unmarshaller unmarshaller = null;
+            try {
+                unmarshaller = unmarshallerPool.acquireUnmarshaller();
+                final InputStream responseStream = AbstractRequest.openRichException(conec, securityManager);  
+                response = unmarshaller.unmarshal(responseStream);
+                if (response instanceof JAXBElement) {
+                    JAXBElement element = (JAXBElement) response;
+                    if (element.getName().equals(ObjectFactory.SOURCE_QNAME) 
+                     || element.getName().equals(ObjectFactory.LAYER_QNAME)
+                     || element.getName().equals(ObjectFactory.INPUT_QNAME)) {
+                        final ParameterValueReader reader = new ParameterValueReader(descriptor);
+                        reader.setInput(element.getValue());
+                        response = reader.read();
+                    } else {
+                        response = ((JAXBElement) response).getValue();
+                    }
+                }
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
+            } catch (XMLStreamException ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read xml response document.\ncause: {0}", ex.getMessage());
+            }  catch (IllegalAccessError ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
+            } finally {
+                if (unmarshaller != null) {
+                    unmarshallerPool.release(unmarshaller);
+                }
+            }
+        } catch (IOException ex) {
+            LOGGER.severe("The Distant service have made an error");
+            return null;
+        }
+        return response;
+    }
+    
+    /**
+     * Send a request to another service.
+     *
+     * @param sourceURL the URL of the distant web-service
+     * @param request The XML object to send in POST mode (if null the request is GET)
+     *
+     * @return The object corresponding to the XML response of the distant web-service
+     *
+     * @throws java.net.MalformedURLException
+     * @throws java.io.IOException
+     * @throws org.constellation.coverage.web.CstlServiceException
+     */
+    private Object sendDescriptorRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
+
+        final URL source = new URL(sourceURL);
+        final URLConnection conec = source.openConnection();
+        getClientSecurity().secure(conec);
+        Object response = null;
+
+        try {
+
+            // for a POST request
+            if (request != null) {
+
+                conec.setDoOutput(true);
+                conec.setRequestProperty("Content-Type", "text/xml");
+                Marshaller marshaller = null;
+                try {
+                    marshaller = POOL.acquireMarshaller();
+                    marshaller.marshal(request, conec.getOutputStream());
+                } catch (JAXBException ex) {
+                    LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
+                } finally {
+                    if (marshaller != null) {
+                        POOL.release(marshaller);
+                    }
+                }
+                
+            }
+            try {
+                final ParameterDescriptorReader reader = new ParameterDescriptorReader();
+                final InputStream responseStream = AbstractRequest.openRichException(conec, securityManager);  
+                reader.setInput(responseStream);
+                reader.read();
+                response = reader.getDescriptorsRoot();
+                
+            } catch (ClassNotFoundException ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read response document.\ncause: {0}", ex.getMessage());
+            } catch (XMLStreamException ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read general parameter descriptor in response document.\ncause: {0}", ex.getMessage());
+            }  catch (IllegalAccessError ex) {
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
+            }
+        } catch (IOException ex) {
+            LOGGER.severe("The Distant service have made an error");
+            return null;
+        }
+        return response;
+    }
+
+    
 }
