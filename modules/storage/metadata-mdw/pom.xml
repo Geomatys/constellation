@@ -19,10 +19,10 @@
     Module description.
   -->
   <groupId>org.constellation.storage</groupId>
-  <artifactId>cstl-store-metadata</artifactId>
+  <artifactId>cstl-store-metadata-mdw</artifactId>
   <packaging>jar</packaging>
-  <name>Metadata Storage</name>
-  <description>A Set of interface/implementation to store/read various type of metadata</description>
+  <name>Metadata Storage for MDweb datasource</name>
+  <description>A Set of implementation to store/read various type of metadata in a MDweb datasource</description>
 
 
 
@@ -49,18 +49,13 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-base</artifactId>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-configuration</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-       <groupId>org.geotoolkit.pending</groupId>
-       <artifactId>geotk-temporal</artifactId>
+      <groupId>org.mdweb.metamodel</groupId>
+      <artifactId>mdweb-metamodel-lib-model</artifactId>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
@@ -68,6 +63,11 @@
        <artifactId>cstl-test-data</artifactId>
        <version>${project.version}</version>
        <scope>test</scope>
+    </dependency>
+    <dependency>
+       <groupId>org.mdweb.metamodel</groupId>
+       <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

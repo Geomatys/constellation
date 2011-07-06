@@ -97,6 +97,7 @@
       </activation>
       <modules>
         <module>metadata</module>
+        <module>metadata-mdw</module>
     	<module>generic</module>
 	<module>observation</module>
 	<module>provider</module>
@@ -156,6 +157,7 @@
       <id>csw</id>
       <modules>
         <module>metadata</module>
+        <module>metadata-mdw</module>
     	<module>generic</module>
       </modules>
     </profile>
@@ -163,6 +165,7 @@
       <id>sos</id>
       <modules>
         <module>metadata</module>
+        <module>metadata-mdw</module>
     	<module>generic</module>
         <module>observation</module>
       </modules>

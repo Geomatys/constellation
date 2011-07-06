@@ -84,7 +84,7 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-metadata</artifactId>
+      <artifactId>cstl-store-metadata-mdw</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
