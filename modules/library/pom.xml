@@ -103,6 +103,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>base</module>
+    <module>api</module>
   </modules>
 
 </project>

@@ -50,16 +50,17 @@ import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
-import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
-import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
-import org.geotoolkit.sld.xml.XMLUtilities;
-import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
+
+import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
+import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
+import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.style.MutableStyle;
 
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -68,7 +69,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 
-import static org.constellation.map.configuration.QueryConstants.*;
+import static org.constellation.api.QueryConstants.*;
 
 /**
  * convenient class to perform actions on constellation web services.

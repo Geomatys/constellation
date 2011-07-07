@@ -73,7 +73,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.FactoryException;
 
 import static org.constellation.ws.ExceptionCode.*;
-import static org.constellation.map.configuration.QueryConstants.*;
+import static org.constellation.api.QueryConstants.*;
 
 /**
  *
