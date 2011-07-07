@@ -156,7 +156,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         
         if ("importRecords".equalsIgnoreCase(request)) {
 
-            final String id       = getParameter("ID", false, parameters);
+            final String id       = getParameter("ID", true, parameters);
             final String fileName = getParameter("fileName", true, parameters);
             return importRecords(id, (File)objectRequest, fileName);
         }

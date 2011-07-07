@@ -76,7 +76,7 @@ import static org.constellation.map.configuration.QueryConstants.*;
  * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public final class ConstellationServer extends AbstractServer{
+public class ConstellationServer extends AbstractServer{
     
     public static final ParameterDescriptor<String> URL_PARAMETER = new DefaultParameterDescriptor("Url","",String.class,null,true);
     public static final ParameterDescriptor<String> USER_PARAMETER = new DefaultParameterDescriptor("User","",String.class,null,true);
@@ -84,7 +84,7 @@ public final class ConstellationServer extends AbstractServer{
     public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP =
             new DefaultParameterDescriptorGroup("Constellation",URL_PARAMETER,USER_PARAMETER,PASSWORD_PARAMETER);
     
-    private static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
 
     public final Services services   = new Services();
@@ -1170,7 +1170,7 @@ public final class ConstellationServer extends AbstractServer{
     /**
      * Configuration methods for csw
      */
-    public final class Csws {
+    public class Csws {
         
         public boolean refreshIndex(final String id, final boolean asynchrone) {
             try {
@@ -1216,7 +1216,7 @@ public final class ConstellationServer extends AbstractServer{
     
     // convinient methods //////////////////////////////////////////////////////
     
-    private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
+    protected Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
          return sendRequest(sourceURL, request, null, null, false);
     }
     
@@ -1232,7 +1232,7 @@ public final class ConstellationServer extends AbstractServer{
      * @throws java.io.IOException
      * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor, 
+    protected Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor, 
             MarshallerPool unmarshallerPool, boolean put) throws MalformedURLException, IOException {
 
         final URL source = new URL(sourceURL);
@@ -1355,7 +1355,7 @@ public final class ConstellationServer extends AbstractServer{
      * @throws java.io.IOException
      * @throws org.constellation.coverage.web.CstlServiceException
      */
-    private Object sendDescriptorRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
+    protected Object sendDescriptorRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
 
         final URL source = new URL(sourceURL);
         final URLConnection conec = source.openConnection();
