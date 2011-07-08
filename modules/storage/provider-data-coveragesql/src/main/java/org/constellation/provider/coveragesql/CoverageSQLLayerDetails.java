@@ -149,6 +149,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
                             style = STYLE_FACTORY.style(symbol);
                             return MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
                         }
+                        break;
                     }
                 }
             }

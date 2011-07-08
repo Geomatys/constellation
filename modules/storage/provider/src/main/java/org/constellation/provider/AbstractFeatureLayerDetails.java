@@ -38,6 +38,9 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.filter.text.cql2.CQL;
+import org.geotoolkit.filter.text.cql2.CQLException;
+import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
@@ -50,6 +53,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.Envelope;
@@ -130,12 +134,43 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      * {@inheritDoc}
      */
     @Override
-    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException{
+    public final MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException{
+        
+        final MapLayer layer;
         try {
-            return createMapLayer(style, params);
+            layer = createMapLayer(style, params);
         } catch (DataStoreException ex) {
             throw new PortrayalException(ex);
         }
+        
+        // EXTRA FILTER extra parameter ////////////////////////////////////////
+        if (params != null && layer instanceof FeatureMapLayer) {
+            final Map<String,?> extras = (Map<String, ?>) params.get(KEY_EXTRA_PARAMETERS);
+            if(extras != null){
+                for(String key : extras.keySet()){
+                    if(key.equalsIgnoreCase("cql_filter")){
+                        final String cqlFilter = ((List)extras.get(key)).get(0).toString();
+                        if(cqlFilter == null){
+                            break;
+                        }
+                        try {
+                            final Filter filter = CQL.toFilter(cqlFilter);
+                            if(filter != null){
+                                final FeatureMapLayer fml = (FeatureMapLayer) layer;
+                                fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));
+                            }
+                            
+                        } catch (CQLException ex) {
+                            LOGGER.log(Level.INFO,  ex.getMessage(),ex);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        ////////////////////////////////////////////////////////////////////////
+        
+        return layer;
     }
 
     /**
@@ -205,9 +240,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
                     if(date != null){
                         dates.add(date);
                     }
-                    
                 }
-                
             } catch(DataStoreException ex) {
                 LOGGER.log(Level.WARNING , "Could not evaluate dates",ex);
             } finally {
