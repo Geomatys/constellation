@@ -105,7 +105,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebIndexer(configuration, serviceID);
             case FILESYSTEM:
-                return new GenericIndexer(reader, configuration, serviceID, additionalQueryable);
+                return new GenericIndexer(reader, configuration.getConfigurationDirectory(), serviceID, additionalQueryable);
             default:
                 throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type + DEFAULT_FACTORY);
         }

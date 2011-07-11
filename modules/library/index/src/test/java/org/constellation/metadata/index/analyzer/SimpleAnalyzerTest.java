@@ -54,9 +54,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new SimpleAnalyzer(Version.LUCENE_32), Level.FINER);
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new SimpleAnalyzer(Version.LUCENE_33), Level.FINER);
         indexer.destroy();
-        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new SimpleAnalyzer(Version.LUCENE_32));
+        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new SimpleAnalyzer(Version.LUCENE_33));
         indexSearcher.setLogLevel(Level.FINER);
     }
 

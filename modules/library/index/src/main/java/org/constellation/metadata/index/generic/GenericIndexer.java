@@ -45,7 +45,6 @@ import org.apache.lucene.util.Version;
 
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
-import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.AbstractCSWIndexer;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MetadataReader;
@@ -87,12 +86,12 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
      * 
      * @param reader A generic reader to request the metadata dataSource.
-     * @param configuration  A configuration object containing the directory where the index can write indexation file.
+     * @param configurationDirectory The directory where the index can write indexation file.
      * @param serviceID The identifier, if there is one, of the index/service.
      * @param additionalQueryable A map of additional queryable element.
      */
-    public GenericIndexer(final MetadataReader reader, final Automatic configuration, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
-        super(serviceID, configuration.getConfigurationDirectory(), additionalQueryable);
+    public GenericIndexer(final MetadataReader reader, final File configurationDirectory, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
+        super(serviceID, configurationDirectory, additionalQueryable);
         this.reader = reader;
         if (create) {
             createIndex();
@@ -137,7 +136,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         final long time = System.currentTimeMillis();
         int nbEntries = 0;
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_32, analyzer);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_33, analyzer);
             final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
             final String serviceID       = getServiceID();
             
@@ -177,7 +176,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         final long time = System.currentTimeMillis();
         int nbEntries = 0;
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_32, analyzer);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_33, analyzer);
             final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
             final String serviceID       = getServiceID();
             
