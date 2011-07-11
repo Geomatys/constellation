@@ -7,8 +7,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.constellation</groupId>
-    <artifactId>web-services</artifactId>
+    <groupId>org.constellation.web-services</groupId>
+    <artifactId>cstl-web-sos</artifactId>
     <version>0.8-SNAPSHOT</version>
   </parent>
 
@@ -18,9 +18,9 @@
     Module description.
   -->
   <groupId>org.constellation.web-services</groupId>
-  <artifactId>cstl-web-sos</artifactId>
+  <artifactId>cstl-web-sos-base</artifactId>
   <packaging>jar</packaging>
-  <name>Web service for an OGC SOS</name>
+  <name>Web service for an OGC SOS base</name>
   <description>
     Web service facades to standardized service Sensor Observation Service.
   </description>
