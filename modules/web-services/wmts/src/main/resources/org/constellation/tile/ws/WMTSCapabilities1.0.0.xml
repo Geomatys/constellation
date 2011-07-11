@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is an example of a GetCapabilities response -->
+<Capabilities xmlns="http://www.opengis.net/wmts/1.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://www.opengis.net/wmts/1.0 http://schemas.opengis.net/wmts/1.0/wmtsGetCapabilities_response.xsd" version="1.0.0">
+    <ows:ServiceIdentification>
+        <ows:Title>Web Map Tile Service by glegal</ows:Title>
+        <ows:Abstract>Service that contrains the map access interface to some TileMatrixSets</ows:Abstract>
+        <ows:Keywords>
+            <ows:Keyword>tile</ows:Keyword>
+            <ows:Keyword>tile matrix set</ows:Keyword>
+            <ows:Keyword>map</ows:Keyword>
+            <ows:Keyword>constellation</ows:Keyword>
+        </ows:Keywords>
+        <ows:ServiceType>OGC WMTS</ows:ServiceType>
+        <ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
+        <ows:Fees>none</ows:Fees>
+        <ows:AccessConstraints>none</ows:AccessConstraints>
+    </ows:ServiceIdentification>
+    <ows:ServiceProvider>
+        <ows:ProviderName>Geomatys</ows:ProviderName>
+        <ows:ProviderSite xlink:href="http://www.geomatys.fr/"/>
+        <ows:ServiceContact>
+            <ows:IndividualName>Vincent Heurteaux</ows:IndividualName>
+            <ows:PositionName>PDG</ows:PositionName>
+            <ows:ContactInfo>
+                <ows:Phone>
+                    <ows:Voice>04 67 54 87 30</ows:Voice>
+                </ows:Phone>
+                <ows:Address>
+                    <ows:DeliveryPoint>Geomatys</ows:DeliveryPoint>
+                    <ows:City>Arles</ows:City>
+                    <ows:PostalCode>13200</ows:PostalCode>
+                    <ows:Country>FRANCE</ows:Country>
+                </ows:Address>
+            </ows:ContactInfo>
+        </ows:ServiceContact>
+    </ows:ServiceProvider>
+    
+</Capabilities>
+
