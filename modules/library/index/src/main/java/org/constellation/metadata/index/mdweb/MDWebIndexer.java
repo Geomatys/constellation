@@ -28,20 +28,23 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.sql.DataSource;
 
+// Apache Lucene dependencies
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
-
-// constellation dependencies
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
+
+// constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.index.AbstractCSWIndexer;
 
-import org.geotoolkit.lucene.IndexingException;
 import static org.constellation.metadata.CSWQueryable.*;
+
+// geotoolkit dependencies
+import org.geotoolkit.lucene.IndexingException;
 
 // MDweb dependencies
 import org.mdweb.model.schemas.Classe;

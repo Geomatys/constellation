@@ -17,6 +17,7 @@
 
 package org.constellation.metadata.index;
 
+// J2SE dependencies
 import java.util.Map.Entry;
 import java.io.File;
 import java.util.ArrayList;
@@ -26,10 +27,12 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
+// Apache Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 
+// geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 

@@ -41,9 +41,9 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.util.Version;
 
 // constellation dependencies
-import org.apache.lucene.util.Version;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.AbstractCSWIndexer;
@@ -54,11 +54,11 @@ import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
 
 // geotoolkit dependencies
-import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
+import org.opengis.metadata.Metadata;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Position;
 import org.opengis.util.InternationalString;
@@ -238,7 +238,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     @Override
     protected boolean isISO19139(final Object meta) {
-        return meta instanceof DefaultMetadata;
+        return meta instanceof Metadata;
     }
 
     /**
