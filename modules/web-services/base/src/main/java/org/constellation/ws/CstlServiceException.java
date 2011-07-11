@@ -129,10 +129,16 @@ public class CstlServiceException extends Exception {
         this.locator = locator;
     }
 
+    /**
+     * Return the exception code.
+     */
     public CodeList getExceptionCode() {
         return exceptionCode;
     }
 
+    /**
+     * Return the location of the error (on a request parameter most of the time)
+     */
     public String getLocator() {
         return locator;
     }

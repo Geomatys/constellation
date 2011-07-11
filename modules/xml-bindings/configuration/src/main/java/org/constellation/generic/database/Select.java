@@ -53,7 +53,7 @@ public class Select {
      */
     public Select(String var, String sql) {
         this.col = new ArrayList<Column>();
-       this.col.add(new Column(var, sql));
+        this.col.add(new Column(var, sql));
     }
 
     /**

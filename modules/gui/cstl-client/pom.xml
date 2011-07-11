@@ -72,12 +72,7 @@
            <artifactId>cstl-lib-api</artifactId>
            <version>${project.version}</version>
        </dependency>
-       
-        <!--for base64 enconding -->
-        <dependency>
-            <groupId>net.iharder</groupId>
-            <artifactId>base64</artifactId>
-        </dependency>
+
     </dependencies>
 
 </project>
