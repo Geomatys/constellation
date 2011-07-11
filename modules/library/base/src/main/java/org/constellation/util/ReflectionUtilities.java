@@ -870,4 +870,24 @@ public final class ReflectionUtilities {
 
         return result;
     }
+    
+    /**
+     * Return true if the specified class or on of its superClass is equals to the specified name.
+     * 
+     * @param fullClassName
+     * @param c
+     * @return 
+     */
+    public static boolean instanceOf(final String fullClassName, Class c) {
+        if (c != null) {
+            Class currentClass = c;
+            do {
+                if (currentClass.getName().equals(fullClassName)) {
+                    return true;
+                }
+                currentClass = currentClass.getSuperclass();
+            } while (currentClass != null);
+        }
+        return false;
+    }
 }

@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
-// apache Lucene dependencies
+// Apache Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -55,16 +55,12 @@ import org.constellation.util.ReflectionUtilities;
 
 // geotoolkit dependencies
 import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.temporal.object.DefaultInstant;
-import org.geotoolkit.temporal.object.DefaultPosition;
-import org.geotoolkit.csw.xml.v202.RecordType;
-import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
-import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
-import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Position;
 import org.opengis.util.InternationalString;
 import org.opengis.util.LocalName;
 
@@ -250,7 +246,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     @Override
     protected boolean isDublinCore(final Object meta) {
-        return meta instanceof RecordType;
+        return ReflectionUtilities.instanceOf("org.geotoolkit.csw.xml.v202.RecordType", meta.getClass());
     }
 
     /**
@@ -258,7 +254,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     @Override
     protected boolean isEbrim25(final Object meta) {
-        return meta instanceof RegistryObjectType;
+        return ReflectionUtilities.instanceOf("org.geotoolkit.ebrim.xml.v250.RegistryObjectType", meta.getClass());
     }
 
     /**
@@ -266,7 +262,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     @Override
     protected boolean isEbrim30(final Object meta) {
-        return meta instanceof IdentifiableType;
+        return ReflectionUtilities.instanceOf("org.geotoolkit.ebrim.xml.v300.IdentifiableType", meta.getClass());
     }
 
 
@@ -438,14 +434,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         } else if (obj instanceof org.opengis.util.CodeList) {
             result = ((org.opengis.util.CodeList)obj).name();
         
-        } else if (obj instanceof DefaultPosition) {
-            final DefaultPosition pos = (DefaultPosition) obj;
-            synchronized(LUCENE_DATE_FORMAT) {
-                result = LUCENE_DATE_FORMAT.format(pos.getDate());
-            }
-            
-        } else if (obj instanceof TimePositionType) {
-            final TimePositionType pos = (TimePositionType) obj;
+        } else if (obj instanceof Position) {
+            final Position pos = (Position) obj;
             final Date d = pos.getDate();
             if (d != null) {
                 synchronized(LUCENE_DATE_FORMAT) {
@@ -455,8 +445,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                result = NULL_VALUE;
             }
 
-        } else if (obj instanceof DefaultInstant) {
-            final DefaultInstant inst = (DefaultInstant)obj;
+        } else if (obj instanceof Instant) {
+            final Instant inst = (Instant)obj;
             if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
                 synchronized(LUCENE_DATE_FORMAT) {
                     result = LUCENE_DATE_FORMAT.format(inst.getPosition().getDate());

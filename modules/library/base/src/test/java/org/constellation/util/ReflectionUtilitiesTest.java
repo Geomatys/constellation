@@ -34,6 +34,9 @@ import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.SimpleInternationalString;
+import org.geotoolkit.ebrim.xml.v250.NotifyActionType;
+import org.geotoolkit.ebrim.xml.v250.ClassificationSchemeType;
+import org.geotoolkit.ebrim.xml.v250.UserType;
 
 import org.opengis.metadata.extent.TemporalExtent;
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -400,5 +403,13 @@ public class ReflectionUtilitiesTest {
         assertTrue("result type was:" + result.getClass().getName(), result instanceof List);
         assertEquals(Arrays.asList(key3, key4), ((List)result).get(0));
         assertEquals(Arrays.asList(key7, key8), ((List)result).get(1));
+    }
+    
+    @Test
+    public void instanceOfTest() {
+         assertTrue(ReflectionUtilities.instanceOf("org.geotoolkit.ebrim.xml.v250.RegistryObjectType", UserType.class));
+         assertTrue(ReflectionUtilities.instanceOf("org.geotoolkit.ebrim.xml.v250.RegistryObjectType", ClassificationSchemeType.class));
+         assertFalse(ReflectionUtilities.instanceOf("org.geotoolkit.ebrim.xml.v250.RegistryObjectType", NotifyActionType.class));
+         
     }
 }

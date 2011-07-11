@@ -126,6 +126,10 @@ public class MdwebIndexTest {
             ds.shutdown();
         }
         FileUtilities.deleteDirectory(new File("MDwebIndexTest"));
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
     }
 
     @Before

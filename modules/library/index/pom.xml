@@ -51,10 +51,6 @@
   -->
   <dependencies>
     <dependency>
-     <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-ebrim</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-spatial-lucene</artifactId>
     </dependency>

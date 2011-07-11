@@ -130,6 +130,10 @@ public class MdwebFormIndexTest {
             FileUtilities.deleteDirectory(configDirectory);
         }
         ds.shutdown();
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
     }
 
     @Before
