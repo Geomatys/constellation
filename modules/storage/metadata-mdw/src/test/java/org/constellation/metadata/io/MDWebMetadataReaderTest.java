@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import java.io.File;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
 import javax.xml.bind.JAXBElement;
 import java.io.StringReader;
@@ -114,6 +115,10 @@ public class MDWebMetadataReaderTest {
         }
         if (ds != null) {
             ds.shutdown();
+        }
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
         }
     }
 

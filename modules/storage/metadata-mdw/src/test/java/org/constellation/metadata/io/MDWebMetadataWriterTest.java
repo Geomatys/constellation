@@ -19,6 +19,7 @@
 package org.constellation.metadata.io;
 
 
+import java.io.File;
 import org.geotoolkit.xml.IdentifiedObject;
 import org.opengis.metadata.identification.DataIdentification;
 import java.net.URI;
@@ -46,9 +47,7 @@ import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.util.ComparisonMode;
-import org.geotoolkit.util.Utilities;
 
 import org.opengis.feature.catalog.FeatureCatalogue;
 
@@ -122,6 +121,10 @@ public class MDWebMetadataWriterTest {
             ds.shutdown();
         }
         Setup.shutdown();
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
     }
 
     @Before

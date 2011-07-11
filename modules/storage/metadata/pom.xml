@@ -58,10 +58,6 @@
       <artifactId>cstl-xml-configuration</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-       <groupId>org.geotoolkit.pending</groupId>
-       <artifactId>geotk-temporal</artifactId>
-    </dependency>
     <!-- Test dependencies -->
     <dependency>
        <groupId>org.constellation.testing</groupId>
