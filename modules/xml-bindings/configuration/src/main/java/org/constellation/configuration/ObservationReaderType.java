@@ -28,7 +28,9 @@ public enum ObservationReaderType {
 
     DEFAULT("default"),
 
-    FILESYSTEM("filesystem");
+    FILESYSTEM("filesystem"),
+    
+    NONE("none");
     
     private final String name;
     

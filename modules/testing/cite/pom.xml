@@ -102,7 +102,12 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-sos</artifactId>
+      <artifactId>cstl-web-sos-filesystem</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-sos-postgrid</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

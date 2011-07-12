@@ -18,7 +18,10 @@
 package org.constellation.sos.ws;
 
 // JDK dependencies
-import org.geotoolkit.temporal.object.TemporalUtilities;
+import javax.imageio.spi.ServiceRegistry;
+import java.util.Iterator;
+import org.constellation.sos.factory.AbstractSMLSOSFactory;
+import org.constellation.sos.factory.AbstractOMSOSFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -57,10 +60,7 @@ import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.metadata.io.AbstractMetadataReader;
-import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationFilterReader;
 import org.constellation.sos.io.ObservationReader;
@@ -124,7 +124,6 @@ import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.factory.FactoryNotFoundException;
-import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureType;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
@@ -155,6 +154,7 @@ import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 
@@ -272,14 +272,14 @@ public class SOSworker extends AbstractWorker {
     private SensorWriter smlWriter;
 
     /**
-     * A registry factory allowing to load carious SOS factory in function of the build implementation.
+     * The factory to instanciate the O&M Readers / Writers / Filters
      */
-    private static FactoryRegistry factory = new FactoryRegistry(AbstractSOSFactory.class);
-
+    private AbstractOMSOSFactory omFactory;
+    
     /**
-     * The factory to instanciate the Readers / Writers / Filters
+     * The factory to instanciate the SensorML Readers / Writers 
      */
-    private AbstractSOSFactory sosFactory;
+    private AbstractSMLSOSFactory smlFactory;
 
     /**
      * The supported Response Mode for GetObservation request (depends on reader capabilities)
@@ -379,8 +379,7 @@ public class SOSworker extends AbstractWorker {
             }
             omConfiguration.setConfigurationDirectory(configurationDirectory);
 
-            // we load the factory from the available classes
-            sosFactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
+            
         
             //we initialize the properties attribute
             final String observationIdBase  = configuration.getObservationIdBase() != null ?
@@ -397,11 +396,11 @@ public class SOSworker extends AbstractWorker {
 
             // we fill a map of properties to sent to the reader/writer/filter
             final Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put(AbstractSOSFactory.OBSERVATION_ID_BASE, observationIdBase);
-            properties.put(AbstractSOSFactory.OBSERVATION_TEMPLATE_ID_BASE, observationTemplateIdBase);
-            properties.put(AbstractSOSFactory.SENSOR_ID_BASE, sensorIdBase);
-            properties.put(AbstractSOSFactory.PHENOMENON_ID_BASE, phenomenonIdBase);
-            properties.put(AbstractSOSFactory.IDENTIFIER_MAPPING, map);
+            properties.put(AbstractOMSOSFactory.OBSERVATION_ID_BASE, observationIdBase);
+            properties.put(AbstractOMSOSFactory.OBSERVATION_TEMPLATE_ID_BASE, observationTemplateIdBase);
+            properties.put(AbstractOMSOSFactory.SENSOR_ID_BASE, sensorIdBase);
+            properties.put(AbstractOMSOSFactory.PHENOMENON_ID_BASE, phenomenonIdBase);
+            properties.put(AbstractOMSOSFactory.IDENTIFIER_MAPPING, map);
 
             int h, m;
             try {
@@ -419,16 +418,30 @@ public class SOSworker extends AbstractWorker {
             }
             templateValidTime = (h * 3600000) + (m * 60000);
 
-            // we initialize the reader/writer/filter
-            smlReader = sosFactory.getSensorReader(smlType, smlConfiguration, properties);
-            smlWriter = sosFactory.getSensorWriter(smlType, smlConfiguration, properties);
-            omReader  = sosFactory.getObservationReader(omReaderType, omConfiguration, properties);
-            omWriter  = sosFactory.getObservationWriter(omWriterType, omConfiguration, properties);
-            omFilter  = sosFactory.getObservationFilter(omFilterType, omConfiguration, properties);
-
-            //we initialize the variables depending on the Reader capabilities
-            this.acceptedResponseMode   = omReader.getResponseModes();
-            this.acceptedResponseFormat = omReader.getResponseFormats();
+            // we initialize the reader/writer
+            if (!DataSourceType.NONE.equals(smlType)) {
+                smlFactory = getSMLFactory(smlType);
+                smlReader  = smlFactory.getSensorReader(smlType, smlConfiguration, properties);
+                smlWriter  = smlFactory.getSensorWriter(smlType, smlConfiguration, properties);
+            }
+            
+            // we initialize the O&M reader/writer/filter
+            if (!ObservationReaderType.NONE.equals(omReaderType)) {
+                omFactory = getOMFactory(omReaderType);
+                omReader  = omFactory.getObservationReader(omReaderType, omConfiguration, properties);
+                
+                //we initialize the variables depending on the Reader capabilities
+                this.acceptedResponseMode   = omReader.getResponseModes();
+                this.acceptedResponseFormat = omReader.getResponseFormats();
+            }
+            if (!ObservationWriterType.NONE.equals(omWriterType)) {
+                omFactory = getOMFactory(omWriterType);
+                omWriter  = omFactory.getObservationWriter(omWriterType, omConfiguration, properties);
+            }
+            if (!ObservationFilterType.NONE.equals(omFilterType)) {
+                omFactory = getOMFactory(omFilterType);
+                omFilter  = omFactory.getObservationFilter(omFilterType, omConfiguration, properties);
+            }
 
             // we log some implementation informations
             logInfos();
@@ -448,7 +461,7 @@ public class SOSworker extends AbstractWorker {
             LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\n\ncause: JAXBException:{0}", msg);
             isStarted = false;
         } catch (FactoryNotFoundException ex) {
-            LOGGER.warning("\nThe SOS worker is not running!\ncause: Unable to find a SOS Factory");
+            LOGGER.warning("\nThe SOS worker is not running!\ncause: Unable to find a SOS Factory.\n" + ex.getMessage());
             isStarted = false;
         } catch (MetadataIoException ex) {
             LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: MetadataIOException while initializing the sensor reader/writer:\n{0}", ex.getMessage());
@@ -461,6 +474,28 @@ public class SOSworker extends AbstractWorker {
                 GenericDatabaseMarshallerPool.getInstance().release(configUM);
             }
         }
+    }
+    
+    private AbstractOMSOSFactory getOMFactory(Object type) {
+        final Iterator<AbstractOMSOSFactory> ite = ServiceRegistry.lookupProviders(AbstractOMSOSFactory.class);
+        while (ite.hasNext()) {
+            AbstractOMSOSFactory currentFactory = ite.next();
+            if (currentFactory.factoryMatchType(type)) {
+                return currentFactory;
+            }
+        }
+        throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
+    }
+    
+    private AbstractSMLSOSFactory getSMLFactory(Object type) {
+        final Iterator<AbstractSMLSOSFactory> ite = ServiceRegistry.lookupProviders(AbstractSMLSOSFactory.class);
+        while (ite.hasNext()) {
+            AbstractSMLSOSFactory currentFactory = ite.next();
+            if (currentFactory.factoryMatchType(type)) {
+                return currentFactory;
+            }
+        }
+        throw new FactoryNotFoundException("No SML factory has been found for type:" + type);
     }
 
     /**
@@ -822,7 +857,7 @@ public class SOSworker extends AbstractWorker {
         verifyBaseRequest(requestObservation);
 
         // we clone the filter for this request
-        final ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
+        final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
 
 
         //we verify that the output format is good.
@@ -1266,7 +1301,7 @@ public class SOSworker extends AbstractWorker {
         verifyBaseRequest(requestResult);
 
         // we clone the filter for this request
-        final ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
+        final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
         
         ObservationType template = null;
         if (requestResult.getObservationTemplateId() != null) {
@@ -1745,17 +1780,22 @@ public class SOSworker extends AbstractWorker {
             
             // and we record the position of the piezometer
             final DirectPositionType position = getSensorPosition(process);
-            omWriter.recordProcedureLocation(phyId, position);
-                                    
-            //we assign the new capteur id to the observation template
-            final ProcessType p = new ProcessType(id);
-            obs.setProcedure(p);
-            obs.setName(observationTemplateIdBase + num);
-            LOGGER.finer(obs.toString());
-            //we write the observation template in the O&M database
-            omWriter.writeObservation(obs);
+            if (omWriter != null) {
+                omWriter.recordProcedureLocation(phyId, position);
+
+                //we assign the new capteur id to the observation template
+                final ProcessType p = new ProcessType(id);
+                obs.setProcedure(p);
+                obs.setName(observationTemplateIdBase + num);
+                LOGGER.finer(obs.toString());
+                //we write the observation template in the O&M database
+                omWriter.writeObservation(obs);
+                addSensorToOffering(process, obs);
+            } else {
+                LOGGER.warning("unable to record Sensor template and location in O&M datasource: no O&M writer");
+            }
                    
-            addSensorToOffering(process, obs);
+            
             
            success = true; 
 
@@ -2229,12 +2269,6 @@ public class SOSworker extends AbstractWorker {
         this.logLevel = logLevel;
         if (omFilter != null) {
             omFilter.setLoglevel(logLevel);
-        }
-        if (smlReader instanceof AbstractMetadataReader) {
-            ((AbstractMetadataReader)smlReader).setLogLevel(logLevel);
-        }
-        if (smlWriter instanceof AbstractMetadataWriter) {
-            ((AbstractMetadataWriter)smlWriter).setLogLevel(logLevel);
         }
     }
 

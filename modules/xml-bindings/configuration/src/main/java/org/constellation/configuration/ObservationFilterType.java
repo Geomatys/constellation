@@ -29,5 +29,7 @@ public enum ObservationFilterType {
 
     DEFAULT,
 
-    LUCENE
+    LUCENE,
+    
+    NONE
 }

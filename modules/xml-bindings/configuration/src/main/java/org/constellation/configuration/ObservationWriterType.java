@@ -25,5 +25,7 @@ package org.constellation.configuration;
 public enum ObservationWriterType {
     DEFAULT,
 
-    FILESYSTEM
+    FILESYSTEM,
+    
+    NONE
 }

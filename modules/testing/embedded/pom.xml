@@ -66,7 +66,6 @@
     </developer>
   </developers>
 
-
   <!--
     Required dependencies for building. These dependencies wil be included into
     the JARs list that Maven will put into the directory "target/binaries".
@@ -98,7 +97,12 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-sos</artifactId>
+      <artifactId>cstl-web-sos-postgrid</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-sos-filesystem</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
