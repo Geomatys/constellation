@@ -32,7 +32,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 import org.mdweb.io.MD_IOException;
@@ -78,7 +78,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
             throw new MetadataIoException("the service has throw a MD_IO Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         }
-        this.map = (Properties) properties.get(AbstractOMSOSFactory.IDENTIFIER_MAPPING);
+        this.map = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
     }
 
     /**

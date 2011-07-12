@@ -36,7 +36,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.FilterQuery;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.util.logging.Logging;
@@ -92,8 +92,8 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos.io.generic");
 
     public AbstractGenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
-        this.observationIdBase         = (String) properties.get(AbstractOMSOSFactory.OBSERVATION_ID_BASE);
-        this.observationTemplateIdBase = (String) properties.get(AbstractOMSOSFactory.OBSERVATION_TEMPLATE_ID_BASE);
+        this.observationIdBase         = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        this.observationTemplateIdBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }

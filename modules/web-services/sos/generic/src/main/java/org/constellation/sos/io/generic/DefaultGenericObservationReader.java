@@ -26,7 +26,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.constellation.generic.GenericReader;
 import org.constellation.generic.Values;
 import org.constellation.generic.database.Automatic;
@@ -80,7 +80,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     
     public DefaultGenericObservationReader(Automatic configuration, Map<String, Object> properties) throws CstlServiceException, MetadataIoException {
         super(configuration);
-        this.observationIdBase = (String) properties.get(AbstractOMSOSFactory.OBSERVATION_ID_BASE);
+        this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
     }
 
     /**

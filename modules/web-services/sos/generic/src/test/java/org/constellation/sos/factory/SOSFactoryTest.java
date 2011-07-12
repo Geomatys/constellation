@@ -28,7 +28,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -39,13 +38,13 @@ import static org.junit.Assert.*;
  */
 public class SOSFactoryTest {
 
-    private static AbstractOMSOSFactory omFactory;
+    private static OMFactory omFactory;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        final Iterator<AbstractOMSOSFactory> ite = ServiceRegistry.lookupProviders(AbstractOMSOSFactory.class);
+        final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
         while (ite.hasNext()) {
-            AbstractOMSOSFactory currentFactory = ite.next();
+            OMFactory currentFactory = ite.next();
             if (currentFactory.factoryMatchType(ObservationReaderType.GENERIC)) {
                 omFactory = currentFactory;
             }
@@ -76,10 +75,10 @@ public class SOSFactoryTest {
         final BDD bdd            = new BDD("org.postgresql.driver", "SomeUrl", "boby", "gary");
         final Automatic config   = new Automatic("postgrid", bdd);
         final Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put(AbstractOMSOSFactory.OBSERVATION_ID_BASE, "idbase");
-        parameters.put(AbstractOMSOSFactory.OBSERVATION_TEMPLATE_ID_BASE, "templateIdBase");
-        parameters.put(AbstractOMSOSFactory.SENSOR_ID_BASE, "sensorBase");
-        parameters.put(AbstractOMSOSFactory.IDENTIFIER_MAPPING, new Properties());
+        parameters.put(OMFactory.OBSERVATION_ID_BASE, "idbase");
+        parameters.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, "templateIdBase");
+        parameters.put(OMFactory.SENSOR_ID_BASE, "sensorBase");
+        parameters.put(OMFactory.IDENTIFIER_MAPPING, new Properties());
 
         boolean exLaunched = false;
         try  {

@@ -39,7 +39,7 @@ import static org.constellation.configuration.ObservationFilterType.*;
  * @since 0.8
  * @author Guilhem Legal (Geomatys)
  */
-public class LuceneSOSFactory extends AbstractOMSOSFactory {
+public class LuceneSOSFactory implements OMFactory {
 
     /**
      * {@inheritDoc}

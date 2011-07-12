@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
@@ -130,7 +130,7 @@ public class DefaultObservationReader implements ObservationReader {
      * @param observationIdBase
      */
     public DefaultObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
-        this.observationIdBase = (String) properties.get(AbstractOMSOSFactory.OBSERVATION_ID_BASE);
+        this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }

@@ -38,7 +38,7 @@ import static org.constellation.configuration.ObservationFilterType.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class PostgridSOSFactory extends AbstractOMSOSFactory {
+public class PostgridSOSFactory implements OMFactory {
 
     /**
      * {@inheritDoc}

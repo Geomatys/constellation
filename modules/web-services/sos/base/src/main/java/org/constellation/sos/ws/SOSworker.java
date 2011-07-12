@@ -21,7 +21,7 @@ package org.constellation.sos.ws;
 import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
 import org.constellation.sos.factory.AbstractSMLSOSFactory;
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -274,7 +274,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * The factory to instanciate the O&M Readers / Writers / Filters
      */
-    private AbstractOMSOSFactory omFactory;
+    private OMFactory omFactory;
     
     /**
      * The factory to instanciate the SensorML Readers / Writers 
@@ -396,11 +396,11 @@ public class SOSworker extends AbstractWorker {
 
             // we fill a map of properties to sent to the reader/writer/filter
             final Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put(AbstractOMSOSFactory.OBSERVATION_ID_BASE, observationIdBase);
-            properties.put(AbstractOMSOSFactory.OBSERVATION_TEMPLATE_ID_BASE, observationTemplateIdBase);
-            properties.put(AbstractOMSOSFactory.SENSOR_ID_BASE, sensorIdBase);
-            properties.put(AbstractOMSOSFactory.PHENOMENON_ID_BASE, phenomenonIdBase);
-            properties.put(AbstractOMSOSFactory.IDENTIFIER_MAPPING, map);
+            properties.put(OMFactory.OBSERVATION_ID_BASE, observationIdBase);
+            properties.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, observationTemplateIdBase);
+            properties.put(OMFactory.SENSOR_ID_BASE, sensorIdBase);
+            properties.put(OMFactory.PHENOMENON_ID_BASE, phenomenonIdBase);
+            properties.put(OMFactory.IDENTIFIER_MAPPING, map);
 
             int h, m;
             try {
@@ -476,10 +476,10 @@ public class SOSworker extends AbstractWorker {
         }
     }
     
-    private AbstractOMSOSFactory getOMFactory(Object type) {
-        final Iterator<AbstractOMSOSFactory> ite = ServiceRegistry.lookupProviders(AbstractOMSOSFactory.class);
+    private OMFactory getOMFactory(Object type) {
+        final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
         while (ite.hasNext()) {
-            AbstractOMSOSFactory currentFactory = ite.next();
+            OMFactory currentFactory = ite.next();
             if (currentFactory.factoryMatchType(type)) {
                 return currentFactory;
             }

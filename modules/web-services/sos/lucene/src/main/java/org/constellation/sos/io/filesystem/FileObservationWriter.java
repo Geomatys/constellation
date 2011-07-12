@@ -28,7 +28,7 @@ import javax.xml.bind.Marshaller;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.lucene.LuceneObservationIndexer;
 import org.constellation.ws.CstlServiceException;
@@ -89,7 +89,7 @@ public class FileObservationWriter implements ObservationWriter {
 
     public FileObservationWriter(final Automatic configuration,  final Map<String, Object> properties) throws CstlServiceException {
         super();
-        this.observationTemplateIdBase = (String) properties.get(AbstractOMSOSFactory.OBSERVATION_TEMPLATE_ID_BASE);
+        this.observationTemplateIdBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");

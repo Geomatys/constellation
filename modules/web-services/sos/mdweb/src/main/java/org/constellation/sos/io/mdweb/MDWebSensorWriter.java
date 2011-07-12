@@ -36,7 +36,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 
@@ -76,11 +76,11 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     
     public MDWebSensorWriter(final Automatic configuration, final Map<String, Object> properties) throws MetadataIoException {
         super(configuration);
-        final String sensorIdBase = (String) properties.get(AbstractOMSOSFactory.SENSOR_ID_BASE);
+        final String sensorIdBase = (String) properties.get(OMFactory.SENSOR_ID_BASE);
         final BDD db = configuration.getBdd();
         try {
             smlConnection   = db.getConnection();
-            this.map        = (Properties) properties.get(AbstractOMSOSFactory.IDENTIFIER_MAPPING);
+            this.map        = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
              //we build the prepared Statement
             final String version = ((AbstractReader)mdWriter).getVersion();
             if ("2.0".equals(version)) {

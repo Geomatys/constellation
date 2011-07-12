@@ -29,7 +29,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.ws.CstlServiceException;
@@ -72,7 +72,7 @@ public class LuceneObservationFilter implements ObservationFilter {
     }
 
     public LuceneObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
-        this.map  =  (Properties) properties.get(AbstractOMSOSFactory.IDENTIFIER_MAPPING);
+        this.map  =  (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
         try {
             this.searcher = new LuceneObservationSearcher(configuration.getConfigurationDirectory(), "");
         } catch (IndexingException ex) {

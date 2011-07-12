@@ -30,7 +30,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
@@ -86,7 +86,7 @@ public class FileObservationReader implements ObservationReader {
     private static final String FILE_EXTENSION = ".xml";
 
     public FileObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
-        this.observationIdBase = (String) properties.get(AbstractOMSOSFactory.OBSERVATION_ID_BASE);
+        this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             offeringDirectory            = new File(dataDirectory, "offerings");

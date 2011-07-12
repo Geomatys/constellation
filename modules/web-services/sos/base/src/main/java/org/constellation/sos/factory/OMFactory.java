@@ -26,14 +26,13 @@ import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.factory.Factory;
 
 /**
  * Factory used to load various implementation of observation reader/writer/filter.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractOMSOSFactory extends Factory {
+public interface OMFactory {
 
     public static final String OBSERVATION_ID_BASE = "observationIdBase";
 
@@ -45,7 +44,10 @@ public abstract class AbstractOMSOSFactory extends Factory {
 
     public static final String IDENTIFIER_MAPPING = "identifierMapping";
 
-    public abstract boolean factoryMatchType(Object type);
+    /**
+     * Return true if the factory can return an implementation for the specified type.
+     */
+    boolean factoryMatchType(Object type);
     
     /**
      * Return an observation filter for  the specified datasource.
@@ -57,7 +59,7 @@ public abstract class AbstractOMSOSFactory extends Factory {
      * @return An observation filter for  the specified datasource.
      * @throws CstlServiceException
      */
-    public abstract ObservationFilter getObservationFilter(ObservationFilterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
+    ObservationFilter getObservationFilter(ObservationFilterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
 
     /**
      * Clone an observation filter.
@@ -67,7 +69,7 @@ public abstract class AbstractOMSOSFactory extends Factory {
      * @return a clone of the specified Observation filter.
      * @throws CstlServiceException
      */
-    public abstract ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws CstlServiceException;
+    ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws CstlServiceException;
 
     /**
      * Return an Observation reader for the specified datasource.
@@ -79,7 +81,7 @@ public abstract class AbstractOMSOSFactory extends Factory {
      * @return An Observation reader for the specified datasource.
      * @throws CstlServiceException
      */
-    public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
+    ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
 
     /**
      * Return an Observation writer for the specified datasource.
@@ -91,6 +93,6 @@ public abstract class AbstractOMSOSFactory extends Factory {
      * @return an Observation writer for the specified datasource.
      * @throws CstlServiceException
      */
-    public abstract ObservationWriter getObservationWriter(ObservationWriterType type,  Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
+    ObservationWriter getObservationWriter(ObservationWriterType type,  Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
 
 }

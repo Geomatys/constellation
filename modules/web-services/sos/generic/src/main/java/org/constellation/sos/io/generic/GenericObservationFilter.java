@@ -29,7 +29,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 // Constellation dependencies
-import org.constellation.sos.factory.AbstractOMSOSFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.From;
 import org.constellation.generic.database.FilterQuery;
@@ -82,7 +82,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      */
     public GenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         super(configuration, properties);
-        this.map = (Properties) properties.get(AbstractOMSOSFactory.IDENTIFIER_MAPPING);
+        this.map = (Properties) properties.get(OMFactory.IDENTIFIER_MAPPING);
     }
     
     /**
