@@ -166,7 +166,7 @@
         <geotoolkit.version>3.x-SNAPSHOT</geotoolkit.version>
         <geotoolkit-pending.version>3.x-SNAPSHOT</geotoolkit-pending.version>
         <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
-        <mapfaces.version>0.6-SNAPSHOT</mapfaces.version>
+        <mapfaces.version>0.7-SNAPSHOT</mapfaces.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
