@@ -74,9 +74,9 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
-                dependency>
+                <dependency>
                     <groupId>org.constellation.web-services</groupId>
-                    <artifactId>cstl-web-sos-mdweb</artifactId>
+                    <artifactId>cstl-web-sos-mdw</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
