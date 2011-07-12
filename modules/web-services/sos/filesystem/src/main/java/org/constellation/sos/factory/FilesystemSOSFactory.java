@@ -35,7 +35,7 @@ import static org.constellation.configuration.DataSourceType.*;
  * @since 0.8
  * @author Guilhem Legal (Geomatys)
  */
-public class FilesystemSOSFactory extends AbstractSMLSOSFactory {
+public class FilesystemSOSFactory implements SMLFactory {
 
     /**
      * {@inheritDoc}

@@ -20,7 +20,7 @@ package org.constellation.sos.ws;
 // JDK dependencies
 import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
-import org.constellation.sos.factory.AbstractSMLSOSFactory;
+import org.constellation.sos.factory.SMLFactory;
 import org.constellation.sos.factory.OMFactory;
 import java.io.File;
 import java.io.FileInputStream;
@@ -279,7 +279,7 @@ public class SOSworker extends AbstractWorker {
     /**
      * The factory to instanciate the SensorML Readers / Writers 
      */
-    private AbstractSMLSOSFactory smlFactory;
+    private SMLFactory smlFactory;
 
     /**
      * The supported Response Mode for GetObservation request (depends on reader capabilities)
@@ -487,10 +487,10 @@ public class SOSworker extends AbstractWorker {
         throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
     }
     
-    private AbstractSMLSOSFactory getSMLFactory(Object type) {
-        final Iterator<AbstractSMLSOSFactory> ite = ServiceRegistry.lookupProviders(AbstractSMLSOSFactory.class);
+    private SMLFactory getSMLFactory(Object type) {
+        final Iterator<SMLFactory> ite = ServiceRegistry.lookupProviders(SMLFactory.class);
         while (ite.hasNext()) {
-            AbstractSMLSOSFactory currentFactory = ite.next();
+            SMLFactory currentFactory = ite.next();
             if (currentFactory.factoryMatchType(type)) {
                 return currentFactory;
             }

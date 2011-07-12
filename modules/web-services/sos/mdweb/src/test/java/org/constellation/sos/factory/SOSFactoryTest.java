@@ -37,13 +37,13 @@ import static org.junit.Assert.*;
  */
 public class SOSFactoryTest {
 
-    private static AbstractSMLSOSFactory smlFactory;
+    private static SMLFactory smlFactory;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        final Iterator<AbstractSMLSOSFactory> ite = ServiceRegistry.lookupProviders(AbstractSMLSOSFactory.class);
+        final Iterator<SMLFactory> ite = ServiceRegistry.lookupProviders(SMLFactory.class);
         while (ite.hasNext()) {
-            AbstractSMLSOSFactory currentFactory = ite.next();
+            SMLFactory currentFactory = ite.next();
             if (currentFactory.factoryMatchType(DataSourceType.MDWEB)) {
                 smlFactory = currentFactory;
             }

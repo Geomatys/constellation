@@ -23,14 +23,13 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
-import org.geotoolkit.factory.Factory;
 
 /**
  * Factory used to load various implementation of sensor metadata reader/writer.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractSMLSOSFactory extends Factory {
+public interface SMLFactory {
 
     public static final String OBSERVATION_ID_BASE = "observationIdBase";
 
@@ -42,7 +41,10 @@ public abstract class AbstractSMLSOSFactory extends Factory {
 
     public static final String IDENTIFIER_MAPPING = "identifierMapping";
 
-    public abstract boolean factoryMatchType(Object type);
+    /**
+     * Return true if the factory can return an implementation for the specified type.
+     */
+    boolean factoryMatchType(Object type);
 
     /**
      *  Return a Sensor metadata reader for the specified datasource.
@@ -54,7 +56,7 @@ public abstract class AbstractSMLSOSFactory extends Factory {
      * @return a Sensor metadata reader for the specified datasource.
      * @throws MetadataIoException
      */
-    public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws MetadataIoException;
+    SensorReader getSensorReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws MetadataIoException;
 
     /**
      * Return a Sensor metadata writer for the specified datasource.
@@ -66,6 +68,6 @@ public abstract class AbstractSMLSOSFactory extends Factory {
      * @return a Sensor metadata writer for the specified datasource.
      * @throws MetadataIoException
      */
-    public abstract SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws MetadataIoException;
+    SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws MetadataIoException;
 
 }

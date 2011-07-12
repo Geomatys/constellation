@@ -35,7 +35,7 @@ import static org.constellation.configuration.DataSourceType.*;
  * @since 0.8
  * @author Guilhem Legal (Geomatys)
  */
-public class MDWebSOSFactory extends AbstractSMLSOSFactory {
+public class MDWebSOSFactory implements SMLFactory {
 
     /**
      * {@inheritDoc}

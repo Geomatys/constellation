@@ -31,7 +31,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.sos.factory.AbstractSMLSOSFactory;
+import org.constellation.sos.factory.SMLFactory;
 
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -76,7 +76,7 @@ public class FileSensorWriter implements SensorWriter {
         if (configuration == null) {
             throw new MetadataIoException("The sensor configuration object is null", NO_APPLICABLE_CODE);
         }
-        this.sensorIdBase = (String) properties.get(AbstractSMLSOSFactory.SENSOR_ID_BASE);
+        this.sensorIdBase = (String) properties.get(SMLFactory.SENSOR_ID_BASE);
         uncommittedFiles = new ArrayList<File>();
         if (configuration.getDataDirectory() == null) {
             throw new MetadataIoException("The sensor data directory is null", NO_APPLICABLE_CODE);
