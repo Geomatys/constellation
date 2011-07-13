@@ -473,6 +473,12 @@ public class SOSworker extends AbstractWorker {
         }
     }
     
+    /**
+     * Select the good O&M factory in the available ones in function of the dataSource type.
+     * 
+     * @param type
+     * @return 
+     */
     private OMFactory getOMFactory(DataSourceType type) {
         final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
         while (ite.hasNext()) {
@@ -484,6 +490,12 @@ public class SOSworker extends AbstractWorker {
         throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
     }
     
+    /**
+     * Select the good O&M factory in the available ones in function of the dataSource type.
+     * 
+     * @param type
+     * @return 
+     */
     private SMLFactory getSMLFactory(DataSourceType type) {
         final Iterator<SMLFactory> ite = ServiceRegistry.lookupProviders(SMLFactory.class);
         while (ite.hasNext()) {

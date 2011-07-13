@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,6 +40,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 
 // JAXB dependencies
+import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -74,7 +76,6 @@ import static org.constellation.metadata.CSWConstants.*;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.ws.AbstractWorker;
 import org.geotoolkit.factory.FactoryNotFoundException;
-import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
@@ -131,12 +132,12 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // GeoAPI dependencies
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.util.CodeList;
 
@@ -234,12 +235,6 @@ public class CSWworker extends AbstractWorker {
     private int profile;
 
     /**
-     * A factory registry allowing to load various CSW Factory in function of the implementation build.
-     */
-    private static FactoryRegistry factory = new FactoryRegistry(AbstractCSWFactory.class);
-
-
-    /**
      * The current version of the service.
      */
     private ServiceDef actingVersion = ServiceDef.CSW_2_0_2;
@@ -326,12 +321,12 @@ public class CSWworker extends AbstractWorker {
 
         // we assign the configuration directory
         configuration.setConfigurationDirectory(configDir);
-
-        // we load the factory from the available classes
-        final AbstractCSWFactory cswfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
-        LOGGER.log(Level.FINER, "CSW factory loaded:{0}", cswfactory.getClass().getName());
-
         final int datasourceType = configuration.getType();
+        
+        // we load the factory from the available classes
+        final AbstractCSWFactory cswfactory = getCSWFactory(datasourceType);
+        LOGGER.log(Level.FINER, "CSW factory loaded:{0}", cswfactory.getClass().getName());
+        
         //we initialize all the data retriever (reader/writer) and index worker
         mdReader                      = cswfactory.getMetadataReader(configuration);
         profile                       = configuration.getProfile();
@@ -350,6 +345,23 @@ public class CSWworker extends AbstractWorker {
         initializeRecordSchema();
         initializeAnchorsMap();
         loadCascadedService(configDir);
+    }
+    
+    /**
+     * Select the good CSW factory in the available ones in function of the dataSource type.
+     * 
+     * @param type
+     * @return 
+     */
+    private AbstractCSWFactory getCSWFactory(int type) {
+        final Iterator<AbstractCSWFactory> ite = ServiceRegistry.lookupProviders(AbstractCSWFactory.class);
+        while (ite.hasNext()) {
+            AbstractCSWFactory currentFactory = ite.next();
+            if (currentFactory.factoryMatchType(type)) {
+                return currentFactory;
+            }
+        }
+        throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
     }
     
     /**

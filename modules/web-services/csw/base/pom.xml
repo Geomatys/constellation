@@ -61,11 +61,6 @@
     in the JARs' list that maven will put in the directory "target/binaries".
   -->
   <dependencies>
-    <!-- MDweb model -->
-    <dependency>
-      <groupId>org.mdweb.metamodel</groupId>
-      <artifactId>mdweb-metamodel-lib-thesaurus</artifactId>
-    </dependency>
     <!-- Constellation dependencies -->
     <dependency>
       <groupId>org.constellation.web-services</groupId>
@@ -80,11 +75,6 @@
     <dependency>
       <groupId>org.constellation.library</groupId>
       <artifactId>cstl-lib-index</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-metadata-mdw</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -145,15 +135,34 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-       <groupId>org.mdweb.metamodel</groupId>
-       <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-sensorML</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+   <build>
+    <plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      </plugins>
+   </build>
 
 </project>

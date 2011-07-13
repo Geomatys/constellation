@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation.web-services</groupId>
-    <artifactId>cstl-web-sos</artifactId>
+    <artifactId>cstl-web-csw</artifactId>
     <version>0.8-SNAPSHOT</version>
   </parent>
 
@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.web-services</groupId>
-  <artifactId>cstl-web-sos-mdw</artifactId>
+  <artifactId>cstl-web-csw-mdw</artifactId>
   <packaging>jar</packaging>
-  <name>Web service for an OGC SOS MDWeb</name>
+  <name>Web service for an OGC CSW MDWeb</name>
   <description>
-   MDWeb SensorML reader/writer for Sensor Observation Service.
+     MDWeb Metadata reader/writer for service Catalogue service Web.
   </description>
 
 
@@ -42,17 +42,6 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
-    <developer>
-      <id>desruisseaux</id>
-      <name>Martin Desruisseaux</name>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
   </developers>
 
 
@@ -61,19 +50,31 @@
     in the JARs' list that maven will put in the directory "target/binaries".
   -->
   <dependencies>
-    <!-- constellation dependencies -->
+    <!-- MDweb model -->
+    <dependency>
+      <groupId>org.mdweb.metamodel</groupId>
+      <artifactId>mdweb-metamodel-lib-thesaurus</artifactId>
+    </dependency>
+    <!-- Constellation dependencies -->
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-sos-base</artifactId>
+      <artifactId>cstl-web-csw-base</artifactId>
       <version>${project.version}</version>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-metadata-mdw</artifactId>
       <version>${project.version}</version>
     </dependency>
     
     <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-csw-base</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.constellation.testing</groupId>
       <artifactId>cstl-test-data</artifactId>
@@ -86,10 +87,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-sos-base</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
+     <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-sensorML</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
