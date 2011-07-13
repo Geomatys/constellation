@@ -7,8 +7,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.constellation</groupId>
-    <artifactId>library</artifactId>
+    <groupId>org.constellation.library</groupId>
+    <artifactId>cstl-lib-index</artifactId>
     <version>0.8-SNAPSHOT</version>
   </parent>
 
@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.library</groupId>
-  <artifactId>cstl-lib-index</artifactId>
+  <artifactId>cstl-lib-index-base</artifactId>
   <packaging>jar</packaging>
-  <name>Library providing CSW Lucene Index handlers</name>
+  <name>Library providing CSW Lucene Index handlers Base</name>
   <description>
-    The library for Constellation CSW Lucene Index handlers.
+    The base library for Constellation CSW Lucene Index handlers.
   </description>
 
 
