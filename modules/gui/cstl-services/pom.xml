@@ -421,7 +421,7 @@
             <dependencies>
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
-                    <artifactId>cstl-web-csw</artifactId>
+                    <artifactId>cstl-web-csw-mdw</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
