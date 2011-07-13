@@ -17,9 +17,9 @@
 package org.constellation.metadata.io;
 
 import java.util.List;
+import java.util.logging.Level;
 
 //geotoolkit dependencies
-import java.util.logging.Level;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 
 /**

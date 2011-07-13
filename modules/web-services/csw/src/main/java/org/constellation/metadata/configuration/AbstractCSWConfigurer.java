@@ -19,19 +19,17 @@
 package org.constellation.metadata.configuration;
 
 // J2SE dependencies
-import org.geotoolkit.util.FileUtilities;
 import java.io.IOException;
 import java.io.FileInputStream;
-import org.constellation.metadata.io.CSWMetadataWriter;
-import java.util.Arrays;
-import javax.ws.rs.core.MultivaluedMap;
-import java.util.StringTokenizer;
 import java.io.File;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import javax.ws.rs.core.MultivaluedMap;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBException;
@@ -41,18 +39,20 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.factory.AbstractCSWFactory;
+import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.constellation.generic.database.BDD;
 
 // Geotoolkit dependencies
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;

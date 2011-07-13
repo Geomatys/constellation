@@ -20,11 +20,11 @@ package org.constellation.metadata.io;
 
 import java.net.URI;
 import java.util.List;
-
-/// geotoolkit dependencies
 import java.util.Map;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
+
+// geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
 

@@ -93,4 +93,8 @@ public class DataSourceType {
         }
         return false;
     }
+    
+    public String toString() {
+        return name;
+    }
 }
