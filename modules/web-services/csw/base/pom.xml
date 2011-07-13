@@ -77,11 +77,6 @@
       <artifactId>cstl-lib-index</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-generic</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <!-- Geotoolkit dependencies -->
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
@@ -90,10 +85,6 @@
     <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-metadata-fra</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-skos</artifactId>
     </dependency>
     <dependency>
      <groupId>org.geotoolkit.pending</groupId>
