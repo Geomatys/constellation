@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Configuration of "sec-services" module from Constellation project.
+  Configuration for the "xacml-security" module of Constellation project.
   Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.constellation.web-services</groupId>
-    <artifactId>cstl-web-csw</artifactId>
+    <groupId>org.constellation.library</groupId>
+    <artifactId>cstl-lib-index</artifactId>
     <version>0.8-SNAPSHOT</version>
   </parent>
 
@@ -17,12 +17,12 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation.web-services</groupId>
-  <artifactId>cstl-web-csw-filesystem</artifactId>
+  <groupId>org.constellation.library</groupId>
+  <artifactId>cstl-lib-index-generic</artifactId>
   <packaging>jar</packaging>
-  <name>Web service for an OGC CSW File System</name>
+  <name>Library providing CSW Lucene Index handlers Generic</name>
   <description>
-     FileSystem Metadata reader/writer for service Catalogue service Web.
+    The library for Constellation CSW Lucene Index handlers for generic datasource.
   </description>
 
 
@@ -46,40 +46,36 @@
 
 
   <!--
-    Required dependencies for building. These dependencies will be included
-    in the JARs' list that maven will put in the directory "target/binaries".
+    Required dependencies for building. These dependencies wil be included into
+    the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
-    <!-- Constellation dependencies -->
     <dependency>
-      <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-csw-base</artifactId>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-index-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-metadata</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-configuration</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-index-generic</artifactId>
+      <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
     <!-- Test dependencies -->
     <dependency>
-      <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-csw-base</artifactId>
-      <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.testing</groupId>
-      <artifactId>cstl-test-data</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-     <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-sensorML</artifactId>
-      <scope>test</scope>
+       <groupId>org.constellation.testing</groupId>
+       <artifactId>cstl-test-data</artifactId>
+       <version>${project.version}</version>
+       <scope>test</scope>
     </dependency>
   </dependencies>
 

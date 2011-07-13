@@ -66,6 +66,11 @@
       <artifactId>cstl-store-metadata-mdw</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-index-mdw</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     
     <!-- Test dependencies -->
     <dependency>

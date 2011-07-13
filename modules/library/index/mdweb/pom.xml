@@ -7,8 +7,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.constellation</groupId>
-    <artifactId>library</artifactId>
+    <groupId>org.constellation.library</groupId>
+    <artifactId>cstl-lib-index</artifactId>
     <version>0.8-SNAPSHOT</version>
   </parent>
 
@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.library</groupId>
-  <artifactId>cstl-lib-base</artifactId>
+  <artifactId>cstl-lib-index-mdw</artifactId>
   <packaging>jar</packaging>
-  <name>Library providing base utilities</name>
+  <name>Library providing CSW Lucene Index handlers MDWeb</name>
   <description>
-    The base library for Constellation.
+    The library for Constellation CSW Lucene Index handlers for MDWeb datasource.
   </description>
 
 
@@ -31,28 +31,6 @@
     Developers and contributors.
   -->
   <developers>
-    <developer>
-      <id>acuster</id>
-      <name>Adrian Custer</name>
-      <email>adrian.custer@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>    
-    <developer>
-      <id>cedricbr</id>
-      <name>Briançon Cédric</name>
-      <email>cedric.briancon@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>    
     <developer>
       <id>glegal</id>
       <name>Guilhem Legal</name>
@@ -66,31 +44,46 @@
     </developer>
   </developers>
 
+
   <!--
     Required dependencies for building. These dependencies wil be included into
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-utility-pending</artifactId>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-index-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- MDWeb Metamodel dependencies -->
+    <dependency>
+      <groupId>org.mdweb.metamodel</groupId>
+      <artifactId>mdweb-metamodel-lib-model</artifactId>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-     <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-ebrim</artifactId>
+       <groupId>org.constellation.testing</groupId>
+       <artifactId>cstl-test-data</artifactId>
+       <version>${project.version}</version>
+       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-base</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-gml</artifactId>
+      <groupId>org.mdweb.metamodel</groupId>
+      <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.project</groupId>
-      <artifactId>geotk-provided</artifactId>
-      <scope>provided</scope>
-    </dependency>
+    
   </dependencies>
 
 </project>

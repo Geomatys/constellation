@@ -7,8 +7,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.constellation.library</groupId>
-    <artifactId>cstl-lib-index</artifactId>
+    <groupId>org.constellation</groupId>
+    <artifactId>library</artifactId>
     <version>0.8-SNAPSHOT</version>
   </parent>
 
@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.library</groupId>
-  <artifactId>cstl-lib-index-base</artifactId>
-  <packaging>jar</packaging>
-  <name>Library providing CSW Lucene Index handlers Base</name>
+  <artifactId>cstl-lib-index</artifactId>
+  <packaging>pom</packaging>
+  <name>Library providing CSW Lucene Index handlers</name>
   <description>
-    The base library for Constellation CSW Lucene Index handlers.
+    The library for Constellation CSW Lucene Index handlers.
   </description>
 
 
@@ -45,15 +45,13 @@
   </developers>
 
 
-  <!--
-    Required dependencies for building. These dependencies wil be included into
-    the JARs list that Maven will put into the directory "target/binaries".
-  -->
-  <dependencies>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-spatial-lucene</artifactId>
-    </dependency>
-  </dependencies>
+  <!-- =========================================================== -->
+  <!--     Modules included in the build                           -->
+  <!-- =========================================================== -->
+  <modules>
+    <module>base</module>
+    <module>mdweb</module>
+    <module>generic</module>
+  </modules>
 
 </project>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cstl:SOSConfiguration xmlns:cstl="http://www.constellation.org/config">
-<cstl:observationFilterType>DEFAULT</cstl:observationFilterType>
-<cstl:observationReaderType>DEFAULT</cstl:observationReaderType>
-<cstl:observationWriterType>DEFAULT</cstl:observationWriterType>
-<cstl:SMLType>FILE_SYSTEM</cstl:SMLType>
+<cstl:observationFilterType>postgrid</cstl:observationFilterType>
+<cstl:observationReaderType>postgrid</cstl:observationReaderType>
+<cstl:observationWriterType>postgrid</cstl:observationWriterType>
+<cstl:SMLType>filesystem</cstl:SMLType>
 <cstl:profile>transactional</cstl:profile>
 <cstl:observationIdBase>urn:ogc:object:observation:SunSpot:</cstl:observationIdBase>
 <cstl:sensorIdBase>urn:ogc:object:sensor:SunSpot:</cstl:sensorIdBase>

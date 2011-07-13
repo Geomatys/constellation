@@ -74,7 +74,12 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-index</artifactId>
+      <artifactId>cstl-lib-index-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-metadata</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Geotoolkit dependencies -->
