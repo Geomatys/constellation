@@ -27,9 +27,6 @@ import javax.faces.model.SelectItem;
 import javax.sql.DataSource;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.observation.sql.ObservationDatabaseCreator;
 import org.mdweb.sql.DatabaseCreator;
@@ -127,14 +124,14 @@ public class SOSBean extends AbstractServiceBean{
     public void setOmConfigType(String omConfigType) {
         if (configurationObject instanceof SOSConfiguration) {
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
-            final ObservationReaderType rType = ObservationReaderType.fromName(omConfigType);
+            final DataSourceType rType = DataSourceType.fromName(omConfigType);
             config.setObservationReaderType(rType);
-            if (rType == ObservationReaderType.DEFAULT) {
-                config.setObservationFilterType(ObservationFilterType.DEFAULT);
-                config.setObservationWriterType(ObservationWriterType.DEFAULT);
-            } else if (rType == ObservationReaderType.FILESYSTEM) {
-                config.setObservationFilterType(ObservationFilterType.LUCENE);
-                config.setObservationWriterType(ObservationWriterType.FILESYSTEM);
+            if (rType == DataSourceType.POSTGRID) {
+                config.setObservationFilterType(DataSourceType.POSTGRID);
+                config.setObservationWriterType(DataSourceType.POSTGRID);
+            } else if (rType == DataSourceType.FILESYSTEM) {
+                config.setObservationFilterType(DataSourceType.LUCENE);
+                config.setObservationWriterType(DataSourceType.FILESYSTEM);
             }
         }
         this.omConfigType = omConfigType;

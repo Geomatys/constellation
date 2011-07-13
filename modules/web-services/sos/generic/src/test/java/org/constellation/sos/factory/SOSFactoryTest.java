@@ -22,8 +22,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
@@ -45,7 +44,7 @@ public class SOSFactoryTest {
         final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
         while (ite.hasNext()) {
             OMFactory currentFactory = ite.next();
-            if (currentFactory.factoryMatchType(ObservationReaderType.GENERIC)) {
+            if (currentFactory.factoryMatchType(DataSourceType.GENERIC)) {
                 omFactory = currentFactory;
             }
         }
@@ -82,7 +81,7 @@ public class SOSFactoryTest {
 
         boolean exLaunched = false;
         try  {
-            ObservationFilter of = omFactory.getObservationFilter(ObservationFilterType.GENERIC, config, parameters);
+            ObservationFilter of = omFactory.getObservationFilter(DataSourceType.GENERIC, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getMessage(), "Unable to find affinage.xml");
@@ -91,7 +90,7 @@ public class SOSFactoryTest {
 
         exLaunched = false;
         try  {
-            ObservationReader or = omFactory.getObservationReader(ObservationReaderType.GENERIC, config, parameters);
+            ObservationReader or = omFactory.getObservationReader(DataSourceType.GENERIC, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertTrue(ex.getMessage().contains("No suitable driver found for SomeUrl"));

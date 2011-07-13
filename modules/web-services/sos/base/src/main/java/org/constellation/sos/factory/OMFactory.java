@@ -18,9 +18,7 @@
 package org.constellation.sos.factory;
 
 import java.util.Map;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationReader;
@@ -47,7 +45,7 @@ public interface OMFactory {
     /**
      * Return true if the factory can return an implementation for the specified type.
      */
-    boolean factoryMatchType(Object type);
+    boolean factoryMatchType(DataSourceType type);
     
     /**
      * Return an observation filter for  the specified datasource.
@@ -59,7 +57,7 @@ public interface OMFactory {
      * @return An observation filter for  the specified datasource.
      * @throws CstlServiceException
      */
-    ObservationFilter getObservationFilter(ObservationFilterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
+    ObservationFilter getObservationFilter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
 
     /**
      * Clone an observation filter.
@@ -81,7 +79,7 @@ public interface OMFactory {
      * @return An Observation reader for the specified datasource.
      * @throws CstlServiceException
      */
-    ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
+    ObservationReader getObservationReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
 
     /**
      * Return an Observation writer for the specified datasource.
@@ -93,6 +91,6 @@ public interface OMFactory {
      * @return an Observation writer for the specified datasource.
      * @throws CstlServiceException
      */
-    ObservationWriter getObservationWriter(ObservationWriterType type,  Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
+    ObservationWriter getObservationWriter(DataSourceType type,  Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
 
 }

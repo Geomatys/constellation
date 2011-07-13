@@ -18,30 +18,49 @@
 
 package org.constellation.configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlValue;
+
 /**
  *
  * @author Guilhem Legal
  */
-public enum DataSourceType {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class DataSourceType {
 
-    FILE_SYSTEM("filesystem"),
+    private static final List<DataSourceType> VALUES = new ArrayList<DataSourceType>();
+    
+    public static final DataSourceType FILESYSTEM = new DataSourceType("filesystem");
 
-    MDWEB("mdweb"),
+    public static final DataSourceType MDWEB = new DataSourceType("mdweb");
 
-    POSTGRID_O_M("posgtgrid"),
+    public static final DataSourceType POSTGRID = new DataSourceType("postgrid");
 
-    GENERIC_O_M("generic"),
+    public static final DataSourceType GENERIC = new DataSourceType("generic");
+    
+    public static final DataSourceType LUCENE = new DataSourceType("lucene");
 
-    NONE("none");
+    public static final DataSourceType NONE = new DataSourceType("none");
 
+    @XmlValue
     private final String name;
     
-    private DataSourceType(final String name) {
+    public DataSourceType() {
+        this.name = null;
+    }
+    
+    public DataSourceType(final String name) {
         this.name = name;
+        if (!VALUES.contains(this)) {
+            VALUES.add(this);
+        }
     }
     
     public static DataSourceType fromName(final String name) {
-        for (DataSourceType o : DataSourceType.values()) {
+        for (DataSourceType o : VALUES) {
             if (o.getName().equals(name)) {
                 return o;
             }
@@ -54,5 +73,24 @@ public enum DataSourceType {
      */
     public String getName() {
         return name;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof DataSourceType) {
+            DataSourceType that = (DataSourceType)obj;
+            return this.name.equals(that.name);
+        }
+        return false;
     }
 }

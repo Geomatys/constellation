@@ -18,9 +18,7 @@
 package org.constellation.sos.factory;
 
 import java.util.Map;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.postgrid.DefaultObservationFilter;
 import org.constellation.sos.io.postgrid.DefaultObservationReader;
@@ -30,7 +28,7 @@ import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
-import static org.constellation.configuration.ObservationFilterType.*;
+import static org.constellation.configuration.DataSourceType.*;
 
 /**
   * A postgrid implementation of the SOS factory.
@@ -44,10 +42,8 @@ public class PostgridSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public boolean factoryMatchType(Object type) {
-        if (type instanceof ObservationFilterType && ((ObservationFilterType)type).equals(DEFAULT) 
-         || type instanceof ObservationReaderType && ((ObservationReaderType)type).equals(ObservationReaderType.DEFAULT)
-         || type instanceof ObservationWriterType && ((ObservationWriterType)type).equals(ObservationWriterType.DEFAULT)) {
+    public boolean factoryMatchType(DataSourceType type) {
+        if (type.equals(POSTGRID)) {
             return true;
         }
         return false;
@@ -57,7 +53,7 @@ public class PostgridSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationFilter getObservationFilter(ObservationFilterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationFilter getObservationFilter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
        return new DefaultObservationFilter(configuration, properties);
     }
 
@@ -73,7 +69,7 @@ public class PostgridSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationReader getObservationReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
         return new DefaultObservationReader(configuration, properties);
     }
 
@@ -81,7 +77,7 @@ public class PostgridSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationWriter getObservationWriter(ObservationWriterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationWriter getObservationWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
         return new DefaultObservationWriter(configuration);
     }
 

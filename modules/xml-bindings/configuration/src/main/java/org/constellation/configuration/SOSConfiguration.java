@@ -44,17 +44,17 @@ public class SOSConfiguration {
     /**
      * Implementation type for observation filter.
      */
-    private ObservationFilterType observationFilterType;
+    private DataSourceType observationFilterType;
 
     /**
      * Implementation type for observation reader.
      */
-    private ObservationReaderType observationReaderType;
+    private DataSourceType observationReaderType;
 
     /**
      * Implementation type for observation writer.
      */
-    private ObservationWriterType observationWriterType;
+    private DataSourceType observationWriterType;
 
     /**
      * type of the datasource for SensorML Datasource.
@@ -179,32 +179,32 @@ public class SOSConfiguration {
     /**
      * @return the observationFilterType
      */
-    public ObservationFilterType getObservationFilterType() {
+    public DataSourceType getObservationFilterType() {
         if (observationFilterType == null)
-            observationFilterType = ObservationFilterType.DEFAULT;
+            observationFilterType = DataSourceType.POSTGRID;
         return observationFilterType;
     }
 
     /**
      * @param observationFilterType the observationFilterType to set
      */
-    public void setObservationFilterType(final ObservationFilterType observationFilterType) {
+    public void setObservationFilterType(final DataSourceType observationFilterType) {
         this.observationFilterType = observationFilterType;
     }
 
     /**
      * @return the observationReaderType
      */
-    public ObservationReaderType getObservationReaderType() {
+    public DataSourceType getObservationReaderType() {
         if (observationReaderType == null)
-            observationReaderType = observationReaderType.DEFAULT;
+            observationReaderType = DataSourceType.POSTGRID;
         return observationReaderType;
     }
 
     /**
      * @param observationReaderType the observationReaderType to set
      */
-    public void setObservationReaderType(final ObservationReaderType observationReaderType) {
+    public void setObservationReaderType(final DataSourceType observationReaderType) {
         this.observationReaderType = observationReaderType;
     }
 
@@ -313,14 +313,14 @@ public class SOSConfiguration {
     /**
      * @return the observationWriterType
      */
-    public ObservationWriterType getObservationWriterType() {
+    public DataSourceType getObservationWriterType() {
         return observationWriterType;
     }
 
     /**
      * @param observationWriterType the observationWriterType to set
      */
-    public void setObservationWriterType(final ObservationWriterType observationWriterType) {
+    public void setObservationWriterType(final DataSourceType observationWriterType) {
         this.observationWriterType = observationWriterType;
     }
 

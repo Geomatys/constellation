@@ -17,14 +17,12 @@
 
 package org.constellation.sos.factory;
 
+import org.constellation.configuration.DataSourceType;
 import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
@@ -47,7 +45,7 @@ public class SOSFactoryTest {
         final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
         while (ite.hasNext()) {
             OMFactory currentFactory = ite.next();
-            if (currentFactory.factoryMatchType(ObservationReaderType.DEFAULT)) {
+            if (currentFactory.factoryMatchType(DataSourceType.POSTGRID)) {
                 omFactory = currentFactory;
             }
         }
@@ -83,7 +81,7 @@ public class SOSFactoryTest {
 
         boolean exLaunched = false;
         try  {
-            ObservationFilter of = omFactory.getObservationFilter(ObservationFilterType.DEFAULT, config, parameters);
+            ObservationFilter of = omFactory.getObservationFilter(DataSourceType.POSTGRID, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertTrue(ex.getMessage().contains("No suitable driver found for SomeUrl"));
@@ -92,7 +90,7 @@ public class SOSFactoryTest {
 
         exLaunched = false;
         try  {
-            ObservationReader or = omFactory.getObservationReader(ObservationReaderType.DEFAULT, config, parameters);
+            ObservationReader or = omFactory.getObservationReader(DataSourceType.POSTGRID, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertTrue(ex.getMessage().contains("No suitable driver found for SomeUrl"));

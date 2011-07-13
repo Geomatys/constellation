@@ -41,8 +41,8 @@ public class FilesystemSOSFactory implements SMLFactory {
      * {@inheritDoc}
      */
     @Override
-    public boolean factoryMatchType(Object type) {
-        if (type instanceof DataSourceType && ((DataSourceType)type).equals(FILE_SYSTEM)) {
+    public boolean factoryMatchType(DataSourceType type) {
+        if (type.equals(FILESYSTEM)) {
             return true;
         }
         return false;

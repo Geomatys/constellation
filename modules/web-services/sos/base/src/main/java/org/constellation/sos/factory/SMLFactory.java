@@ -44,7 +44,7 @@ public interface SMLFactory {
     /**
      * Return true if the factory can return an implementation for the specified type.
      */
-    boolean factoryMatchType(Object type);
+    boolean factoryMatchType(DataSourceType type);
 
     /**
      *  Return a Sensor metadata reader for the specified datasource.

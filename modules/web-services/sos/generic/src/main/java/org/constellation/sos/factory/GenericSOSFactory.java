@@ -18,9 +18,7 @@
 package org.constellation.sos.factory;
 
 import java.util.Map;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.generic.DefaultGenericObservationReader;
@@ -30,7 +28,7 @@ import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
-import static org.constellation.configuration.ObservationFilterType.*;
+import static org.constellation.configuration.DataSourceType.*;
 
 /**
   * A Generic implementation of the SOS O&M factory.
@@ -45,9 +43,8 @@ public class GenericSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public boolean factoryMatchType(Object type) {
-        if (type instanceof ObservationFilterType && ((ObservationFilterType)type).equals(GENERIC) 
-         || type instanceof ObservationReaderType && ((ObservationReaderType)type).equals(ObservationReaderType.GENERIC)) {
+    public boolean factoryMatchType(DataSourceType type) {
+        if (type.equals(GENERIC)) {
             return true;
         }
         return false;
@@ -57,7 +54,7 @@ public class GenericSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationFilter getObservationFilter(ObservationFilterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationFilter getObservationFilter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
         return new GenericObservationFilter(configuration, properties);
     }
 
@@ -77,7 +74,7 @@ public class GenericSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationReader getObservationReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
         try {
             return new DefaultGenericObservationReader(configuration, properties);
         } catch (MetadataIoException ex) {
@@ -89,7 +86,7 @@ public class GenericSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationWriter getObservationWriter(ObservationWriterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationWriter getObservationWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
         return null;
     }
 

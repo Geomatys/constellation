@@ -24,16 +24,12 @@ import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.FilterQuery;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.xml.MarshallerPool;
@@ -94,10 +90,10 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
 
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-            configuration.setObservationReaderType(ObservationReaderType.GENERIC);
-            configuration.setObservationWriterType(ObservationWriterType.NONE);
+            configuration.setObservationReaderType(DataSourceType.GENERIC);
+            configuration.setObservationWriterType(DataSourceType.NONE);
             configuration.setSMLType(DataSourceType.NONE);
-            configuration.setObservationFilterType(ObservationFilterType.GENERIC);
+            configuration.setObservationFilterType(DataSourceType.GENERIC);
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
             configuration.setProfile("discovery");
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");

@@ -54,9 +54,6 @@ import javax.xml.namespace.QName;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -352,13 +349,13 @@ public class SOSworker extends AbstractWorker {
             loadMapping(configurationDirectory);
 
             //we get the O&M filter Type
-            final ObservationFilterType omFilterType = configuration.getObservationFilterType();
+            final DataSourceType omFilterType = configuration.getObservationFilterType();
 
             //we get the O&M reader Type
-            final ObservationReaderType omReaderType = configuration.getObservationReaderType();
+            final DataSourceType omReaderType = configuration.getObservationReaderType();
 
             //we get the O&M writer Type
-            final ObservationWriterType omWriterType = configuration.getObservationWriterType();
+            final DataSourceType omWriterType = configuration.getObservationWriterType();
 
             //we get the Sensor reader type
             final DataSourceType smlType = configuration.getSMLType();
@@ -426,7 +423,7 @@ public class SOSworker extends AbstractWorker {
             }
             
             // we initialize the O&M reader/writer/filter
-            if (!ObservationReaderType.NONE.equals(omReaderType)) {
+            if (!DataSourceType.NONE.equals(omReaderType)) {
                 omFactory = getOMFactory(omReaderType);
                 omReader  = omFactory.getObservationReader(omReaderType, omConfiguration, properties);
                 
@@ -434,11 +431,11 @@ public class SOSworker extends AbstractWorker {
                 this.acceptedResponseMode   = omReader.getResponseModes();
                 this.acceptedResponseFormat = omReader.getResponseFormats();
             }
-            if (!ObservationWriterType.NONE.equals(omWriterType)) {
+            if (!DataSourceType.NONE.equals(omWriterType)) {
                 omFactory = getOMFactory(omWriterType);
                 omWriter  = omFactory.getObservationWriter(omWriterType, omConfiguration, properties);
             }
-            if (!ObservationFilterType.NONE.equals(omFilterType)) {
+            if (!DataSourceType.NONE.equals(omFilterType)) {
                 omFactory = getOMFactory(omFilterType);
                 omFilter  = omFactory.getObservationFilter(omFilterType, omConfiguration, properties);
             }
@@ -476,7 +473,7 @@ public class SOSworker extends AbstractWorker {
         }
     }
     
-    private OMFactory getOMFactory(Object type) {
+    private OMFactory getOMFactory(DataSourceType type) {
         final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
         while (ite.hasNext()) {
             OMFactory currentFactory = ite.next();
@@ -487,7 +484,7 @@ public class SOSworker extends AbstractWorker {
         throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
     }
     
-    private SMLFactory getSMLFactory(Object type) {
+    private SMLFactory getSMLFactory(DataSourceType type) {
         final Iterator<SMLFactory> ite = ServiceRegistry.lookupProviders(SMLFactory.class);
         while (ite.hasNext()) {
             SMLFactory currentFactory = ite.next();

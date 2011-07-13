@@ -41,8 +41,8 @@ public class MDWebSOSFactory implements SMLFactory {
      * {@inheritDoc}
      */
     @Override
-    public boolean factoryMatchType(Object type) {
-        if (type instanceof DataSourceType && ((DataSourceType)type).equals(MDWEB)) {
+    public boolean factoryMatchType(DataSourceType type) {
+        if (type.equals(MDWEB)) {
             return true;
         }
         return false;

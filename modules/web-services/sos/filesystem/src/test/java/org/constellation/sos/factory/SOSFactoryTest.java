@@ -55,7 +55,7 @@ public class SOSFactoryTest {
         final Iterator<SMLFactory> ite = ServiceRegistry.lookupProviders(SMLFactory.class);
         while (ite.hasNext()) {
             SMLFactory currentFactory = ite.next();
-            if (currentFactory.factoryMatchType(DataSourceType.FILE_SYSTEM)) {
+            if (currentFactory.factoryMatchType(DataSourceType.FILESYSTEM)) {
                 smlFactory = currentFactory;
             }
         }

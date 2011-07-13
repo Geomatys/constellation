@@ -23,9 +23,6 @@ import java.sql.Connection;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -87,9 +84,9 @@ public class MDWebSOSWorkerTest extends SOSWorkerTest {
             Automatic OMConfiguration  = new Automatic();
             
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-            configuration.setObservationReaderType(ObservationReaderType.NONE);
-            configuration.setObservationWriterType(ObservationWriterType.NONE);
-            configuration.setObservationFilterType(ObservationFilterType.NONE);
+            configuration.setObservationReaderType(DataSourceType.NONE);
+            configuration.setObservationWriterType(DataSourceType.NONE);
+            configuration.setObservationFilterType(DataSourceType.NONE);
             
             configuration.setSMLType(DataSourceType.MDWEB);
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");

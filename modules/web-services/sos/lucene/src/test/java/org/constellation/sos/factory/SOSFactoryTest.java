@@ -23,9 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
@@ -54,7 +52,7 @@ public class SOSFactoryTest {
         final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
         while (ite.hasNext()) {
             OMFactory currentFactory = ite.next();
-            if (currentFactory.factoryMatchType(ObservationReaderType.FILESYSTEM)) {
+            if (currentFactory.factoryMatchType(DataSourceType.FILESYSTEM)) {
                 omFactory = currentFactory;
             }
         }
@@ -98,7 +96,7 @@ public class SOSFactoryTest {
 
         boolean exLaunched = false;
         try  {
-            ObservationFilter of = omFactory.getObservationFilter(ObservationFilterType.LUCENE, config, parameters);
+            ObservationFilter of = omFactory.getObservationFilter(DataSourceType.LUCENE, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertTrue(ex.getMessage().contains("IndexingException in LuceneObservationFilter constructor"));
@@ -107,7 +105,7 @@ public class SOSFactoryTest {
         
         exLaunched = false;
         try  {
-            ObservationReader or = omFactory.getObservationReader(ObservationReaderType.FILESYSTEM, config, parameters);
+            ObservationReader or = omFactory.getObservationReader(DataSourceType.FILESYSTEM, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getMessage(), "There is no data Directory");
@@ -116,13 +114,13 @@ public class SOSFactoryTest {
 
         config.setConfigurationDirectory(configurationDirectory);
         config.setDataDirectory(dataDirectory.getPath());
-        ObservationReader or = omFactory.getObservationReader(ObservationReaderType.FILESYSTEM, config, parameters);
+        ObservationReader or = omFactory.getObservationReader(DataSourceType.FILESYSTEM, config, parameters);
         assertNotNull(or);
         
-        ObservationWriter ow = omFactory.getObservationWriter(ObservationWriterType.FILESYSTEM, config, parameters);
+        ObservationWriter ow = omFactory.getObservationWriter(DataSourceType.FILESYSTEM, config, parameters);
         assertNotNull(ow);
         
-        ObservationFilter of = omFactory.getObservationFilter(ObservationFilterType.LUCENE, config, parameters);
+        ObservationFilter of = omFactory.getObservationFilter(DataSourceType.LUCENE, config, parameters);
         assertNotNull(of);
         
     }

@@ -18,13 +18,10 @@
 package org.constellation.sos.ws.rs;
 
 // Jersey dependencies
-import org.constellation.configuration.ObservationWriterType;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import javax.xml.bind.Marshaller;
 import java.util.logging.Level;
 import java.io.File;
-import org.geotoolkit.ows.xml.RequestBase;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
@@ -37,14 +34,18 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
+import org.constellation.sos.ws.SOSworker;
+import org.constellation.ws.MimeType;
+
+// Geotoolkit dependencies
+import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -55,8 +56,6 @@ import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
-import org.constellation.sos.ws.SOSworker;
-import org.constellation.ws.MimeType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
@@ -242,10 +241,10 @@ public class SOService extends OGCWebService<SOSworker> {
     @Override
     protected void basicConfigure(final File instanceDirectory) throws CstlServiceException {
         final SOSConfiguration baseConfig = new SOSConfiguration(new Automatic(null, new BDD()), new Automatic(null, new BDD()));
-        baseConfig.setObservationReaderType(ObservationReaderType.FILESYSTEM);
-        baseConfig.setObservationFilterType(ObservationFilterType.LUCENE);
-        baseConfig.setObservationWriterType(ObservationWriterType.FILESYSTEM);
-        baseConfig.setSMLType(DataSourceType.FILE_SYSTEM);
+        baseConfig.setObservationReaderType(DataSourceType.FILESYSTEM);
+        baseConfig.setObservationFilterType(DataSourceType.LUCENE);
+        baseConfig.setObservationWriterType(DataSourceType.FILESYSTEM);
+        baseConfig.setSMLType(DataSourceType.FILESYSTEM);
         configureInstance(instanceDirectory, baseConfig);
     }
 
