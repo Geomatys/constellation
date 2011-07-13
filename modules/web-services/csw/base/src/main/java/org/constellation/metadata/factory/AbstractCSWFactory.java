@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 // constellation dependencies
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -46,7 +47,7 @@ public interface AbstractCSWFactory {
     /**
      * Return true if the factory can return an implementation for the specified type.
      */
-    boolean factoryMatchType(int type);
+    boolean factoryMatchType(final DataSourceType type);
     
     /**
      * Return a Metadata reader for the specified dataSource type.
@@ -93,7 +94,7 @@ public interface AbstractCSWFactory {
      * @return  a Lucene index searcher for the specified dataSource type.
      * @throws IndexingException
      */
-    AbstractIndexSearcher getIndexSearcher(final int dbType, final File configDir, final String serviceID) throws IndexingException;
+    AbstractIndexSearcher getIndexSearcher(final File configDir, final String serviceID) throws IndexingException;
 
     /**
      * Return a catalog harvester in the specified implementation type.

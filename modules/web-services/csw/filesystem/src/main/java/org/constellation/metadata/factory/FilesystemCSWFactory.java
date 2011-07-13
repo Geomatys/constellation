@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 // Constellation dependencies
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -58,8 +59,8 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public boolean factoryMatchType(int type) {
-        return type == FILESYSTEM;
+    public boolean factoryMatchType(final DataSourceType type) {
+        return DataSourceType.FILESYSTEM.equals(type);
     }
     
     /**
@@ -90,7 +91,7 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public AbstractIndexSearcher getIndexSearcher(int dbType, File configDirectory, String serviceID) throws IndexingException {
+    public AbstractIndexSearcher getIndexSearcher(File configDirectory, String serviceID) throws IndexingException {
         return new AbstractIndexSearcher(configDirectory, serviceID);
     }
 

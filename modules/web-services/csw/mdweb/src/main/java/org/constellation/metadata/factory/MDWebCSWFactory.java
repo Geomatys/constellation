@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.factory;
 
+import org.constellation.configuration.DataSourceType;
 import java.io.File;
 
 // Constellation dependencies
@@ -54,8 +55,8 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public boolean factoryMatchType(int type) {
-        return type == MDWEB;
+    public boolean factoryMatchType(final DataSourceType type) {
+        return DataSourceType.MDWEB.equals(type);
     }
     
     /**
@@ -86,7 +87,7 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public AbstractIndexSearcher getIndexSearcher(int dbType, File configDirectory, String serviceID) throws IndexingException {
+    public AbstractIndexSearcher getIndexSearcher(File configDirectory, String serviceID) throws IndexingException {
         return new AbstractIndexSearcher(configDirectory, serviceID);
     }
 

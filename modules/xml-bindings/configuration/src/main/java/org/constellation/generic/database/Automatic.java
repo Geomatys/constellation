@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.constellation.configuration.DataSourceType;
 import org.geotoolkit.util.Utilities;
 
 /**
@@ -38,23 +39,9 @@ public class Automatic {
     @XmlTransient
     public static final int DEFAULT     = 0;
     @XmlTransient
-    public static final int CSR         = 1;
+    public static final int FILESYSTEM  = 1;
     @XmlTransient
-    public static final int CDI         = 2;
-    @XmlTransient
-    public static final int EDMED      = 3;
-    @XmlTransient
-    public static final int MDWEB      = 4;
-    @XmlTransient
-    public static final int FILESYSTEM  = 5;
-    @XmlTransient
-    public static final int PRODLINE    = 6;
-    @XmlTransient
-    public static final int PRODSPEC   = 7;
-    @XmlTransient
-    public static final int SERV       = 8;
-    @XmlTransient
-    public static final int BYID       = 9;
+    public static final int BYID        = 2;
 
     /**
      * The database connection informations.
@@ -294,25 +281,8 @@ public class Automatic {
      * Return the type of implementation as a flag.
      * @return
      */
-    public int getType() {
-        if ("cdi".equalsIgnoreCase(format))
-            return CDI;
-        else if ("csr".equalsIgnoreCase(format))
-            return CSR;
-        else if ("edmed".equalsIgnoreCase(format))
-            return EDMED;
-        else if ("mdweb".equalsIgnoreCase(format))
-            return MDWEB;
-        else if ("filesystem".equalsIgnoreCase(format))
-            return FILESYSTEM;
-        else if ("serv".equalsIgnoreCase(format))
-            return SERV;
-        else if ("prodline".equalsIgnoreCase(format))
-            return PRODLINE;
-        else if ("prodspec".equalsIgnoreCase(format))
-            return PRODSPEC;
-        else
-            return DEFAULT;
+    public DataSourceType getType() {
+        return new DataSourceType(format);
     }
 
     /**

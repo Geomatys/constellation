@@ -52,6 +52,7 @@ import org.apache.lucene.search.SortField;
 
 //Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.FilterParserException;
 import org.constellation.filter.LuceneFilterParser;
@@ -321,7 +322,7 @@ public class CSWworker extends AbstractWorker {
 
         // we assign the configuration directory
         configuration.setConfigurationDirectory(configDir);
-        final int datasourceType = configuration.getType();
+        final DataSourceType datasourceType = configuration.getType();
         
         // we load the factory from the available classes
         final AbstractCSWFactory cswfactory = getCSWFactory(datasourceType);
@@ -331,7 +332,7 @@ public class CSWworker extends AbstractWorker {
         mdReader                      = cswfactory.getMetadataReader(configuration);
         profile                       = configuration.getProfile();
         final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID, mdReader.getAdditionalQueryablePathMap());
-        indexSearcher                 = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
+        indexSearcher                 = cswfactory.getIndexSearcher(configDir, serviceID);
         if (profile == TRANSACTIONAL) {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
             catalogueHarvester        = cswfactory.getCatalogueHarvester(configuration, mdWriter);
@@ -353,7 +354,7 @@ public class CSWworker extends AbstractWorker {
      * @param type
      * @return 
      */
-    private AbstractCSWFactory getCSWFactory(int type) {
+    private AbstractCSWFactory getCSWFactory(DataSourceType type) {
         final Iterator<AbstractCSWFactory> ite = ServiceRegistry.lookupProviders(AbstractCSWFactory.class);
         while (ite.hasNext()) {
             AbstractCSWFactory currentFactory = ite.next();
