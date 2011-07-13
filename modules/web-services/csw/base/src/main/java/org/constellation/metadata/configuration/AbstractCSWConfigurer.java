@@ -53,7 +53,7 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.lucene.IndexingException;
@@ -547,7 +547,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         }
         Unmarshaller u = null;
         try {
-            u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
+            u = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
             for (File importedFile: files) {
                 final Object unmarshalled = u.unmarshal(importedFile);
                 writer.storeMetadata(unmarshalled);
@@ -560,7 +560,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             throw new CstlServiceException(ex);
         } finally {
             if (u != null) {
-                CSWMarshallerPool.getInstance().release(u);
+                EBRIMMarshallerPool.getInstance().release(u);
             }
         }
         return new AcknowlegementType("Error", "An error occurs during the process");

@@ -7,8 +7,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.constellation</groupId>
-    <artifactId>web-services</artifactId>
+    <groupId>org.constellation.web-services</groupId>
+    <artifactId>cstl-web-csw</artifactId>
     <version>0.8-SNAPSHOT</version>
   </parent>
 
@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.web-services</groupId>
-  <artifactId>cstl-web-csw</artifactId>
-  <packaging>pom</packaging>
-  <name>Web service for an OGC CSW</name>
+  <artifactId>cstl-web-csw-generic</artifactId>
+  <packaging>jar</packaging>
+  <name>Web service for an OGC CSW Generic</name>
   <description>
-    Modules for standardized service Catalogue service Web.
+   Generic Metadata reader/writer for service Catalogue service Web.
   </description>
 
 
@@ -42,28 +42,26 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
-    <developer>
-      <id>desruisseaux</id>
-      <name>Martin Desruisseaux</name>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
   </developers>
 
 
-  <!-- =========================================================== -->
-  <!--     Modules included in the build                           -->
-  <!-- =========================================================== -->
-  <modules>
-    <module>base</module>
-    <module>mdweb</module>
-    <module>generic</module>
-    <module>filesystem</module>
-  </modules>
+  <!--
+    Required dependencies for building. These dependencies will be included
+    in the JARs' list that maven will put in the directory "target/binaries".
+  -->
+  <dependencies>
+    <!-- Constellation dependencies -->
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-csw-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-generic</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
 
 </project>

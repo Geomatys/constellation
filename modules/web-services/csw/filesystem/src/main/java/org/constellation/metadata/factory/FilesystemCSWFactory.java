@@ -20,9 +20,11 @@ package org.constellation.metadata.factory;
 
 import java.io.File;
 
-// Constellation dependencies
+// J2SE dependencies
 import java.util.List;
 import java.util.Map;
+
+// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -36,11 +38,13 @@ import org.constellation.metadata.harvest.DefaultCatalogueHarvester;
 import org.constellation.metadata.harvest.FileSystemHarvester;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
+
+import static org.constellation.generic.database.Automatic.*;
+
+// GeotoolKit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-
-import static org.constellation.generic.database.Automatic.*;
 
 /**
  * A default implementation of the CSW factory.
@@ -48,11 +52,7 @@ import static org.constellation.generic.database.Automatic.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class DefaultCSWFactory implements AbstractCSWFactory {
-
-    private static final String UNKNOW_DATABASE_TYPE = "Unknow database type: ";
-
-    private static final String DEFAULT_FACTORY = " In Default CSW Factory.";
+public class FilesystemCSWFactory implements AbstractCSWFactory {
 
     /**
      * {@inheritDoc}
@@ -67,15 +67,7 @@ public class DefaultCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public CSWMetadataReader getMetadataReader(final Automatic configuration) throws MetadataIoException {
-        int type = -1;
-        if (configuration != null)
-            type = configuration.getType();
-        switch (type) {
-            case FILESYSTEM:
-                return new FileMetadataReader(configuration);
-            default:
-                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type + DEFAULT_FACTORY);
-        }
+        return new FileMetadataReader(configuration);
     }
     
     /**
@@ -83,15 +75,7 @@ public class DefaultCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public CSWMetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
-        int type = -1;
-        if (configuration != null)
-            type = configuration.getType();
-        switch (type) {
-            case FILESYSTEM:
-                return new FileMetadataWriter(configuration, indexer);
-            default:
-                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type + DEFAULT_FACTORY);
-        }
+        return new FileMetadataWriter(configuration, indexer);
     }
     
     /**
@@ -99,15 +83,7 @@ public class DefaultCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public AbstractIndexer getIndexer(final Automatic configuration, final MetadataReader reader, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
-        int type = -1;
-        if (configuration != null)
-            type = configuration.getType();
-        switch (type) {
-            case FILESYSTEM:
-                return new GenericIndexer(reader, configuration.getConfigurationDirectory(), serviceID, additionalQueryable);
-            default:
-                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type + DEFAULT_FACTORY);
-        }
+        return new GenericIndexer(reader, configuration.getConfigurationDirectory(), serviceID, additionalQueryable);
     }
     
     /**
@@ -115,12 +91,7 @@ public class DefaultCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public AbstractIndexSearcher getIndexSearcher(int dbType, File configDirectory, String serviceID) throws IndexingException {
-        switch (dbType) {
-            case FILESYSTEM:
-                return new AbstractIndexSearcher(configDirectory, serviceID);
-            default:
-                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + dbType + DEFAULT_FACTORY);
-        }
+        return new AbstractIndexSearcher(configDirectory, serviceID);
     }
 
     /**
@@ -139,7 +110,7 @@ public class DefaultCSWFactory implements AbstractCSWFactory {
             case BYID:
                 return new ByIDHarvester(writer, configuration.getIdentifierDirectory());
             default:
-                throw new IllegalArgumentException("Unknow harvester type: " + type + DEFAULT_FACTORY);
+                throw new IllegalArgumentException("Unknow harvester type: " + type + " In Default CSW Factory.");
         }
     }
 }

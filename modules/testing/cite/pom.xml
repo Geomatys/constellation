@@ -116,6 +116,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-csw-filesystem</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-postgis</artifactId>
       <version>${project.version}</version>
@@ -130,7 +135,7 @@
           <artifactId>jai_imageio</artifactId>
         </exclusion>
       </exclusions>
-</dependency>
+    </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-shapefile</artifactId>

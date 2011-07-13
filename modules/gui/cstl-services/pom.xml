@@ -106,6 +106,11 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-csw-filesystem</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-wms</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -422,6 +427,11 @@
                 <dependency>
                     <groupId>org.constellation.web-services</groupId>
                     <artifactId>cstl-web-csw-mdw</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-csw-filesystem</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
