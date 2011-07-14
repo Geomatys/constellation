@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlValue;
 
+import org.geotoolkit.util.Utilities;
+
 /**
  *
  * @author Guilhem Legal
@@ -89,7 +91,7 @@ public class DataSourceType {
         }
         if (obj instanceof DataSourceType) {
             DataSourceType that = (DataSourceType)obj;
-            return this.name.equals(that.name);
+            return Utilities.equals(this.name, that.name);
         }
         return false;
     }
