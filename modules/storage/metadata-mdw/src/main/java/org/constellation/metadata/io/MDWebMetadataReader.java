@@ -45,7 +45,7 @@ import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.ReflectionUtilities;
-        
+
 // MDWeb dependencies
 import org.constellation.util.Util;
 import org.mdweb.model.schemas.CodeListElement;
@@ -70,21 +70,21 @@ import org.geotoolkit.resources.Locales;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.UnlimitedInteger;
 
 // GeoAPI dependencies
 import org.geotoolkit.util.StringUtilities;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 import org.opengis.util.TypeName;
-import org.opengis.util.UnlimitedInteger;
 
 
 /**
  * A database Reader designed for an MDweb database.
- * 
+ *
  * It read The MDweb forms into the database and instantiate them into GeotoolKit object.
  * When an object have been read it is stored in cache.
- * 
+ *
  * @author Guilhem legal
  */
 public class MDWebMetadataReader extends AbstractMetadataReader {
@@ -93,22 +93,22 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * A reader to the MDWeb database.
      */
     protected Reader mdReader;
-    
+
     /**
      * A map containing the mapping between the MDWeb className and java typeName
      */
     private final Map<String, Class> classBinding;
-    
+
     /**
      * A list of package containing the ISO 19115 interfaces (and the codelist classes)
      */
     private List<String> opengisPackage;
-    
+
     /**
      * A list of package containing the ISO 19115 implementation.
      */
     private List<String> geotoolkitPackage;
-    
+
     /**
      * A list of package containing the CSW and dublinCore implementation
      */
@@ -144,18 +144,18 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * A list of package containing the Ebrim V3.0 implementation
      */
     private List<String> ebrimV3Package;
-    
+
      /**
      * A list of package containing the Ebrim V2.5 implementation
      */
     private List<String> ebrimV25Package;
-    
+
     /**
      * A List of the already see object for the current metadata read
      * (in order to avoid infinite loop)
      */
     protected Map<Value, Object> alreadyRead;
-    
+
     /**
      * A List of the already logged missing MDWeb {@link Classe}.
      */
@@ -165,7 +165,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
     /**
      * Build a new metadata Reader.
-     * 
+     *
      * @param MDReader a reader to the MDWeb database.
      */
     public MDWebMetadataReader(final Automatic configuration) throws MetadataIoException {
@@ -282,7 +282,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
     /**
      * Initialize the class binding between MDWeb database classes and java implementation classes.
-     * 
+     *
      * We give the possibility to the user to add a configuration file making the mapping.
      * @return
      */
@@ -317,12 +317,12 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * Return a metadata object from the specified identifier.
      * if is not already in cache it read it from the MDWeb database.
-     * 
+     *
      * @param identifier The metadata identifier.
      * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
-     * 
+     *
      * @return A metadata Object (Dublin core Record / GeotoolKit metadata / EBrim registry object)
-     * 
+     *
      * @throws java.sql.MetadataIoException
      */
     @Override
@@ -348,14 +348,14 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
              throw new MetadataIoException("MD_IO Exception while reading the metadata: " + identifier, e, null, "id");
         }
     }
-    
+
     /**
      * Return an object from a MDWeb record.
      *
      * @param identifier The metadata Identifier.
      * @param form the MDWeb record.
      * @param mode The data type (EBRIM, SENSORML, ISO)
-     * 
+     *
      * @return a GeotoolKit/constellation object representing the metadata.
      */
     protected Object getObjectFromForm(final String identifier, final Form form, final int mode) {
@@ -369,7 +369,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                addInCache(identifier, result);
             }
             return result;
-        
+
         //debugging part to see why the form cannot be read.
         } else {
             if (form == null) {
@@ -382,14 +382,14 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             return null;
         }
     }
-    
+
     /**
      * Return a GeotoolKit object from a MDWeb value (this value can be see as a tree).
      * This method build the value and all is attribute recursively.
-     * 
+     *
      * @param form the MDWeb record containing this value.
      * @param value The value to build.
-     * 
+     *
      * @return a GeotoolKit metadata object.
      */
     private Object getObjectFromValue(final Value value, final int mode) {
@@ -401,14 +401,14 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             LOGGER.log(Level.WARNING, "Error null type for value:{0}", value.getIdValue());
             return null;
         }
-        
+
         if (classe == null) {
             return null;
         }
-        
+
         Object result;
         /*
-         * 
+         *
          * if the value is a leaf => primitive type
          *
          */
@@ -518,8 +518,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     return null;
                 }
 
-            
-               
+
+
              }  else if ("DefaultMemberName".equals(className)) {
                 TextValue child = null;
                 Value typeChild = null;
@@ -649,7 +649,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     resultIS.add(entry.getKey(), entry.getValue());
                 }
                 return resultIS;
-            
+
             /**
              * Again another special case PT_Locale has a special construction.
              */
@@ -699,7 +699,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             for (Value childValue : value.getChildren()) {
 
                 final Path path = childValue.getPath();
-                
+
 
                 // we get the object from the child Value
                 final Object param = getObjectFromValue(childValue, mode);
@@ -726,7 +726,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         attribName = "abbreviation";
                     } else if (attribName.equalsIgnoreCase("uom")) {
                         attribName = "unit";
-                    } 
+                    }
                 }
 
                 boolean putSuceed = false;
@@ -842,8 +842,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
     /**
      * Return a class (java primitive type) from a class name.
-     * 
-     * @param className the standard name of a class. 
+     *
+     * @param className the standard name of a class.
      * @return a primitive class.
      */
     private static Class getPrimitiveTypeFromName(final String className, final String standardName) {
@@ -892,7 +892,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     private List<String> getPackageFromStandard(final String standardName, final String className, final int mode) {
         final List<String> packagesName = new ArrayList<String>();
-        
+
         if ("Catalog Web Service".equals(standardName) || "DublinCore".equals(standardName) ||
             "OGC Web Service".equals(standardName)     || "OGC Filter".equals(standardName)) {
             packagesName.addAll(cswPackage);
@@ -931,9 +931,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
     /**
      * Search an implementation for the specified class name.
-     * 
+     *
      * @param className a standard class name.
-     * 
+     *
      * @return a class object corresponding to the specified name.
      */
     private Class getClassFromName(final Classe type, final int mode) {
@@ -948,7 +948,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else {
             return result;
         }
-        
+
         //for the primitive type we return java primitive type
         result = getPrimitiveTypeFromName(className, standardName);
         if (result != null) {
@@ -968,7 +968,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         final List<String> packagesName = getPackageFromStandard(standardName, className, mode);
 
         for (String packageName : packagesName) {
-            
+
             //TODO remove this special case
             /*if ("RS_Identifier".equals(className))
                 packageName = "org.geotoolkit.referencing";
@@ -976,7 +976,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 packageName = "org.opengis.metadata.maintenance";
             else if ("SV_ServiceIdentification".equals(className))
                 packageName = "org.geotoolkit.service";
-            else if (className.startsWith("FRA_")) 
+            else if (className.startsWith("FRA_"))
                 packageName = "org.geotoolkit.metadata.fra";
             else if ("ReferenceSystemMetadata".equals(className))
                 packageName = "org.geotoolkit.internal.jaxb.metadata";
@@ -993,7 +993,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 try {
                     LOGGER.finer("searching: " + packageName + '.' + name);
                     result = Class.forName(packageName + '.' + name);
-                    
+
                     //if we found the class we store and return it
                     classBinding.put(classNameSave, result);
                     LOGGER.finer("class found:" + packageName + '.' + name);
@@ -1148,7 +1148,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public List<String> getAllIdentifiers() throws MetadataIoException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
     /**
      * {@inheritDoc }
      */
