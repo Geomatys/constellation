@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -275,7 +275,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
                 return cswfactory.getMetadataReader(config);
 
             } catch (MetadataIoException ex) {
-                throw new CstlServiceException("JAXBException while initializing the reader!", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("JAXBException while initializing the reader!", ex, NO_APPLICABLE_CODE);
             }
         } else {
             throw new CstlServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
@@ -299,7 +299,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
                 return cswfactory.getMetadataWriter(config, null);
 
             } catch (MetadataIoException ex) {
-                throw new CstlServiceException("JAXBException while initializing the writer!", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("JAXBException while initializing the writer!", ex, NO_APPLICABLE_CODE);
             }
         } else {
             throw new CstlServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
