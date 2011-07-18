@@ -96,6 +96,12 @@ public class Automatic {
      * -- MDWeb specific flag
      */
     private Boolean indexOnlyPublishedMetadata;
+    
+    /**
+     * Enable the indexation of external recordSet.
+     * -- MDWeb specific flag
+     */
+    private Boolean indexExternalRecordset;
 
     /**
      * Enable the indexation of internal recordSet.
@@ -494,6 +500,23 @@ public class Automatic {
      */
     public void setIndexInternalRecordset(final Boolean indexInternalRecordset) {
         this.indexInternalRecordset = indexInternalRecordset;
+    }
+    
+    /**
+     * @return the indexExternalRecordset
+     */
+    public Boolean getIndexExternalRecordset() {
+        if (indexExternalRecordset == null) {
+            return true;
+        }
+        return indexExternalRecordset;
+    }
+
+    /**
+     * @param indexExternalRecordset the indexExternalRecordset to set
+     */
+    public void setIndexExternalRecordset(final Boolean indexExternalRecordset) {
+        this.indexExternalRecordset = indexExternalRecordset;
     }
     
     @Override

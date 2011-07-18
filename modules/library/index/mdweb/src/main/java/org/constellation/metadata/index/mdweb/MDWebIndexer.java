@@ -85,6 +85,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     private final boolean indexOnlyPusblishedMetadata;
 
     private final boolean indexInternalRecordset;
+    
+    private final boolean indexExternalRecordset;
 
     /**
      * Creates a new CSW indexer for a MDWeb database.
@@ -97,6 +99,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
         this.indexOnlyPusblishedMetadata = configuration.getIndexOnlyPublishedMetadata();
         this.indexInternalRecordset      = configuration.getIndexInternalRecordset();
+        this.indexExternalRecordset      = configuration.getIndexExternalRecordset();
         
         // we get the database informations
         final BDD db = configuration.getBdd();
@@ -145,19 +148,24 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
             // getting the objects list and index avery item in the IndexWriter.
             final List<RecordSet> cats = mdWebReader.getRecordSets();
-            final List<RecordSet> catToIndex;
-            if (indexInternalRecordset) {
-                catToIndex = cats;
-            } else {
-                catToIndex = new ArrayList<RecordSet>();
-                for (RecordSet r : cats) {
-                    if (r.getExposure() != EXPOSURE.INTERNAL) {
+            final List<RecordSet> catToIndex = new ArrayList<RecordSet>();
+            for (RecordSet r : cats) {
+                if (indexInternalRecordset) {
+                    if (r.getExposure() == EXPOSURE.INTERNAL) {
                         catToIndex.add(r);
                     } else {
                         LOGGER.log(logLevel, "RecordSet:{0} is internal we exclude it.", r.getCode());
                     }
+               }
+                if (indexExternalRecordset) {
+                    if (r.getExposure() == EXPOSURE.EXTERNAL) {
+                        catToIndex.add(r);
+                    } else {
+                        LOGGER.log(logLevel, "RecordSet:{0} is external we exclude it.", r.getCode());
+                    }
                 }
             }
+            
             nbRecordSets = cats.size();
             final List<String> results = mdWebReader.getAllIdentifiers(catToIndex, indexOnlyPusblishedMetadata);
             LOGGER.log(logLevel, "{0} forms to read.", results.size());
