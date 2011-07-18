@@ -19,6 +19,9 @@
 package org.constellation.metadata.configuration;
 
 // J2SE dependencies
+import javax.imageio.spi.ServiceRegistry;
+import java.util.Iterator;
+import org.constellation.configuration.DataSourceType;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.File;
@@ -55,7 +58,6 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.factory.FactoryNotFoundException;
-import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.AbstractIndexer.IndexDirectoryFilter;
@@ -73,16 +75,6 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
      * A Map of service configuration.
      */
     protected Map<String, Automatic> serviceConfiguration = new HashMap<String, Automatic>();
-    
-    /**
-     * A generic factory to get the correct CSW Factory.
-     */
-    private static FactoryRegistry factory = new FactoryRegistry(AbstractCSWFactory.class);
-
-    /**
-     * A CSW factory
-     */
-    private AbstractCSWFactory cswfactory;
     
     /**
      * A flag indicating if an indexation is going on.
@@ -103,14 +95,6 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     public AbstractCSWConfigurer(final ContainerNotifierImpl cn) throws ConfigurationException {
         this.containerNotifier = cn;
         indexing = false;
-        try {
-            cswfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
-
-        } catch (FactoryNotFoundException ex) {
-            throw new ConfigurationException("Unable to find a CSW factory for CSW in configuration service", ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
-        }
         refreshServiceConfiguration();
     }
     
@@ -230,6 +214,23 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     }
     
     /**
+     * Select the good CSW factory in the available ones in function of the dataSource type.
+     * 
+     * @param type
+     * @return 
+     */
+    private AbstractCSWFactory getCSWFactory(DataSourceType type) {
+        final Iterator<AbstractCSWFactory> ite = ServiceRegistry.lookupProviders(AbstractCSWFactory.class);
+        while (ite.hasNext()) {
+            AbstractCSWFactory currentFactory = ite.next();
+            if (currentFactory.factoryMatchType(type)) {
+                return currentFactory;
+            }
+        }
+        throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
+    }
+    
+    /**
      * Build a new Indexer for the specified service ID.
      * 
      * @param serviceID the service identifier (form multiple CSW) default: ""
@@ -242,6 +243,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
+        final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
         if (config != null) {
             try {
                 if (currentReader == null) {
@@ -270,6 +272,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
+        final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
         if (config != null) {
             try {
                 return cswfactory.getMetadataReader(config);
@@ -294,6 +297,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
+        final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
         if (config != null) {
             try {
                 return cswfactory.getMetadataWriter(config, null);
