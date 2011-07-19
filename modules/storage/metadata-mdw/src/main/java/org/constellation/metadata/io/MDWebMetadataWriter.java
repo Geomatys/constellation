@@ -47,7 +47,7 @@ import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.Util;
 
 // Geotoolkit dependencies
-import org.geotoolkit.internal.jaxb.gco.ObjectReference;
+import org.geotoolkit.xml.XLink;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription;
 import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.StringUtilities;
@@ -80,32 +80,32 @@ import org.opengis.metadata.Metadata;
  * @author Guilhem Legal (Geomatys)
  */
 public class MDWebMetadataWriter extends AbstractMetadataWriter {
-    
+
     /**
      * A MDWeb RecordSets where write the form.
      */
     private RecordSet mdRecordSet;
-    
+
     /**
      * The MDWeb user who owe the inserted form.
      */
     private final User defaultUser;
-    
+
     /**
      * A writer to the MDWeb database.
      */
     protected Writer mdWriter;
-    
+
     /**
      * The current main standard of the Object to create
      */
     private Standard mainStandard;
-    
+
     /**
      * A map recording the binding between java Class and MDWeb {@link classe}
      */
     private Map<String, Classe> classBinding;
-    
+
     /**
      * A List of the already see object for the current metadata read
      * (in order to avoid infinite loop)
@@ -131,7 +131,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     /**
      * Build a new metadata writer.
-     * 
+     *
      */
     public MDWebMetadataWriter(final Automatic configuration) throws MetadataIoException {
         super();
@@ -148,7 +148,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final DataSource dataSource = db.getDataSource();
             final boolean isPostgres    = db.getClassName().equals("org.postgresql.Driver");
             mdWriter                    = MD_IOFactory.getPooledInstance(dataSource, isPostgres);
-           
+
             mdRecordSet = getRecordSet(configuration.getDefaultRecordSet());
             defaultUser = mdWriter.getUser("admin");
 
@@ -169,7 +169,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             throw new MetadataIoException("SQLException while initializing the MDWeb writer:" +'\n'+
                                            "cause:" + ex.getMessage());
         }
-        
+
         this.classBinding = new HashMap<String, Classe>();
         this.alreadyWrite = new HashMap<Object, Value>();
     }
@@ -348,18 +348,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     /**
      * Return an MDWeb {@link Form} from an object.
-     * 
+     *
      * @param object The object to transform in form.
      * @return an MDWeb {@link Form} representing the metadata object.
      */
     protected Form getFormFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
-        
+
         if (object != null) {
             //we try to find a title for the from
             if ("unknow title".equals(title)) {
                 title = mdWriter.getAvailableTitle();
             }
-            
+
             final Date creationDate = new Date(System.currentTimeMillis());
             final String className  = object.getClass().getSimpleName();
             // ISO 19115 types
@@ -367,18 +367,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
            // ISO 19115-2 types
                 "MI_Metadata".equals(className)          ||
-            
-            // ISO 19110 types        
+
+            // ISO 19110 types
                 "FeatureCatalogueImpl".equals(className) ||
                 "FeatureOperationImpl".equals(className) ||
                 "FeatureAssociationImpl".equals(className)
             ) {
                 mainStandard   = Standard.ISO_19115;
-            
-            // CSW Types    
+
+            // CSW Types
             } else if ("RecordType".equals(className)) {
                 mainStandard = Standard.CSW;
-            
+
             // SML Types
             } else if ("SensorML".equals(className)) {
                 mainStandard = Standard.SENSORML;
@@ -389,7 +389,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             } else if (object.getClass().getName().startsWith("org.geotoolkit.ebrim.xml.v250")) {
                 mainStandard = Standard.EBRIM_V2_5;
-                
+
             // unkow types
             } else {
                 mainStandard   = Standard.ISO_19115;
@@ -401,7 +401,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 throw new MD_IOException("The identifier " + identifier + " is already used");
             }
             final Form form = new Form(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, Form.TYPE.NORMALFORM);
-            
+
             final Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
                 alreadyWrite.clear();
@@ -418,12 +418,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             return null;
         }
     }
-    
+
     /**
      * Add a MDWeb value (and his children)to the specified form.
-     * 
+     *
      * @param form The created form.
-     * 
+     *
      */
     protected List<Value> addValueFromObject(final Form form, Object object, Path path, Value parentValue) throws MD_IOException {
 
@@ -432,11 +432,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         //if the path is not already in the database we write it
         if (mdWriter.getPath(path.getId()) == null) {
            mdWriter.writePath(path);
-        } 
+        }
         if (object == null) {
             return result;
-        }          
-        
+        }
+
         //if the object is a JAXBElement we desencapsulate it
         if (object instanceof JAXBElement) {
             final JAXBElement jb = (JAXBElement) object;
@@ -452,18 +452,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     path = mdWriter.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3");
                 }
                 result.addAll(addValueFromObject(form, obj, path, parentValue));
-                
+
             }
             return result;
         } else {
             classe = getClasseFromObject(object);
         }
-        
+
         //if we don't have found the class we stop here
         if (classe == null) {
             return result;
         }
-        
+
         //we try to find the good ordinal
         int ordinal;
         if (parentValue == null) {
@@ -481,7 +481,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         } else {
             linkedValue = alreadyWrite.get(object);
         }
-        
+
         //Special case for PT_FreeText
         if (classe.getName().equals("PT_FreeText")) {
             final DefaultInternationalString dis = (DefaultInternationalString) object;
@@ -500,7 +500,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final Classe localisedString = mdWriter.getClasse("LocalisedCharacterString", Standard.ISO_19103);
             for (Locale locale : dis.getLocales())  {
                 if (locale == null) continue;
-                
+
                 final Path valuePath = new Path(path, classe.getPropertyByName("textGroup"));
                 final Value value = new Value(valuePath, form, ordinal, localisedString, rootValue);
                 result.add(value);
@@ -537,8 +537,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             result.add(couTextValue);
 
             // 4. the encoding value "LOST for now" TODO
-            
-            
+
+
         // if its a primitive type we create a TextValue
         } else if (classe.isPrimitive() || classe.getName().equals("LocalName")) {
             if (classe instanceof CodeList) {
@@ -556,11 +556,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         if (codelistElement == null) {
                             codelistElement = ((org.opengis.util.CodeList) object).name();
                         }
-                        
+
                     } else if (object.getClass().isEnum()) {
-                        
+
                         codelistElement = Util.getElementNameFromEnum(object);
-                        
+
                     } else {
                         LOGGER.log (Level.SEVERE, "{0} is not a codelist!", object.getClass().getName());
                         codelistElement = null;
@@ -579,7 +579,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     for (Property p: classe.getProperties()) {
                         values.append(p.getName()).append('\n');
                     }
-                    LOGGER.warning("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() + 
+                    LOGGER.warning("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() +
                             "\nallowed values are:\n" +  values);
                 }
             }
@@ -591,32 +591,32 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             } else {
                 value = object.toString();
             }
-            
+
             final TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);
             result.add(textValue);
-        
+
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
 
             final LinkedValue value = new LinkedValue(path, form, ordinal, linkedValue.getForm(), linkedValue, classe, parentValue);
             result.add(value);
-        
+
         // else we build a Value node.
         } else {
-        
+
             final Value value = new Value(path, form, ordinal, classe, parentValue);
             result.add(value);
             //we add this object to the listed of already write element
             if (!isNoLink()) {
                 alreadyWrite.put(object, value);
             }
-            
+
             do {
                 for (Property prop: classe.getProperties()) {
                     // TODO remove when fix in MDweb2
                     if (prop.getName().equals("geographicElement3") ||  prop.getName().equals("geographicElement4"))
                         continue;
-                    
+
                     final String propName = specialCorrectionName(prop.getName(), object.getClass());
 
                     Method getter;
@@ -636,14 +636,14 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             }
                             if (propertyValue != null) {
                                 final Path childPath = new Path(path, prop);
-                            
+
                                 //if the path is not already in the database we write it
                                 if (mdWriter.getPath(childPath.getId()) == null) {
                                     mdWriter.writePath(childPath);
                                 }
                                 result.addAll(addValueFromObject(form, propertyValue, childPath, value));
-                            } 
-                    
+                            }
+
                         } catch (IllegalAccessException e) {
                             LOGGER.severe("The class is not accessible");
                             return result;
@@ -714,7 +714,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     /**
      * apply special fix on the property name.
-     * 
+     *
      * @param attributeName
      * @param objectClass
      * @return
@@ -739,17 +739,17 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
         return propName;
     }
-    
+
 
     /**
      * Return an MDWeb {@link Classe} object for the specified java object.
-     * 
+     *
      * @param object the object to identify
      *
      * @throws org.mdweb.io.MD_IOException
      */
     protected Classe getClasseFromObject(final Object object) throws MD_IOException {
-        
+
         String className;
         String packageName;
         Classe result;
@@ -765,25 +765,25 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             if (result != null) {
                 return result;
             }
-            
-            // special case for the sub classe of Xlink ObjectReference
-            if (object instanceof ObjectReference) {
+
+            // special case for the sub classe of Xlink (was ObjectReference in previous version)
+            if (object instanceof XLink) {
                 return mdWriter.getClasse("XLink", mdWriter.getStandard("Xlink"));
             }
-            
+
             //special case for Proxy: we extract the GeoAPI interface, then we get the UML annotation for className
             if (object.getClass().getSimpleName().startsWith("$Proxy")) {
                 final Class apiInterface =  object.getClass().getInterfaces()[0];
                 final UML a = (UML) apiInterface.getAnnotation(UML.class);
                 className =  a.identifier();
-                packageName = "";    
-                
+                packageName = "";
+
             } else {
                 className   = object.getClass().getSimpleName();
                 packageName = object.getClass().getPackage().getName();
             }
             LOGGER.log(Level.FINER, "search for classe {0}", className);
-            
+
         } else {
             return null;
         }
@@ -813,12 +813,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (className.isEmpty()) {
             return null;
         }
-        
+
         final List<Standard> availableStandards = standardMapping.get(mainStandard);
         if (availableStandards == null) {
             throw new IllegalArgumentException("Unexpected Main standard: " + mainStandard);
         }
-        
+
         String availableStandardLabel = "";
         for (Standard standard : availableStandards) {
 
@@ -859,7 +859,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 }
             }
         }
-        
+
         availableStandardLabel = availableStandardLabel.substring(0, availableStandardLabel.length() - 1);
         LOGGER.warning("class not found: " + className + " in the following standards: " + availableStandardLabel + "\n (" + object.getClass().getName() + ')');
         return null;
@@ -869,13 +869,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * Find The class name by extracting the {@link XmlRootElement} annotation.
      * For the instance of {@link org.opengis.util.CodeList},
      * we extract the name from the {@link UML} annotation
-     * 
+     *
      * @param object A GeotoolKit object
      * @return the name parameter in the XmlElementRoot annotation or identifier parameter in UM annotation.
      *
      */
     private String getNameFromAnnotation(final Object object) {
-        
+
         if (object instanceof org.opengis.util.CodeList) {
             UML a = (UML)object.getClass().getAnnotation(UML.class);
             if (a != null) {
@@ -889,11 +889,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
         return null;
    }
-    
+
     /**
      * Return a {@link Classe} (java primitive type) from a class name.
-     * 
-     * @param className the standard name of a class. 
+     *
+     * @param className the standard name of a class.
      * @return a primitive class.
      */
     private Classe getPrimitiveTypeFromName(final String className) throws MD_IOException {
@@ -908,7 +908,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 || "Boolean".equalsIgnoreCase(className)) {
             mdwclassName = className;
             mdwStandard  = Standard.ISO_19103;
-        
+
         }  else if ("Long".equalsIgnoreCase(className)) {
             mdwclassName = "Integer";
             mdwStandard = Standard.ISO_19103;
@@ -952,7 +952,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         final long start = System.currentTimeMillis();
         long transTime   = 0;
         long writeTime   = 0;
-        
+
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
         }
@@ -971,14 +971,14 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final long startTrans = System.currentTimeMillis();
             form                  = getFormFromObject(obj, title);
             transTime             = System.currentTimeMillis() - startTrans;
-            
+
         } catch (IllegalArgumentException e) {
              throw new MetadataIoException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
                                            "cause: " + e.getMessage(), e, null);
         } catch (MD_IOException e) {
              throw new MetadataIoException("The service has throw an MD_IOException while transforming the metadata to a MDWeb object: " + e.getMessage(), e, null);
         }
-        
+
         // and we store it in the database
         if (form != null) {
 
@@ -988,7 +988,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             } else {
                 form.setInputLevelCompletion(new boolean[]{true, true, true}, new Date(System.currentTimeMillis()));
             }
-            
+
             try {
                 final long startWrite = System.currentTimeMillis();
                 mdWriter.writeForm(form, false, true);
@@ -997,7 +997,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             } catch (MD_IOException e) {
                 throw new MetadataIoException("The service has throw an SQLException while writing the metadata :" + e.getMessage(), e, null);
             }
-            
+
             final long time = System.currentTimeMillis() - start;
 
             final StringBuilder report = new StringBuilder("inserted new Form: ");
@@ -1028,7 +1028,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 mdWriter.close();
             classBinding.clear();
             alreadyWrite.clear();
-            
+
         } catch (MD_IOException ex) {
             LOGGER.info("SQL Exception while destroying Metadata writer");
         }
@@ -1098,7 +1098,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             throw new MetadataIoException(ex);
         }
     }
-    
+
     /**
      * Return an MDWeb path from a XPath.
      *
@@ -1119,7 +1119,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             typeName = typeName.substring(typeName.indexOf(':') + 1);
         }
         xpath = xpath.substring(xpath.indexOf(typeName) + typeName.length() + 1);
-        
+
         Classe type;
         // we look for a know metadata type
         if ("MD_Metadata".equals(typeName)) {
