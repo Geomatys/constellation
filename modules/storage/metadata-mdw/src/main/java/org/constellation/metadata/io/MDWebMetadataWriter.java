@@ -767,7 +767,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
 
             // special case for the sub classe of Xlink (was ObjectReference in previous version)
-            if (object instanceof XLink) {
+            if (object.getClass().equals(XLink.class)) {
                 return mdWriter.getClasse("XLink", mdWriter.getStandard("Xlink"));
             }
 

@@ -48,6 +48,7 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.util.ComparisonMode;
+import org.geotoolkit.xml.IdentifierSpace;
 
 import org.opengis.feature.catalog.FeatureCatalogue;
 
@@ -222,7 +223,7 @@ public class MDWebMetadataWriterTest {
         DataIdentification expId = ((ServiceIdentificationImpl)expResult.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
         DataIdentification resId = ((ServiceIdentificationImpl)result.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
         assertEquals(new URI("http://test.com"), ((IdentifiedObject)expId).getXLink().getHRef());
-        assertEquals(new URI("http://test.com"), ((IdentifiedObject)resId).getXLink().getHRef());
+        assertEquals(new URI("http://test.com"), ((IdentifiedObject)resId).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK).getHRef());
         metadataEquals(expResult,result);
         
         
