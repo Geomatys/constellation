@@ -731,7 +731,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
                 boolean putSuceed = false;
                 if (isMeta) {
-                      putSuceed = putMeta(metaMap, attribName, param, result, path);
+                    putSuceed = putMeta(metaMap, attribName, param, result, path);
                 }
 
                 if (!putSuceed) {
@@ -810,6 +810,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 final CoordinateSystemAxis[] params = new CoordinateSystemAxis[1];
                 params[0] = (CoordinateSystemAxis) param;
                 field.set(result, params);
+            } else if ("type".equals(attribName)) {
+                final Object typeValue = Enum.valueOf(org.geotoolkit.xml.XLink.Type.class, ((String)param).toUpperCase(Locale.US));
+                field.set(result, typeValue);
             } else if (field.getType().isArray()) {
                 // todo find how to build a typed array
                 final Object[] params = new Object[1];

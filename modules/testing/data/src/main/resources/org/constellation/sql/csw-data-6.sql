@@ -670,6 +670,7 @@ INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard
 
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (32, 'ISO 19115:MD_Metadata:fileIdentifier', 1, 'CharacterString', 'ISO 19103', 'ISO 19115:MD_Metadata.1:identificationInfo.1:fileIdentifier.1', '666-999-666');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (32, 'ISO 19115:MD_Metadata:identificationInfo:operatesOn:xLink:href', 1, 'URI', 'ISO 19103', 'ISO 19115:MD_Metadata.1:identificationInfo.1:operatesOn.1:xLink.1:href.1', 'http://test.com');
+INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (32, 'ISO 19115:MD_Metadata:identificationInfo:operatesOn:xLink:type', 1, 'CharacterString', 'ISO 19103', 'ISO 19115:MD_Metadata.1:identificationInfo.1:operatesOn.1:xLink.1:type.1', 'simple');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (32, 'ISO 19115:MD_Metadata:identificationInfo:operatesOn:abstract', 1, 'CharacterString', 'ISO 19103', 'ISO 19115:MD_Metadata.1:identificationInfo.1:operatesOn.1:abstract.1', 'not empty');
 
 INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (33, 'CSWCat', '999-666-999','meta 21', 'admin', NULL, NULL, '2009-08-27', 1, 1, 'NORMALFORM');
@@ -681,4 +682,5 @@ INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard
 
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (33, 'ISO 19115:MD_Metadata:fileIdentifier', 1, 'CharacterString', 'ISO 19103', 'ISO 19115:MD_Metadata.1:identificationInfo.1:fileIdentifier.1', '999-666-999');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (33, 'ISO 19115:MD_Metadata:identificationInfo:operatesOn:xLink:href', 1, 'URI', 'ISO 19103', 'ISO 19115:MD_Metadata.1:identificationInfo.1:operatesOn.1:xLink.1:href.1', 'http://test2.com');
+INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (33, 'ISO 19115:MD_Metadata:identificationInfo:operatesOn:xLink:type', 1, 'CharacterString', 'ISO 19103', 'ISO 19115:MD_Metadata.1:identificationInfo.1:operatesOn.1:xLink.1:type.1', 'simple');
 

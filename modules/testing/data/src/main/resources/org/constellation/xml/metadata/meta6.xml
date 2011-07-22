@@ -383,7 +383,7 @@
                     <gmd:resourceConstraints>
                         <gmd:MD_LegalConstraints>
                             <gmd:accessConstraints>
-                                <gmd:MD_RestrictionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#No access restriction" codeListValue="No access restriction"/>
+                                <gmd:MD_RestrictionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#NoAccessRestriction" codeListValue="NoAccessRestriction"/>
                             </gmd:accessConstraints>
                         </gmd:MD_LegalConstraints>
                     </gmd:resourceConstraints>

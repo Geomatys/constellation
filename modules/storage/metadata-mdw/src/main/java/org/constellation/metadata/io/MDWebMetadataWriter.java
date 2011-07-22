@@ -53,6 +53,7 @@ import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.StringUtilities;
 
 // MDWeb dependencies
+import org.geotoolkit.xml.XLink.Type;
 import org.mdweb.model.profiles.Profile;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
@@ -665,6 +666,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             }
                             result.addAll(addValueFromObject(form, propertyValue, childPath, value));
                         }
+                    } else {
+                        LOGGER.warning("no getter found for:" + propName + " class: " + object.getClass().getName());
                     }
                 }
                 classe = classe.getSuperClass();
@@ -766,9 +769,14 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 return result;
             }
 
-            // special case for the sub classe of Xlink (was ObjectReference in previous version)
+            // special case for the sub classe of Xlink
             if (object.getClass().equals(XLink.class)) {
                 return mdWriter.getClasse("XLink", mdWriter.getStandard("Xlink"));
+            }
+            
+            // special case for Xlink.Type enum
+            if (object.getClass().equals(Type.class)) {
+                return PrimitiveType.STRING;
             }
 
             //special case for Proxy: we extract the GeoAPI interface, then we get the UML annotation for className
@@ -934,7 +942,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             result = mdWriter.getClasse(mdwclassName, mdwStandard);
         }
         if (result == null) {
-            LOGGER.warning("The database does not conatins the primitive type:" + mdwclassName + " in the standard:" + mdwStandard.getName());
+            LOGGER.warning("The database does not contains the primitive type:" + mdwclassName + " in the standard:" + mdwStandard.getName());
         }
         return result;
     }
