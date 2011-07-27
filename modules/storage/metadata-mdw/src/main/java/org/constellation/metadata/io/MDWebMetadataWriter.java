@@ -589,6 +589,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 synchronized (DATE_FORMAT) {
                     value = DATE_FORMAT.get(1).format(object);
                 }
+            } else if (object.getClass().isEnum()){
+                value =  object.toString().toLowerCase(Locale.US);
             } else {
                 value = object.toString();
             }
