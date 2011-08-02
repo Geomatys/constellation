@@ -279,9 +279,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         standardMapping.put(newMainStandard, standards);
                     }
                 }
-            } else if (object instanceof URI){
-                 value = object.toString();
-                 value = value.replace("%5C", "\\");
             } else {
                 LOGGER.warning("Unable to find the extra-standard properties file");
             }
@@ -595,6 +592,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 }
             } else if (object.getClass().isEnum()){
                 value =  object.toString().toLowerCase(Locale.US);
+            
+            } else if (object instanceof URI){
+                 value = object.toString();
+                 value = value.replace("%5C", "\\");
             } else {
                 value = object.toString();
             }
