@@ -17,8 +17,11 @@
 
 package org.constellation.jaxb;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.xml.ObjectConverters;
 
 /**
@@ -48,4 +51,19 @@ public class MarshallWarnings extends ObjectConverters {
         return messages.isEmpty();
     }
     
+   @Override
+   public URI toURI(String value) throws URISyntaxException {
+        if (value != null && !(value = value.trim()).isEmpty()) try {
+            value = IOUtilities.encodeURI(value);
+            if (value.contains("\\")) {
+                value = value.replace("\\", "%5C");
+            }
+            return new URI(value);
+        } catch (URISyntaxException e) {
+            if (!exceptionOccured(value, String.class, URI.class, e)) {
+                throw e;
+            }
+        }
+        return null;
+    }
 }

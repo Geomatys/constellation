@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -278,6 +279,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         standardMapping.put(newMainStandard, standards);
                     }
                 }
+            } else if (object instanceof URI){
+                 value = object.toString();
+                 value = value.replace("%5C", "\\");
             } else {
                 LOGGER.warning("Unable to find the extra-standard properties file");
             }

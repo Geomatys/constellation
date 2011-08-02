@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -468,6 +469,16 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
             } else if (classe.equals(Locale.class)) {
                 return Locales.parse(textValue);
+            
+            // patch for backSlash in URI
+            } else if (classe.equals(URI.class)) {
+                textValue = textValue.replace("\\", "%5C");
+                try {
+                    return new URI(textValue);
+                } catch (URISyntaxException ex) {
+                    LOGGER.log(Level.WARNING, "URI syntax exception for:{0}", textValue);
+                    return null;
+                }
 
             // Patch for LocalName Class
             } else if (classe.equals(DefaultLocalName.class)) {
