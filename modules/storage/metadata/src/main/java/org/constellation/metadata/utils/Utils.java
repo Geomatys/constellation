@@ -22,10 +22,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import org.constellation.util.ReflectionUtilities;
 import org.geotoolkit.util.SimpleInternationalString;
+import org.geotoolkit.util.converter.Classes;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.util.InternationalString;
 
@@ -229,6 +231,14 @@ public final class Utils {
                         attributeName = pathID;
                         pathID = "";
                     }
+                    
+                    //we extract the specified type if there is one
+                    String paramClassName = null;
+                    int brackIndex = attributeName.indexOf('[');
+                    if (brackIndex != -1) {
+                        paramClassName = attributeName.substring(brackIndex + 1, attributeName.length() -1);
+                        attributeName = attributeName.substring(0, brackIndex);
+                    }
 
                     if (!pathID.isEmpty()) {
                         // we get the temporary object when navigating through the object.
@@ -253,26 +263,42 @@ public final class Utils {
                                         currentObject = ((JAXBElement)currentObject).getValue();
                                     }
                                 } else {
-                                    LOGGER.warning("TODO collection is empty");
+                                    if (paramClassName == null) {
+                                        Class returnType = Classes.boundOfParameterizedAttribute(getter);
+                                        currentObject = ReflectionUtilities.newInstance(returnType);
+                                    } else {
+                                        try {
+                                            Class paramClass = Class.forName(paramClassName);
+                                            currentObject = ReflectionUtilities.newInstance(paramClass);
+                                        } catch (ClassNotFoundException ex) {
+                                            LOGGER.log(Level.WARNING, "unable to find the class:" + paramClassName, ex);
+                                        }
+                                    }
+                                    // if the build succeed we set it to the global previous object
+                                    if (currentObject != null) {
+                                        Method setter = ReflectionUtilities.getSetterFromName(attributeName, getter.getReturnType(), temp.getClass());
+                                        if (setter != null) {
+                                            ReflectionUtilities.invokeMethod(setter, temp, Arrays.asList(currentObject));
+                                        }
+                                    }
                                 }
                             } else if (currentObject instanceof JAXBElement) {
                                 currentObject = ((JAXBElement)currentObject).getValue();
                             }
                         }
 
-                    /* 
-                     * when we are at the end of the path we call the set Method.
-                     *  TODO make it more generic
-                     */  
                     } else {
+                        /*
+                         * we use the getter to determinate the parameter class.
+                         */
+                        Method getter = ReflectionUtilities.getGetterFromName(attributeName, currentObject.getClass());
                         Class parameterClass;
-                        if (attributeName.equals("content")) {
-                            parameterClass = List.class;
-                        } else if (attributeName.equals("organisationName")) {
-                            parameterClass = InternationalString.class;
+                        if (getter != null) {
+                            parameterClass = getter.getReturnType();
                         } else {
                             parameterClass = String.class;
                         }
+                        
                         Method setter = ReflectionUtilities.getSetterFromName(attributeName, parameterClass, currentObject.getClass());
                         if (setter != null) {
                             // if the parameter is a string collection
@@ -283,6 +309,140 @@ public final class Utils {
                             } else {
                                 ReflectionUtilities.invokeMethod(setter, currentObject, identifier);
                             }
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * This method try to set an title for this object.
+     *
+     * @param obj the object for which we want to set title.
+     *
+     */
+    public static void setTitle(final String title, final Object object) {
+
+        final List<String> paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo[org.geotoolkit.metadata.iso.identification.DefaultDataIdentification]:citation[org.geotoolkit.metadata.iso.citation.DefaultCitation]:title");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo[org.geotoolkit.metadata.iso.identification.DefaultDataIdentification]:citation[org.geotoolkit.metadata.iso.citation.DefaultCitation]:title");
+        //paths.add("ISO 19115:CI_ResponsibleParty:individualName");
+        paths.add("ISO 19115:CI_ResponsibleParty:organisationName");
+        paths.add("ISO 19110:FC_FeatureCatalogue:name");
+        paths.add("Catalog Web Service:Record:title:content");
+        paths.add("Ebrim v3.0:*:name:localizedString:value");
+        paths.add("Ebrim v2.5:*:name:localizedString:value");
+        paths.add("SensorML:SensorML:member:process:id");
+
+        for (String pathID : paths) {
+
+            if (ReflectionUtilities.pathMatchObjectType(object, pathID)) {
+                Object currentObject = object;
+                /*
+                 * we remove the prefix path part the path always start with STANDARD:TYPE:
+                 */
+                pathID = pathID.substring(pathID.indexOf(':') + 1);
+                pathID = pathID.substring(pathID.indexOf(':') + 1);
+                while (!pathID.isEmpty()) {
+
+                    //we extract the current attributeName
+                    String attributeName;
+                    if (pathID.indexOf(':') != -1) {
+                        attributeName = pathID.substring(0, pathID.indexOf(':'));
+                        pathID = pathID.substring(pathID.indexOf(':') + 1);
+                    } else {
+                        attributeName = pathID;
+                        pathID = "";
+                    }
+                    
+                    //we extract the specified type if there is one
+                    String paramClassName = null;
+                    int brackIndex = attributeName.indexOf('[');
+                    if (brackIndex != -1) {
+                        paramClassName = attributeName.substring(brackIndex + 1, attributeName.length() -1);
+                        attributeName = attributeName.substring(0, brackIndex);
+                    }
+
+                    if (!pathID.isEmpty()) {
+                        // we get the temporary object when navigating through the object.
+                        Object temp = currentObject;
+                        Method getter = ReflectionUtilities.getGetterFromName(attributeName, currentObject.getClass());
+                        if (getter != null) {
+                            currentObject = ReflectionUtilities.invokeMethod(currentObject, getter);
+                            // if the object is not yet instantiate, we build it
+                            if (currentObject == null) {
+                                if (paramClassName == null) {
+                                    currentObject = ReflectionUtilities.newInstance(getter.getReturnType());
+                                } else {
+                                    try {
+                                        Class paramClass = Class.forName(paramClassName);
+                                        currentObject = ReflectionUtilities.newInstance(paramClass);
+                                    } catch (ClassNotFoundException ex) {
+                                        LOGGER.log(Level.WARNING, "unable to find the class:" + paramClassName, ex);
+                                    }
+                                }
+                                // if the build succeed we set it to the global previous object
+                                if (currentObject != null) {
+                                    Method setter = ReflectionUtilities.getSetterFromName(attributeName, currentObject.getClass(), temp.getClass());
+                                    if (setter != null) {
+                                        ReflectionUtilities.invokeMethod(setter, temp, currentObject);
+                                    }
+                                } 
+                            } else if (currentObject instanceof Collection) {
+                                if (((Collection) currentObject).size() > 0) {
+                                    currentObject = ((Collection) currentObject).iterator().next();
+                                    if (currentObject instanceof JAXBElement) {
+                                        currentObject = ((JAXBElement)currentObject).getValue();
+                                    }
+                                } else {
+                                    if (paramClassName == null) {
+                                        Class returnType = Classes.boundOfParameterizedAttribute(getter);
+                                        currentObject = ReflectionUtilities.newInstance(returnType);
+                                    } else {
+                                        try {
+                                            Class paramClass = Class.forName(paramClassName);
+                                            currentObject = ReflectionUtilities.newInstance(paramClass);
+                                        } catch (ClassNotFoundException ex) {
+                                            LOGGER.log(Level.WARNING, "unable to find the class:" + paramClassName, ex);
+                                        }
+                                    }
+                                    // if the build succeed we set it to the global previous object
+                                    if (currentObject != null) {
+                                        Method setter = ReflectionUtilities.getSetterFromName(attributeName, getter.getReturnType(), temp.getClass());
+                                        if (setter != null) {
+                                            ReflectionUtilities.invokeMethod(setter, temp, Arrays.asList(currentObject));
+                                        }
+                                    }
+                                }
+                            } else if (currentObject instanceof JAXBElement) {
+                                currentObject = ((JAXBElement)currentObject).getValue();
+                            }
+                        }
+
+                    } else {
+                         /*
+                         * we use the getter to determinate the parameter class.
+                         */
+                        Method getter = ReflectionUtilities.getGetterFromName(attributeName, currentObject.getClass());
+                        Class parameterClass;
+                        if (getter != null) {
+                            parameterClass = getter.getReturnType();
+                        } else {
+                            parameterClass = String.class;
+                        }
+                        Method setter = ReflectionUtilities.getSetterFromName(attributeName, parameterClass, currentObject.getClass());
+                        if (setter != null) {
+                            // if the parameter is a string collection
+                            if (parameterClass.equals(List.class)) {
+                                ReflectionUtilities.invokeMethod(setter, currentObject, Arrays.asList(title));
+                            } else if (parameterClass.equals(InternationalString.class)){
+                                ReflectionUtilities.invokeMethod(setter, currentObject, new SimpleInternationalString(title));
+                            } else {
+                                ReflectionUtilities.invokeMethod(setter, currentObject, title);
+                            }
+                            return;
                         }
                     }
                 }

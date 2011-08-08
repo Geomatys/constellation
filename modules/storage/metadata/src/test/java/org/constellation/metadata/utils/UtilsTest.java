@@ -564,7 +564,7 @@ public class UtilsTest {
     }
 
     @Test
-    public void SetIdentifierTestDC() throws Exception {
+    public void setIdentifierTestDC() throws Exception {
         /*
          * DublinCore Record v202 with identifier (replace)
          */
@@ -591,9 +591,38 @@ public class UtilsTest {
 
         assertEquals("new-ident", record.getIdentifier().getContent().get(0));
     }
+    
+    @Test
+    public void setTitleTestDC() throws Exception {
+        /*
+         * DublinCore Record v202 with identifier (replace)
+         */
+        RecordType record = new RecordType();
+        record.setTitle(new SimpleLiteral("42292_5p_19900609195600"));
+        record.setModified(new SimpleLiteral("2009-01-01T06:00:00+01:00"));
+        record.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.1667, 36.6, 1.1667, 36.6));
+
+        Utils.setTitle("new-ident", record);
+
+        assertEquals(1, record.getTitle().getContent().size());
+        assertEquals("new-ident", record.getTitle().getContent().get(0));
+
+
+        /*
+         * DublinCore Record v202 without identifier (insert)
+         */
+        record = new RecordType();
+        record.setModified(new SimpleLiteral("2009-01-01T06:00:00+01:00"));
+        record.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.1667, 36.6, 1.1667, 36.6));
+
+
+        Utils.setTitle("new-ident", record);
+
+        assertEquals("new-ident", record.getTitle().getContent().get(0));
+    }
 
     @Test
-    public void SetIdentifierEbrimTest() throws Exception {
+    public void setIdentifierEbrimTest() throws Exception {
         /*
          * Ebrim v 3.0 with identifier (replace)
          */
@@ -634,6 +663,49 @@ public class UtilsTest {
 
         assertEquals("id22", reg25.getId());
     }
+    
+    @Test
+    public void setTitleEbrimTest() throws Exception {
+        /*
+         * Ebrim v 3.0 with identifier (replace)
+         */
+        RegistryObjectType reg = new RegistryObjectType();
+        reg.setId("ebrimid-1");
+
+        Utils.setTitle("id1", reg);
+
+        assertEquals("id1", reg.getName().getLocalizedString().get(0).getValue());
+
+        /*
+         * Ebrim v 3.0 with no identifier (insert)
+         */
+        reg = new RegistryObjectType();
+
+        Utils.setTitle("id12", reg);
+
+        assertEquals("id12", reg.getName().getLocalizedString().get(0).getValue());
+
+
+        /*
+         * Ebrim v 2.5 with identifier (replace)
+         */
+        org.geotoolkit.ebrim.xml.v250.RegistryObjectType reg25 = new org.geotoolkit.ebrim.xml.v250.RegistryObjectType();
+        reg25.setId("ebrimid-2");
+
+        Utils.setTitle("id2", reg25);
+
+        assertEquals("id2", reg25.getName().getLocalizedString().get(0).getValue());
+
+        /*
+         * Ebrim v 2.5 with no identifier (insert)
+         */
+        reg25 = new org.geotoolkit.ebrim.xml.v250.RegistryObjectType();
+        
+
+        Utils.setTitle("id22", reg25);
+
+        assertEquals("id22", reg25.getName().getLocalizedString().get(0).getValue());
+    }
 
     @Test
     public void setIdentifierISO19115Test() throws Exception {
@@ -667,6 +739,50 @@ public class UtilsTest {
         assertEquals(expResult, result);
 
     }
+    
+    @Test
+    public void setTitleISO19115Test() throws Exception {
+        /*
+         * ISO 19139 Metadata with title (replace)
+         */
+        DefaultMetadata metadata = new DefaultMetadata();
+        DefaultDataIdentification identification = new DefaultDataIdentification();
+        DefaultCitation citation = new DefaultCitation();
+        citation.setTitle(new DefaultInternationalString("titleMeta"));
+        identification.setCitation(citation);
+        metadata.setIdentificationInfo(Arrays.asList(identification));
+        
+        Utils.setTitle("titleMeta-2", metadata);
+        assertEquals("titleMeta-2", metadata.getIdentificationInfo().iterator().next().getCitation().getTitle().toString());
+
+        /*
+         * ISO 19139 Metadata with no title (insert)
+         */
+        metadata = new DefaultMetadata();
+
+        Utils.setTitle("titleMeta-2", metadata);
+        assertEquals("titleMeta-2", metadata.getIdentificationInfo().iterator().next().getCitation().getTitle().toString());
+        
+        /*
+         * Responsible party with title (replace)
+         */
+        DefaultResponsibleParty party = new DefaultResponsibleParty();
+        party.setOrganisationName(new SimpleInternationalString("partyIdent"));
+        
+        Utils.setTitle("party-ident-2", party);
+        
+        String expResult = "party-ident-2";
+        assertEquals(expResult, party.getOrganisationName().toString());
+
+        /*
+         * Responsible party with title (replace)
+         */
+        DefaultResponsibleParty party2 = new DefaultResponsibleParty();
+        
+        Utils.setTitle("party-ident-3", party2);
+        
+        assertEquals("party-ident-3", party2.getOrganisationName().toString());
+    }
 
     @Test
     public void setIdentifierISO19110Test() throws Exception {
@@ -687,6 +803,27 @@ public class UtilsTest {
 
         Utils.setIdentifier("fcat2", catalogue);
         assertEquals("fcat2", catalogue.getId());
+    }
+    
+    @Test
+    public void setTitleISO19110Test() throws Exception {
+
+        /*
+         * ISO 19110 Metadata with identifier (replace)
+         */
+        FeatureCatalogueImpl catalogue = new FeatureCatalogueImpl();
+        catalogue.setName("somename");
+
+        Utils.setTitle("fcat", catalogue);
+        assertEquals("fcat", catalogue.getName());
+
+        /*
+         * ISO 19110 Metadata with no id (insert)
+         */
+        catalogue = new FeatureCatalogueImpl();
+
+        Utils.setTitle("fcat2", catalogue);
+        assertEquals("fcat2", catalogue.getName());
     }
 
     @Test
@@ -734,6 +871,55 @@ public class UtilsTest {
         org.geotoolkit.sml.xml.v101.SensorML smlC1 = new org.geotoolkit.sml.xml.v101.SensorML("1.0.1", Arrays.asList(memberC1));
 
         Utils.setIdentifier("newidC-101", smlC1);
+
+        assertEquals("newidC-101", smlC1.getMember().get(0).getProcess().getValue().getId());
+    }
+    
+    @Test
+    public void setTitleSensorMLTest() throws Exception {
+        /*
+         * SensorML 1.0.0 with title (replace)
+         */
+        SystemType system = new SystemType();
+        system.setId("sml-id-1");
+        Member member = new Member(system);
+        SensorML sml = new SensorML("1.0", Arrays.asList(member));
+
+        Utils.setTitle("newid", sml);
+
+        assertEquals("newid", sml.getMember().get(0).getProcess().getValue().getId());
+
+        ComponentType component = new ComponentType();
+        component.setId("sml-id-1-compo");
+        Member memberC = new Member(component);
+        SensorML smlC = new SensorML("1.0", Arrays.asList(memberC));
+
+        Utils.setTitle("newidC", smlC);
+
+        assertEquals("newidC", smlC.getMember().get(0).getProcess().getValue().getId());;
+
+
+        /*
+         * SensorML 1.0.1 system with title (replace)
+         */
+        org.geotoolkit.sml.xml.v101.SystemType system1 = new org.geotoolkit.sml.xml.v101.SystemType();
+        system1.setId("sml-id-101");
+        org.geotoolkit.sml.xml.v101.SensorML.Member member1 = new org.geotoolkit.sml.xml.v101.SensorML.Member(system1);
+        org.geotoolkit.sml.xml.v101.SensorML sml1 = new org.geotoolkit.sml.xml.v101.SensorML("1.0.1", Arrays.asList(member1));
+
+        Utils.setTitle("newid-101", sml1);
+
+        assertEquals("newid-101", sml1.getMember().get(0).getProcess().getValue().getId());
+
+        /*
+         * SensorML 1.0.1 component with title (replace)
+         */
+        org.geotoolkit.sml.xml.v101.ComponentType component1 = new org.geotoolkit.sml.xml.v101.ComponentType();
+        component1.setId("sml-id-101-compo");
+        org.geotoolkit.sml.xml.v101.SensorML.Member memberC1 = new org.geotoolkit.sml.xml.v101.SensorML.Member(component1);
+        org.geotoolkit.sml.xml.v101.SensorML smlC1 = new org.geotoolkit.sml.xml.v101.SensorML("1.0.1", Arrays.asList(memberC1));
+
+        Utils.setTitle("newidC-101", smlC1);
 
         assertEquals("newidC-101", smlC1.getMember().get(0).getProcess().getValue().getId());
     }
