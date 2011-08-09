@@ -16,6 +16,9 @@
  */
 package org.constellation.scheduler;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.opengis.util.NoSuchIdentifierException;
 import org.quartz.SimpleTrigger;
 
 import java.util.List;
@@ -69,7 +72,13 @@ public class TasksReader extends StaxStreamReader{
             final int type = reader.next();
             if (type == START_ELEMENT
                     && reader.getLocalName().equalsIgnoreCase(TAG_TASK)) {
-                final Task t = readTask();
+                Task t;
+                try {
+                    t = readTask();
+                } catch (NoSuchIdentifierException ex) {
+                    t = null;
+                    Logger.getLogger(TasksReader.class.getName()).log(Level.WARNING, null, ex);
+                }
                 if(t != null){
                     tasks.add(t);
                 }
@@ -81,7 +90,7 @@ public class TasksReader extends StaxStreamReader{
         return tasks;
     }
     
-    private Task readTask() throws XMLStreamException, IOException {
+    private Task readTask() throws XMLStreamException, IOException, NoSuchIdentifierException {
         
         final String id = reader.getAttributeValue(null, ATT_ID);
         final String authority = reader.getAttributeValue(null, ATT_AUTHORITY);

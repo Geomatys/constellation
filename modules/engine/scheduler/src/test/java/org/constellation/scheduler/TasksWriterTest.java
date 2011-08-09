@@ -30,6 +30,7 @@ import org.geotoolkit.test.xml.DomComparator;
 import org.junit.Test;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.NoSuchIdentifierException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 
@@ -48,7 +49,7 @@ public class TasksWriterTest {
 
 
     @Test
-    public void testWriter() throws IOException, XMLStreamException, ParserConfigurationException, SAXException {
+    public void testWriter() throws IOException, XMLStreamException, ParserConfigurationException, SAXException, NoSuchIdentifierException {
         final String authority = "mymaths";
         final String code = "add";
         

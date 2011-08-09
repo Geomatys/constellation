@@ -26,18 +26,16 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javanet.staxutils.IndentingXMLStreamWriter;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.process.ProcessFactory;
 import org.geotoolkit.process.ProcessFinder;
 
+import org.geotoolkit.process.ProcessingRegistry;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.xml.StaxStreamWriter;
 import org.opengis.feature.type.Name;
 
 import org.quartz.Scheduler;
@@ -101,9 +99,9 @@ public class CstlScheduler {
     public List<Name> listProcess(){
         final List<Name> names = new ArrayList<Name>();
         
-        final Iterator<ProcessFactory> ite = ProcessFinder.getProcessFactories();
+        final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
         while(ite.hasNext()){
-            final ProcessFactory factory = ite.next();            
+            final ProcessingRegistry factory = ite.next();            
             final String authorityCode = factory.getIdentification().getCitation()
                               .getIdentifiers().iterator().next().getCode();
             

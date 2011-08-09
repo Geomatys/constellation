@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 
+import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.converters.StringToAffineTransformConverter;
 import org.geotoolkit.process.converters.StringToCRSConverter;
 import org.geotoolkit.process.converters.StringToFilterConverter;
@@ -47,7 +48,6 @@ import org.geotoolkit.ows.xml.v110.CodeType;
 import org.geotoolkit.ows.xml.v110.DomainMetadataType;
 import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessFactory;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.converters.StringToFeatureCollectionConverter;
 import org.geotoolkit.util.converter.ConverterRegistry;
@@ -143,10 +143,12 @@ import org.constellation.wps.converters.ReferenceToGridCoverage2DConverter;
 import org.constellation.wps.converters.ReferenceToGridCoverageReaderConverter;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.process.ProcessingRegistry;
 import org.geotoolkit.wps.xml.v100.LiteralOutputType;
 import org.geotoolkit.wps.xml.v100.SupportedUOMsType;
 import org.geotoolkit.wps.xml.v100.UOMsType;
 
+import org.opengis.util.NoSuchIdentifierException;
 import static org.constellation.query.Query.*;
 import static org.constellation.wps.ws.WPSConstant.*;
 
@@ -350,11 +352,11 @@ public class WPSWorker extends AbstractWorker {
         
         final ProcessOfferings offering = new ProcessOfferings();
 
-        final Iterator<ProcessFactory> factoryIte = ProcessFinder.getProcessFactories();
+        final Iterator<ProcessingRegistry> factoryIte = ProcessFinder.getProcessFactories();
 
         while (factoryIte.hasNext()) {
 
-            final ProcessFactory factory = factoryIte.next();
+            final ProcessingRegistry factory = factoryIte.next();
             ProcessBriefType brief = new ProcessBriefType();
 
             for (ProcessDescriptor descriptor : factory.getDescriptors()) {
@@ -439,8 +441,8 @@ public class WPSWorker extends AbstractWorker {
                     OPERATION_NOT_SUPPORTED, identifier.getValue());
             }
             
-            descriptionType.setTitle(new LanguageStringType(processDesc.getName().getCode()));          //Process Title
-            descriptionType.setAbstract(new LanguageStringType(processDesc.getAbstract().toString()));  //Process abstract
+            descriptionType.setTitle(new LanguageStringType(processDesc.getIdentifier().getCode()));          //Process Title
+            descriptionType.setAbstract(new LanguageStringType(processDesc.getProcedureDescription().toString()));  //Process abstract
 
         // Get process input and output descriptors
             final ParameterDescriptorGroup input = processDesc.getInputDescriptor();
@@ -681,7 +683,6 @@ public class WPSWorker extends AbstractWorker {
         List<File> files = null;
         
         //Create Process and Inputs
-        final org.geotoolkit.process.Process proc = processDesc.createProcess();
         final ParameterValueGroup in = processDesc.getInputDescriptor().createValue();
 
         /******************
@@ -892,7 +893,7 @@ public class WPSWorker extends AbstractWorker {
         }
 
         //Give input parameter to the process
-        proc.setInput(in);
+        final org.geotoolkit.process.Process proc = processDesc.createProcess(in);
         
         //Status
         ProcessStartedType started = new ProcessStartedType();
@@ -901,7 +902,12 @@ public class WPSWorker extends AbstractWorker {
         //status.setProcessStarted(started);
         
         //Run the process
-        proc.run();
+        final ParameterValueGroup result;
+        try {
+            result = proc.call();
+        } catch (ProcessException ex) {
+            throw new CstlServiceException("Process execution failed");
+        }
         
         /******************
          * Process OUTPUT *
@@ -916,7 +922,7 @@ public class WPSWorker extends AbstractWorker {
             /* Raw Data returned */
             if(isOutputRaw){
                 System.out.println("LOG -> Output -> Raw");
-                final Object outputValue = proc.getOutput().parameter(rawOutputID).getValue();
+                final Object outputValue = result.parameter(rawOutputID).getValue();
                 System.out.println("DEBUG -> Output -> Raw -> Value="+outputValue);
                 
                 if(outputValue instanceof Geometry){
@@ -953,7 +959,7 @@ public class WPSWorker extends AbstractWorker {
                     outData.setAbstract(new LanguageStringType(outputDescriptor.getRemarks().toString()));
 
                     /* Output value from process */
-                    final Object outputValue = proc.getOutput().parameter(outputIdentifier).getValue();
+                    final Object outputValue = result.parameter(outputIdentifier).getValue();
 
                     final DataType data = new DataType();
                     if (outputDescriptor instanceof ParameterDescriptor) {
@@ -1068,6 +1074,8 @@ public class WPSWorker extends AbstractWorker {
             processDesc = ProcessFinder.getProcessDescriptor(processFactory, processName);
         } catch (IllegalArgumentException ex) {
             throw new CstlServiceException(ex, INVALID_REQUEST, KEY_VERSION.toLowerCase());
+        } catch (NoSuchIdentifierException ex) {
+            throw new CstlServiceException(ex, INVALID_REQUEST, KEY_VERSION.toLowerCase());
         }
         return processDesc;
     }
@@ -1093,9 +1101,9 @@ public class WPSWorker extends AbstractWorker {
     private static ProcessBriefType processBrief(final ProcessDescriptor processDesc) {
 
         final ProcessBriefType brief = new ProcessBriefType();
-        brief.setIdentifier(new CodeType(processDesc.getName().getAuthority().getTitle().toString() + "." + processDesc.getName().getCode()));
-        brief.setTitle(new LanguageStringType(processDesc.getName().getCode()));
-        brief.setAbstract(new LanguageStringType(processDesc.getAbstract().toString()));
+        brief.setIdentifier(new CodeType(processDesc.getIdentifier().getAuthority().getTitle().toString() + "." + processDesc.getIdentifier().getCode()));
+        brief.setTitle(new LanguageStringType(processDesc.getIdentifier().getCode()));
+        brief.setAbstract(new LanguageStringType(processDesc.getProcedureDescription().toString()));
         brief.setProcessVersion(null);
         brief.setWSDL(null);
 

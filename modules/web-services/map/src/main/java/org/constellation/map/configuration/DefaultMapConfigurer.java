@@ -18,7 +18,6 @@
 package org.constellation.map.configuration;
 
 import java.io.File;
-import org.constellation.configuration.ConfigDirectory;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 import org.quartz.TriggerBuilder;
 import org.quartz.SimpleScheduleBuilder;
 
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
@@ -71,6 +71,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.FactoryException;
+import org.opengis.util.NoSuchIdentifierException;
 
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
@@ -783,7 +784,12 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final String authority = getParameter("authority", true, parameters);
         final String code = getParameter("code", true, parameters);
         
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(authority,code);
+        final ProcessDescriptor desc;
+        try {
+            desc = ProcessFinder.getProcessDescriptor(authority,code);
+        } catch (NoSuchIdentifierException ex) {
+            throw new CstlServiceException("No Process for id : {" + authority + "}"+code+" has been found", INVALID_PARAMETER_VALUE);
+        }
         if(desc == null){
             throw new CstlServiceException("No Process for id : {" + authority + "}"+code+" has been found", INVALID_PARAMETER_VALUE);
         }
@@ -850,7 +856,12 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
         
         //rebuild original values since we have changed the namespace
-        final ParameterDescriptorGroup originalDesc = ProcessFinder.getProcessDescriptor(authority,code).getInputDescriptor();
+        final ParameterDescriptorGroup originalDesc;
+        try {
+            originalDesc = ProcessFinder.getProcessDescriptor(authority,code).getInputDescriptor();
+        } catch (NoSuchIdentifierException ex) {
+            return new AcknowlegementType("Failure", "No process for given id.");
+        }
         final ParameterValueGroup orig = originalDesc.createValue();
         orig.values().addAll(params.values());
         
@@ -898,7 +909,12 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
         
         //rebuild original values since we have changed the namespace
-        final ParameterDescriptorGroup originalDesc = ProcessFinder.getProcessDescriptor(authority,code).getInputDescriptor();
+        final ParameterDescriptorGroup originalDesc;
+        try {
+            originalDesc = ProcessFinder.getProcessDescriptor(authority,code).getInputDescriptor();
+        } catch (NoSuchIdentifierException ex) {
+            return new AcknowlegementType("Failure", "No process for given id.");
+        }
         final ParameterValueGroup orig = originalDesc.createValue();
         orig.values().addAll(params.values());
         

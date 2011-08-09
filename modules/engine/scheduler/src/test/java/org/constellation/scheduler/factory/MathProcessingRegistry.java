@@ -21,15 +21,14 @@ import java.util.Collections;
 import org.geotoolkit.metadata.iso.DefaultIdentifier;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.identification.DefaultServiceIdentification;
-import org.geotoolkit.process.AbstractProcessFactory;
-
+import org.geotoolkit.process.AbstractProcessingRegistry;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
 
 /**
  * The factory is registered in META-INF/
  */
-public class MathProcessFactory extends AbstractProcessFactory{
+public class MathProcessingRegistry extends AbstractProcessingRegistry{
     
     /** factory name **/
     public static final String NAME = "mymaths";
@@ -43,7 +42,7 @@ public class MathProcessFactory extends AbstractProcessFactory{
         IDENTIFICATION.setCitation(citation);
     }
 
-    public MathProcessFactory() {
+    public MathProcessingRegistry() {
         super(AddDescriptor.INSTANCE);
     }
     
