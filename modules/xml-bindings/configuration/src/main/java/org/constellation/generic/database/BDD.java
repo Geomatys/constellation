@@ -77,6 +77,11 @@ public class BDD {
      * The password of the user
      */
     private String password;
+    
+    /**
+     * The database schema.
+     */
+    private String schema;
 
     /**
      * Constructor used by JAXB
@@ -208,6 +213,20 @@ public class BDD {
      */
     public void setPassword(final String password) {
         this.password = password;
+    }
+    
+    /**
+     * @return the schema
+     */
+    public String getSchema() {
+        return schema;
+    }
+
+    /**
+     * @param schema the schema to set
+     */
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
     
     /**
@@ -352,6 +371,13 @@ public class BDD {
         return DriverManager.getConnection(connectURL, user, password);
     }
     
+    public boolean isPostgres() {
+        if (className == null) {
+            className = POSTGRES_DRIVER_CLASS;
+        }
+        return className.equals(POSTGRES_DRIVER_CLASS);
+    }
+    
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[BDD]");
@@ -376,6 +402,7 @@ public class BDD {
             return Utilities.equals(this.className,  that.className)  &&
                    Utilities.equals(this.connectURL, that.connectURL) &&
                    Utilities.equals(this.user  ,     that.user)       &&
+                   Utilities.equals(this.schema  ,   that.schema)     &&
                    Utilities.equals(this.password,   that.password);
         }
         return false;
@@ -388,6 +415,7 @@ public class BDD {
         hash = 59 * hash + (this.connectURL != null ? this.connectURL.hashCode() : 0);
         hash = 59 * hash + (this.user != null ? this.user.hashCode() : 0);
         hash = 59 * hash + (this.password != null ? this.password.hashCode() : 0);
+        hash = 59 * hash + (this.schema != null ? this.schema.hashCode() : 0);
         return hash;
     }
 }

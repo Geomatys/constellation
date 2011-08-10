@@ -17,6 +17,7 @@
 
 package org.constellation.metadata.io.mdweb;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,11 +56,13 @@ import org.geotoolkit.util.StringUtilities;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.Value;
-import org.mdweb.io.MD_IOException;
-import org.mdweb.io.sql.LocalReaderThesaurus;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.thesaurus.Word;
+import org.mdweb.model.thesaurus.Thesaurus;
+import org.mdweb.io.MD_IOException;
+import org.mdweb.io.sql.LocalThesaurusHandler;
+import org.mdweb.io.sql.ThesaurusDatabase;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -122,25 +125,31 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         super(configuration);
 
         final List<BDD> thesaurusDBs = configuration.getThesaurus();
+        final List<Thesaurus> thesaurusList = new ArrayList<Thesaurus>();
         for (BDD thesaurusDB : thesaurusDBs) {
             try {
-
-                final Connection tConnection       = thesaurusDB.getConnection();
-                final LocalReaderThesaurus tReader = new LocalReaderThesaurus(tConnection);
-                final List<Word> words             = tReader.getWords();
-                tReader.close();
-                for (final Word word : words) {
-                    try {
-                        final URI uri = new URI(word.getUriConcept());
-                        conceptMap.put(word.getLabel(), uri);
-
-                    } catch (URISyntaxException ex) {
-                        LOGGER.log(Level.WARNING, "URI syntax exception for:{0}", word.getUriConcept());
-                    }
-                }
+                final DataSource source    =    thesaurusDB.getPooledDataSource();
+                final String schema        = thesaurusDB.getSchema();
+                final boolean derby        = !thesaurusDB.isPostgres();
+                final ThesaurusDatabase th = new ThesaurusDatabase(source, schema, null, "", derby);
+                thesaurusList.add(th);
 
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "SQLException while initializing the Thesaurus reader: {0}", thesaurusDB.getConnectURL());
+            }
+        }
+        if (thesaurusList.size() > 0) {
+            final LocalThesaurusHandler tReader = new LocalThesaurusHandler(thesaurusList);
+            final List<Word> words = tReader.getWords(null);
+            tReader.close();
+            for (final Word word : words) {
+                try {
+                    final URI uri = new URI(word.getUriConcept());
+                    conceptMap.put(word.getLabel(), uri);
+
+                } catch (URISyntaxException ex) {
+                    LOGGER.log(Level.WARNING, "URI syntax exception for:{0}", word.getUriConcept());
+                }
             }
         }
     }
