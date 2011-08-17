@@ -160,7 +160,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      * Set the basic authentication for HTTP request.
      * @return true if login/password are valid
      */
-    private boolean authenticate() {
+    protected boolean authenticate() {
         final String str = this.serverURL.toString() + "configuration";
         InputStream stream = null;
         HttpURLConnection cnx = null;
