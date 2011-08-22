@@ -57,6 +57,10 @@
          <artifactId>cstl-lib-base</artifactId>
          <version>${project.version}</version>
       </dependency>
+      <dependency>
+         <groupId>org.apache.shiro</groupId>
+         <artifactId>shiro-core</artifactId>
+      </dependency>
   </dependencies>
 
 </project>

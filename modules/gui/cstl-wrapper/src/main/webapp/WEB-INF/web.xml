@@ -7,6 +7,16 @@
 
     <display-name>Constellation</display-name>
 
+    <!-- Shiro filter handling security access -->
+    <filter>
+        <filter-name>Shiro</filter-name>
+        <filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Shiro</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <context-param>
         <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
         <param-value>server</param-value>
@@ -199,42 +209,8 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
-    <login-config>
-        <auth-method>BASIC</auth-method>
-    </login-config>
-    <session-config>
+   <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-
-    <!--
-        Security role name.
-        - In the case of sun-based application server (like glassfish), this fields is mapped
-          into the sun-web.xml file to the group name defined in the container.
-        - For Tomcat, this role name is directly tested against the realm.
-          The sun-web.xml is not used.
-    -->
-    <security-role>
-        <role-name>cstladmin</role-name>
-    </security-role>
-
-    <!-- Secured all GET and POST requests done on the configuration webservice -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Constellation secured service</web-resource-name>
-            <url-pattern>/WS/configuration</url-pattern>
-            <url-pattern>/WS/wms/admin</url-pattern>
-            <url-pattern>/WS/wmts/admin</url-pattern>
-            <url-pattern>/WS/wcs/admin</url-pattern>
-            <url-pattern>/WS/csw/admin</url-pattern>
-            <url-pattern>/WS/sos/admin</url-pattern>
-            <url-pattern>/WS/wfs/admin</url-pattern>
-            <http-method>GET</http-method>
-            <http-method>POST</http-method>
-        </web-resource-collection>
-        <auth-constraint>
-            <description>User must be logged in as an administrator to use this service.</description>
-            <role-name>cstladmin</role-name>
-        </auth-constraint>
-    </security-constraint>
 
 </web-app>

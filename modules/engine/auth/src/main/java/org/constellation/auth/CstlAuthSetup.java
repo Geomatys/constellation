@@ -44,18 +44,11 @@ public class CstlAuthSetup implements SetupService {
     
     @Override
     public void initialize(Properties properties, boolean reinit) {
-        final File configDir = ConfigDirectory.getConfigDirectory();
-        if (!configDir.exists()) {
-            configDir.mkdir();
-        }
-        final File authDir = new File(configDir, "auth");
-        if (!authDir.exists()) {
-            authDir.mkdir();
-        }
-        final File authDbProperties = new File(authDir, "cstl-auth.properties");
+        final File authDir          = ConfigDirectory.getAuthConfigDirectory();
+        final File authDbProperties = ConfigDirectory.getAuthConfigFile();
         if (!authDbProperties.exists()) {
             LOGGER.info("Creating default Authentication Derby database");
-            final String dbUrl = "jdbc:derby:" + authDir.getPath() + "Cstl_User_Db";
+            final String dbUrl = "jdbc:derby:" + authDir.getPath() + "/Cstl_User_Db";
             final File authDbDir = new File(authDir, "Cstl_User_Db");
             try {
                 AuthDatabaseCreator.createEmbeddedUserDatabase(authDbDir);
@@ -68,7 +61,7 @@ public class CstlAuthSetup implements SetupService {
             
             Properties prop = new Properties();
             prop.put("cstl_authdb_type", "DERBYDIR");
-            prop.put("cstl_authdb_host", "jdbc:derby:" + authDir.getPath() + "Cstl_User_Db");
+            prop.put("cstl_authdb_host", "jdbc:derby:" + authDir.getPath() + "/Cstl_User_Db");
             try {
                 final FileOutputStream stream = new FileOutputStream(authDbProperties);
                 prop.store(stream, "auto generated at cstl startup");

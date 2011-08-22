@@ -463,6 +463,15 @@
             <artifactId>cstl-web-configuration</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-auth</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+        </dependency>
         <!-- Required only when creating the embedded EPSG database -->
         <dependency>
             <groupId>org.geotoolkit</groupId>
@@ -487,10 +496,6 @@
         </dependency>
 
     </dependencies>
-
-    <properties>
-        <netbeans.hint.deploy.server>Tomcat70</netbeans.hint.deploy.server>
-    </properties>
 
     <build>
         <plugins>

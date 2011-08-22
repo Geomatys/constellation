@@ -7,13 +7,16 @@
     
     <display-name>constellation</display-name>
 
-    <login-config>
-        <auth-method>BASIC</auth-method>
-    </login-config>
-    <session-config>
-        <session-timeout>30</session-timeout>
-    </session-config>
-    
+    <!-- Shiro filter handling security access -->
+    <filter>
+        <filter-name>Shiro</filter-name>
+        <filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Shiro</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!-- REST Servlet for constellation web service -->
     <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
@@ -41,6 +44,10 @@
         <url-pattern>/WS/*</url-pattern>
     </servlet-mapping>
     
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
     <!-- here is a tag to use TOMCAT pooled connection datasource  -->
 
     <!--resource-ref>
@@ -109,12 +116,17 @@
           into the sun-web.xml file to the group name defined in the container.
         - For Tomcat, this role name is directly tested against the realm.
           The sun-web.xml is not used.
-    -->
+    >
+    <login-config>
+        <auth-method>BASIC</auth-method>
+    </login-config>
+    
+
     <security-role>
         <role-name>cstladmin</role-name>
-    </security-role>
+    </security-role-->
 
-    <!-- Secured all GET and POST requests done on the configuration webservice -->
+    <!-- Secured all GET and POST requests done on the configuration webservice>
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Constellation secured service</web-resource-name>
@@ -133,6 +145,6 @@
             <description>User must be logged in as an administrator to use this service.</description>
             <role-name>cstladmin</role-name>
         </auth-constraint>
-    </security-constraint>
+    </security-constraint-->
 
 </web-app>

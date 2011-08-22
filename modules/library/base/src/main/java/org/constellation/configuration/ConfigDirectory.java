@@ -191,9 +191,35 @@ public final class ConfigDirectory {
 
         return providerDirectory;
     }
+    
+    /**
+     * Return a folder named 'auth' at the root in the configuration directory.
+     */
+     public static File getAuthConfigDirectory() {
+        final File constellationDirectory = getConfigDirectory();
+
+        if(!constellationDirectory.exists()){
+            constellationDirectory.mkdirs();
+        }
+
+        final File authDirectory = new File(constellationDirectory, "auth");
+        if (!authDirectory.exists()) {
+            authDirectory.mkdirs();
+        }
+
+        return authDirectory;
+     }
+     
+    /**
+     * Return the properties file at the root in the auth directory.
+     */
+    public static File getAuthConfigFile() {
+        final File authDirectory = getAuthConfigDirectory();
+        return new File(authDirectory, "cstl-auth.properties");
+    }
 
     /**
-     * Return a file at the root in the configuration directory.
+     * Return a file at the root in the provider directory.
      */
     public static File getProviderConfigFile(final String fileName) {
         final File providerDirectory = getProviderConfigDirectory();
