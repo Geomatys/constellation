@@ -17,7 +17,6 @@
 
 package org.constellation.map.configuration;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,6 @@ import javax.xml.stream.XMLStreamException;
 import org.quartz.TriggerBuilder;
 import org.quartz.SimpleScheduleBuilder;
 
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
@@ -131,15 +129,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     @Override
     public Object treatRequest(final String request, final MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
         
-        //general configuration
-        if (REQUEST_GET_CONFIG_PATH.equalsIgnoreCase(request)) {
-            return getConfigPath(parameters);
-        } else if (REQUEST_SET_CONFIG_PATH.equalsIgnoreCase(request)) {
-            return setConfigPath(parameters);
-        }
-        
         //Provider services operations
-        else if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
+        if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
             return listProviderServices();
         } else if (REQUEST_GET_SERVICE_DESCRIPTOR.equalsIgnoreCase(request)) {
             return getServiceDescriptor(parameters);
@@ -224,25 +215,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         
     }
     
-    
-    private AcknowlegementType getConfigPath(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String path = ConfigDirectory.getConfigDirectory().getPath();
-        return new AcknowlegementType("Success", path);
-    }
-    
-    private AcknowlegementType setConfigPath(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String path = getParameter("path", true, parameters);
-        // Set the new user directory
-        if (path != null && !path.isEmpty()) {
-            final File userDirectory = new File(path);
-            if (!userDirectory.isDirectory()) {
-                userDirectory.mkdir();
-            }
-            ConfigDirectory.setConfigDirectory(userDirectory);
-        }
-
-        return new AcknowlegementType("Success", path);
-    }
     
     /**
      * Add a new source to the specified provider.

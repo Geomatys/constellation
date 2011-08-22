@@ -109,10 +109,10 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     
     public ConstellationServer(final URL server, final String user, final String password) {
         super(server,new BasicAuthenticationSecurity(user, password));
-        this.services = createServiceManager();
+        this.services  = createServiceManager();
         this.providers = createProviderManager();
-        this.csws = createCswManager();
-        this.tasks = createTaskManager();
+        this.csws      = createCswManager();
+        this.tasks     = createTaskManager();
     }
     
     protected S createServiceManager(){
@@ -192,7 +192,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      */
     public String getConfigurationPath(){
         try {
-            final String url = getURL() + "configuration?request="+REQUEST_GET_CONFIG_PATH;
+            final String url = getURL() + "configuration?request=" + REQUEST_GET_CONFIG_PATH;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ak = (AcknowlegementType) response;
@@ -222,7 +222,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     public boolean setConfigurationPath(final String path){
         try {
             
-            final String url = getURL() + "configuration?request="+REQUEST_SET_CONFIG_PATH+"&path=" + URLEncoder.encode(path);
+            final String url = getURL() + "configuration?request=" + REQUEST_SET_CONFIG_PATH + "&path=" + URLEncoder.encode(path);
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -252,7 +252,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean restartAll() {
             try {
-                final String url = getURL() + "configuration?request=restart";
+                final String url = getURL() + "configuration?request=" + REQUEST_FULL_RESTART;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());

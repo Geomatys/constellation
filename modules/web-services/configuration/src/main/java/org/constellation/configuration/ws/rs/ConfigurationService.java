@@ -17,6 +17,7 @@
 package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
+import org.constellation.configuration.ConfigDirectory;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +66,7 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.FileUtilities;
 
+import static org.constellation.api.QueryConstants.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -139,24 +141,35 @@ public final class ConfigurationService extends WebService  {
         Marshaller marshaller = null;
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
-            String request  = request = (String) getParameter("REQUEST", true);
+            final String request = (String) getParameter("REQUEST", true);
 
             for (AbstractConfigurer configurer: configurers) {
                 configurer.setContainerNotifier(cn);
             }
             
-            if ("Restart".equalsIgnoreCase(request)) {
+            if (REQUEST_FULL_RESTART.equalsIgnoreCase(request)) {
                 final boolean force = Boolean.parseBoolean(getParameter("FORCED", false));
                 return Response.ok(restartService(force), MimeType.TEXT_XML).build();
             }
             
-            else if ("Download".equalsIgnoreCase(request)) {    
+            else if (REQUEST_DOWNLOAD.equalsIgnoreCase(request)) {    
                 final File f = downloadFile();
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
             }
                     
-            else if ("ListAvailableService".equalsIgnoreCase(request)) {    
+            else if (REQUEST_LIST_SERVICE.equalsIgnoreCase(request)) {    
                 final ServiceReport response = new ServiceReport(REGISTERED_SERVICE);
+                return Response.ok(response, MediaType.TEXT_XML).build(); 
+            } 
+            
+            else if (REQUEST_GET_CONFIG_PATH.equalsIgnoreCase(request)) {
+                final AcknowlegementType response = getConfigPath();
+                return Response.ok(response, MediaType.TEXT_XML).build(); 
+            } 
+            
+            else if (REQUEST_SET_CONFIG_PATH.equalsIgnoreCase(request)) {
+                final String path = getParameter("path", false);
+                final AcknowlegementType response = setConfigPath(path);
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
                     
@@ -291,6 +304,24 @@ public final class ConfigurationService extends WebService  {
      */
     private File downloadFile() throws CstlServiceException {
         throw new CstlServiceException("Download operation not implemented", OPERATION_NOT_SUPPORTED);
+    }
+    
+    private AcknowlegementType getConfigPath() throws CstlServiceException{
+        final String path = ConfigDirectory.getConfigDirectory().getPath();
+        return new AcknowlegementType("Success", path);
+    }
+    
+    private AcknowlegementType setConfigPath(final String path) throws CstlServiceException{
+        // Set the new user directory
+        if (path != null && !path.isEmpty()) {
+            final File userDirectory = new File(path);
+            if (!userDirectory.isDirectory()) {
+                userDirectory.mkdir();
+            }
+            ConfigDirectory.setConfigDirectory(userDirectory);
+        }
+
+        return new AcknowlegementType("Success", path);
     }
 
     /**

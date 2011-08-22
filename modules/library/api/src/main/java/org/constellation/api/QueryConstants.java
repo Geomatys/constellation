@@ -25,6 +25,10 @@ public final class QueryConstants {
     //Constellation configuration itself
     public static final String REQUEST_GET_CONFIG_PATH = "getConfigurationPath"; 
     public static final String REQUEST_SET_CONFIG_PATH = "setConfigurationPath"; 
+    public static final String REQUEST_FULL_RESTART    = "Restart";
+    public static final String REQUEST_DOWNLOAD        = "Download";
+    public static final String REQUEST_LIST_SERVICE    = "ListAvailableService";
+    
     
     //Provider services operations
     public static final String REQUEST_LIST_SERVICES                = "listServices"; 
