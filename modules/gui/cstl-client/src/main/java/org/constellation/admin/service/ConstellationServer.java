@@ -261,6 +261,28 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         return false;
     }
     
+    public String getUserName(){
+        try {
+            final String url = getURL() + "configuration?request=getUserName";
+            final Object response = sendRequest(url, null);
+            if (response instanceof AcknowlegementType) {
+                final AcknowlegementType ak = (AcknowlegementType) response;
+                if ("Success".equalsIgnoreCase(ak.getStatus())) {
+                    return ak.getMessage();
+                }
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return null;
+            } else {
+                LOGGER.warning("The service respond uncorrectly");
+                return null;
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return null;
+    }
+    
     /**
      * Configuration methods for services
      */

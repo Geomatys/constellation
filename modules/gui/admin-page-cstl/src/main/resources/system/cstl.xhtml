@@ -11,9 +11,30 @@
 
         <h3>Configuration folder :</h3>
         <h:inputText value="#{cstlBean.configurationDirectory}" style="width: 100%"/>
-
-        <div style="text-align: right;">
-            <h:commandButton value="#{cstlBean.i18n['save']}" />
+	<br/>
+	<br/>
+	<h3>Constellation User :</h3>
+	<br/>
+        <table style="width:100%;"> 
+                <colgroup>
+                        <col width="10%"/>
+                        <col width="10%"/>
+                        <col width="80%"/>
+                </colgroup>
+                <tr>
+                    <td><h:outputText value="User name"/></td>
+                    <td><h:inputText value="#{cstlBean.userName}"/></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><h:outputText value="Password"/></td>
+                    <td><h:inputSecret value="#{cstlBean.password}"/></td>
+                    <td></td>
+                </tr>
+        </table>
+	<br/>
+	<div style="text-align: right;">
+            <h:commandButton value="#{cstlBean.i18n['save']}" action="#{cstlBean.save}" />
         </div>
     </ui:define>
 

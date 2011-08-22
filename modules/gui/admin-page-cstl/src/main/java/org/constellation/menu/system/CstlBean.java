@@ -33,6 +33,11 @@ public class CstlBean extends I18NBean{
      */
     public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
     
+    private String configurationDirectory;
+    
+    private String userName;
+    
+    private String password;
     
     protected ConstellationServer getServer(){
         return (ConstellationServer) FacesContext.getCurrentInstance()
@@ -40,26 +45,69 @@ public class CstlBean extends I18NBean{
     }
     
     public String getConfigurationDirectory(){
+        if (configurationDirectory == null) {
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                configurationDirectory = server.getConfigurationPath();
+            }
+        }
+        return configurationDirectory;
+    }
+
+    public void setConfigurationDirectory(final String path){
+        this.configurationDirectory = path;
+    }
+
+    /**
+     * @return the userName
+     */
+    public String getUserName() {
         final ConstellationServer server = getServer();
         if (server != null) {
-            return server.getConfigurationPath();
+            return server.getUserName();
         }
         return null;
     }
 
-    public void setConfigurationDirectory(final String path){
+    /**
+     * @param userName the userName to set
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void save() {
         // Set the new user directory
-        if (path != null && !path.isEmpty()) {
+        if (configurationDirectory != null && !configurationDirectory.isEmpty()) {
             //reload services
             final ConstellationServer server = getServer();
             if (server != null) {
-                server.setConfigurationPath(path);
+                server.setConfigurationPath(configurationDirectory);
                 server.services.restartAll();
                 server.providers.restartAllLayerProviders();
                 server.providers.restartAllStyleProviders();
             }
         }
-
+        // save the new login / password
+        if (userName != null && !userName.isEmpty() && password != null && !password.isEmpty()) {
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.updateUser(userName, password);
+            }
+        }
     }
-
 }

@@ -18,8 +18,6 @@ package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
 import java.util.Arrays;
-import org.mdweb.model.auth.AuthenticationException;
-import org.mdweb.io.auth.sql.DataSourceAuthenticationReader;
 import java.io.FileInputStream;
 import java.util.Properties;
 import org.mdweb.io.auth.AuthenticationReader;
@@ -75,6 +73,11 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// Mdweb metamodel auth dependencies
+import org.mdweb.model.auth.AuthenticationException;
+import org.mdweb.io.auth.sql.DataSourceAuthenticationReader;
+import org.mdweb.model.auth.UserAuthnInfo;
 
 /**
  * Web service for administration and configuration operations.
@@ -199,6 +202,11 @@ public final class ConfigurationService extends WebService  {
                 final String userName = getParameter("userName", true);
                 final String password = getParameter("password", true);
                 final AcknowlegementType response = updateUser(userName, password);
+                return Response.ok(response, MediaType.TEXT_XML).build(); 
+            }
+            
+            else if ("getUserName".equalsIgnoreCase(request)) {
+                final AcknowlegementType response = getUserName();
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
@@ -358,6 +366,22 @@ public final class ConfigurationService extends WebService  {
             authReader.writeUser(userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"));
             authReader.destroy();
             return new AcknowlegementType("Success", "The user has been changed");
+        } catch (AuthenticationException ex) {
+            LOGGER.log(Level.WARNING, "Error while updating user", ex);
+        }
+        return new AcknowlegementType("Failure", "An error occurs");
+    }
+    
+    private AcknowlegementType getUserName() {
+        try {
+            final AuthenticationReader authReader = getAuthReader();
+            final List<UserAuthnInfo> users =  authReader.listAllUsers();
+            String userName = null;
+            if (users != null && !users.isEmpty()) {
+                userName = users.get(0).getLogin();
+            }
+            authReader.destroy();
+            return new AcknowlegementType("Success", userName);
         } catch (AuthenticationException ex) {
             LOGGER.log(Level.WARNING, "Error while updating user", ex);
         }
