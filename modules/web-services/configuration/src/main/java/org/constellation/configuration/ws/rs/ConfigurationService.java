@@ -17,6 +17,12 @@
 package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
+import java.util.Arrays;
+import org.mdweb.model.auth.AuthenticationException;
+import org.mdweb.io.auth.sql.DataSourceAuthenticationReader;
+import java.io.FileInputStream;
+import java.util.Properties;
+import org.mdweb.io.auth.AuthenticationReader;
 import org.constellation.configuration.ConfigDirectory;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -65,6 +71,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -99,7 +106,7 @@ public final class ConfigurationService extends WebService  {
      * The factory registry allowing to load the correct implementation specific configurer.
      */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractConfigurerFactory.class);
-
+    
 
     /**
      * Construct the ConfigurationService and configure its context.
@@ -131,6 +138,21 @@ public final class ConfigurationService extends WebService  {
             INSTANCE = new WeakReference<ConfigurationService>(this);
         }
         
+    }
+    
+    private AuthenticationReader getAuthReader() {
+        final File authProperties = ConfigDirectory.getAuthConfigFile();
+        final Properties prop = new Properties();
+        try {
+            final FileInputStream fis = new FileInputStream(authProperties);
+            prop.load(fis);
+            final String url = prop.getProperty("cstl_authdb_host");
+            final DefaultDataSource ds = new DefaultDataSource(url.replace('\\', '/') + ";");
+            return new DataSourceAuthenticationReader(ds);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "IOException while loading cstl auth properties file", ex);
+        }
+        return null;
     }
     
     /**
@@ -172,7 +194,13 @@ public final class ConfigurationService extends WebService  {
                 final AcknowlegementType response = setConfigPath(path);
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
-                    
+            
+            else if ("updateUser".equalsIgnoreCase(request)) {
+                final String userName = getParameter("userName", true);
+                final String password = getParameter("password", true);
+                final AcknowlegementType response = updateUser(userName, password);
+                return Response.ok(response, MediaType.TEXT_XML).build(); 
+            }
             
             /* specific operations */
             
@@ -324,6 +352,18 @@ public final class ConfigurationService extends WebService  {
         return new AcknowlegementType("Success", path);
     }
 
+    private AcknowlegementType updateUser(final String userName, final String password) {
+        try {
+            final AuthenticationReader authReader = getAuthReader();
+            authReader.writeUser(userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"));
+            authReader.destroy();
+            return new AcknowlegementType("Success", "The user has been changed");
+        } catch (AuthenticationException ex) {
+            LOGGER.log(Level.WARNING, "Error while updating user", ex);
+        }
+        return new AcknowlegementType("Failure", "An error occurs");
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -352,9 +392,9 @@ public final class ConfigurationService extends WebService  {
         final String request = (String) getParameter("REQUEST", true);
         final MultivaluedMap<String,String> parameters = getParameters();
         for (AbstractConfigurer configurer: configurers) {
-            if(configurer.needCustomUnmarshall(request,parameters)){
+            if (configurer.needCustomUnmarshall(request,parameters)) {
                 return configurer.unmarshall(request,parameters, is);
-            };
+            }
         }
         return super.unmarshallRequest(unmarshaller, is);
     }

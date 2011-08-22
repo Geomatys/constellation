@@ -239,6 +239,27 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         return false;
     }
     
+    public boolean updateUser(final String userName, final String password){
+        try {
+            final String url = getURL() + "configuration?request=updateUser&username=" + userName + "&password=" + password;
+            final Object response = sendRequest(url, null);
+            if (response instanceof AcknowlegementType) {
+                final AcknowlegementType ak = (AcknowlegementType) response;
+                if ("Success".equalsIgnoreCase(ak.getStatus())) {
+                    return true;
+                }
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
+            } else {
+                LOGGER.warning("The service respond uncorrectly");
+                return false;
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
     
     /**
      * Configuration methods for services

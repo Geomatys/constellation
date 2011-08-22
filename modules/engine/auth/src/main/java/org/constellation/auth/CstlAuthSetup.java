@@ -55,6 +55,7 @@ public class CstlAuthSetup implements SetupService {
                 final DataSource ds = new DefaultDataSource(dbUrl + ";create=true");
                 final AuthenticationReader reader = new DataSourceAuthenticationReader(ds);
                 reader.writeUser("admin", "admin", "Default Constellation Administrator", Arrays.asList("cstl-admin"));
+                reader.destroy();
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "SQL exception while creating authentication derby database", ex);
             }

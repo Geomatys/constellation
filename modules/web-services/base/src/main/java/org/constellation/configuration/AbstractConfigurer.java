@@ -26,7 +26,6 @@ import javax.xml.bind.JAXBException;
 
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.constellation.ws.rs.WebService;
 import static org.constellation.ws.ExceptionCode.*;
 
 import org.geotoolkit.util.logging.Logging;
