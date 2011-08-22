@@ -59,6 +59,7 @@
     <module>scheduler</module>
     <module>testing</module>
     <module>xacml</module>
+    <module>auth</module>
   </modules>
 
 </project>

@@ -401,12 +401,7 @@
             </dependency>
 	    <dependency>
                <groupId>org.mdweb.metamodel</groupId>
-               <artifactId>mdweb-metamodel-lib-sql-data-gnc</artifactId>
-               <version>${mdweb-meta.version}</version>
-            </dependency>
-            <dependency>
-               <groupId>org.mdweb.metamodel</groupId>
-               <artifactId>mdweb-metamodel-lib-sql-data-natsdi</artifactId>
+               <artifactId>mdweb-metamodel-lib-auth</artifactId>
                <version>${mdweb-meta.version}</version>
             </dependency>
             <!-- GeoAPI -->

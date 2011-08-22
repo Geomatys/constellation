@@ -26,6 +26,7 @@ import org.geotoolkit.internal.SetupService;
  */
 public class CstlSchedulerSetup implements SetupService {
     
+    @Override
     public void initialize(Properties properties, boolean reinit) {
         CstlScheduler.getInstance();
     }
@@ -33,6 +34,7 @@ public class CstlSchedulerSetup implements SetupService {
     /**
      * Invoked when the module needs to be shutdown.
      */
+    @Override
     public void shutdown() {
         CstlScheduler.getInstance().stop();
     }
