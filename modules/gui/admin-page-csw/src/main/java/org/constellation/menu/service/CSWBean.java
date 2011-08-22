@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import javax.faces.model.SelectItem;
 import javax.sql.DataSource;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.geotoolkit.util.FileUtilities;
@@ -331,8 +332,11 @@ public class CSWBean extends AbstractServiceBean {
      */
      public void refreshIndex() {
          final String instanceId = getConfiguredInstance().getName();
-         getServer().csws.refreshIndex(instanceId, true);
-         getServer().services.restartInstance("CSW", instanceId);
+         final ConstellationServer server = getServer();
+         if (server != null) {
+             server.csws.refreshIndex(instanceId, true);
+             server.services.restartInstance("CSW", instanceId);
+         }
      }
      
      /**
@@ -353,7 +357,10 @@ public class CSWBean extends AbstractServiceBean {
                 try {
                     final File tmp = File.createTempFile("cstl", null);
                     final File importedfile = FileUtilities.buildFileFromStream(uploadedRecord.getInputStream(), tmp);
-                    getServer().csws.importFile(instanceId, importedfile, uploadedRecord.getFileName());
+                    final ConstellationServer server = getServer();
+                    if (server != null) {
+                        server.csws.importFile(instanceId, importedfile, uploadedRecord.getFileName());
+                    }
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
                 }

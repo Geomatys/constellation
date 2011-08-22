@@ -47,22 +47,22 @@ public class ProviderBean extends I18NBean {
     }
 
     private static ConstellationServer getServer(){
-        final ConstellationServer server = (ConstellationServer) FacesContext.getCurrentInstance()
+        return (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(AbstractProviderConfigBean.SERVICE_ADMIN_KEY);
-        
-        if(server == null){
-            throw new IllegalStateException("Distant server is null.");
-        }
-        
-        return server;
     }
     
     public void reloadLayerProviders() {
-        getServer().providers.restartAllLayerProviders();
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            server.providers.restartAllLayerProviders();
+        }
     }
 
     public void reloadStyleProviders() {
-        getServer().providers.restartAllStyleProviders();
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            server.providers.restartAllStyleProviders();
+        }
     }
 
     public void show(){
@@ -110,40 +110,42 @@ public class ProviderBean extends I18NBean {
     private static TreeModel buildModel(final boolean styleServices, final boolean onlyKeys){
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
 
-        final ProvidersReport report = getServer().providers.listProviders();
-        
-        
-        final Set<ProviderServiceReport> map = new TreeSet<ProviderServiceReport>(new Comparator<ProviderServiceReport>(){
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            final ProvidersReport report = server.providers.listProviders();
 
-            @Override
-            public int compare(ProviderServiceReport o1, ProviderServiceReport o2) {
-                return o1.getType().compareTo(o2.getType());
-            }
 
-        });
-        map.addAll(report.getProviderServices());
+            final Set<ProviderServiceReport> map = new TreeSet<ProviderServiceReport>(new Comparator<ProviderServiceReport>(){
 
-        for(final ProviderServiceReport service : map){
-            if(service.isStyleService() != styleServices){
-                continue;
-            }
-            
-            final DefaultMutableTreeNode n = new DefaultMutableTreeNode(service.getType());
-            root.add(n);
-            
-            for(final ProviderReport pr : service.getProviders()){
-                final DefaultMutableTreeNode lpn = new DefaultMutableTreeNode(pr.getId());
-                n.add(lpn);
-                
-                for(String layer : pr.getItems()){
-                    final DefaultMutableTreeNode ldn = new DefaultMutableTreeNode(layer);
-                    lpn.add(ldn);
+                @Override
+                public int compare(ProviderServiceReport o1, ProviderServiceReport o2) {
+                    return o1.getType().compareTo(o2.getType());
                 }
-                
+
+            });
+            map.addAll(report.getProviderServices());
+
+            for(final ProviderServiceReport service : map){
+                if(service.isStyleService() != styleServices){
+                    continue;
+                }
+
+                final DefaultMutableTreeNode n = new DefaultMutableTreeNode(service.getType());
+                root.add(n);
+
+                for(final ProviderReport pr : service.getProviders()){
+                    final DefaultMutableTreeNode lpn = new DefaultMutableTreeNode(pr.getId());
+                    n.add(lpn);
+
+                    for(String layer : pr.getItems()){
+                        final DefaultMutableTreeNode ldn = new DefaultMutableTreeNode(layer);
+                        lpn.add(ldn);
+                    }
+
+                }
+
             }
-
         }
-
         return new DefaultTreeModel(root);
     }
 

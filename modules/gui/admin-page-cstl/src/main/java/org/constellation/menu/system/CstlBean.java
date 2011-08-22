@@ -35,32 +35,29 @@ public class CstlBean extends I18NBean{
     
     
     protected ConstellationServer getServer(){
-        final ConstellationServer server = (ConstellationServer) FacesContext.getCurrentInstance()
+        return (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
-        
-        if(server == null){
-            throw new IllegalStateException("Distant server is null.");
-        }
-        
-        return server;
     }
     
     public String getConfigurationDirectory(){
-        return getServer().getConfigurationPath();
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            return server.getConfigurationPath();
+        }
+        return null;
     }
 
     public void setConfigurationDirectory(final String path){
-        
         // Set the new user directory
         if (path != null && !path.isEmpty()) {
             //reload services
-            final ConstellationServer admin = (ConstellationServer) FacesContext.getCurrentInstance()
-                    .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
-
-            admin.setConfigurationPath(path);
-            admin.services.restartAll();
-            admin.providers.restartAllLayerProviders();
-            admin.providers.restartAllStyleProviders();
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.setConfigurationPath(path);
+                server.services.restartAll();
+                server.providers.restartAllLayerProviders();
+                server.providers.restartAllStyleProviders();
+            }
         }
 
     }

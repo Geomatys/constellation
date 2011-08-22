@@ -88,6 +88,15 @@ public final class NavigationBean extends I18NBean{
     
     public void logout(){
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove(SERVICE_ADMIN_KEY);
+        //redirect
+        final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        final String webapp = context.getRequestContextPath();
+        try {
+            //the session is not logged, redirect him to the authentication page
+            context.redirect(webapp + "/authentication.jsf");
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
     }
     
     /**

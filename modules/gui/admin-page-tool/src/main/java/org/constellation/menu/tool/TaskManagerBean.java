@@ -92,47 +92,45 @@ public class TaskManagerBean extends I18NBean{
     }
 
     protected ConstellationServer getServer(){
-        final ConstellationServer server = (ConstellationServer) FacesContext.getCurrentInstance()
+        return (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
-        
-        if(server == null){
-            throw new IllegalStateException("Distant server is null.");
-        }
-        
-        return server;
     }
     
     public TreeModel getTaskModel(){
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-        
-        final List<StringTreeNode> values = getServer().tasks.listTasks().getChildren();
-        for(StringTreeNode value : values){
-            final DefaultMutableTreeNode n = new SeletableNode(value);
-            root.add(n);
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            final List<StringTreeNode> values = server.tasks.listTasks().getChildren();
+            for(StringTreeNode value : values){
+                final DefaultMutableTreeNode n = new SeletableNode(value);
+                root.add(n);
+            }
         }
-        
         return new DefaultTreeModel(root);
     }
 
     public TreeModel getProcessModel() {
         if(processModel == null){
             final DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-            final List<String> values = getServer().tasks.listProcess().getList();
-            final Map<String,DefaultMutableTreeNode> authorities = new HashMap<String, DefaultMutableTreeNode>();
-            
-            for(String value : values){
-                final Name name = DefaultName.valueOf(value);
-                final String ns = name.getNamespaceURI();
-                
-                DefaultMutableTreeNode parent = authorities.get(ns);
-                if(parent == null){
-                    parent = new DefaultMutableTreeNode(ns);
-                    root.add(parent);
-                    authorities.put(ns, parent);
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                final List<String> values = server.tasks.listProcess().getList();
+                final Map<String,DefaultMutableTreeNode> authorities = new HashMap<String, DefaultMutableTreeNode>();
+
+                for(String value : values){
+                    final Name name = DefaultName.valueOf(value);
+                    final String ns = name.getNamespaceURI();
+
+                    DefaultMutableTreeNode parent = authorities.get(ns);
+                    if(parent == null){
+                        parent = new DefaultMutableTreeNode(ns);
+                        root.add(parent);
+                        authorities.put(ns, parent);
+                    }
+
+                    final DefaultMutableTreeNode n = new SeletableNode(name);
+                    parent.add(n);
                 }
-                
-                final DefaultMutableTreeNode n = new SeletableNode(name);
-                parent.add(n);
             }
             
             processModel = new DefaultTreeModel(root);
@@ -221,9 +219,12 @@ public class TaskManagerBean extends I18NBean{
             
             final Name name = (Name)userObject;            
             processid = name;
-            final GeneralParameterDescriptor desc = getServer().tasks.getProcessDescriptor(name.getNamespaceURI(), name.getLocalPart());
-            if(desc != null){
-                parameters = desc.createValue();
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                final GeneralParameterDescriptor desc = server.tasks.getProcessDescriptor(name.getNamespaceURI(), name.getLocalPart());
+                if(desc != null){
+                    parameters = desc.createValue();
+                }
             }
         }
         
@@ -240,11 +241,13 @@ public class TaskManagerBean extends I18NBean{
             processid = new DefaultName(auto, code);
             taskstep = Integer.valueOf(n.getProperties().get("step"));
             
-            final ParameterDescriptorGroup desc = (ParameterDescriptorGroup)
-                    getServer().tasks.getProcessDescriptor(auto,code);
-            parameters = getServer().tasks.getTaskParameters(id,desc);
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) server.tasks.getProcessDescriptor(auto,code);
+                parameters = server.tasks.getTaskParameters(id,desc);
+            }
             
-            if(configPage != null){
+            if (configPage != null) {
                 final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
                 try {
                     context.redirect(configPage);
@@ -255,13 +258,15 @@ public class TaskManagerBean extends I18NBean{
         }
         
         public void delete(){
-            if(!(userObject instanceof StringTreeNode)){
+            if (!(userObject instanceof StringTreeNode)) {
                 return;
             }
-            
             final StringTreeNode n = (StringTreeNode) userObject;
             final String nid = n.getProperties().get("id");
-            getServer().tasks.deleteTask(nid);
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.tasks.deleteTask(nid);
+            }
         }
     
     }

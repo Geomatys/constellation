@@ -73,15 +73,18 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
         style.featureTypeStyles().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
         style.featureTypeStyles().get(0).rules().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
         
-        getServer().providers.createStyle(configuredInstance.provider.getId(), newStyleName, style);
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            server.providers.createStyle(configuredInstance.provider.getId(), newStyleName, style);
         
-        //update the provider report
-        final ProvidersReport reports = getServer().providers.listProviders();
-        refreshUsedIds(reports);
-        final ProviderServiceReport serviceReport = reports.getProviderService(this.serviceName);
-        if(serviceReport != null){
-            final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());
-            configuredInstance = new ProviderNode(report);
+            //update the provider report
+            final ProvidersReport reports = server.providers.listProviders();
+            refreshUsedIds(reports);
+            final ProviderServiceReport serviceReport = reports.getProviderService(this.serviceName);
+            if(serviceReport != null){
+                final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());
+                configuredInstance = new ProviderNode(report);
+            }
         }
         
         layersModel = null;
@@ -93,8 +96,9 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
     
     public void saveEditedSLD(){
         final ConstellationServer server = getServer();
-        
-        server.providers.updateStyle(editedSLDNode.provider.getId(), editedSLDNode.key, editedStyle);
+        if (server != null) {
+            server.providers.updateStyle(editedSLDNode.provider.getId(), editedSLDNode.key, editedStyle);
+        }
         layersModel = null;
         
         //TODO, update service to allow renaming
@@ -131,29 +135,34 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
             configuredInstance.select();
 
             final ConstellationServer server = getServer();
-            editedStyle = server.providers.downloadStyle(provider.getId(), key);
-            editedSLDNode = this;
-                       
-            if(itemConfigPage != null){
-                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                try {
-                    context.redirect(itemConfigPage);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
+            if (server != null) {
+                editedStyle = server.providers.downloadStyle(provider.getId(), key);
+                editedSLDNode = this;
+
+                if(itemConfigPage != null){
+                    final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+                    try {
+                        context.redirect(itemConfigPage);
+                    } catch (IOException ex) {
+                        LOGGER.log(Level.WARNING, null, ex);
+                    }
                 }
             }
         }
         
         public void delete(){
-            getServer().providers.deleteStyle(provider.getId(), key);
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.providers.deleteStyle(provider.getId(), key);
             
-            //update the provider report
-            final ProvidersReport reports = getServer().providers.listProviders();            
-            refreshUsedIds(reports);
-            final ProviderServiceReport serviceReport = reports.getProviderService(AbstractStyleServiceBean.this.serviceName);
-            if(serviceReport != null){
-                final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());
-                configuredInstance = new ProviderNode(report);
+                //update the provider report
+                final ProvidersReport reports = server.providers.listProviders();            
+                refreshUsedIds(reports);
+                final ProviderServiceReport serviceReport = reports.getProviderService(AbstractStyleServiceBean.this.serviceName);
+                if(serviceReport != null){
+                    final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());
+                    configuredInstance = new ProviderNode(report);
+                }
             }
             
             layersModel = null;

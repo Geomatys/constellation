@@ -52,7 +52,6 @@ import org.mapfaces.facelet.parametereditor.ParameterModelAdaptor;
 import org.mapfaces.facelet.parametereditor.ParameterTreeModel;
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
-import org.mapfaces.utils.FacesUtils;
 
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -146,7 +145,11 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     } 
     
     private GeneralParameterDescriptor getSourceDescriptor(){
-        return getServer().providers.getSourceDescriptor(serviceName);
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            return server.providers.getSourceDescriptor(serviceName);
+        }
+        return null;
     }
         
     /**
@@ -158,26 +161,23 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         //but we don't have any event system yet to handle this, so we make the query each time
         //for know.
         //if(layersModel == null){
-            final ProvidersReport report = getServer().providers.listProviders();
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            final ProvidersReport report = server.providers.listProviders();
             refreshUsedIds(report);
             if (report != null) {
                 layersModel = buildModel(report,false);
             } else {
                 LOGGER.warning("Unable to get the provider service list.");
             }
+        }
         //}
         return layersModel;
     }
     
     protected ConstellationServer getServer(){
-        final ConstellationServer server = (ConstellationServer) FacesContext.getCurrentInstance()
+        return (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
-        
-        if(server == null){
-            throw new IllegalStateException("Distant server is null.");
-        }
-        
-        return server;
     }
     
     public synchronized TreeModel getLayerModel(){
@@ -223,18 +223,20 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         final List<String> sourceNames = new ArrayList<String>(names);
         
         //add all names from the configuration files
-        final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
-                server.providers.getServiceDescriptor(serviceName);        
-        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup)
-                serviceDesc.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
-        final ParameterValueGroup config = (ParameterValueGroup)
-                server.providers.getProviderConfiguration(provider.getId(), sourceDesc);
-        
-        if(config != null){
-            for(ParameterValueGroup layer : ProviderParameters.getLayers(config)){
-                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
-                if(!names.contains(layerName)){
-                    names.add(layerName);
+        if (server != null) {
+            final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
+                    server.providers.getServiceDescriptor(serviceName);        
+            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup)
+                    serviceDesc.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
+            final ParameterValueGroup config = (ParameterValueGroup)
+                    server.providers.getProviderConfiguration(provider.getId(), sourceDesc);
+
+            if (config != null) {
+                for (ParameterValueGroup layer : ProviderParameters.getLayers(config)) {
+                    final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
+                    if (!names.contains(layerName)) {
+                        names.add(layerName);
+                    }
                 }
             }
         }
@@ -242,11 +244,10 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         //sort them
         Collections.sort(names);
 
-        for(String name : names){
+        for (String name : names) {
             final DefaultMutableTreeNode n = buildItemNode(provider, name, sourceNames);
             root.add(n);
         }
-        
         return root;        
     }
     
@@ -288,19 +289,21 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
 
         final ConstellationServer server = getServer();
-        final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
-                server.providers.getServiceDescriptor(serviceName);
-        
-        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup)
-                serviceDesc.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
-        final ParameterValueGroup params = sourceDesc.createValue();
-        params.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(newSourceName);
-        
-        AcknowlegementType type = server.providers.createProvider(serviceName, params);
-        
-        if(type != null){
-            FacesContext.getCurrentInstance().addMessage("Error", 
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, type.getMessage(), ""));
+        if (server != null) {
+            final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
+                    server.providers.getServiceDescriptor(serviceName);
+
+            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup)
+                    serviceDesc.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
+            final ParameterValueGroup params = sourceDesc.createValue();
+            params.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(newSourceName);
+
+            AcknowlegementType type = server.providers.createProvider(serviceName, params);
+
+            if (type != null) {
+                FacesContext.getCurrentInstance().addMessage("Error", 
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, type.getMessage(), ""));
+            }
         }
         
         layersModel = null;
@@ -361,7 +364,9 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     
     public void saveConfiguration(){
         final ConstellationServer server = getServer();
-        server.providers.updateProvider(serviceName, configuredInstance.provider.getId(), configuredParams);
+        if (server!= null) {
+            server.providers.updateProvider(serviceName, configuredInstance.provider.getId(), configuredParams);
+        }
     }
 
 
@@ -379,14 +384,20 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
         
         public void delete(){
-            getServer().providers.deleteProvider(provider.getId());
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.providers.deleteProvider(provider.getId());
+            }
             layersModel = null;
             configuredInstance = null;
             configuredParams = null;
         }
 
         public void reload(){
-            getServer().providers.restartProvider(provider.getId());
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.providers.restartProvider(provider.getId());
+            }
             layersModel = null;
             configuredInstance = null;
             configuredParams = null;
@@ -399,9 +410,11 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             layersModel = null;
             configuredInstance = this;
             final ConstellationServer server = getServer();
-            configuredParams = (ParameterValueGroup)server.providers.getProviderConfiguration(provider.getId(),
+            if (server != null) {
+                configuredParams = (ParameterValueGroup)server.providers.getProviderConfiguration(provider.getId(),
                     (ParameterDescriptorGroup)((ParameterDescriptorGroup)server.providers.getServiceDescriptor(serviceName))
                     .descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
+            }
         }
         
         /**

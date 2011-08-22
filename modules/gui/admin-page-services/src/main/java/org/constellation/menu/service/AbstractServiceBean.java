@@ -143,12 +143,15 @@ public class AbstractServiceBean extends I18NBean{
      *      This list include both started and stopped instances.
      */
     public final TreeModel getInstances(){
-        final InstanceReport report = getServer().services.listInstance(getSpecificationName());
+        final ConstellationServer server = getServer();
         final List<ServiceInstance> instances = new ArrayList<ServiceInstance>();
-        for(Instance instance : report.getInstances()){
-            instances.add(new ServiceInstance(instance));
+        if (server != null) {
+            final InstanceReport report = server.services.listInstance(getSpecificationName());
+            for (Instance instance : report.getInstances()) {
+                instances.add(new ServiceInstance(instance));
+            }
+            Collections.sort(instances);
         }
-        Collections.sort(instances);
         return new ListTreeModel(instances);
     }
 
@@ -188,16 +191,17 @@ public class AbstractServiceBean extends I18NBean{
             //unvalid name
             return;
         }
-
-        final InstanceReport report = getServer().services.listInstance(getSpecificationName());
-        for(Instance instance : report.getInstances()){
-            if(newServiceName.equals(instance.getName())){
-                //an instance with this already exist
-                return;
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            final InstanceReport report = server.services.listInstance(getSpecificationName());
+            for (Instance instance : report.getInstances()) {
+                if (newServiceName.equals(instance.getName())) {
+                    //an instance with this already exist
+                    return;
+                }
             }
+            server.services.newInstance(getSpecificationName(), newServiceName);
         }
-
-        getServer().services.newInstance(getSpecificationName(), newServiceName);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -309,9 +313,10 @@ public class AbstractServiceBean extends I18NBean{
      * Save the currently edited instance.
      * Subclass should override this method to make the proper save.
      */
-    public void saveConfiguration(){
-        if(configuredInstance != null){
-            getServer().services.configureInstance(getSpecificationName(), configuredInstance.getName(), configurationObject);
+    public void saveConfiguration() {
+        final ConstellationServer server = getServer();
+        if(configuredInstance != null && server != null){
+            server.services.configureInstance(getSpecificationName(), configuredInstance.getName(), configurationObject);
             configuredInstance.restart();
         }
     }
@@ -327,7 +332,10 @@ public class AbstractServiceBean extends I18NBean{
                 try {
                     final File tmp = File.createTempFile("cstl", null);
                     final File importedfile = FileUtilities.buildFileFromStream(uploadedCapabilities.getInputStream(), tmp);
-                    getServer().services.updateCapabilities(getSpecificationName(), instanceId, importedfile, uploadedCapabilities.getFileName());
+                    final ConstellationServer server = getServer();
+                    if (server != null) {
+                        server.services.updateCapabilities(getSpecificationName(), instanceId, importedfile, uploadedCapabilities.getFileName());
+                    }
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
                 }
@@ -370,7 +378,11 @@ public class AbstractServiceBean extends I18NBean{
          * @return URL path to the running service.
          */
         public String getPath(){
-            return getServer().services.getInstanceURL(getSpecificationName(), instance.getName());
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                return server.services.getInstanceURL(getSpecificationName(), instance.getName());
+            }
+            return null;
         }
 
         public String getStatusIcon(){
@@ -386,15 +398,18 @@ public class AbstractServiceBean extends I18NBean{
          */
         public void config(){
             configuredInstance = this;
-            configurationObject = getServer().services.getInstanceconfiguration(getSpecificationName(), instance.getName());
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                configurationObject = server.services.getInstanceconfiguration(getSpecificationName(), instance.getName());
+            }
 
-            if(configurationObject instanceof LayerContext){
+            if (configurationObject instanceof LayerContext) {
                 treemodel = new LayerContextTreeModel((LayerContext)configurationObject);
-            }else{
+            } else {
                 treemodel = null;
             }
             
-            if(configPage != null){
+            if (configPage != null) {
                 final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
                 try {
                     //the session is not logged, redirect him to the authentication page
@@ -407,21 +422,33 @@ public class AbstractServiceBean extends I18NBean{
         }
 
         public void start(){
-            getServer().services.startInstance(getSpecificationName(), instance.getName());
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.services.startInstance(getSpecificationName(), instance.getName());
+            }
             refresh();
         }
         public void stop(){
-            getServer().services.stopInstance(getSpecificationName(), instance.getName());
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.services.stopInstance(getSpecificationName(), instance.getName());
+            }
             refresh();
         }
 
         public void delete(){
-            getServer().services.deleteInstance(getSpecificationName(), instance.getName());
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.services.deleteInstance(getSpecificationName(), instance.getName());
+            }
             refresh();
         }
 
         public void restart(){
-            getServer().services.restartInstance(getSpecificationName(), instance.getName());
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.services.restartInstance(getSpecificationName(), instance.getName());
+            }
             refresh();
         }
 
@@ -429,11 +456,14 @@ public class AbstractServiceBean extends I18NBean{
          * Refresh this instance.
          */
         private void refresh(){
-            final InstanceReport report = getServer().services.listInstance(getSpecificationName());
-            for(final Instance inst : report.getInstances()){
-                if(instance.getName().equals(inst.getName())){
-                    instance = inst;
-                    return;
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                final InstanceReport report = server.services.listInstance(getSpecificationName());
+                for (final Instance inst : report.getInstances()) {
+                    if (instance.getName().equals(inst.getName())) {
+                        instance = inst;
+                        return;
+                    }
                 }
             }
         }
