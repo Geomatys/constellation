@@ -147,8 +147,10 @@ public class AbstractServiceBean extends I18NBean{
         final List<ServiceInstance> instances = new ArrayList<ServiceInstance>();
         if (server != null) {
             final InstanceReport report = server.services.listInstance(getSpecificationName());
-            for (Instance instance : report.getInstances()) {
-                instances.add(new ServiceInstance(instance));
+            if (report != null) {
+                for (Instance instance : report.getInstances()) {
+                    instances.add(new ServiceInstance(instance));
+                }
             }
             Collections.sort(instances);
         }

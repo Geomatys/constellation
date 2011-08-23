@@ -123,7 +123,9 @@ public class ProviderBean extends I18NBean {
                 }
 
             });
-            map.addAll(report.getProviderServices());
+            if (report != null) {
+                map.addAll(report.getProviderServices());
+            }
 
             for(final ProviderServiceReport service : map){
                 if(service.isStyleService() != styleServices){

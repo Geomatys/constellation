@@ -100,6 +100,8 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     public final C csws;
     public final T tasks;
     
+    public final String currentUser;
+    
     public ConstellationServer(final ParameterValueGroup value) throws MalformedURLException {
         this(new URL(Parameters.value(URL_PARAMETER, value)),
              Parameters.stringValue(USER_PARAMETER, value),
@@ -109,10 +111,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     
     public ConstellationServer(final URL server, final String user, final String password) {
         super(server,new BasicAuthenticationSecurity(user, password));
-        this.services  = createServiceManager();
-        this.providers = createProviderManager();
-        this.csws      = createCswManager();
-        this.tasks     = createTaskManager();
+        this.services    = createServiceManager();
+        this.providers   = createProviderManager();
+        this.csws        = createCswManager();
+        this.tasks       = createTaskManager();
+        this.currentUser = user;
     }
     
     protected S createServiceManager(){
@@ -239,9 +242,31 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         return false;
     }
     
-    public boolean updateUser(final String userName, final String password){
+    public boolean deleteUser(final String userName){
         try {
-            final String url = getURL() + "configuration?request=updateUser&username=" + userName + "&password=" + password;
+            final String url = getURL() + "configuration?request=deleteUser&username=" + userName;
+            final Object response = sendRequest(url, null);
+            if (response instanceof AcknowlegementType) {
+                final AcknowlegementType ak = (AcknowlegementType) response;
+                if ("Success".equalsIgnoreCase(ak.getStatus())) {
+                    return true;
+                }
+            } else if (response instanceof ExceptionReport){
+                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                return false;
+            } else {
+                LOGGER.warning("The service respond uncorrectly");
+                return false;
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+        }
+        return false;
+    }
+    
+    public boolean updateUser(final String userName, final String password, final String oldLogin){
+        try {
+            final String url = getURL() + "configuration?request=updateUser&username=" + userName + "&password=" + password + "&oldLogin=" + oldLogin;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ak = (AcknowlegementType) response;

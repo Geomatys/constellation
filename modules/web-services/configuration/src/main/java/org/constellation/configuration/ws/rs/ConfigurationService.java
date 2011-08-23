@@ -201,7 +201,14 @@ public final class ConfigurationService extends WebService  {
             else if ("updateUser".equalsIgnoreCase(request)) {
                 final String userName = getParameter("userName", true);
                 final String password = getParameter("password", true);
-                final AcknowlegementType response = updateUser(userName, password);
+                final String oldLogin = getParameter("oldLogin", true);
+                final AcknowlegementType response = updateUser(userName, password, oldLogin);
+                return Response.ok(response, MediaType.TEXT_XML).build(); 
+            }
+            
+            else if ("deleteUser".equalsIgnoreCase(request)) {
+                final String userName = getParameter("userName", true);
+                final AcknowlegementType response = deleteUser(userName);
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
@@ -360,14 +367,26 @@ public final class ConfigurationService extends WebService  {
         return new AcknowlegementType("Success", path);
     }
 
-    private AcknowlegementType updateUser(final String userName, final String password) {
+    private AcknowlegementType updateUser(final String userName, final String password, final String oldLogin) {
         try {
             final AuthenticationReader authReader = getAuthReader();
-            authReader.writeUser(userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"));
+            authReader.writeUser(userName, password, "Default Constellation Administrator", Arrays.asList("cstl-admin"), oldLogin);
             authReader.destroy();
             return new AcknowlegementType("Success", "The user has been changed");
         } catch (AuthenticationException ex) {
             LOGGER.log(Level.WARNING, "Error while updating user", ex);
+        }
+        return new AcknowlegementType("Failure", "An error occurs");
+    }
+    
+    private AcknowlegementType deleteUser(final String userName) {
+        try {
+            final AuthenticationReader authReader = getAuthReader();
+            authReader.deleteUser(userName);
+            authReader.destroy();
+            return new AcknowlegementType("Success", "The user has been deleted");
+        } catch (AuthenticationException ex) {
+            LOGGER.log(Level.WARNING, "Error while deleting user", ex);
         }
         return new AcknowlegementType("Failure", "An error occurs");
     }

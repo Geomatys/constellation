@@ -17,17 +17,24 @@
 
 package org.constellation.menu.system;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import org.constellation.admin.service.ConstellationServer;
+import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.i18n.I18NBean;
 
 /**
  * Bean for general constellation configuration.
  * 
  * @author Johann Sorel (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  */
-public class CstlBean extends I18NBean{
+public class CstlBean extends I18NBean {
 
+    private static final Logger LOGGER = Logging.getLogger(CstlBean.class);
     /**
      * When user is log in, a ServiceAdministrator object is added in the session map.
      */
@@ -96,17 +103,35 @@ public class CstlBean extends I18NBean{
             //reload services
             final ConstellationServer server = getServer();
             if (server != null) {
-                server.setConfigurationPath(configurationDirectory);
-                server.services.restartAll();
-                server.providers.restartAllLayerProviders();
-                server.providers.restartAllStyleProviders();
+                final String oldConfigDirectory = server.getConfigurationPath();
+                if (!oldConfigDirectory.equals(configurationDirectory)) {
+                    LOGGER.info("updating configuration Path");
+                    server.setConfigurationPath(configurationDirectory);
+                    server.services.restartAll();
+                    server.providers.restartAllLayerProviders();
+                    server.providers.restartAllStyleProviders();
+                }
             }
         }
         // save the new login / password
         if (userName != null && !userName.isEmpty() && password != null && !password.isEmpty()) {
             final ConstellationServer server = getServer();
             if (server != null) {
-                server.updateUser(userName, password);
+                LOGGER.info("updating User");
+                server.updateUser(userName, password, server.currentUser);
+                /*
+                 * we must disconnect the user
+                 */
+                FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove(SERVICE_ADMIN_KEY);
+                //redirect
+                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+                final String webapp = context.getRequestContextPath();
+                try {
+                    //the session is not logged, redirect him to the authentication page
+                    context.redirect(webapp + "/authentication.jsf");
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                }
             }
         }
     }
