@@ -354,7 +354,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @param object The object to transform in form.
      * @return an MDWeb {@link Form} representing the metadata object.
      */
-    protected Form getFormFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
+    public Form getFormFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
 
         if (object != null) {
             //we try to find a title for the from

@@ -359,7 +359,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @return a GeotoolKit/constellation object representing the metadata.
      */
-    protected Object getObjectFromForm(final String identifier, final Form form, final int mode) {
+    public Object getObjectFromForm(final String identifier, final Form form, final int mode) {
 
         if (form != null && form.getRoot() != null && form.getRoot().getType() != null) {
             final Value topValue = form.getRoot();
