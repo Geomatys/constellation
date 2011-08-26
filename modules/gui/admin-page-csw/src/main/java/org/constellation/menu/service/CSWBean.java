@@ -318,7 +318,8 @@ public class CSWBean extends AbstractServiceBean {
             try {
                 if (config.getBdd() != null) {
                     final DataSource ds    = config.getBdd().getDataSource();
-                    DatabaseCreator.createPGMetadataDatabase(ds);
+                    final DatabaseCreator dbCreator = new DatabaseCreator(ds, false);
+                    dbCreator.createPGMetadataDatabase();
                 }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while creating the database", ex);
