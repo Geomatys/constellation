@@ -190,7 +190,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                  */
                 if (instanceDirectory.isDirectory() && !instanceDirectory.getName().startsWith(".")) {
                     final W newWorker = createWorker(instanceDirectory);
-                    workersMap.put(instanceDirectory.getName(), newWorker);
+                    if (newWorker != null) {
+                        workersMap.put(instanceDirectory.getName(), newWorker);
+                    }
                 }
             }
         } else {
@@ -204,7 +206,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             final File instanceDirectory = new File(serviceDirectory, identifier);
             if (instanceDirectory.isDirectory()) {
                 final W newWorker = createWorker(instanceDirectory);
-                workersMap.put(instanceDirectory.getName(), newWorker);
+                if (newWorker != null) {
+                    workersMap.put(instanceDirectory.getName(), newWorker);
+                }
                 return newWorker;
             } else {
                 LOGGER.log(Level.SEVERE, "The instance directory: {0} does not exist or is not a directory.", instanceDirectory.getPath());

@@ -217,6 +217,11 @@ public final class ConfigurationService extends WebService  {
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
+            else if ("access".equalsIgnoreCase(request)) {
+                final AcknowlegementType response = new AcknowlegementType("Success", "You have access to the configuration service");
+                return Response.ok(response, MediaType.TEXT_XML).build(); 
+            }
+            
             /* specific operations */
             
             else {
