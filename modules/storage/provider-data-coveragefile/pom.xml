@@ -64,6 +64,10 @@
         <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-coverageio-geotiff</artifactId>
     </dependency>
+    <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-coverageio-bil</artifactId>
+    </dependency>
 
   </dependencies>
 

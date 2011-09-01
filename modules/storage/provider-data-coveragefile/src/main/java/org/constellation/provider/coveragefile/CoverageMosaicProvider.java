@@ -62,7 +62,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         @Override
         public GridCoverageReader get(Object key) {
             if(key instanceof Name && ((Name)key).isGlobal()){
-                String nmsp = value(NAMESPACE_DESCRIPTOR, getSource());
+                String nmsp = value(NAMESPACE_DESCRIPTOR, getSourceConfiguration(getSource()));
                 if (nmsp == null) {
                     nmsp = DEFAULT_NAMESPACE;
                 } else if ("no namespace".equals(nmsp)) {
