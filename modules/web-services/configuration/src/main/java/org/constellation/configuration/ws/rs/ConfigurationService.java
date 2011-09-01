@@ -76,7 +76,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Mdweb metamodel auth dependencies
 import org.mdweb.model.auth.AuthenticationException;
-import org.mdweb.io.auth.sql.DataSourceAuthenticationReader;
+import org.mdweb.io.auth.sql.v24.DataSourceAuthenticationReader;
 import org.mdweb.model.auth.UserAuthnInfo;
 
 /**

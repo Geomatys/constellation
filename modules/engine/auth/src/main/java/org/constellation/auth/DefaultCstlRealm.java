@@ -43,7 +43,7 @@ import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.logging.Logging;
 import org.mdweb.io.auth.AuthenticationReader;
-import org.mdweb.io.auth.sql.DataSourceAuthenticationReader;
+import org.mdweb.io.auth.sql.v24.DataSourceAuthenticationReader;
 import org.mdweb.model.auth.UserAuthnInfo;
 
 /**
