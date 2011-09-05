@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -276,7 +278,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
                 @Override
                 public TermValue call() {
-                    return new TermValue(term, getValues(metadata, queryableSet.get(term)));
+                    return new TermValue(term, getValuesList(metadata, queryableSet.get(term)));
                 }
             });
         }
@@ -284,10 +286,12 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         for (int i = 0; i < queryableSet.size(); i++) {
             try {
                 final TermValue values = formatStringValue(cs.take().get());
-                doc.add(new Field(values.term,           values.value, Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
-                    anyText.append(values.value).append(" ");
+                for (String value : values.value) {
+                    doc.add(new Field(values.term,           value, Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new Field(values.term + "_sort", value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                    if (value != null && !value.equals(NULL_VALUE) && anyText.indexOf(value) == -1) {
+                        anyText.append(value).append(" ");
+                    }
                 }
 
             } catch (InterruptedException ex) {
@@ -305,12 +309,15 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     private TermValue formatStringValue(final TermValue values) {
          if ("date".equals(values.term)) {
-             String value = values.value;
-             if (value.endsWith("z") || value.endsWith("Z")) {
-                 value = value.substring(0, value.length() - 1);
+             final List<String> newValues = new ArrayList<String>();
+             for (String value : values.value) {
+                 if (value.endsWith("z") || value.endsWith("Z")) {
+                     value = value.substring(0, value.length() - 1);
+                 }
+                value = value.replace("-", "");
+                newValues.add(value);
              }
-             value = value.replace("-", "");
-             values.value = value;
+             values.value = newValues;
          }
          return values;
     }
@@ -328,6 +335,19 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     @Override
     protected String getValues(final Object metadata, final List<String> paths) {
+        final List<String> values =  extractValues(metadata, paths);
+        final StringBuilder sb = new StringBuilder();
+        for (String value : values) {
+            sb.append(value).append(',');
+        }
+        if (!sb.toString().isEmpty()) {
+            // we remove the last ','
+            sb.delete(sb.length() - 1, sb.length()); 
+        }
+        return sb.toString();
+    }
+    
+    protected List<String> getValuesList(final Object metadata, final List<String> paths) {
         return extractValues(metadata, paths);
     }
 
@@ -340,8 +360,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param paths
      * @return
      */
-    public static String extractValues(final Object metadata, final List<String> paths) {
-        final StringBuilder response  = new StringBuilder("");
+    public static List<String> extractValues(final Object metadata, final List<String> paths) {
+        final List<String> response  = new ArrayList<String>();
         
         if (paths != null) {
             for (String fullPathID: paths) {
@@ -373,24 +393,24 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 }
                 
                 if (conditionalAttribute == null) {
-                    final Object brutValue = ReflectionUtilities.getValuesFromPath(pathID, metadata);
-                    final String value     = getStringValue(brutValue);
-                    if (value != null && !value.isEmpty() && !value.equals(NULL_VALUE))
-                        response.append(value).append(',');
+                    final Object brutValue   = ReflectionUtilities.getValuesFromPath(pathID, metadata);
+                    final List<String> value = getStringValue(brutValue);
+                    if (value != null && !value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE)))
+                        response.addAll(value);
                 } else {
-                    final Object brutValue = ReflectionUtilities.getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata);
-                    final String value     = getStringValue(brutValue);
-                    response.append(value).append(',');
+                    final Object brutValue   = ReflectionUtilities.getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata);
+                    final List<String> value = getStringValue(brutValue);
+                    response.addAll(value);
                 }
             }
         }
-        if (response.toString().isEmpty()) {
-            response.append(NULL_VALUE);
+        if (response.isEmpty()) {
+            response.add(NULL_VALUE);
         } else {
             // we remove the last ','
-            response.delete(response.length() - 1, response.length()); 
+            //response.delete(response.length() - 1, response.length()); 
         }
-        return response.toString();
+        return response;
     }
 
 
@@ -400,63 +420,59 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param obj
      * @return
      */
-    private static String getStringValue(final Object obj) {
-        String result = "";
+    private static List<String> getStringValue(final Object obj) {
+        final List<String> result = new ArrayList<String>();
         if (obj == null) {
-            return NULL_VALUE;
+            return Arrays.asList(NULL_VALUE);
         } else if (obj instanceof String) {
-            result = (String) obj;
+            result.add((String) obj);
         } else if (obj instanceof InternationalString) {
             final InternationalString is = (InternationalString) obj;
-            result = is.toString();
+            result.add(is.toString());
         } else if (obj instanceof LocalName) {
             final LocalName ln = (LocalName) obj;
-            result = ln.toString();
+            result.add(ln.toString());
         } else if (obj instanceof Double || obj instanceof Long) {
-            result = obj.toString();
+            result.add(obj.toString());
         } else if (obj instanceof java.util.Locale) {
             try {
-                result = ((java.util.Locale)obj).getISO3Language();
+                result.add(((java.util.Locale)obj).getISO3Language());
             } catch (MissingResourceException ex) {
-                result = ((java.util.Locale)obj).getLanguage();
+                result.add(((java.util.Locale)obj).getLanguage());
             }
         } else if (obj instanceof Collection) {
-            final StringBuilder sb = new StringBuilder();
             for (Object o : (Collection) obj) {
-                sb.append(getStringValue(o)).append(',');
+                result.addAll(getStringValue(o));
             }
-            result = sb.toString();
-            if (result.indexOf(',') != -1)
-            result = result.substring(0, result.length() - 1);
-            if (result.length() == 0)
-                result = NULL_VALUE;
+            if (result.isEmpty()) {
+                return Arrays.asList(NULL_VALUE);
+            }
         } else if (obj instanceof org.opengis.util.CodeList) {
-            result = ((org.opengis.util.CodeList)obj).name();
+            result.add(((org.opengis.util.CodeList)obj).name());
         
         } else if (obj instanceof Position) {
             final Position pos = (Position) obj;
             final Date d = pos.getDate();
             if (d != null) {
                 synchronized(LUCENE_DATE_FORMAT) {
-                    result = LUCENE_DATE_FORMAT.format(d);
+                    result.add(LUCENE_DATE_FORMAT.format(d));
                 }
             } else {
-               result = NULL_VALUE;
+               return Arrays.asList(NULL_VALUE);
             }
 
         } else if (obj instanceof Instant) {
             final Instant inst = (Instant)obj;
             if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
                 synchronized(LUCENE_DATE_FORMAT) {
-                    result = LUCENE_DATE_FORMAT.format(inst.getPosition().getDate());
+                    result.add( LUCENE_DATE_FORMAT.format(inst.getPosition().getDate()));
                 }
             } else {
-                result = NULL_VALUE;
+                return Arrays.asList(NULL_VALUE);
             }
-            
         } else if (obj instanceof Date) {
             synchronized (LUCENE_DATE_FORMAT){
-                result = LUCENE_DATE_FORMAT.format((Date)obj);
+                result.add(LUCENE_DATE_FORMAT.format((Date)obj));
             }
             
         } else {
@@ -475,9 +491,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     private static class TermValue {
         public String term;
 
-        public String value;
+        public List<String> value;
 
-        public TermValue(String term, String value) {
+        public TermValue(String term, List<String> value) {
             this.term  = term;
             this.value = value;
         }

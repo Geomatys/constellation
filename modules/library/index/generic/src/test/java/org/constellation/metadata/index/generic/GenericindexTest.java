@@ -710,8 +710,8 @@ public class GenericindexTest {
         citation.setDates(Arrays.asList(date));
         ident.setCitation(citation);
         meta.setIdentificationInfo(Arrays.asList(ident));
-        String result = GenericIndexer.extractValues(meta, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date"));
-        assertEquals("19700101", result);
+        List<String> result = GenericIndexer.extractValues(meta, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date"));
+        assertEquals(Arrays.asList("19700101"), result);
         
         DefaultMetadata meta2 = new DefaultMetadata();
         DefaultDataIdentification ident2 = new DefaultDataIdentification();
@@ -722,7 +722,7 @@ public class GenericindexTest {
         ident2.setCitation(citation2);
         meta2.setIdentificationInfo(Arrays.asList(ident2));
         result = GenericIndexer.extractValues(meta2, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date"));
-        assertEquals("null", result);
+        assertEquals(Arrays.asList("null"), result);
         
         Unmarshaller unmarshaller    = CSWMarshallerPool.getInstance().acquireUnmarshaller();
         DefaultMetadata meta3 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
@@ -735,7 +735,7 @@ public class GenericindexTest {
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:position");
         result = GenericIndexer.extractValues(meta3, paths);
         
-        assertEquals("19900605", result);
+        assertEquals(Arrays.asList("19900605"), result);
         
         
         paths = new ArrayList<String>();
@@ -745,7 +745,7 @@ public class GenericindexTest {
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:position");
         result = GenericIndexer.extractValues(meta3, paths);
         
-        assertEquals("19900702", result);
+        assertEquals(Arrays.asList("19900702"), result);
         
     }
     
@@ -765,8 +765,8 @@ public class GenericindexTest {
         ident4.setExtents(Arrays.asList(ext));
                 
         meta4.setIdentificationInfo(Arrays.asList(ident4));
-        String result = GenericIndexer.extractValues(meta4, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent#id=[0-9]+-all:beginPosition"));
-        assertEquals("20081101", result);
+        List<String> result = GenericIndexer.extractValues(meta4, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent#id=[0-9]+-all:beginPosition"));
+        assertEquals(Arrays.asList("20081101"), result);
     }
 
     public static List<Object> fillTestData() throws JAXBException {
