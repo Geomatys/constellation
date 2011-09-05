@@ -2,14 +2,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
         xmlns:h="http://java.sun.com/jsf/html"
-        xmlns:f="http://java.sun.com/jsf/core"
-        xmlns:c="http://java.sun.com/jstl/core">
+        xmlns:f="http://java.sun.com/jsf/core">
 
-    <f:view locale="#{localeBean.locale}">
+    <f:view contentType="text/html; charset=UTF-8" locale="#{localeBean.locale}">
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <c:set var="contextPath" value="#{facesContext.externalContext.requestContextPath}" />
         <title>Constellation</title>
         <link rel="stylesheet" type="text/css" href="resources/css/login.css"/>
         <link rel="stylesheet" type="text/css" href="resources/css/base.css"/>
@@ -17,7 +15,7 @@
 
     <body>
         <center>
-            <h:graphicImage url="resources/img/constellation400.png"/>
+            <img src="#{facesContext.externalContext.requestContextPath}/resources/img/constellation400.png"/>
             <br/><br/><br/><br/>
 
             <div class="boxbody">
@@ -28,29 +26,23 @@
                         <!--translation-->
                         <div style="margin: 5px 10px;text-align:right;">
                             <h:commandLink action="#{localeBean.toEnglish}">
-                                <img alt="en" style="border:0px" src="#{contextPath}/resources/img/en.png"/>
+                                <img alt="en" style="border:0px" src="#{facesContext.externalContext.requestContextPath}/resources/img/en.png"/>
                             </h:commandLink>
                             <h:commandLink action="#{localeBean.toFrench}">
-                                <img alt="fr" style="border:0px" src="#{contextPath}/resources/img/fr.png"/>
+                                <img alt="fr" style="border:0px" src="#{facesContext.externalContext.requestContextPath}/resources/img/fr.png"/>
                             </h:commandLink>
                         </div>
-
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td style="text-align: right"><h:outputText value="#{navigationBean.i18n['user']} : " /></td>
-                                    <td><h:inputText value="#{navigationBean.login}"/></td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: right"><h:outputText value="#{navigationBean.i18n['password']} : " /></td>
-                                    <td><h:inputSecret value="#{navigationBean.password}"/></td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: right"><h:outputText value="#{navigationBean.i18n['serverurl']} : " /></td>
-                                    <td><h:inputText value="#{navigationBean.serverUrl}"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <h:panelGrid columns="2" columnClasses="col1, col2">
+                            <h:outputText value="#{navigationBean.i18n['user']} : " />
+                            <h:inputText value="#{navigationBean.login}"/>
+                            
+                            <h:outputText value="#{navigationBean.i18n['password']} : " />
+                            <h:inputSecret value="#{navigationBean.password}"/>
+                            
+                            <h:outputText value="#{navigationBean.i18n['serverurl']} : " />
+                            <h:inputText value="#{navigationBean.serverUrl}"/>
+                            
+                        </h:panelGrid>
                         <br/>
                         <h:commandButton styleClass="button" action="#{navigationBean.authentify}" value="#{navigationBean.i18n['connect']}" />
                         <br/>
@@ -58,6 +50,10 @@
                     </center>
                 </h:panelGroup>
                 </h:form>
+                
+                <style type="text/css">
+                    .col1{text-align: right;}
+                </style>
 
             </div>
             <br/>
