@@ -413,7 +413,7 @@
               </xsl:when>
               <xsl:otherwise>
                 <xsl:variable name="content-type" 
-                  select="$response//headers/header[@name='content-type']"/><!-- modified by glegal to accept lower-case-->
+                  select="$response//headers/header[@name='Content-Type']"/>
                 <xsl:if test="matches($content-type,'.+/xml') != true()">
                     <ctl:message>FAILURE: Content-Type response header does not indicate an XML media type (<xsl:value-of select="$content-type"/>)</ctl:message>
                     <ctl:fail/>
@@ -536,7 +536,7 @@
 					<parsers:HTTPParser />
 				</ctl:request>
 			</xsl:variable>
-            <xsl:variable name="content-type" select="$response//headers/header[@name='content-type']"/><!-- modified by glegal to accept lower-case-->
+            <xsl:variable name="content-type" select="$response//headers/header[@name='Content-Type']"/>
 			<xsl:if test="not(starts-with($content-type, $format))">
 				<ctl:message>FAILURE: Unexpected content type for response entity (Request: <xsl:value-of select="$format"/>, Response: <xsl:value-of select="$content-type"/>).</ctl:message>
 				<ctl:fail/>

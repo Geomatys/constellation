@@ -388,7 +388,7 @@
                             <ctl:fail />
                         </xsl:when>
                         <xsl:otherwise>
-        					<xsl:variable name="content-type" select="$request1/response/headers/header[@name='content-type']"/><!-- modified by glegal to accept lower-case-->
+        					<xsl:variable name="content-type" select="$request1/response/headers/header[@name='Content-Type']"/>
                             <xsl:variable name="isValidMIMEType">
                                 <ctl:call-function name="owsFunctions:isValidMIMETypeFormat">
                                     <ctl:with-param name="responseFormat" select="$content-type" />
@@ -1356,7 +1356,7 @@
 			</xsl:variable>
 <!--<ctl:message select="concat('*******', $response)"/>-->
 			
-            <xsl:variable name="content-type" select="$response//headers/header[@name='content-type']"/><!-- modified by glegal to accept lower-case-->
+            <xsl:variable name="content-type" select="$response//headers/header[@name='Content-Type']"/>
 			<xsl:choose>			
 				<xsl:when test="not($response/*)">
 					<ctl:message select="'FAILURE: HTTP Header failed validation.'"/>
