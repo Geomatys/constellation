@@ -30,20 +30,20 @@
             </mf:DataTableColumn>
 
             <mf:DataTableColumn width="24px">
-                 <a4j:commandLink action="#{node.config}">
-                    <h:graphicImage value="provider.edit.png.mfRes" style="border:none;"/>
-                </a4j:commandLink>
+                 <h:commandLink action="#{node.config}">
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.edit.png.mfRes" style="border:none;"/>
+                </h:commandLink>
             </mf:DataTableColumn>
             
             <mf:DataTableColumn width="24px">
                 <a4j:commandLink action="#{node.reload}" reRender="storePreview">
-                    <h:graphicImage value="provider.reload.png.mfRes" style="border:none;"/>
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
                 </a4j:commandLink>
             </mf:DataTableColumn>
 
             <mf:DataTableColumn width="24px">
                 <a4j:commandLink action="#{node.delete}" reRender="storePreview">
-                    <h:graphicImage value="provider.remove.png.mfRes" style="border:none;"/>
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
                 </a4j:commandLink>
             </mf:DataTableColumn>
 
@@ -55,17 +55,17 @@
                     rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
 
             <mf:DataTableColumn width="24px">
-                <h:graphicImage value="#{node.statusIcon}" style="border:none;"/>
+                <img src="#{facesContext.externalContext.requestContextPath}/#{node.statusIcon}" style="border:none;"/>
             </mf:DataTableColumn>
             
             <mf:DataTableColumn>
-                    <h:outputText value="#{node.userObject}"/>
+                <h:outputText value="#{node.userObject}"/>
             </mf:DataTableColumn>
 
             <mf:DataTableColumn width="24px">
-                <a4j:commandLink action="#{node.config}">
-                    <h:graphicImage value="provider.edit.png.mfRes" style="border:none;"/>
-                </a4j:commandLink>
+                <h:commandLink action="#{node.config}">
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.edit.png.mfRes" style="border:none;"/>
+                </h:commandLink>
             </mf:DataTableColumn>
             
             <!--
@@ -74,7 +74,7 @@
                     <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractProviderConfigBean$TypeNode') and node.exist}" fallthrought="false">
                         <a4j:commandLink action="#{node.show}" 
                                          oncomplete="window.open('#{contextPath}/provider/mapview.jsf','maptab',config='height=600, width=800, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=yes');">
-                            <h:graphicImage value="provider.view.png.mfRes" style="border:none;"/>
+                            <img src="#{facesContext.externalContext.requestContextPath}/provider.view.png.mfRes" style="border:none;"/>
                         </a4j:commandLink>
                     </mf:case>
                 </mf:switch>
@@ -85,7 +85,7 @@
                 <mf:switch>
                     <mf:case condition="#{mf:isInstance(node,'org.constellation.menu.provider.AbstractProviderConfigBean$TypeNode') and not node.exist}" fallthrought="false">
                         <a4j:commandLink action="#{node.delete}" reRender="layerPreview">
-                            <h:graphicImage value="provider.remove.png.mfRes" style="border:none;"/>
+                            <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
                         </a4j:commandLink>
                     </mf:case>
                 </mf:switch>

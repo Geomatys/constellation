@@ -63,7 +63,7 @@
                             <a4j:commandLink action="#{providerBean.show}" 
                                              oncomplete="window.open('#{contextPath}/provider/mapview.jsf','maptab',config='height=600, width=800, toolbar=no, menubar=no, scrollbars=yes, resizable=yes, location=no, directories=no, status=yes');">
                                 <f:param name="currentNodeId" value="#{layerPreview.nodeIndex}" />
-                                <h:graphicImage value="provider.view.png.mfRes" style="border:none;"/>
+                                <img src="#{facesContext.externalContext.requestContextPath}/provider.view.png.mfRes" style="border:none;"/>
                             </a4j:commandLink>
                             
                         </mf:case>

@@ -9,8 +9,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>Constellation</title>
-        <link rel="stylesheet" type="text/css" href="resources/css/login.css"/>
-        <link rel="stylesheet" type="text/css" href="resources/css/base.css"/>
+        <link rel="stylesheet" type="text/css" href="#{facesContext.externalContext.requestContextPath}/resources/css/base.css"/>
     </head>
 
     <body>
@@ -32,7 +31,7 @@
                                 <img alt="fr" style="border:0px" src="#{facesContext.externalContext.requestContextPath}/resources/img/fr.png"/>
                             </h:commandLink>
                         </div>
-                        <h:panelGrid columns="2" columnClasses="col1, col2">
+                        <h:panelGrid columns="2" columnClasses="logincol1, logincol2">
                             <h:outputText value="#{navigationBean.i18n['user']} : " />
                             <h:inputText value="#{navigationBean.login}"/>
                             
@@ -52,7 +51,7 @@
                 </h:form>
                 
                 <style type="text/css">
-                    .col1{text-align: right;}
+                    .logincol1{text-align: right;}
                 </style>
 
             </div>

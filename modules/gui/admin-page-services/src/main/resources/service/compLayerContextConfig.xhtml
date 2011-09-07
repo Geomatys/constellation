@@ -7,27 +7,29 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
-    <center><a href="#{bean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
+    <center>
+        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
+    </center>
     <br/>
     <br/>
 
     
     <b>#{bean.i18n['instance']}</b><br/>
     <div class="rounded">
-        <h:graphicImage value="#{bean.configuredInstance.statusIcon}" style="border:none;"/>
+        <img src="#{facesContext.externalContext.requestContextPath}/#{bean.configuredInstance.statusIcon}" style="border:none;"/>
         <a href="#{bean.configuredInstance.path}" target="blank">#{bean.configuredInstance.name}</a>
         
         &#160;
         <h:commandLink action="#{bean.configuredInstance.restart}">
-            <h:graphicImage value="provider.reload.png.mfRes" style="border:none;"/>
+            <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
         </h:commandLink>
         &#160;
         <h:commandLink action="#{bean.configuredInstance.stop}">
-            <h:graphicImage value="service.stop.png.mfRes" style="border:none;"/>
+            <img src="#{facesContext.externalContext.requestContextPath}/service.stop.png.mfRes" style="border:none;"/>
         </h:commandLink>
         &#160;
         <h:commandLink action="#{bean.configuredInstance.start}">
-            <h:graphicImage value="service.start.png.mfRes" style="border:none;"/>
+            <img src="#{facesContext.externalContext.requestContextPath}/service.start.png.mfRes" style="border:none;"/>
         </h:commandLink>
         <br/>
     </div>
@@ -38,7 +40,7 @@
         <f:selectItems value="#{bean.potentialSources}" />
     </h:selectOneListbox>
     <h:commandLink action="#{bean.addSource}" class="logout">
-        <h:graphicImage value="service.add24_bleu.png.mfRes" style="border:none;"/>
+        <img src="#{facesContext.externalContext.requestContextPath}/service.add24_bleu.png.mfRes" style="border:none;"/>
         #{bean.i18n['add']}
     </h:commandLink>
     <br/>
@@ -62,7 +64,7 @@
             <h:commandLink action="#{bean.removeSource}" rendered="#{mf:isInstance(node.userObject,'Source')}" styleClass="logout">
                 <f:param name="NodeId" value="#{sourceLayers.nodeIndex}" />
                 &#160;
-                <h:graphicImage value="service.cancel.png.mfRes" style="border:none;vertical-align:middle;" />
+                <img src="#{facesContext.externalContext.requestContextPath}/service.cancel.png.mfRes" style="border:none;vertical-align:middle;" />
                 #{bean.i18n['remove']}
                 &#160;
             </h:commandLink>
@@ -73,7 +75,7 @@
         <mf:DataTableColumn width="40">
             <f:facet name="header">
                 <h:panelGrid columns="1">
-                    <h:graphicImage value="service.valid_on.png.mfRes" style="border:none;"/>
+                    <img src="#{facesContext.externalContext.requestContextPath}/service.valid_on.png.mfRes" style="border:none;"/>
                     <h:outputText value="#{bean.i18n['include']}" />
                 </h:panelGrid>
             </f:facet>
@@ -89,7 +91,7 @@
         <mf:DataTableColumn width="40">
             <f:facet name="header">
                 <h:panelGrid columns="1">
-                    <h:graphicImage value="service.unvalid_on.png.mfRes" style="border:none;"/>
+                    <img src="#{facesContext.externalContext.requestContextPath}/service.unvalid_on.png.mfRes" style="border:none;"/>
                     <h:outputText value="#{bean.i18n['exclude']}" />
                 </h:panelGrid>
             </f:facet>

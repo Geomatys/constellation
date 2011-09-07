@@ -11,7 +11,7 @@
                 template="/pages/base.xhtml">
 
     <ui:define name="content">
-        <h:graphicImage url="service.sos100.png.mfRes"/>
+        <img src="#{facesContext.externalContext.requestContextPath}/service.sos100.png.mfRes"/>
         <br/>
         <br/>
         <cstl:servicepreview bean="#{sosBean}" />

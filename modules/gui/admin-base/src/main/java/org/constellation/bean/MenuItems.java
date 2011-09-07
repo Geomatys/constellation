@@ -23,14 +23,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.context.FacesContext;
 import javax.imageio.spi.ServiceRegistry;
-import javax.servlet.ServletContext;
 import org.apache.commons.io.IOUtils;
+import org.constellation.util.ReflectionUtilities;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -38,40 +42,53 @@ import org.geotoolkit.util.collection.UnmodifiableArrayList;
  */
 public final class MenuItems {
 
+    private static final Logger LOGGER = Logging.getLogger(ReflectionUtilities.class);
+    
     private static final List<MenuItem> PAGES;
 
     static {
 
         //get the root path of the application
-        final Object obj = FacesContext.getCurrentInstance().getExternalContext().getContext();
-        final ServletContext ctx = (ServletContext) obj;
-        final String webapp = ctx.getRealPath("/");
-        final File webappFolder = new File(webapp);
+        final Object ctx = FacesContext.getCurrentInstance().getExternalContext().getContext();
+        
+        /**
+         * the method getRealPath is available in PortletContext and ServletContext
+         * in order to avoid a class cast exception we use reflection to get the method
+         */
+        final Method m = ReflectionUtilities.getMethod("getRealPath", ctx.getClass(), String.class);
+        if (m != null) {
+            final String webapp = (String) ReflectionUtilities.invokeMethod(m, ctx, "/");
+            final File webappFolder = new File(webapp);
 
 
-        final Iterator<MenuItem> ite = ServiceRegistry.lookupProviders(MenuItem.class);
-        final List<MenuItem> lst = new ArrayList<MenuItem>();
-        while(ite.hasNext()){
-            final MenuItem page = ite.next();
-            lst.add(page);
+            final Iterator<MenuItem> ite = ServiceRegistry.lookupProviders(MenuItem.class);
+            final List<MenuItem> lst = new ArrayList<MenuItem>();
+            while(ite.hasNext()){
+                final MenuItem page = ite.next();
+                lst.add(page);
 
-            // copy each file in the web app folder preserving the path
-            for(String path : page.getPages()){
-                final String[] parts = path.split("/");
-                File parent = webappFolder;
-                for(int i=0;i<parts.length-1;i++){
-                    parent = new File(parent,parts[i]);
-                    //ensure it is removed when application stops
-                    parent.deleteOnExit();
-                    parent.mkdirs();
+                // copy each file in the web app folder preserving the path
+                for(String path : page.getPages()){
+                    final String[] parts = path.split("/");
+                    File parent = webappFolder;
+                    for(int i=0;i<parts.length-1;i++){
+                        parent = new File(parent,parts[i]);
+                        //ensure it is removed when application stops
+                        parent.deleteOnExit();
+                        parent.mkdirs();
+                    }
+
+                    final File target = new File(parent,parts[parts.length-1]);
+                    LOGGER.info("new File target:" + target.getPath());
+                    copy(MenuItems.class.getResourceAsStream(path), target);
                 }
-
-                final File target = new File(parent,parts[parts.length-1]);
-                copy(MenuItems.class.getResourceAsStream(path), target);
             }
-        }
 
-        PAGES = UnmodifiableArrayList.wrap(lst.toArray(new MenuItem[lst.size()]));
+            PAGES = UnmodifiableArrayList.wrap(lst.toArray(new MenuItem[lst.size()]));
+        } else {
+            PAGES = new ArrayList<MenuItem>();
+            LOGGER.log(Level.WARNING, "There is no method getRealPath on: {0}", ctx.getClass().getName());
+        }
     }
 
     private MenuItems() {}

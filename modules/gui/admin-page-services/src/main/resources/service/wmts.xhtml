@@ -12,7 +12,7 @@
 
     <ui:define name="content">
 
-        <h:graphicImage url="service.wmts100.png.mfRes"/>
+        <img src="#{facesContext.externalContext.requestContextPath}/service.wmts100.png.mfRes"/>
         <br/>
         <br/>    
         <cstl:servicepreview bean="#{wmtsBean}" />

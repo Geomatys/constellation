@@ -17,15 +17,11 @@
 
 package org.constellation.menu.tool;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -33,7 +29,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.constellation.admin.service.ConstellationServer;
-import org.constellation.bean.MenuBean;
 import org.constellation.configuration.StringTreeNode;
 
 import org.geotoolkit.feature.DefaultName;
@@ -83,12 +78,18 @@ public class TaskManagerBean extends I18NBean{
     public TaskManagerBean(){
         addBundle("tasks.tasks");       
         
-        mainPage = MenuBean.toApplicationPath("/tasks/quartzmanager.xhtml");
-        configPage = MenuBean.toApplicationPath("/tasks/taskConfig.xhtml");
+        mainPage = "/tasks/quartzmanager.xhtml";
+        configPage = "/tasks/taskConfig.xhtml";
     }
 
     public String getMainPage() {
         return mainPage;
+    }
+    
+    public void goMainPage(){
+        if (mainPage != null) {
+            FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
+        }
     }
 
     protected ConstellationServer getServer(){
@@ -197,13 +198,8 @@ public class TaskManagerBean extends I18NBean{
         id = null;
         parameters = null;
         taskstep = 15;
-        if(configPage != null){
-            final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-            try {
-                context.redirect(configPage);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "Redirection to "+configPage+" failed.", ex);
-            }
+        if (configPage != null) { 
+            FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
         }
     }
     
@@ -248,12 +244,7 @@ public class TaskManagerBean extends I18NBean{
             }
             
             if (configPage != null) {
-                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                try {
-                    context.redirect(configPage);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
-                }
+                FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
             }
         }
         

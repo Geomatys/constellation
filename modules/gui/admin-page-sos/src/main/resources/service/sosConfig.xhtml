@@ -10,25 +10,27 @@
 
     <ui:define name="content">
 
-        <center><a href="#{sosBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
+        <center>
+            <h:commandLink action="#{sosBean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
+        </center>
         <br/>
         <br/>
         <b>#{sosBean.i18n['instance']}</b><br/>
         <div class="rounded">
-           <h:graphicImage value="#{sosBean.configuredInstance.statusIcon}" style="border:none;"/>
+           <img src="#{facesContext.externalContext.requestContextPath}/#{sosBean.configuredInstance.statusIcon}" style="border:none;"/>
            <a href="#{sosBean.configuredInstance.path}" target="blank">#{cswBean.configuredInstance.name}</a>
         
            &#160;
            <h:commandLink action="#{sosBean.configuredInstance.restart}">
-               <h:graphicImage value="provider.reload.png.mfRes" style="border:none;"/>
+               <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
            </h:commandLink>
            &#160;
            <h:commandLink action="#{sosBean.configuredInstance.stop}">
-              <h:graphicImage value="service.stop.png.mfRes" style="border:none;"/>
+              <img src="#{facesContext.externalContext.requestContextPath}/service.stop.png.mfRes" style="border:none;"/>
            </h:commandLink>
            &#160;
            <h:commandLink action="#{sosBean.configuredInstance.start}">
-              <h:graphicImage value="service.start.png.mfRes" style="border:none;"/>
+              <img src="#{facesContext.externalContext.requestContextPath}/service.start.png.mfRes" style="border:none;"/>
            </h:commandLink>
            <br/>
        </div>
@@ -53,30 +55,29 @@
                         <mf:case condition="#{sosBean.omConfigType == 'filesystem'}" fallthrought="false">
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['dataDirectory']}"/></td>
-                            <td><h:inputText value="#{sosBean.omDataDirectory}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{sosBean.omDataDirectory}" style="width:50%;"/></td>
                             </tr>
                         </mf:case>
-                        <mf:case condition="#{sosBean.omConfigType == 'default'}" fallthrought="false">
+                        <mf:case condition="#{sosBean.omConfigType == 'postgrid'}" fallthrought="false">
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['driverClass']}"/></td>
-                            <td><h:inputText value="#{sosBean.omDriverClass}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{sosBean.omDriverClass}" style="width:50%;"/></td>
                             </tr>
-
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['dbURL']}"/></td>
-                            <td><h:inputText value="#{sosBean.omConnectURL}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{sosBean.omConnectURL}" style="width:50%;"/></td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['user']}"/></td>
-                            <td><h:inputText value="#{sosBean.omUserName}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{sosBean.omUserName}" style="width:50%;"/></td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['passwd']}"/></td>
-                            <td><h:inputSecret value="#{sosBean.omUserPass}" style="width:50%;"/></td>
+                                <td><h:inputSecret value="#{sosBean.omUserPass}" style="width:50%;"/></td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['postgisFolder']}"/></td>
-                            <td><h:inputText value="#{sosBean.omPostgisDir}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{sosBean.omPostgisDir}" style="width:50%;"/></td>
                             </tr>
                         </mf:case>
                     </mf:switch>   

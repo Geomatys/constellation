@@ -13,7 +13,7 @@
     
     <ui:define name="header">
         
-        <link rel="stylesheet" type="text/css" href="provider.parameters.css.mfRes"/>
+        <link rel="stylesheet" type="text/css" href="#{facesContext.externalContext.requestContextPath}/provider.parameters.css.mfRes"/>
         
     </ui:define>
     
@@ -82,7 +82,7 @@
         <br/>
         
         <div style="text-align: right;">
-            <a href="#{taskmanagerBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a>
+            <h:commandLink action="#{taskmanagerBean.mainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
             &#160;&#160;
             <h:commandButton action="#{taskmanagerBean.saveTask}" value="#{taskmanagerBean.i18n['save']}" />
         </div>

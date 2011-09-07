@@ -63,7 +63,7 @@ public class DataSourceType {
     
     public static DataSourceType fromName(final String name) {
         for (DataSourceType o : VALUES) {
-            if (o.getName().equals(name)) {
+            if (o.getName().equalsIgnoreCase(name)) {
                 return o;
             }
         }

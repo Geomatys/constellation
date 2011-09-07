@@ -11,7 +11,7 @@
                 template="/pages/base.xhtml">
 
     <ui:define name="content">
-        <h:graphicImage url="service.wfs110.png.mfRes"/>
+        <img src="#{facesContext.externalContext.requestContextPath}/service.wfs110.png.mfRes"/>
         <br/>
         <br/> 
         <cstl:servicepreview bean="#{wfsBean}" />

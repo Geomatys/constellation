@@ -10,7 +10,9 @@
 
     <ui:define name="content">
 
-        <center><a href="#{wpsBean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
+        <center>
+            <h:commandLink action="#{wpsBean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
+        </center>
         <br/>
         <br/>
         <div class="rounded">

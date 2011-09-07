@@ -17,16 +17,13 @@
 
 package org.constellation.menu.provider;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -35,7 +32,6 @@ import javax.swing.tree.TreeNode;
 
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.HighLightRowStyler;
-import org.constellation.bean.MenuBean;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
@@ -118,10 +114,10 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             final String mainPage, final String configPage, final String layerConfigPage){
         addBundle("provider.overview");
 
-        this.serviceName = serviceName;
-        this.mainPage = MenuBean.toApplicationPath(mainPage);
-        this.sourceConfigPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
-        this.itemConfigPage = (layerConfigPage != null) ? MenuBean.toApplicationPath(layerConfigPage) : null;
+        this.serviceName      = serviceName;
+        this.mainPage         = mainPage;
+        this.sourceConfigPage = configPage;
+        this.itemConfigPage   = layerConfigPage;
 
     }
 
@@ -320,6 +316,12 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     public String getMainPage(){
         return mainPage;
     }
+    
+    public void goMainPage(){
+        if (mainPage != null) {
+            FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
+        }
+    }
 
     /**
      * @return the currently configured instance.
@@ -422,17 +424,10 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
          */
         public void config(){
             select();
-
-            if(sourceConfigPage != null){
-                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                try {
-                    context.redirect(sourceConfigPage);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "Redirection to "+sourceConfigPage+" failed.", ex);
-                }
+            if (sourceConfigPage != null) {
+                FacesContext.getCurrentInstance().getViewRoot().setViewId(sourceConfigPage);
             }
         }
-
     }
 
     public final class TypeNode extends DefaultMutableTreeNode{
@@ -477,7 +472,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                 }
             }
             
-            if(layerParams == null){
+            if (layerParams == null) {
                 //config does not exist, create it
                 layerParams = configuredParams.addGroup(
                         ProviderParameters.LAYER_DESCRIPTOR.getName().getCode());
@@ -486,13 +481,8 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             }
             
             
-            if(itemConfigPage != null){
-                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                try {
-                    context.redirect(itemConfigPage);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
-                }
+            if (itemConfigPage != null) {
+                FacesContext.getCurrentInstance().getViewRoot().setViewId(itemConfigPage);
             }
         }
         

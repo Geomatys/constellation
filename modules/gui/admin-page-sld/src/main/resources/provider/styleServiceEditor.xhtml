@@ -29,20 +29,20 @@
             </mf:DataTableColumn>
 
             <mf:DataTableColumn width="24px">
-                 <a4j:commandLink action="#{node.config}">
-                    <h:graphicImage value="provider.edit.png.mfRes" style="border:none;"/>
-                </a4j:commandLink>
+                 <h:commandLink action="#{node.config}">
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.edit.png.mfRes" style="border:none;"/>
+                </h:commandLink>
             </mf:DataTableColumn>
             
             <mf:DataTableColumn width="24px">
                 <a4j:commandLink action="#{node.reload}" reRender="storePreview">
-                    <h:graphicImage value="provider.reload.png.mfRes" style="border:none;"/>
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
                 </a4j:commandLink>
             </mf:DataTableColumn>
 
             <mf:DataTableColumn width="24px">
                 <a4j:commandLink action="#{node.delete}" reRender="storePreview">
-                    <h:graphicImage value="provider.remove.png.mfRes" style="border:none;"/>
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
                 </a4j:commandLink>
             </mf:DataTableColumn>
 
@@ -69,14 +69,14 @@
             </mf:DataTableColumn>
             
             <mf:DataTableColumn width="24px">
-                <a4j:commandLink action="#{node.config}">
-                    <h:graphicImage value="provider.edit.png.mfRes" style="border:none;"/>
-                </a4j:commandLink>
+                <h:commandLink action="#{node.config}">
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.edit.png.mfRes" style="border:none;"/>
+                </h:commandLink>
             </mf:DataTableColumn>
             
             <mf:DataTableColumn width="24px">
                 <a4j:commandLink action="#{node.delete}" reRender="layerPreview">
-                    <h:graphicImage value="provider.remove.png.mfRes" style="border:none;"/>
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
                 </a4j:commandLink>
             </mf:DataTableColumn>
             

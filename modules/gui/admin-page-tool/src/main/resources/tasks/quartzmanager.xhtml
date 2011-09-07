@@ -44,14 +44,14 @@
                 <!-- Edit action column -->
                 <mf:DataTableColumn width="16px">
                     <a4j:commandLink action="#{node.edit}" reRender="sourceLayers">
-                        <h:graphicImage value="provider.edit.png.mfRes" style="border:none;"/>
+                        <img src="#{facesContext.externalContext.requestContextPath}/provider.edit.png.mfRes" style="border:none;"/>
                     </a4j:commandLink>
                 </mf:DataTableColumn>
                                 
                 <!-- Delete action column -->
                 <mf:DataTableColumn width="30px">
                     <a4j:commandLink action="#{node.delete}" reRender="sourceLayers">
-                        <h:graphicImage value="provider.remove.png.mfRes" style="border:none;"/>
+                        <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
                     </a4j:commandLink>
                 </mf:DataTableColumn>
 

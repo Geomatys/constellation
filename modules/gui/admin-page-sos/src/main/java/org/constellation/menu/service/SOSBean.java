@@ -88,7 +88,7 @@ public class SOSBean extends AbstractServiceBean{
     
     public List<SelectItem> getOmConfigTypes() {
         final List<SelectItem> selectItems = new ArrayList<SelectItem>();
-        selectItems.add(new SelectItem("default"));
+        selectItems.add(new SelectItem("postgrid"));
         selectItems.add(new SelectItem("filesystem"));
         return selectItems;
     }
@@ -113,7 +113,7 @@ public class SOSBean extends AbstractServiceBean{
     public String getOmConfigType() {
         if (configurationObject instanceof SOSConfiguration) {
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
-            this.omConfigType = config.getObservationReaderType().getName();
+            this.omConfigType = config.getObservationReaderType().getName().toLowerCase();
         }
         return omConfigType;
     }

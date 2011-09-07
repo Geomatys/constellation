@@ -7,7 +7,9 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
-    <center><a href="#{bean.mainPage}" class="logout">#{menuBean.i18n['return']}</a></center>
+    <center>
+        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
+    </center>
     <br/>
     <br/>  
     <mf:namer styleClass="rounded">

@@ -130,28 +130,12 @@ public class MenuBean extends I18NBean{
             }
         }
 
-        String link = null;
-        if(path.linkedPage != null){
-            link = toApplicationPath(path.linkedPage);
-        }
-
-        final I18NNode node = new I18NNode(path.i18nKey, path.icon, link,path.priority);
+        final I18NNode node = new I18NNode(path.i18nKey, path.icon, path.linkedPage ,path.priority);
         cache.put(path.i18nKey, node);
 
         //insert node based on it's priority
         parent.insert(node, getInsertIndex(parent, node));
         return node;
-    }
-
-    /**
-     * change a path to an .xhtml pag to a path to .jsf prefixed with application name.
-     */
-    public static String toApplicationPath(final String pagePath){
-        final String webapp = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
-        String link = pagePath;
-        link = link.replaceAll(".xhtml", ".jsf");
-        link = webapp+link;
-        return link;
     }
 
     private static int getInsertIndex(final I18NNode parent, final I18NNode candidate){
@@ -196,15 +180,11 @@ public class MenuBean extends I18NBean{
         final UIOutline outline = (UIOutline) FacesUtils.findComponentById(FacesContext.getCurrentInstance().getViewRoot(), "navTree");
         final TreeNode[] path = outline.getTreePath(rowId);
 
-        if(path != null){
+        if (path != null) {
             final String targetPage = ((I18NNode)path[path.length-1]).getTargetPage();
-            try {
-                context.redirect(targetPage);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
+            LOGGER.info("redirect to:" + targetPage);
+            FacesContext.getCurrentInstance().getViewRoot().setViewId(targetPage);
         }
-        
     }
 
     public class I18NNode extends DefaultMutableTreeNode{

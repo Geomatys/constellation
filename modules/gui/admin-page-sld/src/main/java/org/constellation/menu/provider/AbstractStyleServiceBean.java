@@ -17,10 +17,7 @@
 
 package org.constellation.menu.provider;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.constellation.admin.service.ConstellationServer;
@@ -139,13 +136,8 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
                 editedStyle = server.providers.downloadStyle(provider.getId(), key);
                 editedSLDNode = this;
 
-                if(itemConfigPage != null){
-                    final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                    try {
-                        context.redirect(itemConfigPage);
-                    } catch (IOException ex) {
-                        LOGGER.log(Level.WARNING, null, ex);
-                    }
+                if (itemConfigPage != null) {
+                    FacesContext.getCurrentInstance().getViewRoot().setViewId(itemConfigPage);
                 }
             }
         }

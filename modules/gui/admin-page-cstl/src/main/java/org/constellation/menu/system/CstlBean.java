@@ -17,10 +17,7 @@
 
 package org.constellation.menu.system;
 
-import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import org.constellation.admin.service.ConstellationServer;
 import org.geotoolkit.util.logging.Logging;
@@ -124,14 +121,8 @@ public class CstlBean extends I18NBean {
                  */
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove(SERVICE_ADMIN_KEY);
                 //redirect
-                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                final String webapp = context.getRequestContextPath();
-                try {
-                    //the session is not logged, redirect him to the authentication page
-                    context.redirect(webapp + "/authentication.jsf");
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
-                }
+                //the session is not logged, redirect him to the authentication page
+                FacesContext.getCurrentInstance().getViewRoot().setViewId("/authentication.xhtml");
             }
         }
     }

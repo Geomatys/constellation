@@ -33,15 +33,13 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ConstellationServer;
-import org.constellation.bean.MenuBean;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.ProviderReport;
+import org.constellation.configuration.ProviderServiceReport;
+import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.Source;
-import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
@@ -124,8 +122,8 @@ public class AbstractServiceBean extends I18NBean{
         ArgumentChecks.ensureNonNull("specification", specification);
         ArgumentChecks.ensureNonNull("main page", mainPage);
         this.specification = specification;
-        this.mainPage = MenuBean.toApplicationPath(mainPage);
-        this.configPage = (configPage != null) ? MenuBean.toApplicationPath(configPage) : null;
+        this.mainPage      = mainPage;
+        this.configPage    = configPage;
         addBundle("service.service");
     }
 
@@ -211,9 +209,17 @@ public class AbstractServiceBean extends I18NBean{
     
     public List<SelectItem> getPotentialSources(){
         final List<SelectItem> items = new ArrayList<SelectItem>();
-        for(LayerProvider provider : LayerProviderProxy.getInstance().getProviders()){
-            final String name = Parameters.stringValue(ProviderParameters.SOURCE_ID_DESCRIPTOR, provider.getSource());
-            items.add(new SelectItem(name, name));
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            final ProvidersReport pr = server.providers.listProviders();
+            for(ProviderServiceReport provider : pr.getProviderServices()){
+                if (!provider.isStyleService()) {
+                    for (ProviderReport p : provider.getProviders()) {
+                        final String name = p.getId();
+                        items.add(new SelectItem(name, name));
+                    }
+                }
+            }
         }
         return items;
     }
@@ -277,9 +283,16 @@ public class AbstractServiceBean extends I18NBean{
     /**
      * @return the main service page.
      * this is used to return from the configuration page.
+     * @Deprecated use goMainPage() (portlet issue).
      */
     public String getMainPage(){
         return mainPage;
+    }
+    
+    public void goMainPage(){
+        if (mainPage != null) {
+            FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
+        }
     }
 
     /**
@@ -302,6 +315,7 @@ public class AbstractServiceBean extends I18NBean{
      */
     public void configurationClosed(final CloseEvent event){
         //reset configured instance
+        LOGGER.info("configuration closed");
         configuredInstance = null;
         configurationObject = null;
     }
@@ -399,6 +413,7 @@ public class AbstractServiceBean extends I18NBean{
          * Set this instance as the currently configured one in for the property dialog.
          */
         public void config(){
+            LOGGER.info("Config:" + configPage);
             configuredInstance = this;
             final ConstellationServer server = getServer();
             if (server != null) {
@@ -412,15 +427,10 @@ public class AbstractServiceBean extends I18NBean{
             }
             
             if (configPage != null) {
-                final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-                try {
-                    //the session is not logged, redirect him to the authentication page
-                    context.redirect(configPage);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
-                }
+                //the session is not logged, redirect him to the authentication page
+                LOGGER.info("service redirect to config page:" + configPage);
+                FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
             }
-
         }
 
         public void start(){
@@ -431,6 +441,7 @@ public class AbstractServiceBean extends I18NBean{
             refresh();
         }
         public void stop(){
+            LOGGER.info("STOP:");
             final ConstellationServer server = getServer();
             if (server != null) {
                 server.services.stopInstance(getSpecificationName(), instance.getName());

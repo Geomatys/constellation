@@ -16,7 +16,6 @@
  */
 package org.constellation.bean;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -89,14 +88,8 @@ public final class NavigationBean extends I18NBean{
     public void logout(){
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove(SERVICE_ADMIN_KEY);
         //redirect
-        final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-        final String webapp = context.getRequestContextPath();
-        try {
-            //the session is not logged, redirect him to the authentication page
-            context.redirect(webapp + "/authentication.jsf");
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-        }
+        //the session is not logged, redirect him to the authentication page
+        FacesContext.getCurrentInstance().getViewRoot().setViewId("/authentication.xhtml");
     }
     
     /**
@@ -106,13 +99,8 @@ public final class NavigationBean extends I18NBean{
 
         final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         if(context.getSessionMap().get(SERVICE_ADMIN_KEY) == null){
-            final String webapp = context.getRequestContextPath();
-            try {
-                //the session is not logged, redirect him to the authentication page
-                context.redirect(webapp+"/authentication.jsf");
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
-            }
+            //the session is not logged, redirect him to the authentication page
+            FacesContext.getCurrentInstance().getViewRoot().setViewId("/authentication.xhtml");
         }
     }
     
