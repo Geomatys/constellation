@@ -24,11 +24,4 @@
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
     
-    <!-- WMTS service -->
-    <managed-bean>
-        <managed-bean-name>wmtsBean</managed-bean-name>
-        <managed-bean-class>org.constellation.menu.service.WMTSBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
-    
 </faces-config>

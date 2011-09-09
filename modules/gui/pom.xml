@@ -105,6 +105,7 @@
         <module>admin-page-providers</module>
         <module>admin-page-sld</module>
         <module>admin-page-services</module>
+	<module>admin-page-wmts</module>
         <module>admin-page-csw</module>
         <module>admin-page-sos</module>
         <module>admin-page-wps</module>

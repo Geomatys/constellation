@@ -1,4 +1,3 @@
 org.constellation.menu.service.WCSItem
 org.constellation.menu.service.WFSItem
 org.constellation.menu.service.WMSItem
-org.constellation.menu.service.WMTSItem
