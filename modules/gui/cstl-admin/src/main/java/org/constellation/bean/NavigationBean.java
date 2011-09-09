@@ -87,7 +87,9 @@ public final class NavigationBean extends I18NBean{
     
     public void logout(){
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove(SERVICE_ADMIN_KEY);
-        //redirect
+        
+        refreshNavigationBeanStack();
+        
         //the session is not logged, redirect him to the authentication page
         FacesContext.getCurrentInstance().getViewRoot().setViewId("/authentication.xhtml");
     }
@@ -118,5 +120,15 @@ public final class NavigationBean extends I18NBean{
             LOGGER.log(Level.WARNING, null, ex);
         }
         return result;
+    }
+    
+    private void refreshNavigationBeanStack() {
+        final FacesContext context = FacesContext.getCurrentInstance();
+        if (context != null) {
+            final MenuBean bean = (MenuBean) context.getApplication().evaluateExpressionGet(context, "#{menuBean}", MenuBean.class);
+            if (bean != null) {
+                bean.initNavigationStack();
+            }
+        }
     }
 }

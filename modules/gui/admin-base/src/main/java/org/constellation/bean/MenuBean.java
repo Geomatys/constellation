@@ -17,10 +17,10 @@
 
 package org.constellation.bean;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -40,7 +40,7 @@ import org.mapfaces.utils.FacesUtils;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class MenuBean extends I18NBean{
+public class MenuBean extends I18NBean {
 
     /**
      * When user is log in, a ServiceAdministrator object is added in the session map.
@@ -81,8 +81,11 @@ public class MenuBean extends I18NBean{
     private TreeModel model = null;
     private ConstellationServer oldServer = null;
 
+    private final List<String> navigationStack = new ArrayList<String>();
+    
     public MenuBean() {
         addBundle("org.constellation.bundle.base");
+        initNavigationStack();
     }
 
     private ConstellationServer getServer(){
@@ -98,19 +101,19 @@ public class MenuBean extends I18NBean{
 
         ConstellationServer server = getServer();
         
-        for(final MenuItem page : MenuItems.getPages()){
+        for (final MenuItem page : MenuItems.getPages()) {
             if(!page.isAvailable(server)){
                 continue;
             }
             
             //load the extension bundle
             final String bundle = page.getResourceBundlePath();
-            if(bundle != null){
+            if (bundle != null) {
                 addBundle(bundle);
             }
             
             //add all pages
-            for(final Path path : page.getPaths()){
+            for (final Path path : page.getPaths()) {
                 create(root, nodes, path);
             }
         }
@@ -182,9 +185,45 @@ public class MenuBean extends I18NBean{
 
         if (path != null) {
             final String targetPage = ((I18NNode)path[path.length-1]).getTargetPage();
+            // update navigation stack
+            updateNavigationStack(targetPage);
+            // redirect
             LOGGER.info("redirect to:" + targetPage);
             FacesContext.getCurrentInstance().getViewRoot().setViewId(targetPage);
         }
+    }
+    
+    
+    public final void initNavigationStack() {
+        navigationStack.clear();
+        navigationStack.add("Constellation - Administration du SIG");
+    }
+    
+    private void updateNavigationStack(final String targetPage) {
+        navigationStack.clear();
+        navigationStack.add("Administration du SIG -> ");
+        final String[] stack = targetPage.split("/");
+        for (int i = 0; i < stack.length; i++) {
+            String s = stack[i];
+            if (!s.isEmpty()) {
+                s = s.replace(".xhtml", "");
+                if (i != stack.length - 1) {
+                    s = s + " -> ";
+                }
+                navigationStack.add(s);
+            }
+        }
+    }
+
+    /**
+     * @return the navigationStack
+     */
+    public List<String> getNavigationStack() {
+        return navigationStack;
+    }
+    
+    public int getNavigationStackSize() {
+        return navigationStack.size();
     }
 
     public class I18NNode extends DefaultMutableTreeNode{

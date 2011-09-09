@@ -10,14 +10,20 @@
 
     <ui:define name="page">
 
+        <br/>
+        <br/>
+        <br/>
+        <div id="navigationBar" class="rounded">
+            <h:panelGrid columns="#{menuBean.navigationStackSize}">
+                <a4j:repeat value="#{menuBean.navigationStack}" var="navItem">
+                    <h:outputText value="#{navItem}"/>
+                </a4j:repeat>
+            </h:panelGrid>
+            
+        </div>
         <h:panelGrid columns="2" columnClasses="col1,col2" style="height:100%;width:100%">
 
             <h:panelGroup>
-
-                <br/>
-                <br/>
-                <br/>
-                <br/>
 
                 <!-- Menus -->
                 <mf:Outline id="navTree" actionVisible="true" rootVisible="false"
