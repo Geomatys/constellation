@@ -30,7 +30,6 @@ import javax.swing.tree.TreeNode;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.MenuItem.Path;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
-import org.geotoolkit.gui.swing.tree.Trees;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.i18n.I18NBean;
@@ -118,7 +117,6 @@ public class MenuBean extends I18NBean {
                 create(root, nodes, path);
             }
         }
-        LOGGER.info(Trees.toString(model));
         return model;
     }
     
@@ -192,7 +190,6 @@ public class MenuBean extends I18NBean {
             // update navigation stack
             updateNavigationStack(targetPage);
             // redirect
-            LOGGER.info("redirect to:" + targetPage);
             FacesContext.getCurrentInstance().getViewRoot().setViewId(targetPage);
         }
     }

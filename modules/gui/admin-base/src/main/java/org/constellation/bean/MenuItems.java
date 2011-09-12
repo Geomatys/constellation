@@ -79,7 +79,6 @@ public final class MenuItems {
                     }
 
                     final File target = new File(parent,parts[parts.length-1]);
-                    LOGGER.info("new File target:" + target.getPath());
                     copy(MenuItems.class.getResourceAsStream(path), target);
                 }
             }
