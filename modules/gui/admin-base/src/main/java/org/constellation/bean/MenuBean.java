@@ -30,6 +30,7 @@ import javax.swing.tree.TreeNode;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.MenuItem.Path;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
+import org.geotoolkit.gui.swing.tree.Trees;
 import org.geotoolkit.util.logging.Logging;
 import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.i18n.I18NBean;
@@ -117,6 +118,7 @@ public class MenuBean extends I18NBean {
                 create(root, nodes, path);
             }
         }
+        LOGGER.info(Trees.toString(model));
         return model;
     }
     
@@ -127,17 +129,19 @@ public class MenuBean extends I18NBean {
         if(path.parent != null){
             //search the cache first
             parent = cache.get(path.parent.i18nKey);
-            if(parent == null){
+            if (parent == null) {
                 //not found so create it
                 parent = create(root, cache, path.parent);
             }
         }
 
-        final I18NNode node = new I18NNode(path.i18nKey, path.icon, path.linkedPage ,path.priority);
-        cache.put(path.i18nKey, node);
-
-        //insert node based on it's priority
-        parent.insert(node, getInsertIndex(parent, node));
+        I18NNode node = cache.get(path.i18nKey);
+        if (node == null) {
+            node = new I18NNode(path.i18nKey, path.icon, path.linkedPage ,path.priority);
+            cache.put(path.i18nKey, node);
+            //insert node based on it's priority
+            parent.insert(node, getInsertIndex(parent, node));
+        }
         return node;
     }
 
@@ -263,6 +267,16 @@ public class MenuBean extends I18NBean {
             return hash;
         }
 
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("[I18NNode]\n");
+            sb.append("i18nKey:").append(i18nkey).append('\n');
+            sb.append("targetPage:").append(targetPage).append('\n');
+            sb.append("icon:").append(icon).append('\n');
+            sb.append("priority:").append(priority).append('\n');
+            return  sb.toString();
+        }
+        
         @Override
         public boolean equals(Object obj) {
             if (obj == null) {

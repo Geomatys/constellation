@@ -11,15 +11,13 @@
         <version>0.8-SNAPSHOT</version>
     </parent>
 
-
-
     <!--
     Module description.
   -->
     <groupId>org.constellation.gui</groupId>
-    <artifactId>admin-page-sos</artifactId>
+    <artifactId>admin-page-wms</artifactId>
     <packaging>jar</packaging>
-    <name>Web site : SOS informations</name>
+    <name>Web site : WMS informations</name>
 
 
     <!--
@@ -45,22 +43,6 @@
     included in the JARs' list for which Maven will move into "target/binaries".
   -->
     <dependencies>
-        <!-- for MDWeb database creation -->
-        <dependency>
-            <groupId>org.mdweb.metamodel</groupId>
-            <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
-        </dependency>
-        <!-- for O&M database creation -->
-        <dependency>
-            <groupId>org.constellation.storage</groupId>
-            <artifactId>cstl-store-observation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit</groupId>
-            <artifactId>geotk-coverage-sql</artifactId>
-        </dependency>
-        <!-- for user interface -->
         <dependency>
             <groupId>org.constellation.gui</groupId>
             <artifactId>admin-page-services</artifactId>

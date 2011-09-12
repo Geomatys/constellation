@@ -47,12 +47,12 @@
     <dependencies>
         <dependency>
             <groupId>org.constellation.gui</groupId>
-            <artifactId>admin-base</artifactId>
+            <artifactId>admin-page-services</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.constellation.gui</groupId>
-            <artifactId>admin-page-services</artifactId>
+            <artifactId>admin-base</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

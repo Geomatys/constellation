@@ -71,6 +71,21 @@ public interface MenuItem {
             this.icon = icon;
             this.priority = priority;
         }
+        
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("[Path]\n");
+            if (parent != null) {
+                sb.append("parent:").append(parent.i18nKey).append('\n');;
+            } else {
+                sb.append("no parent\n");
+            }
+            sb.append("i18nKey:").append(i18nKey).append('\n');
+            sb.append("linkedPage:").append(linkedPage).append('\n');
+            sb.append("icon:").append(icon).append('\n');
+            sb.append("priority:").append(priority).append('\n');
+            return  sb.toString();
+        }
 
     }
 

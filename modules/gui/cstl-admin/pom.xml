@@ -70,6 +70,21 @@
             <artifactId>admin-page-services</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-wfs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-wcs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.gui</groupId>
+            <artifactId>admin-page-wms</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 	<dependency>
             <groupId>org.constellation.gui</groupId>
             <artifactId>admin-page-wmts</artifactId>

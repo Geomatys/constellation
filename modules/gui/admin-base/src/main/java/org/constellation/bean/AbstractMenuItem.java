@@ -28,7 +28,7 @@ import org.geotoolkit.util.collection.UnmodifiableArrayList;
  */
 public abstract class AbstractMenuItem implements MenuItem {
 
-    public static final Path SERVICES_PATH = new Path(null, "services", null, "org.constellation.icons.socket.png.mfRes",400);
+    public static final Path SERVICES_PATH = new Path(null, "services", "/base/services.xhtml", "org.constellation.icons.socket.png.mfRes",400);
     public static final Path PROVIDERS_PATH = new Path(null, "providers", null, "org.constellation.icons.nfs_unmount.png.mfRes",300);
     public static final Path PROVIDERS_DATA_PATH = new Path(PROVIDERS_PATH, "datas", null, "org.constellation.icons.harddrive.png.mfRes",500);
     public static final Path PROVIDERS_STYLE_PATH = new Path(PROVIDERS_PATH, "styles", null, "org.constellation.icons.colors.png.mfRes",200);
@@ -64,6 +64,20 @@ public abstract class AbstractMenuItem implements MenuItem {
     @Override
     public List<Path> getPaths() {
         return paths;
+    }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[").append(this.getClass().getSimpleName()).append("]");
+        sb.append("pages:\n");
+        for (String page : pages) {
+            sb.append(page).append('\n');
+        }
+        sb.append("bundle path:").append(bundlePath).append('\n');
+        for (Path path : paths) {
+            sb.append(path).append('\n');
+        }
+        return sb.toString();
     }
 
 }
