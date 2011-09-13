@@ -413,7 +413,6 @@ public class AbstractServiceBean extends I18NBean{
          * Set this instance as the currently configured one in for the property dialog.
          */
         public void config(){
-            LOGGER.info("Config:" + configPage);
             configuredInstance = this;
             final ConstellationServer server = getServer();
             if (server != null) {
@@ -428,7 +427,6 @@ public class AbstractServiceBean extends I18NBean{
             
             if (configPage != null) {
                 //the session is not logged, redirect him to the authentication page
-                LOGGER.info("service redirect to config page:" + configPage);
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
             }
         }

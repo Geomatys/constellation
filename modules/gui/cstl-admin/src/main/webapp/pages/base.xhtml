@@ -13,18 +13,7 @@
         <br/>
         <br/>
         <br/>
-        <div id="navigationBar" class="rounded">
-            <ul style="padding:10px;">
-                <a4j:repeat value="#{menuBean.navigationStack}" var="node">
-		<li style="padding:10px;float:left;list-style:none;">
-		            <h:commandLink action="#{menuBean.navigateTo}" value="#{node.title}" styleClass="profile-element">
-		                <f:param name="itemId" value="#{node.i18nkey}"/>
-		            </h:commandLink>
-		</li>
-                </a4j:repeat>
-            </ul>
-            
-        </div>
+        
         <h:panelGrid columns="2" columnClasses="col1,col2" style="height:100%;width:100%">
 
             <h:panelGroup>
