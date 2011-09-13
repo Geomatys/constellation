@@ -311,6 +311,16 @@ public class AbstractServiceBean extends I18NBean{
             FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
         }
     }
+    
+    public void goToSourceAdmin(){
+        if (mainPage != null) {
+            final MenuBean bean = getMenuBean();
+            if (bean != null) {
+                bean.updateNavigationStack("providers");
+            }
+            FacesContext.getCurrentInstance().getViewRoot().setViewId("/base/providers.xhtml");
+        }
+    }
 
     /**
      * @return the currently configured instance.

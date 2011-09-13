@@ -27,9 +27,16 @@
             <br/>
         </span>
     </div>
+    
     <br/>
     <b>#{bean.i18n['sources']}</b><br/>
     <br/>
+    <h:commandLink action="#{bean.goToSourceAdmin}">
+         <h:outputText value="#{bean.i18n['newSource']}"/>
+    </h:commandLink>
+     &#160;
+    <h:outputText value="#{bean.i18n['useExistantSource']}"/>
+     &#160;
     <h:selectOneListbox value="#{bean.selectedPotentialSource}" size="1">
         <f:selectItems value="#{bean.potentialSources}" />
     </h:selectOneListbox>
@@ -98,6 +105,13 @@
         
     </mf:Outline>
     </div>
+    <b>#{bean.i18n['advancedOption']}</b>
+    <br/>
+    <br/>
+    #{bean.i18n['security']}
+    <br/>
+    <h:inputTextarea value="#{bean.configurationObject.security}" style="width:100%;" />
+    
     <table style="width:100%;"> 
        <colgroup>
           <col width="20%"/>
@@ -113,9 +127,6 @@
                 </tr>
        </tbody>    
     </table>
-    <br/>
-    <b>#{bean.i18n['security']}</b><br/>
-    <h:inputTextarea value="#{bean.configurationObject.security}" style="width:100%;" />
     <br/>
     <br/>
     
