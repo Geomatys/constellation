@@ -30,8 +30,7 @@ import org.constellation.configuration.ProvidersReport;
 public class PostGISItem extends AbstractMenuItem{
 
     public PostGISItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/provider/postgis.xhtml",
                 "/provider/postgisConfig.xhtml",
                 "/provider/postgisLayerConfig.xhtml"},

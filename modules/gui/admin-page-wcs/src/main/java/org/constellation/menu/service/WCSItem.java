@@ -25,11 +25,10 @@ import org.constellation.bean.AbstractMenuItem;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class WCSItem extends AbstractMenuItem{
+public class WCSItem extends AbstractMenuItem {
 
     public WCSItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/service/wcs.xhtml",
                 "/service/wcsConfig.xhtml"},
             "service.wcs",

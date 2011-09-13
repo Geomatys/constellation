@@ -14,24 +14,18 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-package org.constellation.menu.system;
-
-import org.constellation.bean.AbstractMenuItem;
-
+package org.constellation.bean;
 
 /**
- * Add a JVM information page to constellation administration interface.
  *
- * @author Johann Sorel (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  */
-public class GeoTkItem extends AbstractMenuItem{
+public class RootMenuItem extends AbstractMenuItem {
 
-    public GeoTkItem() {
-        super(new String[]{"/system/geotk.xhtml"},
-            null,
-            new Path(SYSTEMS_PATH,"GeotoolKit", "/system/geotk.xhtml", null,300)
-            );
+    public RootMenuItem() {
+        super(new String[]{"/pages/base.xhtml"},
+            null, // no bundle
+            new Path(null, "root", "/pages/base.xhtml", null, 0)); // no path
     }
-
+    
 }

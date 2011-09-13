@@ -34,6 +34,20 @@ public interface MenuItem {
     public boolean isAvailable(ConstellationServer server);
     
     /**
+     * The identifier of the MenuItem
+     * 
+     * @return an identifier never null
+     */
+    public String getId();
+    
+    /**
+     * The localized name of the MenuItem
+     * 
+     * @return a name never null
+     */
+    public String getTitle();
+    
+    /**
      * List of string path to xhtml pages that need to be copied in the web application.
      * 
      * @return list never null
@@ -47,15 +61,15 @@ public interface MenuItem {
     public String getResourceBundlePath();
 
     /**
-     * List of Path which will be added in the administration menu.
+     * A Path which will be added in the administration menu.
      * @return never null.
      */
-    public List<Path> getPaths();
+    public Path getPath();
 
     /**
      * A Path describe a menu item displayed in the administration menu.
      */
-    public static final class Path{
+    public static final class Path {
 
         public final Path parent;
         public final String i18nKey;

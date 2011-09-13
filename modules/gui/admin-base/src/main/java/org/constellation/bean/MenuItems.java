@@ -96,26 +96,28 @@ public final class MenuItems {
         return PAGES;
     }
 
-    private static void copy(final InputStream in, File f){
-        OutputStream out = null;
-        try {
-            out = new FileOutputStream(f);
-            IOUtils.copy(in, out);
-        } catch (FileNotFoundException ex) {
-            throw new RuntimeException(ex);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }finally{
+    private static void copy(final InputStream in, final File f){
+        if (in != null) {
+            OutputStream out = null;
             try {
-                in.close();
+                out = new FileOutputStream(f);
+                IOUtils.copy(in, out);
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
-            }
-            if(out != null){
+            } finally {
                 try {
-                    out.close();
+                    in.close();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
+                }
+                if(out != null){
+                    try {
+                        out.close();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         }

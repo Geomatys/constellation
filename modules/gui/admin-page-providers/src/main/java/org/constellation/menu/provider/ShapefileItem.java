@@ -29,8 +29,7 @@ import org.constellation.configuration.ProvidersReport;
 public class ShapefileItem extends AbstractMenuItem{
 
     public ShapefileItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/provider/shapefile.xhtml",
                 "/provider/shapefileConfig.xhtml",
                 "/provider/shapefileLayerConfig.xhtml"},

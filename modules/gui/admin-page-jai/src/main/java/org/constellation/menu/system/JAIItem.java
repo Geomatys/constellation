@@ -28,11 +28,9 @@ import org.constellation.bean.AbstractMenuItem;
 public class JAIItem extends AbstractMenuItem{
 
     public JAIItem() {
-        super(
-            new String[]{"/system/jai.xhtml"},
+        super(new String[]{"/system/jai.xhtml"},
             null,
-            new Path(SYSTEMS_PATH,"JAI", "/system/jai.xhtml", null,100)
-            );
+            new Path(SYSTEMS_PATH,"JAI", "/system/jai.xhtml", null,100));
     }
 
 }

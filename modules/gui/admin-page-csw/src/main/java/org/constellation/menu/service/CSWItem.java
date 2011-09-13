@@ -25,11 +25,10 @@ import org.constellation.bean.AbstractMenuItem;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CSWItem extends AbstractMenuItem{
+public class CSWItem extends AbstractMenuItem {
 
     public CSWItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/service/csw.xhtml",
                 "/service/cswConfig.xhtml"},
             "service.csw",

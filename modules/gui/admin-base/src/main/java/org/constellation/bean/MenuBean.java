@@ -18,9 +18,11 @@
 package org.constellation.bean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -31,10 +33,8 @@ import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.MenuItem.Path;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotoolkit.util.logging.Logging;
-import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
-import org.mapfaces.utils.FacesUtils;
 
 /**
  *
@@ -81,7 +81,7 @@ public class MenuBean extends I18NBean {
     private TreeModel model = null;
     private ConstellationServer oldServer = null;
 
-    private final List<String> navigationStack = new ArrayList<String>();
+    private final List<I18NNode> navigationStack = new ArrayList<I18NNode>();
     
     public MenuBean() {
         addBundle("org.constellation.bundle.base");
@@ -91,6 +91,15 @@ public class MenuBean extends I18NBean {
     private ConstellationServer getServer(){
         return (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
+    }
+    
+    private MenuItem getMenuItem(final String id) {
+        for (final MenuItem page : MenuItems.getPages()) {
+            if (page.getId().equals(id)) {
+                return page;
+            }
+        }
+        return null;
     }
     
     private TreeModel createMenuModel(){
@@ -113,7 +122,8 @@ public class MenuBean extends I18NBean {
             }
             
             //add all pages
-            for (final Path path : page.getPaths()) {
+            final Path path = page.getPath();
+            if (path != null) {
                 create(root, nodes, path);
             }
         }
@@ -173,53 +183,58 @@ public class MenuBean extends I18NBean {
 
     public void navigateTo(){
         final ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-        final String nodeId = context.getRequestParameterMap().get("targetPageNode");
+        final String nodeId           = context.getRequestParameterMap().get("itemId");
 
         if(nodeId == null || nodeId.isEmpty()){
             return;
         }
 
-        final String strRowId = nodeId.substring(nodeId.lastIndexOf(':')+1);
-        final int rowId = Integer.valueOf(strRowId);
+        final MenuItem item = getMenuItem(nodeId);
 
-        final UIOutline outline = (UIOutline) FacesUtils.findComponentById(FacesContext.getCurrentInstance().getViewRoot(), "navTree");
-        final TreeNode[] path = outline.getTreePath(rowId);
-
-        if (path != null) {
-            final String targetPage = ((I18NNode)path[path.length-1]).getTargetPage();
+        if (item != null) {
+            final String targetPage = item.getPath().linkedPage;
             // update navigation stack
-            updateNavigationStack(targetPage);
+            updateNavigationStack(nodeId);
             // redirect
             FacesContext.getCurrentInstance().getViewRoot().setViewId(targetPage);
+        } else {
+            LOGGER.log(Level.WARNING, "no item found for:{0}", nodeId);
         }
     }
     
     
     public final void initNavigationStack() {
         navigationStack.clear();
-        navigationStack.add("Constellation - Administration du SIG");
+        final MenuItem item = getMenuItem("root");
+        final I18NNode rootNode = new I18NNode(item.getId(), null, item.getPath().linkedPage ,0);
+        navigationStack.add(rootNode);
     }
     
-    private void updateNavigationStack(final String targetPage) {
+    private void updateNavigationStack(final String itemId) {
         navigationStack.clear();
-        navigationStack.add("Administration du SIG -> ");
-        final String[] stack = targetPage.split("/");
-        for (int i = 0; i < stack.length; i++) {
-            String s = stack[i];
-            if (!s.isEmpty()) {
-                s = s.replace(".xhtml", "");
-                if (i != stack.length - 1) {
-                    s = s + " -> ";
-                }
-                navigationStack.add(s);
+        MenuItem item = getMenuItem(itemId);
+        while (item != null) {
+            final I18NNode node = new I18NNode(item.getId(), null, item.getPath().linkedPage ,0);
+            navigationStack.add(node);
+            Path parent = item.getPath().parent;
+            if (parent != null) {
+                item = getMenuItem(parent.i18nKey);
+            } else {
+                item = null;
             }
         }
+        if (!"root".equals(itemId)) {
+            final MenuItem rootItem = getMenuItem("root");
+            final I18NNode rootNode = new I18NNode(rootItem.getId(), null, rootItem.getPath().linkedPage ,0);
+            navigationStack.add(rootNode);
+        }
+        Collections.reverse(navigationStack);
     }
 
     /**
      * @return the navigationStack
      */
-    public List<String> getNavigationStack() {
+    public List<I18NNode> getNavigationStack() {
         return navigationStack;
     }
     
@@ -242,6 +257,10 @@ public class MenuBean extends I18NBean {
             setUserObject(new Object[]{i18nKey,icon,targetPage,priority});
         }
 
+        public String getI18nkey(){
+            return i18nkey;
+        }
+        
         public String getTitle(){
             return getI18n().get(i18nkey);
         }

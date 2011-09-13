@@ -28,8 +28,7 @@ import org.constellation.bean.AbstractMenuItem;
 public class WMSItem extends AbstractMenuItem{
 
     public WMSItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/service/wms.xhtml",
                 "/service/wmsConfig.xhtml"},
             "service.wms",

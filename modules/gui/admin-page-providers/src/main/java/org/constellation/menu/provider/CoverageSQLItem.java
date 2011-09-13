@@ -30,8 +30,7 @@ import org.constellation.configuration.ProvidersReport;
 public class CoverageSQLItem extends AbstractMenuItem{
 
     public CoverageSQLItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/provider/coveragesql.xhtml",
                 "/provider/coveragesqlConfig.xhtml",
                 "/provider/coveragesqlLayerConfig.xhtml"},

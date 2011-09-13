@@ -25,16 +25,15 @@ import org.constellation.bean.AbstractMenuItem;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class SLDItem extends AbstractMenuItem{
+public class SLDItem extends AbstractMenuItem {
 
     public SLDItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/provider/sld.xhtml",
                 "/provider/sldConfig.xhtml",
                 "/provider/onesldeditor.xhtml"},
             "provider.sld",
-            new Path(PROVIDERS_STYLE_PATH,"SLD Styles", "/provider/sld.xhtml", null,900)
+            new Path(STYLE_PATH,"SLD Styles", "/provider/sld.xhtml", null,900)
             );
     }
 

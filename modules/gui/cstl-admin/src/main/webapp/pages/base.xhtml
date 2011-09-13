@@ -14,11 +14,15 @@
         <br/>
         <br/>
         <div id="navigationBar" class="rounded">
-            <h:panelGrid columns="#{menuBean.navigationStackSize}">
-                <a4j:repeat value="#{menuBean.navigationStack}" var="navItem">
-                    <h:outputText value="#{navItem}"/>
+            <ul style="padding:10px;">
+                <a4j:repeat value="#{menuBean.navigationStack}" var="node">
+		<li style="padding:10px;float:left;list-style:none;">
+		            <h:commandLink action="#{menuBean.navigateTo}" value="#{node.title}" styleClass="profile-element">
+		                <f:param name="itemId" value="#{node.i18nkey}"/>
+		            </h:commandLink>
+		</li>
                 </a4j:repeat>
-            </h:panelGrid>
+            </ul>
             
         </div>
         <h:panelGrid columns="2" columnClasses="col1,col2" style="height:100%;width:100%">
@@ -34,7 +38,7 @@
                         <h:graphicImage value="#{node.iconPath}" rendered="#{node.iconPath != null}" style="vertical-align: middle;"/>
 
                         <h:commandLink action="#{menuBean.navigateTo}" value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage != null}">
-                            <f:param name="targetPageNode" value="#{navTree.nodeIndex}"/>
+                            <f:param name="itemId" value="#{node.i18nkey}"/>
                         </h:commandLink>
 
                         <h:outputText value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage == null}"/>

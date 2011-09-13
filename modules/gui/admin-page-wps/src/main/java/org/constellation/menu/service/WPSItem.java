@@ -28,8 +28,7 @@ import org.constellation.bean.AbstractMenuItem;
 public class WPSItem extends AbstractMenuItem{
 
     public WPSItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/service/wps.xhtml",
                 "/service/wpsConfig.xhtml"},
             "service.wps",

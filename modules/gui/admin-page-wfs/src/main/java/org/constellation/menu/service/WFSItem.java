@@ -28,8 +28,7 @@ import org.constellation.bean.AbstractMenuItem;
 public class WFSItem extends AbstractMenuItem{
 
     public WFSItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/service/wfs.xhtml",
                 "/service/wfsConfig.xhtml"},
             "service.wfs",

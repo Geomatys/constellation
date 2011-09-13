@@ -28,13 +28,11 @@ import org.constellation.bean.AbstractMenuItem;
 public class WMTSItem extends AbstractMenuItem{
 
     public WMTSItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/service/wmts.xhtml",
                 "/service/wmtsConfig.xhtml"},
             "org.constellation.menu.service.wmts",
-            new Path(SERVICES_PATH,"WMTS", "/service/wmts.xhtml", null,100)
-            );
+            new Path(SERVICES_PATH,"WMTS", "/service/wmts.xhtml", null,100));
     }
 
 }

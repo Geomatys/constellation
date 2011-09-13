@@ -30,8 +30,7 @@ import org.constellation.configuration.ProvidersReport;
 public class CoverageFileItem extends AbstractMenuItem{
 
     public CoverageFileItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/provider/coveragefile.xhtml",
                 "/provider/coveragefileConfig.xhtml",
                 "/provider/coveragefileLayerConfig.xhtml"},

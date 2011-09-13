@@ -20,13 +20,12 @@ import org.constellation.bean.AbstractMenuItem;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal (Geomatys)
  */
 public class ServicesItem extends AbstractMenuItem {
 
     public ServicesItem() {
-        super(
-            new String[]{"/base/services.xhtml"},
+        super(new String[]{"/base/services.xhtml"},
             null, // no bundle
             SERVICES_PATH);
     }

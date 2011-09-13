@@ -29,8 +29,7 @@ public class TaskManagerItem extends AbstractMenuItem{
 
 
     public TaskManagerItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/tasks/quartzmanager.xhtml",
                 "/tasks/taskConfig.xhtml"},
             "tasks.tasks",

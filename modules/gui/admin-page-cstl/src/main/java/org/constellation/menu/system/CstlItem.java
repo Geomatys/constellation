@@ -28,8 +28,7 @@ import org.constellation.bean.AbstractMenuItem;
 public class CstlItem extends AbstractMenuItem{
 
     public CstlItem() {
-        super(
-            new String[]{"/system/cstl.xhtml"},
+        super(new String[]{"/system/cstl.xhtml"},
             null,
             new Path(SYSTEMS_PATH,"Constellation", "/system/cstl.xhtml", null,400)
             );

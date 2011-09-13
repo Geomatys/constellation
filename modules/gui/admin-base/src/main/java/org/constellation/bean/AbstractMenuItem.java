@@ -28,27 +28,38 @@ import org.geotoolkit.util.collection.UnmodifiableArrayList;
  */
 public abstract class AbstractMenuItem implements MenuItem {
 
-    public static final Path SERVICES_PATH = new Path(null, "services", "/base/services.xhtml", "org.constellation.icons.socket.png.mfRes",400);
-    public static final Path PROVIDERS_PATH = new Path(null, "providers", null, "org.constellation.icons.nfs_unmount.png.mfRes",300);
+    public static final Path SERVICES_PATH       = new Path(null, "services", "/base/services.xhtml", "org.constellation.icons.socket.png.mfRes",400);
+    public static final Path PROVIDERS_PATH      = new Path(null, "providers", "/base/providers.xhtml", "org.constellation.icons.nfs_unmount.png.mfRes",300);
     public static final Path PROVIDERS_DATA_PATH = new Path(PROVIDERS_PATH, "datas", null, "org.constellation.icons.harddrive.png.mfRes",500);
-    public static final Path PROVIDERS_STYLE_PATH = new Path(PROVIDERS_PATH, "styles", null, "org.constellation.icons.colors.png.mfRes",200);
-    public static final Path SYSTEMS_PATH = new Path(null, "systems", null, "org.constellation.icons.configure.png.mfRes",200);
-    public static final Path TOOLS_PATH = new Path(null, "tools", null, "org.constellation.icons.tool.png.mfRes",100);
+    public static final Path STYLE_PATH          = new Path(null, "styles", null, "org.constellation.icons.colors.png.mfRes",250);
+    public static final Path SYSTEMS_PATH        = new Path(null, "systems", null, "org.constellation.icons.configure.png.mfRes",200);
+    public static final Path TOOLS_PATH          = new Path(null, "tools", null, "org.constellation.icons.tool.png.mfRes",100);
 
     private final List<String> pages;
     private final String bundlePath;
-    private final List<Path> paths;
+    private final Path path;
 
-    public AbstractMenuItem(final String[] pages, final String bundlePath, Path ... paths) {
+    public AbstractMenuItem(final String[] pages, final String bundlePath, final Path path) {
         ArgumentChecks.ensureNonNull("pages", pages);
-        this.pages = UnmodifiableArrayList.wrap(pages);
+        ArgumentChecks.ensureNonNull("path", path);
+        this.pages      = UnmodifiableArrayList.wrap(pages);
         this.bundlePath = bundlePath;
-        this.paths = UnmodifiableArrayList.wrap(paths);
+        this.path       = path;
     }
 
     @Override
     public boolean isAvailable(ConstellationServer server) {
         return true;
+    }
+    
+    @Override
+    public String getId() {
+        return path.i18nKey;
+    }
+    
+    @Override
+    public String getTitle() {
+        return path.i18nKey;
     }
 
     @Override
@@ -62,8 +73,8 @@ public abstract class AbstractMenuItem implements MenuItem {
     }
 
     @Override
-    public List<Path> getPaths() {
-        return paths;
+    public Path getPath() {
+        return path;
     }
     
     @Override
@@ -74,8 +85,8 @@ public abstract class AbstractMenuItem implements MenuItem {
             sb.append(page).append('\n');
         }
         sb.append("bundle path:").append(bundlePath).append('\n');
-        for (Path path : paths) {
-            sb.append(path).append('\n');
+        if (path != null) {
+            sb.append("path:").append(path).append('\n');
         }
         return sb.toString();
     }

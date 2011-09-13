@@ -30,8 +30,7 @@ import org.constellation.configuration.ProvidersReport;
 public class OMItem extends AbstractMenuItem{
 
     public OMItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/provider/om.xhtml",
                 "/provider/omConfig.xhtml",
                 "/provider/omLayerConfig.xhtml"},

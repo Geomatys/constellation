@@ -30,8 +30,7 @@ import org.constellation.configuration.ProvidersReport;
 public class SensorMLItem extends AbstractMenuItem{
 
     public SensorMLItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/provider/sensorml.xhtml",
                 "/provider/sensormlConfig.xhtml",
                 "/provider/sensormlLayerConfig.xhtml"},

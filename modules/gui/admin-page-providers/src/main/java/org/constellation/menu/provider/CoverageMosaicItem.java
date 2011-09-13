@@ -30,8 +30,7 @@ import org.constellation.configuration.ProvidersReport;
 public class CoverageMosaicItem extends AbstractMenuItem{
 
     public CoverageMosaicItem() {
-        super(
-            new String[]{
+        super(new String[]{
                 "/provider/coveragemosaic.xhtml",
                 "/provider/coveragemosaicConfig.xhtml",
                 "/provider/coveragemosaicLayerConfig.xhtml"},
