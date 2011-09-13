@@ -40,6 +40,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
+import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.Source;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.FileUtilities;
@@ -112,7 +113,6 @@ public class AbstractServiceBean extends I18NBean{
     private final Specification specification;
     private final String configPage;
     private final String mainPage;
-    private String newServiceName = "default";
     private ServiceInstance configuredInstance = null;
     protected Object configurationObject = null;
     private LayerContextTreeModel treemodel = null;
@@ -171,37 +171,49 @@ public class AbstractServiceBean extends I18NBean{
     // CREATING NEW INSTANCE ///////////////////////////////////////////////////
 
     /**
-     * @return String : name of the new service name to create.
-     */
-    public String getNewServiceName() {
-        return newServiceName;
-    }
-
-    /**
-     * Set the name of the new service to create.
-     */
-    public void setNewServiceName(final String newServiceName) {
-        this.newServiceName = newServiceName;
-    }
-
-    /**
      * Create a new instance of this service.
      */
     public void createInstance(){
-        if(newServiceName == null || newServiceName.isEmpty()){
-            //unvalid name
-            return;
-        }
         final ConstellationServer server = getServer();
         if (server != null) {
             final InstanceReport report = server.services.listInstance(getSpecificationName());
-            for (Instance instance : report.getInstances()) {
-                if (newServiceName.equals(instance.getName())) {
-                    //an instance with this already exist
-                    return;
+            // Look for a free Instance name
+            String newInstanceName = "default";
+            int i = 1;
+            boolean freeName = false;
+            while (!freeName) {
+                freeName = true;
+                for (Instance instance : report.getInstances()) {
+                    if (newInstanceName.equals(instance.getName())) {
+                        //an instance with this already exist
+                        freeName = false;
+                        newInstanceName = "default" + i;
+                        i++;
+                        break;
+                    }
                 }
             }
-            server.services.newInstance(getSpecificationName(), newServiceName);
+            server.services.newInstance(getSpecificationName(), newInstanceName);
+            
+            configuredInstance  = new ServiceInstance(new Instance(newInstanceName, ServiceStatus.NOT_STARTED));
+            configurationObject = server.services.getInstanceconfiguration(getSpecificationName(), newInstanceName);
+           
+
+            if (configurationObject instanceof LayerContext) {
+                treemodel = new LayerContextTreeModel((LayerContext)configurationObject);
+            } else {
+                treemodel = null;
+            }
+            
+            if (configPage != null) {
+                final MenuBean bean = getMenuBean();
+                if (bean != null) {
+                    bean.addToNavigationStack(configuredInstance.getName());
+                }
+            
+                //the session is not logged, redirect him to the authentication page
+                FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
+            }
         }
     }
 
