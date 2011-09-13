@@ -352,6 +352,7 @@ public class AbstractServiceBean extends I18NBean{
             server.services.configureInstance(getSpecificationName(), configuredInstance.getName(), configurationObject);
             configuredInstance.restart();
         }
+        goMainPage();
     }
     
     public void updateCapabilities() {

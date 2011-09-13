@@ -12,8 +12,7 @@
         <h:outputText value="#{bean.i18n['serviceName']}"/>
         &#160;
         <h:inputText value="#{bean.configuredInstance.name}"/>
-        <span style="text-align: right;width:75%">
-            &#160;
+        <span style="float: right;">
             <h:commandLink action="#{bean.configuredInstance.restart}">
                 <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
             </h:commandLink>
