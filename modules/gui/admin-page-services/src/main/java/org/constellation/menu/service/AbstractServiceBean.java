@@ -33,6 +33,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.bean.MenuBean;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerContext;
@@ -291,6 +292,10 @@ public class AbstractServiceBean extends I18NBean{
     
     public void goMainPage(){
         if (mainPage != null) {
+            final MenuBean bean = getMenuBean();
+            if (bean != null) {
+                bean.backNavigationStack();
+            }
             FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
         }
     }
@@ -378,6 +383,11 @@ public class AbstractServiceBean extends I18NBean{
         this.uploadedCapabilities = uploadedCapabilities;
     }
 
+    public MenuBean getMenuBean() {
+        final FacesContext context = FacesContext.getCurrentInstance();
+        return (MenuBean) context.getApplication().evaluateExpressionGet(context, "#{menuBean}", MenuBean.class);
+    }
+    
     public class ServiceInstance implements Comparable<ServiceInstance>{
 
         protected Instance instance;
@@ -388,6 +398,21 @@ public class AbstractServiceBean extends I18NBean{
 
         public String getName(){
             return instance.getName();
+        }
+
+        public void setName(final String newName){
+            if (!newName.equals(instance.getName())) {
+                final ConstellationServer server = getServer();
+                if (server != null) {
+                    server.services.renameInstance(getSpecificationName(), instance.getName(), newName);
+                    instance.setName(newName);
+                    final MenuBean menuBean = getMenuBean();
+                    if (menuBean != null) {
+                        menuBean.backNavigationStack();
+                        menuBean.addToNavigationStack(newName);
+                    }
+                }
+            }
         }
 
         /**
@@ -426,6 +451,11 @@ public class AbstractServiceBean extends I18NBean{
             }
             
             if (configPage != null) {
+                final MenuBean bean = getMenuBean();
+                if (bean != null) {
+                    bean.addToNavigationStack(configuredInstance.getName());
+                }
+            
                 //the session is not logged, redirect him to the authentication page
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
             }

@@ -341,8 +341,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     
                 final File serviceDirectory = getServiceDirectory();
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                    File instanceDirectory     = new File (serviceDirectory, identifier);
-                    File instanceDirectoryBack = new File (serviceDirectory, "." + identifier);
+                    final File instanceDirectory     = new File (serviceDirectory, identifier);
+                    final File instanceDirectoryBack = new File (serviceDirectory, "." + identifier);
                     //if the backup directory already exist we delete it
                     if (instanceDirectoryBack.isDirectory()) {
                         if (!FileUtilities.deleteDirectory(instanceDirectoryBack)) {
@@ -370,12 +370,57 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 final AcknowlegementType response;
                 final File serviceDirectory = getServiceDirectory();
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                    File instanceDirectory     = new File (serviceDirectory, identifier);
+                    final File instanceDirectory = new File (serviceDirectory, identifier);
                     if (instanceDirectory.mkdir()) {
                         basicConfigure(instanceDirectory);
                         response = new AcknowlegementType("Success", "instance succefully created");
                     } else {
                         response = new AcknowlegementType("Error", "unable to create an instance");
+                    }
+                } else {
+                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+                }
+                return Response.ok(response, "text/xml").build();
+
+                
+            } else if ("renameInstance".equalsIgnoreCase(request)) {
+                LOGGER.info("renaming an instance");
+                final String identifier = getParameter("id", true);
+                final String newName    = getParameter("newName", true);
+                // we stop the current worker
+                final W worker = workersMap.get(identifier);
+                if (worker != null) {
+                    worker.destroy();
+                    workersMap.remove(identifier);
+                } 
+                
+                final AcknowlegementType response;
+                final File serviceDirectory = getServiceDirectory();
+                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+                    final File instanceDirectory = new File (serviceDirectory, identifier);
+                    final File newDirectory      = new File (serviceDirectory, newName);
+                    
+                    if (instanceDirectory.isDirectory()) {
+                        if (!newDirectory.exists()) {
+                            if (instanceDirectory.renameTo(newDirectory)) {
+                                final Worker newWorker = buildWorker(newName);
+                                if (newWorker == null) {
+                                    throw new CstlServiceException("The instance " + newName + " can be started, maybe there is no configuration directory with this name.", INVALID_PARAMETER_VALUE);
+                                } else {
+                                    if (newWorker.isStarted()) {
+                                        response = new AcknowlegementType("Success", "instance succefully renamed");
+                                    } else {
+                                        response = new AcknowlegementType("Error", "unable to start the renamed instance");
+                                    }
+                                }
+                            } else {
+                                response = new AcknowlegementType("Error", "Unable to rename the directory");
+                            }
+                        } else {
+                            response = new AcknowlegementType("Error", "already existing instance:" + newName);
+                        }
+                    } else {
+                        response = new AcknowlegementType("Error", "no existing instance:" + identifier);
                     }
                 } else {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);

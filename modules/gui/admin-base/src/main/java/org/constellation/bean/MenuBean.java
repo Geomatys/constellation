@@ -210,6 +210,15 @@ public class MenuBean extends I18NBean {
         navigationStack.add(rootNode);
     }
     
+    public void backNavigationStack() {
+        navigationStack.remove(navigationStack.size() -1);
+    }
+    
+    public void addToNavigationStack(final String itemName) {
+        final I18NNode node = new I18NNode(itemName, null, null ,0);
+        navigationStack.add(node);
+    }
+    
     private void updateNavigationStack(final String itemId) {
         navigationStack.clear();
         MenuItem item = getMenuItem(itemId);

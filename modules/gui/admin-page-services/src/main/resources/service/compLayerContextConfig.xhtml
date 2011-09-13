@@ -7,31 +7,26 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
-    <center>
-        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
-    </center>
-    <br/>
-    <br/>
-
-    
-    <b>#{bean.i18n['instance']}</b><br/>
     <div class="rounded">
         <img src="#{facesContext.externalContext.requestContextPath}/#{bean.configuredInstance.statusIcon}" style="border:none;"/>
-        <a href="#{bean.configuredInstance.path}" target="blank">#{bean.configuredInstance.name}</a>
-        
+        <h:outputText value="#{bean.i18n['serviceName']}"/>
         &#160;
-        <h:commandLink action="#{bean.configuredInstance.restart}">
-            <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
-        </h:commandLink>
-        &#160;
-        <h:commandLink action="#{bean.configuredInstance.stop}">
-            <img src="#{facesContext.externalContext.requestContextPath}/service.stop.png.mfRes" style="border:none;"/>
-        </h:commandLink>
-        &#160;
-        <h:commandLink action="#{bean.configuredInstance.start}">
-            <img src="#{facesContext.externalContext.requestContextPath}/service.start.png.mfRes" style="border:none;"/>
-        </h:commandLink>
-        <br/>
+        <h:inputText value="#{bean.configuredInstance.name}"/>
+        <span style="text-align: right;width:75%">
+            &#160;
+            <h:commandLink action="#{bean.configuredInstance.restart}">
+                <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
+            </h:commandLink>
+            &#160;
+            <h:commandLink action="#{bean.configuredInstance.stop}">
+                <img src="#{facesContext.externalContext.requestContextPath}/service.stop.png.mfRes" style="border:none;"/>
+            </h:commandLink>
+            &#160;
+            <h:commandLink action="#{bean.configuredInstance.start}">
+                <img src="#{facesContext.externalContext.requestContextPath}/service.start.png.mfRes" style="border:none;"/>
+            </h:commandLink>
+            <br/>
+        </span>
     </div>
     <br/>
     <b>#{bean.i18n['sources']}</b><br/>
@@ -52,7 +47,7 @@
                 cellStyler="#{mf:constant('org.constellation.menu.service.AbstractServiceBean.CELL_STYLER')}">
         <!-- Name column -->
         <h:column>            
-            <h:inputText value="#{node.userObject.id}" rendered="#{mf:isInstance(node.userObject,'Source')}"/>
+            <h:outputText value="#{node.userObject.id}" rendered="#{mf:isInstance(node.userObject,'Source')}"/>
             <h:commandLink action="#{bean.changeSourceLoadAll}" rendered="#{mf:isInstance(node.userObject,'Source')}" styleClass="logout">
                 <f:param name="NodeId" value="#{sourceLayers.nodeIndex}" />
                 &#160;
@@ -126,6 +121,7 @@
     <br/>
     
     <div style="text-align: right;">
+        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
         <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
     </div>
 

@@ -52,6 +52,10 @@ public class Instance {
     public String getName() {
         return name;
     }
+    
+    public void setName(final String newName) {
+        this.name = newName;
+    }
 
     /**
      * @return the status

@@ -362,6 +362,32 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
+        
+        /**
+         * Restart all the instance of a specific web-service (wms, wfs, csw,...)
+         * 
+         * @param service The service name to restart (wms, wfs, csw,...).
+         * 
+         * @return true if the operation succeed
+         */
+        public boolean renameInstance(final String service, final String instanceId, final String newName) {
+            try {
+                final String url = getURL() + service.toLowerCase() + "/admin?request=renameInstance&id=" + instanceId + "&newName=" + newName;
+                final Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    return "Success".equals(((AcknowlegementType)response).getStatus());
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return false;
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return false;
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
 
         /**
          * Restart a unique instance for the specified service  (wms, wfs, csw,...) and instance identifier.
