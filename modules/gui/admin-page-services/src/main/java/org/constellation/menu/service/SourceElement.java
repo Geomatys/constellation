@@ -16,11 +16,9 @@
  */
 package org.constellation.menu.service;
 
-import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.Source;
-import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -30,8 +28,6 @@ public class SourceElement {
     private final Source parent;
     private final String name;
 
-    protected static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
-    
     public SourceElement(final Source parent, String name) {
         this.parent = parent;
         this.name = name;
@@ -46,24 +42,19 @@ public class SourceElement {
     }
 
     public Boolean getIncluded() {
-        LOGGER.info("included?");
         if (!isLoadAll()) {
             
             for (Layer l : parent.getInclude()) {
                 if (name.equals(l.getName().getLocalPart())) {
-                    LOGGER.info("yes is included");
                     return true;
                 }
             }
-            LOGGER.info("noincluded");
             return false;
         }
-        LOGGER.info("loadall?");
         return true;
     }
 
     public void setIncluded(Boolean included) {
-        LOGGER.info("set included:" + included);
         if (included == null) {
             return;
         }
