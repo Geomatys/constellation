@@ -393,6 +393,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             layersModel = null;
             configuredInstance = null;
             configuredParams = null;
+            goMainPage();
         }
 
         public void reload(){

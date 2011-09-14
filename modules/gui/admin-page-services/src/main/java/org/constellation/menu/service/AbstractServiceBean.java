@@ -498,6 +498,7 @@ public class AbstractServiceBean extends I18NBean{
                 server.services.deleteInstance(getSpecificationName(), instance.getName());
             }
             refresh();
+            goMainPage();
         }
 
         public void restart(){

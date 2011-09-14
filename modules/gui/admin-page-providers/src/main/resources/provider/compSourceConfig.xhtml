@@ -7,27 +7,30 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
-    <center>
-        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
-    </center>
-    <br/>
-    <br/>
     <b>#{bean.i18n['instance']}</b><br/>
     <div class="rounded">
-        <table>
+        <table style="width:100%;">
+            <colgroup>
+                <col width="20%"/>
+                <col width="80%"/>
+            </colgroup>
             <tbody>
                 <tr>
-                    <td>
-                        <h:commandLink action="#{bean.configuredInstance.reload}">
-                            <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
-                        </h:commandLink>
-                    </td>
                     <td>
                         <mf:namer>
                             <mf:parametereditor value="#{bean.idParameter}" rootVisible="true"/>
                         </mf:namer>
                     </td>
                     <td>
+                        <span style="float: right;">
+                            <h:commandLink action="#{bean.configuredInstance.reload}">
+                                <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
+                            </h:commandLink>
+
+                            <h:commandLink action="#{bean.configuredInstance.delete}">
+                                <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
+                            </h:commandLink>
+                        </span>
                     </td>
                 </tr>
             </tbody>
@@ -41,6 +44,7 @@
     
     <br/>
     <div style="text-align: right;">
+        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
         <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
     </div>
     
