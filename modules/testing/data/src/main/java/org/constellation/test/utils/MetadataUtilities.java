@@ -45,6 +45,7 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.service.ServiceIdentificationImpl;
 
+import org.geotoolkit.xml.IdentifierSpace;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.content.ContentInformation;
 import org.opengis.metadata.citation.Citation;
@@ -88,8 +89,8 @@ public class MetadataUtilities {
                 Identification resId = result.getIdentificationInfo().iterator().next();
                 assertTrue(Utilities.deepEquals(expId.getAbstract(), resId.getAbstract(), mode));
                 assertTrue(Utilities.deepEquals(expId.getAggregationInfo(), resId.getAggregationInfo(), mode));
-                
-                
+
+
                 if (expId instanceof DefaultDataIdentification) {
                     // TODO
                 } else if (expId instanceof ServiceIdentificationImpl) {
@@ -104,7 +105,7 @@ public class MetadataUtilities {
         }
         assertTrue(Utilities.deepEquals(expResult, result, mode));
     }
-    
+
     public static void metadataEquals(final DefaultMetadata expResult, final DefaultMetadata result) {
 
         assertEquals(expResult.getAcquisitionInformation().size(), result.getAcquisitionInformation().size());
@@ -384,7 +385,8 @@ public class MetadataUtilities {
                     while (expItOo.hasNext()) {
                         DefaultDataIdentification expOo = (DefaultDataIdentification) expItOo.next();
                         DefaultDataIdentification resOo = (DefaultDataIdentification) resItOo.next();
-                        assertEquals(expOo.getXLink(), resOo.getXLink());
+                        assertEquals(expOo.getIdentifierMap().getSpecialized(IdentifierSpace.XLINK),
+                                     resOo.getIdentifierMap().getSpecialized(IdentifierSpace.XLINK));
                         assertEquals(expOo, resOo);
                     }
                     assertEquals(expService.getOperatesOn(), resService.getOperatesOn());
@@ -496,7 +498,7 @@ public class MetadataUtilities {
 
         assertEquals(expectedExtents, resultExtents);
     }
-    
+
     public static void citationEquals(final Citation expectedCitation, final Citation resultCitation) {
         if (expectedCitation != null && resultCitation != null) {
             assertEquals(expectedCitation.getAlternateTitles(), resultCitation.getAlternateTitles());
@@ -595,9 +597,9 @@ public class MetadataUtilities {
 
         assertEquals(expResult.getMember().size(), result.getMember().size());
     }
-    
+
     public static void systemSMLEquals(final SensorML expResult, final SensorML result) {
-        
+
         sensorMLEquals(expResult, result);
         assertEquals(expResult.getMember().size(), 1);
         SystemType expSysProcess = (SystemType) expResult.getMember().iterator().next().getProcess().getValue();
@@ -648,7 +650,7 @@ public class MetadataUtilities {
         for (int i = 0; i < expSysProcess.getClassification().get(0).getClassifierList().getClassifier().size(); i++) {
             assertEquals(expSysProcess.getClassification().get(0).getClassifierList().getClassifier().get(i), resSysProcess.getClassification().get(0).getClassifierList().getClassifier().get(i));
         }
-        
+
         assertEquals(expSysProcess.getClassification().get(0).getClassifierList().getClassifier(), resSysProcess.getClassification().get(0).getClassifierList().getClassifier());
         assertEquals(expSysProcess.getClassification().get(0).getClassifierList(), resSysProcess.getClassification().get(0).getClassifierList());
         assertEquals(expSysProcess.getClassification().get(0), resSysProcess.getClassification().get(0));
@@ -709,7 +711,7 @@ public class MetadataUtilities {
         assertEquals(expSysProcess.getPositions().getPositionList().getPosition(), resSysProcess.getPositions().getPositionList().getPosition());
         assertEquals(expSysProcess.getPositions().getPositionList(), resSysProcess.getPositions().getPositionList());
         assertEquals(expSysProcess.getPositions(), resSysProcess.getPositions());
-        
+
         assertEquals(expSysProcess.getSMLLocation().getPoint().getPos(), resSysProcess.getSMLLocation().getPoint().getPos());
         assertEquals(expSysProcess.getSMLLocation().getPoint().getAxisLabels(), resSysProcess.getSMLLocation().getPoint().getAxisLabels());
         assertEquals(expSysProcess.getSMLLocation().getPoint().getUomLabels(), resSysProcess.getSMLLocation().getPoint().getUomLabels());
@@ -735,9 +737,9 @@ public class MetadataUtilities {
     }
 
     public static void componentEquals(final SensorML expResult, final SensorML result) {
-        
+
         sensorMLEquals(expResult, result);
-        
+
         assertEquals(expResult.getMember().size(), 1);
         ComponentType expProcess = (ComponentType) expResult.getMember().iterator().next().getProcess().getValue();
         assertTrue(result.getMember().iterator().next().getProcess().getValue() instanceof ComponentType);
