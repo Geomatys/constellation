@@ -1,4 +1,3 @@
-org.constellation.menu.provider.ProviderItem
 org.constellation.menu.provider.ProvidersItem
 org.constellation.menu.provider.CoverageFileItem
 org.constellation.menu.provider.CoverageMosaicItem

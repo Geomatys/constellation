@@ -35,7 +35,7 @@ public class PostGISItem extends AbstractMenuItem{
                 "/provider/postgisConfig.xhtml",
                 "/provider/postgisLayerConfig.xhtml"},
             "provider.postgis",
-            new Path(PROVIDERS_DATA_PATH,"PostGIS", "/provider/postgis.xhtml", null,200)
+            new Path(PROVIDERS_PATH,"PostGIS", "/provider/postgis.xhtml", null,200)
             );
     }
 

@@ -35,7 +35,7 @@ public class CoverageSQLItem extends AbstractMenuItem{
                 "/provider/coveragesqlConfig.xhtml",
                 "/provider/coveragesqlLayerConfig.xhtml"},
             "provider.coveragesql",
-            new Path(PROVIDERS_DATA_PATH,"Coverage-SQL", "/provider/coveragesql.xhtml", null,600)
+            new Path(PROVIDERS_PATH,"Coverage-SQL", "/provider/coveragesql.xhtml", null,600)
             );
     }
 

@@ -26,7 +26,7 @@ public class ProvidersItem extends AbstractMenuItem {
 
     public ProvidersItem() {
         super(new String[]{"/base/providers.xhtml"},
-            null, // no bundle
+            "provider.overview", // todo rename the bundle
             PROVIDERS_PATH);
     }
     
