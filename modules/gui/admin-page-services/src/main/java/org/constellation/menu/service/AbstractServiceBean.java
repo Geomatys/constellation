@@ -278,18 +278,6 @@ public class AbstractServiceBean extends I18NBean{
     }
     
     
-    /*public void changeSourceLoadAll(){
-        final FacesContext context = FacesContext.getCurrentInstance();
-        final ExternalContext ext = context.getExternalContext();
-        final Integer index = Integer.valueOf(ext.getRequestParameterMap().get("NodeId"));
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) 
-                OutlineDataModel.getNode((TreeNode)getLayerModel().getRoot(), index);
-        
-        final Source src = (Source) node.getUserObject();
-        src.setLoadAll( !(Boolean.TRUE.equals(src.getLoadAll())) ); //flip state
-        
-    }*/
-    
     ////////////////////////////////////////////////////////////////////////////
     // CONFIGURE CURRENT INSTANCE //////////////////////////////////////////////
 
@@ -455,6 +443,10 @@ public class AbstractServiceBean extends I18NBean{
                 case ERROR:     return "provider.smallred.png.mfRes";
                 default:        return "provider.smallgray.png.mfRes";
             }
+        }
+        
+        public boolean isWorking(){
+            return ServiceStatus.WORKING.equals(instance.getStatus());
         }
 
         /**

@@ -17,12 +17,16 @@
                 <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
             </h:commandLink>
             &#160;
-            <h:commandLink action="#{bean.configuredInstance.stop}">
+            <h:commandLink action="#{bean.configuredInstance.stop}" rendered="#{bean.configuredInstance.working}">
                 <img src="#{facesContext.externalContext.requestContextPath}/service.stop.png.mfRes" style="border:none;"/>
+                &#160;
             </h:commandLink>
-            &#160;
-            <h:commandLink action="#{bean.configuredInstance.start}">
+            <h:commandLink action="#{bean.configuredInstance.start}" rendered="#{!bean.configuredInstance.working}">
                 <img src="#{facesContext.externalContext.requestContextPath}/service.start.png.mfRes" style="border:none;"/>
+                &#160;
+            </h:commandLink>
+            <h:commandLink action="#{bean.configuredInstance.delete}">
+                <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
             </h:commandLink>
             <br/>
         </span>

@@ -39,21 +39,12 @@
             </h:commandLink>
         </mf:DataTableColumn>
         
-        <mf:DataTableColumn width="16">
-            <h:commandLink action="#{node.userObject.stop}">
+        <mf:DataTableColumn width="32">
+            <h:commandLink action="#{node.userObject.stop}" rendered="#{mf:isInstance(node.userObject,'org.constellation.menu.service.AbstractServiceBean$ServiceInstance') and node.userObject.working}">
                 <img src="#{facesContext.externalContext.requestContextPath}/service.stop.png.mfRes" style="border:none;"/>
             </h:commandLink>
-        </mf:DataTableColumn>
-        
-        <mf:DataTableColumn width="16">
-            <h:commandLink action="#{node.userObject.start}">
+            <h:commandLink action="#{node.userObject.start}" rendered="#{mf:isInstance(node.userObject,'org.constellation.menu.service.AbstractServiceBean$ServiceInstance') and !node.userObject.working}">
                 <img src="#{facesContext.externalContext.requestContextPath}/service.start.png.mfRes" style="border:none;"/>
-            </h:commandLink>
-        </mf:DataTableColumn>
-        
-        <mf:DataTableColumn width="32">
-            <h:commandLink action="#{node.userObject.delete}">
-                <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
             </h:commandLink>
         </mf:DataTableColumn>
         
