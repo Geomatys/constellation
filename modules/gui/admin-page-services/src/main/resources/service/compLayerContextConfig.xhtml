@@ -54,14 +54,6 @@
         <!-- Name column -->
         <h:column>            
             <h:outputText value="#{node.userObject.id}" rendered="#{mf:isInstance(node.userObject,'Source')}"/>
-            <h:commandLink action="#{bean.changeSourceLoadAll}" rendered="#{mf:isInstance(node.userObject,'Source')}" styleClass="logout">
-                <f:param name="NodeId" value="#{sourceLayers.nodeIndex}" />
-                &#160;
-                <h:graphicImage value="service.valid_on.png.mfRes" style="border:none;vertical-align:middle;" rendered="#{node.userObject.loadAll != null and node.userObject.loadAll == true}"/>
-                <h:graphicImage value="service.valid_off.png.mfRes" style="border:none;vertical-align:middle;" rendered="#{node.userObject.loadAll == null or node.userObject.loadAll == false}"/>
-                #{bean.i18n['loadAll']}
-                &#160;
-            </h:commandLink>
             <h:commandLink action="#{bean.removeSource}" rendered="#{mf:isInstance(node.userObject,'Source')}" styleClass="logout">
                 <f:param name="NodeId" value="#{sourceLayers.nodeIndex}" />
                 &#160;
@@ -76,33 +68,21 @@
         <mf:DataTableColumn width="40">
             <f:facet name="header">
                 <h:panelGrid columns="1">
-                    <img src="#{facesContext.externalContext.requestContextPath}/service.valid_on.png.mfRes" style="border:none;"/>
                     <h:outputText value="#{bean.i18n['include']}" />
                 </h:panelGrid>
             </f:facet>
-            <mf:switch>
-                <mf:case condition="#{mf:isInstance(node.userObject,'SourceElement') and node.userObject.included != null}">
-                    <h:selectBooleanCheckbox value="#{node.userObject.included}" />
-                </mf:case>
-            </mf:switch>
-            
-               
+            <mf:Div rendered="#{mf:isInstance(node.userObject,'SourceElement')}">
+                <h:selectBooleanCheckbox value="#{node.userObject.included}"/>
+                
+            </mf:Div>
+            <mf:Div rendered="#{mf:isInstance(node.userObject,'Source')}">
+                <h:selectBooleanCheckbox value="#{node.userObject.loadAll}">
+                    <a4j:support event="onclick" reRender="sourceLayers" ajaxSingle="true"/>
+                </h:selectBooleanCheckbox>
+            </mf:Div>
         </mf:DataTableColumn>
         
-        <mf:DataTableColumn width="40">
-            <f:facet name="header">
-                <h:panelGrid columns="1">
-                    <img src="#{facesContext.externalContext.requestContextPath}/service.unvalid_on.png.mfRes" style="border:none;"/>
-                    <h:outputText value="#{bean.i18n['exclude']}" />
-                </h:panelGrid>
-            </f:facet>
-            <mf:switch>
-                <mf:case condition="#{mf:isInstance(node.userObject,'SourceElement') and node.userObject.excluded != null}">
-                    <h:selectBooleanCheckbox value="#{node.userObject.excluded}" />
-                </mf:case>
-            </mf:switch>
-        </mf:DataTableColumn>
-        
+       
     </mf:Outline>
     </div>
     <b>#{bean.i18n['advancedOption']}</b>

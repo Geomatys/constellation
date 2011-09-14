@@ -278,7 +278,7 @@ public class AbstractServiceBean extends I18NBean{
     }
     
     
-    public void changeSourceLoadAll(){
+    /*public void changeSourceLoadAll(){
         final FacesContext context = FacesContext.getCurrentInstance();
         final ExternalContext ext = context.getExternalContext();
         final Integer index = Integer.valueOf(ext.getRequestParameterMap().get("NodeId"));
@@ -288,7 +288,7 @@ public class AbstractServiceBean extends I18NBean{
         final Source src = (Source) node.getUserObject();
         src.setLoadAll( !(Boolean.TRUE.equals(src.getLoadAll())) ); //flip state
         
-    }
+    }*/
     
     ////////////////////////////////////////////////////////////////////////////
     // CONFIGURE CURRENT INSTANCE //////////////////////////////////////////////
