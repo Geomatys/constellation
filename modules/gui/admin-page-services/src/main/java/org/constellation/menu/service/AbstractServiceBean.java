@@ -118,6 +118,8 @@ public class AbstractServiceBean extends I18NBean{
     private LayerContextTreeModel treemodel = null;
     private String selectedPotentialSource = null;
     private UploadedFile uploadedCapabilities;
+    
+    private boolean creatingFlag = false;
 
     public AbstractServiceBean(final Specification specification, final String mainPage, final String configPage) {
         ArgumentChecks.ensureNonNull("specification", specification);
@@ -206,12 +208,11 @@ public class AbstractServiceBean extends I18NBean{
             }
             
             if (configPage != null) {
+                 creatingFlag = true;
                 final MenuBean bean = getMenuBean();
                 if (bean != null) {
                     bean.addToNavigationStack(configuredInstance.getName());
                 }
-            
-                //the session is not logged, redirect him to the authentication page
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
             }
         }
@@ -291,6 +292,13 @@ public class AbstractServiceBean extends I18NBean{
     }
     
     public void goMainPage(){
+        if (creatingFlag && configuredInstance != null) {
+            creatingFlag = false;
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.services.deleteInstance(getSpecificationName(), configuredInstance.getName());
+            }
+        }
         if (mainPage != null) {
             final MenuBean bean = getMenuBean();
             if (bean != null) {
@@ -350,6 +358,7 @@ public class AbstractServiceBean extends I18NBean{
             server.services.configureInstance(getSpecificationName(), configuredInstance.getName(), configurationObject);
             configuredInstance.restart();
         }
+        creatingFlag = false;
         goMainPage();
     }
     

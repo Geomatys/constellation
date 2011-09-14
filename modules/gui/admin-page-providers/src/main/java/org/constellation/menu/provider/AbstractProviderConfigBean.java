@@ -109,6 +109,8 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     protected ProviderNode configuredInstance = null;
     private ParameterValueGroup configuredParams = null;
     private ParameterValueGroup layerParams = null;
+    
+    private boolean creatingFlag = false;
 
     public AbstractProviderConfigBean(final String serviceName, 
             final String mainPage, final String configPage, final String layerConfigPage){
@@ -310,6 +312,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             configuredParams   = params;
 
             if (sourceConfigPage != null) {
+                creatingFlag = true;
                 final MenuBean bean = getMenuBean();
                 if (bean != null) {
                     bean.addToNavigationStack(newSourceName);
@@ -333,6 +336,13 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     }
     
     public void goMainPage(){
+        if (creatingFlag && configuredInstance != null) {
+            creatingFlag = false;
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.providers.deleteProvider(configuredInstance.provider.getId());
+            }
+        }
         if (mainPage != null) {
             final MenuBean bean = getMenuBean();
             if (bean != null) {
@@ -399,6 +409,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         if (server!= null) {
             server.providers.updateProvider(serviceName, configuredInstance.provider.getId(), configuredParams);
         }
+        creatingFlag = false;
         goMainPage();
     }
     
