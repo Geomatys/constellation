@@ -7,17 +7,13 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
-    <center>
-        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
-    </center>
-    <br/>
-    <br/>  
     <mf:namer styleClass="rounded">
         <mf:parametereditor value="#{bean.layerConfiguredParameters}" width="100%" rootVisible="false"/>
     </mf:namer>
     
     <div style="text-align: right;">
-        <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
+        <h:commandLink action="#{bean.goMainPageFromLayer}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
+        <h:commandButton action="#{bean.saveConfigurationFromLayer}" value="#{bean.i18n['save']}" />
     </div>
     
 </ui:composition>

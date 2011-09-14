@@ -32,6 +32,7 @@ import javax.swing.tree.TreeNode;
 
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.HighLightRowStyler;
+import org.constellation.bean.MenuBean;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
@@ -108,7 +109,6 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     protected ProviderNode configuredInstance = null;
     private ParameterValueGroup configuredParams = null;
     private ParameterValueGroup layerParams = null;
-    private String newSourceName = "default";
 
     public AbstractProviderConfigBean(final String serviceName, 
             final String mainPage, final String configPage, final String layerConfigPage){
@@ -262,30 +262,33 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     // CREATING NEW INSTANCE ///////////////////////////////////////////////////
 
     /**
-     * @return String : name of the new service name to create.
-     */
-    public String getNewSourceName() {
-        return newSourceName;
-    }
-
-    /**
-     * Set the name of the new service to create.
-     */
-    public void setNewSourceName(final String newSourceName) {
-        this.newSourceName = newSourceName;
-    }
-
-    /**
      * Create a new instance of this service.
      */
     public void createSource(){
-        if(newSourceName == null || newSourceName.isEmpty()){
-            //unvalid name
-            return;
-        }
-
+        
         final ConstellationServer server = getServer();
         if (server != null) {
+            
+            final ProvidersReport report              = server.providers.listProviders();
+            final ProviderServiceReport serviceReport = report.getProviderService(serviceName);
+            String newSourceName = "default";
+            int i = 1;
+            boolean freeName = false;
+            while (!freeName) {
+                freeName = true;
+                if (serviceReport != null && serviceReport.getProviders() != null) {
+                    for (final ProviderReport p : serviceReport.getProviders()) {
+                        if (p.getId().equals(newSourceName)) {
+                            //an instance with this already exist
+                            freeName = false;
+                            newSourceName = "default" + i;
+                            i++;
+                            break;
+                        }
+                    }
+                }
+            }
+        
             final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
                     server.providers.getServiceDescriptor(serviceName);
 
@@ -300,9 +303,21 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                 FacesContext.getCurrentInstance().addMessage("Error", 
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, type.getMessage(), ""));
             }
+            
+            layersModel = null;
+           
+            configuredInstance = new ProviderNode(new ProviderReport(newSourceName, null));
+            configuredParams   = params;
+
+            if (sourceConfigPage != null) {
+                final MenuBean bean = getMenuBean();
+                if (bean != null) {
+                    bean.addToNavigationStack(newSourceName);
+                }
+                FacesContext.getCurrentInstance().getViewRoot().setViewId(sourceConfigPage);
+            }
+            
         }
-        
-        layersModel = null;
     }
 
 
@@ -319,6 +334,21 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     
     public void goMainPage(){
         if (mainPage != null) {
+            final MenuBean bean = getMenuBean();
+            if (bean != null) {
+                bean.backNavigationStack();
+            }
+            FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
+        }
+    }
+    
+    public void goMainPageFromLayer(){
+        if (mainPage != null) {
+            final MenuBean bean = getMenuBean();
+            if (bean != null) {
+                bean.backNavigationStack();
+                bean.backNavigationStack();
+            }
             FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
         }
     }
@@ -369,8 +399,21 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         if (server!= null) {
             server.providers.updateProvider(serviceName, configuredInstance.provider.getId(), configuredParams);
         }
+        goMainPage();
+    }
+    
+    public void saveConfigurationFromLayer(){
+        final ConstellationServer server = getServer();
+        if (server!= null) {
+            server.providers.updateProvider(serviceName, configuredInstance.provider.getId(), configuredParams);
+        }
+        goMainPageFromLayer();
     }
 
+    public MenuBean getMenuBean() {
+        final FacesContext context = FacesContext.getCurrentInstance();
+        return (MenuBean) context.getApplication().evaluateExpressionGet(context, "#{menuBean}", MenuBean.class);
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     // SUBCLASSES //////////////////////////////////////////////////////////////
@@ -426,6 +469,10 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         public void config(){
             select();
             if (sourceConfigPage != null) {
+                final MenuBean bean = getMenuBean();
+                if (bean != null) {
+                    bean.addToNavigationStack(configuredInstance.provider.getId());
+                }
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(sourceConfigPage);
             }
         }
@@ -483,6 +530,11 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             
             
             if (itemConfigPage != null) {
+                final MenuBean bean = getMenuBean();
+                if (bean != null) {
+                    bean.addToNavigationStack(provider.getId());
+                    bean.addToNavigationStack(name.getLocalPart());
+                }
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(itemConfigPage);
             }
         }

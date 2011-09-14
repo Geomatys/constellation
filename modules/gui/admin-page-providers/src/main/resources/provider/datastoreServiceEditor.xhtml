@@ -10,11 +10,7 @@
     <!-- ensure providerBean is loaded -->
     <h:outputText value="#{providerBean}" style="display:none;"/>
     
-    <h:outputText value="#{bean.i18n['newsource']}" />
-    <span/>
-    <h:inputText value="#{bean.newSourceName}" />
-    <span/>
-    <h:commandButton action="#{bean.createSource}" value="#{bean.i18n['add']}" />
+    <h:commandButton action="#{bean.createSource}" value="#{bean.i18n['addSource']}" />
     <br/>
     <br/>
     <h:messages errorClass="errorMessage" />
