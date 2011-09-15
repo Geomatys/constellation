@@ -222,7 +222,7 @@ public class MDWebMetadataWriterTest {
 
         DataIdentification expId = ((ServiceIdentificationImpl)expResult.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
         DataIdentification resId = ((ServiceIdentificationImpl)result.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
-        assertEquals(new URI("http://test.com"), ((IdentifiedObject)expId).getXLink().getHRef());
+        assertEquals(new URI("http://test.com"), ((IdentifiedObject)expId).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK).getHRef());
         assertEquals(new URI("http://test.com"), ((IdentifiedObject)resId).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK).getHRef());
         metadataEquals(expResult,result);
         
@@ -237,8 +237,8 @@ public class MDWebMetadataWriterTest {
 
         expId = ((ServiceIdentificationImpl)expResult.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
         resId = ((ServiceIdentificationImpl)result.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
-        assertEquals(new URI("http://test2.com"), ((IdentifiedObject)expId).getXLink().getHRef());
-        assertEquals(new URI("http://test2.com"), ((IdentifiedObject)resId).getXLink().getHRef());
+        assertEquals(new URI("http://test2.com"), ((IdentifiedObject)expId).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK).getHRef());
+        assertEquals(new URI("http://test2.com"), ((IdentifiedObject)resId).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK).getHRef());
         
         metadataEquals(expResult, result, ComparisonMode.BY_CONTRACT);
         

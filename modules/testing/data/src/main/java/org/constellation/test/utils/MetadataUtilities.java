@@ -44,6 +44,7 @@ import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.service.ServiceIdentificationImpl;
+import org.geotoolkit.xml.IdentifierSpace;
 
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.content.ContentInformation;
@@ -384,7 +385,7 @@ public class MetadataUtilities {
                     while (expItOo.hasNext()) {
                         DefaultDataIdentification expOo = (DefaultDataIdentification) expItOo.next();
                         DefaultDataIdentification resOo = (DefaultDataIdentification) resItOo.next();
-                        assertEquals(expOo.getXLink(), resOo.getXLink());
+                        assertEquals(expOo.getIdentifierMap().getSpecialized(IdentifierSpace.XLINK), resOo.getIdentifierMap().getSpecialized(IdentifierSpace.XLINK));
                         assertEquals(expOo, resOo);
                     }
                     assertEquals(expService.getOperatesOn(), resService.getOperatesOn());

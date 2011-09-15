@@ -72,9 +72,13 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.UnlimitedInteger;
+import org.geotoolkit.xml.IdentifierSpace;
+import org.geotoolkit.xml.IdentifiedObject;
+import org.geotoolkit.xml.XLink;
 
 // GeoAPI dependencies
 import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.xml.IdentifiedObject;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 import org.opengis.util.TypeName;
@@ -754,6 +758,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
                         if (mode != SENSORML  && attribName.equalsIgnoreCase("identifier")) {
                             attribName = "name";
+                        }
+                        // special case for xlink
+                        if (attribName.equals("xLink") && IdentifiedObject.class.isAssignableFrom(classe)) {
+                            ((IdentifiedObject)result).getIdentifierMap().putSpecialized(IdentifierSpace.XLINK, (XLink)param);
                         }
                         final Field field = ReflectionUtilities.getFieldFromName(attribName, classe);
 

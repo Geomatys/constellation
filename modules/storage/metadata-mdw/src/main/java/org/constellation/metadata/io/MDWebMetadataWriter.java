@@ -48,13 +48,15 @@ import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.Util;
 
 // Geotoolkit dependencies
-import org.geotoolkit.xml.XLink;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription;
 import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.xml.IdentifierSpace;
+import org.geotoolkit.xml.IdentifiedObject;
+import org.geotoolkit.xml.XLink;
+import org.geotoolkit.xml.XLink.Type;
 
 // MDWeb dependencies
-import org.geotoolkit.xml.XLink.Type;
 import org.mdweb.model.profiles.Profile;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
@@ -660,7 +662,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                           "\nCause: " + e.getMessage());
                             return result;
                         }
-                    // we get directly the field
+                        
+                    // special case for xlink
+                    } else if ("xLink".equals(propName) && object instanceof IdentifiedObject) {
+                        final Object propertyValue = ((IdentifiedObject)object).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK);
+                        if (propertyValue != null) {
+                            final Path childPath = new Path(path, prop);
+
+                            //if the path is not already in the database we write it
+                            if (mdWriter.getPath(childPath.getId()) == null) {
+                                mdWriter.writePath(childPath);
+                            }
+                            result.addAll(addValueFromObject(form, propertyValue, childPath, value));
+                        }
                     } else if (!"unitOfMeasure".equals(propName) && !"verticalDatum".equals(propName)) {
                         final Class valueClass     = object.getClass();
                         final Object propertyValue = getValueFromField(valueClass, propName, object);
