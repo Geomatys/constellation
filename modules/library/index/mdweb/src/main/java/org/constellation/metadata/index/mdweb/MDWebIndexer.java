@@ -143,7 +143,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         int nbRecordSets = 0;
         int nbForms      = 0;
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_33, analyzer);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_34, analyzer);
             final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
 
             // getting the objects list and index avery item in the IndexWriter.
@@ -200,7 +200,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         final int nbRecordSets = 0;
         int nbForms = 0;
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_33, analyzer);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_34, analyzer);
             final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
 
             nbForms = forms.size();
