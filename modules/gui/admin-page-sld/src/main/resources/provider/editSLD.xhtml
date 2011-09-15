@@ -7,19 +7,35 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
-    <center>
-        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
-    </center>
-    <br/>
-    <br/>
     <div styleClass="rounded">
-    #{bean.i18n['name']}<h:inputText value="#{bean.editedSLDNode.userObject}" />
+        <table style="width:100%;">
+            <colgroup>
+                <col width="30%"/>
+                <col width="60%"/>
+            </colgroup>
+            <tbody>
+                <tr>
+                    <td>
+                        #{bean.i18n['name']}<h:inputText value="#{bean.editedSLDNode.userObject}" />
+                    </td>
+                    <td>
+                        <span style="float: right;">
+                           <h:commandLink action="#{bean.editedSLDNode.delete}">
+                                <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
+                           </h:commandLink>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    
     </div>
     <br/>
     <br/>
     <mf:styleeditor value="#{bean.editedSLD}"/>        
     <br/>
     <div style="text-align: right;">
+        <h:commandLink action="#{bean.goMainPageStyle}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
         <h:commandButton action="#{bean.saveEditedSLD}" value="#{bean.i18n['save']}" />
     </div>
     

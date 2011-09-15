@@ -110,7 +110,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     private ParameterValueGroup configuredParams = null;
     private ParameterValueGroup layerParams = null;
     
-    private boolean creatingFlag = false;
+    protected boolean creatingFlag = false;
 
     public AbstractProviderConfigBean(final String serviceName, 
             final String mainPage, final String configPage, final String layerConfigPage){

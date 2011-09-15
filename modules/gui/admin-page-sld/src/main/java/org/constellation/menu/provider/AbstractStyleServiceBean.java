@@ -21,6 +21,7 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.bean.MenuBean;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
@@ -53,34 +54,57 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
     ////////////////////////////////////////////////////////////////////////////
     // CONFIGURE SLD INSTANCE //////////////////////////////////////////////////
 
-    private String newStyleName = "newStyle";
-
-    public String getNewStyleName() {
-        return newStyleName;
-    }
-
-    public void setNewStyleName(final String newStyleName) {
-        this.newStyleName = newStyleName;
-    }
     
     public void createNewStyle(){
-        final MutableStyle style = StyleEditionConstants.SF.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
-        style.setName(newStyleName);
-        style.setDescription(StyleEditionConstants.SF.description(newStyleName, newStyleName));
-        style.featureTypeStyles().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
-        style.featureTypeStyles().get(0).rules().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
         
         final ConstellationServer server = getServer();
         if (server != null) {
+            String newStyleName = "newStyle";
+            int i = 1;
+            boolean freeName = false;
+            while (!freeName) {
+                freeName = true;
+                for (final String p : configuredInstance.provider.getItems()) {
+                    if (p.equals(newStyleName)) {
+                        //an instance with this already exist
+                        freeName = false;
+                        newStyleName = "newStyle" + i;
+                        i++;
+                        break;
+                    }
+                }
+            }
+
+            final MutableStyle style = StyleEditionConstants.SF.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
+            style.setName(newStyleName);
+            style.setDescription(StyleEditionConstants.SF.description(newStyleName, newStyleName));
+            style.featureTypeStyles().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
+            style.featureTypeStyles().get(0).rules().get(0).setDescription(StyleConstants.DEFAULT_DESCRIPTION);
+        
+        
             server.providers.createStyle(configuredInstance.provider.getId(), newStyleName, style);
         
             //update the provider report
             final ProvidersReport reports = server.providers.listProviders();
             refreshUsedIds(reports);
             final ProviderServiceReport serviceReport = reports.getProviderService(this.serviceName);
-            if(serviceReport != null){
+            if (serviceReport != null) {
                 final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());
                 configuredInstance = new ProviderNode(report);
+                configuredInstance.select();
+
+            
+                editedStyle = server.providers.downloadStyle(configuredInstance.provider.getId(), newStyleName);
+                editedSLDNode = new SLDNode(report, newStyleName);
+
+                if (itemConfigPage != null) {
+                    creatingFlag = true;
+                    final MenuBean bean = getMenuBean();
+                    if (bean != null) {
+                        bean.addToNavigationStack(newStyleName);
+                    }
+                    FacesContext.getCurrentInstance().getViewRoot().setViewId(itemConfigPage);
+                }
             }
         }
         
@@ -96,7 +120,9 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
         if (server != null) {
             server.providers.updateStyle(editedSLDNode.provider.getId(), editedSLDNode.key, editedStyle);
         }
+        creatingFlag = false;
         layersModel = null;
+        goMainPageStyle();
         
         //TODO, update service to allow renaming
 //        final String newName = editedSLDNode.getUserObject().toString();
@@ -137,6 +163,10 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
                 editedSLDNode = this;
 
                 if (itemConfigPage != null) {
+                    final MenuBean bean = getMenuBean();
+                    if (bean != null) {
+                        bean.addToNavigationStack(key);
+                    }
                     FacesContext.getCurrentInstance().getViewRoot().setViewId(itemConfigPage);
                 }
             }
@@ -154,12 +184,28 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
                 if(serviceReport != null){
                     final ProviderReport report = serviceReport.getProvider(configuredInstance.provider.getId());
                     configuredInstance = new ProviderNode(report);
+                    goMainPageStyle();
                 }
             }
             
             layersModel = null;
         }
-                
     }
 
+    public void goMainPageStyle(){
+        if (creatingFlag && configuredInstance != null) {
+            creatingFlag = false;
+            final ConstellationServer server = getServer();
+            if (server != null) {
+                server.providers.deleteStyle(configuredInstance.provider.getId(), editedSLDNode.key);
+            }
+        }
+        if (mainPage != null) {
+            final MenuBean bean = getMenuBean();
+            if (bean != null) {
+                bean.backNavigationStack();
+            }
+            FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
+        }
+    }
 }

@@ -7,13 +7,7 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
-    <h:outputText value="#{bean.i18n['newsource']}" />
-    <span/>
-    <h:inputText value="#{bean.newSourceName}" />
-    <!-- TODO validation client side -->
-    <!-- h:inputText value="#{bean.newSourceName}" onkeyup="matchesKeyword(this.value,'#{bean.usedIds}');"/ -->
-    <span/>
-    <h:commandButton action="#{bean.createSource}" value="#{bean.i18n['add']}" />
+    <h:commandButton action="#{bean.createSource}" value="#{bean.i18n['addSource']}" />
     <br/>
     <br/>
     <h:messages errorClass="errorMessage" />
@@ -40,23 +34,11 @@
                 </a4j:commandLink>
             </mf:DataTableColumn>
 
-            <mf:DataTableColumn width="24px">
-                <a4j:commandLink action="#{node.delete}" reRender="storePreview">
-                    <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
-                </a4j:commandLink>
-            </mf:DataTableColumn>
-
         </mf:Outline>
     </div>
     
     <mf:Div rendered="#{bean.configuredInstance != null}">
-        <h:outputText value="#{bean.i18n['newstyle']}" />
-        <span/>
-        <h:inputText value="#{bean.newStyleName}" />
-        <span/>
-        <a4j:commandLink styleClass="logout" action="#{bean.createNewStyle}" reRender="layerPreview">
-            #{bean.i18n['add']}
-        </a4j:commandLink>
+        <h:commandButton action="#{bean.createNewStyle}" value="#{bean.i18n['newstyle']}" />
     </mf:Div>
     
     
@@ -72,12 +54,6 @@
                 <h:commandLink action="#{node.config}">
                     <img src="#{facesContext.externalContext.requestContextPath}/provider.edit.png.mfRes" style="border:none;"/>
                 </h:commandLink>
-            </mf:DataTableColumn>
-            
-            <mf:DataTableColumn width="24px">
-                <a4j:commandLink action="#{node.delete}" reRender="layerPreview">
-                    <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
-                </a4j:commandLink>
             </mf:DataTableColumn>
             
         </mf:Outline>
