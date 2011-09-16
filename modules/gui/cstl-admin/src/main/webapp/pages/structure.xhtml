@@ -48,7 +48,7 @@
             <div id="navigationBar" class="rounded">
                 <ul style="padding:10px;">
                     <a4j:repeat value="#{menuBean.navigationStack}" var="node">
-                        <li style="padding:10px;float:left;list-style:none;">
+                        <li style="padding-left:10px;float:left;list-style:none;">
                             <h:commandLink action="#{menuBean.navigateTo}" value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage != null}">
                                 <f:param name="itemId" value="#{node.i18nkey}"/>
                             </h:commandLink>

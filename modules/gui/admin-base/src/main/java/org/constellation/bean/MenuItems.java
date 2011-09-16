@@ -31,9 +31,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.context.FacesContext;
 import javax.imageio.spi.ServiceRegistry;
+import javax.servlet.ServletContext;
 import org.apache.commons.io.IOUtils;
 import org.constellation.util.ReflectionUtilities;
-import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -42,15 +42,14 @@ import org.geotoolkit.util.logging.Logging;
  */
 public final class MenuItems {
 
-    private static final Logger LOGGER = Logging.getLogger(ReflectionUtilities.class);
+    private static final Logger LOGGER = Logging.getLogger(MenuItems.class);
     
-    private static final List<MenuItem> PAGES;
+    private static final List<MenuItem> PAGES =  new ArrayList<MenuItem>();
 
-    static {
+    private MenuItems() {}
+    
+    public static void deployPages(final Object ctx) {
 
-        //get the root path of the application
-        final Object ctx = FacesContext.getCurrentInstance().getExternalContext().getContext();
-        
         /**
          * the method getRealPath is available in PortletContext and ServletContext
          * in order to avoid a class cast exception we use reflection to get the method
@@ -62,10 +61,9 @@ public final class MenuItems {
 
 
             final Iterator<MenuItem> ite = ServiceRegistry.lookupProviders(MenuItem.class);
-            final List<MenuItem> lst = new ArrayList<MenuItem>();
             while(ite.hasNext()){
                 final MenuItem page = ite.next();
-                lst.add(page);
+                PAGES.add(page);
 
                 // copy each file in the web app folder preserving the path
                 for(String path : page.getPages()){
@@ -82,15 +80,12 @@ public final class MenuItems {
                     copy(MenuItems.class.getResourceAsStream(path), target);
                 }
             }
-
-            PAGES = UnmodifiableArrayList.wrap(lst.toArray(new MenuItem[lst.size()]));
         } else {
-            PAGES = new ArrayList<MenuItem>();
-            LOGGER.log(Level.WARNING, "There is no method getRealPath on: {0}", ctx.getClass().getName());
+           LOGGER.log(Level.WARNING, "There is no method getRealPath on: {0}", ctx.getClass().getName());
         }
     }
 
-    private MenuItems() {}
+    
 
     public static List<MenuItem> getPages() {
         return PAGES;

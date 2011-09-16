@@ -4,6 +4,9 @@
     <listener>
         <listener-class>org.constellation.Installer</listener-class>
     </listener>
+    <listener>
+        <listener-class>org.constellation.listener.PageDeployerListener</listener-class>
+    </listener>
 
     <display-name>Constellation</display-name>
 
