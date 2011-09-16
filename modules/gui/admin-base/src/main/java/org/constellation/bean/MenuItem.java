@@ -19,6 +19,7 @@ package org.constellation.bean;
 
 import java.util.List;
 import org.constellation.admin.service.ConstellationServer;
+import org.geotoolkit.util.Utilities;
 
 /**
  * 
@@ -84,6 +85,39 @@ public interface MenuItem {
             this.linkedPage = linkedPage;
             this.icon = icon;
             this.priority = priority;
+        }
+        
+        public boolean isChildOf(final Path path) {
+            if (this.equals(path)) return true;
+            if (this.parent != null) return this.parent.isChildOf(path);
+            else return false;
+        }
+        
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof Path) {
+                final Path that = (Path) obj;
+                return Utilities.equals(this.i18nKey, that.i18nKey) &&
+                       Utilities.equals(this.icon, that.icon) &&
+                       Utilities.equals(this.linkedPage, that.linkedPage) &&
+                       Utilities.equals(this.priority, that.priority) &&
+                       Utilities.equals(this.parent, that.parent);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 53 * hash + (this.parent != null ? this.parent.hashCode() : 0);
+            hash = 53 * hash + (this.i18nKey != null ? this.i18nKey.hashCode() : 0);
+            hash = 53 * hash + (this.linkedPage != null ? this.linkedPage.hashCode() : 0);
+            hash = 53 * hash + (this.icon != null ? this.icon.hashCode() : 0);
+            hash = 53 * hash + this.priority;
+            return hash;
         }
         
         @Override

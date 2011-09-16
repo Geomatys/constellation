@@ -46,7 +46,9 @@ public class MenuBean extends I18NBean {
      * When user is log in, a ServiceAdministrator object is added in the session map.
      */
     public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
-    
+
+    private static boolean PARTIAL_TREE = false;
+            
     private static final Logger LOGGER = Logging.getLogger(MenuBean.class);
 
     private static final OutlineRowStyler STYLER = new OutlineRowStyler() {
@@ -102,13 +104,29 @@ public class MenuBean extends I18NBean {
         return null;
     }
     
+    private Path getRootPathFromView(final String viewId) {
+        for (final MenuItem page : MenuItems.getPages()) {
+            if (page.getPages().contains(viewId)) {
+                Path goodPath = page.getPath();
+                while (goodPath.parent != null) {
+                    goodPath = goodPath.parent;
+                }
+                return goodPath;
+            }
+        }
+        return null;
+    }
+    
     private TreeModel createMenuModel(){
+        
+        final String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();;
         final Map<String,I18NNode> nodes = new HashMap<String, I18NNode>();
         final I18NNode root = new I18NNode("root",null,null,0);
         nodes.put("root", root);
         model = new DefaultTreeModel(root);
 
-        ConstellationServer server = getServer();
+        final ConstellationServer server = getServer();
+        final Path rootPath = getRootPathFromView(viewId);
         
         for (final MenuItem page : MenuItems.getPages()) {
             if(!page.isAvailable(server)){
@@ -124,7 +142,17 @@ public class MenuBean extends I18NBean {
             //add all pages
             final Path path = page.getPath();
             if (path != null) {
-                create(root, nodes, path);
+                if (PARTIAL_TREE) {
+                    if (rootPath != null) {
+                        if (path.isChildOf(rootPath)) {
+                            create(root, nodes, path);
+                        }
+                    } else {
+                        LOGGER.warning("no root path found for:" + viewId);
+                    }
+                } else {  
+                    create(root, nodes, path);
+                } 
             }
         }
         return model;
@@ -169,7 +197,7 @@ public class MenuBean extends I18NBean {
 
     public TreeModel getModel() {
         final ConstellationServer currentServer = getServer();
-        if(model == null || oldServer==null || !oldServer.equals(currentServer)){
+        if(PARTIAL_TREE || model == null || oldServer==null || !oldServer.equals(currentServer)){
             model = createMenuModel();
             oldServer = currentServer;
         }
