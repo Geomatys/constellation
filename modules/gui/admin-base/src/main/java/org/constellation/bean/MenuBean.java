@@ -47,7 +47,7 @@ public class MenuBean extends I18NBean {
      */
     public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
 
-    private static boolean PARTIAL_TREE = false;
+    public static boolean PARTIAL_TREE = false;
             
     private static final Logger LOGGER = Logging.getLogger(MenuBean.class);
 
