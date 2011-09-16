@@ -1050,8 +1050,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         // 4. IMAGE
         final String mime = getMap.getFormat();
-        final OutputDef odef = new OutputDef(mime, new Object());
-        odef.setCompression(mapDecoration.getCompression(mime));
+        final OutputDef odef = mapDecoration.getOutputDef(mime);
 
         try {
             //force longitude first

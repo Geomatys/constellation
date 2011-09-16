@@ -24,7 +24,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.spi.ImageWriterSpi;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,7 +39,6 @@ import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -61,16 +59,12 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
     @Override
     public void writeTo(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt,
             final MultivaluedMap<String, Object> h, final OutputStream out) throws IOException, WebApplicationException {
-
+        
         BufferedImage img = r.getImage();
         if(img != null){
-            /**
-             * Hack
-             */
-            Registry.setNativeCodecAllowed("PNG", ImageWriterSpi.class, false);
-            Registry.setNativeCodecAllowed("BMP", ImageWriterSpi.class, false); 
-            Registry.setNativeCodecAllowed("GIF", ImageWriterSpi.class, false);
-            DefaultPortrayalService.writeImage(img, new OutputDef(mt.toString(), out));
+            OutputDef outdef = r.getOutputDef();
+            outdef.setOutput(out);
+            DefaultPortrayalService.writeImage(img, outdef);
         } else {
             final CanvasDef cdef = r.getCanvasDef();
             final SceneDef sdef = r.getSceneDef();

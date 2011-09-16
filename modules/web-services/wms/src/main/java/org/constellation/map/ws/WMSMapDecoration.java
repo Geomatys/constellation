@@ -32,13 +32,15 @@ import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.swing.SwingConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -70,12 +72,12 @@ import org.geotoolkit.display2d.ext.scalebar.ScaleBarTemplate;
 import org.geotoolkit.display2d.ext.text.DefaultTextTemplate;
 import org.geotoolkit.display2d.ext.text.GraphicTextJ2D;
 import org.geotoolkit.display2d.ext.text.TextTemplate;
+import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.PortrayalExtension;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.image.io.XImageIO;
-import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.Converters;
+import org.geotoolkit.util.XArrays;
 import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.util.FactoryException;
@@ -178,6 +180,9 @@ public final class WMSMapDecoration {
     private PortrayalExtension extension = null;
     private final Hints hints = new Hints();
     private final Map<String,Float> compressions = new HashMap<String, Float>();
+    private final static Map<String,ImageWriterSpi> nativewriterspi = new HashMap<String, ImageWriterSpi>();
+    private String[] nativeReaders;
+    private String[] nativeWriters;
 
     private LegendTemplate legendTemplate = null;
 
@@ -253,6 +258,47 @@ public final class WMSMapDecoration {
         }
     }
 
+    /**
+     * Create an output definition for the given mime type
+     * Compression rate, type and optimal writer spi.
+     * 
+     * @param mime
+     * @return 
+     */
+    OutputDef getOutputDef(String mime) {
+        final OutputDef odef = new OutputDef(mime, new Object());
+        odef.setCompression(getCompression(mime));
+        
+        if(nativeWriters != null){
+            for(String str : nativeWriters){
+                if(mime.equalsIgnoreCase(str)){
+                    odef.setSpi(getNativeWriterSpi(mime));
+                }
+            }
+        }
+        
+        return odef;
+    }
+    
+    private synchronized static ImageWriterSpi getNativeWriterSpi(final String mime){
+        ImageWriterSpi spi = nativewriterspi.get(mime);
+        if(spi != null) return spi;
+        
+        final ServiceRegistry registry = IIORegistry.getDefaultInstance();
+        for (final Iterator<ImageWriterSpi> it = registry.getServiceProviders(ImageWriterSpi.class, false); it.hasNext();) {
+            spi = it.next();
+            final String classname = spi.getClass().getName();
+            if (classname.startsWith("com.sun.media.")) {
+                if(XArrays.contains(spi.getMIMETypes(),mime)){
+                    nativewriterspi.put(mime, spi);
+                    return spi;
+                }
+            }
+        }
+        return null;
+    }
+    
+    
     private PortrayalExtension read(final File configFile) throws ParserConfigurationException, SAXException, IOException{
 
         if(!configFile.exists()){
@@ -346,36 +392,10 @@ public final class WMSMapDecoration {
                 hints.put(GO2Hints.KEY_PARALLAL_BUFFER, Boolean.parseBoolean(value));
             }else if(HINT_NATIVE_READER.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
-                final String[] parts = value.split(",");
-
-                //reset values, only allow pure java readers
-                for(String jn : ImageIO.getReaderFormatNames()){
-                    Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
-                }
-
-                //allow natives readers only on thoses requested
-                for(String part : parts){
-                    final String[] javaNames = XImageIO.getFormatNamesByMimeType(part, true, false);
-                    for(String jn : javaNames){
-                        Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, true);
-                    }
-                }
+                nativeReaders = value.split(",");
             }else if(HINT_NATIVE_WRITER.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
-                final String[] parts = value.split(",");
-
-                //reset values, only allow pure java writers
-                for(String jn : ImageIO.getWriterFormatNames()){
-                    Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
-                }
-
-                //allow natives writers only on thoses requested
-                for(String part : parts){
-                    final String[] javaNames = XImageIO.getFormatNamesByMimeType(part, false, true);
-                    for(String jn : javaNames){
-                        Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, true);
-                    }
-                }
+                nativeWriters = value.split(",");
             }
         }
 
