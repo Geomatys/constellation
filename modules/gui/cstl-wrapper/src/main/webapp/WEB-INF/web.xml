@@ -4,10 +4,6 @@
     <listener>
         <listener-class>org.constellation.Installer</listener-class>
     </listener>
-    <listener>
-        <listener-class>org.constellation.listener.PageDeployerListener</listener-class>
-    </listener>
-
     <display-name>Constellation</display-name>
 
     <!-- Shiro filter handling security access -->
@@ -20,6 +16,10 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <context-param>
+         <param-name>facelets.RESOURCE_RESOLVER</param-name>
+         <param-value>org.mapfaces.resolver.JARFaceletsResolver</param-value>
+    </context-param>
     <context-param>
         <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
         <param-value>server</param-value>
