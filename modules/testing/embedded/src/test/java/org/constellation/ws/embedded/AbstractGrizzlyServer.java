@@ -17,6 +17,10 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.spi.ImageReaderSpi;
+import org.geotoolkit.image.jai.Registry;
+import javax.imageio.ImageIO;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.geotoolkit.data.om.OMDataStoreFactory;
@@ -186,6 +190,16 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSMapDecoration.setEmptyExtension(true);
+        
+        //reset values, only allow pure java readers
+        for(String jn : ImageIO.getReaderFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+        }
+
+        //reset values, only allow pure java writers
+        for(String jn : ImageIO.getWriterFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+        }
         
         // Starting the grizzly server
         grizzly.start();
