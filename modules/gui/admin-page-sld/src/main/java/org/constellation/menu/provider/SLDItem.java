@@ -33,8 +33,7 @@ public class SLDItem extends AbstractMenuItem {
                 "/provider/sldConfig.xhtml",
                 "/provider/onesldeditor.xhtml"},
             "provider.sld",
-            new Path(STYLE_PATH,"SLD Styles", "/provider/sld.xhtml", null,900)
-            );
+            new Path(null, "styles", "/provider/sld.xhtml", "org.constellation.icons.colors.png.mfRes",250));
     }
 
 }

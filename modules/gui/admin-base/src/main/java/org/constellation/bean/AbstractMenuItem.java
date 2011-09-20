@@ -30,7 +30,7 @@ public abstract class AbstractMenuItem implements MenuItem {
 
     public static final Path SERVICES_PATH       = new Path(null, "services", "/base/services.xhtml", "org.constellation.icons.socket.png.mfRes",400);
     public static final Path PROVIDERS_PATH      = new Path(null, "providers", "/base/providers.xhtml", "org.constellation.icons.nfs_unmount.png.mfRes",300);
-    public static final Path STYLE_PATH          = new Path(null, "styles", null, "org.constellation.icons.colors.png.mfRes",250);
+    //public static final Path STYLE_PATH          = new Path(null, "styles", null, "org.constellation.icons.colors.png.mfRes",250);
     public static final Path SYSTEMS_PATH        = new Path(null, "systems", null, "org.constellation.icons.configure.png.mfRes",200);
     public static final Path TOOLS_PATH          = new Path(null, "tools", null, "org.constellation.icons.tool.png.mfRes",100);
 
