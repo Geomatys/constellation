@@ -31,12 +31,33 @@
     
     </div>
     <br/>
-    <br/>
-    <mf:styleeditor value="#{bean.editedSLD}"/>        
-    <br/>
-    <div style="text-align: right;">
-        <h:commandLink action="#{bean.goMainPageStyle}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
-        <h:commandButton action="#{bean.saveEditedSLD}" value="#{bean.i18n['save']}" />
+    
+    <div>
+        <mf:TabPanel id="tabpanel">
+                <mf:TabItem id="tabitem_simple" title="simple-style">
+                    <mf:styleeditor value="#{bean.editedSLD}"/>
+                    <div style="text-align: right;">
+                        <h:commandLink action="#{bean.goMainPageStyle}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
+                        <h:commandButton action="#{bean.saveEditedSLD}" value="#{bean.i18n['save']}" />
+                    </div>
+                </mf:TabItem>
+                <mf:TabItem id="tabitem_advanced" title="advanced-style">
+                    <mf:styleeditor value="#{bean.editedSLD}"/>
+                    <div style="text-align: right;">
+                        <h:commandLink action="#{bean.goMainPageStyle}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
+                        <h:commandButton action="#{bean.saveEditedSLD}" value="#{bean.i18n['save']}" />
+                    </div>
+                </mf:TabItem>
+                <mf:TabItem id="tabitem_xml" title="xml-style">
+                    <h:inputTextarea value="#{bean.xmlSLD}" style="width:95%;height:100%;"/>
+                    <div style="text-align: right;">
+                        <h:commandLink action="#{bean.goMainPageStyle}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
+                        <h:commandButton action="#{bean.saveXmlSLD}" value="#{bean.i18n['save']}" />
+                    </div>
+                </mf:TabItem>
+        </mf:TabPanel>
+    
+       
     </div>
     
 </ui:composition>

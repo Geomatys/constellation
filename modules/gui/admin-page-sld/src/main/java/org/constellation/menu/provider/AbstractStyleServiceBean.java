@@ -17,17 +17,26 @@
 
 package org.constellation.menu.provider;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.xml.bind.JAXBException;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.MenuBean;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
+import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
+import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
+import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
 import org.mapfaces.facelet.styleeditor.StyleEditionConstants;
+import org.opengis.util.FactoryException;
 
 
 /**
@@ -40,6 +49,8 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
     private MutableStyle editedStyle = null;
     private SLDNode editedSLDNode = null;
 
+    private String xmlSLD = "";
+    
     public AbstractStyleServiceBean(final String serviceName, final String mainPage, 
             final String configPage, final String sldConfig){
         super(serviceName,mainPage,configPage,sldConfig);
@@ -97,6 +108,9 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
                 editedStyle = server.providers.downloadStyle(configuredInstance.provider.getId(), newStyleName);
                 editedSLDNode = new SLDNode(report, newStyleName);
 
+                // marshall the current Style into the xmlSLD area
+                xmlSLD = readXmlSLD(editedStyle);
+                
                 if (itemConfigPage != null) {
                     creatingFlag = true;
                     final MenuBean bean = getMenuBean();
@@ -109,6 +123,32 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
         }
         
         layersModel = null;
+    }
+    
+    private String readXmlSLD(final MutableStyle style) {
+        final XMLUtilities util = new XMLUtilities();
+        try {
+            final StringWriter sw = new StringWriter();
+            util.writeStyle(sw, style, StyledLayerDescriptor.V_1_1_0);
+            return sw.toString();
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "JAXBException while marshalling Style.", ex);
+        }
+        return null;
+    }
+    
+    private MutableStyle writeXmlSLD(final String xmlStyle) {
+        final XMLUtilities util = new XMLUtilities();
+        try {
+            final StringWriter sw = new StringWriter();
+            return util.readStyle(new StringReader(xmlStyle), SymbologyEncoding.V_1_1_0);
+            
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.WARNING, "FactoryException while unmarshalling Style.", ex);
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "JAXBException while unmarshalling Style.", ex);
+        }
+        return null;
     }
     
     public MutableStyle getEditedSLD() {
@@ -134,8 +174,43 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
         
     }
 
+    public void saveXmlSLD(){
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            final MutableStyle xmlStyle = writeXmlSLD(xmlSLD);
+            server.providers.updateStyle(editedSLDNode.provider.getId(), editedSLDNode.key, xmlStyle);
+        }
+        creatingFlag = false;
+        layersModel = null;
+        goMainPageStyle();
+        
+        //TODO, update service to allow renaming
+//        final String newName = editedSLDNode.getUserObject().toString();
+//        if(!newName.equals(editedSLDNode.key)){
+//            //name changed
+//            editedSLDNode.provider.rename(editedSLDNode.key, newName);
+//            editedSLDNode.key = newName;
+//        }
+        
+    }
+
+    
     public SLDNode getEditedSLDNode() {
         return editedSLDNode;
+    }
+    
+    /**
+     * @return the xmlSLD
+     */
+    public String getXmlSLD() {
+        return xmlSLD;
+    }
+
+    /**
+     * @param xmlSLD the xmlSLD to set
+     */
+    public void setXmlSLD(String xmlSLD) {
+        this.xmlSLD = xmlSLD;
     }
     
     ////////////////////////////////////////////////////////////////////////////
@@ -159,8 +234,9 @@ public abstract class AbstractStyleServiceBean extends AbstractProviderConfigBea
 
             final ConstellationServer server = getServer();
             if (server != null) {
-                editedStyle = server.providers.downloadStyle(provider.getId(), key);
+                editedStyle   = server.providers.downloadStyle(provider.getId(), key);
                 editedSLDNode = this;
+                xmlSLD        = readXmlSLD(editedStyle);
 
                 if (itemConfigPage != null) {
                     final MenuBean bean = getMenuBean();

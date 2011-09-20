@@ -51,7 +51,7 @@ input[type="submit"]:hover {
     -moz-border-radius : 20px;
 } 
 
-input[type="submit"] {  
+input[type="submit"] { 
     padding: 5px;
     color: #727c86;
     background: #FFFFFF;
@@ -175,6 +175,17 @@ tr.mouseHighLight{
 }
 
 tr.mouseHighLight:hover{
+    background: #aecae4;
+    color: #FFFFFF;
+}
+
+
+tr.mouseHighLight_alt {
+    color: #999999;
+    background: #EFF8FE;
+}
+
+tr.mouseHighLight_alt:hover{
     background: #aecae4;
     color: #FFFFFF;
 }

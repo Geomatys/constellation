@@ -37,7 +37,13 @@ public class HighLightRowStyler implements OutlineRowStyler{
 
     @Override
     public String getRowClass(final TreeNode node) {
-        return "mouseHighLight";
+        final TreeNode parent = node.getParent();
+        final int index = parent.getIndex(node);
+        if ((index % 2) == 0) {
+            return "mouseHighLight";
+        } else {
+            return "mouseHighLight_alt";
+        }
     }
     
 }
