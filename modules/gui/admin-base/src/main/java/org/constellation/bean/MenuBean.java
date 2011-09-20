@@ -194,7 +194,20 @@ public class MenuBean extends I18NBean {
         return index;
     }
 
-
+    public boolean getDisplayMenu() {
+        final TreeModel currentModel = getModel();
+        if (PARTIAL_TREE) {
+             final Object root = currentModel.getRoot();
+             int childCount = currentModel.getChildCount(root);
+             if (childCount == 1) {
+                 final Object firstLevelNode = currentModel.getChild(root, 0);
+                 childCount = currentModel.getChildCount(firstLevelNode);
+                 return childCount != 0;
+             }
+        }
+        return true;
+    }
+    
     public TreeModel getModel() {
         final ConstellationServer currentServer = getServer();
         if(PARTIAL_TREE || model == null || oldServer==null || !oldServer.equals(currentServer)){

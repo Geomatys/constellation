@@ -7,7 +7,7 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
-    <div class="rounded">
+    <div>
         <img src="#{facesContext.externalContext.requestContextPath}/#{bean.configuredInstance.statusIcon}" style="border:none;"/>
         <h:outputText value="#{bean.i18n['serviceName']}"/>
         &#160;
@@ -19,12 +19,11 @@
             &#160;
             <h:commandLink action="#{bean.configuredInstance.stop}" rendered="#{bean.configuredInstance.working}">
                 <img src="#{facesContext.externalContext.requestContextPath}/service.stop.png.mfRes" style="border:none;"/>
-                &#160;
             </h:commandLink>
             <h:commandLink action="#{bean.configuredInstance.start}" rendered="#{!bean.configuredInstance.working}">
                 <img src="#{facesContext.externalContext.requestContextPath}/service.start.png.mfRes" style="border:none;"/>
-                &#160;
             </h:commandLink>
+            &#160;
             <h:commandLink action="#{bean.configuredInstance.delete}">
                 <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
             </h:commandLink>

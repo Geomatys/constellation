@@ -20,7 +20,7 @@
                     rowStyler="#{bean.instanceRowStyler}">
 
             <mf:DataTableColumn>
-               <h:commandLink action="#{node.select}">
+               <h:commandLink class="serviceLink" action="#{node.select}">
                     <h:outputText value="#{node.userObject.id}"/>
                 </h:commandLink>
             </mf:DataTableColumn>
