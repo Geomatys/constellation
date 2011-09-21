@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.ImageIO;
 
 // Constellation dependencies
 import org.constellation.data.CoverageSQLTestCase;
@@ -37,6 +40,7 @@ import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.image.jai.Registry;
 
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -224,6 +228,16 @@ public final class GrizzlyServer {
         StyleProviderProxy.getInstance().setConfigurator(styleconfig);
 
 
+        //reset values, only allow pure java readers
+        for(String jn : ImageIO.getReaderFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+        }
+
+        //reset values, only allow pure java writers
+        for(String jn : ImageIO.getWriterFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+        }
+        
         // Starting the grizzly server
         grizzly.start();
 
