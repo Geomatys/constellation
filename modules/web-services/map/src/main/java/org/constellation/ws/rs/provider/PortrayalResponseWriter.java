@@ -60,33 +60,35 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
     public void writeTo(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt,
             final MultivaluedMap<String, Object> h, final OutputStream out) throws IOException, WebApplicationException {
         
+        OutputDef outdef = r.getOutputDef();
+        if(outdef == null){
+            outdef = new OutputDef(mt.toString(), out);
+        }
+        outdef.setOutput(out);
+        
+        
         BufferedImage img = r.getImage();
         if(img != null){
-            OutputDef outdef = r.getOutputDef();
-            outdef.setOutput(out);
             DefaultPortrayalService.writeImage(img, outdef);
         } else {
             final CanvasDef cdef = r.getCanvasDef();
             final SceneDef sdef = r.getSceneDef();
             final ViewDef vdef = r.getViewDef();
-            final OutputDef odef = r.getOutputDef();
-            odef.setOutput(out);
-
             
             if(LOGGER.isLoggable(Level.FINE)){
                 final long before = System.nanoTime();
                 try {
-                    CstlPortrayalService.getInstance().portray(sdef, vdef, cdef, odef);
+                    CstlPortrayalService.getInstance().portray(sdef, vdef, cdef, outdef);
                 } catch (PortrayalException ex) {
                     //should not happen normally since we asked to never fail.
                     throw new IOException(ex);
                 }
                 final long after = System.nanoTime();
                 LOGGER.log(Level.FINE, "Portraying+Response ({0},Compression:{1}) time = {2} ms",
-                        new Object[]{odef.getMime(),odef.getCompression(),Math.round( (after - before) / 1000000d)});
+                        new Object[]{outdef.getMime(),outdef.getCompression(),Math.round( (after - before) / 1000000d)});
             }else{
                 try {
-                    CstlPortrayalService.getInstance().portray(sdef, vdef, cdef, odef);
+                    CstlPortrayalService.getInstance().portray(sdef, vdef, cdef, outdef);
                 } catch (PortrayalException ex) {
                     //should not happen normally since we asked to never fail.
                     throw new IOException(ex);
