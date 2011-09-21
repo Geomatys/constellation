@@ -42,6 +42,7 @@ import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.Source;
+import org.geotoolkit.gui.swing.tree.Trees;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
@@ -202,7 +203,7 @@ public class AbstractServiceBean extends I18NBean{
            
 
             if (configurationObject instanceof LayerContext) {
-                treemodel = new LayerContextTreeModel((LayerContext)configurationObject);
+                treemodel = new LayerContextTreeModel((LayerContext)configurationObject, server);
             } else {
                 treemodel = null;
             }
@@ -255,10 +256,10 @@ public class AbstractServiceBean extends I18NBean{
         final Source src = new Source();
         src.setId((selectedPotentialSource == null) ? "" : selectedPotentialSource );
         ctx.getLayers().add(src);
-        
-        if(configurationObject instanceof LayerContext){
-            treemodel = new LayerContextTreeModel((LayerContext)configurationObject);
-        }else{
+        final ConstellationServer server = getServer();
+        if (configurationObject instanceof LayerContext && server != null) {
+            treemodel = new LayerContextTreeModel((LayerContext)configurationObject, server);
+        } else {
             treemodel = null;
         }
         
@@ -273,9 +274,9 @@ public class AbstractServiceBean extends I18NBean{
         final ExternalContext ext = context.getExternalContext();
         final Integer index = Integer.valueOf(ext.getRequestParameterMap().get("NodeId"));
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode) 
-                OutlineDataModel.getNode((TreeNode)getLayerModel().getRoot(), index);
+                OutlineDataModel.getNode((TreeNode)treemodel.getRoot(), index);
         
-        getLayerModel().removeProperty(new TreePath(OutlineDataModel.getTreePath(node)));
+        treemodel.removeProperty(new TreePath(OutlineDataModel.getTreePath(node)));
     }
     
     
@@ -344,6 +345,7 @@ public class AbstractServiceBean extends I18NBean{
     }
     
     public LayerContextTreeModel getLayerModel(){
+        LOGGER.info(Trees.toString(treemodel));
         return treemodel;
     }
     
@@ -466,10 +468,10 @@ public class AbstractServiceBean extends I18NBean{
             final ConstellationServer server = getServer();
             if (server != null) {
                 configurationObject = server.services.getInstanceconfiguration(getSpecificationName(), instance.getName());
-            }
-
-            if (configurationObject instanceof LayerContext) {
-                treemodel = new LayerContextTreeModel((LayerContext)configurationObject);
+            
+                if (configurationObject instanceof LayerContext) {
+                    treemodel = new LayerContextTreeModel((LayerContext)configurationObject, server);
+                }
             } else {
                 treemodel = null;
             }

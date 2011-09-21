@@ -21,14 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.ProviderReport;
+import org.constellation.configuration.ProviderServiceReport;
+import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.Source;
-import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
-import org.geotoolkit.parameter.Parameters;
-import org.opengis.feature.type.Name;
 
 /**
  *
@@ -37,10 +36,12 @@ import org.opengis.feature.type.Name;
 public class LayerContextTreeModel extends DefaultTreeModel{
 
     private final LayerContext layerContext;
+    private final ConstellationServer server;
     
-    public LayerContextTreeModel(final LayerContext context){
+    public LayerContextTreeModel(final LayerContext context, ConstellationServer server){
         super(new javax.swing.tree.DefaultMutableTreeNode());
         this.layerContext = context;
+        this.server       = server;
         final ValueNode node = new ValueNode(context);
         setRoot(node);
         refresh();
@@ -96,14 +97,15 @@ public class LayerContextTreeModel extends DefaultTreeModel{
                                 
                 final List<SourceElement> elements = new ArrayList<SourceElement>();
                 
-                for(LayerProvider provider : LayerProviderProxy.getInstance().getProviders()){
-                    final String name = Parameters.stringValue(ProviderParameters.SOURCE_ID_DESCRIPTOR, provider.getSource());
-                    if(!name.equals(id)){
-                        continue;
-                    }
-                    
-                    for(Name n : provider.getKeys()){
-                        elements.add(new SourceElement(src, n.getLocalPart()));
+                ProvidersReport report = server.providers.listProviders();
+                for (ProviderServiceReport providerService : report.getProviderServices()){
+                    for (ProviderReport provider : providerService.getProviders()) {
+                        if (!provider.getId().equals(id)) {
+                            continue;
+                        }
+                        for(String n : provider.getItems()){
+                            elements.add(new SourceElement(src, n));
+                        }
                     }
                 }
                 

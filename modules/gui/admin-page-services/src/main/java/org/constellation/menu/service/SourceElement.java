@@ -45,7 +45,7 @@ public class SourceElement {
         if (!isLoadAll()) {
             
             for (Layer l : parent.getInclude()) {
-                if (name.equals(l.getName().getLocalPart())) {
+                if (l.getName() != null && name.equals(l.getName().getLocalPart())) {
                     return true;
                 }
             }
@@ -114,6 +114,11 @@ public class SourceElement {
                 }
             }
         }
+    }
+    
+    @Override
+    public String toString() {
+        return "SourceElement:" + name;
     }
     
 }

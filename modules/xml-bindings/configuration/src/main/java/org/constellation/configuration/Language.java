@@ -68,4 +68,12 @@ public class Language {
     }
 
 
+    @Override
+    public String toString() {
+        String s =  "[Language]=" + languageCode;
+        if (defaultt) {
+            s = s + "(default)";
+        }
+        return s;
+    }
 }
