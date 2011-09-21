@@ -444,17 +444,12 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     public void deleteLayer() {
         final ParameterValueGroup config = configuredParams;
         final String name = Parameters.value(ProviderParameters.LAYER_NAME_DESCRIPTOR, layerParams);
-        LOGGER.info("layer to remove:" + name);
         for (GeneralParameterValue groups : config.values()) {
             if (IdentifiedObjects.nameMatches(groups.getDescriptor(), ProviderParameters.LAYER_DESCRIPTOR)) {
                 final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, (ParameterValueGroup)groups);
-                LOGGER.info("candidate:" + layerName);
                 if (name.equals(layerName)) {
-                    LOGGER.info("okay removing:" + groups);
                     //we have found the layer to remove
                     config.values().remove(groups);
-                    LOGGER.info(config.toString());
-                    LOGGER.info("values" + config.values().toString());
                     break;
                 }
             }
