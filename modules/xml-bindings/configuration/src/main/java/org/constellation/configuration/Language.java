@@ -71,7 +71,7 @@ public class Language {
     @Override
     public String toString() {
         String s =  "[Language]=" + languageCode;
-        if (defaultt) {
+        if (defaultt != null && defaultt) {
             s = s + "(default)";
         }
         return s;

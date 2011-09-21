@@ -7,6 +7,31 @@
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mf="http://mapfaces.org/taglib">
 
+    <div>
+        <table style="width:100%;">
+            <colgroup>
+                <col width="20%"/>
+                <col width="80%"/>
+            </colgroup>
+            <tbody>
+                <tr>
+                    <td>
+                        <mf:namer>
+                            <mf:parametereditor value="#{bean.layerNameParameter}" rootVisible="true"/>
+                        </mf:namer>
+                    </td>
+                    <td>
+                        <span style="float: right;">
+                            <h:commandLink action="#{bean.deleteLayer}">
+                                <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
+                            </h:commandLink>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>        
+    </div>
+    <br/>
     <mf:namer styleClass="rounded">
         <mf:parametereditor value="#{bean.layerConfiguredParameters}" width="100%" rootVisible="false"/>
     </mf:namer>

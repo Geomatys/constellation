@@ -41,6 +41,7 @@ import org.constellation.provider.configuration.ProviderParameters;
 
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.logging.Logging;
@@ -385,6 +386,13 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     }
     
     /**
+     * @return the source id parameter
+     */
+    public GeneralParameterValue getLayerNameParameter(){
+        return layerParams.parameter(ProviderParameters.LAYER_NAME_DESCRIPTOR.getName().getCode());
+    }
+    
+    /**
      * @return the source store parameters
      */
     public GeneralParameterValue getSourceParameters(){
@@ -400,8 +408,15 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
      * 
      * @return the layer parameters
      */
-    public GeneralParameterValue getLayerConfiguredParameters(){
-        return layerParams;
+    public ParameterTreeModel getLayerConfiguredParameters(){
+        final List<GeneralParameterDescriptor> restrictions = new ArrayList<GeneralParameterDescriptor>();
+        for (GeneralParameterDescriptor desc : layerParams.getDescriptor().descriptors()) {
+            if (!desc.equals(ProviderParameters.LAYER_NAME_DESCRIPTOR)) {
+                restrictions.add(desc);
+            }
+        }
+        final ParameterTreeModel model = new ParameterTreeModel(layerParams, restrictions.toArray(new GeneralParameterDescriptor[restrictions.size()]));
+        return model;
     }
     
     public void saveConfiguration(){
@@ -424,6 +439,27 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     public MenuBean getMenuBean() {
         final FacesContext context = FacesContext.getCurrentInstance();
         return (MenuBean) context.getApplication().evaluateExpressionGet(context, "#{menuBean}", MenuBean.class);
+    }
+    
+    public void deleteLayer() {
+        final ParameterValueGroup config = configuredParams;
+        final String name = Parameters.value(ProviderParameters.LAYER_NAME_DESCRIPTOR, layerParams);
+        LOGGER.info("layer to remove:" + name);
+        for (GeneralParameterValue groups : config.values()) {
+            if (IdentifiedObjects.nameMatches(groups.getDescriptor(), ProviderParameters.LAYER_DESCRIPTOR)) {
+                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, (ParameterValueGroup)groups);
+                LOGGER.info("candidate:" + layerName);
+                if (name.equals(layerName)) {
+                    LOGGER.info("okay removing:" + groups);
+                    //we have found the layer to remove
+                    config.values().remove(groups);
+                    LOGGER.info(config.toString());
+                    LOGGER.info("values" + config.values().toString());
+                    break;
+                }
+            }
+        }
+        saveConfigurationFromLayer();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -522,12 +558,14 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             configuredInstance.select();
 
             layerParams = null;
-            for(ParameterValueGroup layer : ProviderParameters.getLayers(configuredParams)){
-                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
-                if(DefaultName.match(name, layerName)){
-                    //we have found the layer
-                    layerParams = layer;                
-                    break;
+            for (GeneralParameterValue groups : configuredParams.values()) {
+                if (IdentifiedObjects.nameMatches(groups.getDescriptor(), ProviderParameters.LAYER_DESCRIPTOR)) {
+                    final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, (ParameterValueGroup) groups);
+                    if (DefaultName.match(name, layerName)) {
+                       //we have found the layer
+                        layerParams = (ParameterValueGroup) groups;   
+                        break;
+                    }
                 }
             }
             
@@ -553,14 +591,16 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         public void delete(){
             //add all names from the configuration files
             final ParameterValueGroup config = configuredParams;
-            for(ParameterValueGroup layer : ProviderParameters.getLayers(config)){
-                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, layer);
-                if(DefaultName.match(name, layerName)){
+            for (GeneralParameterValue groups : config.values()) {
+            if (IdentifiedObjects.nameMatches(groups.getDescriptor(), ProviderParameters.LAYER_DESCRIPTOR)) {
+                final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, (ParameterValueGroup)groups);
+                if (DefaultName.match(name, layerName)) {
                     //we have found the layer to remove
-                    config.values().remove(layer);                    
+                    config.values().remove(groups);
                     break;
                 }
             }
+        }
             
             saveConfiguration();
         }
