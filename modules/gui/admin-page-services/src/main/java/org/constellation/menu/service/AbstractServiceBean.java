@@ -42,7 +42,6 @@ import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.Source;
-import org.geotoolkit.gui.swing.tree.Trees;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
@@ -345,7 +344,6 @@ public class AbstractServiceBean extends I18NBean{
     }
     
     public LayerContextTreeModel getLayerModel(){
-        LOGGER.info(Trees.toString(treemodel));
         return treemodel;
     }
     
@@ -495,7 +493,6 @@ public class AbstractServiceBean extends I18NBean{
             refresh();
         }
         public void stop(){
-            LOGGER.info("STOP:");
             final ConstellationServer server = getServer();
             if (server != null) {
                 server.services.stopInstance(getSpecificationName(), instance.getName());
