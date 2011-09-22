@@ -34,7 +34,9 @@
             </h:panelGroup>
 
             <h:panelGroup>
-                <h2><h:outputText value="#{pageTitle}"/></h2>
+                <mf:CustomHtml tag="h2" rendered="#{pageTitle  != null and pageTitle  != '' }">
+                    <h:outputText value="#{pageTitle}"/>
+                 </mf:CustomHtml>
 
                 <!-- dynamic content -->
                 <ui:insert name="content">

@@ -11,10 +11,9 @@
                 template="/pages/base.xhtml">
 
     <ui:define name="content">
+        <h1>#{providerBean.i18n['providersDesc1']}</h1>
         <br/>
-        <h1>Cette bibliothèque regroupe l'ensemble des de données.</h1>
-        <br/>
-        <b>Ces dernières correspondent soit a des import de fichiers soit a des connexions a des base de données.</b>
+        <b>#{providerBean.i18n['providersDesc2']}</b>
 
         <!-- layer providers -->
         <h:panelGroup>

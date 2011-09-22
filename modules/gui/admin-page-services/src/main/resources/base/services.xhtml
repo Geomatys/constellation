@@ -11,17 +11,15 @@
                 template="/pages/base.xhtml">
 
     <ui:define name="content">
+        <h1>#{serviceBean.i18n['servicesDesc1']}</h1>
         <br/>
+        <b>#{serviceBean.i18n['servicesDesc2']}</b>
         <br/>
-        <h1>Lancer, Arrêter et configurer les services web de données cartographique.</h1>
+        <b>WFS</b>&#160; #{serviceBean.i18n['servicesDesc3']}
         <br/>
-        <b>Quelle difference entre WFS, WMS, WCS ?</b>
+        <b>WMS, WMTS</b>&#160; #{serviceBean.i18n['servicesDesc4']}
         <br/>
-        <b>WFS</b> permet l'affichage de données dites "attributaires".
-        <br/>
-        <b>WMS et WMTS</b> permettent la mise a disposition d'outil cartographique.
-        <br/>
-        <b>WMS</b> est recommendé pour l'affichage de vastes etendues ou l'utilisateur se deplace librement.
+        <b>WMS</b>&#160; #{serviceBean.i18n['servicesDesc5']}
         
     </ui:define>
 
