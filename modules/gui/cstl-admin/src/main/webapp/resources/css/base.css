@@ -118,6 +118,11 @@ a{
     
 }
 
+.newLink {
+    -moz-text-decoration-line: underline;
+    text-decoration: underline;
+}
+
 .errorMessage{
     color: #cd0a0a;
 }
