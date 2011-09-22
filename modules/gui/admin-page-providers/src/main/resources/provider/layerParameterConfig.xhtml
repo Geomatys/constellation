@@ -32,6 +32,23 @@
         </table>        
     </div>
     <br/>
+    <b>#{bean.i18n['style']}</b><br/>
+    <br/>
+    <h:commandLink action="#{bean.goToStyleAdmin}" class="newLink">
+         <h:outputText value="#{bean.i18n['newStyle']}"/>
+    </h:commandLink>
+     &#160;
+    <h:outputText value="#{bean.i18n['useExistantStyle']}"/>
+     &#160;
+    <h:selectOneListbox value="#{bean.selectedPotentialStyle}" size="1">
+        <f:selectItems value="#{bean.potentialStyles}" />
+    </h:selectOneListbox>
+    <h:commandLink action="#{bean.addStyle}" class="logout">
+        <img src="#{facesContext.externalContext.requestContextPath}/service.add24_bleu.png.mfRes" style="border:none;"/>
+        #{bean.i18n['apply']}
+    </h:commandLink>
+     <br/>
+     <br/>
     <mf:namer styleClass="rounded">
         <mf:parametereditor value="#{bean.layerConfiguredParameters}" width="100%" rootVisible="false"/>
     </mf:namer>

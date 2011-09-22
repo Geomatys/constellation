@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -110,6 +111,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     protected ProviderNode configuredInstance = null;
     private ParameterValueGroup configuredParams = null;
     private ParameterValueGroup layerParams = null;
+    private String selectedPotentialStyle = null;
     
     protected boolean creatingFlag = false;
 
@@ -364,6 +366,16 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
     }
 
+    public void goToStyleAdmin(){
+        if (mainPage != null) {
+            final MenuBean bean = getMenuBean();
+            if (bean != null) {
+                bean.updateNavigationStack("SLD Styles");
+            }
+            FacesContext.getCurrentInstance().getViewRoot().setViewId("/provider/sld.xhtml");
+        }
+    }
+    
     /**
      * @return the currently configured instance.
      */
@@ -457,6 +469,44 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         saveConfigurationFromLayer();
     }
 
+    public List<SelectItem> getPotentialStyles(){
+        final List<SelectItem> items = new ArrayList<SelectItem>();
+        final ConstellationServer server = getServer();
+        if (server != null) {
+            final ProvidersReport pr = server.providers.listProviders();
+            for(ProviderServiceReport provider : pr.getProviderServices()){
+                if (provider.isStyleService()) {
+                    for (ProviderReport p : provider.getProviders()) {
+                        for (String item : p.getItems()) {
+                            items.add(new SelectItem(item, item));
+                        }
+                    }
+                }
+            }
+        }
+        return items;
+    }
+    
+    /**
+     * @return the selectedPotentialStyle
+     */
+    public String getSelectedPotentialStyle() {
+        return selectedPotentialStyle;
+    }
+
+    /**
+     * @param selectedPotentialStyle the selectedPotentialStyle to set
+     */
+    public void setSelectedPotentialStyle(String selectedPotentialStyle) {
+        this.selectedPotentialStyle = selectedPotentialStyle;
+    }
+
+    public void addStyle() {
+        if (layerParams != null) {
+            layerParams.parameter(ProviderParameters.LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue(selectedPotentialStyle);
+        }
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     // SUBCLASSES //////////////////////////////////////////////////////////////
 
