@@ -507,6 +507,10 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
     }
     
+    public boolean getPartialTree() {
+        return MenuBean.PARTIAL_TREE;
+    }
+    
     ////////////////////////////////////////////////////////////////////////////
     // SUBCLASSES //////////////////////////////////////////////////////////////
 

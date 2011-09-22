@@ -34,11 +34,12 @@
     <br/>
     <b>#{bean.i18n['sources']}</b><br/>
     <br/>
-    <h:commandLink action="#{bean.goToSourceAdmin}" class="newLink">
+    <h:commandLink action="#{bean.goToSourceAdmin}" class="newLink" rendered="#{!bean.partialTree}">
          <h:outputText value="#{bean.i18n['newSource']}"/>
     </h:commandLink>
      &#160;
-    <h:outputText value="#{bean.i18n['useExistantSource']}"/>
+    <h:outputText value="#{bean.i18n['useExistantSource']}" rendered="#{!bean.partialTree}"/>
+    <h:outputText value="#{bean.i18n['useExistantSourceAlt']}" rendered="#{bean.partialTree}"/>
      &#160;
     <h:selectOneListbox value="#{bean.selectedPotentialSource}" size="1">
         <f:selectItems value="#{bean.potentialSources}" />

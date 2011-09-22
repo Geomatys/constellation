@@ -246,6 +246,10 @@ public class AbstractServiceBean extends I18NBean{
         selectedPotentialSource = selected;
     }
     
+    public boolean getPartialTree() {
+        return MenuBean.PARTIAL_TREE;
+    }
+    
     public void addSource(){
         if(!(configurationObject instanceof LayerContext) ){
             return;
