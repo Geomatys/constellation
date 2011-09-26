@@ -36,12 +36,13 @@
 
         </mf:Outline>
     </div>
+    <br/>
     
     <mf:Div rendered="#{bean.configuredInstance != null}">
         <h:commandButton action="#{bean.createNewStyle}" value="#{bean.i18n['newstyle']}" />
     </mf:Div>
     
-    
+    <br/>
     <mf:Div styleClass="rounded" rendered="#{bean.configuredInstance != null}">
         <mf:Outline id="layerPreview" rootVisible="false" value="#{bean.layerModel}" var="node" width="100%"
                     rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">

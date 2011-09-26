@@ -72,7 +72,7 @@ public class MenuBean extends I18NBean {
                 final String sp = n.targetPage.substring(0, n.targetPage.length()-3);
                 final String rp = page.substring(0, page.length()-5);
                 if(sp.contains(rp)){
-                    candidate += " active";
+                    candidate += "Selected";
                 }
             }
             
