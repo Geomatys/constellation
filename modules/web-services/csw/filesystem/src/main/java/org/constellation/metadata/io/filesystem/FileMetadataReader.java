@@ -76,7 +76,6 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.geotoolkit.util.StringUtilities;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
@@ -215,6 +214,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 }
                 return metadata;
             } catch (JAXBException ex) {
+                throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
+                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+            } catch (IllegalArgumentException ex) {
                 throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } finally {
@@ -536,10 +538,14 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         if (value != null && !value.equals(Arrays.asList("null"))) {
                             result.addAll(value);
                         }
+                        
+                     //continue to the next file   
                     } catch (JAXBException ex) {
-                        // throw or continue to the next file?
-                        throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
-                                "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\n" +
+                                "cause: " + ex.getMessage());
+                    } catch (IllegalArgumentException ex) {
+                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\n"
+                                + "cause: " + ex.getMessage());
                     }
                 } else {
                     result.addAll(getAllValuesFromPaths(paths, metadataFile));

@@ -148,8 +148,12 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             LOGGER.log( Level.INFO, "{0} metadata to index (light memory mode)", nbEntries);
             for (String id : ids) {
                 if (!stopIndexing && !indexationToStop.contains(serviceID)) {
-                    final Object entry = reader.getMetadata(id, AbstractMetadataReader.ISO_19115);
-                    indexDocument(writer, entry);
+                    try {
+                        final Object entry = reader.getMetadata(id, AbstractMetadataReader.ISO_19115);
+                        indexDocument(writer, entry);
+                    } catch (MetadataIoException ex) {
+                        LOGGER.warning("Metadata IO exeption while indexing metadata: " + id + " " + ex.getMessage() + "\nmove to next metadata...");
+                    }
                 } else {
                      LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
                      stopIndexation(writer, serviceID);
