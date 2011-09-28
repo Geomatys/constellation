@@ -47,6 +47,8 @@ public class SOSRequestTest extends AbstractTestRequest {
     private static final String SOS_POST_URL = "http://localhost:9090/sos/default?";
 
     private static final String SOS_GETCAPABILITIES_URL = "http://localhost:9090/sos/default?request=GetCapabilities&service=SOS&version=1.0.0";
+    
+    private static final String SOS_GETFEATUROFINTEREST_URL = "http://localhost:9090/sos/default?request=GetFeatureOfInterest&service=SOS&version=1.0.0&FeatureOfInterestId=sampling-point-001";
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -117,7 +119,7 @@ public class SOSRequestTest extends AbstractTestRequest {
 
 
         // Try to marshall something from the response returned by the server.
-        // The response should be a WMT_MS_Capabilities.
+        // The response should be a Capabilities.
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof Capabilities);
     }
@@ -191,5 +193,15 @@ public class SOSRequestTest extends AbstractTestRequest {
             type = obj.getClass().getName();
         }
         assertTrue("expecting SamplingPointType but was: " + type, obj instanceof SamplingPointType);
+        
+        // Creates a valid GetFeatureFInterest url.
+        final URL getFoiUrl = new URL(SOS_GETFEATUROFINTEREST_URL);
+
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a Capabilities.
+        obj = unmarshallResponse(getFoiUrl);
+        
+        assertTrue("expecting SamplingPointType but was: " + obj, obj instanceof SamplingPointType);
     }
 }

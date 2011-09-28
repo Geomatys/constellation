@@ -18,6 +18,7 @@
 package org.constellation.sos.ws.rs;
 
 // Jersey dependencies
+import org.geotoolkit.util.StringUtilities;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
 import java.util.logging.Level;
@@ -191,7 +192,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws CstlServiceException every time.
      */
     private void throwUnsupportedGetMethod(String operationName) throws CstlServiceException {
-        throw new CstlServiceException("The operation " + operationName + " is only requestable in XML",
+        throw new CstlServiceException("The operation " + operationName + " is only requestable in XML via POST method",
                                                   OPERATION_NOT_SUPPORTED, operationName);
     }
     
@@ -285,13 +286,14 @@ public class SOService extends OGCWebService<SOSworker> {
      */
     private RequestBase adaptQuery(String request) throws CstlServiceException {
          if ("GetObservation"    .equalsIgnoreCase(request) ||
-             "GetFeatureInterest".equalsIgnoreCase(request) ||
              "InsertObservation" .equalsIgnoreCase(request) ||
              "GetResult"         .equalsIgnoreCase(request) ||
              "RegisterSensor"    .equalsIgnoreCase(request)
          ){
              throwUnsupportedGetMethod(request);
 
+         } else if ("GetFeatureOfInterest".equalsIgnoreCase(request)) {
+             return createGetFeatureOfInterest();
          } else if ("DescribeSensor".equalsIgnoreCase(request)) {
              return createDescribeSensor();
          } else if ("GetCapabilities".equalsIgnoreCase(request)) {
@@ -358,5 +360,11 @@ public class SOService extends OGCWebService<SOSworker> {
                                   getParameter("OUTPUTFORMAT", true));
 
 
+    }
+    
+    private GetFeatureOfInterest createGetFeatureOfInterest() throws CstlServiceException {
+        final String featureID = getParameter("FeatureOfInterestId", true);
+        final List<String> fidList = StringUtilities.toStringList(featureID);
+        return new GetFeatureOfInterest(getParameter("VERSION", true),getParameter("SERVICE", true), fidList);
     }
 }
