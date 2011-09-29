@@ -844,6 +844,108 @@ public class CSWworkerTest {
          
         pool.release(unmarshaller);
     }
+    
+    /**
+     * Tests the getRecords on ISO 19115-2 method
+     *
+     * @throws java.lang.Exception
+     */
+    public void getRecords191152Test() throws Exception {
+        
+        /*
+         *  TEST 1 : getRecords with RESULT - DC mode (FULL) - CQL text: Instrument='Instrument 007'
+         */
+        List<QName> typeNames             = Arrays.asList(RECORD_QNAME);
+        ElementSetNameType elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        SortByType sortBy                 = null;
+        QueryConstraintType constraint    = new QueryConstraintType("Instrument='Instrument 007'", "1.0.0");
+        QueryType query = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        GetRecordsResponseType result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().size() == 1);
+        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 1);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        Object obj = result.getSearchResults().getAbstractRecord().get(0);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof RecordType);
+        RecordType recordResult = (RecordType) obj;
+
+        assertEquals(recordResult.getIdentifier().getContent().get(0), "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        
+        
+        /*
+         *  TEST 2 : getRecords with RESULTS - DC mode (FULL) - CQL text: Platform='Platform 007'
+         */
+
+        typeNames      = Arrays.asList(RECORD_QNAME);
+        elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        sortBy         = null;
+        constraint     = new QueryConstraintType("Platform='Platform 007'", "1.0.0");
+        query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().size() == 1);
+        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 1);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        obj = result.getSearchResults().getAbstractRecord().get(0);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof RecordType);
+        recordResult = (RecordType) obj;
+
+        assertEquals(recordResult.getIdentifier().getContent().get(0), "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        
+        /*
+         *  TEST 3 : getRecords with RESULTS - DC mode (FULL) - CQL text: Operation='Earth Observing System'
+         */
+
+        typeNames      = Arrays.asList(RECORD_QNAME);
+        elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        sortBy         = null;
+        constraint     = new QueryConstraintType("Operation='Earth Observing System'", "1.0.0");
+        query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
+        assertTrue(result.getSearchResults().getAbstractRecord().size() == 1);
+        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+        assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
+        assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 1);
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        obj = result.getSearchResults().getAbstractRecord().get(0);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof RecordType);
+        recordResult = (RecordType) obj;
+
+        assertEquals(recordResult.getIdentifier().getContent().get(0), "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+        
+    }
 
     /**
      * Tests the getRecords method
@@ -1086,6 +1188,7 @@ public class CSWworkerTest {
         list.add("40510_145_19930221211500");
         list.add("42292_5p_19900609195600");
         list.add("42292_9s_19900610041000");
+        list.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         list.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         list.add("urn:motiive:csw-ebrim");
         list.add("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
@@ -1113,6 +1216,7 @@ public class CSWworkerTest {
         list.add("40510_145_19930221211500");
         list.add("42292_5p_19900609195600");
         list.add("42292_9s_19900610041000");
+        list.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         list.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         // no ebrim list.add("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
         values = new ListOfValuesType(list);
@@ -1139,6 +1243,7 @@ public class CSWworkerTest {
         list.add("90008411.ctd");
         list.add("92005711.ctd");
         list.add("Feature Type Catalogue Extension Package");
+        list.add("Sea surface temperature and history derived from an analysis of MODIS Level 3 data for the Gulf of Mexico");
         list.add("WMS Server for CORINE Land Cover France");
         list.add("ebrim1Title");
         list.add("ebrim2Title");
@@ -1165,6 +1270,7 @@ public class CSWworkerTest {
         list.add("90008411-2.ctd");
         list.add("90008411.ctd");
         list.add("92005711.ctd");
+        list.add("Sea surface temperature and history derived from an analysis of MODIS Level 3 data for the Gulf of Mexico");
         list.add("WMS Server for CORINE Land Cover France");
         values = new ListOfValuesType(list);
         value  = new DomainValuesType(null, "Title", values, METADATA_QNAME);
@@ -1484,7 +1590,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertEquals(5, response.getSearchResults().getAny().size());
+        assertEquals(6, response.getSearchResults().getAny().size());
 
         List<String> results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1498,7 +1604,7 @@ public class CSWworkerTest {
         expResult.add("40510_145_19930221211500");
         expResult.add("42292_9s_19900610041000");
         expResult.add("CTDF02");
-
+        expResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         assertEquals(expResult, results);
 
 
@@ -1517,7 +1623,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertEquals(4, response.getSearchResults().getAny().size());
+        assertEquals(5, response.getSearchResults().getAny().size());
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1530,6 +1636,7 @@ public class CSWworkerTest {
         expResult.add("40510_145_19930221211500");
         expResult.add("42292_9s_19900610041000");
         expResult.add("CTDF02");
+        expResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
 
         assertEquals(expResult, results);
 

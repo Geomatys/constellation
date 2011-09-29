@@ -108,6 +108,7 @@ public class MdwebIndexTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.5.sql"));
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");

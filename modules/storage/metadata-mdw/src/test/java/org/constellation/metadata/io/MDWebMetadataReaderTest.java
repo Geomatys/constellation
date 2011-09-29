@@ -94,6 +94,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-5.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.5.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
         
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));

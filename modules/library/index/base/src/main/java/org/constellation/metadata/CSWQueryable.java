@@ -292,6 +292,21 @@ public final class CSWQueryable {
         ISO_QUERYABLE.put("OperatesOn", paths);
         ISO_QUERYABLE.put("OperatesOnIdentifier", paths);
         ISO_QUERYABLE.put("OperatesOnWithOpName", paths);
+        
+        /**
+         * ISO 19115-2 specific queryable
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:platform:citation:title");
+        ISO_QUERYABLE.put("Platform", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:instrument:citation:title");
+        ISO_QUERYABLE.put("Instrument", paths);
+        
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:citation:title");
+        ISO_QUERYABLE.put("Operation", paths);
     }
     
     

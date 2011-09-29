@@ -96,6 +96,22 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         isoMap.put("language",    "ISO 19115:MD_Metadata:language");
         isoMap.put("rights",      "ISO 19115:MD_Metadata:identificationInfo:resourceConstraint:useLimitation");
         DUBLINCORE_PATH_MAP.put(Standard.ISO_19115, isoMap);
+        
+        final Map<String, String> iso2Map = new HashMap<String, String>();
+        iso2Map.put("identifier",  "ISO 19115-2:MI_Metadata:fileIdentifier");
+        iso2Map.put("type",        "ISO 19115-2:MI_Metadata:hierarchyLevel");
+        iso2Map.put("date",        "ISO 19115-2:MI_Metadata:dateStamp");
+        iso2Map.put("subject",     "ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        iso2Map.put("subject2",    "ISO 19115-2:MI_Metadata:identificationInfo:topicCategory");
+        iso2Map.put("subject3",    "ISO 19115-2:MI_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
+        iso2Map.put("format",      "ISO 19115-2:MI_Metadata:identificationInfo:resourceFormat:name");
+        iso2Map.put("abstract",    "ISO 19115-2:MI_Metadata:identificationInfo:abstract");
+        iso2Map.put("boundingBox", "ISO 19115-2:MI_Metadata:identificationInfo:extent:geographicElement2");
+        iso2Map.put("creator",     "ISO 19115-2:MI_Metadata:identificationInfo:credit");
+        iso2Map.put("publisher",   "ISO 19115-2:MI_Metadata:distributionInfo:distributor:distributorContact:organisationName");
+        iso2Map.put("language",    "ISO 19115-2:MI_Metadata:language");
+        iso2Map.put("rights",      "ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraint:useLimitation");
+        DUBLINCORE_PATH_MAP.put(Standard.ISO_19115_2, iso2Map);
 
         final Map<String, String> ebrimMap = new HashMap<String, String>();
         ebrimMap.put("identifier", "Ebrim v3.0:RegistryObject:id");
@@ -354,7 +370,10 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final Value top                   = form.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
 
-        if (recordStandard.equals(Standard.ISO_19115) || recordStandard.equals(Standard.EBRIM_V3)) {
+        if (recordStandard.equals(Standard.ISO_19115)   || 
+            recordStandard.equals(Standard.ISO_19115_2) || 
+            recordStandard.equals(Standard.ISO_19115_FRA) || 
+            recordStandard.equals(Standard.EBRIM_V3)) {
             return transformMDFormInRecord(form, type, elementName);
 
         } else {
@@ -386,7 +405,11 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final Value top                   = form.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
         final Map<String, String> pathMap = DUBLINCORE_PATH_MAP.get(recordStandard);
-
+        
+        if (pathMap == null) {
+            LOGGER.warning("No dublin core path_mapping for standard:" + recordStandard.getName());
+            return null;
+        }
         // we get the title of the form
         final SimpleLiteral title             = new SimpleLiteral(null, form.getTitle());
 

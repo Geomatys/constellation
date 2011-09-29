@@ -1619,6 +1619,13 @@
             </gmi:operation>
             <gmi:platform>
                 <gmi:MI_Platform>
+                    <gmi:citation>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>Platform 007</gco:CharacterString>
+                            </gmd:title>
+                        </gmd:CI_Citation>
+                    </gmi:citation>
                     <gmi:identifier>
                         <gmd:MD_Identifier>
                             <gmd:authority>
@@ -1686,6 +1693,17 @@
                     </gmi:instrument>
                 </gmi:MI_Platform>
             </gmi:platform>
+            <gmi:instrument>
+                <gmi:MI_Instrument>
+                    <gmi:citation>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>Instrument 007</gco:CharacterString>
+                            </gmd:title>
+                        </gmd:CI_Citation>
+                    </gmi:citation>
+                </gmi:MI_Instrument>
+            </gmi:instrument>
         </gmi:MI_AcquisitionInformation>
     </gmi:acquisitionInformation>
 </gmi:MI_Metadata>

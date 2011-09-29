@@ -65,6 +65,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115-2.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/users/creation_user.sql"));
             sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/profiles/inputLevels.sql"));
@@ -74,6 +75,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
 
             //we write the configuration file
@@ -154,6 +156,12 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     @Override
     public void getRecordsTest() throws Exception {
         super.getRecordsTest();
+    }
+    
+    @Test
+    @Override
+    public void getRecords191152Test() throws Exception {
+        super.getRecords191152Test();
     }
 
     @Test

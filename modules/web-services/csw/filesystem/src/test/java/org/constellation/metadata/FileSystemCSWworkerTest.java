@@ -60,6 +60,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             writeDataFile(dataDirectory, "meta4.xml", "11325_158_19640418141800");
             writeDataFile(dataDirectory, "meta5.xml", "40510_145_19930221211500");
             writeDataFile(dataDirectory, "meta-19119.xml", "mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
+            writeDataFile(dataDirectory, "imageMetadata.xml", "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
             writeDataFile(dataDirectory, "ebrim1.xml", "000068C3-3B49-C671-89CF-10A39BB1B652");
             writeDataFile(dataDirectory, "ebrim2.xml", "urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
             writeDataFile(dataDirectory, "ebrim3.xml", "urn:motiive:csw-ebrim");
@@ -148,6 +149,13 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         super.getRecordsTest();
     }
 
+    @Test
+    @Override
+    public void getRecords191152Test() throws Exception {
+        super.getRecords191152Test();
+    }
+
+    
     /**
      * Tests the getRecords method
      *
