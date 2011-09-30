@@ -36,6 +36,7 @@ public class MapSetup implements SetupService {
 
     private static final Logger LOGGER = Logging.getLogger(MapSetup.class);
     
+    @Override
     public void initialize(Properties properties, boolean reinit) {
         
         LOGGER.log(Level.WARNING, "=== Activating Native Codec ===");
@@ -54,6 +55,7 @@ public class MapSetup implements SetupService {
     /**
      * Invoked when the module needs to be shutdown.
      */
+    @Override
     public void shutdown() {
         // do nothing
     }
