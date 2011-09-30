@@ -46,7 +46,15 @@ public class MapSetup implements SetupService {
             Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
         }
 
+        for(String jn : ImageIO.getReaderFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+        }
+        
         //reset values, only allow pure java writers
+        for(String jn : ImageIO.getWriterFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+        }
+        
         for(String jn : ImageIO.getWriterFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
         }
