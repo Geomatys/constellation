@@ -32,7 +32,7 @@ import java.util.logging.Level;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.From;
-import org.constellation.generic.database.FilterQuery;
+import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Select;
 import org.constellation.generic.database.Where;
 import org.constellation.sos.io.ObservationResult;
@@ -90,7 +90,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      */
     @Override
     public void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) {
-        currentQuery              = new FilterQuery();
+        currentQuery              = new Query();
         final Select select       = configurationQuery.getSelect("filterObservation");
         final From from           = configurationQuery.getFrom("observations");
         final Where where         = configurationQuery.getWhere("observationType");
@@ -110,7 +110,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      */
     @Override
     public void initFilterGetResult(final Observation template, final QName resultModel) {
-        currentQuery              = new FilterQuery();
+        currentQuery              = new Query();
         final Select select       = configurationQuery.getSelect("filterResult");
         final From from           = configurationQuery.getFrom("observations");
         final Where where         = configurationQuery.getWhere(PROCEDURE);

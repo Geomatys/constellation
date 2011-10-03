@@ -34,7 +34,6 @@
             </select>
             <from>"observation"."observations"</from>
             <where>"name" LIKE '%:$%'</where>
-            <orderBy></orderBy>
          </query>
          <!-- Observation id already exist (not needed in discovery profile)-->
          <query>
@@ -46,7 +45,6 @@
             </select>
             <from>"observation"."observations"</from>
             <where>"name"=:$</where>
-            <orderBy></orderBy>
          </query>
 	 <!-- minimal time event for offering -->
          <query>
@@ -57,8 +55,6 @@
                </col>
             </select>
             <from>"sos"."observation_offerings"</from>
-            <where></where>
-            <orderBy></orderBy>
          </query>
          <!-- verify that the offering exist -->
          <query>
@@ -70,7 +66,6 @@
             </select>
             <from>"sos"."observation_offerings"</from>
             <where>"id"=:$</where>
-            <orderBy></orderBy>
          </query>
          <!-- time bound for an offering -->
          <query>
@@ -86,7 +81,6 @@
             </select>
             <from>"sos"."observation_offerings"</from>
             <where>"id"=:$</where>
-            <orderBy></orderBy>
          </query>
          <!-- phenomenon exist? -->
          <query>
@@ -98,7 +92,6 @@
             </select>
             <from>"observation"."phenomenons"</from>
             <where>"id"=:$</where>
-            <orderBy></orderBy>
          </query>
 	 <!-- simple phenomenon -->
          <query>
@@ -114,7 +107,6 @@
             </select>
             <from>"observation"."phenomenons"</from>
             <where>"id"=:$</where>
-            <orderBy></orderBy>
          </query>
          <!-- composite phenomenon -->
          <query>
@@ -130,7 +122,6 @@
             </select>
             <from>"observation"."composite_phenomenons"</from>
             <where>"id"=:$</where>
-            <orderBy></orderBy>
          </query>
 	 <!-- feature of interest (samplingPoint) exist-->
          <query>
@@ -142,7 +133,6 @@
             </select>
             <from>"observation"."sampling_points"</from>
             <where>"id"=:$</where>
-            <orderBy></orderBy>
          </query>
          <!-- feature of interest (samplingPoint)-->
          <query>
@@ -174,7 +164,6 @@
             </select>
             <from>"observation"."sampling_points"</from>
             <where>"id"=:$</where>
-            <orderBy></orderBy>
          </query>
 	 <!-- observation -->
          <query>
@@ -206,7 +195,6 @@
             </select>
             <from>"observation"."observations"</from>
             <where>"name"=:$</where>
-            <orderBy></orderBy>
          </query>
 	 <!-- result -->
          <query>
@@ -246,7 +234,6 @@
             </select>
             <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."text_block_encodings" e</from>
             <where>r."definition" = d."id_array_definition" AND d."encoding"=e."id_encoding" AND r."id_result"=:$</where>
-            <orderBy></orderBy>
          </query>
       </single>
       <!--                  -->
@@ -263,7 +250,6 @@
             </select>
             <from>"observation"."sampling_points"</from>
             <where>"id"=:$</where>
-            <orderBy></orderBy>
         </query>
         <query>
             <select>
@@ -284,8 +270,6 @@
                </col>
             </select>
             <from>"sos"."observation_offerings"</from>
-            <where></where>
-            <orderBy></orderBy>
          </query>
 	 <!-- all procedure id -->
          <query>
@@ -296,8 +280,6 @@
                </col>
             </select>
             <from>"observation"."process"</from>
-            <where></where>
-            <orderBy></orderBy>
          </query>
          <!-- all phenomenon names-->
          <query>
@@ -308,8 +290,6 @@
                </col>
             </select>
             <from>"observation"."phenomenons"</from>
-            <where></where>
-            <orderBy></orderBy>
          </query>
 	<!-- all feature of interest name -->
          <query>
@@ -320,8 +300,6 @@
                </col>
             </select>
             <from>"observation"."sampling_points"</from>
-            <where></where>
-            <orderBy></orderBy>
          </query>
          <!-- observation offering -->
          <query>
@@ -333,7 +311,6 @@
             </select>
             <from>"sos"."observation_offerings"</from>
             <where>"id"=:$</where>
-            <orderBy></orderBy>
          </query>
          <!-- procedure for an offering -->
          <query>
@@ -345,7 +322,6 @@
             </select>
             <from>"sos"."offering_procedures" p, "observation"."references" r</from>
             <where>p."procedure"=r."id_reference" AND p."id_offering"=:$</where>
-            <orderBy></orderBy>
          </query>
 	 <!-- simple phenomenon for an offering -->
          <query>
@@ -357,7 +333,6 @@
             </select>
             <from>"sos"."offering_phenomenons"</from>
             <where>"id_offering"=:$</where>
-            <orderBy></orderBy>
          </query>
          <!-- composite phenomenon for an offering -->
          <query>
@@ -369,7 +344,6 @@
             </select>
             <from>"sos"."offering_phenomenons"</from>
             <where>"id_offering"=:$</where>
-            <orderBy></orderBy>
          </query>
          <!-- composite phenomenon for an offering -->
          <query>
@@ -381,7 +355,6 @@
             </select>
             <from>"sos"."offering_sampling_features" sp, "observation"."references" r</from>
             <where>sp."sampling_feature"=r."id_reference" AND sp."id_offering"=:$</where>
-            <orderBy></orderBy>
          </query>
          <!-- component for a composite phenomenon -->
          <query>
@@ -417,7 +390,6 @@
             </select>
             <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."any_scalars" a</from>
             <where>r."definition" = d."id_array_definition" AND r."definition"=a."id_datablock" AND r."id_result"=:$</where>
-            <orderBy></orderBy>
          </query>
       </multiFixed>
    </queries>

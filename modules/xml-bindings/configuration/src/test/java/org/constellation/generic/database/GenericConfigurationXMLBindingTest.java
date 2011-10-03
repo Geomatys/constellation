@@ -308,7 +308,7 @@ public class GenericConfigurationXMLBindingTest {
 
         String xml =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"                                                            + '\n' +
-        "<filter:query name=\"ObservationAffinage\" xmlns:filter=\"http://constellation.generic.filter.org\">"  + '\n' +
+        "<query name=\"ObservationAffinage\" xmlns:filter=\"http://constellation.generic.filter.org\">"  + '\n' +
         " <parameters>"                                                                                         + '\n' +
         "     <entry>"                                                                                          + '\n' +
         "       <key>st1</key>"                                                                                 + '\n' +
@@ -335,12 +335,12 @@ public class GenericConfigurationXMLBindingTest {
         "</select>"                                                                                             + '\n' +
         "<from group=\"observations\">location loc, physical_parameter pp</from>"                               + '\n' +
         "<where group=\"observations\">loc.location_id = lm.location_id</where>"                                + '\n' +
-        "<orderby group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderby>"         + '\n' +
-        "</filter:query>";
+        "<orderBy group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderBy>"         + '\n' +
+        "</query>";
 
         StringReader sr = new StringReader(xml);
 
-        FilterQuery result = (FilterQuery) unmarshaller.unmarshal(sr);
+        Query result = (Query) unmarshaller.unmarshal(sr);
 
 
         Select select = new Select();
@@ -360,7 +360,7 @@ public class GenericConfigurationXMLBindingTest {
         order.setvalue("loc.platform_code, loc.instrument_code");
         order.setSens("ASC");
 
-        FilterQuery expResult = new FilterQuery();
+        Query expResult = new Query();
         expResult.setName("ObservationAffinage");
         expResult.addSelect(select);
         expResult.addFrom(from);
@@ -400,7 +400,7 @@ public class GenericConfigurationXMLBindingTest {
 
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                                                            + '\n' +
-        "<ns4:query name=\"ObservationAffinage\" >"  + '\n' +
+        "<query name=\"ObservationAffinage\" >"  + '\n' +
         "    <parameters>"                                                                                         + '\n' +
         "        <entry>"                                                                                          + '\n' +
         "            <key>st1</key>"                                                                                 + '\n' +
@@ -427,8 +427,8 @@ public class GenericConfigurationXMLBindingTest {
         "    </select>"                          + '\n' +
         "    <from group=\"observations\">location loc, physical_parameter pp</from>"                               + '\n' +
         "    <where group=\"observations\">loc.location_id = lm.location_id</where>"                                + '\n' +
-        "    <orderby group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderby>"         + '\n' +
-        "</ns4:query>" + '\n';
+        "    <orderBy group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderBy>"         + '\n' +
+        "</query>" + '\n';
 
         Select select = new Select();
         select.setGroup("filterObservation");
@@ -447,7 +447,7 @@ public class GenericConfigurationXMLBindingTest {
         order.setvalue("loc.platform_code, loc.instrument_code");
         order.setSens("ASC");
 
-        FilterQuery query = new FilterQuery();
+        Query query = new Query();
         query.setName("ObservationAffinage");
         query.addSelect(select);
         query.addFrom(from);

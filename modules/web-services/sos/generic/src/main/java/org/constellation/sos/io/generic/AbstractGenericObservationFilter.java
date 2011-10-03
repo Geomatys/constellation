@@ -33,7 +33,7 @@ import javax.xml.bind.JAXBException;
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.generic.database.FilterQuery;
+import org.constellation.generic.database.Query;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.factory.OMFactory;
@@ -51,12 +51,12 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
     /**
      * The base whole configuration query extract from the file Affinage.xml
      */
-    protected final FilterQuery configurationQuery;
+    protected final Query configurationQuery;
 
     /**
      *  The current query built by the sos worker in the scope of a getObservation/getResult request.
      */
-    protected FilterQuery currentQuery;
+    protected Query currentQuery;
 
      /**
      * The base for observation id.
@@ -109,8 +109,8 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
             final File affinage = new File(configuration.getConfigurationDirectory(), "affinage.xml");
             if (affinage.exists()) {
                 final Object object = unmarshaller.unmarshal(affinage);
-                if (object instanceof FilterQuery)
-                    this.configurationQuery = (FilterQuery) object;
+                if (object instanceof Query)
+                    this.configurationQuery = (Query) object;
                 else
                     throw new CstlServiceException("Invalid content in affinage.xml", NO_APPLICABLE_CODE);
             } else {

@@ -465,6 +465,7 @@ public class SOSworker extends AbstractWorker {
             isStarted = false;
         } catch (CstlServiceException ex) {
             LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause:{0}", ex.getMessage());
+            LOGGER.log(Level.FINER, "\nThe SOS worker is not running!", ex);
             isStarted = false;
         } finally {
             if (configUM != null) {

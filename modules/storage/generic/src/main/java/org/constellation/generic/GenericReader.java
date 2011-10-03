@@ -174,8 +174,13 @@ public abstract class GenericReader  {
             for (Query query : allQueries) {
                 final List<String> varNames        = query.getVarNames();
                 final String textQuery             = query.buildSQLQuery(staticParameters);
-                final LockedPreparedStatement stmt =  new LockedPreparedStatement(connection.prepareStatement(textQuery), textQuery);
-                statements.put(stmt, varNames);
+                try {
+                    final LockedPreparedStatement stmt =  new LockedPreparedStatement(connection.prepareStatement(textQuery), textQuery);
+                    statements.put(stmt, varNames);
+                } catch (SQLException ex) {
+                    LOGGER.warning("SQL exception while executing:" + textQuery);
+                    throw ex;
+                }
             }
         } else {
             LOGGER.warning("The configuration file is probably malformed, there is no queries part.");
@@ -200,18 +205,23 @@ public abstract class GenericReader  {
             for (Query query : statique.getQuery()) {
                 final String varName   = query.getFirstVarName();
                 final String textQuery = query.buildSQLQuery(staticParameters);
-                final ResultSet res    = stmt.executeQuery(textQuery);
-                final StringBuilder parameterValue = new StringBuilder();
-                while (res.next()) {
-                    parameterValue.append("'").append(res.getString(1)).append("',");
+                try {
+                    final ResultSet res    = stmt.executeQuery(textQuery);
+                    final StringBuilder parameterValue = new StringBuilder();
+                    while (res.next()) {
+                        parameterValue.append("'").append(res.getString(1)).append("',");
+                    }
+                    res.close();
+                    //we remove the last ','
+                    String pValue = parameterValue.toString();
+                    if (parameterValue.length() > 0) {
+                        pValue = parameterValue.substring(0, parameterValue.length() - 1);
+                    }
+                    staticParameters.put(varName, pValue);
+                } catch (SQLException ex) {
+                    LOGGER.warning("SQL exception while executing:" + textQuery);
+                    throw ex;
                 }
-                res.close();
-                //we remove the last ','
-                String pValue = parameterValue.toString();
-                if (parameterValue.length() > 0) {
-                    pValue = parameterValue.substring(0, parameterValue.length() - 1);
-                }
-                staticParameters.put(varName, pValue);
             }
             stmt.close();
         }

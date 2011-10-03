@@ -120,12 +120,4 @@ public class ObjectFactory {
     public Groupby createGroupby() {
         return new Groupby();
     }
-
-    /**
-     * Create an instance of {@link Query }
-     *
-     */
-    public FilterQuery createFilterQuery() {
-        return new FilterQuery();
-    }
 }

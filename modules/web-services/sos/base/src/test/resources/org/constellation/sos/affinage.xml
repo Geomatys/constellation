@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<filter:query name="ObservationAffinage" xmlns:filter="http://constellation.generic.filter.org">
+<query name="ObservationAffinage">
 
 
 -- ===== SELECT =====
 
 
-<select group="filterObservation" type="text">"name"</select>
+<select group="filterObservation">
+    <col>
+        <var>name</var>
+        <sql>name</sql>
+    </col>
+</select>
 
-<select group="filterResult" type="text">"result", "sampling_time_begin", "sampling_time_end"</select>
+<select group="filterResult">
+    <col>
+        <var>result</var>
+        <sql>result</sql>
+    </col>
+    <col>
+        <var>sampling_time_begin</var>
+        <sql>sampling_time_begin</sql>
+    </col>
+    <col>
+        <var>sampling_time_end</var>
+        <sql>sampling_time_end</sql>
+    </col>
+</select>
 
 -- ==== FROM ========
 
@@ -48,4 +66,4 @@
 -- ===== TIME EQUALS TimeInstant========
 <where group="tequalsTI"><![CDATA[("sampling_time_begin"=&position AND "sampling_time_end" IS NULL) OR ("sampling_time_begin"<=&position AND "sampling_time_end">=&position)]]></where>
 
-</filter:query>
+</query>
