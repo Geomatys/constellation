@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.geotoolkit.util.Utilities;
 
 
@@ -31,6 +34,10 @@ import org.geotoolkit.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Select {
 
+    @XmlAttribute
+    @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
+    private String group;
+    
     /**
      * A list of Column to add in the select and their alias.
      */
@@ -51,7 +58,7 @@ public class Select {
      * @param var the alias of the column
      * @param sql the column itself
      */
-    public Select(String var, String sql) {
+    public Select(final String var, final String sql) {
         this.col = new ArrayList<Column>();
         this.col.add(new Column(var, sql));
     }
@@ -61,7 +68,7 @@ public class Select {
      *
      * @param col the column to add to the select CLAUSE.
      */
-    public Select(Column col) {
+    public Select(final Column col) {
         this.col = new ArrayList<Column>();
         this.col.add(col);
     }
@@ -92,10 +99,50 @@ public class Select {
         this.col = value;
     }
     
+    /**
+     * Gets the value of the alias property.
+     */
+    public void addCol(final Column column) {
+        if (column != null) {
+            if (col == null) {
+                col = new ArrayList<Column>();
+            }
+            col.add(column);
+        }
+    }
+    
+    /**
+     * Gets the value of the alias property.
+     */
+    public void addCol(final String var, final String sql) {
+        if (col == null) {
+            col = new ArrayList<Column>();
+        }
+        col.add(new Column(var, sql));
+    }
+
+    
+    /**
+     * @return the group
+     */
+    public String getGroup() {
+        return group;
+    }
+
+    /**
+     * @param group the group to set
+     */
+    public void setGroup(final String group) {
+        this.group = group;
+    }
+    
     
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Select]");
+        if (group != null) {
+            s.append("group: ").append(group).append('\n');
+        }
         s.append("columns: ").append('\n');
         for (Column c: col) {
             s.append(c.toString()).append('\n');
@@ -114,7 +161,8 @@ public class Select {
         if (object instanceof Select) {
             final Select that = (Select) object;
 
-            return Utilities.equals(this.col, that.col);
+            return Utilities.equals(this.col,   that.col) &&
+                   Utilities.equals(this.group, that.group);
         }
         return false;
     }
@@ -123,6 +171,7 @@ public class Select {
     public int hashCode() {
         int hash = 7;
         hash = 79 * hash + (this.col != null ? this.col.hashCode() : 0);
+        hash = 79 * hash + (this.group != null ? this.group.hashCode() : 0);
         return hash;
     }
 }

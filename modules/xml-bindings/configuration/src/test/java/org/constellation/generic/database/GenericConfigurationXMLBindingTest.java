@@ -316,7 +316,7 @@ public class GenericConfigurationXMLBindingTest {
         "     </entry>"                                                                                         + '\n' +
         " </parameters>"                                                                                        + '\n' +
         " <statique>"                                                                                           + '\n' +
-        "  	   <query name=\"platformList\">"                                                                   + '\n' +
+        "  	   <query name=\"platformList\">"                                                               + '\n' +
         "        <select>"                                                                                      + '\n' +
         "           <col>"                                                                                      + '\n' +
         "              <var>platformList</var>"                                                                 + '\n' +
@@ -324,10 +324,15 @@ public class GenericConfigurationXMLBindingTest {
         "           </col>"                                                                                     + '\n' +
         "        </select>"                                                                                     + '\n' +
         "        <from>(select '13471' from dual)</from>"                                                       + '\n' +
-        "        <orderBy>name</orderBy>"                                                                           + '\n' +
+        "        <orderBy>name</orderBy>"                                                                       + '\n' +
         "     </query>"                                                                                         + '\n' +
         "</statique>"                                                                                           + '\n' +
-        "<select group=\"filterObservation\" type=\"text\">loc.location_date</select>"                          + '\n' +
+        "<select group=\"filterObservation\">"                                                                  + '\n' +
+        "   <col>"                                                                                              + '\n' +
+        "       <var>locationDate</var>"                                                                        + '\n' +
+        "       <sql>loc.location_date</sql>"                                                               + '\n' +
+        "   </col>"                                                                                             + '\n' +
+        "</select>"                                                                                             + '\n' +
         "<from group=\"observations\">location loc, physical_parameter pp</from>"                               + '\n' +
         "<where group=\"observations\">loc.location_id = lm.location_id</where>"                                + '\n' +
         "<orderby group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderby>"         + '\n' +
@@ -338,10 +343,9 @@ public class GenericConfigurationXMLBindingTest {
         FilterQuery result = (FilterQuery) unmarshaller.unmarshal(sr);
 
 
-        FilterSelect select = new FilterSelect();
+        Select select = new Select();
         select.setGroup("filterObservation");
-        select.setType("text");
-        select.setvalue("loc.location_date");
+        select.addCol("locationDate", "loc.location_date");
 
         From from = new From();
         from.setGroup("observations");
@@ -415,16 +419,20 @@ public class GenericConfigurationXMLBindingTest {
         "            <orderBy>name</orderBy>"                                                                           + '\n' +
         "        </query>"                                                                                         + '\n' +
         "    </statique>"                                                                                           + '\n' +
-        "    <select group=\"filterObservation\" type=\"text\">loc.location_date</select>"                          + '\n' +
+        "    <select group=\"filterObservation\">"                                                                 + '\n' +
+        "        <col>"                                                                 + '\n' +
+        "            <var>locationDate</var>"                                                                 + '\n' +
+        "            <sql>loc.location_date</sql>"                                                                 + '\n' +
+        "        </col>"                                                                 + '\n' +
+        "    </select>"                          + '\n' +
         "    <from group=\"observations\">location loc, physical_parameter pp</from>"                               + '\n' +
         "    <where group=\"observations\">loc.location_id = lm.location_id</where>"                                + '\n' +
         "    <orderby group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderby>"         + '\n' +
         "</ns4:query>" + '\n';
 
-        FilterSelect select = new FilterSelect();
+        Select select = new Select();
         select.setGroup("filterObservation");
-        select.setType("text");
-        select.setvalue("loc.location_date");
+        select.addCol("locationDate","loc.location_date");
 
         From from = new From();
         from.setGroup("observations");

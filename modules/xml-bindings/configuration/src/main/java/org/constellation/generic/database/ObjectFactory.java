@@ -122,14 +122,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Select }
-     *
-     */
-    public FilterSelect createFilterSelect() {
-        return new FilterSelect();
-    }
-
-    /**
      * Create an instance of {@link Query }
      *
      */

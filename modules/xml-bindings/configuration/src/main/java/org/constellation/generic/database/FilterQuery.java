@@ -55,7 +55,7 @@ public class FilterQuery {
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     private String option;
     @XmlElement(required = true)
-    private List<FilterSelect> select;
+    private List<Select> select;
     private List<LeftJoin> leftJoin;
     @XmlElement(required = true)
     private List<From> from;
@@ -99,9 +99,9 @@ public class FilterQuery {
     /**
      * Gets the value of the select property.
      */
-    public List<FilterSelect> getSelect() {
+    public List<Select> getSelect() {
         if (select == null) {
-            select = new ArrayList<FilterSelect>();
+            select = new ArrayList<Select>();
         }
         return this.select;
     }
@@ -109,8 +109,8 @@ public class FilterQuery {
     /**
      * Gets the value of the select property for the specified group name.
      */
-    public FilterSelect getSelect(String group) {
-        for(FilterSelect s: getSelect()) {
+    public Select getSelect(final String group) {
+        for(Select s: getSelect()) {
             if (group != null && group.equals(s.getGroup())) {
                 return s;
             }
@@ -123,7 +123,7 @@ public class FilterQuery {
      *
      * @param select a SQL Select clause
      */
-    public void addSelect(FilterSelect select) {
+    public void addSelect(final Select select) {
         this.getSelect().add(select);
     }
 
@@ -140,7 +140,7 @@ public class FilterQuery {
     /**
      * Gets the value of the select property for the specified group name.
      */
-    public From getFrom(String group) {
+    public From getFrom(final String group) {
         for(From s: getFrom()) {
             if (group != null && group.equals(s.getGroup())) {
                 return s;
@@ -154,7 +154,7 @@ public class FilterQuery {
      *
      * @param select a SQL FROM clause
      */
-    public void addFrom(From from) {
+    public void addFrom(final From from) {
         this.getFrom().add(from);
     }
 
@@ -171,7 +171,7 @@ public class FilterQuery {
     /**
      * Gets the value of the where property for the specified group name.
      */
-    public Where getWhere(String group) {
+    public Where getWhere(final String group) {
         for (Where s: getWhere()) {
             if (group != null && group.equals(s.getGroup())) {
                 return s;
@@ -183,7 +183,7 @@ public class FilterQuery {
     /**
      * Gets all the value of the where property for the specified group name.
      */
-    public List<Where> getAllWhere(String group) {
+    public List<Where> getAllWhere(final String group) {
         final List<Where> result = new ArrayList<Where>();
         for (Where s: getWhere()) {
             if (group != null && group.equals(s.getGroup())) {
@@ -198,7 +198,7 @@ public class FilterQuery {
      *
      * @param select a SQL WHERE clause
      */
-    public void addWhere(Where where) {
+    public void addWhere(final Where where) {
         this.getWhere().add(where);
     }
     
@@ -215,7 +215,7 @@ public class FilterQuery {
     /**
      * Gets the value of the where property for the specified group name.
      */
-    public Orderby getOrderby(String group) {
+    public Orderby getOrderby(final String group) {
         for (Orderby o: getOrderby()) {
             if (group != null && group.equals(o.getGroup())) {
                 return o;
@@ -229,7 +229,7 @@ public class FilterQuery {
      *
      * @param select a SQL ORDERBY clause
      */
-    public void addOrderby(Orderby orderby) {
+    public void addOrderby(final Orderby orderby) {
         this.getOrderby().add(orderby);
     }
 
@@ -253,11 +253,76 @@ public class FilterQuery {
     /**
      * @param parameters the parameters to set
      */
-    public void setParameters(HashMap<String, String> parameters) {
+    public void setParameters(final HashMap<String, String> parameters) {
         this.parameters = parameters;
     }
     
 
+    /**
+     * @return the statique
+     */
+    public QueryList getStatique() {
+        return statique;
+    }
+
+    /**
+     * @param statique the statique to set
+     */
+    public void setStatique(QueryList statique) {
+        this.statique = statique;
+    }
+    
+    /**
+     * @return the leftJoin
+     */
+    public List<LeftJoin> getLeftJoin() {
+        if (leftJoin == null) {
+            leftJoin = new ArrayList<LeftJoin>();
+        }
+        return leftJoin;
+    }
+
+    /**
+     * @param leftJoin the leftJoin to set
+     */
+    public void setLeftJoin(final List<LeftJoin> leftJoin) {
+        this.leftJoin = leftJoin;
+    }
+    
+    /**
+     * Gets the value of the where property for the specified group name.
+     */
+    public LeftJoin getLeftJoin(final String group) {
+        for (LeftJoin s: getLeftJoin()) {
+            if (group != null && group.equals(s.getGroup())) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets all the value of the LeftJoin property for the specified group name.
+     */
+    public List<LeftJoin> getAllLeftJoin(final String group) {
+        final List<LeftJoin> result = new ArrayList<LeftJoin>();
+        for (LeftJoin s: getLeftJoin()) {
+            if (group != null && group.equals(s.getGroup())) {
+                result.add(s);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Add a LeftJoin clause to the query.
+     *
+     * @param select a SQL LeftJoin clause
+     */
+    public void addLeftJoin(final LeftJoin leftJoin) {
+        this.getLeftJoin().add(leftJoin);
+    }
+    
     /**
      * Build the concrete SQL text query by combinating all the clause contained in this object.
      * @return An SQL query.
@@ -266,11 +331,20 @@ public class FilterQuery {
         StringBuilder sb = new StringBuilder();
         if (select != null) {
             sb.append("SELECT ");
-            for (FilterSelect s : select) {
-                sb.append(s.getvalue()).append(" , ");
+            for (Select s : select) {
+                for (Column col : s.getCol()) {
+                    String varName        = col.getVar();
+                    final String varValue = col.getSql();
+                    if (varName != null) {
+                        sb.append(varValue).append(" AS ").append(varName).append(',');
+                    } else {
+                        sb.append(varValue).append(',');
+                    }
+                }
+                if (!s.getCol().isEmpty()) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
             }
-            if (select.size() > 0)
-               sb = sb.delete(sb.length() - 3, sb.length());
         }
         if (from != null) {
             sb.append('\n');
@@ -355,7 +429,7 @@ public class FilterQuery {
         }
         if (select != null) {
             sb.append("SELECT: ");
-            for (FilterSelect s : select) {
+            for (Select s : select) {
                 sb.append(s).append('\n');
             }
         }
@@ -390,71 +464,6 @@ public class FilterQuery {
             }
         }
         return sb.toString();
-    }
-
-    /**
-     * @return the statique
-     */
-    public QueryList getStatique() {
-        return statique;
-    }
-
-    /**
-     * @param statique the statique to set
-     */
-    public void setStatique(QueryList statique) {
-        this.statique = statique;
-    }
-    
-    /**
-     * @return the leftJoin
-     */
-    public List<LeftJoin> getLeftJoin() {
-        if (leftJoin == null) {
-            leftJoin = new ArrayList<LeftJoin>();
-        }
-        return leftJoin;
-    }
-
-    /**
-     * @param leftJoin the leftJoin to set
-     */
-    public void setLeftJoin(List<LeftJoin> leftJoin) {
-        this.leftJoin = leftJoin;
-    }
-    
-    /**
-     * Gets the value of the where property for the specified group name.
-     */
-    public LeftJoin getLeftJoin(String group) {
-        for (LeftJoin s: getLeftJoin()) {
-            if (group != null && group.equals(s.getGroup())) {
-                return s;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Gets all the value of the LeftJoin property for the specified group name.
-     */
-    public List<LeftJoin> getAllLeftJoin(String group) {
-        final List<LeftJoin> result = new ArrayList<LeftJoin>();
-        for (LeftJoin s: getLeftJoin()) {
-            if (group != null && group.equals(s.getGroup())) {
-                result.add(s);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Add a LeftJoin clause to the query.
-     *
-     * @param select a SQL LeftJoin clause
-     */
-    public void addLeftJoin(LeftJoin leftJoin) {
-        this.getLeftJoin().add(leftJoin);
     }
 
     /**
