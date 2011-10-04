@@ -32,12 +32,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
+import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
@@ -189,8 +191,20 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             if (dataSource == null) {
                 throw new MetadataIoException("Unable to instanciate a dataSource.");
             }
-            mdReader = MD_IOFactory.getPooledInstance(dataSource, isPostgres);
-            mdReader.setProperty("readProfile", false);
+            MD_IOFactory factory = null;
+            final Iterator<MD_IOFactory> ite = ServiceRegistry.lookupProviders(MD_IOFactory.class);
+            while (ite.hasNext()) {
+                MD_IOFactory currentFactory = ite.next();
+                if (currentFactory.matchImplementationType(dataSource, isPostgres)) {
+                    factory = currentFactory;
+                }
+            }
+            if (factory != null) {
+                mdReader = factory.getPooledInstance(dataSource, isPostgres);
+                mdReader.setProperty("readProfile", false);
+            } else {
+                throw new MetadataIoException("unable to find a MD_IO factory");
+            }
         } catch (SQLException ex) {
             throw new MetadataIoException("SQLException while initializing the MDWeb reader:" +'\n'+
                                            "cause:" + ex.getMessage());

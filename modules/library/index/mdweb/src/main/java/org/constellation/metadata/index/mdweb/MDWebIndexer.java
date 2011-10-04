@@ -22,10 +22,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import javax.imageio.spi.ServiceRegistry;
 import javax.sql.DataSource;
 
 // Apache Lucene dependencies
@@ -109,11 +111,23 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         try {
             final DataSource dataSource = db.getDataSource();
             final boolean isPostgres    = db.getClassName().equals("org.postgresql.Driver");
-            mdWebReader                 = MD_IOFactory.getReaderInstance(dataSource, isPostgres);
-            mdWebReader.setProperty("readProfile", false);
-            initEbrimClasses();
-            if (create) {
-                createIndex();
+            MD_IOFactory factory = null;
+            final Iterator<MD_IOFactory> ite = ServiceRegistry.lookupProviders(MD_IOFactory.class);
+            while (ite.hasNext()) {
+                MD_IOFactory currentFactory = ite.next();
+                if (currentFactory.matchImplementationType(dataSource, isPostgres)) {
+                    factory = currentFactory;
+                }
+            }
+            if (factory != null) {
+                mdWebReader                 = factory.getReaderInstance(dataSource, isPostgres);
+                mdWebReader.setProperty("readProfile", false);
+                initEbrimClasses();
+                if (create) {
+                    createIndex();
+                }
+            } else {
+                throw new IndexingException("Unable to find a MD_IO factory");
             }
         } catch (SQLException ex) {
             throw new IndexingException("SQL Exception while creating mdweb indexer: " + ex.getMessage());

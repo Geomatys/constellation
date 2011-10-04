@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,6 +37,7 @@ import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.logging.Level;
+import javax.imageio.spi.ServiceRegistry;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 
@@ -151,21 +153,32 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             final DataSource dataSource = db.getDataSource();
             final boolean isPostgres    = db.getClassName().equals("org.postgresql.Driver");
-            mdWriter                    = MD_IOFactory.getPooledInstance(dataSource, isPostgres);
-
-            mdRecordSet = getRecordSet(configuration.getDefaultRecordSet());
-            defaultUser = mdWriter.getUser("admin");
-
-            if ("true".equalsIgnoreCase(configuration.getNoIndexation())) {
-                noIndexation = true;
-                LOGGER.info("indexation is de-activated for Transactionnal part");
-            } else {
-                noIndexation = false;
+            MD_IOFactory factory = null;
+            final Iterator<MD_IOFactory> ite = ServiceRegistry.lookupProviders(MD_IOFactory.class);
+            while (ite.hasNext()) {
+                MD_IOFactory currentFactory = ite.next();
+                if (currentFactory.matchImplementationType(dataSource, isPostgres)) {
+                    factory = currentFactory;
+                }
             }
+            if (factory != null) {
+                mdWriter    = factory.getPooledInstance(dataSource, isPostgres);
+                mdRecordSet = getRecordSet(configuration.getDefaultRecordSet());
+                defaultUser = mdWriter.getUser("admin");
 
-            this.contacts = new HashMap<Object, Value>();
-            initStandardMapping();
-            initContactMap();
+                if ("true".equalsIgnoreCase(configuration.getNoIndexation())) {
+                    noIndexation = true;
+                    LOGGER.info("indexation is de-activated for Transactionnal part");
+                } else {
+                    noIndexation = false;
+                }
+
+                this.contacts = new HashMap<Object, Value>();
+                initStandardMapping();
+                initContactMap();
+            } else {
+                throw new MetadataIoException("unable to find a MD_IO factory");
+            }
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while initializing the MDWeb writer:" +'\n'+
                                            "cause:" + ex.getMessage());

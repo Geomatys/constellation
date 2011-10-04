@@ -18,6 +18,8 @@
 package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
+import javax.imageio.spi.ServiceRegistry;
+import java.util.Iterator;
 import org.mdweb.model.storage.TextValue;
 import java.io.File;
 import java.sql.Connection;
@@ -788,7 +790,16 @@ public class MdwebIndexTest {
     @Test
     public void extractValuesTest() throws Exception {
         
-        Reader reader = MD_IOFactory.getReaderInstance(ds, false);
+        MD_IOFactory factory = null;
+        final Iterator<MD_IOFactory> ite = ServiceRegistry.lookupProviders(MD_IOFactory.class);
+        while (ite.hasNext()) {
+            MD_IOFactory currentFactory = ite.next();
+            if (currentFactory.matchImplementationType(ds, false)) {
+                factory = currentFactory;
+            }
+        }
+        
+        Reader reader = factory.getReaderInstance(ds, false);
         Form form = reader.getForm("40510_145_19930221211500");
         
         assertNotNull(form);

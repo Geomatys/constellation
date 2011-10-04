@@ -22,11 +22,13 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //Junit dependencies
+import javax.imageio.spi.ServiceRegistry;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -109,7 +111,16 @@ public class MdwebFormIndexTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/model/mdw_schema_2.3(derby).sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
 
-        Writer writer = MD_IOFactory.getWriterInstance(ds, false);
+        MD_IOFactory factory = null;
+        final Iterator<MD_IOFactory> ite = ServiceRegistry.lookupProviders(MD_IOFactory.class);
+        while (ite.hasNext()) {
+            MD_IOFactory currentFactory = ite.next();
+            if (currentFactory.matchImplementationType(ds, false)) {
+                factory = currentFactory;
+            }
+        }
+        
+        Writer writer = factory.getWriterInstance(ds, false);
         fillTestData(writer);
         writer.close();
 
