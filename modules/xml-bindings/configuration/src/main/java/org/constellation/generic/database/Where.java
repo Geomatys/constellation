@@ -138,9 +138,9 @@ public class Where {
     public void replaceVariable(String varName, String varValue, boolean withQuote) {
         if (varValue != null) {
             if (withQuote) {
-                value = value.replaceAll('&' + varName, "'" + varValue + "'");
+                value = value.replace(":${" + varName + '}', "'" + varValue + "'");
             } else {
-                value = value.replaceAll('&' + varName, varValue);
+                value = value.replace(":${" + varName + '}', varValue);
             }
         }
     }
@@ -155,7 +155,7 @@ public class Where {
      */
     public void replaceVariable(HashMap<String, String> parameters) {
         for (Entry<String, String> entry : parameters.entrySet()) {
-            value = value.replaceAll('&' + entry.getKey(), entry.getValue());
+            value = value.replace(":{" + entry.getKey() + '}', entry.getValue());
         }
     }
 

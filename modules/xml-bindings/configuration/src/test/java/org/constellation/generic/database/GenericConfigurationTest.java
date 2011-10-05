@@ -74,7 +74,7 @@ public class GenericConfigurationTest {
 
         result = mquery.buildSQLQuery(parameters);
 
-        expResult = "SELECT pp.name AS var02,tr.id AS var03 FROM physical_parameter pp, transduction tr WHERE tr.parameter=pp.id AND pp.id=something AND tr.parameter IN (blavl, bloub)";
+        expResult = "SELECT pp.name AS var02,tr.id AS var03 FROM physical_parameter pp, transduction tr\n WHERE (tr.parameter=pp.id AND pp.id=something AND tr.parameter IN (blavl, bloub))";
         
         assertEquals(expResult, result);
     }

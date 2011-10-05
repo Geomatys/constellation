@@ -479,23 +479,53 @@ public class Query {
         }
         
         final String varBegin = ":${";
-        if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().isEmpty()) {
-            String sql = where.get(0).getvalue();
-            while (sql.indexOf(varBegin) != -1 && sql.indexOf('}') != -1) {
-                final String paramName   = sql.substring(sql.indexOf(varBegin) + 3, sql.indexOf('}'));
-                final String paramValues = staticParameters.get(paramName);
-                if (paramValues != null) {
-                    final String s = sql.substring(sql.indexOf(varBegin), sql.indexOf('}') + 1);
-                    sql = sql.replace(s, paramValues);
-                    
+        if (where != null) {
+            mainQuery.append("\n WHERE ");
+            boolean oRblock = false;
+            for (int i = 0; i < where.size(); i++) {
+                final Where w = where.get(i);
+
+                String sql = w.getvalue();
+                while (sql.indexOf(varBegin) != -1 && sql.indexOf('}') != -1) {
+                    final String paramName = sql.substring(sql.indexOf(varBegin) + 3, sql.indexOf('}'));
+                    final String paramValues = staticParameters.get(paramName);
+                    if (paramValues != null) {
+                        final String s = sql.substring(sql.indexOf(varBegin), sql.indexOf('}') + 1);
+                        sql = sql.replace(s, paramValues);
+
+                    } else {
+                        final String s = sql.substring(sql.indexOf(varBegin), sql.indexOf('}') + 1);
+                        sql = sql.replace(s, "?");
+                    }
+                }
+                sql        = sql.replace("':$'", "?");
+                sql        = sql.replace(":$", "?");
+                
+                final String block = '(' + sql + ')';
+                
+                if (i + 1 < where.size()) {
+                    if (where.get(i + 1).getGroup().equals(w.getGroup()) && (!"AND".equals(w.getOperator()))) {
+                        if (oRblock) {
+                            mainQuery.append(block).append(" OR ");
+                        } else {
+                            mainQuery.append('(').append(block).append(" OR ");
+                            oRblock = true;
+                        }
+                    } else {
+                        if (oRblock) {
+                            mainQuery.append(block).append(") AND ");
+                            oRblock = false;
+                        } else {
+                            mainQuery.append(block).append(" AND ");
+                        }
+                    }
                 } else {
-                    final String s = sql.substring(sql.indexOf(varBegin), sql.indexOf('}') + 1);
-                    sql = sql.replace(s, "?");
+                    mainQuery.append(block);
                 }
             }
-            sql = sql.replace("':$'", "?");
-            sql = sql.replace(":$", "?");
-            mainQuery.append(" WHERE ").append(sql);
+            if (oRblock) {
+                mainQuery.append(')');
+            }
         }
         if (orderBy != null && !orderBy.isEmpty()) {
             mainQuery.append(" ORDER BY ");
