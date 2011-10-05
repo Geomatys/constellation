@@ -84,7 +84,7 @@ public class SOSFactoryTest {
             SensorReader sr = smlFactory.getSensorReader(DataSourceType.MDWEB, config, parameters);
         } catch (MetadataIoException ex) {
             exLaunched = true;
-            assertTrue(ex.getMessage().contains("Error while instantiating MDweb writer"));
+            assertTrue("was:" + ex.getMessage(), ex.getMessage().contains("MD_IOException while initializing the MDWeb reader"));
         }
         assertTrue(exLaunched);
         
@@ -92,7 +92,7 @@ public class SOSFactoryTest {
             SensorWriter sw = smlFactory.getSensorWriter(DataSourceType.MDWEB, config, parameters);
         } catch (MetadataIoException ex) {
             exLaunched = true;
-            assertTrue(ex.getMessage().contains("Error while instantiating MDweb writer"));
+            assertTrue("was:" + ex.getMessage(),ex.getMessage().contains("MD_IOException while initializing the MDWeb writer"));
         }
         assertTrue(exLaunched);
         
