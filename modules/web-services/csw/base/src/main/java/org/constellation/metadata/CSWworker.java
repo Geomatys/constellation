@@ -779,7 +779,7 @@ public class CSWworker extends AbstractWorker {
                 for (Entry<String, String> entry : prefixs.entrySet()) {
                     report.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
                 }
-                LOGGER.log(logLevel, report.toString());
+                LOGGER.log(Level.FINER, report.toString());
             }
             
         } else {
@@ -890,7 +890,7 @@ public class CSWworker extends AbstractWorker {
         if (max > results.size()) {
             max = results.size();
         }
-        LOGGER.log(logLevel, "local max = " + max + " distributed max = " + maxDistributed);
+        LOGGER.log(Level.FINER, "local max = " + max + " distributed max = " + maxDistributed);
 
         int mode;
         if (outputSchema.equals(Namespaces.GMD) || outputSchema.equals(Namespaces.GFC)) {
