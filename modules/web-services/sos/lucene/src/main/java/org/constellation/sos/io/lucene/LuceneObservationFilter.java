@@ -367,4 +367,14 @@ public class LuceneObservationFilter implements ObservationFilter {
             searcher.setLogLevel(logLevel);
         }
     }
+
+    @Override
+    public void setTimeLatest() throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setTimeFirst() throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

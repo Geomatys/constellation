@@ -27,6 +27,16 @@ public class Union {
 
     private Query query;
 
+    public Union() {
+        
+    }
+    
+    public Union(final Union union) {
+        if (union != null) {
+            this.query = new Query(union.query);
+        }
+    }
+    
     /**
      * @return the query
      */

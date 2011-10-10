@@ -43,13 +43,22 @@ public class QueryList {
     public QueryList() {
 
     }
+    
+    public QueryList(final QueryList queryList) {
+        if (queryList != null) {
+            this.query = new ArrayList<Query>();
+            for (Query q : queryList.query) {
+                this.query.add(new Query(q));
+            }
+        }
+    }
 
     /**
      * build a query list with only one query.
      *
      * @param query A SQL Query.
      */
-    public QueryList(Query query) {
+    public QueryList(final Query query) {
         this.query = new ArrayList<Query>();
         this.query.add(query);
     }
@@ -58,7 +67,7 @@ public class QueryList {
      * build a query list with the specified queries.
      * @param query
      */
-    public QueryList(List<Query> query) {
+    public QueryList(final List<Query> query) {
         this.query = query;
     }
 

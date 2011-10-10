@@ -17,6 +17,8 @@
 
 package org.constellation.sos.ws;
 
+import java.util.Date;
+import org.geotoolkit.temporal.object.ISODateParser;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -134,7 +136,6 @@ public final class Utils {
     public static String getTimeValue(final TimePositionType time) throws CstlServiceException {
         if (time != null && time.getValue() != null) {
             String value = time.getValue();
-            value = value.replace("T", " ");
 
             /*we delete the data after the second
             if (value.indexOf('.') != -1) {
@@ -142,14 +143,16 @@ public final class Utils {
             }*/
              try {
                  //here t is not used but it allow to verify the syntax of the timestamp
-                 final Timestamp t = Timestamp.valueOf(value);
+                 final ISODateParser parser = new ISODateParser();
+                 final Date d = parser.parseToDate(value);
+                 final Timestamp t = new Timestamp(d.getTime());
                  return t.toString();
 
              } catch(IllegalArgumentException e) {
                 throw new CstlServiceException("Unable to parse the value: " + value + '\n' +
-                                               "Bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms.",
+                                               "Bad format of timestamp:\n" + e.getMessage(),
                                                INVALID_PARAMETER_VALUE, "eventTime");
-             }
+             } 
           } else {
             String locator;
             if (time == null)
@@ -169,7 +172,6 @@ public final class Utils {
     public static String getLuceneTimeValue(final TimePositionType time) throws CstlServiceException {
         if (time != null && time.getValue() != null) {
             String value = time.getValue();
-            value = value.replace("T", " ");
 
             // we delete the data after the second TODO remove
             if (value.indexOf('.') != -1) {
@@ -177,11 +179,13 @@ public final class Utils {
             }
             try {
                 // verify the syntax of the timestamp
-                Timestamp.valueOf(value);
+                //here t is not used but it allow to verify the syntax of the timestamp
+                 final ISODateParser parser = new ISODateParser();
+                 final Date d = parser.parseToDate(value);
 
             } catch(IllegalArgumentException e) {
                throw new CstlServiceException("Unable to parse the value: " + value + '\n' +
-                                              "Bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms.",
+                                              "Bad format of timestamp:\n" + e.getMessage(),
                                               INVALID_PARAMETER_VALUE, "eventTime");
             }
             value = value.replace(" ", "");

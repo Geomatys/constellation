@@ -437,4 +437,14 @@ public class DefaultObservationFilter implements ObservationFilter {
     public void setLoglevel(final Level logLevel) {
          //do nothing
     }
+
+    @Override
+    public void setTimeLatest() throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setTimeFirst() throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

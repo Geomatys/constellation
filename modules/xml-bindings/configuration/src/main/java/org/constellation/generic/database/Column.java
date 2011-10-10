@@ -46,6 +46,13 @@ public class Column {
     public Column() {
 
     }
+    
+    public Column(final Column column) {
+        if (column != null) {
+            this.sql = column.sql;
+            this.var = column.var;
+        }
+    }
 
     /**
      * Build a new Column.
@@ -53,7 +60,7 @@ public class Column {
      * @param var the alias of the column.
      * @param sql the column name (or a function)
      */
-    public Column(String var, String sql) {
+    public Column(final String var, final String sql) {
         this.sql = sql;
         this.var = var;
     }

@@ -349,4 +349,14 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
+    @Override
+    public void setTimeLatest() throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setTimeFirst() throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

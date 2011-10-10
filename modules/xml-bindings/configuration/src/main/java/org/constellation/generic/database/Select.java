@@ -48,6 +48,16 @@ public class Select {
      */
     public Select() {
     }
+    
+    public Select(final Select select) {
+        if (select != null) {
+            this.col = new ArrayList<Column>();
+            for (Column c : select.getCol()) {
+                this.col.add(new Column(c));
+            }
+            this.group = select.group;
+        }
+    }
 
     /**
      * Build a select with a single Column.

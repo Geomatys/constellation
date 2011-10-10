@@ -43,6 +43,17 @@ public class Groupby {
     @XmlValue
     private String value;
 
+    public Groupby() {
+        
+    }
+    
+    public Groupby(final Groupby groupBy) {
+        if (groupBy != null) { 
+            this.group = groupBy.group;
+            this.value = groupBy.value;
+        }
+    }
+    
     /**
      * Gets the value of the group property.
      */

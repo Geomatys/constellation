@@ -99,6 +99,22 @@ public interface ObservationFilter {
      * @throws org.constellation.ws.CstlServiceException
      */
     void setTimeDuring(Object time) throws CstlServiceException;
+    
+    /**
+     * Add a latest time filter to the current request.
+     *
+     * @param time
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    void setTimeLatest() throws CstlServiceException;
+    
+    /**
+     * Add a first time filter to the current request.
+     *
+     * @param time
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    void setTimeFirst() throws CstlServiceException;
 
     /**
      * Add a BBOX filter to the current request.

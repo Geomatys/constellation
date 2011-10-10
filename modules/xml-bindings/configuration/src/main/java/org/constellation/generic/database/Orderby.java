@@ -49,6 +49,18 @@ public class Orderby {
     @XmlValue
     private String value;
 
+    public Orderby() {
+        
+    }
+    
+    public Orderby(final Orderby orderBy) {
+        if (orderBy != null) {
+            this.group  = orderBy.group;
+            this.sens   = orderBy.sens;
+            this.value  = orderBy.value;
+        }
+    }
+    
     /**
      * Gets the value of the sens property.
      */

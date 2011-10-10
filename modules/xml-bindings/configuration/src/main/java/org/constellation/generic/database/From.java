@@ -54,11 +54,20 @@ public class From {
 
     }
 
+    public From(final From from) {
+        if (from != null) {
+            this.alias = from.alias;
+            this.group = from.group;
+            this.value = from.value;
+        }
+    }
+
+    
     /**
      * Build a FROM clause with the value.
      * @param value the string to add after the FROM in th SQL request.
      */
-    public From(String value) {
+    public From(final String value) {
         this.value = value;
     }
 

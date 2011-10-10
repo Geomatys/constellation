@@ -71,13 +71,59 @@ public class Query {
     }
 
     /**
+     * Clone a Query
+     * @param name
+     * @param select
+     * @param from 
+     */
+    public Query(final Query query) {
+        if (query != null) {
+            this.from = new ArrayList<From>();
+            for (From f : query.getFrom()) {
+                this.from.add(new From(f));
+            }
+            this.groupby = new ArrayList<Groupby>();
+            for (Groupby f : query.getGroupby()) {
+                this.groupby.add(new Groupby(f));
+            }
+            this.leftJoin = new ArrayList<LeftJoin>();
+            for (LeftJoin f : query.getLeftJoin()) {
+                this.leftJoin.add(new LeftJoin(f));
+            }
+            this.name = query.name;
+            this.option = query.option;
+            this.orderBy = new ArrayList<Orderby>();
+            for (Orderby f : query.getOrderby()) {
+                this.orderBy.add(new Orderby(f));
+            }
+            if (query.parameters != null) {
+                this.parameters = (HashMap<String, String>) query.parameters.clone();
+            }
+            this.select = new ArrayList<Select>();
+            for (Select f : query.getSelect()) {
+                this.select.add(new Select(f));
+            }
+            if (query.statique != null) {
+               this.statique = new QueryList(query.statique);
+            }
+            if (query.union != null) {
+               this.union = new Union(query.union);
+            }
+            this.where = new ArrayList<Where>();
+            for (Where f : query.getWhere()) {
+                this.where.add(new Where(f));
+            }
+        }
+    }
+    
+    /**
      * Build a SQL query with SELECT and FROM clause.
      *
      * @param name The name of the SQL query.
      * @param select The SELECT clause.
      * @param from The FROM clause.
      */
-    public Query(String name, Select select, From from) {
+    public Query(final String name, final Select select, final From from) {
         this.name   = name;
         this.select = Arrays.asList(select);
         this.from   = Arrays.asList(from);
@@ -91,7 +137,7 @@ public class Query {
      * @param from The FROM clause.
      * @param where The WHERE clause.
      */
-    public Query(String name, Select select, From from, Where where) {
+    public Query(final String name, final Select select, final From from, final Where where) {
         this.name   = name;
         this.select = Arrays.asList(select);
         this.from   = Arrays.asList(from);
@@ -108,7 +154,7 @@ public class Query {
      * @param where The WHERE clause.
      * @param orderBy The ORDERBy clause.
      */
-    public Query(String name, Select select, From from, Where where, Orderby orderBy) {
+    public Query(final String name, final Select select, final From from, final Where where, final Orderby orderBy) {
         this.name    = name;
         this.select  = Arrays.asList(select);
         this.from    = Arrays.asList(from);
@@ -204,6 +250,23 @@ public class Query {
      */
     public void addSelect(final Select select) {
         this.getSelect().add(select);
+    }
+    
+    /**
+     * Gets the value of the select property.
+     */
+    public void setSelect(final List<Select> select) {
+        this.select = select;
+    }
+    
+    /**
+     * Gets the value of the select property.
+     */
+    public void setSelect(final Select select) {
+        if (this.select == null) {
+            this.select = new ArrayList<Select>();
+        }
+        this.select.add(select);
     }
     
     /**
@@ -332,6 +395,9 @@ public class Query {
      * @return the groupby
      */
     public List<Groupby> getGroupby() {
+        if (groupby == null) {
+            groupby = new ArrayList<Groupby>();
+        }
         return groupby;
     }
 

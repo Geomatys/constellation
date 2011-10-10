@@ -149,6 +149,7 @@ import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.temporal.object.ISODateParser;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.temporal.object.TemporalUtilities;
@@ -233,15 +234,6 @@ public class SOSworker extends AbstractWorker {
      * The profile of the SOS service (transational/discovery). 
      */
     private int profile;
-    
-    /**
-     * A date formater used to parse datablock.
-     */
-    private static final List<DateFormat> DATE_FORMATS = new ArrayList<DateFormat>();
-    static {
-        DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"));
-        DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-    }
     
     /**
      * The Observation database reader
@@ -1508,17 +1500,12 @@ public class SOSworker extends AbstractWorker {
                 while (tokenizer.hasMoreTokens()) {
                     final String block = tokenizer.nextToken();
                     String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
-                    samplingTimeValue = samplingTimeValue.replace('T', ' ');
                     Date d = null;
-                    for (DateFormat dateformat : DATE_FORMATS) {
-                        try {
-                            synchronized (dateformat) {
-                                d = dateformat.parse(samplingTimeValue);
-                                break;
-                            }
-                        } catch (ParseException ex) {
-                            LOGGER.log(Level.FINER, "unable to parse the value: {0}", samplingTimeValue);
-                        }
+                    try {
+                        final ISODateParser parser = new ISODateParser();
+                        d = parser.parseToDate(samplingTimeValue);
+                    } catch (NumberFormatException ex) {
+                        LOGGER.log(Level.FINER, "unable to parse the value: {0}", samplingTimeValue);
                     }
                     if (d == null) {
                         LOGGER.log(Level.WARNING, "unable to parse the value: {0}", samplingTimeValue);
@@ -1868,10 +1855,11 @@ public class SOSworker extends AbstractWorker {
             if (obs.getSamplingTime() instanceof TimeInstantType) {
                final TimeInstantType timeInstant = (TimeInstantType) obs.getSamplingTime();
                 try {
-                    final Date d = DATE_FORMATS.get(0).parse(timeInstant.getTimePosition().getValue());
+                    final ISODateParser parser = new ISODateParser();
+                    final Date d = parser.parseToDate(timeInstant.getTimePosition().getValue());
                     final long t = System.currentTimeMillis() - d.getTime();
                     LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + TemporalUtilities.durationToString(t) + ')');
-                } catch (ParseException ex) {
+                } catch (IllegalArgumentException ex) {
                     LOGGER.warning("unable to parse the samplingTime");
                 }
             }
@@ -1929,6 +1917,27 @@ public class SOSworker extends AbstractWorker {
                     //String propertyName = time.getTEquals().getPropertyName();
                     final Object timeFilter   = time.getTEquals().getRest().get(0);
                     
+                    // look for "latest" or "getFirst" filter (52N compatibility)
+                    if (timeFilter instanceof TimeInstantType){
+                        final TimeInstantType ti = (TimeInstantType) timeFilter;
+                        if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("latest")) {
+                            if (!template) {
+                                localOmFilter.setTimeLatest();
+                                continue;
+                            } else {
+                                LOGGER.warning("latest time are not handled with template mode");
+                            }
+                        }
+                        if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("getFirst")) {
+                            if (!template) {
+                                localOmFilter.setTimeFirst();
+                                continue;
+                            } else {
+                                LOGGER.warning("getFirst time are not handled with template mode");
+                            }
+                        }
+                    }
+                        
                     if (!template) {
                         localOmFilter.setTimeEquals(timeFilter);
                         
