@@ -243,8 +243,8 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
-        final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
         if (config != null) {
+            final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
                 if (currentReader == null) {
                     currentReader = cswfactory.getMetadataReader(config);
@@ -272,8 +272,8 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
-        final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
         if (config != null) {
+            final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
                 return cswfactory.getMetadataReader(config);
 
@@ -297,8 +297,8 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
-        final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
         if (config != null) {
+            final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
                 return cswfactory.getMetadataWriter(config, null);
 
