@@ -191,6 +191,7 @@ public final class Utils {
             value = value.replace(" ", "");
             value = value.replace("-", "");
             value = value.replace(":", "");
+            value = value.replace("T", "");
             return value;
           } else {
             String locator;
