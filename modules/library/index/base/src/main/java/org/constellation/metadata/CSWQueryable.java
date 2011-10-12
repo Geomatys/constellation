@@ -272,6 +272,14 @@ public final class CSWQueryable {
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:position");
         ISO_QUERYABLE.put("TempExtent_end", paths);
 
+        /*
+         *  cloud cover percentage
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:contentInfo:cloudCoverPercentage");
+        paths.add("ISO 19115-2:MI_Metadata:contentInfo:cloudCoverPercentage");
+        ISO_QUERYABLE.put("CloudCover", paths);
+        
         /**
          * ISO 19119 specific queryable
          */
