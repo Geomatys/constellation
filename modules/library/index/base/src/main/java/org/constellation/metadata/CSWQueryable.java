@@ -306,14 +306,24 @@ public final class CSWQueryable {
          */
         paths = new ArrayList<String>();
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:platform:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:instrument:mountedOn:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:platform:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:parentOperation:platform:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:childOperation:platform:citation:title");
         ISO_QUERYABLE.put("Platform", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:instrument:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:platform:instrument:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:platform:instrument:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:parentOperation:platform:instrument:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:childOperation:platform:instrument:citation:title");
         ISO_QUERYABLE.put("Instrument", paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:childOperation:citation:title");
+        paths.add("ISO 19115-2:MI_Metadata:acquisitionInformation:operation:parentOperation:citation:title");
         ISO_QUERYABLE.put("Operation", paths);
     }
     
