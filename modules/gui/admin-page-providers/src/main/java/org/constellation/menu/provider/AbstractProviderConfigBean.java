@@ -226,7 +226,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         //add all names from the configuration files
         if (server != null) {
             final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
-                    server.providers.getServiceDescriptor(serviceName);        
+                    server.providers.getServiceDescriptor(serviceName);
             final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup)
                     serviceDesc.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
             final ParameterValueGroup config = (ParameterValueGroup)
@@ -275,21 +275,25 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         if (server != null) {
             
             final ProvidersReport report              = server.providers.listProviders();
-            final ProviderServiceReport serviceReport = report.getProviderService(serviceName);
+            final List<ProviderServiceReport> serviceReports = report.getProviderServices();
+            final List<ProviderReport> providerReports = new ArrayList<ProviderReport>();
+            if (serviceReports != null && !serviceReports.isEmpty()) {
+                for (ProviderServiceReport serviceReport : serviceReports) {
+                    providerReports.addAll(serviceReport.getProviders());
+                }
+            }
             String newSourceName = "default";
             int i = 1;
             boolean freeName = false;
             while (!freeName) {
                 freeName = true;
-                if (serviceReport != null && serviceReport.getProviders() != null) {
-                    for (final ProviderReport p : serviceReport.getProviders()) {
-                        if (p.getId().equals(newSourceName)) {
-                            //an instance with this already exist
-                            freeName = false;
-                            newSourceName = "default" + i;
-                            i++;
-                            break;
-                        }
+                for (final ProviderReport p : providerReports) {
+                    if (p.getId().equals(newSourceName)) {
+                        //an instance with this already exist
+                        freeName = false;
+                        newSourceName = "default" + i;
+                        i++;
+                        break;
                     }
                 }
             }
