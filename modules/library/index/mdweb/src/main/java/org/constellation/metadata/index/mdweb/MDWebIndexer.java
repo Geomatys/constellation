@@ -304,12 +304,14 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     @Override
     protected void indexQueryableSet(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
         for (Entry<String,List<String>> entry :queryableSet.entrySet()) {
-            final String values = getValues(form, entry.getValue());
-            if (!"null".equals(values)) {
+            final List<String> values = getValuesList(form, entry.getValue());
+            if (!values.isEmpty() && values.get(0).equals("null")) {
                 anyText.append(values).append(" ");
             }
-            doc.add(new Field(entry.getKey(),           values, Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(entry.getKey() + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
+            for (String value : values) {
+                doc.add(new Field(entry.getKey(),           value, Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(entry.getKey() + "_sort", value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+            }
         }
     }
 
@@ -344,6 +346,31 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         return response.toString();
     }
 
+    protected List<String> getValuesList(final Form form, final List<String> paths) throws IndexingException {
+        final List<String> response  = new ArrayList<String>();
+        if (paths != null) {
+            for (String fullPathID: paths) {
+                try {
+                    final List<Value> values = getValuesFromPathID(fullPathID, form);
+                    for (final Value v: values) {
+                        //only handle textvalue
+                        if (!(v instanceof TextValue)) continue;
+
+                        final TextValue tv = (TextValue) v;
+                        response.add(getTextValueStringDescription(tv));
+                    }
+                } catch (MD_IOException ex) {
+                    throw new IndexingException("MD_IO exception while get values from path", ex);
+                }
+            }
+        }
+        if (response.isEmpty()) {
+            response.add("null");
+        }
+        return response;
+    
+    }
+    
     /**
      * Return the String description of An MDWeb textValue :
      * For almost all the value it return TextValue.getValue()

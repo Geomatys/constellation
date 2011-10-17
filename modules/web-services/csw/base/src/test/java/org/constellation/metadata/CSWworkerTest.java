@@ -866,7 +866,7 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().size() == 1);
+        assertEquals(1, result.getSearchResults().getAbstractRecord().size());
         assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 1);
