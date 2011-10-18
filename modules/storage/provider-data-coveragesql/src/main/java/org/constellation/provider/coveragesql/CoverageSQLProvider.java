@@ -197,6 +197,9 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
     @Override
     public ElevationModel getElevationModel(Name name) {
+        if(name == null){
+            return null;
+        }
 
         final ParameterValueGroup layer = getLayer(getSource(), name.getLocalPart());
         if(layer != null){

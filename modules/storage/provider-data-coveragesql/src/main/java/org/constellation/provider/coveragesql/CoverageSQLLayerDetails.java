@@ -180,7 +180,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
                     if (symbol instanceof RasterSymbolizer){
                         final RasterSymbolizer rs = (RasterSymbolizer) symbol;
                         final ShadedRelief sr     = rs.getShadedRelief();
-                        if (sr.getReliefFactor().evaluate(null, Float.class) != 0){
+                        if (sr.getReliefFactor().evaluate(null, Float.class) != 0 && elevationModel!=null){
                             final ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
                             if (model != null){
                                 mapLayer.setElevationModel(model);
