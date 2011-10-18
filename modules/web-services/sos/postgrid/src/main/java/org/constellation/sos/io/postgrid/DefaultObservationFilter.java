@@ -447,4 +447,9 @@ public class DefaultObservationFilter implements ObservationFilter {
     public void setTimeFirst() throws CstlServiceException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public void setOffering(final ObservationOfferingType offering) throws CstlServiceException {
+        // not used in this implementations
+    }
 }

@@ -283,6 +283,14 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
+    public void setOffering(final ObservationOfferingType offering) throws CstlServiceException {
+        // not used in this implementations
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
         try {
             final SpatialQuery query = new SpatialQuery(luceneRequest.toString());

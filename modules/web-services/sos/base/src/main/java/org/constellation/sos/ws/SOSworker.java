@@ -28,9 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -945,7 +942,8 @@ public class SOSworker extends AbstractWorker {
                                               INVALID_PARAMETER_VALUE, OFFERING);
             }
         }
-
+        localOmFilter.setOffering(off);
+        
         //we verify that the srsName (if there is one) is advertised in the offering
         if (requestObservation.getSrsName() != null) {
             if (!off.getSrsName().contains(requestObservation.getSrsName())) {

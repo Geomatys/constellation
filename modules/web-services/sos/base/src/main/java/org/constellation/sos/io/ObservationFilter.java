@@ -126,6 +126,14 @@ public interface ObservationFilter {
     void setBoundingBox(EnvelopeType e) throws CstlServiceException;
 
     /**
+     * Set the offering for the current request
+     *
+     * @param offering
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    void setOffering(final ObservationOfferingType offering) throws CstlServiceException;
+            
+    /**
      * Add a filter on the result for the specified property.
      *
      * @param propertyName a property of the result.

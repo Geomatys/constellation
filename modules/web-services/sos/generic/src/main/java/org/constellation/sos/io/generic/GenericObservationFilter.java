@@ -273,6 +273,14 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
+    public void setOffering(final ObservationOfferingType offering) throws CstlServiceException {
+        // not used in this implementations
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
         final String request = currentQuery.buildSQLQuery();
         LOGGER.log(Level.INFO, "request:{0}", request);
