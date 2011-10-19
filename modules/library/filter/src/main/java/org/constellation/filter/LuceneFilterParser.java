@@ -220,13 +220,18 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException {
+    protected void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final Object literalValue, final String operator) throws FilterParserException {
         final String literal;
-        final boolean isDate = isDateField(propertyName);
-        if ( isDate && !"LIKE".equals(operator)) {
-            literal = extractDateValue(literalValue);
+        final boolean isDate   = isDateField(propertyName);
+        final boolean isNumber = literalValue instanceof Number;
+        if (isNumber) {
+            literal = literalValue.toString();
+        } else if ( isDate && !"LIKE".equals(operator)) {
+            literal = extractDateValue(literalValue.toString());
+        } else if ( literalValue == null) {
+            literal = "null";
         } else {
-            literal = literalValue;
+            literal = literalValue.toString();
         }
         final char open;
         final char close;
@@ -250,18 +255,31 @@ public class LuceneFilterParser extends FilterParser {
             final String lowerBound;
             if (isDate) {
                 lowerBound = "00000101 \"";
+            } else if (isNumber){
+                lowerBound = "-2147483648 TO ";
             } else {
                 lowerBound = "0 \"";
             }
-            response.append(open).append(lowerBound).append(literal).append('\"').append(close);
+            if (isNumber) {
+                response.append(open).append(lowerBound).append(literal).append(close);
+            } else {
+                response.append(open).append(lowerBound).append(literal).append('\"').append(close);
+            }
         } else if (">=".equals(operator) || ">".equals(operator)) {
             final String upperBound;
             if (isDate) {
                 upperBound = "\" 30000101";
+            } else if (isNumber){
+                upperBound = " TO 2147483648";
             } else {
                 upperBound = "\" z";
             }
-            response.append(open).append('\"').append(literal).append(upperBound).append(close);
+            
+            if (isNumber) {
+                response.append(open).append(literal).append(upperBound).append(close);
+            } else {
+                response.append(open).append('\"').append(literal).append(upperBound).append(close);
+            }
 
             // Equals
         } else {

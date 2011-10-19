@@ -245,7 +245,7 @@ public abstract class FilterParser {
                 throw new FilterParserException("A binary comparison operator must be constitued of a literal and a property name.",
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } else {
-                final String literalValue = (String) literal.getValue();
+                final Object literalValue = literal.getValue();
 
                 if (bc instanceof PropertyIsEqualTo) {
                     addComparisonFilter(response, propertyName, literalValue, "=");
@@ -285,7 +285,7 @@ public abstract class FilterParser {
      *
      * @throws FilterParserException
      */
-    protected abstract void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final String literalValue, final String operator) throws FilterParserException;
+    protected abstract void addComparisonFilter(final StringBuilder response, final PropertyName propertyName, final Object literalValue, final String operator) throws FilterParserException;
 
     /**
      * Extract and format a date representation from the specified String.

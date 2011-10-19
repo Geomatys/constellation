@@ -268,11 +268,16 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws FilterParserException {
+    protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, Object literalValue, String operator) throws FilterParserException {
         response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName.getPropertyName())).append("' AND ");
         response.append('v').append(nbField).append(".\"value\" ").append(operator);
+        if (literalValue != null) {
+            literalValue = literalValue.toString();
+        } else {
+            literalValue = "null";
+        }
         if (isDateField(propertyName)) {
-            literalValue = extractDateValue(literalValue);
+            literalValue = extractDateValue((String)literalValue);
         }
         if (!"IS NULL ".equals(operator)) {
             response.append("'").append(literalValue).append("' ");
