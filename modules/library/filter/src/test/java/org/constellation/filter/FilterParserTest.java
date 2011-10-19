@@ -340,6 +340,38 @@ public class FilterParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
 
+        /**
+         * Test 11: a simple Filter PropertyIsLessThanOrEqualTo with numeric field
+         */
+        filter = FilterParser.cqlToFilter("CloudCover <= 12");
+        
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+        
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "CloudCover:[-2147483648 TO 12]");
+        
+        /**
+         * Test 11: a simple Filter PropertyIsGreaterThan with numeric field
+         */
+        filter = FilterParser.cqlToFilter("CloudCover > 12");
+        
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+        
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+        
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "CloudCover:{12 TO 2147483648}");
+        
         pool.release(filterUnmarshaller);
     }
 
