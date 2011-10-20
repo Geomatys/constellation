@@ -283,7 +283,13 @@ public class LuceneFilterParser extends FilterParser {
 
             // Equals
         } else {
-            response.append("\"").append(literal).append('"');
+            if (isNumber) {
+                // we make this because of an issue wiht numeric fields and equals method T
+                // TODO ind a better way or fix
+                response.append("[").append(literal).append(" TO ").append(literal).append("]");
+            } else {
+                response.append("\"").append(literal).append('"');
+            }
         }
     }
 

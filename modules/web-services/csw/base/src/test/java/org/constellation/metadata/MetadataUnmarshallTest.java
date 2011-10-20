@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,6 +64,7 @@ import org.geotoolkit.metadata.iso.citation.DefaultOnlineResource;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.metadata.iso.citation.DefaultTelephone;
 import org.geotoolkit.metadata.iso.constraint.DefaultLegalConstraints;
+import org.geotoolkit.metadata.iso.content.DefaultImageDescription;
 import org.geotoolkit.metadata.iso.distribution.DefaultDigitalTransferOptions;
 import org.geotoolkit.metadata.iso.distribution.DefaultDistribution;
 import org.geotoolkit.metadata.iso.distribution.DefaultDistributor;
@@ -576,6 +578,14 @@ public class MetadataUnmarshallTest {
         set.add(dataIdentification);
         expResult.setIdentificationInfo(set);
 
+        /*
+         * Content info
+         */
+        DefaultImageDescription contentInfo = new DefaultImageDescription();
+        contentInfo.setCloudCoverPercentage(50.0);
+        expResult.setContentInfo(Arrays.asList(contentInfo));
+        
+        
         /*
          * Distribution info
          */
@@ -1391,6 +1401,13 @@ public class MetadataUnmarshallTest {
         set.add(dataIdentification);
         metadata.setIdentificationInfo(set);
 
+        /*
+         * Content info
+         */
+        DefaultImageDescription contentInfo = new DefaultImageDescription();
+        contentInfo.setCloudCoverPercentage(50.0);
+        metadata.setContentInfo(Arrays.asList(contentInfo));
+        
         /*
          * Distribution info
          */

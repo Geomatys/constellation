@@ -534,9 +534,11 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         if (metadata instanceof JAXBElement) {
                             metadata = ((JAXBElement) metadata).getValue();
                         }
-                        final List<String> value = GenericIndexer.extractValues(metadata, paths);
+                        final List<Object> value = GenericIndexer.extractValues(metadata, paths);
                         if (value != null && !value.equals(Arrays.asList("null"))) {
-                            result.addAll(value);
+                            for (Object obj : value){
+                                result.add(obj.toString());
+                            }
                         }
                         
                      //continue to the next file   

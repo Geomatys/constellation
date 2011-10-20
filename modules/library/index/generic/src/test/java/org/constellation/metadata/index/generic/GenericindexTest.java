@@ -91,8 +91,8 @@ public class GenericindexTest {
         
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object       = fillTestData();
-        indexer                    = new GenericIndexer(object, null, configDirectory, "");
-        indexSearcher               = new AbstractIndexSearcher(configDirectory, "");
+        indexer                   = new GenericIndexer(object, null, configDirectory, "");
+        indexSearcher             = new AbstractIndexSearcher(configDirectory, "");
         //indexer.setLogLevel(Level.FINER);
         //indexSearcher.setLogLevel(Level.FINER);
         
@@ -311,6 +311,100 @@ public class GenericindexTest {
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_5p_19900609195600");
+
+        //issues here it found
+        assertEquals(expectedResult, result);
+
+    }
+    
+    /**
+     * Test simple lucene search.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void numericComparisonSearchTest() throws Exception {
+        Filter nullFilter   = null;
+        String resultReport = "";
+
+        /**
+         * Test 1 numeric search: CloudCover <= 60
+         */
+        SpatialQuery spatialQuery = new SpatialQuery("CloudCover:{-2147483648 TO 60}", nullFilter, SerialChainFilter.AND);
+        List<String> result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 1:\n{0}", resultReport);
+
+        List<String> expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 2 numeric search: CloudCover <= 25
+         */                              
+        spatialQuery = new SpatialQuery("CloudCover:[-2147483648 TO 25]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 2:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_9s_19900610041000");
+
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 3 numeric search: CloudCover => 25
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("CloudCover:[25 TO 2147483648]", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 3:\n{0}", resultReport);
+
+        assertTrue(result.contains("42292_5p_19900609195600"));
+        assertEquals(1, result.size());
+        
+        /**
+         * Test 4 numeric search: CloudCover => 60
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("CloudCover:[60 TO 2147483648]", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 4:\n{0}", resultReport);
+
+        assertEquals(0, result.size());
+        
+         /**
+         * Test 5 numeric search: CloudCover => 50
+         */
+        spatialQuery = new SpatialQuery("CloudCover:[50.0 TO 2147483648]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 5:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -710,7 +804,7 @@ public class GenericindexTest {
         citation.setDates(Arrays.asList(date));
         ident.setCitation(citation);
         meta.setIdentificationInfo(Arrays.asList(ident));
-        List<String> result = GenericIndexer.extractValues(meta, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date"));
+        List<Object> result = GenericIndexer.extractValues(meta, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date"));
         assertEquals(Arrays.asList("19700101"), result);
         
         DefaultMetadata meta2 = new DefaultMetadata();
@@ -765,7 +859,7 @@ public class GenericindexTest {
         ident4.setExtents(Arrays.asList(ext));
                 
         meta4.setIdentificationInfo(Arrays.asList(ident4));
-        List<String> result = GenericIndexer.extractValues(meta4, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent#id=[0-9]+-all:beginPosition"));
+        List<Object> result = GenericIndexer.extractValues(meta4, Arrays.asList("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent#id=[0-9]+-all:beginPosition"));
         assertEquals(Arrays.asList("20081101"), result);
     }
 

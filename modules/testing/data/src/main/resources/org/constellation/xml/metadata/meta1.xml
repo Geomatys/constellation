@@ -427,6 +427,13 @@
             </gmd:extent>
         </gmd:MD_DataIdentification>
     </gmd:identificationInfo>
+    <gmd:contentInfo>
+        <gmd:MD_ImageDescription>
+            <gmd:cloudCoverPercentage>
+                <gco:Decimal>50.0</gco:Decimal>
+            </gmd:cloudCoverPercentage>
+        </gmd:MD_ImageDescription>
+    </gmd:contentInfo>
     <gmd:distributionInfo>
         <gmd:MD_Distribution>
             <gmd:distributionFormat>

@@ -33,9 +33,11 @@ import javax.sql.DataSource;
 // Apache Lucene dependencies
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.Version;
 
 // constellation dependencies
@@ -158,8 +160,9 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         int nbForms      = 0;
         try {
             final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_34, analyzer);
-            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
-
+            final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
+            final String serviceID       = getServiceID();
+            
             // getting the objects list and index avery item in the IndexWriter.
             final List<RecordSet> cats = mdWebReader.getRecordSets();
             final List<RecordSet> catToIndex = new ArrayList<RecordSet>();
@@ -184,12 +187,21 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             final List<String> results = mdWebReader.getAllIdentifiers(catToIndex, indexOnlyPusblishedMetadata);
             LOGGER.log(logLevel, "{0} forms to read.", results.size());
             for (String entry : results) {
-                final Form form = mdWebReader.getForm(entry);
-                indexDocument(writer, form);
-                nbForms++;
+                if (!stopIndexing && !indexationToStop.contains(serviceID)) {
+                    final Form form = mdWebReader.getForm(entry);
+                    indexDocument(writer, form);
+                    nbForms++;
+                } else {
+                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
+                     stopIndexation(writer, serviceID);
+                     return;
+                }
             }
             writer.optimize();
             writer.close();
+            
+            // we store the numeric fields in a properties file int the index directory
+            storeNumericFieldsFile();
 
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
@@ -216,14 +228,23 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         try {
             final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_34, analyzer);
             final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
-
+            final String serviceID       = getServiceID();
             nbForms = forms.size();
             for (Form form : forms) {
-                indexDocument(writer, form);
+                if (!stopIndexing && !indexationToStop.contains(serviceID)) {
+                    indexDocument(writer, form);
+                } else {
+                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
+                     stopIndexation(writer, serviceID);
+                     return;
+                }
             }
             writer.optimize();
             writer.close();
 
+            // we store the numeric fields in a properties file int the index directory
+            storeNumericFieldsFile();
+            
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
@@ -304,19 +325,51 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     @Override
     protected void indexQueryableSet(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
         for (Entry<String,List<String>> entry :queryableSet.entrySet()) {
-            final List<String> values = getValuesList(form, entry.getValue());
+            final List<Object> values = getValuesList(form, entry.getValue());
             if (!values.isEmpty() && values.get(0).equals("null")) {
                 anyText.append(values).append(" ");
             }
-            for (String value : values) {
-                doc.add(new Field(entry.getKey(),           value, Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(entry.getKey() + "_sort", value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+            for (Object value : values) {
+                if (value instanceof String) {
+                    final String stringValue = (String) value;
+                    doc.add(new Field(entry.getKey(),           stringValue, Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new Field(entry.getKey() + "_sort", stringValue, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                } else if (value instanceof Number) {
+                        final Number numValue           = (Number) value;
+                        final NumericField numField     = new NumericField(entry.getKey(), NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
+                        final NumericField numSortField = new NumericField(entry.getKey() + "_sort", NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, false);
+                        final Character fieldType;
+                        if (numValue instanceof Integer) {
+                            numField.setIntValue((Integer) numValue);
+                            numSortField.setIntValue((Integer) numValue);
+                            fieldType = 'i';
+                        } else if (numValue instanceof Double) {
+                            numField.setDoubleValue((Double) numValue);
+                            numSortField.setDoubleValue((Double) numValue);
+                            fieldType = 'd';
+                        } else if (numValue instanceof Float) {
+                            numField.setFloatValue((Float) numValue);
+                            numSortField.setFloatValue((Float) numValue);
+                            fieldType = 'f';
+                        } else if (numValue instanceof Long) {
+                            numField.setLongValue((Long) numValue);
+                            numSortField.setLongValue((Long) numValue);
+                            fieldType = 'l';
+                        } else {
+                            fieldType = 'u';
+                            LOGGER.severe("Unexpected Number type:" + numValue.getClass().getName());
+                        }
+                        addNumericField(entry.getKey(), fieldType);
+                        doc.add(numField);
+                        doc.add(numSortField);
+                    }
             }
         }
     }
 
     /**
      * {@inheritDoc}
+     * 
      */
     @Override
     protected String getValues(final Form form, final List<String> paths) throws IndexingException {
@@ -330,7 +383,11 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                         if (!(v instanceof TextValue)) continue;
 
                         final TextValue tv = (TextValue) v;
-                        response.append(getTextValueStringDescription(tv)).append(',');
+                        try  {
+                            response.append(getTextValueDescription(tv)).append(',');
+                        } catch (NumberFormatException ex) {
+                             LOGGER.warning("Unable to parse value:" + tv.getValue() + "\ncause:" + ex.getMessage());
+                        }
                     }
                 } catch (MD_IOException ex) {
                     throw new IndexingException("MD_IO exception while get values from path", ex);
@@ -346,8 +403,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         return response.toString();
     }
 
-    protected List<String> getValuesList(final Form form, final List<String> paths) throws IndexingException {
-        final List<String> response  = new ArrayList<String>();
+    protected List<Object> getValuesList(final Form form, final List<String> paths) throws IndexingException {
+        final List<Object> response  = new ArrayList<Object>();
         if (paths != null) {
             for (String fullPathID: paths) {
                 try {
@@ -357,7 +414,11 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                         if (!(v instanceof TextValue)) continue;
 
                         final TextValue tv = (TextValue) v;
-                        response.add(getTextValueStringDescription(tv));
+                        try {
+                            response.add(getTextValueDescription(tv));
+                        } catch (NumberFormatException ex) {
+                            LOGGER.warning("Unable to parse value:" + tv.getValue() + "\ncause:" + ex.getMessage());
+                        }
                     }
                 } catch (MD_IOException ex) {
                     throw new IndexingException("MD_IO exception while get values from path", ex);
@@ -381,13 +442,17 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      *
      * @return S String label
      */
-    private String getTextValueStringDescription(final TextValue tv) {
-        final String value;
+    private Object getTextValueDescription(final TextValue tv) throws NumberFormatException {
+        final Object value;
 
         if (tv.getType() instanceof CodeList) {
             value = getCodeListValue(tv);
         } else if (tv.getType().getName().equals("Date")) {
             value = toLuceneDateSyntax(tv.getValue());
+        } else if (tv.getType().getName().equals("Integer")) {
+            value = Integer.parseInt(tv.getValue());
+        } else if (tv.getType().getName().equals("Real") || tv.getType().getName().equals("Decimal")) {
+            value = Double.parseDouble(tv.getValue());
         } else {
             value = tv.getValue();
         }

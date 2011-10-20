@@ -18,6 +18,10 @@
 package org.constellation.metadata.index;
 
 // J2SE dependencies
+import java.util.Properties;
+import org.geotoolkit.util.FileUtilities;
+import org.apache.lucene.index.IndexWriter;
+import java.io.IOException;
 import java.util.Map.Entry;
 import java.io.File;
 import java.util.ArrayList;
@@ -48,6 +52,8 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     protected static final String NULL_VALUE = "null";
 
     private final Map<String, List<String>> additionalQueryable;
+    
+    private final Map<String, String> numericFields = new HashMap<String, String>();
 
     /**
      * Build a new CSW metadata indexer.
@@ -238,14 +244,57 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     }
 
     /**
+     * Add a numeric fields to the current list.
+     * 
+     * @param fieldName
+     * @param numberType 
+     */
+    protected void addNumericField(final String fieldName, final Character numberType) {
+        if (numericFields.get(fieldName) == null) {
+            numericFields.put(fieldName, numberType.toString());
+        }
+    }
+    
+    /**
+     * Store the numeric fields in a properties file int the index directory
+     */
+    protected void storeNumericFieldsFile() {
+        final File indexDirectory   = getFileDirectory();
+        final File numericFieldFile = new File(indexDirectory, "numericFields.properties");
+        final Properties prop       = new Properties();
+        prop.putAll(numericFields);
+        try {
+            FileUtilities.storeProperties(prop, numericFieldFile);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, "Unable to store the numeric fields properties file.", ex);
+        }
+        
+    }
+    
+    protected void stopIndexation(final IndexWriter writer, final String serviceID) throws IOException {
+        writer.optimize();
+        writer.close();
+        FileUtilities.deleteDirectory(getFileDirectory());
+        if (indexationToStop.contains(serviceID)) {
+            indexationToStop.remove(serviceID);
+        }
+        if (indexationToStop.isEmpty()) {
+            stopIndexing = false;
+        }
+    }
+    
+    /**
      * Extract some values from a metadata object using  the list of paths.
      * 
      * @param meta The object to index.
      * @param paths A list of paths where to find the information within the metadata.
      *
+     * @Deprecated
+     * 
      * @return A String containing one or more informations (comma separated) find in the metadata.
      * @throws IndexingException
      */
+    @Deprecated
     protected abstract String getValues(final A meta, final List<String> paths) throws IndexingException;
 
     /**

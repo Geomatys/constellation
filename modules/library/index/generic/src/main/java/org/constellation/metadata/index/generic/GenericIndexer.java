@@ -40,9 +40,11 @@ import java.util.logging.Level;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.Version;
 
 // constellation dependencies
@@ -56,7 +58,6 @@ import org.constellation.util.ReflectionUtilities;
 
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
 import org.opengis.metadata.Metadata;
@@ -162,6 +163,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             }
             writer.optimize();
             writer.close();
+            
+            // we store the numeric fields in a properties file int the index directory
+            storeNumericFieldsFile();
 
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, "IOException while indexing document: {0}", ex.getMessage());
@@ -199,23 +203,14 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             writer.optimize();
             writer.close();
 
+            // we store the numeric fields in a properties file int the index directory
+            storeNumericFieldsFile();
+            
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, IO_SINGLE_MSG, ex);
         }
         LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\n" +
                 " documents indexed: " + nbEntries);
-    }
-
-    private void stopIndexation(final IndexWriter writer, final String serviceID) throws IOException {
-        writer.optimize();
-        writer.close();
-        FileUtilities.deleteDirectory(getFileDirectory());
-        if (indexationToStop.contains(serviceID)) {
-            indexationToStop.remove(serviceID);
-        }
-        if (indexationToStop.isEmpty()) {
-            stopIndexing = false;
-        }
     }
 
     /**
@@ -290,11 +285,42 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         for (int i = 0; i < queryableSet.size(); i++) {
             try {
                 final TermValue values = formatStringValue(cs.take().get());
-                for (String value : values.value) {
-                    doc.add(new Field(values.term,           value, Field.Store.YES, Field.Index.ANALYZED));
-                    doc.add(new Field(values.term + "_sort", value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                    if (value != null && !value.equals(NULL_VALUE) && anyText.indexOf(value) == -1) {
-                        anyText.append(value).append(" ");
+                for (Object value : values.value) {
+                    if (value instanceof String) {
+                        final String stringValue = (String) value;
+                        doc.add(new Field(values.term,           stringValue, Field.Store.YES, Field.Index.ANALYZED));
+                        doc.add(new Field(values.term + "_sort", stringValue, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                        if (!stringValue.equals(NULL_VALUE) && anyText.indexOf(stringValue) == -1) {
+                            anyText.append(stringValue).append(" ");
+                        }
+                    } else if (value instanceof Number) {
+                        final Number numValue           = (Number) value;
+                        final NumericField numField     = new NumericField(values.term, NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
+                        final NumericField numSortField = new NumericField(values.term + "_sort", NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, false);
+                        final Character fieldType;
+                        if (numValue instanceof Integer) {
+                            numField.setIntValue((Integer) numValue);
+                            numSortField.setIntValue((Integer) numValue);
+                            fieldType = 'i';
+                        } else if (numValue instanceof Double) {
+                            numField.setDoubleValue((Double) numValue);
+                            numSortField.setDoubleValue((Double) numValue);
+                            fieldType = 'd';
+                        } else if (numValue instanceof Float) {
+                            numField.setFloatValue((Float) numValue);
+                            numSortField.setFloatValue((Float) numValue);
+                            fieldType = 'f';
+                        } else if (numValue instanceof Long) {
+                            numField.setLongValue((Long) numValue);
+                            numSortField.setLongValue((Long) numValue);
+                            fieldType = 'l';
+                        } else {
+                            fieldType = 'u';
+                            LOGGER.severe("Unexpected Number type:" + numValue.getClass().getName());
+                        }
+                        addNumericField(values.term, fieldType);
+                        doc.add(numField);
+                        doc.add(numSortField);
                     }
                 }
 
@@ -313,12 +339,15 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     private TermValue formatStringValue(final TermValue values) {
          if ("date".equals(values.term)) {
-             final List<String> newValues = new ArrayList<String>();
-             for (String value : values.value) {
-                 if (value.endsWith("z") || value.endsWith("Z")) {
-                     value = value.substring(0, value.length() - 1);
+             final List<Object> newValues = new ArrayList<Object>();
+             for (Object value : values.value) {
+                 if (value instanceof String) {
+                     String stringValue = (String) value; 
+                     if (stringValue.endsWith("z") || stringValue.endsWith("Z")) {
+                         stringValue = stringValue.substring(0, stringValue.length() - 1);
+                     }
+                     stringValue = stringValue.replace("-", "");
                  }
-                value = value.replace("-", "");
                 newValues.add(value);
              }
              values.value = newValues;
@@ -339,9 +368,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      */
     @Override
     protected String getValues(final Object metadata, final List<String> paths) {
-        final List<String> values =  extractValues(metadata, paths);
+        final List<Object> values =  extractValues(metadata, paths);
         final StringBuilder sb = new StringBuilder();
-        for (String value : values) {
+        for (Object value : values) {
             sb.append(value).append(',');
         }
         if (!sb.toString().isEmpty()) {
@@ -351,7 +380,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         return sb.toString();
     }
     
-    protected List<String> getValuesList(final Object metadata, final List<String> paths) {
+    protected List<Object> getValuesList(final Object metadata, final List<String> paths) {
         return extractValues(metadata, paths);
     }
 
@@ -364,8 +393,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param paths
      * @return
      */
-    public static List<String> extractValues(final Object metadata, final List<String> paths) {
-        final List<String> response  = new ArrayList<String>();
+    public static List<Object> extractValues(final Object metadata, final List<String> paths) {
+        final List<Object> response  = new ArrayList<Object>();
         
         if (paths != null) {
             for (String fullPathID: paths) {
@@ -398,12 +427,12 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 
                 if (conditionalAttribute == null) {
                     final Object brutValue   = ReflectionUtilities.getValuesFromPath(pathID, metadata);
-                    final List<String> value = getStringValue(brutValue);
+                    final List<Object> value = getStringValue(brutValue);
                     if (value != null && !value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE)))
                         response.addAll(value);
                 } else {
                     final Object brutValue   = ReflectionUtilities.getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata);
-                    final List<String> value = getStringValue(brutValue);
+                    final List<Object> value = getStringValue(brutValue);
                     response.addAll(value);
                 }
             }
@@ -420,16 +449,19 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
     /**
      * Return a String value from the specified Object.
+     * Let the number object as Number
      * 
      * @param obj
      * @return
      */
-    private static List<String> getStringValue(final Object obj) {
-        final List<String> result = new ArrayList<String>();
+    private static List<Object> getStringValue(final Object obj) {
+        final List<Object> result = new ArrayList<Object>();
         if (obj == null) {
-            return Arrays.asList(NULL_VALUE);
+            result.add(NULL_VALUE);
         } else if (obj instanceof String) {
-            result.add((String) obj);
+            result.add(obj);
+        } else if (obj instanceof Number) {
+            result.add(obj);
         } else if (obj instanceof InternationalString) {
             final InternationalString is = (InternationalString) obj;
             result.add(is.toString());
@@ -449,7 +481,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 result.addAll(getStringValue(o));
             }
             if (result.isEmpty()) {
-                return Arrays.asList(NULL_VALUE);
+                result.add(NULL_VALUE);
             }
         } else if (obj instanceof org.opengis.util.CodeList) {
             result.add(((org.opengis.util.CodeList)obj).name());
@@ -462,7 +494,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                     result.add(LUCENE_DATE_FORMAT.format(d));
                 }
             } else {
-               return Arrays.asList(NULL_VALUE);
+               result.add(NULL_VALUE);
             }
 
         } else if (obj instanceof Instant) {
@@ -472,7 +504,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                     result.add( LUCENE_DATE_FORMAT.format(inst.getPosition().getDate()));
                 }
             } else {
-                return Arrays.asList(NULL_VALUE);
+                result.add(NULL_VALUE);
             }
         } else if (obj instanceof Date) {
             synchronized (LUCENE_DATE_FORMAT){
@@ -495,9 +527,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     private static class TermValue {
         public String term;
 
-        public List<String> value;
+        public List<Object> value;
 
-        public TermValue(String term, List<String> value) {
+        public TermValue(String term, List<Object> value) {
             this.term  = term;
             this.value = value;
         }

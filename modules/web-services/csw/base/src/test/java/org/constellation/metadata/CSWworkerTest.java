@@ -1798,7 +1798,7 @@ public class CSWworkerTest {
 
         
         // then we verify that the modified metadata is well modified and indexed
-        constraint = new QueryConstraintType("WestBoundLongitude = '1.1'", "1.0.0");
+        constraint = new QueryConstraintType("WestBoundLongitude = 1.1", "1.0.0");
         query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
@@ -1956,7 +1956,7 @@ public class CSWworkerTest {
 
 
         // then we verify that the metadata is not modified
-        constraint = new QueryConstraintType("WestBoundLongitude = '1.1'", "1.0.0");
+        constraint = new QueryConstraintType("WestBoundLongitude = 1.1", "1.0.0");
         query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 

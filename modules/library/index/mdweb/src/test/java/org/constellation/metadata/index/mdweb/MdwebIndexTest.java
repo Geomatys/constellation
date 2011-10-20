@@ -252,6 +252,136 @@ public class MdwebIndexTest {
 
         assertEquals(expectedResult, result);
     }
+    
+    /**
+     * Test simple lucene search.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void numericComparisonSearchTest() throws Exception {
+        Filter nullFilter   = null;
+        String resultReport = "";
+
+        /**
+         * Test 1 numeric search: CloudCover < 60
+         */
+        SpatialQuery spatialQuery = new SpatialQuery("CloudCover:{-2147483648 TO 60}", nullFilter, SerialChainFilter.AND);
+        List<String> result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 1:\n{0}", resultReport);
+
+        List<String> expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_9s_19900610041000");
+        expectedResult.add("42292_5p_19900609195600");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 2 numeric search: CloudCover <= 25
+         */                              
+        spatialQuery = new SpatialQuery("CloudCover:[-2147483648 TO 25]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 2:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_9s_19900610041000");
+
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 3 numeric search: CloudCover => 25
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("CloudCover:[25 TO 2147483648]", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 3:\n{0}", resultReport);
+
+        assertEquals(1, result.size());
+        assertTrue(result.contains("42292_5p_19900609195600"));
+        
+        /**
+         * Test 4 numeric search: CloudCover => 60
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("CloudCover:[60 TO 2147483648]", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 4:\n{0}", resultReport);
+
+        assertEquals(0, result.size());
+        
+         /**
+         * Test 5 numeric search: CloudCover => 50
+         */
+        spatialQuery = new SpatialQuery("CloudCover:[50 TO 2147483648]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_5p_19900609195600");
+
+        //issues here it found
+        assertEquals(expectedResult, result);
+        
+        /**
+         * Test 6 numeric search: CloudCover = 50.0
+         */
+        spatialQuery = new SpatialQuery("CloudCover:[50 TO 50]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 6:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("42292_5p_19900609195600");
+
+        //issues here it found
+        assertEquals(expectedResult, result);
+        
+        /**
+         * Test 7 numeric search: CloudCover = 50.0
+         */
+        spatialQuery = new SpatialQuery("CloudCover:50.0", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "numericComparisonSearch 7:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        //expectedResult.add("42292_5p_19900609195600");
+
+        //issues here it didn't find
+        assertEquals(expectedResult, result);
+
+    }
 
      /**
      * Test wildChar lucene search.
