@@ -280,6 +280,16 @@ public final class CSWQueryable {
         paths.add("ISO 19115-2:MI_Metadata:contentInfo:cloudCoverPercentage");
         ISO_QUERYABLE.put("CloudCover", paths);
         
+        /*
+         *  illuminationElevationAngle
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:contentInfo:illuminationElevationAngle");
+        paths.add("ISO 19115-2:MI_Metadata:contentInfo:illuminationElevationAngle");
+        ISO_QUERYABLE.put("IlluminationElevation", paths);
+        
+       
+        
         /**
          * ISO 19119 specific queryable
          */
