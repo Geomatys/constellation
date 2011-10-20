@@ -38,6 +38,7 @@ import java.util.logging.Level;
 
 // Apache Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.AbstractField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
@@ -287,41 +288,10 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 final TermValue values = formatStringValue(cs.take().get());
                 for (Object value : values.value) {
                     if (value instanceof String) {
-                        final String stringValue = (String) value;
-                        doc.add(new Field(values.term,           stringValue, Field.Store.YES, Field.Index.ANALYZED));
-                        doc.add(new Field(values.term + "_sort", stringValue, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                        if (!stringValue.equals(NULL_VALUE) && anyText.indexOf(stringValue) == -1) {
-                            anyText.append(stringValue).append(" ");
-                        }
+                        indexField(values.term, (String) value, anyText, doc);
                     } else if (value instanceof Number) {
-                        final Number numValue           = (Number) value;
-                        final NumericField numField     = new NumericField(values.term, NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
-                        final NumericField numSortField = new NumericField(values.term + "_sort", NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, false);
-                        final Character fieldType;
-                        if (numValue instanceof Integer) {
-                            numField.setIntValue((Integer) numValue);
-                            numSortField.setIntValue((Integer) numValue);
-                            fieldType = 'i';
-                        } else if (numValue instanceof Double) {
-                            numField.setDoubleValue((Double) numValue);
-                            numSortField.setDoubleValue((Double) numValue);
-                            fieldType = 'd';
-                        } else if (numValue instanceof Float) {
-                            numField.setFloatValue((Float) numValue);
-                            numSortField.setFloatValue((Float) numValue);
-                            fieldType = 'f';
-                        } else if (numValue instanceof Long) {
-                            numField.setLongValue((Long) numValue);
-                            numSortField.setLongValue((Long) numValue);
-                            fieldType = 'l';
-                        } else {
-                            fieldType = 'u';
-                            LOGGER.severe("Unexpected Number type:" + numValue.getClass().getName());
-                        }
-                        addNumericField(values.term, fieldType);
-                        doc.add(numField);
-                        doc.add(numSortField);
-                    }
+                        indexNumericField(values.term, (Number) value, doc);
+                    } 
                 }
 
             } catch (InterruptedException ex) {

@@ -31,6 +31,7 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.sql.DataSource;
 
 // Apache Lucene dependencies
+import org.apache.lucene.document.AbstractField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
@@ -326,43 +327,12 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     protected void indexQueryableSet(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
         for (Entry<String,List<String>> entry :queryableSet.entrySet()) {
             final List<Object> values = getValuesList(form, entry.getValue());
-            if (!values.isEmpty() && values.get(0).equals("null")) {
-                anyText.append(values).append(" ");
-            }
             for (Object value : values) {
                 if (value instanceof String) {
-                    final String stringValue = (String) value;
-                    doc.add(new Field(entry.getKey(),           stringValue, Field.Store.YES, Field.Index.ANALYZED));
-                    doc.add(new Field(entry.getKey() + "_sort", stringValue, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                    indexField(entry.getKey(), (String) value, anyText, doc);
                 } else if (value instanceof Number) {
-                        final Number numValue           = (Number) value;
-                        final NumericField numField     = new NumericField(entry.getKey(), NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
-                        final NumericField numSortField = new NumericField(entry.getKey() + "_sort", NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, false);
-                        final Character fieldType;
-                        if (numValue instanceof Integer) {
-                            numField.setIntValue((Integer) numValue);
-                            numSortField.setIntValue((Integer) numValue);
-                            fieldType = 'i';
-                        } else if (numValue instanceof Double) {
-                            numField.setDoubleValue((Double) numValue);
-                            numSortField.setDoubleValue((Double) numValue);
-                            fieldType = 'd';
-                        } else if (numValue instanceof Float) {
-                            numField.setFloatValue((Float) numValue);
-                            numSortField.setFloatValue((Float) numValue);
-                            fieldType = 'f';
-                        } else if (numValue instanceof Long) {
-                            numField.setLongValue((Long) numValue);
-                            numSortField.setLongValue((Long) numValue);
-                            fieldType = 'l';
-                        } else {
-                            fieldType = 'u';
-                            LOGGER.severe("Unexpected Number type:" + numValue.getClass().getName());
-                        }
-                        addNumericField(entry.getKey(), fieldType);
-                        doc.add(numField);
-                        doc.add(numSortField);
-                    }
+                    indexNumericField(entry.getKey(), (Number) value, doc);
+                }
             }
         }
     }
