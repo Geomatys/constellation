@@ -31,14 +31,11 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.sql.DataSource;
 
 // Apache Lucene dependencies
-import org.apache.lucene.document.AbstractField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.SimpleFSDirectory;
-import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.Version;
 
 // constellation dependencies
@@ -327,13 +324,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     protected void indexQueryableSet(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
         for (Entry<String,List<String>> entry :queryableSet.entrySet()) {
             final List<Object> values = getValuesList(form, entry.getValue());
-            for (Object value : values) {
-                if (value instanceof String) {
-                    indexField(entry.getKey(), (String) value, anyText, doc);
-                } else if (value instanceof Number) {
-                    indexNumericField(entry.getKey(), (Number) value, doc);
-                }
-            }
+            indexFields(values, entry.getKey(), anyText, doc);
         }
     }
 
@@ -342,6 +333,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      * 
      */
     @Override
+    @Deprecated
     protected String getValues(final Form form, final List<String> paths) throws IndexingException {
         final StringBuilder response  = new StringBuilder();
         if (paths != null) {

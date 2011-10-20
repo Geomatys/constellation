@@ -38,14 +38,11 @@ import java.util.logging.Level;
 
 // Apache Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.AbstractField;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.SimpleFSDirectory;
-import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.Version;
 
 // constellation dependencies
@@ -286,13 +283,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         for (int i = 0; i < queryableSet.size(); i++) {
             try {
                 final TermValue values = formatStringValue(cs.take().get());
-                for (Object value : values.value) {
-                    if (value instanceof String) {
-                        indexField(values.term, (String) value, anyText, doc);
-                    } else if (value instanceof Number) {
-                        indexNumericField(values.term, (Number) value, doc);
-                    } 
-                }
+                indexFields(values.value, values.term, anyText, doc);
 
             } catch (InterruptedException ex) {
                LOGGER.log(Level.WARNING, "InterruptedException in parralele create document:\n{0}", ex.getMessage());
@@ -337,6 +328,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     protected String getValues(final Object metadata, final List<String> paths) {
         final List<Object> values =  extractValues(metadata, paths);
         final StringBuilder sb = new StringBuilder();

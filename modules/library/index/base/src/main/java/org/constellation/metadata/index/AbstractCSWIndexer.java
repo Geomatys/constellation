@@ -158,6 +158,33 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         return result;
     }
     
+    /**
+     * Index the values for the specified Field
+     * 
+     * @param values
+     * @param fieldName
+     * @param anyText
+     * @param doc 
+     */
+    protected void indexFields(final List<Object> values, final String fieldName, final StringBuilder anyText, final Document doc) {
+        for (Object value : values) {
+            if (value instanceof String) {
+                indexField(fieldName, (String) value, anyText, doc);
+            } else if (value instanceof Number) {
+                indexNumericField(fieldName, (Number) value, doc);
+            }
+        }
+    }
+    
+    /**
+     * Index a single String field.
+     * Add this value to the anyText builder if its not equals to "null".
+     * 
+     * @param fieldName
+     * @param stringValue
+     * @param anyText
+     * @param doc 
+     */
     protected void indexField(final String fieldName, final String stringValue, final StringBuilder anyText, final Document doc) {
         final Field field        = new Field(fieldName, stringValue, Field.Store.YES, Field.Index.ANALYZED);
         final Field fieldSort    = new Field(fieldName + "_sort", stringValue, Field.Store.YES, Field.Index.NOT_ANALYZED);
@@ -168,6 +195,13 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         doc.add(fieldSort);
     }
     
+    /**
+     * Inex a numeric field.
+     * 
+     * @param fieldName
+     * @param numValue
+     * @param doc 
+     */
     protected void indexNumericField(final String fieldName, final Number numValue, final Document doc) {
          
         final NumericField numField     = new NumericField(fieldName, NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
