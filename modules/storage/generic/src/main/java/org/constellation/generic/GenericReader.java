@@ -436,7 +436,16 @@ public abstract class GenericReader  {
         final ResultSet result = stmt.executeQuery();
         while (result.next()) {
             for (String varName : varNames) {
-                values.addToValue(varName, result.getString(varName));
+                final int columnIndex = result.findColumn(varName);
+                final int type        = result.getMetaData().getColumnType(columnIndex);
+                if (type == java.sql.Types.INTEGER || type == java.sql.Types.SMALLINT) {
+                    values.addToValue(varName, Integer.toString(result.getInt(varName)));
+                } else if (type == java.sql.Types.DOUBLE) {
+                    final double d = result.getDouble(varName);
+                    values.addToValue(varName, Double.toString(result.getDouble(varName)));
+                } else {
+                    values.addToValue(varName, result.getString(varName));
+                }
             }
         }
         result.close();
