@@ -37,15 +37,20 @@
                     <img alt="fr" style="border:0px" src="#{contextPath}/resources/img/fr.png"/>
                 </h:commandLink>
 
-                <span class="logout">
+                <span class="headerLink">
+                    <h:outputText>#{navigationBean.login} </h:outputText>
+                    </span>
+                
+                <span class="headerLink">
                     <h:commandLink action="#{navigationBean.logout}">
                         #{menuBean.i18n['logout']}
                     </h:commandLink>
                 </span>
+                
 
             </div>
 
-            <div id="navigationBar" class="rounded">
+            <div id="navigationBar" class="navigBar">
                 <ul style="padding:10px;">
                     <a4j:repeat value="#{menuBean.navigationStack}" var="node">
                         <li style="padding-left:10px;float:left;list-style:none;">

@@ -40,6 +40,11 @@ html {
     -moz-border-radius : 20px;
 }
 
+.navigBar {
+    border-top-image: url("../img/headerBorder.png");
+    border-bottom-image: url("../img/headerBorder.png");
+}
+
 input[type="submit"]:hover {  
     padding: 5px;
     color: #FFFFFF;
@@ -121,6 +126,10 @@ a{
 .newLink {
     -moz-text-decoration-line: underline;
     text-decoration: underline;
+}
+
+.headerLink {
+    color: #FFFFFF;
 }
 
 .errorMessage{

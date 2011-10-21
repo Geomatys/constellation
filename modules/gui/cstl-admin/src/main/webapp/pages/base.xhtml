@@ -14,7 +14,7 @@
 
             <h:panelGroup>
 
-                <!-- Menus -->
+            <!-- Menus -->
                 <mf:Outline id="navTree" actionVisible="true" rootVisible="false"
                             rowStyler="#{menuBean.styler}" value="#{menuBean.model}"
                             var="node" width="100%">
@@ -25,7 +25,7 @@
                         <h:commandLink action="#{menuBean.navigateTo}" value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage != null}">
                             <f:param name="itemId" value="#{node.i18nkey}"/>
                         </h:commandLink>
-
+                        
                         <h:outputText value="#{node.title}" styleClass="profile-element" rendered="#{node.targetPage == null}"/>
 
                     </h:column>
@@ -42,11 +42,8 @@
                 <ui:insert name="content">
                     <center>
                         <br/>
-                        <h:graphicImage url="/resources/img/constellation400.png"/>
-                        <br/>
-                        <br/>
-                        Please select a administration section in the left side menu.
-                        <br/><br/><br/>
+                        <h:graphicImage url="/resources/img/worldcstl.png"/>
+                        <br/><br/><br/><br/>
                     </center>
                 </ui:insert>
             </h:panelGroup>

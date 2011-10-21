@@ -1460,7 +1460,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 }
             }
         } catch (IOException ex) {
-            LOGGER.severe("The Distant service have made an error");
+            LOGGER.log(Level.WARNING, "The Distant service have made an error", ex);
             return null;
         }
         return response;
