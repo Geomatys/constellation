@@ -307,7 +307,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                      if (stringValue.endsWith("z") || stringValue.endsWith("Z")) {
                          stringValue = stringValue.substring(0, stringValue.length() - 1);
                      }
-                     stringValue = stringValue.replace("-", "");
+                     value = stringValue.replace("-", "");
                  }
                 newValues.add(value);
              }

@@ -172,6 +172,8 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
                 indexField(fieldName, (String) value, anyText, doc);
             } else if (value instanceof Number) {
                 indexNumericField(fieldName, (Number) value, doc);
+            } else if (value != null){
+                LOGGER.warning("unexpected type for field:" + value.getClass());
             }
         }
     }
