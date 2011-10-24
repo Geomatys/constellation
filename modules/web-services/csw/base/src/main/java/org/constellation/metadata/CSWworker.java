@@ -852,7 +852,20 @@ public class CSWworker extends AbstractWorker {
 
                 final String propertyName = StringUtilities.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
                 final boolean desc        = !first.getSortOrder().equals(SortOrder.ASCENDING);
-                final SortField sf        = new SortField(propertyName, SortField.STRING, desc);
+                final SortField sf;
+                final Character fieldType =  indexSearcher.getNumericFields().get(propertyName);
+                if (fieldType != null) {
+                    switch (fieldType) {
+                        case 'd': sf = new SortField(propertyName, SortField.DOUBLE, desc);break;
+                        case 'i': sf = new SortField(propertyName, SortField.INT, desc);break;
+                        case 'f': sf = new SortField(propertyName, SortField.FLOAT, desc);break;
+                        case 'l': sf = new SortField(propertyName, SortField.LONG, desc);break;
+                        default : sf = new SortField(propertyName, SortField.STRING, desc);break;
+                    }
+                } else {
+                    sf = new SortField(propertyName, SortField.STRING, desc);
+                }
+                
                 final Sort sortFilter     = new Sort(sf);
                 luceneQuery.setSort(sortFilter);
             }
