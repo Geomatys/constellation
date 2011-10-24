@@ -310,14 +310,15 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "numericComparisonSearch 3:\n{0}", resultReport);
 
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         assertTrue(result.contains("42292_5p_19900609195600"));
+        assertTrue(result.contains("39727_22_19750113062500"));
         
         /**
          * Test 4 numeric search: CloudCover => 60
          */
         resultReport = "";
-        spatialQuery = new SpatialQuery("CloudCover:[60 TO 2147483648]", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("CloudCover:[210 TO 2147483648]", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
@@ -340,8 +341,9 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "numericComparisonSearch 5:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
+        expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_5p_19900609195600");
-
+        
         //issues here it found
         assertEquals(expectedResult, result);
         
@@ -752,6 +754,55 @@ public class MdwebIndexTest {
         expectedResult.add("CTDF02");
         expectedResult.add("cat-1");
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
+
+        assertEquals(expectedResult, result);
+        
+        /**
+         * Test 5 sorted search: orderBy CloudCover ASC with SortField.STRING => bad order 
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("CloudCover:[0 TO 2147483648]", nullFilter, SerialChainFilter.AND);
+        sf = new SortField("CloudCover_sort", SortField.STRING, true);
+        spatialQuery.setSort(new Sort(sf));
+
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+
+        // i don't why we have the good order here
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        
+
+        assertEquals(expectedResult, result);
+        
+        /**
+         * Test 5 sorted search: orderBy CloudCover ASC with SortField.DOUBLE => good order
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("CloudCover:[0 TO 2147483648]", nullFilter, SerialChainFilter.AND);
+        sf = new SortField("CloudCover_sort", SortField.DOUBLE, true);
+        spatialQuery.setSort(new Sort(sf));
+
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("42292_9s_19900610041000");
+        
 
         assertEquals(expectedResult, result);
     }

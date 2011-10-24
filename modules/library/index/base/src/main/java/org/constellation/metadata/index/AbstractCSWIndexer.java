@@ -205,7 +205,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     protected void indexNumericField(final String fieldName, final Number numValue, final Document doc) {
          
         final NumericField numField     = new NumericField(fieldName, NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
-        final NumericField numSortField = new NumericField(fieldName + "_sort", NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, false);
+        final NumericField numSortField = new NumericField(fieldName + "_sort", NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
         final Character fieldType;
         if (numValue instanceof Integer) {
             numField.setIntValue((Integer) numValue);
@@ -228,6 +228,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             LOGGER.severe("Unexpected Number type:" + numValue.getClass().getName());
         }
         addNumericField(fieldName, fieldType);
+        addNumericField(fieldName + "_sort", fieldType);
         doc.add(numField);
         doc.add(numSortField);
     }
