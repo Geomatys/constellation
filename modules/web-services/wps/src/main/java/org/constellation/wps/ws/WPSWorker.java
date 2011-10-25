@@ -595,7 +595,7 @@ public class WPSWorker extends AbstractWorker {
                     MISSING_PARAMETER_VALUE, "identifier");
         }
         final StatusType status = new StatusType();
-        System.out.println("LOG -> Process : "+request.getIdentifier().getValue());
+        LOGGER.info("LOG -> Process : "+request.getIdentifier().getValue());
         //Find the process
         final ProcessDescriptor processDesc = getProcessDescriptor(request.getIdentifier().getValue());
         
@@ -656,9 +656,9 @@ public class WPSWorker extends AbstractWorker {
             //Give a bief process description into the execute response
             response.setProcess(processBrief(processDesc));
             
-            System.out.println("LOG -> Lineage="+isLineage);
-            System.out.println("LOG -> Storage="+useStorage);
-            System.out.println("LOG -> Status="+useStatus);
+            LOGGER.info("LOG -> Lineage="+isLineage);
+            LOGGER.info("LOG -> Storage="+useStorage);
+            LOGGER.info("LOG -> Status="+useStatus);
             
             if(isLineage){
                 //Inputs
@@ -762,7 +762,7 @@ public class WPSWorker extends AbstractWorker {
                       
 
             Object dataValue = null;
-            System.out.println("Expected Class = "+expectedClass.getCanonicalName());
+            LOGGER.info("Expected Class = "+expectedClass.getCanonicalName());
             
             /*
              * A referenced input data
@@ -774,7 +774,7 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Reference value expected",INVALID_PARAMETER_VALUE,inputIdentifier); 
                 }
                 
-                System.out.println("LOG -> Input -> Reference");
+                LOGGER.info("LOG -> Input -> Reference");
                 final String href = inputRequest.getReference().getHref();
                 final String method = inputRequest.getReference().getMethod();
                 final String mime = inputRequest.getReference().getMimeType();
@@ -799,7 +799,7 @@ public class WPSWorker extends AbstractWorker {
                 
                 /* BoundingBox data */
                 if (inputRequest.getData().getBoundingBoxData() != null) {
-                    System.out.println("LOG -> Input -> Boundingbox");
+                    LOGGER.info("LOG -> Input -> Boundingbox");
                     final BoundingBoxType bBox = inputRequest.getData().getBoundingBoxData();
                     final List<Double> lower = bBox.getLowerCorner();
                     final List<Double> upper = bBox.getUpperCorner();
@@ -830,7 +830,7 @@ public class WPSWorker extends AbstractWorker {
                         throw new CstlServiceException("Complex value expected",INVALID_PARAMETER_VALUE,inputIdentifier); 
                     }
                     
-                    System.out.println("LOG -> Input -> Complex");
+                    LOGGER.info("LOG -> Input -> Complex");
 
                     final ComplexDataType complex = inputRequest.getData().getComplexData();
                     final String mime = complex.getMimeType();
@@ -869,14 +869,14 @@ public class WPSWorker extends AbstractWorker {
                         throw new CstlServiceException("Literal value expected",INVALID_PARAMETER_VALUE,inputIdentifier); 
                     }
                     
-                    System.out.println("LOG -> Input -> Literal");
+                    LOGGER.info("LOG -> Input -> Literal");
                     
                     final LiteralDataType literal = inputRequest.getData().getLiteralData();
                     final String data = literal.getValue();
                     
                     //convert String into expected type
                     dataValue = convertFromString(data, expectedClass);
-                    System.out.println("DEBUG -> Input -> Literal -> Value="+dataValue);
+                    LOGGER.info("DEBUG -> Input -> Literal -> Value="+dataValue);
 
                 } else {
                     throw new CstlServiceException("Invalid input data type.", INVALID_REQUEST, inputIdentifier);
@@ -921,9 +921,9 @@ public class WPSWorker extends AbstractWorker {
         }else{
             /* Raw Data returned */
             if(isOutputRaw){
-                System.out.println("LOG -> Output -> Raw");
+                LOGGER.info("LOG -> Output -> Raw");
                 final Object outputValue = result.parameter(rawOutputID).getValue();
-                System.out.println("DEBUG -> Output -> Raw -> Value="+outputValue);
+                LOGGER.info("DEBUG -> Output -> Raw -> Value="+outputValue);
                 
                 if(outputValue instanceof Geometry){
                     try {
@@ -945,7 +945,7 @@ public class WPSWorker extends AbstractWorker {
                
             /* DocumentResponse returned */
             }else{
-                System.out.println("LOG -> Output -> Document");
+                LOGGER.info("LOG -> Output -> Document");
                 final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
                 //Process Outputs
                 for (GeneralParameterDescriptor outputDescriptor : processDesc.getOutputDescriptor().descriptors()) {
@@ -970,14 +970,14 @@ public class WPSWorker extends AbstractWorker {
 
                         /* Bounding Box */
                         if (outClass.equals(Envelope.class)) {
-                            System.out.println("LOG -> Output -> BoundingBox");
+                            LOGGER.info("LOG -> Output -> BoundingBox");
                             org.opengis.geometry.Envelope envelop = (org.opengis.geometry.Envelope) outputValue;
                             
                             data.setBoundingBoxData(new BoundingBoxType(envelop));
 
                         /* Complex */
                         } else if (isSupportedClassOutput("complex", outClass)) {
-                           System.out.println("LOG -> Output -> Complex");
+                           LOGGER.info("LOG -> Output -> Complex");
                             final ComplexDataType complex = new ComplexDataType();
 
                             for(DocumentOutputDefinitionType wO : wantedOutputs){
@@ -1011,7 +1011,7 @@ public class WPSWorker extends AbstractWorker {
 
                         /* Literal */
                         } else if(isSupportedClassOutput("literal", outClass)){
-                            System.out.println("LOG -> Output -> Literal");
+                            LOGGER.info("LOG -> Output -> Literal");
                             final LiteralDataType literal = new LiteralDataType();
                             literal.setDataType(outClass.getCanonicalName());
                             if(outputValue == null){
@@ -1312,12 +1312,12 @@ public class WPSWorker extends AbstractWorker {
             testComplex = isSupportedClass("complex",expectedClass);
             testReference = isSupportedClass("reference",expectedClass);
             testBbox = isSupportedClass("boundingbox", expectedClass);
-            System.out.println("DEBUG -> Is Supported INPUT : ExpectedClass="+expectedClass.getSimpleName()+" "
+            LOGGER.info("DEBUG -> Is Supported INPUT : ExpectedClass="+expectedClass.getSimpleName()+" "
                     + "Literal="+testLiteral+" Complex="+testComplex+" Reference="+testReference+" Bbox="+testBbox);
             if(testLiteral || testComplex || testReference || testBbox){
                 return true;
             }
-        }else if(type.equals("literal")){
+        }else if("literal".equals(type)){
             for(Object obj : LITERAL_INPUT_TYPE_LIST){
                 Class clazz = (Class)obj;
                 if(clazz.isAssignableFrom(expectedClass)){
@@ -1365,34 +1365,34 @@ public class WPSWorker extends AbstractWorker {
             testReference = isSupportedClassOutput("reference", expectedClass);
             testReference = isSupportedClassOutput("boundingbox", expectedClass);
             
-            System.out.println("DEBUG -> Is Supported OUTPUT : ExpectedClass="+expectedClass.getSimpleName()+" "
+            LOGGER.info("DEBUG -> Is Supported OUTPUT : ExpectedClass="+expectedClass.getSimpleName()+" "
                     + "Literal="+testLiteral+" Complex="+testComplex+" Reference="+testReference+" Bbox="+testBbox);
 
             if(testComplex || testLiteral || testReference || testBbox){
                 return true;
             }
-        }else if(type.equals("complex")){
+        }else if("complex".equals(type)){
             for(Object obj : COMPLEX_OUTPUT_TYPE_LIST){
                 Class clazz = (Class)obj;
                 if(clazz.isAssignableFrom(expectedClass)){
                     return true;
                 }
             }
-        }else if(type.equals("literal")){
+        }else if("literal".equals(type)){
             for(Object obj : LITERAL_OUPUT_TYPE_LIST){
                 Class clazz = (Class)obj;
                 if(clazz.isAssignableFrom(expectedClass)){
                     return true;
                 }
             }
-        }else if(type.equals("reference")){
+        }else if("reference".equals(type)){
             for(Object obj : REFERENCE_OUTPUT_TYPE_LIST){
                 Class clazz = (Class)obj;
                 if(clazz.isAssignableFrom(expectedClass)){
                     return true;
                 }
             }
-        }else if(type.equals("boundingbox")){
+        }else if("boundingbox".equals(type)){
             if(Envelope.class.isAssignableFrom(expectedClass)){
                 return true;
             }

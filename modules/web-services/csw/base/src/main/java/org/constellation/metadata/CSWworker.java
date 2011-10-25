@@ -996,7 +996,7 @@ public class CSWworker extends AbstractWorker {
      * @throws CstlServiceException
      */
     private List<String> executeLuceneQuery(final SpatialQuery query) throws CstlServiceException {
-        LOGGER.log(logLevel, "Lucene query obtained:{0}", query);
+        LOGGER.log(Level.FINE, "Lucene query obtained:{0}", query);
         try {
             return indexSearcher.doSearch(query);
         
