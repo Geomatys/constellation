@@ -312,12 +312,14 @@ public class SOSworker extends AbstractWorker {
                 if (object instanceof SOSConfiguration) {
                     configuration = (SOSConfiguration) object;
                 } else {
-                    LOGGER.warning("\nThe SOS worker is not running!\ncause: The generic configuration file is malformed\n");
+                    startError = "The generic configuration file is malformed.";
+                    LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
                     isStarted = false;
                     return;
                 }
             } else {
-                LOGGER.warning("\nThe SOS worker is not running!\ncause: The configuration file can't be found\n");
+                startError = "The configuration file can't be found.";
+                LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
                 isStarted = false;
                 return;
             }
@@ -351,7 +353,8 @@ public class SOSworker extends AbstractWorker {
 
             final Automatic smlConfiguration = configuration.getSMLConfiguration();
             if (smlConfiguration == null) {
-                LOGGER.warning("\nThe SOS worker is not running!\ncause: The configuration file does not contains a SML configuration");
+                startError = "The configuration file does not contains a SML configuration.";
+                LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
                 isStarted = false;
                 return;
             }
@@ -359,7 +362,8 @@ public class SOSworker extends AbstractWorker {
 
             final Automatic omConfiguration = configuration.getOMConfiguration();
             if (omConfiguration == null) {
-                LOGGER.warning("\nThe SOS worker is not running!\ncause: The configuration file does not contains a O&M configuration");
+                startError = "The configuration file does not contains a O&M configuration.";
+                LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
                 isStarted = false;
                 return;
             }
@@ -444,16 +448,20 @@ public class SOSworker extends AbstractWorker {
                     msg = "no message";
                 }
             }
+            startError = msg;
             LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\n\ncause: JAXBException:{0}", msg);
             isStarted = false;
         } catch (FactoryNotFoundException ex) {
-            LOGGER.warning("\nThe SOS worker is not running!\ncause: Unable to find a SOS Factory.\n" + ex.getMessage());
+            startError =  "Unable to find a SOS Factory." + ex.getMessage();
+            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
             isStarted = false;
         } catch (MetadataIoException ex) {
-            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: MetadataIOException while initializing the sensor reader/writer:\n{0}", ex.getMessage());
+            startError = "MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage();
+            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause: {0}", startError);
             isStarted = false;
         } catch (CstlServiceException ex) {
-            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause:{0}", ex.getMessage());
+            startError = ex.getMessage();
+            LOGGER.log(Level.WARNING, "\nThe SOS worker is not running!\ncause:{0}", startError);
             LOGGER.log(Level.FINER, "\nThe SOS worker is not running!", ex);
             isStarted = false;
         } finally {
@@ -2278,6 +2286,7 @@ public class SOSworker extends AbstractWorker {
         for (Timer t : schreduledTask) {
             t.cancel();
         }
+        startError = "The service has been shutdown";
         isStarted = false;
     }
 

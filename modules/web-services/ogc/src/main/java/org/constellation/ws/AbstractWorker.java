@@ -58,6 +58,11 @@ public abstract class AbstractWorker implements Worker {
      * A flag indicating if the worker is correctly started.
      */
     protected boolean isStarted;
+    
+    /**
+     * A message keeping the reason of the start error of the service
+     */
+    protected String startError;
 
     /**
      * Contains the service url used in capabilities document.
@@ -217,7 +222,7 @@ public abstract class AbstractWorker implements Worker {
      */
     protected void isWorking() throws CstlServiceException {
         if (!isStarted) {
-            throw new CstlServiceException("The service is not running!", OWSExceptionCode.NO_APPLICABLE_CODE);
+            throw new CstlServiceException("The service is not running!\nCause:" + startError, OWSExceptionCode.NO_APPLICABLE_CODE);
         }
     }
 

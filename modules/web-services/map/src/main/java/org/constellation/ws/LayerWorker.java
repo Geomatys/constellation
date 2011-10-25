@@ -83,24 +83,28 @@ public abstract class LayerWorker extends AbstractWorker {
                             }
                         }
                     } else {
-                        isStarted = false;
-                        LOGGER.log(Level.WARNING, "The layer context File does not contain a layerContext object");
+                        startError = "The layer context File does not contain a layerContext object";
+                        isStarted  = false;
+                        LOGGER.log(Level.WARNING, startError);
                     }
                 } catch (JAXBException ex) {
-                    isStarted = false;
-                    LOGGER.log(Level.WARNING, "JAXBExeception while unmarshalling the layer context File", ex);
+                    startError = "JAXBExeception while unmarshalling the layer context File";
+                    isStarted  = false;
+                    LOGGER.log(Level.WARNING, startError, ex);
                 } finally {
                     if (unmarshaller != null) {
                         GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
                     }
                 }
             } else {
+                startError = "The configuration file layerContext.xml has not been found";
                 isStarted = false;
-                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: The configuration file layerContext.xml has not been found", id);
+                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: ", id);
             }
         } else {
-            isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: The configuration directory has not been found", id);
+            startError = "The configuration directory has not been found";
+            isStarted  = false;
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         }
 
         layerContext    = candidate;

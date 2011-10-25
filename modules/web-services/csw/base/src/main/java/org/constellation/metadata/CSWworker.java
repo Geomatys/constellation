@@ -266,9 +266,10 @@ public class CSWworker extends AbstractWorker {
                 final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
                 final File configFile                 = new File(configDir, "config.xml");
                 if (!configFile.exists()) {
-                     LOGGER.log(Level.WARNING, "\nThe CSW worker( {0}) is not working!\nCause: The configuration file has not been found", serviceID);
-                     isStarted = false;
-                     return;
+                    startError = "The configuration file has not been found";
+                    LOGGER.log(Level.WARNING, "\nThe CSW worker( {0}) is not working!\nCause: " + startError, serviceID);
+                    isStarted = false;
+                    return;
                 } else {
                     configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
                 }
@@ -284,24 +285,30 @@ public class CSWworker extends AbstractWorker {
             LOGGER.info("CSW" + suffix + " worker (" + configuration.getFormat() + ") \"" + serviceID + "\" running\n");
             
         } catch (FactoryNotFoundException ex) {
-            LOGGER.warning("\nThe CSW worker is not working!\nCause: Unable to find a CSW Factory\n");
+            startError = " Unable to find a CSW Factory";
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}", startError);
             isStarted = false;
         } catch (MetadataIoException e) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", e.getMessage());
+            startError = e.getMessage();
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", startError);
             isStarted = false;
         } catch (IndexingException e) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", e.getMessage());
+            startError = e.getMessage();
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause:{0}\n", startError);
             isStarted = false;
         } catch (IllegalArgumentException e) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: IllegalArgumentException: {0}\n", e.getLocalizedMessage());
+            startError = e.getLocalizedMessage();
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: IllegalArgumentException: {0}\n", startError);
             LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
         } catch (CstlServiceException e) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: CstlServiceException: {0}\n", e.getLocalizedMessage());
+            startError = e.getLocalizedMessage();
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: CstlServiceException: {0}\n", startError);
             LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
         }  catch (JAXBException e) {
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: JAXBException: {0}\n", e.getLocalizedMessage());
+            startError = e.getLocalizedMessage();
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: JAXBException: {0}\n", startError);
             LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
         }
