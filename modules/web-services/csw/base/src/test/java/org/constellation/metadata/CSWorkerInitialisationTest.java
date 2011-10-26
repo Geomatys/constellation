@@ -132,7 +132,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause:The configuration file has not been found");
             exceptionLaunched = true;
         }
 
@@ -154,7 +154,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause:JAXBException:null");
             exceptionLaunched = true;
         }
 
@@ -185,7 +185,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertTrue(ex.getMessage().startsWith("The service is not running!"));
             exceptionLaunched = true;
         }
 
@@ -211,7 +211,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertTrue(ex.getMessage().startsWith("The service is not running!"));
             exceptionLaunched = true;
         }
 
@@ -237,7 +237,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause: Unable to find a CSW Factory");
             exceptionLaunched = true;
         }
 
@@ -263,14 +263,14 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause: Unable to find a CSW Factory");
             exceptionLaunched = true;
         }
 
         assertTrue(exceptionLaunched);
 
         /**
-         * Test 7: A configuration file with mdweb mdweb database and wrong database config.
+         * Test 7: A configuration file with mdweb database and wrong database config.
          */
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
@@ -289,7 +289,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause: Unable to find a CSW Factory");
             exceptionLaunched = true;
         }
 
@@ -314,7 +314,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause: Unable to find a CSW Factory");
             exceptionLaunched = true;
         }
 
@@ -339,7 +339,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause: Unable to find a CSW Factory");
             exceptionLaunched = true;
         }
 
@@ -364,7 +364,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause: Unable to find a CSW Factory");
             exceptionLaunched = true;
         }
 
@@ -389,7 +389,7 @@ public class CSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause: Unable to find a CSW Factory");
             exceptionLaunched = true;
         }
 

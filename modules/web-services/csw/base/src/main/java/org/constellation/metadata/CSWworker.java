@@ -307,8 +307,8 @@ public class CSWworker extends AbstractWorker {
             LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
         }  catch (JAXBException e) {
-            startError = e.getLocalizedMessage();
-            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: JAXBException: {0}\n", startError);
+            startError =  "JAXBException:" + e.getLocalizedMessage();
+            LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: {0}\n", startError);
             LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
         }
