@@ -168,6 +168,11 @@ public abstract class WebService {
      * instead of the parameters map.
      */
     private boolean fullRequestLog = false;
+    
+    /**
+     * If this flag is set r false the method logParameters() will write nothing in the logs
+     */
+    private boolean printRequestParameter = true;
 
     /**
      * If this flag is set to true a validator is added to the XML request unmarshaller.
@@ -511,14 +516,16 @@ public abstract class WebService {
      * Extract all The parameters from the query and write it in the console.
      * It is a debug method.
      */
-    protected void logParameters() throws CstlServiceException {        
-        if (!fullRequestLog) {
-            final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
-            if (!parameters.isEmpty())
-                LOGGER.info(parameters.toString());
-        } else {
-            if (getUriContext().getRequestUri() != null) {
-                LOGGER.info(getUriContext().getRequestUri().toString());
+    protected void logParameters() throws CstlServiceException {
+        if (printRequestParameter) {
+            if (!fullRequestLog) {
+                final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
+                if (!parameters.isEmpty())
+                    LOGGER.info(parameters.toString());
+            } else {
+                if (getUriContext().getRequestUri() != null) {
+                    LOGGER.info(getUriContext().getRequestUri().toString());
+                }
             }
         }
     }
@@ -593,6 +600,20 @@ public abstract class WebService {
         this.fullRequestLog = fullRequestLog;
     }
 
+    /**
+     * @return the printRequestParameter
+     */
+    public boolean isPrintRequestParameter() {
+        return printRequestParameter;
+    }
+
+    /**
+     * @param printRequestParameter the printRequestParameter to set
+     */
+    public void setPrintRequestParameter(boolean printRequestParameter) {
+        this.printRequestParameter = printRequestParameter;
+    }
+    
     /**
      * Enable the request validation.
      * When a request will arrive, the service will try to validate it against the specified
