@@ -20,10 +20,7 @@
             <orderBy></orderBy>
          </query>
       </main-->
-      <!--                  -->
-      <!-- Single queries   -->
-      <!--                  -->
-      <single>
+      <queryList>
 	 <!-- new identifier query (not needed in discovery profile)-->
          <query>
             <select>
@@ -235,11 +232,6 @@
             <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."text_block_encodings" e</from>
             <where>r."definition" = d."id_array_definition" AND d."encoding"=e."id_encoding" AND r."id_result"=:$</where>
          </query>
-      </single>
-      <!--                  -->
-      <!-- Multiple queries -->
-      <!--                  -->
-      <multiFixed>
          <!-- feature of interest coordinates -->
          <query>
             <select>
@@ -391,6 +383,6 @@
             <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."any_scalars" a</from>
             <where>r."definition" = d."id_array_definition" AND r."definition"=a."id_datablock" AND r."id_result"=:$</where>
          </query>
-      </multiFixed>
+      </queryList>
    </queries>
 </automatic>

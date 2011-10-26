@@ -76,7 +76,6 @@ public class GenericConfigurationXMLBindingTest {
         parameters.put("staticVar02", "blavl, bloub");
 
         Query query = new Query("singleQuery1", new Select("var01", "pp.label"), new From("physical_parameter pp"));
-        QueryList single = new QueryList(query);
 
         Query mquery = new Query("multiQuery1", new Select(Arrays.asList(new Column("var02", "pp.name"), new Column("var03", "tr.id"))),
                                                 new From("physical_parameter pp, transduction tr"),
@@ -87,9 +86,9 @@ public class GenericConfigurationXMLBindingTest {
         order.setvalue("blav");
         mquery.getOrderby().add(order);
 
-        QueryList multi = new QueryList(mquery);
+        QueryList multi = new QueryList(Arrays.asList(query, mquery));
 
-        Queries queries = new Queries(null, single, multi, parameters);
+        Queries queries = new Queries(null, multi, parameters);
         Automatic config = new Automatic("MDWEB", bdd, queries);
 
         StringWriter sw = new StringWriter();
@@ -116,7 +115,7 @@ public class GenericConfigurationXMLBindingTest {
         "                <value>blavl, bloub</value>"                                  + '\n' +
         "            </entry>"                                                         + '\n' +
         "        </parameters>"                                                        + '\n' +
-        "        <single>"                                                             + '\n' +
+        "        <queryList>"                                                             + '\n' +
 	"            <query name=\"singleQuery1\">"                                    + '\n' +
         "                <select>"                                                     + '\n' +
         "                    <col>"                                                    + '\n' +
@@ -126,8 +125,6 @@ public class GenericConfigurationXMLBindingTest {
         "                </select>"                                                    + '\n' +
         "                <from>physical_parameter pp</from>"                           + '\n' +
         "            </query>"                                                         + '\n' +
-        "        </single>"                                                            + '\n' +
-        "        <multiFixed>"                                                         + '\n' +
         "            <query name=\"multiQuery1\">"                                     + '\n' +
         "                <select>"                                                     + '\n' +
         "                    <col>"                                                    + '\n' +
@@ -143,7 +140,7 @@ public class GenericConfigurationXMLBindingTest {
         "                <where>tr.parameter=pp.id</where>"                            + '\n' +
         "                <orderBy sens=\"ASC\">blav</orderBy>"                         + '\n' +
         "            </query>"                                                         + '\n' +
-        "        </multiFixed>"                                                        + '\n' +
+        "        </queryList>"                                                        + '\n' +
         "    </queries>"                                                               + '\n' +
         "</automatic>" + '\n';
 
@@ -233,7 +230,7 @@ public class GenericConfigurationXMLBindingTest {
         "                <value>blavl, bloub</value>"                                  + '\n' +
         "            </entry>"                                                         + '\n' +
         "        </parameters>"                                                        + '\n' +
-        "        <single>"                                                             + '\n' +
+        "        <queryList>"                                                             + '\n' +
 	"            <query name=\"singleQuery1\">"                                    + '\n' +
         "                <select>"                                                     + '\n' +
         "                    <col>"                                                    + '\n' +
@@ -243,8 +240,6 @@ public class GenericConfigurationXMLBindingTest {
         "                </select>"                                                    + '\n' +
         "                <from>physical_parameter pp</from>"                           + '\n' +
         "            </query>"                                                         + '\n' +
-        "        </single>"                                                            + '\n' +
-        "        <multiFixed>"                                                         + '\n' +
         "            <query name=\"multiQuery1\">"                                     + '\n' +
         "                <select>"                                                     + '\n' +
         "                    <col>"                                                    + '\n' +
@@ -260,7 +255,7 @@ public class GenericConfigurationXMLBindingTest {
         "                <where>tr.parameter=pp.id</where>"                            + '\n' +
         "                <orderBy sens=\"ASC\">blav</orderBy>"                         + '\n' +
         "            </query>"                                                         + '\n' +
-        "        </multiFixed>"                                                        + '\n' +
+        "        </queryList>"                                                        + '\n' +
         "    </queries>"                                                               + '\n' +
         "</automatic>" + '\n';
 
@@ -272,7 +267,6 @@ public class GenericConfigurationXMLBindingTest {
         BDD bdd = new BDD("org.driver.test", "http://somehost/blablabla", "bobby", "juanito");
 
         HashMap<String, String> parameters = new HashMap<String, String>();
-        ArrayList<String> sp1 = new ArrayList<String>();
         parameters.put("staticVar01", "something");
         ArrayList<String> sp2 = new ArrayList<String>();
         sp2.add("value1");
@@ -280,7 +274,6 @@ public class GenericConfigurationXMLBindingTest {
         parameters.put("staticVar02", "blavl, bloub");
 
         Query query = new Query("singleQuery1", new Select("var01", "pp.label"), new From("physical_parameter pp"));
-        QueryList single = new QueryList(query);
 
         Query mquery = new Query("multiQuery1", new Select(Arrays.asList(new Column("var02", "pp.name"), new Column("var03", "tr.id"))),
                                                 new From("physical_parameter pp, transduction tr"),
@@ -291,9 +284,9 @@ public class GenericConfigurationXMLBindingTest {
         order.setvalue("blav");
         mquery.getOrderby().add(order);
         
-        QueryList multi = new QueryList(mquery);
+        QueryList multi = new QueryList(Arrays.asList(query, mquery));
 
-        Queries queries     = new Queries(null, single, multi, parameters);
+        Queries queries     = new Queries(null, multi, parameters);
         Automatic expResult = new Automatic("MDWEB", bdd, queries);
 
         assertEquals(expResult, result);

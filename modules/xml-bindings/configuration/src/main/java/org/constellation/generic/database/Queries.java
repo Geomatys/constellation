@@ -38,10 +38,8 @@ public class Queries {
 
     private QueryList statique;
     
-    private QueryList single;
+    private QueryList queryList;
     
-    private QueryList multiFixed;
-
     /**
      * Empty constructor used by JAXB
      */
@@ -54,13 +52,11 @@ public class Queries {
      * put the SQL query which normally return only one result in single and the other in multi.
      *
      * @param main The main SQL query (normally used to retrieve all the identifiers)
-     * @param single The SQL queries returning single result.
-     * @param multiFixed The SQL queries returning multiple result.
+     * @param queryList The SQL queries.
      */
-    public Queries(QueryPropertyType main, QueryList single, QueryList multiFixed) {
+    public Queries(final QueryPropertyType main, final QueryList queryList) {
         this.main       = main;
-        this.single     = single;
-        this.multiFixed = multiFixed;
+        this.queryList  = queryList;
     }
 
     /**
@@ -68,14 +64,12 @@ public class Queries {
      * put the SQL query which normally return only one result in single and the other in multi.
      *
      * @param main The main SQL query (normally used to retrieve all the identifiers)
-     * @param single The SQL queries returning single result.
-     * @param multiFixed The SQL queries returning multiple result.
+     * @param queryList The SQL queries.
      * @param parameters a map of varName/varValue.
      */
-    public Queries(QueryPropertyType main, QueryList single, QueryList multiFixed, HashMap<String, String> parameters) {
+    public Queries(final QueryPropertyType main, final QueryList queryList, final HashMap<String, String> parameters) {
         this.main       = main;
-        this.single     = single;
-        this.multiFixed = multiFixed;
+        this.queryList  = queryList;
         this.parameters = parameters;
     }
 
@@ -91,32 +85,16 @@ public class Queries {
      * Return the SQL queries returning multiple results.
      * @return
      */
-    public QueryList getMultiFixed() {
-        return multiFixed;
+    public QueryList getQueryList() {
+        return queryList;
     }
 
     /**
      * Set  the SQL queries returing multiple results.
      * @param single
      */
-    public void setMultiFixed(QueryList multi) {
-        this.multiFixed = multi;
-    }
-
-    /**
-     * Return the SQL queries returing single result.
-     * @return
-     */
-    public QueryList getSingle() {
-        return single;
-    }
-
-    /**
-     * Set  the SQL queries returing single result.
-     * @param single
-     */
-    public void setSingle(QueryList single) {
-        this.single = single;
+    public void setQueryList(QueryList multi) {
+        this.queryList = multi;
     }
 
     /**
@@ -125,11 +103,8 @@ public class Queries {
      */
     public List<Query> getAllQueries() {
         final List<Query> queries = new ArrayList<Query>();
-        if (single != null) {
-            queries.addAll(this.single.getQuery());
-        }
-        if (multiFixed != null) {
-            queries.addAll(this.multiFixed.getQuery());
+        if (queryList != null) {
+            queries.addAll(this.queryList.getQuery());
         }
         return queries;
     }
@@ -141,11 +116,7 @@ public class Queries {
      * @return
      */
     public Query getQueryByName(String queryName) {
-        Query q = single.getQueryByName(queryName);
-        if (q == null) {
-            q = multiFixed.getQueryByName(queryName);
-        }
-        return q;
+        return queryList.getQueryByName(queryName);
     }
     
     /**
@@ -191,8 +162,7 @@ public class Queries {
             }
         }
         s.append("main: ").append(main).append('\n');
-        s.append("Single:").append(single).append('\n');
-        s.append("Multifixed:").append(multiFixed).append('\n');
+        s.append("queryList:").append(queryList).append('\n');
         return s.toString();
     }
     
@@ -207,9 +177,10 @@ public class Queries {
         if (object instanceof Queries) {
             final Queries that = (Queries) object;
 
-            return Utilities.equals(this.main, that.main)     &&
-                   Utilities.equals(this.single, that.single) &&
-                   Utilities.equals(this.multiFixed, that.multiFixed);
+            return Utilities.equals(this.main,       that.main)     &&
+                   Utilities.equals(this.queryList,  that.queryList) &&
+                   Utilities.equals(this.statique,   that.statique) &&
+                   Utilities.equals(this.parameters, that.parameters);
         }
         return false;
     }
@@ -218,8 +189,9 @@ public class Queries {
     public int hashCode() {
         int hash = 3;
         hash = 53 * hash + (this.main != null ? this.main.hashCode() : 0);
-        hash = 53 * hash + (this.single != null ? this.single.hashCode() : 0);
-        hash = 53 * hash + (this.multiFixed != null ? this.multiFixed.hashCode() : 0);
+        hash = 53 * hash + (this.queryList != null ? this.queryList.hashCode() : 0);
+        hash = 53 * hash + (this.statique != null ? this.statique.hashCode() : 0);
+        hash = 53 * hash + (this.parameters != null ? this.parameters.hashCode() : 0);
         return hash;
     }
 }
