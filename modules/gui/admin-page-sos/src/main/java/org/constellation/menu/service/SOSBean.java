@@ -559,7 +559,7 @@ public class SOSBean extends AbstractServiceBean{
             try {
                 final DataSource ds = config.getSMLConfiguration().getBdd().getDataSource();
                 final DatabaseCreator dbCreator = new DatabaseCreator(ds, false);
-                dbCreator.createPGMetadataDatabase();
+                dbCreator.createMetadataDatabase();
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while creating the database", ex);
             }
