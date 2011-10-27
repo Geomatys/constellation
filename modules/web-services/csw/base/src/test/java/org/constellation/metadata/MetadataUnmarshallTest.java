@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -87,6 +88,7 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.SimpleInternationalString;
 
 // GeoAPI dependencies
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.metadata.Datatype;
@@ -124,7 +126,8 @@ public class MetadataUnmarshallTest {
     private static MarshallerPool testPool;
     private static Unmarshaller unmarshaller;
     private static Marshaller marshaller;
-
+    private static final Logger LOGGER = Logging.getLogger(MetadataUnmarshallTest.class);
+    
     @BeforeClass
     public static void setUp() throws JAXBException, URISyntaxException {
         testPool = CSWMarshallerPool.getInstance();
@@ -876,7 +879,7 @@ public class MetadataUnmarshallTest {
         assertTrue(meta.getIdentificationInfo().size() == 1);
         Identification ident = meta.getIdentificationInfo().iterator().next();
         assertTrue(ident instanceof DataIdentification);
-
+        
         DataIdentification dataIdent = (DataIdentification) ident;
 
         assertTrue(dataIdent.getExtents().size() == 2);

@@ -282,6 +282,9 @@ public class CSWworker extends AbstractWorker {
             if (profile == TRANSACTIONAL) {
                 suffix = "-T";
             }
+            // look for log level
+            setLogLevel(configuration.getLogLevel());
+            
             LOGGER.info("CSW" + suffix + " worker (" + configuration.getFormat() + ") \"" + serviceID + "\" running\n");
             
         } catch (FactoryNotFoundException ex) {

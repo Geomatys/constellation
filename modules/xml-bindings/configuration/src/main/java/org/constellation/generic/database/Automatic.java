@@ -20,6 +20,8 @@ package org.constellation.generic.database;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -27,6 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.constellation.configuration.DataSourceType;
 import org.geotoolkit.util.Utilities;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -43,6 +46,8 @@ public class Automatic {
     @XmlTransient
     public static final int BYID        = 2;
 
+    private static final Logger LOGGER = Logging.getLogger(Automatic.class);
+    
     /**
      * The database connection informations.
      */
@@ -154,6 +159,8 @@ public class Automatic {
      * this object contains all the SQL queries used to retrieve and build metadata.
      */
     private Queries queries;
+    
+    private String logLevel;
 
     /**
      * Constructor used by JAXB
@@ -613,5 +620,27 @@ public class Automatic {
         hash = 37 * hash + (this.noIndexation != null ? this.noIndexation.hashCode() : 0);
         hash = 37 * hash + (this.harvester != null ? this.harvester.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * @return the logLevel
+     */
+    public Level getLogLevel() {
+        if (logLevel != null) {
+            try {
+                final Level l = Level.parse(logLevel);
+                return l;
+            } catch (IllegalArgumentException ex) {
+                LOGGER.log(Level.WARNING, "Unexpected value for Log level:{0}", logLevel);
+            }
+        }
+        return Level.INFO;
+    }
+
+    /**
+     * @param logLevel the logLevel to set
+     */
+    public void setLogLevel(String logLevel) {
+        this.logLevel = logLevel;
     }
 }
