@@ -96,15 +96,12 @@ import static org.constellation.metadata.CSWConstants.*;
 @Singleton
 public class CSWService extends OGCWebService<CSWworker> {
     
-    private final CstlXMLSerializer serializer;
-    
     /**
      * Build a new Restful CSW service.
      */
     public CSWService() {
         super(ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());
-        this.serializer = getXMLSerializer();
         LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", workersMap.size());
     }
 
@@ -115,7 +112,6 @@ public class CSWService extends OGCWebService<CSWworker> {
     protected CSWService(final Map<String, CSWworker> workers) {
         super(workers, ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());
-        this.serializer = getXMLSerializer();
         LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", workersMap.size());
     }
 
@@ -172,7 +168,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                     final GetRecordsRequest gr = (GetRecordsRequest)request;
 
                     // we pass the serializer to the messageBodyWriter
-                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), serializer);
+                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), getXMLSerializer());
                     return Response.ok(response, worker.getOutputFormat()).build();
 
                 }
@@ -182,7 +178,7 @@ public class CSWService extends OGCWebService<CSWworker> {
                     final GetRecordById grbi = (GetRecordById)request;
 
                     // we pass the serializer to the messageBodyWriter
-                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), serializer);
+                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), getXMLSerializer());
                     return Response.ok(response, worker.getOutputFormat()).build();
 
                 }
