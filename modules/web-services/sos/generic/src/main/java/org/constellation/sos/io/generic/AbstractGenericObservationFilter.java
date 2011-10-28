@@ -18,6 +18,9 @@
 package org.constellation.sos.io.generic;
 
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.HashMap;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +56,11 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      */
     protected final Query configurationQuery;
 
+    /**
+     * A map of static variable to replace in the statements.
+     */
+    protected HashMap<String, String> staticParameters = new HashMap<String, String>();
+    
     /**
      *  The current query built by the sos worker in the scope of a getObservation/getResult request.
      */
@@ -105,19 +113,25 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         try {
+            this.dataSource = db.getDataSource();
             final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             final File affinage = new File(configuration.getConfigurationDirectory(), "affinage.xml");
             if (affinage.exists()) {
                 final Object object = unmarshaller.unmarshal(affinage);
-                if (object instanceof Query)
+                if (object instanceof Query) {
                     this.configurationQuery = (Query) object;
-                else
+                    if (configurationQuery.getStatique() != null) {
+                        for (Query query : configurationQuery.getStatique().getQuery()) {
+                            processStatiqueQuery(query);
+                        }
+                    } 
+                } else {
                     throw new CstlServiceException("Invalid content in affinage.xml", NO_APPLICABLE_CODE);
+                }
             } else {
                 throw new CstlServiceException("Unable to find affinage.xml", NO_APPLICABLE_CODE);
             }
             GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-            this.dataSource = db.getDataSource();
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXBException in Generic Observation Filter constructor", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
@@ -132,8 +146,44 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
         this.configurationQuery        = that.configurationQuery;
         this.dataSource                = that.dataSource;
         this.logLevel                  = that.logLevel;
+        this.staticParameters          = that.staticParameters;
     }
 
+    private void processStatiqueQuery(final Query query) throws SQLException {
+        final Connection connection = acquireConnection();
+        final Statement stmt        = connection.createStatement();
+        final List<String> varNames = query.getVarNames();
+        final String textQuery      = query.buildSQLQuery(staticParameters);
+        try {
+            final ResultSet res = stmt.executeQuery(textQuery);
+            final Map<String, StringBuilder> parameterValue = new HashMap<String, StringBuilder>();
+            for (String varName : varNames) {
+                parameterValue.put(varName, new StringBuilder());
+            }
+            while (res.next()) {
+                for (String varName : varNames) {
+                    final StringBuilder builder = parameterValue.get(varName);
+                    builder.append("'").append(res.getString(varName)).append("',");
+                }
+            }
+            res.close();
+            //we remove the last ','
+            for (String varName : varNames) {
+                final StringBuilder builder = parameterValue.get(varName);
+                final String pValue;
+                if (builder.length() > 0) {
+                    pValue = builder.substring(0, builder.length() - 1);
+                } else {
+                    pValue = "";
+                }
+                staticParameters.put(varName, pValue);
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "SQL exception while executing static query :{0}", textQuery);
+            throw ex;
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */

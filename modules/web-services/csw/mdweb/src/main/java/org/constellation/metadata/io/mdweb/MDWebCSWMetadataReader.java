@@ -700,7 +700,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             LOGGER.finer("boundingBox created");
             return result;
         } else {
-            LOGGER.warning("boundingBox null");
+            LOGGER.finer("boundingBox null");
             return null;
         }
     }

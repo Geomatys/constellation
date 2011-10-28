@@ -178,7 +178,7 @@ public abstract class GenericReader  {
                     final LockedPreparedStatement stmt =  new LockedPreparedStatement(connection.prepareStatement(textQuery), textQuery);
                     statements.put(stmt, varNames);
                 } catch (SQLException ex) {
-                    LOGGER.warning("SQL exception while executing:" + textQuery);
+                    LOGGER.log(Level.WARNING, "SQL exception while executing:{0}", textQuery);
                     throw ex;
                 }
             }
@@ -203,27 +203,47 @@ public abstract class GenericReader  {
         if (statique != null) {
             final Statement stmt   = connection.createStatement();
             for (Query query : statique.getQuery()) {
-                final String varName   = query.getFirstVarName();
-                final String textQuery = query.buildSQLQuery(staticParameters);
-                try {
-                    final ResultSet res    = stmt.executeQuery(textQuery);
-                    final StringBuilder parameterValue = new StringBuilder();
-                    while (res.next()) {
-                        parameterValue.append("'").append(res.getString(1)).append("',");
+                processStatiqueQuery(query, stmt);
+                if (query.getStatique() != null) {
+                    for (Query subQuery : query.getStatique().getQuery()) {
+                        processStatiqueQuery(subQuery, stmt);
                     }
-                    res.close();
-                    //we remove the last ','
-                    String pValue = parameterValue.toString();
-                    if (parameterValue.length() > 0) {
-                        pValue = parameterValue.substring(0, parameterValue.length() - 1);
-                    }
-                    staticParameters.put(varName, pValue);
-                } catch (SQLException ex) {
-                    LOGGER.warning("SQL exception while executing:" + textQuery);
-                    throw ex;
                 }
             }
             stmt.close();
+        }
+    }
+    
+    private void processStatiqueQuery(final Query query, final Statement stmt) throws SQLException {
+        final List<String> varNames = query.getVarNames();
+        final String textQuery = query.buildSQLQuery(staticParameters);
+        try {
+            final ResultSet res = stmt.executeQuery(textQuery);
+            final Map<String, StringBuilder> parameterValue = new HashMap<String, StringBuilder>();
+            for (String varName : varNames) {
+                parameterValue.put(varName, new StringBuilder());
+            }
+            while (res.next()) {
+                for (String varName : varNames) {
+                    final StringBuilder builder = parameterValue.get(varName);
+                    builder.append("'").append(res.getString(varName)).append("',");
+                }
+            }
+            res.close();
+            //we remove the last ','
+            for (String varName : varNames) {
+                final StringBuilder builder = parameterValue.get(varName);
+                final String pValue;
+                if (builder.length() > 0) {
+                    pValue = builder.substring(0, builder.length() - 1);
+                } else {
+                    pValue = "";
+                }
+                staticParameters.put(varName, pValue);
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "SQL exception while executing static query :{0}", textQuery);
+            throw ex;
         }
     }
 
@@ -360,7 +380,7 @@ public abstract class GenericReader  {
                  * So we try to reconnect.
                  */
                 if (ex.getErrorCode() == 17008 || "08006".equals(ex.getSQLState())) {
-                    LOGGER.warning("detected a conenction lost:" + ex.getMessage());
+                    LOGGER.log(Level.WARNING, "detected a conenction lost:{0}", ex.getMessage());
                     reloadConnection();
                 }
                 logError(statements.get(stmt), ex, stmt.getSql());
@@ -500,13 +520,13 @@ public abstract class GenericReader  {
             code = -1;
             state = "undefined";
         }
-        LOGGER.severe( ex.getClass().getSimpleName()             + " " +
-                      "occurs while executing query: "           + '\n' +
-                      "Query: " + sql                            + '\n' +
-                      "Cause: " + ex.getMessage()                + '\n' +
-                      "Code: "  + code                           + '\n' +
-                      "SQLState : "  + state                     + '\n' +
-                      "For variable: " + value                   + '\n');
+        final StringBuilder sb = new StringBuilder(ex.getClass().getSimpleName());
+        sb.append(" occurs while executing query: \nQuery: ").append(sql);
+        sb.append("\nCause: ").append(ex.getMessage());
+        sb.append("\nCode: ").append(code);
+        sb.append("\nSQLState : ").append(state);
+        sb.append("\nFor variable: ").append(value).append('\n');
+        LOGGER.severe(sb.toString());
     }
 
     /**
