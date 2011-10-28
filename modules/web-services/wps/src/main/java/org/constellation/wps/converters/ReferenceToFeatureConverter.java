@@ -46,9 +46,8 @@ import org.opengis.feature.Feature;
  * <li>method : GET or POST</li>
  * </ul>
  * @author Quentin Boileau
- * @module pending
  */
-public class ReferenceToFeatureConverter extends SimpleConverter<Map<String,String>, Feature> {
+public final class ReferenceToFeatureConverter extends SimpleConverter<Map<String,String>, Feature> {
 
     private static ReferenceToFeatureConverter INSTANCE;
 

@@ -38,7 +38,7 @@ import org.geotoolkit.util.converter.SimpleConverter;
  * </ul>
  * @author Quentin Boileau
  */
-public class ReferenceToGridCoverage2DConverter extends SimpleConverter<Map<String,String>, GridCoverage2D> {
+public final class ReferenceToGridCoverage2DConverter extends SimpleConverter<Map<String,String>, GridCoverage2D> {
 
     private static ReferenceToGridCoverage2DConverter INSTANCE;
 

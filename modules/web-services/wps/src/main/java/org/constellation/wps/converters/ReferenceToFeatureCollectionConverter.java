@@ -53,9 +53,8 @@ import org.geotoolkit.util.converter.SimpleConverter;
  * <li>method : GET or POST</li>
  * </ul>
  * @author Quentin Boileau
- * @module pending
  */
-public class ReferenceToFeatureCollectionConverter extends SimpleConverter<Map<String,String>, FeatureCollection> {
+public final class ReferenceToFeatureCollectionConverter extends SimpleConverter<Map<String,String>, FeatureCollection> {
 
     private static ReferenceToFeatureCollectionConverter INSTANCE;
 

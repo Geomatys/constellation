@@ -43,9 +43,8 @@ import org.opengis.feature.type.FeatureType;
  * <li>method : GET or POST</li>
  * </ul>
  * @author Quentin Boileau
- * @module pending
  */
-public class ReferenceToFeatureTypeConverter extends SimpleConverter<Map<String,String>, FeatureType> {
+public final class ReferenceToFeatureTypeConverter extends SimpleConverter<Map<String,String>, FeatureType> {
 
     private static ReferenceToFeatureTypeConverter INSTANCE;
 

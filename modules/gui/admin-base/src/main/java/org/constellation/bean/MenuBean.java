@@ -40,7 +40,7 @@ import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class MenuBean extends I18NBean {
+public final class MenuBean extends I18NBean {
 
     /**
      * When user is log in, a ServiceAdministrator object is added in the session map.
@@ -119,7 +119,7 @@ public class MenuBean extends I18NBean {
     
     private TreeModel createMenuModel(){
         
-        final String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();;
+        final String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
         final Map<String,I18NNode> nodes = new HashMap<String, I18NNode>();
         final I18NNode root = new I18NNode("root",null,null,0);
         nodes.put("root", root);
@@ -148,7 +148,7 @@ public class MenuBean extends I18NBean {
                             create(root, nodes, path);
                         }
                     } else {
-                        LOGGER.warning("no root path found for:" + viewId);
+                        LOGGER.log(Level.WARNING, "no root path found for:{0}", viewId);
                     }
                 } else {  
                     create(root, nodes, path);
@@ -292,7 +292,7 @@ public class MenuBean extends I18NBean {
         return navigationStack.size();
     }
 
-    public class I18NNode extends DefaultMutableTreeNode{
+    public final class I18NNode extends DefaultMutableTreeNode{
 
         private final String i18nkey;
         private final String icon;

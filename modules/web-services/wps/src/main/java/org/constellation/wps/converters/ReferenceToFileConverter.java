@@ -42,9 +42,8 @@ import org.geotoolkit.util.converter.SimpleConverter;
  * <li>method : GET or POST</li>
  * </ul>
  * @author Quentin Boileau
- * @module pending
  */
-public class ReferenceToFileConverter extends SimpleConverter<Map<String,String>, File> {
+public final class ReferenceToFileConverter extends SimpleConverter<Map<String,String>, File> {
 
     private static ReferenceToFileConverter INSTANCE;
 

@@ -51,7 +51,7 @@ import org.quartz.impl.StdSchedulerFactory;
  * @author Johann Sorel (Geomatys)
  * @module pending
  */
-public class CstlScheduler {
+public final class CstlScheduler {
     
     private static final Logger LOGGER = Logging.getLogger(CstlScheduler.class);
     private static final String TASK_FILE = "scheduler-tasks.xml";    

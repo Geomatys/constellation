@@ -41,9 +41,8 @@ import org.opengis.feature.Feature;
  * <li>encoding : the data encoding like UTF8, ...</li>
  * </ul>
  * @author Quentin Boileau
- * @module pending
  */
-public class ComplexToFeatureArrayConverter extends SimpleConverter<Map<String,Object>, Feature[]> {
+public final class ComplexToFeatureArrayConverter extends SimpleConverter<Map<String,Object>, Feature[]> {
 
     private static ComplexToFeatureArrayConverter INSTANCE;
 

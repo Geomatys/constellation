@@ -38,9 +38,8 @@ import org.w3c.dom.Node;
  * <li>encoding : the data encoding like UTF8, ...</li>
  * </ul>
  * @author Quentin Boileau
- * @module pending
  */
-public class ComplexToFeatureTypeConverter extends SimpleConverter<Map<String,Object>,FeatureType> {
+public final class ComplexToFeatureTypeConverter extends SimpleConverter<Map<String,Object>,FeatureType> {
 
     private static ComplexToFeatureTypeConverter INSTANCE;
 

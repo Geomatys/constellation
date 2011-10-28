@@ -34,9 +34,8 @@ import org.opengis.feature.type.FeatureType;
  * by JAXB.
  * 
  * @author Quentin Boileau
- * @module pending
  */
-public class FeatureCollectionToComplexConverter extends SimpleConverter<FeatureCollection, Collection> {
+public final class FeatureCollectionToComplexConverter extends SimpleConverter<FeatureCollection, Collection> {
 
     private static FeatureCollectionToComplexConverter INSTANCE;
 

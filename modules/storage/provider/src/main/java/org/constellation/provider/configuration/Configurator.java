@@ -40,7 +40,7 @@ public interface Configurator {
 
     void saveConfiguration(String serviceName, ParameterValueGroup params);
 
-    static class DefaultConfigurator implements Configurator{
+    static final class DefaultConfigurator implements Configurator{
 
         private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 

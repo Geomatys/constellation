@@ -75,7 +75,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class MetadataUtilities {
+public final class MetadataUtilities {
 
     private MetadataUtilities() {}
 

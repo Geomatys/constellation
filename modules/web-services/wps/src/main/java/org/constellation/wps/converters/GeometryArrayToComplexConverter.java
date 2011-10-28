@@ -34,9 +34,8 @@ import org.opengis.util.FactoryException;
  * by JAXB.
  * 
  * @author Quentin Boileau
- * @module pending
  */
-public class GeometryArrayToComplexConverter extends SimpleConverter<Geometry[], Collection> {
+public final class GeometryArrayToComplexConverter extends SimpleConverter<Geometry[], Collection> {
 
     private static GeometryArrayToComplexConverter INSTANCE;
 

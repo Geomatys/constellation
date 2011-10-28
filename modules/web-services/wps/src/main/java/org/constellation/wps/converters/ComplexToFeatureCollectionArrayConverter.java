@@ -41,9 +41,8 @@ import org.geotoolkit.util.converter.SimpleConverter;
  * <li>encoding : the data encoding like UTF8, ...</li>
  * </ul>
  * @author Quentin Boileau
- * @module pending
  */
-public class ComplexToFeatureCollectionArrayConverter extends SimpleConverter<Map<String,Object>, FeatureCollection[]> {
+public final class ComplexToFeatureCollectionArrayConverter extends SimpleConverter<Map<String,Object>, FeatureCollection[]> {
 
     private static ComplexToFeatureCollectionArrayConverter INSTANCE;
 

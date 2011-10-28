@@ -46,9 +46,8 @@ import org.opengis.util.FactoryException;
  * <li>method : GET or POST</li>
  * </ul>
  * @author Quentin Boileau
- * @module pending
  */
-public class ReferenceToGeometryConverter extends SimpleConverter<Map<String,String>, Geometry> {
+public final class ReferenceToGeometryConverter extends SimpleConverter<Map<String,String>, Geometry> {
 
     private static ReferenceToGeometryConverter INSTANCE;
 

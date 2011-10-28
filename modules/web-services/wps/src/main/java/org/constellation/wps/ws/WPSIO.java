@@ -33,7 +33,7 @@ import org.opengis.geometry.Geometry;
  * 
  * @author Quentin Boileau
  */
-public class WPSIO {
+public final class WPSIO {
 
 
 

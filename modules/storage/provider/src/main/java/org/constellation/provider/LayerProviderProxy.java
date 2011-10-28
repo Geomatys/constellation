@@ -34,7 +34,7 @@ import org.opengis.feature.type.Name;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDetails,LayerProvider,LayerProviderService>
+public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDetails,LayerProvider,LayerProviderService>
         implements LayerProvider{
 
     private static final LayerProviderProxy INSTANCE = new LayerProviderProxy();

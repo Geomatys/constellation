@@ -33,9 +33,8 @@ import org.opengis.util.FactoryException;
  * Implementation of ObjectConverter to convert a complex input into a JTS Geometry array.
  * Complex Input is define by a <code>List</code> of <code>Object</code>
  * @author Quentin Boileau
- * @module pending
  */
-public class ComplexToGeometryArrayConverter extends SimpleConverter<Map<String,Object>, Geometry[]> {
+public final class ComplexToGeometryArrayConverter extends SimpleConverter<Map<String,Object>, Geometry[]> {
 
     private static ComplexToGeometryArrayConverter INSTANCE;
 
