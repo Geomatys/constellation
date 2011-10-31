@@ -66,10 +66,15 @@ public class WMSResponseWriter<T extends WMSResponse> implements MessageBodyWrit
             if (t instanceof WMT_MS_Capabilities) {
                 final String enc = "UTF8";
                 final CapabilitiesFilterWriter swCaps = new CapabilitiesFilterWriter(out, enc);
+                final String header;
+                if (WMSService.writeDTD) {
+                    header = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
+                             "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n";
+                } else {
+                    header =  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n";
+                }
                 try {
-                    final String s   = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                                       "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n";
-                    swCaps.write(s);
+                    swCaps.write(header);
                 } catch (IOException ex) {
                     throw new JAXBException(ex);
                 }
