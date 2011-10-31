@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -407,7 +406,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final Map<String, String> pathMap = DUBLINCORE_PATH_MAP.get(recordStandard);
         
         if (pathMap == null) {
-            LOGGER.warning("No dublin core path_mapping for standard:" + recordStandard.getName());
+            LOGGER.log(Level.WARNING, "No dublin core path_mapping for standard:{0}", recordStandard.getName());
             return null;
         }
         // we get the title of the form
@@ -427,7 +426,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final List<Value>   bboxValues     = form.getValueFromPath(pathMap.get("boundingBox"));
         final List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
         for (Value v: bboxValues) {
-            bboxes.add(createBoundingBoxFromValue(v.getOrdinal(), form));
+            bboxes.add(createBoundingBoxFromValue(v.getOrdinal(), form, recordStandard));
         }
 
         //we get the type of the data
@@ -638,15 +637,23 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     /**
      * Create a bounding box from a geographiqueElement Value
      */
-    private BoundingBoxType createBoundingBoxFromValue(final int ordinal, final Form f) throws MD_IOException {
+    private BoundingBoxType createBoundingBoxFromValue(final int ordinal, final Form f, final Standard mainStandard) throws MD_IOException {
         Double  southValue  = null;
         Double eastValue    = null;
         Double  westValue   = null;
         Double northValue  = null;
         String crs  = null;
-            try {
+        final String typePrefix;
+        if (Standard.ISO_19115.equals(mainStandard)) {
+            typePrefix = "ISO 19115:MD_Metadata:";
+        } else if (Standard.ISO_19115_2.equals(mainStandard)) {
+            typePrefix = "ISO 19115-2:MI_Metadata:";
+        } else {
+            throw new MD_IOException("unexpected main standard:" + mainStandard);
+        }
+        try {
             //we get the CRS
-            final List<Value> crsValues = f.getValueFromPath("ISO 19115:MD_Metadata:referenceSystemInfo:referenceSystemIdentifier:code");
+            final List<Value> crsValues = f.getValueFromPath(typePrefix + "referenceSystemInfo:referenceSystemIdentifier:code");
             for (Value v: crsValues) {
                 if (v instanceof TextValue && v.getOrdinal() == ordinal) {
                     crs = ((TextValue)v).getValue();
@@ -654,7 +661,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
 
             //we get the east value
-            final List<Value> eastValues = f.getValueFromPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude");
+            final List<Value> eastValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:eastBoundLongitude");
             for (Value v: eastValues) {
                 if (v instanceof TextValue && v.getOrdinal() == ordinal) {
                     eastValue = Double.parseDouble(((TextValue)v).getValue());
@@ -662,7 +669,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
 
             //we get the east value
-            final List<Value> westValues = f.getValueFromPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude");
+            final List<Value> westValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:westBoundLongitude");
             for (Value v: westValues) {
                 if (v instanceof TextValue && v.getOrdinal() == ordinal) {
                     westValue = Double.parseDouble(((TextValue)v).getValue());
@@ -670,7 +677,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
 
             //we get the north value
-            final List<Value> northValues = f.getValueFromPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude");
+            final List<Value> northValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:northBoundLatitude");
             for (Value v: northValues) {
                 if (v instanceof TextValue && v.getOrdinal() == ordinal) {
                     northValue = Double.parseDouble(((TextValue)v).getValue());
@@ -678,7 +685,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
 
             //we get the south value
-            final List<Value> southValues = f.getValueFromPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude");
+            final List<Value> southValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:southBoundLatitude");
             for (Value v: southValues) {
                 if (v instanceof TextValue && v.getOrdinal() == ordinal) {
                     southValue = Double.parseDouble(((TextValue)v).getValue());
