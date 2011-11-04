@@ -90,20 +90,26 @@ public class GenericConfigurationXMLBindingTest {
 
         Queries queries = new Queries(null, multi, parameters);
         Automatic config = new Automatic("MDWEB", bdd, queries);
-
+        config.putParameter("testParam", "paramValue");
         StringWriter sw = new StringWriter();
         marshaller.marshal(config, sw);
 
         String result =  removeXmlns(sw.toString());
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                + '\n' +
-        "<automatic format=\"MDWEB\" >" + '\n' +
+        "<automatic format=\"MDWEB\" >"                                                + '\n' +
         "    <bdd>"                                                                    + '\n' +
         "        <className>org.driver.test</className>"                               + '\n' +
         "        <connectURL>http://somehost/blablabla</connectURL>"                   + '\n' +
         "        <user>bobby</user>"                                                   + '\n' +
         "        <password>juanito</password>"                                         + '\n' +
         "    </bdd>"                                                                   + '\n' +
+        "    <customparameters>"                                                       + '\n' +
+        "        <entry>"                                                              + '\n' +
+        "            <key>testParam</key>"                                             + '\n' +
+        "            <value>paramValue</value>"                                        + '\n' +
+        "        </entry>"                                                             + '\n' +
+        "    </customparameters>"                                                      + '\n' +
         "    <queries>"                                                                + '\n' +
         "        <parameters>"                                                         + '\n' +
         "            <entry>"                                                          + '\n' +
@@ -115,7 +121,7 @@ public class GenericConfigurationXMLBindingTest {
         "                <value>blavl, bloub</value>"                                  + '\n' +
         "            </entry>"                                                         + '\n' +
         "        </parameters>"                                                        + '\n' +
-        "        <queryList>"                                                             + '\n' +
+        "        <queryList>"                                                          + '\n' +
 	"            <query name=\"singleQuery1\">"                                    + '\n' +
         "                <select>"                                                     + '\n' +
         "                    <col>"                                                    + '\n' +
@@ -140,7 +146,7 @@ public class GenericConfigurationXMLBindingTest {
         "                <where>tr.parameter=pp.id</where>"                            + '\n' +
         "                <orderBy sens=\"ASC\">blav</orderBy>"                         + '\n' +
         "            </query>"                                                         + '\n' +
-        "        </queryList>"                                                        + '\n' +
+        "        </queryList>"                                                         + '\n' +
         "    </queries>"                                                               + '\n' +
         "</automatic>" + '\n';
 
@@ -167,7 +173,7 @@ public class GenericConfigurationXMLBindingTest {
         String result =  removeXmlns(sw.toString());
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
-        "<ns2:SOSConfiguration >" + '\n' +
+        "<ns2:SOSConfiguration >"                                                  + '\n' +
         "    <ns2:SMLConfiguration format=\"MDWEB\">"                              + '\n' +
         "        <bdd>"                                                            + '\n' +
         "            <className>org.driver.test</className>"                       + '\n' +
@@ -175,6 +181,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
         "        </bdd>"                                                           + '\n' +
+        "        <customparameters/>"                                               + '\n' +
         "    </ns2:SMLConfiguration>"                                              + '\n' +
         "    <ns2:OMConfiguration format=\"MDWEB\">"                               + '\n' +
         "        <bdd>"                                                            + '\n' +
@@ -183,6 +190,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
         "        </bdd>"                                                           + '\n' +
+        "        <customparameters/>"                                               + '\n' +
         "    </ns2:OMConfiguration>"                                               + '\n' +
         "    <ns2:extensions name=\"coriolis\" format=\"MDWEB\">"                  + '\n' +
         "        <bdd>"                                                            + '\n' +
@@ -191,6 +199,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
         "        </bdd>"                                                           + '\n' +
+        "        <customparameters/>"                                               + '\n' +
         "    </ns2:extensions>"                                                    + '\n' +
         "    <ns2:maxObservationByRequest>0</ns2:maxObservationByRequest>"         + '\n' +
         "    <ns2:debugMode>false</ns2:debugMode>"                                 + '\n' +

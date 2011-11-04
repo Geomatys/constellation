@@ -392,6 +392,11 @@ public class SOSworker extends AbstractWorker {
             properties.put(OMFactory.PHENOMENON_ID_BASE, phenomenonIdBase);
             properties.put(OMFactory.IDENTIFIER_MAPPING, map);
 
+            // we add the custom parameters to the properties
+            properties.putAll(omConfiguration.getCustomparameters());
+            properties.putAll(smlConfiguration.getCustomparameters());
+            
+            // look for template life limit
             int h, m;
             try {
                 String validTime = configuration.getTemplateValidTime();

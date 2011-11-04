@@ -312,12 +312,16 @@ public final class Utils {
      * CSV encoding will be : @@2010-01-01,1,202@@2010-01-02,3,201@@2010-01-03,4,@@2010-01-04,2,210
      *
      * @param value the datablock builder.
-     * @param phenomenonIndex the current phenomenon index.
+     * @param currentIndex the current object index.
      */
-    public static void fillEndingDataHoles(final Appendable value, int phenomenonIndex, final List<String> fieldList, final TextBlockType encoding) throws IOException {
-        while (phenomenonIndex < fieldList.size()) {
-            value.append(encoding.getTokenSeparator());
-            phenomenonIndex++;
+    public static void fillEndingDataHoles(final Appendable value, int currentIndex, final List<String> fieldList, final TextBlockType encoding, final int nbBlockByHole) throws IOException {
+        while (currentIndex < fieldList.size()) {
+            if (value != null) {
+                for (int i = 0; i < nbBlockByHole; i++) {
+                    value.append(encoding.getTokenSeparator());
+                }
+            }
+            currentIndex++;
         }
     }
 

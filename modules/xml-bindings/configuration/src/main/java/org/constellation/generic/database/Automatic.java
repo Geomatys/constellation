@@ -19,7 +19,9 @@ package org.constellation.generic.database;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -153,6 +155,10 @@ public class Automatic {
      * to the harvester where to find the file containing the identifiers.
      */
     private String identifierDirectory;
+    
+    private String logLevel;
+    
+    private HashMap<String, String> customparameters = new HashMap<String, String>();
 
     /**
      * In the case of a generic Implementation,
@@ -160,8 +166,6 @@ public class Automatic {
      */
     private Queries queries;
     
-    private String logLevel;
-
     /**
      * Constructor used by JAXB
      */
@@ -526,6 +530,59 @@ public class Automatic {
         this.indexExternalRecordset = indexExternalRecordset;
     }
     
+    /**
+     * @return the logLevel
+     */
+    public Level getLogLevel() {
+        if (logLevel != null) {
+            try {
+                final Level l = Level.parse(logLevel);
+                return l;
+            } catch (IllegalArgumentException ex) {
+                LOGGER.log(Level.WARNING, "Unexpected value for Log level:{0}", logLevel);
+            }
+        }
+        return Level.INFO;
+    }
+
+    /**
+     * @param logLevel the logLevel to set
+     */
+    public void setLogLevel(String logLevel) {
+        this.logLevel = logLevel;
+    }
+    
+     /**
+     * @return the customparameters
+     */
+    public HashMap<String, String> getCustomparameters() {
+        if (customparameters == null) {
+            customparameters = new HashMap<String, String>();
+        }
+        return customparameters;
+    }
+
+    public void putParameter(final String key, final String value) {
+        if (customparameters == null) {
+            customparameters = new HashMap<String, String>();
+        }
+        this.customparameters.put(key, value);
+    }
+    
+    public String getParameter(final String key) {
+        if (customparameters == null) {
+            customparameters = new HashMap<String, String>();
+        }
+        return customparameters.get(key);
+    }
+    
+    /**
+     * @param customparameters the customparameters to set
+     */
+    public void setCustomparameters(final HashMap<String, String> customparameters) {
+        this.customparameters = customparameters;
+    }
+    
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Automatic]");
@@ -571,6 +628,15 @@ public class Automatic {
         if (identifierDirectory != null) {
             s.append("identifierDirectory: ").append(identifierDirectory).append('\n');
         }
+        if (logLevel != null) {
+            s.append("logLevel: ").append(logLevel).append('\n');
+        }
+        if (customparameters != null) {
+            s.append("custom parameters:\n");
+            for (Entry entry : customparameters.entrySet()) {
+                s.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
+            }
+        }
         return s.toString();
     }
     
@@ -598,6 +664,8 @@ public class Automatic {
                    Utilities.equals(this.noIndexation,     that.noIndexation)     &&
                    Utilities.equals(this.harvester,        that.harvester)        &&
                    Utilities.equals(this.noIndexation,     that.noIndexation)     &&
+                   Utilities.equals(this.logLevel,         that.logLevel)         &&
+                   Utilities.equals(this.customparameters, that.customparameters) &&
                    Utilities.equals(this.queries,          that.queries);
         }
         return false;
@@ -622,25 +690,4 @@ public class Automatic {
         return hash;
     }
 
-    /**
-     * @return the logLevel
-     */
-    public Level getLogLevel() {
-        if (logLevel != null) {
-            try {
-                final Level l = Level.parse(logLevel);
-                return l;
-            } catch (IllegalArgumentException ex) {
-                LOGGER.log(Level.WARNING, "Unexpected value for Log level:{0}", logLevel);
-            }
-        }
-        return Level.INFO;
-    }
-
-    /**
-     * @param logLevel the logLevel to set
-     */
-    public void setLogLevel(String logLevel) {
-        this.logLevel = logLevel;
-    }
 }
