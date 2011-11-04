@@ -1217,14 +1217,17 @@ public class SOSworker extends AbstractWorker {
              *        - The filterReader execute a request and return directly the observations
              *
              */
-            List<Observation> matchingResult = new ArrayList<Observation>();
-
+            final List<Observation> matchingResult;
+            final EnvelopeType computedBounds;
+            
             // case (1)
             if (!(localOmFilter instanceof ObservationFilterReader)) {
+                matchingResult = new ArrayList<Observation>();
                 final List<String> observationIDs = localOmFilter.filterObservation();
                 for (String observationID : observationIDs) {
                     matchingResult.add(omReader.getObservation(observationID, resultModel));
                 }
+                computedBounds         = null;
 
             // case (2)
             } else {
@@ -1233,6 +1236,11 @@ public class SOSworker extends AbstractWorker {
                     matchingResult = omFR.getObservationTemplates();
                 } else {
                     matchingResult = omFR.getObservations();
+                }
+                if (omFR.computeCollectionBound()) {
+                    computedBounds = omFR.getCollectionBoundingShape();
+                } else {
+                    computedBounds = null;
                 }
             }
 
@@ -1263,7 +1271,12 @@ public class SOSworker extends AbstractWorker {
             if ("EPSG:4326".equals(requestObservation.getSrsName())) {
                 srsName ="EPSG:4326";
             }
-            ocResponse.setBoundedBy(getCollectionBound(ocResponse, srsName));
+            if (computedBounds == null) {
+                ocResponse.setBoundedBy(getCollectionBound(ocResponse, srsName));
+            } else {
+                LOGGER.log(Level.FINER, "Using computed bounds:{0}", computedBounds);
+                ocResponse.setBoundedBy(computedBounds);
+            }
             ocResponse = normalizeDocument(ocResponse);
             response = ocResponse;
         } else {

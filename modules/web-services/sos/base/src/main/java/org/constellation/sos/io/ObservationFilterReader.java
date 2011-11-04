@@ -19,6 +19,7 @@ package org.constellation.sos.io;
 
 import java.util.List;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.opengis.observation.Observation;
 
 /**
@@ -70,4 +71,18 @@ public interface ObservationFilterReader extends ObservationFilter {
      * @param responseFormat the MIME type of the response.
      */
     void setResponseFormat(String responseFormat);
+    
+    /**
+     * return true if the filter reader take in charge the calculation of the collection bounding shape.
+     * 
+     * @return True if the filter compute itself the bounding shape of the collection. 
+     */
+    boolean computeCollectionBound();
+    
+    /**
+     * If the filter reader caompute itself the bounding shape of the obervation collection.
+     * this methode return the current shape.
+     * @return 
+     */
+    EnvelopeType getCollectionBoundingShape();
 }
