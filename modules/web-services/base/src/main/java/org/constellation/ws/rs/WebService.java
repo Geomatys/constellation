@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
+import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 // Constellation dependencies
+import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.ws.ExceptionCode.*;
@@ -306,6 +308,12 @@ public abstract class WebService {
             final int equalsIndex   = token.indexOf('=');
             final String paramName  = token.substring(0, equalsIndex);
             final String paramValue = token.substring(equalsIndex + 1);
+            // special case for XML request parameter
+            if ("request".equalsIgnoreCase(paramName) && (paramValue.startsWith("<") || paramValue.startsWith("%3C"))) {
+                final String xml = Util.decodeUTF8URL(paramValue);
+                final InputStream in = new ByteArrayInputStream(xml.getBytes()); 
+                return doPOSTXml(in);
+            }
             log.append("put: ").append(paramName).append("=").append(paramValue).append('\n');
             getUriContext().getQueryParameters().add(paramName, paramValue);
         }
@@ -321,7 +329,7 @@ public abstract class WebService {
      */
     @POST
     @Consumes("*/xml")
-    public Response doPOSTXml(InputStream is) {
+    public Response doPOSTXml(final InputStream is) {
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
@@ -413,7 +421,7 @@ public abstract class WebService {
      */
     @POST
     @Consumes("text/plain")
-    public Response doPOSTPlain(InputStream is) {
+    public Response doPOSTPlain(final InputStream is) {
         LOGGER.warning("request POST plain sending Exception");
         return launchException("The plain text content type is not allowed. Send " +
         		       "a message body with key=value pairs in the " +
