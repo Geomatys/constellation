@@ -34,7 +34,7 @@ import org.geotoolkit.console.Option;
 import org.geotoolkit.util.logging.Logging;
 
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.servlet.GrizzlyWebContainerFactory;
 import com.sun.net.httpserver.HttpContext;
 import org.constellation.metadata.ws.soap.CSWService;
 import org.constellation.ws.rs.CstlServletContainer;
