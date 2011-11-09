@@ -2,7 +2,8 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2011, Institut de Recherche pour le Développement
+ *    (C) 2007 - 2011, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,87 +15,83 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata.io.filesystem;
+package org.constellation.metadata.io.netcdf;
 
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-// JAXB dependencies
 import java.util.StringTokenizer;
+import java.lang.reflect.Method;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import java.util.Arrays;
+import java.util.ArrayList;
 import javax.xml.namespace.QName;
+import java.util.List;
+import java.util.HashMap;
+import java.net.URI;
+import java.util.Map;
+import java.io.File;
 
-// constellation dependencies
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.util.ReflectionUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
 
-// geoAPI dependencies
-import org.opengis.metadata.citation.ResponsibleParty;
-import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.distribution.Format;
-import org.opengis.metadata.extent.Extent;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.metadata.extent.GeographicExtent;
-import org.opengis.metadata.identification.DataIdentification;
-import org.opengis.metadata.identification.Identification;
-import org.opengis.metadata.identification.Keywords;
-import org.opengis.metadata.identification.TopicCategory;
-import org.opengis.metadata.maintenance.ScopeCode;
-import org.opengis.util.InternationalString;
-import org.opengis.metadata.distribution.Distribution;
-import org.opengis.metadata.distribution.Distributor;
-
-// Geotoolkit dependencies
+import org.constellation.metadata.index.generic.GenericIndexer;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
-import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
-import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.csw.xml.v202.BriefRecordType;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.ImageCoverageReader;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 
+import static org.geotoolkit.csw.xml.TypeNames.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
-import static org.geotoolkit.csw.xml.TypeNames.*;
+
+import org.opengis.metadata.distribution.Distributor;
+import org.opengis.metadata.distribution.Distribution;
+import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.distribution.Format;
+import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.util.InternationalString;
+import org.opengis.metadata.identification.Keywords;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.extent.GeographicExtent;
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.identification.DataIdentification;
+import org.opengis.metadata.maintenance.ScopeCode;
+import org.opengis.metadata.identification.Identification;
 
 /**
- * A CSW Metadata Reader. This reader does not require a database.
- * The CSW records are stored XML file in a directory .
- *
- * This reader can be used for test purpose or in case of small amount of record.
+ * 
  *
  * @author Guilhem Legal (Geomatys)
+ * @since 0.8.4
  */
-public class FileMetadataReader extends AbstractMetadataReader implements CSWMetadataReader {
-
-    private static final String METAFILE_MSG = "The metadata file : ";
+public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWMetadataReader {
+    
+    /**
+     * The directory containing the data XML files.
+     */
+    private final File dataDirectory;
+    
+    private static final String METAFILE_MSG = "The netcdf file : ";
     
     /**
      * A date formatter used to display the Date object for Dublin core translation.
@@ -103,19 +100,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     static {
         FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     }
-
-    /**
-     * The directory containing the data XML files.
-     */
-    private final File dataDirectory;
     
     /**
-     * A unmarshaller to get java object from metadata files.
-     */
-    private final MarshallerPool marshallerPool;
-
-    /**
-     * Build a new CSW File Reader.
+     * Build a new CSW NetCDF File Reader.
      *
      * @param configuration A generic configuration object containing a directory path
      * in the configuration.dataDirectory field.
@@ -124,9 +111,8 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * not contains an existing directory path in the configuration.dataDirectory field.
      * If the creation of a MarshallerPool throw a JAXBException.
      */
-    public FileMetadataReader(final Automatic configuration) throws MetadataIoException {
+    public NetCDFMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(true, false);
-        marshallerPool = EBRIMMarshallerPool.getInstance();
         dataDirectory = configuration.getDataDirectory();
         if (dataDirectory == null) {
             throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
@@ -134,7 +120,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             dataDirectory.mkdir();
         }
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -158,7 +144,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     }
 
     /**
-     * Try to find a file named identifier.xml or identifier recursively
+     * Try to find a file named identifier.nc or identifier recursively
      * in the specified directory and its sub-directories.
      *
      * @param identifier The metadata identifier.
@@ -167,7 +153,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     public static File getFileFromIdentifier(final String identifier, final File directory) {
         // 1) try to find the file in the current directory
-        File metadataFile = new File (directory,  identifier + XML_EXT);
+        File metadataFile = new File (directory,  identifier + NETCDF_EXT);
         // 2) trying without the extension
         if (!metadataFile.exists()) {
             metadataFile = new File (directory,  identifier);
@@ -175,7 +161,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         // 3) trying by replacing ':' by '-' (for windows platform who don't accept ':' in file name)
         if (!metadataFile.exists()) {
             final String windowsIdentifier = identifier.replace(':', '-');
-            metadataFile = new File (directory,  windowsIdentifier + XML_EXT);
+            metadataFile = new File (directory,  windowsIdentifier + NETCDF_EXT);
         }
 
         if (metadataFile.exists()) {
@@ -194,7 +180,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     }
 
     /**
-     * Unmarshall The file designed by the path dataDirectory/identifier.xml
+     * Unmarshall The file designed by the path dataDirectory/identifier.nc
      * If the file is not present or if it is impossible to unmarshall it it return an exception.
      *
      * @param identifier the metadata identifier
@@ -204,30 +190,21 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     private Object getObjectFromFile(final String identifier) throws MetadataIoException {
         final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         if (metadataFile != null && metadataFile.exists()) {
-            Unmarshaller unmarshaller = null;
+            final ImageCoverageReader reader = new ImageCoverageReader();
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object metadata = unmarshaller.unmarshal(metadataFile);
-                if (metadata instanceof JAXBElement) {
-                    metadata = ((JAXBElement) metadata).getValue();
-                }
-                if (isCacheEnabled()) {
-                    addInCache(identifier, metadata);
-                }
-                return metadata;
-            } catch (JAXBException ex) {
-                throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
-                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
-            } catch (IllegalArgumentException ex) {
-                throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
-                        "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+                reader.setInput(metadataFile);
+                return reader.getMetadata();
+            } catch (CoverageStoreException ex) {
+                throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
             } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
+                try {
+                    reader.dispose();
+                } catch (CoverageStoreException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
                 }
             }
         } 
-        throw new MetadataIoException(METAFILE_MSG + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
+        throw new MetadataIoException(METAFILE_MSG + identifier + ".nc is not present", INVALID_PARAMETER_VALUE);
     }
 
     /**
@@ -526,16 +503,14 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     private List<String> getAllValuesFromPaths(final List<String> paths, final File directory) throws MetadataIoException {
         final List<String> result = new ArrayList<String>();
-        Unmarshaller unmarshaller = null;
+        final ImageCoverageReader reader = new ImageCoverageReader();
         try {
-            unmarshaller    = marshallerPool.acquireUnmarshaller();
             for (File metadataFile : directory.listFiles()) {
                 if (!metadataFile.isDirectory()) {
                     try {
-                        Object metadata = unmarshaller.unmarshal(metadataFile);
-                        if (metadata instanceof JAXBElement) {
-                            metadata = ((JAXBElement) metadata).getValue();
-                        }
+                        reader.setInput(metadataFile);
+                        Object metadata = reader.getMetadata();
+                        
                         final List<Object> value = GenericIndexer.extractValues(metadata, paths);
                         if (value != null && !value.equals(Arrays.asList("null"))) {
                             for (Object obj : value){
@@ -544,25 +519,20 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         }
                         
                      //continue to the next file   
-                    } catch (JAXBException ex) {
-                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\n" +
-                                "cause: " + ex.getMessage());
+                    } catch (CoverageStoreException ex) {
+                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage());
                     } catch (IllegalArgumentException ex) {
-                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\n"
-                                + "cause: " + ex.getMessage());
+                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage());
                     }
                 } else {
                     result.addAll(getAllValuesFromPaths(paths, metadataFile));
                 }
             }
-        } catch (JAXBException ex) {
-            throw new MetadataIoException("Error while getting unmarshaller from pool\ncause: " + ex.getMessage(), NO_APPLICABLE_CODE);
+            reader.dispose();
+        } catch (CoverageStoreException ex) {
+            throw new MetadataIoException("Error while closing ImageCoverage readerl\ncause: " + ex.getMessage(), ex, NO_APPLICABLE_CODE);
 
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
-        }
+        } 
         
         Collections.sort(result);
         return result;
@@ -597,36 +567,36 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     public List<? extends Object> getAllEntries(final File directory) throws MetadataIoException {
         final List<Object> results = new ArrayList<Object>();
+        final ImageCoverageReader reader = new ImageCoverageReader();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
-            if (fileName.endsWith(XML_EXT)) {
-                final String identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
-                Unmarshaller unmarshaller = null;
+            if (fileName.endsWith(NETCDF_EXT)) {
+                final String identifier = fileName.substring(0, fileName.lastIndexOf(NETCDF_EXT));
+                
                 try {
-                    unmarshaller = marshallerPool.acquireUnmarshaller();
-                    Object metadata = unmarshaller.unmarshal(f);
-                    if (metadata instanceof JAXBElement) {
-                        metadata = ((JAXBElement) metadata).getValue();
-                    }
+                    reader.setInput(f);
+                    Object metadata = reader.getMetadata();
                     if (isCacheEnabled()) {
                         addInCache(identifier, metadata);
                     }
                     results.add(metadata);
-                } catch (JAXBException ex) {
+                } catch (CoverageStoreException ex) {
                     // throw or continue to the next file?
-                    throw new MetadataIoException(METAFILE_MSG + f.getPath() + " can not be unmarshalled\ncause: "
+                    throw new MetadataIoException(METAFILE_MSG + f.getPath() + " can not be read\ncause: "
                             + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
-                } finally {
-                    if (unmarshaller != null) {
-                        marshallerPool.release(unmarshaller);
-                    }
                 }
             } else if (f.isDirectory()) {
                 results.addAll(getAllEntries(f));
             } else {
                 // throw or continue to the next file?
-                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .nc or is not a directory", INVALID_PARAMETER_VALUE);
             }
+        }
+        try {
+            reader.dispose();
+        } catch (CoverageStoreException ex) {
+            // throw or continue to the next file?
+            LOGGER.log(Level.WARNING, "Unable to close the imageCoverageReader", ex);
         }
         return results;
     }
@@ -646,13 +616,13 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         final List<String> results = new ArrayList<String>();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
-            if (fileName.endsWith(XML_EXT)) {
-                final String identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
+            if (fileName.endsWith(NETCDF_EXT)) {
+                final String identifier = fileName.substring(0, fileName.lastIndexOf(NETCDF_EXT));
                 results.add(identifier);
             } else if (f.isDirectory()){
                 results.addAll(getAllIdentifiers(f));
             } else {
-                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .nc or is not a directory", INVALID_PARAMETER_VALUE);
             }
         }
         return results;
@@ -690,4 +660,3 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return new HashMap<String, URI>();
     }
 }
-

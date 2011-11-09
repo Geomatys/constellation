@@ -36,6 +36,8 @@ public class DataSourceType {
     private static final List<DataSourceType> VALUES = new ArrayList<DataSourceType>();
     
     public static final DataSourceType FILESYSTEM = new DataSourceType("filesystem");
+    
+    public static final DataSourceType NETCDF = new DataSourceType("netcdf");
 
     public static final DataSourceType MDWEB = new DataSourceType("mdweb");
 

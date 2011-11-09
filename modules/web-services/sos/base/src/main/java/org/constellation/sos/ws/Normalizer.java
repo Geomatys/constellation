@@ -167,7 +167,7 @@ public final class Normalizer {
                     final CompositePhenomenonType compo = (CompositePhenomenonType) phenomenon.getPhenomenon();
                     for (PhenomenonPropertyType pheno2: compo.getRealComponent()) {
                         if (phenoAlreadySee.contains(pheno2)) {
-                                    pheno2.setToHref();
+                            pheno2.setToHref();
                         } else {
                             phenoAlreadySee.add(pheno2);
                         }

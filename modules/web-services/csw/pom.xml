@@ -64,6 +64,7 @@
     <module>mdweb</module>
     <module>generic</module>
     <module>filesystem</module>
+    <module>netcdf</module>
   </modules>
 
 </project>

@@ -302,7 +302,7 @@ public class CSWworker extends AbstractWorker {
         } catch (IllegalArgumentException e) {
             startError = e.getLocalizedMessage();
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: IllegalArgumentException: {0}\n", startError);
-            LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
         } catch (CstlServiceException e) {
             startError = e.getLocalizedMessage();
