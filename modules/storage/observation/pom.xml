@@ -2,10 +2,11 @@
 
 <!--
   Configuration for the module "observation" of Constellation project.
-  Version: $Id$
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation</groupId>
@@ -23,7 +24,7 @@
   <packaging>jar</packaging>
   <name>Storage using the Observation and Measurement schema</name>
   <description>
-    An Observations and measurement implementation extended to contain both 
+    An Observations and measurement implementation extended to contain both
     Sampling Feature(OnM part-2) and Sensor Web Enablement implementation.
   </description>
 
@@ -115,7 +116,7 @@
 <!--
         Exécution des tests. La propriété "rmi.enabled" indique si
         la suite de tests est autorisée à se connecter au serveur RMI.
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

@@ -7,12 +7,11 @@
   - Directory structures must comply to Maven 2 conventions.
   - Source code must be in UTF-8 encoding.
 
-  Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-         http://maven.apache.org/maven-v4_0_0.xsd">
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <prerequisites>
@@ -32,7 +31,7 @@
     <version>0.8-SNAPSHOT</version>
     <name>Constellation Spatial Data Infrastructure</name>
     <url>http://www.constellation-sdi.org</url>
-    
+
     <description>
         Open source and standard compliant Spatial Data Infrastructure
     </description>
@@ -776,7 +775,7 @@
                 <version>10.8.1.2</version>
                 <scope>runtime</scope>
             </dependency>
-            
+
             <!--testing-->
             <dependency>
                 <groupId>junit</groupId>
@@ -784,8 +783,8 @@
                 <version>4.8.2</version>
                 <scope>test</scope>
             </dependency>
-            
-            
+
+
         </dependencies>
     </dependencyManagement>
 
@@ -959,8 +958,8 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        
-        
+
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1016,7 +1015,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <!-- ======================================================= -->
             <!--   Build: Web site.                                      -->
             <!-- ======================================================= -->
@@ -1142,8 +1141,8 @@
                     </reportPlugins>
                 </configuration>
             </plugin>
-            
-            
+
+
         </plugins>
         <extensions>
             <extension>
