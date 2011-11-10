@@ -17,8 +17,27 @@
 
 package org.constellation.sos.ws;
 
+import org.opengis.filter.capability.Operator;
+import java.util.Arrays;
 import javax.xml.namespace.QName;
 import net.jcip.annotations.Immutable;
+import org.geotoolkit.ogc.xml.v110.ComparisonOperatorsType;
+import org.geotoolkit.ogc.xml.v110.FunctionNameType;
+import org.geotoolkit.ogc.xml.v110.GeometryOperandsType;
+import org.geotoolkit.ogc.xml.v110.IdCapabilitiesType;
+import org.geotoolkit.ogc.xml.v110.ScalarCapabilitiesType;
+import org.geotoolkit.ogc.xml.v110.SpatialCapabilitiesType;
+import org.geotoolkit.ogc.xml.v110.SpatialOperatorType;
+import org.geotoolkit.ogc.xml.v110.SpatialOperatorsType;
+import org.geotoolkit.ogc.xml.v110.TemporalCapabilitiesType;
+import org.geotoolkit.ogc.xml.v110.TemporalOperandsType;
+import org.geotoolkit.ogc.xml.v110.TemporalOperatorNameType;
+import org.geotoolkit.ogc.xml.v110.TemporalOperatorType;
+import org.geotoolkit.ogc.xml.v110.TemporalOperatorsType;
+import org.geotoolkit.sos.xml.v100.FilterCapabilities;
+import org.opengis.filter.capability.SpatialOperator;
+
+import static org.geotoolkit.gml.xml.v311.ObjectFactory.*;
 
 /**
  *
@@ -52,5 +71,56 @@ public final class SOSConstants {
      * The base Qname for measurement observation.
      */
     public static final QName MEASUREMENT_QNAME = new QName("http://www.opengis.net/om/1.0", "Measurement", "om");
+    
+    public static final FilterCapabilities SOS_FILTER_CAPABILITIES = new FilterCapabilities();
+    
+    static {
+        final GeometryOperandsType geom = new GeometryOperandsType(Arrays.asList(_Envelope_QNAME));
+        final SpatialOperator[] spaOps = new SpatialOperator[1];
+        spaOps[0] = new SpatialOperatorType("BBOX", null);
+        final SpatialOperatorsType spaOp = new SpatialOperatorsType(spaOps);
+        final SpatialCapabilitiesType  spatial = new SpatialCapabilitiesType(geom, spaOp);
+        SOS_FILTER_CAPABILITIES.setSpatialCapabilities(spatial);
+        
+        final TemporalCapabilitiesType temporal = new TemporalCapabilitiesType();
+        final TemporalOperandsType temp = new TemporalOperandsType();
+        temp.getTemporalOperand().add(_TimeInstant_QNAME);
+        temp.getTemporalOperand().add(_TimePeriod_QNAME);
+        temporal.setTemporalOperands(temp);
+        final TemporalOperatorsType tempOp = new TemporalOperatorsType();
+        final TemporalOperatorType td = new TemporalOperatorType();
+        td.setName(TemporalOperatorNameType.TM_DURING);
+        final TemporalOperatorType te = new TemporalOperatorType();
+        te.setName(TemporalOperatorNameType.TM_EQUALS);
+        final TemporalOperatorType ta = new TemporalOperatorType();
+        ta.setName(TemporalOperatorNameType.TM_AFTER);
+        final TemporalOperatorType tb = new TemporalOperatorType();
+        tb.setName(TemporalOperatorNameType.TM_BEFORE);
+        
+        tempOp.getTemporalOperator().add(td);
+        tempOp.getTemporalOperator().add(te);
+        tempOp.getTemporalOperator().add(ta);
+        tempOp.getTemporalOperator().add(tb);
+        
+        temporal.setTemporalOperators(tempOp);
+        
+        SOS_FILTER_CAPABILITIES.setTemporalCapabilities(temporal);
+        
+        final Operator[] compOps = new Operator[8];
+        compOps[0] = new FunctionNameType("Between", 0);
+        compOps[1] = new FunctionNameType("EqualTo", 0);
+        compOps[2] = new FunctionNameType("NotEqualTo", 0);
+        compOps[3] = new FunctionNameType("LessThan", 0);
+        compOps[4] = new FunctionNameType("LessThanEqualTo", 0);
+        compOps[5] = new FunctionNameType("GreaterThan", 0);
+        compOps[6] = new FunctionNameType("GreaterThanEqualTo", 0);
+        compOps[7] = new FunctionNameType("Like", 0);
+        final ComparisonOperatorsType compOp = new ComparisonOperatorsType(compOps);
+        final ScalarCapabilitiesType scalar = new ScalarCapabilitiesType(compOp, null, false);
+        SOS_FILTER_CAPABILITIES.setScalarCapabilities(scalar);
+        
+        final IdCapabilitiesType id = new IdCapabilitiesType(true, true);
+        SOS_FILTER_CAPABILITIES.setIdCapabilities(id);
+    }
 }
 

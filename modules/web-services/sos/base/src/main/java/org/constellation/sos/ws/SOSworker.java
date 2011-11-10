@@ -787,7 +787,7 @@ public class SOSworker extends AbstractWorker {
         //we enter the information filter capablities.
         if (sections.containsSection("Filter_Capabilities") || sections.containsSection(ALL)) {
 
-            fc = localCapabilities.getFilterCapabilities();
+            fc = SOS_FILTER_CAPABILITIES;
         }
 
         if (sections.containsSection("Contents") || sections.containsSection(ALL)) {
