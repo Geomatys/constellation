@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  * A container for values retrieved from a database by a generic reader.
@@ -30,6 +33,7 @@ import java.util.Map.Entry;
  */
 public class Values {
 
+    private static final Logger LOGGER = Logging.getLogger(Values.class);
     /**
      * A Map of (varName) - (list of values) refreshed at every request.
      */
@@ -66,6 +70,9 @@ public class Values {
     public String getVariable(final String variable) {
         final List<String> result = values.get(variable);
         if (result != null && result.size() > 0) {
+            if (result.size() > 1) {
+                LOGGER.log(Level.WARNING, "retrieving single value for variable:{0} but the is multiple values", variable);
+            }
             return result.get(0);
         }
         return null;

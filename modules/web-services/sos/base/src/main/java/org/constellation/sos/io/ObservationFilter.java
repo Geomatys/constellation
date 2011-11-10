@@ -36,12 +36,12 @@ public interface ObservationFilter {
     /**
      * Initialize the query for a full observation request.
      */
-    void initFilterObservation(ResponseModeType requestMode, QName resultModel);
+    void initFilterObservation(ResponseModeType requestMode, QName resultModel) throws CstlServiceException;
 
     /**
      * Initialize the query for a restricted to the results request.
      */
-    void initFilterGetResult(Observation procedure, QName resultModel);
+    void initFilterGetResult(Observation procedure, QName resultModel) throws CstlServiceException;
 
     /**
      * Add some procedure filter to the request.
@@ -50,7 +50,7 @@ public interface ObservationFilter {
      * @param procedures
      * @param off
      */
-    void setProcedure(List<String> procedures, ObservationOfferingType off);
+    void setProcedure(List<String> procedures, ObservationOfferingType off) throws CstlServiceException;
 
     /**
      * Add some phenomenon filter to the request.

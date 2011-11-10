@@ -58,6 +58,7 @@ public class Query {
     private List<Where> where;
     private List<Orderby> orderBy;
     private List<Groupby> groupby;
+    private String limit;
     
    
     
@@ -609,6 +610,9 @@ public class Query {
                 mainQuery.append(sql).append(" ");
             }
         }
+        if (limit != null) {
+            mainQuery.append("LIMIT ").append(limit);
+        }
 
         if (union != null) {
             mainQuery.append(" UNION ").append(union.getQuery().buildSQLQuery());
@@ -711,6 +715,20 @@ public class Query {
         hash = 29 * hash + (this.orderBy != null ? this.orderBy.hashCode() : 0);
         hash = 29 * hash + (this.groupby != null ? this.groupby.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * @return the limit
+     */
+    public String getLimit() {
+        return limit;
+    }
+
+    /**
+     * @param limit the limit to set
+     */
+    public void setLimit(String limit) {
+        this.limit = limit;
     }
 
 }
