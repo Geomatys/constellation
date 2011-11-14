@@ -181,7 +181,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
         "        </bdd>"                                                           + '\n' +
-        "        <customparameters/>"                                               + '\n' +
+        "        <customparameters/>"                                              + '\n' +
         "    </ns2:SMLConfiguration>"                                              + '\n' +
         "    <ns2:OMConfiguration format=\"MDWEB\">"                               + '\n' +
         "        <bdd>"                                                            + '\n' +
@@ -190,7 +190,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
         "        </bdd>"                                                           + '\n' +
-        "        <customparameters/>"                                               + '\n' +
+        "        <customparameters/>"                                              + '\n' +
         "    </ns2:OMConfiguration>"                                               + '\n' +
         "    <ns2:extensions name=\"coriolis\" format=\"MDWEB\">"                  + '\n' +
         "        <bdd>"                                                            + '\n' +
@@ -199,8 +199,9 @@ public class GenericConfigurationXMLBindingTest {
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
         "        </bdd>"                                                           + '\n' +
-        "        <customparameters/>"                                               + '\n' +
+        "        <customparameters/>"                                              + '\n' +
         "    </ns2:extensions>"                                                    + '\n' +
+        "    <ns2:parameters/>"                                                    + '\n' +
         "    <ns2:maxObservationByRequest>0</ns2:maxObservationByRequest>"         + '\n' +
         "    <ns2:debugMode>false</ns2:debugMode>"                                 + '\n' +
         "    <ns2:verifySynchronization>false</ns2:verifySynchronization>"         + '\n' +
