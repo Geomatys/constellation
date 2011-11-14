@@ -19,6 +19,7 @@
 package org.constellation.configuration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -73,62 +74,86 @@ public class SOSConfiguration {
      */
     private List<Automatic> extensions;
 
+    private HashMap<String, String> parameters = new HashMap<String, String>();
+    
     /**
      * prefix for observations id (example: urn:ogc:object:observation:orgName:)
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private String observationIdBase;
 
     /**
      * prefix for phenomenons id (example: urn:ogc:def:phenomenon:orgName:)
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private String phenomenonIdBase;
 
     /**
      * prefix for observation templates id (example: urn:ogc:object:observationTemplate:orgName:)
+    * @deprecated move to parameters map
      */
+    @Deprecated
     private String observationTemplateIdBase;
 
     /**
      * prefix for sensorML id (example: urn:ogc:object:sensor:orgName:)
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private String sensorIdBase;
 
     /**
      * maximal number of observations permit in the result of  a getObservation request.
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private int maxObservationByRequest;
 
     /**
      * time of validity of a template obtain with a getObservation with resultTemplate.
      * after this time the template will be destroy.
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private String templateValidTime;
 
     /**
      * profile of the SOS (discovery / transactional)
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private String profile;
 
     /**
      * A directory where to redirect the logs.
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private String logFolder;
 
     /**
      * a debug flag activating some extra logs.
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private boolean debugMode;
 
     /**
      * A debug flag use to verify the synchronization in nearly real time insertion
      * its not advised to set this flag to true.
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private boolean verifySynchronization;
 
     /**
      * if this flag is set to true, the response of the operation getCapabilities wil not be updated
      * every request.
+     * @deprecated move to parameters map
      */
+    @Deprecated
     private boolean keepCapabilities = false;
 
     /**
@@ -432,5 +457,22 @@ public class SOSConfiguration {
         if (omConfiguration != null) {
             smlConfiguration.hideSensibleField();
         }
+    }
+
+    /**
+     * @return the parameters
+     */
+    public HashMap<String, String> getParameters() {
+        if (parameters == null) {
+            this.parameters = new HashMap<String, String>();
+        }
+        return parameters;
+    }
+
+    /**
+     * @param parameters the parameters to set
+     */
+    public void setParameters(HashMap<String, String> parameters) {
+        this.parameters = parameters;
     }
 }

@@ -293,6 +293,8 @@ public class SOSworker extends AbstractWorker {
      */
     private static Capabilities cachedCapabilities;
 
+    private boolean alwaysFeatureCollection;
+            
     /**
      * Initialize the database connection.
      */
@@ -384,6 +386,10 @@ public class SOSworker extends AbstractWorker {
             observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ?
             configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
 
+            alwaysFeatureCollection   = configuration.getParameters().containsKey(OMFactory.ALWAYS_FEATURE_COLLECTION) ?
+            Boolean.parseBoolean(configuration.getParameters().get(OMFactory.ALWAYS_FEATURE_COLLECTION)) : false;
+
+             
             // we fill a map of properties to sent to the reader/writer/filter
             final Map<String, Object> properties = new HashMap<String, Object>();
             properties.put(OMFactory.OBSERVATION_ID_BASE, observationIdBase);
@@ -392,6 +398,9 @@ public class SOSworker extends AbstractWorker {
             properties.put(OMFactory.PHENOMENON_ID_BASE, phenomenonIdBase);
             properties.put(OMFactory.IDENTIFIER_MAPPING, map);
 
+            // we add the general parameters to the properties
+            properties.putAll(configuration.getParameters());
+            
             // we add the custom parameters to the properties
             properties.putAll(omConfiguration.getCustomparameters());
             properties.putAll(smlConfiguration.getCustomparameters());
@@ -1590,7 +1599,13 @@ public class SOSworker extends AbstractWorker {
             if (singleResult == null) {
                 throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
             } else {
-                return (SamplingFeatureType)singleResult;
+                if (!alwaysFeatureCollection) {
+                    return (SamplingFeatureType)singleResult;
+                } else {
+                    final List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
+                    features.add(buildFeatureProperty(singleResult));
+                    return new FeatureCollectionType("feature-collection-1", null, null, features);
+                }
             }
 
         // we return a featureCollection
