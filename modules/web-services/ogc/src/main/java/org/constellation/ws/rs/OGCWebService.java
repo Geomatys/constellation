@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,7 +265,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     /**
      * treat the request sent to the admin instance.
      */
-    public Response treatAdminRequest(Object objectRequest) {
+    private Response treatAdminRequest(Object objectRequest) {
         try {
             final String request = getParameter("request", true);
 
@@ -274,20 +275,40 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
              */
             if ("restart".equalsIgnoreCase(request)) {
                 LOGGER.info("refreshing the workers");
-                final String identifier = getParameter("id", false);
+                final String identifier      = getParameter("id", false);
+                final String closeFirstValue = getParameter("closeFirst", false);
+                final boolean closeFirst;
+                if (closeFirstValue != null) {
+                    closeFirst = Boolean.parseBoolean(closeFirstValue);
+                } else {
+                    closeFirst = true;
+                }
                 specificRestart(identifier);
                 if (identifier == null) {
-                    for (final Worker worker : workersMap.values()) {
-                        worker.destroy();
+                    final Collection<? extends Worker> workers = workersMap.values();
+                    if (closeFirst) {
+                        for (final Worker worker : workers) {
+                            worker.destroy();
+                        }
+                        workersMap.clear();
+                        buildWorkerMap();
+                    } else {
+                        buildWorkerMap();
+                        for (final Worker worker : workers) {
+                            worker.destroy();
+                        }
                     }
-                    workersMap.clear();
-                    buildWorkerMap();
                 } else {
                     if (workersMap.containsKey(identifier)) {
                         Worker worker = workersMap.get(identifier);
-                        workersMap.remove(identifier);
-                        worker.destroy();
-                        buildWorker(identifier);
+                        if (closeFirst) {
+                            workersMap.remove(identifier);
+                            worker.destroy();
+                            buildWorker(identifier);
+                        } else {
+                            buildWorker(identifier);
+                            worker.destroy();
+                        }
                     } else {
                         throw new CstlServiceException("There is no instance " + identifier, INVALID_PARAMETER_VALUE, "id");
                     }
