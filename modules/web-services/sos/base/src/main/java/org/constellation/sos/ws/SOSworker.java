@@ -1950,95 +1950,114 @@ public class SOSworker extends AbstractWorker {
             for (EventTime time: times) {
 
                 // The operation Time Equals
-                if (time.getTEquals() != null && !time.getTEquals().getRest().isEmpty()) {
+                if (time.getTEquals() != null) {
                     
-                    // we get the property name (not used for now)
-                    //String propertyName = time.getTEquals().getPropertyName();
-                    final Object timeFilter   = time.getTEquals().getRest().get(0);
-                    
-                    // look for "latest" or "getFirst" filter (52N compatibility)
-                    if (timeFilter instanceof TimeInstantType){
-                        final TimeInstantType ti = (TimeInstantType) timeFilter;
-                        if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("latest")) {
-                            if (!template) {
-                                localOmFilter.setTimeLatest();
-                                continue;
-                            } else {
-                                LOGGER.warning("latest time are not handled with template mode");
+                    if (!time.getTEquals().getRest().isEmpty()) {
+                        // we get the property name (not used for now)
+                        //String propertyName = time.getTEquals().getPropertyName();
+                        final Object timeFilter   = time.getTEquals().getRest().get(0);
+
+                        // look for "latest" or "getFirst" filter (52N compatibility)
+                        if (timeFilter instanceof TimeInstantType){
+                            final TimeInstantType ti = (TimeInstantType) timeFilter;
+                            if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("latest")) {
+                                if (!template) {
+                                    localOmFilter.setTimeLatest();
+                                    continue;
+                                } else {
+                                    LOGGER.warning("latest time are not handled with template mode");
+                                }
+                            }
+                            if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("getFirst")) {
+                                if (!template) {
+                                    localOmFilter.setTimeFirst();
+                                    continue;
+                                } else {
+                                    LOGGER.warning("getFirst time are not handled with template mode");
+                                }
                             }
                         }
-                        if (ti.getTimePosition() != null && ti.getTimePosition().getValue().equalsIgnoreCase("getFirst")) {
-                            if (!template) {
-                                localOmFilter.setTimeFirst();
-                                continue;
-                            } else {
-                                LOGGER.warning("getFirst time are not handled with template mode");
-                            }
+
+                        if (!template) {
+                            localOmFilter.setTimeEquals(timeFilter);
+
+                        } else if (timeFilter instanceof TimePeriodType || timeFilter instanceof TimeInstantType) {
+                            templateTime = (AbstractTimeGeometricPrimitiveType) timeFilter;
+
+                        } else {
+                            throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
                         }
-                    }
-                        
-                    if (!template) {
-                        localOmFilter.setTimeEquals(timeFilter);
-                        
-                    } else if (timeFilter instanceof TimePeriodType || timeFilter instanceof TimeInstantType) {
-                        templateTime = (AbstractTimeGeometricPrimitiveType) timeFilter;
-                        
                     } else {
-                        throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
+                        throw new CstlServiceException("TM_Equals filter content is empty!",
+                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
                 
                 // The operation Time before    
-                } else if (time.getTBefore() != null && !time.getTBefore().getRest().isEmpty()) {
+                } else if (time.getTBefore() != null) {
 
-                    // we get the property name (not used for now)
-                    // String propertyName = time.getTBefore().getPropertyName();
-                    final Object timeFilter   = time.getTBefore().getRest().get(0);
+                    if (!time.getTBefore().getRest().isEmpty()) {
+                        // we get the property name (not used for now)
+                        // String propertyName = time.getTBefore().getPropertyName();
+                        final Object timeFilter   = time.getTBefore().getRest().get(0);
 
-                    if (!template) {
-                        localOmFilter.setTimeBefore(timeFilter);
-                    } else if (timeFilter instanceof TimeInstantType) {
-                        final TimeInstantType ti = (TimeInstantType)timeFilter;
-                        templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
+                        if (!template) {
+                            localOmFilter.setTimeBefore(timeFilter);
+                        } else if (timeFilter instanceof TimeInstantType) {
+                            final TimeInstantType ti = (TimeInstantType)timeFilter;
+                            templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
+                        } else {
+                            throw new CstlServiceException("TM_Before operation require timeInstant!",
+                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
+                        }
                     } else {
-                        throw new CstlServiceException("TM_Before operation require timeInstant!",
-                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
+                        throw new CstlServiceException("TM_Before filter content is empty!",
+                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
                     
                 // The operation Time after    
-                } else if (time.getTAfter() != null && !time.getTAfter().getRest().isEmpty()) {
+                } else if (time.getTAfter() != null) {
                     
-                    // we get the property name (not used for now)
-                    //String propertyName = time.getTAfter().getPropertyName();
-                    final Object timeFilter   = time.getTAfter().getRest().get(0);
+                    if (!time.getTAfter().getRest().isEmpty()) {
+                        // we get the property name (not used for now)
+                        //String propertyName = time.getTAfter().getPropertyName();
+                        final Object timeFilter   = time.getTAfter().getRest().get(0);
 
-                    if (!template) {
-                        localOmFilter.setTimeAfter(timeFilter);
-                    } else if (timeFilter instanceof TimeInstantType) {
-                        final TimeInstantType ti = (TimeInstantType)timeFilter;
-                        templateTime = new TimePeriodType(ti.getTimePosition());
-                        
+                        if (!template) {
+                            localOmFilter.setTimeAfter(timeFilter);
+                        } else if (timeFilter instanceof TimeInstantType) {
+                            final TimeInstantType ti = (TimeInstantType)timeFilter;
+                            templateTime = new TimePeriodType(ti.getTimePosition());
+
+                        } else {
+                           throw new CstlServiceException("TM_After operation require timeInstant!",
+                                                         INVALID_PARAMETER_VALUE, EVENT_TIME);
+                        }
                     } else {
-                       throw new CstlServiceException("TM_After operation require timeInstant!",
-                                                     INVALID_PARAMETER_VALUE, EVENT_TIME);
+                        throw new CstlServiceException("TM_After filter content is empty!",
+                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
                     
                 // The time during operation    
-                } else if (time.getTDuring() != null && !time.getTDuring().getRest().isEmpty()) {
-                    
-                    // we get the property name (not used for now)
-                    //String propertyName = time.getTDuring().getPropertyName();
-                    final Object timeFilter   = time.getTDuring().getRest().get(0);
+                } else if (time.getTDuring() != null) {
+                    if (!time.getTDuring().getRest().isEmpty()) {
+                        // we get the property name (not used for now)
+                        //String propertyName = time.getTDuring().getPropertyName();
+                        final Object timeFilter   = time.getTDuring().getRest().get(0);
 
-                    if (!template) {
-                        localOmFilter.setTimeDuring(timeFilter);
-                    }
-                    if (timeFilter instanceof TimePeriodType) {
-                        templateTime = (TimePeriodType)timeFilter;
-                        
+                        if (!template) {
+                            localOmFilter.setTimeDuring(timeFilter);
+                        }
+                        if (timeFilter instanceof TimePeriodType) {
+                            templateTime = (TimePeriodType)timeFilter;
+
+                        } else {
+                            throw new CstlServiceException("TM_During operation require TimePeriod!",
+                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
+                        }
                     } else {
-                        throw new CstlServiceException("TM_During operation require TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
+                        throw new CstlServiceException("TM_During filter content is empty!",
+                                                          INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
                 } else if (time.getTBegins() != null || time.getTBegunBy() != null || time.getTContains() != null ||time.getTEndedBy() != null || time.getTEnds() != null || time.getTMeets() != null
                            || time.getTOveralps() != null || time.getTOverlappedBy() != null) {
