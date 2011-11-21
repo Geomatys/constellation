@@ -79,31 +79,76 @@ public final class MetadataUtilities {
 
     private MetadataUtilities() {}
 
+    public static void assertEqualsMode(final Object expected, final Object result, final ComparisonMode mode) {
+        final boolean eq = Utilities.deepEquals(expected, result, mode);
+        final String msg;
+        if (!eq) {
+            msg = "expected:<" + expected + "> but was <" + result + ">"; 
+        } else {
+            msg = "object are equals";
+        }
+        assertTrue(msg, eq);
+    }
+    
     public static void metadataEquals(final DefaultMetadata expResult, final DefaultMetadata result, ComparisonMode mode) {
 
-        assertTrue(Utilities.deepEquals(expResult.getFileIdentifier(), result.getFileIdentifier(), mode));
+        assertEqualsMode(expResult.getFileIdentifier(), result.getFileIdentifier(), mode);
         if (expResult.getIdentificationInfo() != null && result.getIdentificationInfo() != null) {
             assertEquals(expResult.getIdentificationInfo().size(), result.getIdentificationInfo().size());
             for (int i = 0; i < expResult.getIdentificationInfo().size(); i++) {
                 Identification expId = expResult.getIdentificationInfo().iterator().next();
                 Identification resId = result.getIdentificationInfo().iterator().next();
-                assertTrue(Utilities.deepEquals(expId.getAbstract(), resId.getAbstract(), mode));
-                assertTrue(Utilities.deepEquals(expId.getAggregationInfo(), resId.getAggregationInfo(), mode));
+                assertEqualsMode(expId.getAbstract(), resId.getAbstract(), mode);
+                assertEqualsMode(expId.getAggregationInfo(), resId.getAggregationInfo(), mode);
+                assertEqualsMode(expId.getCitation(), resId.getCitation(), mode);
+                assertEqualsMode(expId.getCredits(), resId.getCredits(), mode);
+                assertEqualsMode(expId.getDescriptiveKeywords(), resId.getDescriptiveKeywords(), mode);
+                assertEqualsMode(expId.getGraphicOverviews(), resId.getGraphicOverviews(), mode);
+                assertEqualsMode(expId.getPointOfContacts(), resId.getPointOfContacts(), mode);
+                assertEqualsMode(expId.getPurpose(), resId.getPurpose(), mode);
+                assertEqualsMode(expId.getResourceConstraints(), resId.getResourceConstraints(), mode);
+                assertEqualsMode(expId.getResourceFormats(), resId.getResourceFormats(), mode);
+                assertEqualsMode(expId.getResourceMaintenances(), resId.getResourceMaintenances(), mode);
+                assertEqualsMode(expId.getResourceSpecificUsages(), resId.getResourceSpecificUsages(), mode);
+                assertEqualsMode(expId.getStatus(), resId.getStatus(), mode);
                 
                 
                 if (expId instanceof DefaultDataIdentification) {
-                    // TODO
+                    DefaultDataIdentification expDid = (DefaultDataIdentification) expId;
+                    DefaultDataIdentification resDid = (DefaultDataIdentification) resId;
+                    assertEqualsMode(expDid.getCharacterSets(), resDid.getCharacterSets(), mode);
+                    assertEqualsMode(expDid.getEnvironmentDescription(), resDid.getEnvironmentDescription(), mode);
+                    assertEquals(expDid.getExtents().size(), resDid.getExtents().size());
+                    
+                    Iterator<Extent> expExtents = expDid.getExtents().iterator();
+                    Iterator<Extent> resExtents = resDid.getExtents().iterator();
+                    while (expExtents.hasNext()) {
+                        Extent expExtent = expExtents.next();
+                        Extent resExtent = resExtents.next();
+                        assertEqualsMode(expExtent.getGeographicElements(), resExtent.getGeographicElements(), mode);
+                        assertEqualsMode(expExtent.getTemporalElements(), resExtent.getTemporalElements(), mode);
+                        assertEqualsMode(expExtent.getVerticalElements(), resExtent.getVerticalElements(), mode);
+                        assertEqualsMode(expExtent, resExtent, mode);
+                    }
+                            
+                    
+                    assertEqualsMode(expDid.getExtents(), resDid.getExtents(), mode);
+                    assertEqualsMode(expDid.getLanguages(), resDid.getLanguages(), mode);
+                    assertEqualsMode(expDid.getSpatialRepresentationTypes(), resDid.getSpatialRepresentationTypes(), mode);
+                    assertEqualsMode(expDid.getSpatialResolutions(), resDid.getSpatialResolutions(), mode);
+                    assertEqualsMode(expDid.getSupplementalInformation(), resDid.getSupplementalInformation(), mode);
+                    assertEqualsMode(expDid.getTopicCategories(), resDid.getTopicCategories(), mode);
+                    
                 } else if (expId instanceof ServiceIdentificationImpl) {
                     ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;
                     ServiceIdentificationImpl resService = (ServiceIdentificationImpl) result.getIdentificationInfo().iterator().next();
-                    String msg = "expected:\n" + expService.getOperatesOn() + "\nbut was:\n" + resService.getOperatesOn();
-                    assertTrue(msg, Utilities.deepEquals(expService.getOperatesOn(), resService.getOperatesOn(), mode));
-                    assertTrue(Utilities.deepEquals(expService, resService, mode));
+                    assertEqualsMode(expService.getOperatesOn(), resService.getOperatesOn(), mode);
+                    assertEqualsMode(expService, resService, mode);
                 }
             }
-            assertTrue(Utilities.deepEquals(expResult.getIdentificationInfo(), result.getIdentificationInfo(), mode));
+            assertEqualsMode(expResult.getIdentificationInfo(), result.getIdentificationInfo(), mode);
         }
-        assertTrue(Utilities.deepEquals(expResult, result, mode));
+        assertEqualsMode(expResult, result, mode);
     }
     
     public static void metadataEquals(final DefaultMetadata expResult, final DefaultMetadata result) {

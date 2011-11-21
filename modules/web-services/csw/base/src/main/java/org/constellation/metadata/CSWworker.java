@@ -55,8 +55,6 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.FilterParserException;
-import org.constellation.filter.LuceneFilterParser;
-import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -173,12 +171,12 @@ public class CSWworker extends AbstractWorker {
     /**
      * A filter parser which create lucene query from OGC filter
      */
-    private final FilterParser luceneFilterParser = new LuceneFilterParser();
+    private FilterParser luceneFilterParser;
     
     /**
      * A filter parser which create SQL query from OGC filter (used for ebrim query)
      */
-    private final FilterParser sqlFilterParser = new SQLFilterParser();
+    private FilterParser sqlFilterParser;
     
     /**
      * A catalogue Harvester communicating with other CSW
@@ -343,6 +341,8 @@ public class CSWworker extends AbstractWorker {
         profile                       = configuration.getProfile();
         final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID, mdReader.getAdditionalQueryablePathMap());
         indexSearcher                 = cswfactory.getIndexSearcher(configDir, serviceID);
+        luceneFilterParser            = cswfactory.getLuceneFilterParser();
+        sqlFilterParser               = cswfactory.getSQLFilterParser();
         if (profile == TRANSACTIONAL) {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
             catalogueHarvester        = cswfactory.getCatalogueHarvester(configuration, mdWriter);

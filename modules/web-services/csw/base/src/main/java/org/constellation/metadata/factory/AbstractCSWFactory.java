@@ -24,6 +24,7 @@ import java.util.Map;
 
 // constellation dependencies
 import org.constellation.configuration.DataSourceType;
+import org.constellation.filter.FilterParser;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -107,4 +108,7 @@ public interface AbstractCSWFactory {
      */
     CatalogueHarvester getCatalogueHarvester(final Automatic configuration, final MetadataWriter writer) throws MetadataIoException;
 
+    FilterParser getLuceneFilterParser();
+    
+    FilterParser getSQLFilterParser();
 }

@@ -18,6 +18,9 @@
 
 package org.constellation.metadata.factory;
 
+import org.constellation.filter.SQLFilterParser;
+import org.constellation.filter.LuceneFilterParser;
+import org.constellation.filter.FilterParser;
 import org.constellation.configuration.DataSourceType;
 import java.io.File;
 
@@ -109,5 +112,21 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
             default:
                 throw new IllegalArgumentException("Unknow harvester type: " + type + " In Default CSW Factory.");
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FilterParser getLuceneFilterParser() {
+        return new LuceneFilterParser();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FilterParser getSQLFilterParser() {
+        return new SQLFilterParser();
     }
 }

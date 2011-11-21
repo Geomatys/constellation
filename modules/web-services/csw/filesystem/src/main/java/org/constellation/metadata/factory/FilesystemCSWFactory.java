@@ -26,6 +26,9 @@ import java.util.Map;
 
 // Constellation dependencies
 import org.constellation.configuration.DataSourceType;
+import org.constellation.filter.FilterParser;
+import org.constellation.filter.LuceneFilterParser;
+import org.constellation.filter.SQLFilterParser;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -114,5 +117,21 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
             default:
                 throw new IllegalArgumentException("Unknow harvester type: " + type + " In Default CSW Factory.");
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FilterParser getLuceneFilterParser() {
+        return new LuceneFilterParser();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FilterParser getSQLFilterParser() {
+        return new SQLFilterParser();
     }
 }
