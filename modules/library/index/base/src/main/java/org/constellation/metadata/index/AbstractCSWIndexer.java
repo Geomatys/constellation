@@ -49,7 +49,7 @@ import static org.constellation.metadata.CSWQueryable.*;
  */
 public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
-    private static final String NOT_SPATIALLY_INDEXABLE = "unable to spatially index metadata: ";
+    protected static final String NOT_SPATIALLY_INDEXABLE = "unable to spatially index metadata: ";
 
     protected static final String NULL_VALUE = "null";
 
@@ -276,23 +276,23 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      */
     protected boolean indexSpatialPart(Document doc, A form, Map<String, List<String>> queryableSet) throws IndexingException {
 
-            final List<Double> minxs = extractPositions(form, queryableSet.get("WestBoundLongitude"));
-            final List<Double> maxxs = extractPositions(form, queryableSet.get("EastBoundLongitude"));
-            final List<Double> maxys = extractPositions(form, queryableSet.get("NorthBoundLatitude"));
-            final List<Double> minys = extractPositions(form, queryableSet.get("SouthBoundLatitude"));
+        final List<Double> minxs = extractPositions(form, queryableSet.get("WestBoundLongitude"));
+        final List<Double> maxxs = extractPositions(form, queryableSet.get("EastBoundLongitude"));
+        final List<Double> maxys = extractPositions(form, queryableSet.get("NorthBoundLatitude"));
+        final List<Double> minys = extractPositions(form, queryableSet.get("SouthBoundLatitude"));
 
-            if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
-                if (minxs.size() == 1) {
-                    addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
-                    return true;
-                } else if (minxs.size() > 0) {
-                    addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
-                    return true;
-                }
-            } else {
-                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(form) + "\n cause: missing coordinates."
-                        + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
+        if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
+            if (minxs.size() == 1) {
+                addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
+                return true;
+            } else if (minxs.size() > 0) {
+                addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
+                return true;
             }
+        } else {
+            LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(form) + "\n cause: missing coordinates."
+                    + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
+        }
         return false;
     }
 
