@@ -56,21 +56,22 @@ public class CstlAuthSetup implements SetupService {
                 final AuthenticationReader reader = new DataSourceAuthenticationReader(ds);
                 reader.writeUser("admin", "admin", "Default Constellation Administrator", Arrays.asList("cstl-admin"));
                 reader.destroy();
+                
+                Properties prop = new Properties();
+                prop.put("cstl_authdb_type", "DERBYDIR");
+                prop.put("cstl_authdb_host", "jdbc:derby:" + authDir.getPath() + "/Cstl_User_Db");
+                try {
+                    final FileOutputStream stream = new FileOutputStream(authDbProperties);
+                    prop.store(stream, "auto generated at cstl startup");
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "IO exception while storing authentication properties file", ex);
+                }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "SQL exception while creating authentication derby database", ex);
             }
             
-            Properties prop = new Properties();
-            prop.put("cstl_authdb_type", "DERBYDIR");
-            prop.put("cstl_authdb_host", "jdbc:derby:" + authDir.getPath() + "/Cstl_User_Db");
-            try {
-                final FileOutputStream stream = new FileOutputStream(authDbProperties);
-                prop.store(stream, "auto generated at cstl startup");
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "IO exception while storing authentication properties file", ex);
-            }
         } else {
-            LOGGER.info("Authentication datasource present");
+            LOGGER.info("Authentication datasource propertie file present");
         }
         
         

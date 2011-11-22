@@ -77,12 +77,18 @@ public class DefaultCstlRealm extends AuthorizingRealm {
  
         final String username = upToken.getUsername();
         checkNotNull(username, "Null usernames are not allowed by this realm.");
- 
         final String password;
-        if (!authReader.UserExist(username)) {
-            throw new UnknownAccountException("There is no account for login:" + username);
-        } else {
-            password = authReader.getPassword(username);
+        try {
+            
+            if (!authReader.UserExist(username)) {
+                throw new UnknownAccountException("There is no account for login:" + username);
+            } else {
+                password = authReader.getPassword(username);
+            }
+        } catch ( org.mdweb.model.auth.AuthenticationException ex) {
+            final String msg = "Unable to contact authentication database. refusing the access to anyone";
+            LOGGER.warning(msg);
+            throw new UnknownAccountException(msg);
         }
  
         return new SimpleAuthenticationInfo(username, password, getName());
