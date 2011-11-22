@@ -23,6 +23,7 @@ package org.constellation.auth;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Properties;
@@ -53,6 +54,8 @@ import org.mdweb.model.auth.UserAuthnInfo;
  */
 public class DefaultCstlRealm extends AuthorizingRealm {
  
+    private static final String NO_DB_MSG = "Unable to contact authentication database. refusing the access to anyone";
+    
     private AuthenticationReader authReader;
     
     private static final Logger LOGGER = Logging.getLogger(DefaultCstlRealm.class);
@@ -66,16 +69,21 @@ public class DefaultCstlRealm extends AuthorizingRealm {
             final String url = prop.getProperty("cstl_authdb_host");
             final DefaultDataSource ds = new DefaultDataSource(url.replace('\\', '/') + ";");
             authReader = new DataSourceAuthenticationReader(ds);
+        } catch (FileNotFoundException ex) {
+            LOGGER.log(Level.WARNING, "unable to find cstl auth properties file.\nAuthentication is not working.");
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, "IOException while loading cstl auth properties file", ex);
         }
     }
     
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws UnknownAccountException {
-        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
- 
-        final String username = upToken.getUsername();
+    protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token) throws UnknownAccountException {
+        if (authReader == null) {
+            LOGGER.warning(NO_DB_MSG);
+            throw new UnknownAccountException(NO_DB_MSG);
+        }
+        final UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+        final String username               = upToken.getUsername();
         checkNotNull(username, "Null usernames are not allowed by this realm.");
         final String password;
         try {
@@ -86,23 +94,26 @@ public class DefaultCstlRealm extends AuthorizingRealm {
                 password = authReader.getPassword(username);
             }
         } catch ( org.mdweb.model.auth.AuthenticationException ex) {
-            final String msg = "Unable to contact authentication database. refusing the access to anyone";
-            LOGGER.warning(msg);
-            throw new UnknownAccountException(msg);
+            LOGGER.warning(NO_DB_MSG);
+            throw new UnknownAccountException(NO_DB_MSG);
         }
  
         return new SimpleAuthenticationInfo(username, password, getName());
     }
  
-    private void checkNotNull(Object reference, String message) {
+    private void checkNotNull(final Object reference, final String message) {
         if (reference == null) {
             throw new AuthenticationException(message);
         }
     }
 
     @Override
-    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+    protected AuthorizationInfo doGetAuthorizationInfo(final PrincipalCollection principals) {
         checkNotNull(principals, "PrincipalCollection method argument cannot be null.");
+        if (authReader == null) {
+            LOGGER.warning(NO_DB_MSG);
+            throw new UnknownAccountException(NO_DB_MSG);
+        }
  
         final String username              = (String) principals.getPrimaryPrincipal();
         final UserAuthnInfo user           = authReader.getUser(username);
