@@ -127,6 +127,23 @@ public final class MetadataUtilities {
                         Extent resExtent = resExtents.next();
                         assertEqualsMode(expExtent.getGeographicElements(), resExtent.getGeographicElements(), mode);
                         assertEqualsMode(expExtent.getTemporalElements(), resExtent.getTemporalElements(), mode);
+                        
+                        Iterator<? extends VerticalExtent> expVExtents = expExtent.getVerticalElements().iterator();
+                        Iterator<? extends VerticalExtent> resVExtents = resExtent.getVerticalElements().iterator();
+                        while (expVExtents.hasNext()) {
+                            VerticalExtent expVExtent = expVExtents.next();
+                            VerticalExtent resVExtent = resVExtents.next();
+                            assertEqualsMode(expVExtent.getMaximumValue(), resVExtent.getMaximumValue(), mode);
+                            assertEqualsMode(expVExtent.getMinimumValue(), resVExtent.getMinimumValue(), mode);
+                            if (expVExtent.getVerticalCRS() != null && resVExtent.getVerticalCRS() != null) {
+                                assertEqualsMode(expVExtent.getVerticalCRS().getCoordinateSystem(), resVExtent.getVerticalCRS().getCoordinateSystem(), mode);
+                                assertEqualsMode(expVExtent.getVerticalCRS().getDatum(), resVExtent.getVerticalCRS().getDatum(), mode);
+                            }
+                            assertEqualsMode(expVExtent.getVerticalCRS(), resVExtent.getVerticalCRS(), mode);
+                            
+                            assertEqualsMode(expVExtent, resVExtent, mode);
+                        }
+                        
                         assertEqualsMode(expExtent.getVerticalElements(), resExtent.getVerticalElements(), mode);
                         assertEqualsMode(expExtent, resExtent, mode);
                     }

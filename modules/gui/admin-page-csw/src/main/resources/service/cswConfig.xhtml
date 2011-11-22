@@ -9,30 +9,29 @@
                 template="/pages/slider.xhtml">
 
     <ui:define name="content">
-
-        <center>
-            <h:commandLink action="#{cswBean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
-        </center>
-        <br/>
-        <br/>
-        <b>#{cswBean.i18n['instance']}</b><br/>
-        <div class="rounded">
+        <div>
            <img src="#{facesContext.externalContext.requestContextPath}/#{cswBean.configuredInstance.statusIcon}" style="border:none;"/>
-           <a href="#{cswBean.configuredInstance.path}" target="blank">#{cswBean.configuredInstance.name}</a>
+           <h:outputText value="#{cswBean.i18n['serviceName']}"/>
+           &#160;
+           <h:inputText value="#{cswBean.configuredInstance.name}"/>
         
-           &#160;
-           <h:commandLink action="#{cswBean.configuredInstance.restart}">
-               <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
-           </h:commandLink>
-           &#160;
-           <h:commandLink action="#{cswBean.configuredInstance.stop}">
-              <img src="#{facesContext.externalContext.requestContextPath}/service.stop.png.mfRes" style="border:none;"/>
-           </h:commandLink>
-           &#160;
-           <h:commandLink action="#{cswBean.configuredInstance.start}">
-              <img src="#{facesContext.externalContext.requestContextPath}/service.start.png.mfRes" style="border:none;"/>
-           </h:commandLink>
-           <br/>
+           <span style="float: right;">
+               <h:commandLink action="#{cswBean.configuredInstance.restart}">
+                   <img src="#{facesContext.externalContext.requestContextPath}/provider.reload.png.mfRes" style="border:none;"/>
+               </h:commandLink>
+               &#160;
+               <h:commandLink action="#{cswBean.configuredInstance.stop}" rendered="#{cswBean.configuredInstance.working}">
+                  <img src="#{facesContext.externalContext.requestContextPath}/service.stop.png.mfRes" style="border:none;"/>
+               </h:commandLink>
+               <h:commandLink action="#{cswBean.configuredInstance.start}" rendered="#{!cswBean.configuredInstance.working}">
+                  <img src="#{facesContext.externalContext.requestContextPath}/service.start.png.mfRes" style="border:none;"/>
+               </h:commandLink>
+                &#160;
+                <h:commandLink action="#{cswBean.configuredInstance.delete}">
+                    <img src="#{facesContext.externalContext.requestContextPath}/provider.remove.png.mfRes" style="border:none;"/>
+                </h:commandLink>
+               <br/>
+            </span>
        </div>
        <br/>
         <div class="rounded">
@@ -120,14 +119,16 @@
         
         <table style="width:100%;"> 
                 <colgroup>
-                        <col width="80%"/>
+                        <col width="70%"/>
+                        <col width="10%"/>
                         <col width="10%"/>
                         <col width="10%"/>
                 </colgroup>
                 <tr>
                     <td></td>
-                    <td><h:commandButton action="#{cswBean.refreshIndex}" value="#{cswBean.i18n['refreshIndex']}" /></td>
-                    <td><h:commandButton action="#{cswBean.saveConfiguration}" value="#{cswBean.i18n['save']}" /></td>
+                    <td><h:commandLink action="#{cswBean.goMainPage}" style="width:100%;" class="logout">#{menuBean.i18n['return']}</h:commandLink></td>
+                    <td><h:commandButton action="#{cswBean.refreshIndex}" value="#{cswBean.i18n['refreshIndex']}"/></td>
+                    <td><h:commandButton action="#{cswBean.saveConfiguration}" value="#{cswBean.i18n['save']}"/></td>
                 </tr>
         </table>
         
