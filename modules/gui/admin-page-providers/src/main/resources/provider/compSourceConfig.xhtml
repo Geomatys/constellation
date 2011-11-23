@@ -42,11 +42,4 @@
         <mf:parametereditor value="#{bean.sourceParameters}" width="100%" rootVisible="#{not mf:isInstance(bean.sourceParameters,'ParameterValueGroup')}"/>
     </div>
     
-    <br/>
-    <div style="text-align: right;">
-        <h:commandButton action="#{bean.create}" value="#{menuBean.i18n['create']}" rendered="#{bean.hasCreationMethod}"/>
-        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
-        <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
-    </div>
-    
 </ui:composition>

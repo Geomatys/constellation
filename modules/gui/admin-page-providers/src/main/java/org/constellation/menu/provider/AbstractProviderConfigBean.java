@@ -109,7 +109,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     protected final String mainPage;
     protected TreeModel layersModel = null;
     protected ProviderNode configuredInstance = null;
-    private ParameterValueGroup configuredParams = null;
+    protected ParameterValueGroup configuredParams = null;
     private ParameterValueGroup layerParams = null;
     private String selectedPotentialStyle = null;
     
@@ -126,14 +126,6 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
 
     }
     
-    public void create() {
-        // override this method
-    }
-    
-    public boolean getHasCreationMethod() {
-        return false;
-    }
-
     public String getUsedIds() {
         return StringUtilities.toCommaSeparatedValues(usedIds);
     }

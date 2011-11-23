@@ -15,6 +15,11 @@
             <tag-name>compSourceConfig</tag-name>
             <source>/provider/compSourceConfig.xhtml</source>
         </tag>
+        
+        <tag>
+            <tag-name>compSourceConfigFooter</tag-name>
+            <source>/provider/compSourceConfigFooter.xhtml</source>
+        </tag>
                 
         <tag>
             <tag-name>layerParameterConfig</tag-name>

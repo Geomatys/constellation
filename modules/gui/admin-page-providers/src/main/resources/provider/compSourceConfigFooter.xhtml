@@ -1,0 +1,16 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib">
+    
+    <br/>
+    <div style="text-align: right;">
+        <h:commandLink action="#{bean.goMainPage}" class="logout">#{menuBean.i18n['return']}</h:commandLink>
+        <h:commandButton action="#{bean.saveConfiguration}" value="#{bean.i18n['save']}" />
+    </div>
+    
+</ui:composition>

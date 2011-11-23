@@ -19,6 +19,27 @@
     <ui:define name="content">
 
         <cstl:compSourceConfig bean="#{coveragesqlBean}" />
+        
+        <table style="width:100%;">
+            <colgroup>
+                <col width="20%"/>
+                <col width="60%"/>
+                <col width="20%"/>
+            </colgroup>
+            <tbody>
+                <tr>
+                    <td>#{menuBean.i18n['PostgisDir']}</td>
+                    <td><h:inputText value="#{coveragesqlBean.postgisInstall}"/></td>
+                    <td>
+                        <span style="float: right;">
+                            <h:commandButton action="#{coveragesqlBean.createCoverageDatabase}" value="#{menuBean.i18n['create']}" />
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>   
+        
+        <cstl:compSourceConfigFooter bean="#{coveragesqlBean}" />
 
     </ui:define>
 
