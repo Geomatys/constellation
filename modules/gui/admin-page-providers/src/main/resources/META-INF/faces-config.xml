@@ -21,13 +21,6 @@
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
     
-    <!-- coverage sql provider -->
-    <managed-bean>
-        <managed-bean-name>coveragesqlBean</managed-bean-name>
-        <managed-bean-class>org.constellation.menu.provider.CoverageSQLBean</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
-    
     <!-- om provider -->
     <managed-bean>
         <managed-bean-name>omBean</managed-bean-name>

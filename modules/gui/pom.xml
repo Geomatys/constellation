@@ -104,6 +104,7 @@
         <module>admin-page-geotk</module>
         <module>admin-page-tool</module>
         <module>admin-page-providers</module>
+        <module>admin-page-provider-coveragesql</module>
         <module>admin-page-sld</module>
         <module>admin-page-services</module>
 	<module>admin-page-wmts</module>

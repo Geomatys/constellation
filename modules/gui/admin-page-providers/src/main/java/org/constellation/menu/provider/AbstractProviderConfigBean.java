@@ -125,6 +125,14 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         this.itemConfigPage   = layerConfigPage;
 
     }
+    
+    public void create() {
+        // override this method
+    }
+    
+    public boolean getHasCreationMethod() {
+        return false;
+    }
 
     public String getUsedIds() {
         return StringUtilities.toCommaSeparatedValues(usedIds);
