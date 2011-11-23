@@ -48,6 +48,7 @@ import static org.constellation.test.utils.MetadataUtilities.*;
 import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
+import org.geotoolkit.util.ComparisonMode;
 import static org.junit.Assert.*;
 import org.junit.*;
 
@@ -121,7 +122,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     @Override
     public void getRecordByIdTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -138,11 +139,14 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         Object obj = result.getAny().get(0);
         assertTrue(obj instanceof DefaultMetadata);
 
+/*        Marshaller marshaller = pool.acquireMarshaller();
+        marshaller.marshal(obj, new File("test.xml"));*/
+        
         DefaultMetadata isoResult = (DefaultMetadata) obj;
 
-        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
+        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/2005092200_sst_21-24.en.xml"));
 
-        metadataEquals(ExpResult1, isoResult);
+        metadataEquals(ExpResult1, isoResult, ComparisonMode.APPROXIMATIVE);
 
         /*
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).

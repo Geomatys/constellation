@@ -163,14 +163,14 @@ public class MDWebMetadataReaderTest {
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
-        metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result, ComparisonMode.BY_CONTRACT);
 
         result = reader.getMetadata("identifier-test", AbstractMetadataReader.ISO_19115);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta9.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
-        metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result, ComparisonMode.BY_CONTRACT);
 
         pool.release(unmarshaller);
     }

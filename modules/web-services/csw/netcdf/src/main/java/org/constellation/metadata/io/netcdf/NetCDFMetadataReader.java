@@ -42,6 +42,7 @@ import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
 
 import org.constellation.metadata.index.generic.GenericIndexer;
+import org.constellation.metadata.utils.Utils;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
@@ -193,7 +194,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             final ImageCoverageReader reader = new ImageCoverageReader();
             try {
                 reader.setInput(metadataFile);
-                return reader.getMetadata();
+                final Object obj = reader.getMetadata();
+                Utils.setIdentifier(identifier, obj);
+                return obj;
             } catch (CoverageStoreException ex) {
                 throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
             } finally {
@@ -508,8 +511,11 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             for (File metadataFile : directory.listFiles()) {
                 if (!metadataFile.isDirectory()) {
                     try {
+                        final String fileName = metadataFile.getName();
+                        final String identifier = fileName.substring(0, fileName.lastIndexOf('.'));
                         reader.setInput(metadataFile);
-                        Object metadata = reader.getMetadata();
+                        final Object metadata = reader.getMetadata();
+                        Utils.setIdentifier(identifier, metadata);
                         
                         final List<Object> value = GenericIndexer.extractValues(metadata, paths);
                         if (value != null && !value.equals(Arrays.asList("null"))) {
@@ -575,7 +581,8 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 
                 try {
                     reader.setInput(f);
-                    Object metadata = reader.getMetadata();
+                    final Object metadata = reader.getMetadata();
+                    Utils.setIdentifier(identifier, metadata);
                     if (isCacheEnabled()) {
                         addInCache(identifier, metadata);
                     }

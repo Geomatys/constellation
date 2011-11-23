@@ -93,6 +93,7 @@ import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
+import org.geotoolkit.util.ComparisonMode;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
@@ -285,7 +286,7 @@ public class CSWworkerTest {
 
         DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
 
-        metadataEquals(ExpResult1, isoResult);
+        metadataEquals(ExpResult1, isoResult, ComparisonMode.BY_CONTRACT);
 
         /*
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).

@@ -430,7 +430,7 @@ public class MDWebMetadataWriterTest {
         result = (DefaultMetadata) absResult;
         expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
 
-        metadataEquals(expResult,result);
+        metadataEquals(expResult,result, ComparisonMode.BY_CONTRACT);
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta9.xml"));
         writer.storeMetadata(absExpResult);
@@ -440,7 +440,7 @@ public class MDWebMetadataWriterTest {
         result = (DefaultMetadata) absResult;
         expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta9.xml"));
 
-        metadataEquals(expResult,result);
+        metadataEquals(expResult,result, ComparisonMode.BY_CONTRACT);
 
         pool.release(unmarshaller);
     }
