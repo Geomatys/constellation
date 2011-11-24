@@ -67,6 +67,7 @@ public final class QueryConstants {
     //CSW operations
     public static final String REQUEST_REFRESH_INDEX    = "refreshIndex"; 
     public static final String REQUEST_IMPORT_RECORDS   = "importRecords"; 
+    public static final String REQUEST_METADATA_EXIST   = "metadataExist"; 
     
     //Service operations
     public static final String REQUEST_UPDATE_CAPABILITIES = "updateCapabilities"; 

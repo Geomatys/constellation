@@ -1334,6 +1334,28 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
+        
+        public boolean metadataExist(final String id, final String metadataName) {
+            try {
+                final String url = getURL() + "configuration?request=" + REQUEST_METADATA_EXIST + "&id=" + id + "&metadata=" + metadataName;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Exist".equals(ack.getStatus())) {
+                        return true;
+                    } else if ("Not Exist".equals(ack.getStatus())){
+                        return false;
+                    } else {
+                        LOGGER.log(Level.WARNING, "Failure:{0}", ack.getMessage());
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
     }
     
     

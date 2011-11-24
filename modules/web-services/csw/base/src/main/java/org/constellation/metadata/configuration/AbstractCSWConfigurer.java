@@ -145,6 +145,13 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             return importRecords(id, (File)objectRequest, fileName);
         }
         
+        if ("metadataExist".equalsIgnoreCase(request)) {
+
+            final String id       = getParameter("ID", true, parameters);
+            final String metadata = getParameter("metadata", true, parameters);
+            return metadataExist(id, metadata);
+        }
+        
         if ("UpdateVocabularies".equalsIgnoreCase(request)) {
             return updateVocabularies();
         }
@@ -568,6 +575,23 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             }
         }
         return new AcknowlegementType("Error", "An error occurs during the process");
+    }
+    
+    private AcknowlegementType metadataExist(final String id, final String metadataName) throws CstlServiceException {
+        LOGGER.info("Importing record");
+        final CSWMetadataReader reader = initReader(id);
+        try {
+            final Object meta = reader.getMetadata(metadataName, AbstractMetadataReader.ISO_19115);
+            if (meta != null) {
+                final String msg = "The specified record exist in the CSW";
+                return new AcknowlegementType("Exist", msg);
+            } else {
+                final String msg = "The specified record does not exist in the CSW";
+                return new AcknowlegementType("Not Exist", msg);
+            }
+        } catch (MetadataIoException ex) {
+            throw new CstlServiceException(ex);
+        }
     }
 
     /**
