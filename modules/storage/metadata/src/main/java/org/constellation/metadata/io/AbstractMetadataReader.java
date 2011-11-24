@@ -74,40 +74,37 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     }
     
     /**
-     * Return a metadata object from the specified identifier.
-     * 
-     * @param identifier The metadata identifier.
-     * @param mode An output schema mode: EBRIM, ISO_19115, DUBLINCORE and SENSORML supported.
-     * @param elementName A list of QName describing the requested fields. (implies type == null)
-     * 
-     * @return A marshallable metadata object.
-     * @throws MetadataIoException
+     * {@inheritDoc}
      */
     @Override
     public abstract Object getMetadata(final String identifier, final int mode) throws MetadataIoException;
     
     /**
-     * Return all the entries from the database
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract boolean existMetadata(final String identifier) throws MetadataIoException;
+    
+    /**
+     * {@inheritDoc}
      */
     @Override
     public abstract List<? extends Object> getAllEntries() throws MetadataIoException;
 
-     /**
-     * Return all the entries identifiers from the database
+    /**
+     * {@inheritDoc}
      */
     @Override
     public abstract List<String> getAllIdentifiers() throws MetadataIoException;
     
     /**
-     * Destroy all the resource used by this reader.
+     * {@inheritDoc}
      */
     @Override
     public abstract void destroy();
 
     /**
-     * Remove a metadata from the cache.
-     * 
-     * @param identifier The metadata identifier.
+     * {@inheritDoc}
      */
     @Override
     public void removeFromCache(final String identifier) {
@@ -135,7 +132,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     }
     
     /**
-     * Return true is the cache mecanism is enabled.
+     * {@inheritDoc}
      */
     @Override
     public boolean isCacheEnabled() {
@@ -143,7 +140,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     }
 
     /**
-     * Return true is the cache mecanism is enabled.
+     * {@inheritDoc}
      */
     @Override
     public boolean isThreadEnabled() {

@@ -38,6 +38,16 @@ public interface MetadataReader {
     Object getMetadata(final String identifier, final int mode) throws MetadataIoException;
     
     /**
+     * Return true if the metadata exist.
+     * 
+     * @param identifier The metadata identifier.
+     * 
+     * @return true if the metadata exist
+     * @throws MetadataIoException 
+     */
+    boolean existMetadata(final String identifier) throws MetadataIoException;
+    
+    /**
      * Return all the entries from the database
      */
     List<? extends Object> getAllEntries() throws MetadataIoException;

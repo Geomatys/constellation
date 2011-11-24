@@ -38,7 +38,7 @@ public interface CSWMetadataReader extends MetadataReader {
     /**
      * Return a list of values for each specific fields specified as a coma separated String.
      */
-    List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException;
+    List<DomainValues> getFieldDomainofValues(final String propertyNames) throws MetadataIoException;
 
     /**
      * Return a metadata object from the specified identifier.
@@ -51,7 +51,7 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException;
+    Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException;
 
     /**
      * Return the list of supported data types.
@@ -80,7 +80,7 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return
      * @throws MetadataIoException
      */
-    List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException;
+    List<String> executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException;
 
     /**
      * Set the global level of log for information message.

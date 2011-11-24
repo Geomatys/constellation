@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.sql.DataSource;
@@ -367,6 +368,16 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
              throw new MetadataIoException("MD_IO Exception while reading the metadata: " + identifier, e, null, "id");
         }
     }
+    
+    @Override
+    public boolean existMetadata(String identifier) throws MetadataIoException {
+        try {
+            return mdReader.isAlreadyUsedIdentifier(identifier);
+        } catch (MD_IOException ex) {
+            throw  new MetadataIoException(ex);
+        }
+    }
+    
 
     /**
      * Return an object from a MDWeb record.

@@ -157,6 +157,12 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return obj;
     }
 
+    @Override
+    public boolean existMetadata(final String identifier) throws MetadataIoException {
+        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
+        return metadataFile != null && metadataFile.exists();
+    }
+    
     /**
      * Try to find a file named identifier.xml or identifier recursively
      * in the specified directory and its sub-directories.

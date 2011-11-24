@@ -581,8 +581,8 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         LOGGER.info("Importing record");
         final CSWMetadataReader reader = initReader(id);
         try {
-            final Object meta = reader.getMetadata(metadataName, AbstractMetadataReader.ISO_19115);
-            if (meta != null) {
+            final boolean exist = reader.existMetadata(metadataName);
+            if (exist) {
                 final String msg = "The specified record exist in the CSW";
                 return new AcknowlegementType("Exist", msg);
             } else {

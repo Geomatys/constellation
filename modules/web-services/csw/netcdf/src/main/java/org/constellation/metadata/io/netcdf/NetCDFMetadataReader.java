@@ -143,6 +143,12 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         }
         return obj;
     }
+    
+    @Override
+    public boolean existMetadata(final String identifier) throws MetadataIoException {
+        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
+        return metadataFile != null && metadataFile.exists();
+    }
 
     /**
      * Try to find a file named identifier.nc or identifier recursively
