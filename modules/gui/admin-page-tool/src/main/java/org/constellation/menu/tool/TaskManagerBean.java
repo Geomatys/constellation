@@ -225,6 +225,7 @@ public class TaskManagerBean extends I18NBean{
         }
         
         public void edit(){
+            System.out.println("edit");
             if(!(userObject instanceof StringTreeNode)){
                 return;
             }
@@ -244,6 +245,7 @@ public class TaskManagerBean extends I18NBean{
             }
             
             if (configPage != null) {
+                System.out.println("go edit");
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
             }
         }
