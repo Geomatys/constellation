@@ -134,6 +134,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         return (P) new Providers();
     }
     
+    public static ConstellationServer login(final ParameterValueGroup value) {
+        return login(Parameters.value(URL_PARAMETER, value),
+             Parameters.stringValue(USER_PARAMETER, value),
+             Parameters.stringValue(PASSWORD_PARAMETER, value));
+    }
+    
     public static ConstellationServer login(final String serviceURL, 
             final String login, final String password) {
         ArgumentChecks.ensureNonNull("server url", serviceURL);

@@ -578,7 +578,6 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     }
     
     private AcknowlegementType metadataExist(final String id, final String metadataName) throws CstlServiceException {
-        LOGGER.info("Importing record");
         final CSWMetadataReader reader = initReader(id);
         try {
             final boolean exist = reader.existMetadata(metadataName);
