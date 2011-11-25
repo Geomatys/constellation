@@ -472,6 +472,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-process</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
         </dependency>

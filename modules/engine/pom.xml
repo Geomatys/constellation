@@ -59,6 +59,7 @@
   <modules>
     <module>server</module>
     <module>scheduler</module>
+    <module>process</module>
     <module>testing</module>
     <module>xacml</module>
     <module>auth</module>
