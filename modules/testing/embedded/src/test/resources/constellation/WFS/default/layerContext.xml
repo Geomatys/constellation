@@ -4,6 +4,7 @@
         <Source id="coverageTestSrc" load_all="true"/>
         <Source id="omSrc" load_all="true"/>
         <Source id="shapeSrc" load_all="true"/>
+        <Source id="postgisSrc" load_all="true"/>
     </layers>
 </LayerContext>
 

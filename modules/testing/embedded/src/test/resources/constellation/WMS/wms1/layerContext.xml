@@ -15,6 +15,8 @@
                 <Layer name="gml:Lakes"/>
            </include>
         </Source>
+        <Source id="postgisSrc" load_all="true">
+        </Source>
     </layers>
 </LayerContext>
 

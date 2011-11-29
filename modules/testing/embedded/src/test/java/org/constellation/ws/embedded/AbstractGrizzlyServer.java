@@ -41,9 +41,11 @@ import org.constellation.map.ws.WMSMapDecoration;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
+import org.constellation.provider.postgis.PostGisProviderService;
 import org.constellation.util.Util;
 
 // Geotoolkit dependencies
+import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
@@ -60,6 +62,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.junit.Assume.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 
 
 /**
@@ -116,7 +119,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
 
                 final ParameterValueGroup config = desc.createValue();
-
+                
                 if("coverage-sql".equals(serviceName)){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
@@ -173,6 +176,28 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(),ex);
                     }
+                }else if("postgis".equals(serviceName)){
+                    // Defines a PostGis data provider
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(PostgisNGDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                    
+                    srcconfig.parameter(HOST.getName().getCode()).setValue("db.geomatys.com");
+                    srcconfig.parameter(PORT.getName().getCode()).setValue(5432);
+                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                    srcconfig.parameter(USER.getName().getCode()).setValue("test");
+                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");                    
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+                    
+                    //add a custom sql query layer                    
+                    ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("CustomSQLQuery");
+                    layer.parameter(LAYER_QUERY_LANGUAGE.getName().getCode()).setValue("CUSTOM-SQL");
+                    layer.parameter(LAYER_QUERY_STATEMENT.getName().getCode()).setValue(
+                            "SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
                 }
 
                 //empty configuration for others

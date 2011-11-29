@@ -151,7 +151,7 @@ public class WFSRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof Schema);
 
         Schema schema = (Schema) obj;
-        assertEquals(13, schema.getElements().size());
+        assertEquals(17, schema.getElements().size());
 
     }
 
