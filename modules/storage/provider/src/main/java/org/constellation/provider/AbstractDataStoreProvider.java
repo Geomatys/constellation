@@ -168,9 +168,9 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
             final String layerName = value(LAYER_NAME_DESCRIPTOR, queryLayer);
             final String language = value(LAYER_QUERY_LANGUAGE, queryLayer);
             final String statement = value(LAYER_QUERY_STATEMENT, queryLayer);
-            final Query query = QueryBuilder.language(language, statement);
             final Name name = new DefaultName(namespace, layerName);
-            store.addQuery(query, name);
+            final Query query = QueryBuilder.language(language, statement, name);
+            store.addQuery(query);
         }
 
 
