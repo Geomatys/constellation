@@ -424,12 +424,10 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         //we get The boundingBox(es)
         final List<Value>   bboxValues     = form.getValueFromPath(pathMap.get("boundingBox"));
-        System.out.println("\n\n\n nb box Values for:" + form.getIdentifier() + " => " + bboxValues.size() + "\n\n");
         final List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
         for (Value v: bboxValues) {
             bboxes.add(createBoundingBoxFromValue(v.getOrdinal(), form, recordStandard));
         }
-        System.out.println("bboxes size:" + bboxes.size());
 
         //we get the type of the data
         final List<Value> typeValues  = form.getValueFromPath(pathMap.get("type"));
