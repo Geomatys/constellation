@@ -775,6 +775,7 @@ public class CSWworkerTest {
         expCustomResult2.setIdentifier(new SimpleLiteral("42292_9s_19900610041000"));
         expCustomResult2.setModified(new SimpleLiteral("2009-01-26T12:00:00+01:00"));
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.3667, 36.6, 1.3667, 36.6));
+        expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 12.1, 31.2, 12.1, 31.2));
 
 
         assertEquals(expCustomResult1, customResult1);
@@ -827,6 +828,7 @@ public class CSWworkerTest {
         expCustomResult2.setIdentifier(new SimpleLiteral("42292_9s_19900610041000"));
         expCustomResult2.setModified(new SimpleLiteral("2009-01-26T12:00:00+01:00"));
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.3667, 36.6, 1.3667, 36.6));
+        expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 12.1, 31.2, 12.1, 31.2));
         
         RecordType expCustomResult3 =  new RecordType();
         expCustomResult3.setIdentifier(new SimpleLiteral("39727_22_19750113062500"));

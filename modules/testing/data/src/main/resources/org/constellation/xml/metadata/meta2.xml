@@ -619,6 +619,25 @@
                             </gmd:northBoundLatitude>
                         </gmd:EX_GeographicBoundingBox>
                     </gmd:geographicElement>
+                    <gmd:geographicElement>
+                        <gmd:EX_GeographicBoundingBox>
+                            <gmd:extentTypeCode>
+                                <gco:Boolean>true</gco:Boolean>
+                            </gmd:extentTypeCode>
+                            <gmd:westBoundLongitude>
+                                <gco:Decimal>12.1</gco:Decimal>
+                            </gmd:westBoundLongitude>
+                            <gmd:eastBoundLongitude>
+                                <gco:Decimal>12.1</gco:Decimal>
+                            </gmd:eastBoundLongitude>
+                            <gmd:southBoundLatitude>
+                                <gco:Decimal>31.2</gco:Decimal>
+                            </gmd:southBoundLatitude>
+                            <gmd:northBoundLatitude>
+                                <gco:Decimal>31.2</gco:Decimal>
+                            </gmd:northBoundLatitude>
+                        </gmd:EX_GeographicBoundingBox>
+                    </gmd:geographicElement>
                     <gmd:temporalElement>
                         <gmd:EX_TemporalExtent>
                             <gmd:extent>

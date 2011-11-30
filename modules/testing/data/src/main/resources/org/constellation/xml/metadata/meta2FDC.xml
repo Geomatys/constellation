@@ -28,4 +28,8 @@
             <ows:LowerCorner>1.3667 36.6</ows:LowerCorner>
             <ows:UpperCorner>1.3667 36.6</ows:UpperCorner>
         </ows:BoundingBox>
+        <ows:BoundingBox dimensions="2" crs="EPSG:4326">
+            <ows:LowerCorner>12.1 31.2</ows:LowerCorner>
+            <ows:UpperCorner>12.1 31.2</ows:UpperCorner>
+        </ows:BoundingBox>
 </csw:Record>

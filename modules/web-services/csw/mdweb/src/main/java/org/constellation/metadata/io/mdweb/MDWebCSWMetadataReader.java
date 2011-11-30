@@ -424,10 +424,12 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         //we get The boundingBox(es)
         final List<Value>   bboxValues     = form.getValueFromPath(pathMap.get("boundingBox"));
+        System.out.println("\n\n\n nb box Values for:" + form.getIdentifier() + " => " + bboxValues.size() + "\n\n");
         final List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
         for (Value v: bboxValues) {
             bboxes.add(createBoundingBoxFromValue(v.getOrdinal(), form, recordStandard));
         }
+        System.out.println("bboxes size:" + bboxes.size());
 
         //we get the type of the data
         final List<Value> typeValues  = form.getValueFromPath(pathMap.get("type"));
@@ -652,18 +654,12 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             throw new MD_IOException("unexpected main standard:" + mainStandard);
         }
         try {
-            //we get the CRS
-            final List<Value> crsValues = f.getValueFromPath(typePrefix + "referenceSystemInfo:referenceSystemIdentifier:code");
-            for (Value v: crsValues) {
-                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
-                    crs = ((TextValue)v).getValue();
-                }
-            }
 
             //we get the east value
             final List<Value> eastValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:eastBoundLongitude");
             for (Value v: eastValues) {
-                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                final Value parentValue = v.getParent();
+                if (v instanceof TextValue && parentValue.getOrdinal() == ordinal) {
                     eastValue = Double.parseDouble(((TextValue)v).getValue());
                 }
             }
@@ -671,7 +667,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             //we get the east value
             final List<Value> westValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:westBoundLongitude");
             for (Value v: westValues) {
-                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                final Value parentValue = v.getParent();
+                if (v instanceof TextValue && parentValue.getOrdinal() == ordinal) {
                     westValue = Double.parseDouble(((TextValue)v).getValue());
                 }
             }
@@ -679,7 +676,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             //we get the north value
             final List<Value> northValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:northBoundLatitude");
             for (Value v: northValues) {
-                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                final Value parentValue = v.getParent();
+                if (v instanceof TextValue && parentValue.getOrdinal() == ordinal) {
                     northValue = Double.parseDouble(((TextValue)v).getValue());
                 }
             }
@@ -687,7 +685,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             //we get the south value
             final List<Value> southValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:southBoundLatitude");
             for (Value v: southValues) {
-                if (v instanceof TextValue && v.getOrdinal() == ordinal) {
+                final Value parentValue = v.getParent();
+                if (v instanceof TextValue && parentValue.getOrdinal() == ordinal) {
                     southValue = Double.parseDouble(((TextValue)v).getValue());
                 }
             }
@@ -696,10 +695,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
 
         if (eastValue != null && westValue != null && northValue != null && southValue != null) {
-            if (crs != null && crs.indexOf("EPSG:") == -1) {
-                crs = "EPSG:" + crs;
-            }
-            final BoundingBoxType result = new BoundingBoxType(crs,
+            final BoundingBoxType result = new BoundingBoxType("EPSG:4326",
                                                                eastValue,
                                                                southValue,
                                                                westValue,
