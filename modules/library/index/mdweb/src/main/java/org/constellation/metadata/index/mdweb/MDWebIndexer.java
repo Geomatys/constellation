@@ -157,7 +157,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         int nbRecordSets = 0;
         int nbForms      = 0;
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_34, analyzer);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_35, analyzer);
             final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
             final String serviceID       = getServiceID();
             
@@ -195,7 +195,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                      return;
                 }
             }
-            writer.optimize();
+            // writer.optimize(); no longer justified
             writer.close();
             
             // we store the numeric fields in a properties file int the index directory
@@ -224,7 +224,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         final int nbRecordSets = 0;
         int nbForms = 0;
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_34, analyzer);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_35, analyzer);
             final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
             final String serviceID       = getServiceID();
             nbForms = forms.size();
@@ -237,7 +237,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                      return;
                 }
             }
-            writer.optimize();
+            // writer.optimize(); no longer justified
             writer.close();
 
             // we store the numeric fields in a properties file int the index directory

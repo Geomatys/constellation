@@ -351,7 +351,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     }
     
     protected void stopIndexation(final IndexWriter writer, final String serviceID) throws IOException {
-        writer.optimize();
+        // writer.optimize(); no longer justified
         writer.close();
         FileUtilities.deleteDirectory(getFileDirectory());
         if (indexationToStop.contains(serviceID)) {

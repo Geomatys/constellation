@@ -128,7 +128,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
                 }
             }
             template = false;
-            writer.optimize();
+            // writer.optimize(); no longer justified
             writer.close();
 
         } catch (CorruptIndexException ex) {
@@ -171,7 +171,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
             for (ObservationType observation : observations) {
                 indexDocument(writer, observation);
             }
-            writer.optimize();
+            // writer.optimize(); no longer justified
             writer.close();
 
         } catch (CorruptIndexException ex) {
