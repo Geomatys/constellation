@@ -51,7 +51,8 @@
     <br/>
     <br/>
     <div class="rounded">
-    <mf:Outline id="sourceLayers" actionVisible="true" rootVisible="false"
+    <mf:Outline id="sourceLayers" rootVisible="false"
+                actionVisible="#{bean.actionVisible}"
                 value="#{bean.layerModel}" var="node" width="100%" 
                 rowStyler="#{mf:constant('org.constellation.menu.service.AbstractServiceBean.ROW_STYLER')}" 
                 cellStyler="#{mf:constant('org.constellation.menu.service.AbstractServiceBean.CELL_STYLER')}">

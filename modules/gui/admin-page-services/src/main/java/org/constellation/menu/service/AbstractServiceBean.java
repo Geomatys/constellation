@@ -57,7 +57,7 @@ import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public class AbstractServiceBean extends I18NBean{
+public class AbstractServiceBean extends I18NBean {
 
     public static final OutlineRowStyler ROW_STYLER = new OutlineRowStyler() {
 
@@ -118,6 +118,8 @@ public class AbstractServiceBean extends I18NBean{
     private LayerContextTreeModel treemodel = null;
     private String selectedPotentialSource = null;
     private UploadedFile uploadedCapabilities;
+    
+    public static boolean ACTION_VISIBLE = true;
     
     private boolean creatingFlag = false;
 
@@ -248,6 +250,10 @@ public class AbstractServiceBean extends I18NBean{
     
     public boolean getPartialTree() {
         return MenuBean.PARTIAL_TREE;
+    }
+    
+    public boolean getActionVisible() {
+        return AbstractServiceBean.ACTION_VISIBLE;
     }
     
     public void addSource(){
