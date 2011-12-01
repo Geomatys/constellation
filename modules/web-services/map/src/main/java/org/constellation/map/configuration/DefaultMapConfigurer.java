@@ -731,11 +731,14 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final StringTreeNode n = new StringTreeNode();
             n.getProperties().put("id", t.getId());
             n.getProperties().put("title", t.getTitle());
-            
-            n.getProperties().put("lastRun", String.valueOf(t.getLastExecutionDate()));
-            if(t.getLastFailedException() != null){
+            if (t.getLastExecutionDate() != null) {
+                n.getProperties().put("lastRun", String.valueOf(t.getLastExecutionDate()));
+            } else {
+                n.getProperties().put("lastRun", "");
+            }
+            if (t.getLastFailedException() != null) {
                 n.getProperties().put("lastError", t.getLastFailedException().getMessage());
-            }else{
+            } else {
                 n.getProperties().put("lastError", "");
             }
             

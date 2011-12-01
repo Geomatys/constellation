@@ -1251,7 +1251,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                         +"&id=" + id
                         +"&title=" + title 
                         +"&step=" + step;
-                Object response = sendRequest(url, parameters);
+                final Object response = sendRequest(url, parameters);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
                     if ("Success".equals(ack.getStatus())) {

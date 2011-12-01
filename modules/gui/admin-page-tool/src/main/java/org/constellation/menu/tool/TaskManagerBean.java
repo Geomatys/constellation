@@ -56,6 +56,8 @@ public class TaskManagerBean extends I18NBean{
      */
     public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
     
+    public static boolean ACTION_VISIBLE = true;
+    
     public static final OutlineRowStyler ROW_STYLER = new OutlineRowStyler() {
 
         @Override
@@ -82,6 +84,10 @@ public class TaskManagerBean extends I18NBean{
         configPage = "/tasks/taskConfig.xhtml";
     }
 
+    public boolean getActionVisible() {
+        return TaskManagerBean.ACTION_VISIBLE;
+    }
+    
     public String getMainPage() {
         return mainPage;
     }
@@ -225,7 +231,6 @@ public class TaskManagerBean extends I18NBean{
         }
         
         public void edit(){
-            System.out.println("edit");
             if(!(userObject instanceof StringTreeNode)){
                 return;
             }
@@ -245,7 +250,6 @@ public class TaskManagerBean extends I18NBean{
             }
             
             if (configPage != null) {
-                System.out.println("go edit");
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
             }
         }

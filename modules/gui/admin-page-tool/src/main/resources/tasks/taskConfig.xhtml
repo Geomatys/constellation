@@ -31,9 +31,10 @@
                         <!-- process list -->
                         <mf:Div styleClass="rounded" rendered="#{taskmanagerBean.id == null}">
 
-                            <mf:Outline id="processTree" actionVisible="true" rootVisible="false"
+                            <mf:Outline id="processTree" rootVisible="false"
                                 value="#{taskmanagerBean.processModel}" var="node" width="100%" 
-                                rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}">
+                                rowStyler="#{mf:constant('org.constellation.bean.HighLightRowStyler.INSTANCE')}"
+                                actionVisible="#{taskmanagerBean.actionVisible}">
 
                                 <!-- Name column -->
                                 <mf:DataTableColumn>
@@ -70,7 +71,8 @@
                                 <legend>#{taskmanagerBean.i18n['parameters']} : #{taskmanagerBean.processId}</legend>                                
                                 <br/>
                                 <mf:parametereditor value="#{taskmanagerBean.taskParameters}" width="100%" 
-                                                    rootVisible="#{not mf:isInstance(taskmanagerBean.taskParameters,'ParameterValueGroup')}"/>
+                                                    rootVisible="#{not mf:isInstance(taskmanagerBean.taskParameters,'ParameterValueGroup')}"
+                                                    actionVisible="#{taskmanagerBean.actionVisible}"/>
     
                             </fieldset>
                         </mf:Div>
