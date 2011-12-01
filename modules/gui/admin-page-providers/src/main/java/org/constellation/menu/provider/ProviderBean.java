@@ -42,8 +42,15 @@ public class ProviderBean extends I18NBean {
     private final MapContext context = MapBuilder.createContext();
     private TreeModel stylesModel = null;
 
+    public static boolean ACTION_VISIBLE = true;
+    
+    
     public ProviderBean(){
         addBundle("provider.overview");
+    }
+    
+    public boolean getActionVisible() {
+        return ProviderBean.ACTION_VISIBLE;
     }
 
     private static ConstellationServer getServer(){
