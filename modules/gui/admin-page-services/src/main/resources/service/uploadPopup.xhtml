@@ -8,7 +8,9 @@
 
     <mf:Div id="popupuploadDiv" rendered="#{bean.popupUpload}">
         <h:form id="formupload" enctype="multipart/form-data">
-            <mf:ModalPopup id="popupupload" hidden="true" modalStyleClass="popupUploadClass">
+            <mf:ModalPopup id="popupupload" hidden="true" modalStyleClass="popupUploadClass" style="height: 110px; border: 5px solid rgb(194, 204, 214); width: 700px; margin-left: -300px; margin-top: -55px; border-radius: 4px 4px 4px 4px; background: none repeat scroll 0pt 0pt rgb(215, 241, 255);">
+                <br/>
+                <br/>
                 <h:panelGrid columns="3" cellpadding="5">
                     <h:outputText value="#{bean.i18n['customCapabilities']}"/>
                     <input type="file" name="uploadedFile" />

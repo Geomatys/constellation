@@ -116,10 +116,10 @@
             
             <mf:CustomHtml tag="table" rendered="#{cswBean.popupUpload}">
                 <tr>
-                    <td><h:commandButton value="Import Metadata" onclick="jQuery('.popupImportClass').show();return false;" /></td>
+                    <td><h:commandButton value="#{cswBean.i18n['uploadRecord']}" onclick="jQuery('.popupImportClass').show();return false;" /></td>
                 </tr>
                 <tr>
-                    <td><h:commandButton value="Upload your capabilities" onclick="jQuery('.popupUploadClass').show();return false;"/></td>
+                    <td><h:commandButton value="#{cswBean.i18n['uploadCapabilities']}" onclick="jQuery('.popupUploadClass').show();return false;"/></td>
                 </tr>     
             </mf:CustomHtml>
             
@@ -153,7 +153,9 @@
         
         <mf:Div id="importuploadDiv" rendered="#{cswBean.popupUpload}">
             <h:form id="formimport" enctype="multipart/form-data">
-                <mf:ModalPopup id="popupimport" hidden="true" modalStyleClass="popupImportClass">
+                <mf:ModalPopup id="popupimport" hidden="true" modalStyleClass="popupImportClass" style="height: 110px; border: 5px solid rgb(194, 204, 214); width: 470px; margin-left: -300px; margin-top: -55px; border-radius: 4px 4px 4px 4px; background: none repeat scroll 0pt 0pt rgb(215, 241, 255);">
+                    <br/>
+                    <br/>
                     <h:panelGrid columns="3" cellpadding="5">
                         <h:outputText value="#{cswBean.i18n['importRecord']}"/>
                         <input type="file" name="uploadedFile" />

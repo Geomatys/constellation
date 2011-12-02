@@ -96,7 +96,7 @@
     #{bean.i18n['security']}
     <br/>
     <h:inputTextarea value="#{bean.configurationObject.security}" style="width:100%;" />
-    <h:commandButton value="Upload your capabilities" onclick="jQuery('.popupUploadClass').show();return false;" rendered="#{bean.popupUpload}"/>
+    <h:commandButton value="#{cswBean.i18n['uploadCapabilities']}" onclick="jQuery('.popupUploadClass').show();return false;" rendered="#{bean.popupUpload}"/>
     
     <mf:CustomHtml tag="table" style="width:100%;" rendered="#{!bean.popupUpload}"> 
        <colgroup>
