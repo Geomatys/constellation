@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.sql.DataSource;
 import org.constellation.ServiceDef.Specification;
@@ -32,6 +33,10 @@ import org.constellation.generic.database.BDD;
 import org.geotoolkit.util.FileUtilities;
 import org.mdweb.sql.DatabaseCreator;
 import org.mapfaces.model.UploadedFile;
+
+// portlet upload
+import javax.portlet.ActionRequest;
+import org.apache.commons.fileupload.FileItem;
 
 /**
  *
@@ -361,6 +366,44 @@ public class CSWBean extends AbstractServiceBean {
                     final ConstellationServer server = getServer();
                     if (server != null) {
                         server.csws.importFile(instanceId, importedfile, uploadedRecord.getFileName());
+                    }
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
+                }
+                
+            } else {
+                LOGGER.log(Level.WARNING, "This content type can not be read : {0}", contentType);
+            }
+        } else {
+            LOGGER.log(Level.WARNING, "imported file is null");
+        }
+    }
+
+    
+     /**
+     * Import a record
+     */
+    public void importRecordPortlet() {
+        final FacesContext context = FacesContext.getCurrentInstance();
+        final ActionRequest request = (ActionRequest) context.getExternalContext().getRequest();
+        final FileItem item = (FileItem) request.getAttribute("uploadedFile");
+        if (item != null) {
+            final String contentType = item.getContentType();
+            if ("application/zip".equals(contentType)
+             || "application/octet-stream".equals(contentType)
+             || "application/x-download".equals(contentType)
+             || "application/download".equals(contentType)
+             || "text/xml".equals(contentType)
+             || "application/x-httpd-php".equals(contentType)
+             || "application/x-zip-compressed".equals(contentType)) {
+               
+                final String instanceId = getConfiguredInstance().getName();
+                try {
+                    final File tmp = File.createTempFile("cstl", null);
+                    final File importedfile = FileUtilities.buildFileFromStream(item.getInputStream(), tmp);
+                    final ConstellationServer server = getServer();
+                    if (server != null) {
+                        server.csws.importFile(instanceId, importedfile, item.getName());
                     }
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);

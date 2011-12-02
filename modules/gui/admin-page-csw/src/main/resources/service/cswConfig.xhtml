@@ -98,21 +98,32 @@
                         </h:selectOneMenu>
                     </td> 
                 </tr>
-                <tr>
+                <mf:CustomHtml tag="tr" rendered="#{!cswBean.popupUpload}">
                     <td><h:outputText value="#{cswBean.i18n['importRecord']}"/></td>     
                     <td><mf:FileUpload id="importFile" 
                                        size="30"
                                        uploadedFile="#{cswBean.uploadedRecord}" /></td>
 	            <td><h:commandButton action="#{cswBean.importRecord}" value="#{cswBean.i18n['importFile']}"/></td>
-                </tr>
-                <tr>
+                </mf:CustomHtml>
+                <mf:CustomHtml tag="tr" rendered="#{!cswBean.popupUpload}">
                     <td><h:outputText value="#{cswBean.i18n['customCapabilities']}"/></td>     
                     <td><mf:FileUpload id="customCapabilities" 
                                        size="30"
                                        uploadedFile="#{cswBean.uploadedCapabilities}" /></td>
                     <td><h:commandButton action="#{cswBean.updateCapabilities}" value="#{cswBean.i18n['importFile']}"/></td>
-                </tr>     
+                </mf:CustomHtml>     
             </table> 
+            
+            <mf:CustomHtml tag="table" rendered="#{cswBean.popupUpload}">
+                <tr>
+                    <td><h:commandButton value="Import Metadata" onclick="jQuery('.popupImportClass').show();return false;" /></td>
+                </tr>
+                <tr>
+                    <td><h:commandButton value="Upload your capabilities" onclick="jQuery('.popupUploadClass').show();return false;"/></td>
+                </tr>     
+            </mf:CustomHtml>
+            
+           
 
 
         </div>
@@ -126,13 +137,32 @@
                 </colgroup>
                 <tr>
                     <td></td>
-                    <td><h:commandLink action="#{cswBean.goMainPage}" style="width:100%;" class="logout">#{menuBean.i18n['return']}</h:commandLink></td>
+                    <td><h:commandLink action="#{cswBean.goMainPage}" style="width:100%;" class="logout">#{cswBean.i18n['return']}</h:commandLink></td>
                     <td><h:commandButton action="#{cswBean.refreshIndex}" value="#{cswBean.i18n['refreshIndex']}"/></td>
                     <td><h:commandButton action="#{cswBean.saveConfiguration}" value="#{cswBean.i18n['save']}"/></td>
                 </tr>
         </table>
         
 
+    </ui:define>
+    
+    <!-- a popup for upload capabilities in portlet context-->
+    <ui:define name="outsideform">
+        
+        <cstl:popupUpload bean="#{cswBean}" />
+        
+        <mf:Div id="importuploadDiv" rendered="#{cswBean.popupUpload}">
+            <h:form id="formimport" enctype="multipart/form-data">
+                <mf:ModalPopup id="popupimport" hidden="true" modalStyleClass="popupImportClass">
+                    <h:panelGrid columns="3" cellpadding="5">
+                        <h:outputText value="#{cswBean.i18n['importRecord']}"/>
+                        <input type="file" name="uploadedFile" />
+                        <h:commandButton action="#{cswBean.importRecordPortlet}" value="#{cswBean.i18n['importFile']}"/>
+                    </h:panelGrid>
+                </mf:ModalPopup>
+            </h:form>
+        </mf:Div>
+        
     </ui:define>
 
 

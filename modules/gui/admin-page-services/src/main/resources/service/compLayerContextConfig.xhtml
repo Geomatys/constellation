@@ -96,8 +96,9 @@
     #{bean.i18n['security']}
     <br/>
     <h:inputTextarea value="#{bean.configurationObject.security}" style="width:100%;" />
+    <h:commandButton value="Upload your capabilities" onclick="jQuery('.popupUploadClass').show();return false;" rendered="#{bean.popupUpload}"/>
     
-    <table style="width:100%;"> 
+    <mf:CustomHtml tag="table" style="width:100%;" rendered="#{!bean.popupUpload}"> 
        <colgroup>
           <col width="20%"/>
           <col width="80%"/>
@@ -111,7 +112,7 @@
                     <td><h:commandButton action="#{bean.updateCapabilities}" value="#{bean.i18n['importFile']}"/></td>
                 </tr>
        </tbody>    
-    </table>
+    </mf:CustomHtml>
     <br/>
     <br/>
     

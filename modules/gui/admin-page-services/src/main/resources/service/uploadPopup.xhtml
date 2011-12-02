@@ -1,0 +1,20 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jstl/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib">
+
+    <mf:Div id="popupuploadDiv" rendered="#{bean.popupUpload}">
+        <h:form id="formupload" enctype="multipart/form-data">
+            <mf:ModalPopup id="popupupload" hidden="true" modalStyleClass="popupUploadClass">
+                <h:panelGrid columns="3" cellpadding="5">
+                    <h:outputText value="#{bean.i18n['customCapabilities']}"/>
+                    <input type="file" name="uploadedFile" />
+                    <h:commandButton action="#{bean.updateCapabilitiesPortlet}" value="#{bean.i18n['importFile']}"/>
+                </h:panelGrid>
+            </mf:ModalPopup>
+        </h:form>
+    </mf:Div>
+</ui:composition>

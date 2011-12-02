@@ -15,5 +15,10 @@
             <tag-name>layerContextConfig</tag-name>
             <source>/service/compLayerContextConfig.xhtml</source>
         </tag>
+        
+        <tag>
+            <tag-name>popupUpload</tag-name>
+            <source>/service/uploadPopup.xhtml</source>
+        </tag>
 
 </facelet-taglib>

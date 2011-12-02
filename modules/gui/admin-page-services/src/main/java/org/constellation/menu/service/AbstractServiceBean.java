@@ -31,6 +31,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+
+// Constellation dependencies
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.MenuBean;
@@ -42,9 +44,13 @@ import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.Source;
+
+// Geotoolkit dependencies
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
+
+// Mapfaces dependencies
 import org.mapfaces.event.CloseEvent;
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.model.UploadedFile;
@@ -52,10 +58,15 @@ import org.mapfaces.renderkit.html.outline.OutlineCellStyler;
 import org.mapfaces.renderkit.html.outline.OutlineDataModel;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 
+// portlet upload
+import javax.portlet.ActionRequest;
+import org.apache.commons.fileupload.FileItem;
+
 /**
  * Abstract JSF Bean for service administration interface.
  * 
  * @author Johann Sorel (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  */
 public class AbstractServiceBean extends I18NBean {
 
@@ -120,6 +131,8 @@ public class AbstractServiceBean extends I18NBean {
     private UploadedFile uploadedCapabilities;
     
     public static boolean ACTION_VISIBLE = true;
+    
+    public static boolean POPUP_UPLOAD = false;
     
     private boolean creatingFlag = false;
 
@@ -256,6 +269,10 @@ public class AbstractServiceBean extends I18NBean {
         return AbstractServiceBean.ACTION_VISIBLE;
     }
     
+    public boolean getPopupUpload() {
+        return AbstractServiceBean.POPUP_UPLOAD;
+    }
+    
     public void addSource(){
         if(!(configurationObject instanceof LayerContext) ){
             return;
@@ -372,6 +389,35 @@ public class AbstractServiceBean extends I18NBean {
         goMainPage();
     }
     
+    public void updateCapabilitiesPortlet() {
+        final FacesContext context = FacesContext.getCurrentInstance();
+        final ActionRequest request = (ActionRequest) context.getExternalContext().getRequest();
+        final FileItem item = (FileItem) request.getAttribute("uploadedFile");
+        if (item != null) {
+            final String contentType = item.getContentType();
+            if ("application/xml".equals(contentType)
+             || "text/xml".equals(contentType)
+             || "application/x-httpd-php".equals(contentType)){
+               
+                final String instanceId = getConfiguredInstance().getName();
+                try {
+                    final File tmp = File.createTempFile("cstl", null);
+                    final File importedfile = FileUtilities.buildFileFromStream(item.getInputStream(), tmp);
+                    final ConstellationServer server = getServer();
+                    if (server != null) {
+                        server.services.updateCapabilities(getSpecificationName(), instanceId, importedfile, item.getName());
+                    }
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
+                }
+            } else {
+                LOGGER.log(Level.WARNING, "This content type can not be read : {0}", contentType);
+            }
+        } else {
+            LOGGER.log(Level.WARNING, "imported file is null");
+        }
+    }
+    
     public void updateCapabilities() {
          if (uploadedCapabilities != null) {
             final String contentType = uploadedCapabilities.getContentType();
@@ -390,7 +436,6 @@ public class AbstractServiceBean extends I18NBean {
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
                 }
-                
             } else {
                 LOGGER.log(Level.WARNING, "This content type can not be read : {0}", contentType);
             }

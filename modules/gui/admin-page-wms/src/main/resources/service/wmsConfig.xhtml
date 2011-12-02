@@ -13,5 +13,12 @@
         <cstl:layerContextConfig bean="#{wmsBean}" />
 
     </ui:define>
+    
+    <!-- a popup for upload capabilities in portlet context-->
+    <ui:define name="outsideform">
+        
+        <cstl:popupUpload bean="#{wmsBean}" />
+        
+    </ui:define>
 
 </ui:composition>

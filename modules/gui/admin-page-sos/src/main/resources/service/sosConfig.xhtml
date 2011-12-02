@@ -174,15 +174,18 @@
                         </h:selectOneMenu>
                     </td>
                 </tr> 
-                <tr>
+                <mf:CustomHtml tag="tr" rendered="#{!sosBean.popupUpload}">
                     <td><h:outputText value="#{sosBean.i18n['customCapabilities']}"/></td>     
                     <td><mf:FileUpload id="customCapabilities" 
                                        size="30"
                                        uploadedFile="#{sosBean.uploadedCapabilities}" /></td>
                     <td><h:commandButton action="#{sosBean.updateCapabilities}" value="#{sosBean.i18n['importFile']}"/></td>
-                </tr>
+                </mf:CustomHtml>
                 </tbody>    
             </table>
+            
+            <h:commandButton value="Upload your capabilities" onclick="jQuery('.popupUploadClass').show();return false;" rendered="#{sosBean.popupUpload}"/>
+            
         </div>
        <table style="width:100%;"> 
            <colgroup>
@@ -199,4 +202,10 @@
     </ui:define>
 
 
+    <!-- a popup for upload capabilities in portlet context-->
+    <ui:define name="outsideform">
+        
+        <cstl:popupUpload bean="#{sosBean}" />
+        
+    </ui:define>
 </ui:composition>
