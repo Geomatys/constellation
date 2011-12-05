@@ -426,7 +426,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final List<Value>   bboxValues     = form.getValueFromPath(pathMap.get("boundingBox"));
         final List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
         for (Value v: bboxValues) {
-            bboxes.add(createBoundingBoxFromValue(v.getOrdinal(), form, recordStandard));
+            bboxes.add(createBoundingBoxFromValue(v.getIdValue(), form, recordStandard));
         }
 
         //we get the type of the data
@@ -637,7 +637,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     /**
      * Create a bounding box from a geographiqueElement Value
      */
-    private BoundingBoxType createBoundingBoxFromValue(final int ordinal, final Form f, final Standard mainStandard) throws MD_IOException {
+    private BoundingBoxType createBoundingBoxFromValue(final String idValue, final Form f, final Standard mainStandard) throws MD_IOException {
         Double  southValue  = null;
         Double eastValue    = null;
         Double  westValue   = null;
@@ -657,7 +657,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             final List<Value> eastValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:eastBoundLongitude");
             for (Value v: eastValues) {
                 final Value parentValue = v.getParent();
-                if (v instanceof TextValue && parentValue.getOrdinal() == ordinal) {
+                if (v instanceof TextValue && parentValue.getIdValue().equals(idValue)) {
                     eastValue = Double.parseDouble(((TextValue)v).getValue());
                 }
             }
@@ -666,7 +666,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             final List<Value> westValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:westBoundLongitude");
             for (Value v: westValues) {
                 final Value parentValue = v.getParent();
-                if (v instanceof TextValue && parentValue.getOrdinal() == ordinal) {
+                if (v instanceof TextValue && parentValue.getIdValue().equals(idValue)) {
                     westValue = Double.parseDouble(((TextValue)v).getValue());
                 }
             }
@@ -675,7 +675,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             final List<Value> northValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:northBoundLatitude");
             for (Value v: northValues) {
                 final Value parentValue = v.getParent();
-                if (v instanceof TextValue && parentValue.getOrdinal() == ordinal) {
+                if (v instanceof TextValue && parentValue.getIdValue().equals(idValue)) {
                     northValue = Double.parseDouble(((TextValue)v).getValue());
                 }
             }
@@ -684,7 +684,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             final List<Value> southValues = f.getValueFromPath(typePrefix + "identificationInfo:extent:geographicElement2:southBoundLatitude");
             for (Value v: southValues) {
                 final Value parentValue = v.getParent();
-                if (v instanceof TextValue && parentValue.getOrdinal() == ordinal) {
+                if (v instanceof TextValue && parentValue.getIdValue().equals(idValue)) {
                     southValue = Double.parseDouble(((TextValue)v).getValue());
                 }
             }

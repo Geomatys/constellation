@@ -18,6 +18,7 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
+import javax.xml.bind.Marshaller;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -349,9 +350,31 @@ public class CSWworkerTest {
 
         assertEquals(expRecordResult1.getFormat(), recordResult.getFormat());
         assertEquals(expRecordResult1, recordResult);
+        
+        /*
+         *  TEST 5 : getRecordById with the a metadata in DC mode (FULL).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("39727_22_19750113062500"));
+        result = (GetRecordByIdResponseType) worker.getRecordById(request);
+
+        assertTrue(result != null);
+        assertTrue(result.getAbstractRecord().size() == 1);
+        assertTrue(result.getAny().isEmpty());
+
+        obj = result.getAbstractRecord().get(0);
+        assertTrue(obj instanceof RecordType);
+
+        recordResult = (RecordType) obj;
+        
+        RecordType expRecordResult3 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta3FDC.xml"))).getValue();
+
+        assertEquals(expRecordResult3.getFormat(), recordResult.getFormat());
+        assertEquals(expRecordResult3, recordResult);
+        
 
         /*
-         *  TEST 5 : getRecordById with two metadata in DC mode (FULL).
+         *  TEST 6 : getRecordById with two metadata in DC mode (FULL).
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600","42292_9s_19900610041000"));
@@ -375,7 +398,7 @@ public class CSWworkerTest {
         assertEquals(expRecordResult2, recordResult2);
 
         /*
-         *  TEST 6 : getRecordById with the first metadata with no outputSchema.
+         *  TEST 7 : getRecordById with the first metadata with no outputSchema.
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
                 MimeType.APPLICATION_XML, null, Arrays.asList("42292_5p_19900609195600"));
@@ -396,7 +419,7 @@ public class CSWworkerTest {
         assertEquals(expSumResult1, sumResult);
 
         /*
-         *  TEST 7 : getRecordById with the first metadata with no outputSchema and no ElementSetName.
+         *  TEST 8 : getRecordById with the first metadata with no outputSchema and no ElementSetName.
          */
         request = new GetRecordByIdType("CSW", "2.0.2", null,
                 MimeType.APPLICATION_XML, null, Arrays.asList("42292_5p_19900609195600"));
@@ -417,7 +440,7 @@ public class CSWworkerTest {
         assertEquals(expSumResult1, sumResult);
 
         /*
-         *  TEST 8 : getRecordById with ebrim 2.5 etadata.
+         *  TEST 9 : getRecordById with ebrim 2.5 etadata.
          */
         request = new GetRecordByIdType("CSW", "2.0.2", null,
                 MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", Arrays.asList("000068C3-3B49-C671-89CF-10A39BB1B652"));
@@ -437,7 +460,7 @@ public class CSWworkerTest {
         assertEquals(expEoResult, eoResult);
 
         /*
-         *  TEST 9 : getRecordById with ebrim 3.0 metadata.
+         *  TEST 10 : getRecordById with ebrim 3.0 metadata.
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", Arrays.asList("urn:motiive:csw-ebrim"));
@@ -834,6 +857,7 @@ public class CSWworkerTest {
         expCustomResult3.setIdentifier(new SimpleLiteral("39727_22_19750113062500"));
         expCustomResult3.setModified(new SimpleLiteral("2009-01-26T12:21:45+01:00"));
         expCustomResult3.setBoundingBox(new BoundingBoxType("EPSG:4326", -4.967, -6.95, -4.967, -6.95));
+        expCustomResult3.setBoundingBox(new BoundingBoxType("EPSG:4326", -5.1, -7.2, -5.1, -7.2));
 
         RecordType expCustomResult4 =  new RecordType();
         expCustomResult4.setIdentifier(new SimpleLiteral("11325_158_19640418141800"));
