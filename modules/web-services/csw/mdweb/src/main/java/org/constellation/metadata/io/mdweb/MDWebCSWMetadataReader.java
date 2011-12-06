@@ -436,13 +436,16 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         try {
             if (!typeValues.isEmpty()) {
                 final TextValue value = (TextValue)typeValues.get(0);
-                final int code        = Integer.parseInt(value.getValue());
-                final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList)value.getType();
-                final CodeListElement element = codelist.getElementByCode(code);
-                if (element != null) {
-                    dataType = element.getName();
-                } else {
-                    LOGGER.warning("No codeListElement found for code:" + code + " in codelist:" + codelist.getName());
+                final String stringValue = value.getValue();
+                if (stringValue != null && !stringValue.isEmpty()) {
+                    final int code        = Integer.parseInt(stringValue);
+                    final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList)value.getType();
+                    final CodeListElement element = codelist.getElementByCode(code);
+                    if (element != null) {
+                        dataType = element.getName();
+                    } else {
+                        LOGGER.warning("No codeListElement found for code:" + code + " in codelist:" + codelist.getName());
+                    }
                 }
             }
             litType = new SimpleLiteral(null, dataType);
@@ -651,6 +654,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         } else {
             throw new MD_IOException("unexpected main standard:" + mainStandard);
         }
+        String currentParsed = null;
         try {
 
             //we get the east value
@@ -658,7 +662,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             for (Value v: eastValues) {
                 final Value parentValue = v.getParent();
                 if (v instanceof TextValue && parentValue.getIdValue().equals(idValue)) {
-                    eastValue = Double.parseDouble(((TextValue)v).getValue());
+                    currentParsed = ((TextValue)v).getValue();
+                    eastValue = Double.parseDouble(currentParsed);
                 }
             }
 
@@ -667,7 +672,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             for (Value v: westValues) {
                 final Value parentValue = v.getParent();
                 if (v instanceof TextValue && parentValue.getIdValue().equals(idValue)) {
-                    westValue = Double.parseDouble(((TextValue)v).getValue());
+                    currentParsed = ((TextValue)v).getValue();
+                    westValue = Double.parseDouble(currentParsed);
                 }
             }
 
@@ -676,7 +682,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             for (Value v: northValues) {
                 final Value parentValue = v.getParent();
                 if (v instanceof TextValue && parentValue.getIdValue().equals(idValue)) {
-                    northValue = Double.parseDouble(((TextValue)v).getValue());
+                    currentParsed = ((TextValue)v).getValue();
+                    northValue = Double.parseDouble(currentParsed);
                 }
             }
 
@@ -685,11 +692,14 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             for (Value v: southValues) {
                 final Value parentValue = v.getParent();
                 if (v instanceof TextValue && parentValue.getIdValue().equals(idValue)) {
-                    southValue = Double.parseDouble(((TextValue)v).getValue());
+                    currentParsed = ((TextValue)v).getValue();
+                    southValue = Double.parseDouble(currentParsed);
                 }
             }
         } catch (NumberFormatException ex) {
-            LOGGER.log(Level.WARNING, "unable to parse a double in bounding box value:\n{0}", ex.getMessage()) ;
+            if (currentParsed != null && !currentParsed.isEmpty()) {
+                LOGGER.log(Level.WARNING, "unable to parse a double in bounding box value:\n{0}", ex.getMessage()) ;
+            }
         }
 
         if (eastValue != null && westValue != null && northValue != null && southValue != null) {
