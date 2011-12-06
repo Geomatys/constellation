@@ -90,14 +90,18 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     
     private final boolean indexExternalRecordset;
 
+    public MDWebIndexer(final Automatic configuration, final String serviceID) throws IndexingException {
+        this(configuration, serviceID, INSPIRE_QUERYABLE);
+    }
+    
     /**
      * Creates a new CSW indexer for a MDWeb database.
      *
      * @param configuration A configuration object containing the database informations. Must not be null.
      * @param serviceID The identifier, if there is one, of the index/service.
      */
-    public MDWebIndexer(Automatic configuration, String serviceID) throws IndexingException {
-        super(serviceID, configuration.getConfigurationDirectory(), INSPIRE_QUERYABLE);
+    public MDWebIndexer(final Automatic configuration, final String serviceID, final Map<String, List<String>> additionalQueryable) throws IndexingException {
+        super(serviceID, configuration.getConfigurationDirectory(), additionalQueryable);
 
         this.indexOnlyPusblishedMetadata = configuration.getIndexOnlyPublishedMetadata();
         this.indexInternalRecordset      = configuration.getIndexInternalRecordset();
