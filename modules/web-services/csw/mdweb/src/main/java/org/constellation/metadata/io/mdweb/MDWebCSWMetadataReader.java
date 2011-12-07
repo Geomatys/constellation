@@ -94,6 +94,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         isoMap.put("publisher",   "ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName");
         isoMap.put("language",    "ISO 19115:MD_Metadata:language");
         isoMap.put("rights",      "ISO 19115:MD_Metadata:identificationInfo:resourceConstraint:useLimitation");
+        isoMap.put("description", "ISO 19115:MD_Metadata:identificationInfo:graphicOverview:fileName");
         DUBLINCORE_PATH_MAP.put(Standard.ISO_19115, isoMap);
         
         final Map<String, String> iso2Map = new HashMap<String, String>();
@@ -110,6 +111,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         iso2Map.put("publisher",   "ISO 19115-2:MI_Metadata:distributionInfo:distributor:distributorContact:organisationName");
         iso2Map.put("language",    "ISO 19115-2:MI_Metadata:language");
         iso2Map.put("rights",      "ISO 19115-2:MI_Metadata:identificationInfo:resourceConstraint:useLimitation");
+        iso2Map.put("description", "ISO 19115-2:MI_Metadata:identificationInfo:graphicOverview:fileName");
         DUBLINCORE_PATH_MAP.put(Standard.ISO_19115_2, iso2Map);
 
         final Map<String, String> ebrimMap = new HashMap<String, String>();
@@ -518,15 +520,30 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         // the last update date
         final SimpleLiteral modified = new SimpleLiteral(null, dates);
 
-        // the descriptions
-        final List<Value>   descriptionValues = form.getValueFromPath(pathMap.get("abstract"));
+        // the abstracts
+        final List<Value>   abstractValues = form.getValueFromPath(pathMap.get("abstract"));
+        final List<String>  abstracts      = new ArrayList<String>();
+        for (Value v: abstractValues) {
+            if (v instanceof TextValue) {
+                abstracts.add(((TextValue)v).getValue());
+            }
+        }
+        final SimpleLiteral _abstract = new SimpleLiteral(null, abstracts);
+        
+        // the description
+        final List<Value>   descriptionValues = form.getValueFromPath(pathMap.get("description"));
         final List<String>  descriptions      = new ArrayList<String>();
         for (Value v: descriptionValues) {
             if (v instanceof TextValue) {
                 descriptions.add(((TextValue)v).getValue());
             }
         }
-        final SimpleLiteral description = new SimpleLiteral(null, descriptions);
+        final SimpleLiteral description;
+        if (!descriptions.isEmpty()) {
+            description = new SimpleLiteral(null, descriptions);
+        } else {
+            description = null;
+        }
 
         // TODO add spatial
 
@@ -541,7 +558,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
         }
         final SimpleLiteral creator;
-        if (creators.size() > 0) {
+        if (!creators.isEmpty()) {
             creator = new SimpleLiteral(null, creators);
         } else {
             creator = null;
@@ -586,10 +603,13 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
         final SimpleLiteral language = new SimpleLiteral(null, languages);
 
-        final RecordType fullResult = new RecordType(identifier, title, litType , keywords, format, modified, date, description, bboxes,
+        final RecordType fullResult = new RecordType(identifier, title, litType , keywords, format, modified, date, _abstract, bboxes,
                         creator, publisher, language, null, null);
         if (right != null) {
             fullResult.setRights(right);
+        }
+        if (description != null) {
+            fullResult.setDescription(description);
         }
 
 
@@ -600,7 +620,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
 
             if (type.equals(ElementSetType.SUMMARY)) {
-                return new SummaryRecordType(identifier, title, litType , bboxes, keywords, format, modified, description);
+                return new SummaryRecordType(identifier, title, litType , bboxes, keywords, format, modified, _abstract);
 
             } else {
 
