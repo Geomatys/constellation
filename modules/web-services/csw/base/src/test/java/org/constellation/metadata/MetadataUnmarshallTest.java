@@ -75,6 +75,7 @@ import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.metadata.iso.extent.DefaultTemporalExtent;
 import org.geotoolkit.metadata.iso.extent.DefaultVerticalExtent;
 import org.geotoolkit.metadata.iso.identification.DefaultAggregateInformation;
+import org.geotoolkit.metadata.iso.identification.DefaultBrowseGraphic;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.metadata.iso.identification.DefaultKeywords;
 import org.geotoolkit.metadata.iso.spatial.DefaultGeometricObjects;
@@ -377,6 +378,12 @@ public class MetadataUnmarshallTest {
         set.add(custodian);
         dataIdentification.setPointOfContacts(set);
 
+        /*
+         * Browse graphic
+         */
+        DefaultBrowseGraphic go = new DefaultBrowseGraphic(URI.create("http://fr.wikipedia.org/wiki/Fichier:Death_skull.svg"));
+        go.setFileDescription(new SimpleInternationalString("thumbnail"));
+        dataIdentification.setGraphicOverviews(Arrays.asList(go));
         /*
          * keywords
          */
@@ -1210,6 +1217,13 @@ public class MetadataUnmarshallTest {
         set.add(custodian);
         dataIdentification.setPointOfContacts(set);
 
+        /*
+         * Browse graphic
+         */
+        DefaultBrowseGraphic go = new DefaultBrowseGraphic(URI.create("http://fr.wikipedia.org/wiki/Fichier:Death_skull.svg"));
+        go.setFileDescription(new SimpleInternationalString("thumbnail"));
+        dataIdentification.setGraphicOverviews(Arrays.asList(go));
+        
         /*
          * keywords
          */

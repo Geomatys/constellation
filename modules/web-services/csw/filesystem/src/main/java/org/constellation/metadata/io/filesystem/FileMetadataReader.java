@@ -77,6 +77,7 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.opengis.metadata.identification.BrowseGraphic;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -431,7 +432,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             if (elementName != null && elementName.contains(_Date_QNAME)) {
                 customRecord.setDate(date);
             }
-
+            
 
             List<SimpleLiteral> creator = new ArrayList<SimpleLiteral>();
             for (Identification identification: metadata.getIdentificationInfo()) {
@@ -439,13 +440,25 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                     if (Role.ORIGINATOR.equals(rp.getRole())) {
                         creator.add(new SimpleLiteral(rp.getOrganisationName().toString()));
                     }
-
                 }
             }
             if (creator.isEmpty()) creator = null;
             
             if (elementName != null && elementName.contains(_Creator_QNAME)) {
                 customRecord.setCreator(creator);
+            }
+            
+            List<String> descriptions = new ArrayList<String>();
+            for (Identification identification: metadata.getIdentificationInfo()) {
+                for (BrowseGraphic go :identification.getGraphicOverviews()) {
+                    if (go.getFileName() != null) {
+                        descriptions.add(go.getFileName().toString());
+                    }
+                }
+            }
+            
+            if (!descriptions.isEmpty() && elementName != null && elementName.contains(_Description_QNAME)) {
+                customRecord.setDescription(new SimpleLiteral(null, descriptions));
             }
 
 
@@ -479,8 +492,13 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             // TODO
             final SimpleLiteral spatial = null;
             final SimpleLiteral references = null;
-            if (type != null && type.equals(ElementSetType.FULL))
-                return new RecordType(identifier, title, dataType, subjects, formats, modified, date, abstractt, bboxes, creator, distributor, language, spatial, references);
+            if (type != null && type.equals(ElementSetType.FULL)) {
+                final RecordType r = new RecordType(identifier, title, dataType, subjects, formats, modified, date, abstractt, bboxes, creator, distributor, language, spatial, references);
+                 if (!descriptions.isEmpty()) {
+                    r.setDescription(new SimpleLiteral(null, descriptions));
+                 }
+                return r;
+            }
 
             return customRecord;
         }
