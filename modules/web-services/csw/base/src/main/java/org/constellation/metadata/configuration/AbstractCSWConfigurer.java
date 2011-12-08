@@ -234,7 +234,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
                 return currentFactory;
             }
         }
-        throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
+        throw new FactoryNotFoundException("No CSW factory has been found for type:" + type);
     }
     
     /**

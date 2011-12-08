@@ -531,18 +531,12 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final SimpleLiteral _abstract = new SimpleLiteral(null, abstracts);
         
         // the description
-        final List<Value>   descriptionValues = form.getValueFromPath(pathMap.get("description"));
-        final List<String>  descriptions      = new ArrayList<String>();
+        final List<Value>   descriptionValues   = form.getValueFromPath(pathMap.get("description"));
+        final List<SimpleLiteral>  descriptions = new ArrayList<SimpleLiteral>();
         for (Value v: descriptionValues) {
             if (v instanceof TextValue) {
-                descriptions.add(((TextValue)v).getValue());
+                descriptions.add(new SimpleLiteral(((TextValue)v).getValue()));
             }
-        }
-        final SimpleLiteral description;
-        if (!descriptions.isEmpty()) {
-            description = new SimpleLiteral(null, descriptions);
-        } else {
-            description = null;
         }
 
         // TODO add spatial
@@ -608,8 +602,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         if (right != null) {
             fullResult.setRights(right);
         }
-        if (description != null) {
-            fullResult.setDescription(description);
+        if (!descriptions.isEmpty()) {
+            fullResult.setDescription(descriptions);
         }
 
 

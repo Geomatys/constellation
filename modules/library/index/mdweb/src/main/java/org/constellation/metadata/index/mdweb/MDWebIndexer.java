@@ -410,17 +410,18 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     private Object getTextValueDescription(final TextValue tv) throws NumberFormatException {
         final Object value;
-
-        if (tv.getType() instanceof CodeList) {
+        final Classe valueType   = tv.getType();
+        final String stringValue = tv.getValue();
+        if (valueType instanceof CodeList) {
             value = getCodeListValue(tv);
-        } else if (tv.getType().getName().equals("Date")) {
-            value = toLuceneDateSyntax(tv.getValue());
-        } else if (tv.getType().getName().equals("Integer")) {
-            value = Integer.parseInt(tv.getValue());
-        } else if (tv.getType().getName().equals("Real") || tv.getType().getName().equals("Decimal")) {
-            value = Double.parseDouble(tv.getValue());
+        } else if (valueType.getName().equals("Date") && !stringValue.isEmpty()) {
+            value = toLuceneDateSyntax(stringValue);
+        } else if (valueType.getName().equals("Integer")  && !stringValue.isEmpty()) {
+            value = Integer.parseInt(stringValue);
+        } else if ((valueType.getName().equals("Real") || valueType.getName().equals("Decimal")) && !stringValue.isEmpty()) {
+            value = Double.parseDouble(stringValue);
         } else {
-            value = tv.getValue();
+            value = stringValue;
         }
         return value;
     }
