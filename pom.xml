@@ -166,6 +166,7 @@
         <geotoolkit-pending.version>3.x-SNAPSHOT</geotoolkit-pending.version>
         <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
         <mapfaces.version>0.8-SNAPSHOT</mapfaces.version>
+        <jersey.version>1.11</jersey.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
@@ -243,27 +244,27 @@
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-core</artifactId>
-                <version>1.10</version>
+                <version>${jersey.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-server</artifactId>
-                <version>1.10</version>
+                <version>${jersey.version}</version>
             </dependency>
 	    <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-servlet</artifactId>
-                <version>1.10</version>
+                <version>${jersey.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-grizzly2</artifactId>
-                <version>1.10</version>
+                <version>${jersey.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-grizzly2-servlet</artifactId>
-                <version>1.10</version>
+                <version>${jersey.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.ws</groupId>

@@ -371,6 +371,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     public Form getFormFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
 
+        if (user == null) {
+            throw new MD_IOException("The User must not be null");
+        }
         if (object != null) {
             //we try to find a title for the from
             if ("unknow title".equals(title)) {
