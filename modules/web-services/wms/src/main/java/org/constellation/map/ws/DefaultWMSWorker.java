@@ -765,6 +765,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final Map<String, Object> params       = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_TIME, time);
+        params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getFI.getParameters());
         final SceneDef sdef = new SceneDef();
 
         try {
