@@ -32,7 +32,7 @@ public interface MenuItem {
      * @param server : Server to test
      * @return true if this menu item is available for the given server.
      */
-    public boolean isAvailable(ConstellationServer server);
+    public boolean isAvailable(final ConstellationServer server);
     
     /**
      * The identifier of the MenuItem

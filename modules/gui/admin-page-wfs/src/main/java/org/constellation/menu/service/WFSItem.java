@@ -17,6 +17,7 @@
 
 package org.constellation.menu.service;
 
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.AbstractMenuItem;
 
 
@@ -35,5 +36,9 @@ public class WFSItem extends AbstractMenuItem{
             new Path(SERVICES_PATH,"WFS", "/service/wfs.xhtml", null,300)
             );
     }
-
+    
+    @Override
+    public boolean isAvailable(final ConstellationServer server) {
+        return serviceAvailable(server, "WFS");
+    }
 }

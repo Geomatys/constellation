@@ -17,6 +17,7 @@
 
 package org.constellation.menu.service;
 
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.AbstractMenuItem;
 
 
@@ -35,4 +36,8 @@ public class WMTSItem extends AbstractMenuItem{
             new Path(SERVICES_PATH,"WMTS", "/service/wmts.xhtml", null,100));
     }
 
+    @Override
+    public boolean isAvailable(final ConstellationServer server) {
+        return serviceAvailable(server, "WMTS");
+    }
 }

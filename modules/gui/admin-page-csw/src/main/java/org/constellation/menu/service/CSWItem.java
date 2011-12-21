@@ -17,6 +17,7 @@
 
 package org.constellation.menu.service;
 
+import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.AbstractMenuItem;
 
 
@@ -34,6 +35,11 @@ public class CSWItem extends AbstractMenuItem {
             "service.csw",
             new Path(SERVICES_PATH,"CSW", "/service/csw.xhtml",null,600)
             );
+    }
+    
+    @Override
+    public boolean isAvailable(final ConstellationServer server) {
+        return serviceAvailable(server, "CSW");
     }
 
 }

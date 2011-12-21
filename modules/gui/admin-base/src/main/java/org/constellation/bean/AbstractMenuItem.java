@@ -18,9 +18,12 @@
 package org.constellation.bean;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.constellation.admin.service.ConstellationServer;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -28,6 +31,8 @@ import org.geotoolkit.util.collection.UnmodifiableArrayList;
  */
 public abstract class AbstractMenuItem implements MenuItem {
 
+    protected static final Logger LOGGER = Logging.getLogger(AbstractMenuItem.class);
+    
     public static final Path SERVICES_PATH       = new Path(null, "services", "/base/services.xhtml", "org.constellation.icons.socket.png.mfRes",400);
     public static final Path PROVIDERS_PATH      = new Path(null, "providers", "/base/providers.xhtml", "org.constellation.icons.nfs_unmount.png.mfRes",300);
     //public static final Path STYLE_PATH          = new Path(null, "styles", null, "org.constellation.icons.colors.png.mfRes",250);
@@ -47,8 +52,20 @@ public abstract class AbstractMenuItem implements MenuItem {
     }
 
     @Override
-    public boolean isAvailable(ConstellationServer server) {
+    public boolean isAvailable(final ConstellationServer server) {
         return true;
+    }
+    
+    protected boolean serviceAvailable(final ConstellationServer server, final String serviceName) {
+        if (server != null) {
+            final List<String> availableService = server.services.getAvailableService();
+            if (availableService.contains(serviceName)) {
+                return true;
+            } else {
+                LOGGER.log(Level.INFO, "remote server does not embbed a {0} server", serviceName);
+            }
+        }
+        return false;
     }
     
     @Override
