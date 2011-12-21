@@ -453,6 +453,7 @@ public abstract class GenericReader  {
      */
     private void fillValues(final LockedPreparedStatement stmt, final List<String> varNames, final Values values) throws SQLException {
 
+        LOGGER.log(Level.FINER, "ExecuteQuery:{0}", stmt.getSql());
         final ResultSet result = stmt.executeQuery();
         while (result.next()) {
             for (String varName : varNames) {

@@ -16,14 +16,7 @@
  */
 package org.constellation.admin.service;
 
-import org.constellation.admin.service.ConstellationServer.Tasks;
-import org.constellation.admin.service.ConstellationServer.Services;
-import org.constellation.admin.service.ConstellationServer.Providers;
-import org.constellation.admin.service.ConstellationServer.Csws;
-import org.opengis.parameter.ParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.constellation.configuration.StringTreeNode;
+import java.util.List;
 import java.io.OutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
@@ -42,30 +36,38 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 
+import org.constellation.admin.service.ConstellationServer.Tasks;
+import org.constellation.admin.service.ConstellationServer.Services;
+import org.constellation.admin.service.ConstellationServer.Providers;
+import org.constellation.admin.service.ConstellationServer.Csws;
+import org.constellation.configuration.StringTreeNode;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ProvidersReport;
+import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
-import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
+import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
-
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.style.MutableStyle;
 
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -318,6 +320,25 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      * Configuration methods for services
      */
     public final class Services{
+        
+        public List<String> getAvailableService() {
+            try {
+                final String url = getURL() + "configuration?request=" + REQUEST_LIST_SERVICE;
+                final Object response = sendRequest(url, null);
+                if (response instanceof ServiceReport) {
+                    return ((ServiceReport)response).getAvailableServices();
+                } else if (response instanceof ExceptionReport){
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                    return new ArrayList<String>();
+                } else {
+                    LOGGER.warning("The service respond uncorrectly");
+                    return new ArrayList<String>();
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return new ArrayList<String>();
+        }
         
         /**
          * Restart all the web-service (wms, wfs, csw,...)
