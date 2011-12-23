@@ -104,6 +104,8 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     
     private final String CURRENT_EXT;
     
+    private final boolean usePathAsIdentifier;
+    
     /**
      * Build a new CSW NetCDF File Reader.
      *
@@ -127,6 +129,12 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             CURRENT_EXT = extension;
         } else {
             CURRENT_EXT = NETCDF_EXT;
+        }
+        final String usePathAsIdentifierValue = configuration.getCustomparameters().get("usePathAsIdentifier");
+        if (usePathAsIdentifierValue != null) {
+            usePathAsIdentifier = Boolean.valueOf(usePathAsIdentifierValue);
+        } else {
+            usePathAsIdentifier = false;
         }
     }
     
@@ -154,7 +162,12 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory, CURRENT_EXT);
+        final File metadataFile;
+        if (usePathAsIdentifier) {
+            metadataFile = getFileFromPathIdentifier(identifier, dataDirectory, CURRENT_EXT);
+        } else {
+            metadataFile = getFileFromIdentifier(identifier, dataDirectory, CURRENT_EXT);
+        }
         return metadataFile != null && metadataFile.exists();
     }
 
@@ -193,6 +206,50 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         }
         return null;
     }
+    
+    /**
+     * Try to find a file named identifier.nc or identifier recursively
+     * in the specified directory and its sub-directories.
+     *
+     * @param identifier The metadata identifier.
+     * @param directory The current directory to explore.
+     * @return
+     */
+    public static File getFileFromPathIdentifier(final String identifier, final File directory, final String ext) {
+        
+        // if where are in the final directory
+        if (identifier.indexOf(':') == -1) {
+            // 1) try to find the file in the current directory
+            File metadataFile = new File (directory,  identifier + ext);
+            // 2) trying without the extension
+            if (!metadataFile.exists()) {
+                metadataFile = new File (directory,  identifier);
+            }
+            // 3) trying by replacing ':' by '-' (for windows platform who don't accept ':' in file name)
+            if (!metadataFile.exists()) {
+                final String windowsIdentifier = identifier.replace(':', '-');
+                metadataFile = new File (directory,  windowsIdentifier + ext);
+            }
+
+            if (metadataFile.exists()) {
+                return metadataFile;
+            } else {
+                LOGGER.warning("unable to find the metadata:" + identifier + " in the directory:" + directory.getPath());
+                return null;
+            }
+        } else {
+            final int separator = identifier.indexOf(':');
+            final String directoryName = identifier.substring(0, separator);
+            final File child = new File(directory, directoryName);
+            if (child.isDirectory()) {
+                final String childIdentifier = identifier.substring(separator + 1);
+                return getFileFromPathIdentifier(childIdentifier, child, ext);
+            } else {
+                LOGGER.warning(child.getPath() + " is not a  directory.");
+                return null;
+            }
+        }
+    }
 
     /**
      * Unmarshall The file designed by the path dataDirectory/identifier.nc
@@ -203,7 +260,12 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * @throws org.constellation.ws.MetadataIoException
      */
     private Object getObjectFromFile(final String identifier) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory, CURRENT_EXT);
+        final File metadataFile;
+        if (usePathAsIdentifier) {
+            metadataFile = getFileFromPathIdentifier(identifier, dataDirectory, CURRENT_EXT);
+        } else {
+            metadataFile = getFileFromIdentifier(identifier, dataDirectory, CURRENT_EXT);
+        }
         if (metadataFile != null && metadataFile.exists()) {
             final ImageCoverageReader reader = new ImageCoverageReader();
             try {
@@ -497,7 +559,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
 
             if (!paths.isEmpty()) {
 
-                final List<String> values         = getAllValuesFromPaths(paths, dataDirectory);
+                final List<String> values         = getAllValuesFromPaths(paths, dataDirectory, null);
                 final ListOfValuesType listValues = new ListOfValuesType(values);
                 final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);
                 responseList.add(value);
@@ -518,34 +580,39 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * @return
      * @throws MetadataIoException
      */
-    private List<String> getAllValuesFromPaths(final List<String> paths, final File directory) throws MetadataIoException {
-        final List<String> result = new ArrayList<String>();
+    private List<String> getAllValuesFromPaths(final List<String> paths, final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
+        final String identifierPrefix    = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
+        final List<String> result        = new ArrayList<String>();
         final ImageCoverageReader reader = new ImageCoverageReader();
         try {
             for (File metadataFile : directory.listFiles()) {
-                if (!metadataFile.isDirectory()) {
+                
+                final String fileName = metadataFile.getName();
+                if (fileName.endsWith(CURRENT_EXT)) {
                     try {
-                        final String fileName = metadataFile.getName();
-                        final String identifier = fileName.substring(0, fileName.lastIndexOf('.'));
+                        final String identifier = computeIdentifier(fileName, identifierPrefix);
                         reader.setInput(metadataFile);
                         final Object metadata = reader.getMetadata();
                         Utils.setIdentifier(identifier, metadata);
-                        
+
                         final List<Object> value = GenericIndexer.extractValues(metadata, paths);
                         if (value != null && !value.equals(Arrays.asList("null"))) {
-                            for (Object obj : value){
+                            for (Object obj : value) {
                                 result.add(obj.toString());
                             }
                         }
-                        
-                     //continue to the next file   
+                        //continue to the next file   
                     } catch (CoverageStoreException ex) {
                         LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage());
                     } catch (IllegalArgumentException ex) {
                         LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage());
                     }
+
+                } else if (metadataFile.isDirectory()) {
+                    result.addAll(getAllValuesFromPaths(paths, metadataFile, identifierPrefix));
                 } else {
-                    result.addAll(getAllValuesFromPaths(paths, metadataFile));
+                    //do not throw exception just skipping
+                    //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
                 }
             }
             reader.dispose();
@@ -579,20 +646,20 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public List<? extends Object> getAllEntries() throws MetadataIoException {
-        return getAllEntries(dataDirectory);
+        return getAllEntries(dataDirectory, null);
     }
     
     /**
      *
      */
-    public List<? extends Object> getAllEntries(final File directory) throws MetadataIoException {
+    private List<? extends Object> getAllEntries(final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
+        final String identifierPrefix = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
         final List<Object> results = new ArrayList<Object>();
         final ImageCoverageReader reader = new ImageCoverageReader();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
             if (fileName.endsWith(CURRENT_EXT)) {
-                final String identifier = fileName.substring(0, fileName.lastIndexOf(CURRENT_EXT));
-                
+               final String identifier = computeIdentifier(fileName, identifierPrefix);
                 try {
                     reader.setInput(f);
                     final Object metadata = reader.getMetadata();
@@ -607,10 +674,10 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                             + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
                 }
             } else if (f.isDirectory()) {
-                results.addAll(getAllEntries(f));
+                results.addAll(getAllEntries(f, identifierPrefix));
             } else {
-                // throw or continue to the next file?
-                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
+                //do not throw exception just skipping
+                //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
             }
         }
         try {
@@ -627,21 +694,21 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
-        return getAllIdentifiers(dataDirectory);
+        return getAllIdentifiers(dataDirectory, null);
     }
 
     /**
      * 
      */
-    public List<String> getAllIdentifiers(final File directory) throws MetadataIoException {
+    public List<String> getAllIdentifiers(final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
+        final String identifierPrefix = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
         final List<String> results = new ArrayList<String>();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
             if (fileName.endsWith(CURRENT_EXT)) {
-                final String identifier = fileName.substring(0, fileName.lastIndexOf(CURRENT_EXT));
-                results.add(identifier);
+                results.add(computeIdentifier(fileName, identifierPrefix));
             } else if (f.isDirectory()){
-                results.addAll(getAllIdentifiers(f));
+                results.addAll(getAllIdentifiers(f, identifierPrefix));
             } else {
                 //do not throw exception just skipping
                 //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
@@ -650,6 +717,25 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         return results;
     }
 
+    private String computeIdentifier(final String fileName, final String identifierPrefix) {
+        if (usePathAsIdentifier) {
+            return identifierPrefix + ':' + fileName.substring(0, fileName.lastIndexOf(CURRENT_EXT));
+        } else {
+            return fileName.substring(0, fileName.lastIndexOf(CURRENT_EXT));
+        }
+    }
+    
+    private String conputeIdentifierPrefix(final File directory, final String identifierPrefix) {
+        if (usePathAsIdentifier) {
+            if (identifierPrefix == null) {
+                return "";
+            } else {
+                return identifierPrefix + ':' + directory.getName();
+            }
+        }
+        return null;
+    }
+    
     /**
      * {@inheritDoc}
      */
