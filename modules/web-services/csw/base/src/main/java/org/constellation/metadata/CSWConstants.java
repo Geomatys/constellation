@@ -45,6 +45,7 @@ public abstract class CSWConstants {
     public static final String NAMESPACE = "namespace";
     public static final String XML_EXT = ".xml";
     public static final String NETCDF_EXT = ".nc";
+    public static final String NCML_EXT = ".ncml";
 
     // TODO those 3 namespace must move to geotk Namespace class
     public static final String EBRIM_25 = "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";

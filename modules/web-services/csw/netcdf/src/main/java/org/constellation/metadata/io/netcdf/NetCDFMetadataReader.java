@@ -102,6 +102,8 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     }
     
+    private final String CURRENT_EXT;
+    
     /**
      * Build a new CSW NetCDF File Reader.
      *
@@ -119,6 +121,12 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
         } else if (!dataDirectory.exists()) {
             dataDirectory.mkdir();
+        }
+        final String extension = configuration.getCustomparameters().get("netcdfExtension");
+        if (extension != null) {
+            CURRENT_EXT = extension;
+        } else {
+            CURRENT_EXT = NETCDF_EXT;
         }
     }
     
@@ -146,7 +154,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
+        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory, CURRENT_EXT);
         return metadataFile != null && metadataFile.exists();
     }
 
@@ -158,9 +166,9 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * @param directory The current directory to explore.
      * @return
      */
-    public static File getFileFromIdentifier(final String identifier, final File directory) {
+    public static File getFileFromIdentifier(final String identifier, final File directory, final String ext) {
         // 1) try to find the file in the current directory
-        File metadataFile = new File (directory,  identifier + NETCDF_EXT);
+        File metadataFile = new File (directory,  identifier + ext);
         // 2) trying without the extension
         if (!metadataFile.exists()) {
             metadataFile = new File (directory,  identifier);
@@ -168,7 +176,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         // 3) trying by replacing ':' by '-' (for windows platform who don't accept ':' in file name)
         if (!metadataFile.exists()) {
             final String windowsIdentifier = identifier.replace(':', '-');
-            metadataFile = new File (directory,  windowsIdentifier + NETCDF_EXT);
+            metadataFile = new File (directory,  windowsIdentifier + ext);
         }
 
         if (metadataFile.exists()) {
@@ -176,7 +184,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         } else {
             for (File child : directory.listFiles()) {
                 if (child.isDirectory()) {
-                    final File result = getFileFromIdentifier(identifier, child);
+                    final File result = getFileFromIdentifier(identifier, child, ext);
                     if (result != null && result.exists()) {
                         return result;
                     }
@@ -195,7 +203,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * @throws org.constellation.ws.MetadataIoException
      */
     private Object getObjectFromFile(final String identifier) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
+        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory, CURRENT_EXT);
         if (metadataFile != null && metadataFile.exists()) {
             final ImageCoverageReader reader = new ImageCoverageReader();
             try {
@@ -582,8 +590,8 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         final ImageCoverageReader reader = new ImageCoverageReader();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
-            if (fileName.endsWith(NETCDF_EXT)) {
-                final String identifier = fileName.substring(0, fileName.lastIndexOf(NETCDF_EXT));
+            if (fileName.endsWith(CURRENT_EXT)) {
+                final String identifier = fileName.substring(0, fileName.lastIndexOf(CURRENT_EXT));
                 
                 try {
                     reader.setInput(f);
@@ -602,7 +610,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 results.addAll(getAllEntries(f));
             } else {
                 // throw or continue to the next file?
-                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .nc or is not a directory", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
             }
         }
         try {
@@ -629,13 +637,14 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         final List<String> results = new ArrayList<String>();
         for (File f : directory.listFiles()) {
             final String fileName = f.getName();
-            if (fileName.endsWith(NETCDF_EXT)) {
-                final String identifier = fileName.substring(0, fileName.lastIndexOf(NETCDF_EXT));
+            if (fileName.endsWith(CURRENT_EXT)) {
+                final String identifier = fileName.substring(0, fileName.lastIndexOf(CURRENT_EXT));
                 results.add(identifier);
             } else if (f.isDirectory()){
                 results.addAll(getAllIdentifiers(f));
             } else {
-                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .nc or is not a directory", INVALID_PARAMETER_VALUE);
+                //do not throw exception just skipping
+                //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
             }
         }
         return results;
