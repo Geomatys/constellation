@@ -528,8 +528,12 @@ public abstract class WebService {
         if (printRequestParameter) {
             if (!fullRequestLog) {
                 final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
-                if (!parameters.isEmpty())
-                    LOGGER.info(parameters.toString());
+                if (!parameters.isEmpty()) {
+                    // we don't write POST request with VERSION parameters automatically put
+                    if (parameters.size() != 1 || !parameters.containsKey("VERSION")) {
+                        LOGGER.info(parameters.toString());
+                    }
+                }
             } else {
                 if (getUriContext().getRequestUri() != null) {
                     LOGGER.info(getUriContext().getRequestUri().toString());

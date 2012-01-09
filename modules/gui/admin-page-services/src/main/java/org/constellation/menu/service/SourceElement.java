@@ -19,6 +19,7 @@ package org.constellation.menu.service;
 import javax.xml.namespace.QName;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.Source;
+import org.constellation.util.Util;
 
 /**
  *
@@ -65,7 +66,8 @@ public class SourceElement {
         if (included) {
             //add layer
             final Layer layer = new Layer();
-            layer.setName(new QName(name));
+            
+            layer.setName(Util.parseLayerQName(name));
             parent.getInclude().add(layer);
         } else {
             //remove layer
@@ -102,7 +104,7 @@ public class SourceElement {
         if (excluded) {
             //add layer
             final Layer layer = new Layer();
-            layer.setName(new QName(name));
+            layer.setName(Util.parseLayerQName(name));
             parent.getExclude().add(layer);
         } else {
             //remove layer

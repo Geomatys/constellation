@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
@@ -159,6 +160,23 @@ public final class Util {
             name = new DefaultName(namespace, localPart);
         } else {
             name = new DefaultName(layerName);
+        }
+        return name;
+    }
+    
+    /**
+     * Parse a String to instantiate a named Layer ({namespace}name).
+     * @param layerName
+     * @return
+     */
+    public static QName parseLayerQName(final String layerName) {
+        final QName name;
+        if (layerName != null && layerName.lastIndexOf('}') != -1) {
+            final String namespace = layerName.substring(1, layerName.lastIndexOf('}'));
+            final String localPart = layerName.substring(layerName.lastIndexOf('}') + 1);
+            name = new QName(namespace, localPart);
+        } else {
+            name = new QName(layerName);
         }
         return name;
     }

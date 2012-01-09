@@ -77,7 +77,7 @@ public class TasksReader extends StaxStreamReader{
                     t = readTask();
                 } catch (NoSuchIdentifierException ex) {
                     t = null;
-                    Logger.getLogger(TasksReader.class.getName()).log(Level.WARNING, null, ex);
+                    Logger.getLogger(TasksReader.class.getName()).log(Level.WARNING, ex.getMessage());
                 }
                 if(t != null){
                     tasks.add(t);
