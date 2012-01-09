@@ -259,15 +259,19 @@ public final class CSWQueryable {
          * Temporal Extent
          */ 
         paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition:value");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:position");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:beginPosition");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:position");
         ISO_QUERYABLE.put("TempExtent_begin", paths);
         
         paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:endPosition:value");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:endPosition");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:position");
+        paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:endPosition:value");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:endPosition");
         paths.add("ISO 19115-2:MI_Metadata:identificationInfo:extent:temporalElement:extent:position");
         ISO_QUERYABLE.put("TempExtent_end", paths);
