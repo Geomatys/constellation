@@ -18,10 +18,7 @@
 package org.constellation.sos.ws;
 
 // JDK dependencies
-import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
-import org.constellation.sos.factory.SMLFactory;
-import org.constellation.sos.factory.OMFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,6 +38,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import javax.imageio.spi.ServiceRegistry;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
@@ -49,6 +47,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.sos.factory.SMLFactory;
+import org.constellation.sos.factory.OMFactory;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
@@ -71,7 +71,6 @@ import static org.constellation.sos.ws.Normalizer.*;
 
 
 // GeoAPI dependencies
-import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.observation.Observation;
 import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
@@ -79,6 +78,7 @@ import org.opengis.observation.Measure;
 import org.opengis.observation.sampling.SamplingFeature;
 
 // Geotoolkit dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
@@ -302,7 +302,7 @@ public class SOSworker extends AbstractWorker {
         super(id, configurationDirectory, ServiceDef.Specification.SOS);
         
         isStarted                      = true;
-        SOSConfiguration configuration = null;
+        final SOSConfiguration configuration;
 
         // Database configuration
         Unmarshaller configUM = null;
@@ -670,7 +670,6 @@ public class SOSworker extends AbstractWorker {
         }
         
         //we prepare the different parts response document
-        Capabilities c           = null; 
         ServiceIdentification si = null;
         ServiceProvider       sp = null;
         OperationsMetadata    om = null;
@@ -808,10 +807,8 @@ public class SOSworker extends AbstractWorker {
                 cont = new Contents(ool);
             }
         }
-        c = new Capabilities(si, sp, om, VERSION, null, fc, cont);
-
-        // we normalize the document
-        c = normalizeDocument(c);
+        // we build and normalize the document
+        Capabilities c = normalizeDocument(new Capabilities(si, sp, om, VERSION, null, fc, cont));
 
         LOGGER.log(logLevel, "getCapabilities processed in {0} ms.\n", (System.currentTimeMillis() - start));
         return c;

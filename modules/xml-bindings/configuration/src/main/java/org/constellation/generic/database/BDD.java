@@ -82,6 +82,8 @@ public class BDD {
      * The database schema.
      */
     private String schema;
+    
+    private boolean sharedConnection = false;
 
     /**
      * Constructor used by JAXB
@@ -230,6 +232,20 @@ public class BDD {
     }
     
     /**
+     * @return the sharedConnection
+     */
+    public boolean isSharedConnection() {
+        return sharedConnection;
+    }
+
+    /**
+     * @param sharedConnection the sharedConnection to set
+     */
+    public void setSharedConnection(boolean sharedConnection) {
+        this.sharedConnection = sharedConnection;
+    }
+    
+    /**
      * Return a new connection to the database.
      * 
      * @return
@@ -238,22 +254,26 @@ public class BDD {
      * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
      */
     public Connection getConnection() throws SQLException {
-        Connection conec = CONNECTION_MAP.get(this);
-        if (conec == null || conec.isClosed()) {
-            // by Default  we use the postgres driver.
-            if (className == null) {
-                className = POSTGRES_DRIVER_CLASS;
+        if (sharedConnection) {
+            Connection conec = CONNECTION_MAP.get(this);
+            if (conec == null || conec.isClosed()) {
+                // by Default  we use the postgres driver.
+                if (className == null) {
+                    className = POSTGRES_DRIVER_CLASS;
+                }
+                try {
+                    Class.forName(className);
+                } catch (ClassNotFoundException e) {
+                    // Non-fatal exception, ignore. If there is really a problem, the
+                    // following line is expected to throw the appropriate SQLException.
+                }
+                conec = DriverManager.getConnection(connectURL, user, password);
+                CONNECTION_MAP.put(this, conec);
             }
-            try {
-                Class.forName(className);
-            } catch (ClassNotFoundException e) {
-                // Non-fatal exception, ignore. If there is really a problem, the
-                // following line is expected to throw the appropriate SQLException.
-            }
-            conec = DriverManager.getConnection(connectURL, user, password);
-            CONNECTION_MAP.put(this, conec);
+            return conec;
+        } else {
+            return getFreshConnection();
         }
-        return conec;
     }
 
     public static void clearConnectionPool() {
