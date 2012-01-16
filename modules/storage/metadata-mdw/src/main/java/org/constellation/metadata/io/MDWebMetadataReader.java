@@ -842,7 +842,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 LOGGER.log(Level.SEVERE, "Exception while putting in geotoolkit metadata.", ex);
                 tryAgain = false;
             } catch (UnsupportedOperationException ex) {
-                LOGGER.log("Unsuported operation Exception while putting in geotoolkit metadata. ",  ex);
+                LOGGER.log(Level.SEVERE, "Unsuported operation Exception while putting in geotoolkit metadata. ",  ex);
                 tryAgain = false;
             }
         }
