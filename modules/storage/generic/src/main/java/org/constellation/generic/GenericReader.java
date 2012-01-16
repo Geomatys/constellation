@@ -380,7 +380,7 @@ public abstract class GenericReader  {
                  * So we try to reconnect.
                  */
                 if (ex.getErrorCode() == 17008 || "08006".equals(ex.getSQLState())) {
-                    LOGGER.log(Level.WARNING, "detected a conenction lost:{0}", ex.getMessage());
+                    LOGGER.log(Level.WARNING, "detected a connection lost:{0}", ex.getMessage());
                     reloadConnection();
                 }
                 logError(statements.get(stmt), ex, stmt.getSql());
