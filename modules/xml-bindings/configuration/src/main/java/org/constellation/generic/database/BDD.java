@@ -32,13 +32,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import oracle.jdbc.pool.OracleConnectionPoolDataSource;
 import oracle.jdbc.pool.OracleDataSource;
+import org.apache.commons.dbcp.BasicDataSource;
 
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.jdbc.DBCPDataSource;
 import org.geotoolkit.jdbc.WrappedDataSource;
 import org.geotoolkit.util.Utilities;
 import org.geotoolkit.util.logging.Logging;
 
-import org.postgresql.ds.PGConnectionPoolDataSource;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.postgresql.ds.common.BaseDataSource;
 
@@ -330,9 +331,53 @@ public class BDD {
         }
         if (className.equals(POSTGRES_DRIVER_CLASS)) {
             if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
-                final PGConnectionPoolDataSource pgSource = new PGConnectionPoolDataSource();
-                fillSourceFromURL(pgSource);
-                source = new WrappedDataSource(pgSource);
+                //final PGConnectionPoolDataSource pgSource = new PGConnectionPoolDataSource();
+                final BasicDataSource dataSource = new BasicDataSource();
+
+                // some default data source behaviour
+                dataSource.setPoolPreparedStatements(true);
+
+                // driver
+                dataSource.setDriverClassName(POSTGRES_DRIVER_CLASS);
+
+                // url
+                dataSource.setUrl(connectURL);
+
+                // username
+                dataSource.setUsername(user);
+
+                // password
+                if (password != null) {
+                    dataSource.setPassword(password);
+                }
+
+                /* max wait
+                final Integer maxWait = (Integer) params.parameter(MAXWAIT.getName().toString()).getValue();
+                if (maxWait != null && maxWait != -1) {
+                    dataSource.setMaxWait(maxWait * 1000);
+                }
+
+                // connection pooling options
+                final Integer minConn = (Integer) params.parameter(MINCONN.getName().toString()).getValue();
+                if ( minConn != null ) {
+                    dataSource.setMinIdle(minConn);
+                }
+
+                final Integer maxConn = (Integer) params.parameter(MAXCONN.getName().toString()).getValue();
+                if ( maxConn != null ) {
+                    dataSource.setMaxActive(maxConn);
+                }
+
+                final Boolean validate = (Boolean) params.parameter(VALIDATECONN.getName().toString()).getValue();
+                if(validate != null && validate && getValidationQuery() != null) {
+                    dataSource.setTestOnBorrow(true);
+                    dataSource.setValidationQuery(getValidationQuery());
+                }*/
+
+                // some datastores might need this
+                dataSource.setAccessToUnderlyingConnectionAllowed(true);
+
+                return new DBCPDataSource(dataSource);
             } else {
                 return null;
             }

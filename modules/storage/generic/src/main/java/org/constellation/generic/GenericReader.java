@@ -34,6 +34,7 @@ import java.util.Set;
 // constellation dependecies
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sql.DataSource;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.Queries;
@@ -56,12 +57,12 @@ public abstract class GenericReader  {
     /**
      * A precompiled Statement requesting all The identifiers
      */
-    private PreparedStatement mainStatement;
+    private String mainStatement;
     
     /**
      * A list of precompiled SQL request returning single and multiple values.
      */
-    private final Map<LockedPreparedStatement, List<String>> statements = new HashMap<LockedPreparedStatement, List<String>>();
+    private final Map<String, List<String>> statements = new HashMap<String, List<String>>();
 
     /**
      * A flag indicating if the JDBC driver support several specific operation
@@ -98,7 +99,7 @@ public abstract class GenericReader  {
      /**
      * A connection to the database.
      */
-    private Connection connection;
+    private DataSource datasource;
 
     /**
      * A list of unbounded variable.
@@ -119,7 +120,7 @@ public abstract class GenericReader  {
         try {
             final BDD bdd = configuration.getBdd();
             if (bdd != null) {
-                this.connection = bdd.getConnection();
+                this.datasource = bdd.getPooledDataSource();
                 initStatement();
             } else {
                 throw new MetadataIoException("The database par of the generic configuration file is null");
@@ -166,7 +167,7 @@ public abstract class GenericReader  {
             //initialize the main statement
             if (queries.getMain() != null) {
                 final Query mainQuery = queries.getMain().getQuery();
-                mainStatement         = connection.prepareStatement(mainQuery.buildSQLQuery(staticParameters));
+                mainStatement         = mainQuery.buildSQLQuery(staticParameters);
             }
 
             // initialize the statements
@@ -174,13 +175,7 @@ public abstract class GenericReader  {
             for (Query query : allQueries) {
                 final List<String> varNames        = query.getVarNames();
                 final String textQuery             = query.buildSQLQuery(staticParameters);
-                try {
-                    final LockedPreparedStatement stmt =  new LockedPreparedStatement(connection.prepareStatement(textQuery), textQuery);
-                    statements.put(stmt, varNames);
-                } catch (SQLException ex) {
-                    LOGGER.log(Level.WARNING, "SQL exception while executing:{0}", textQuery);
-                    throw ex;
-                }
+                statements.put(textQuery, varNames);
             }
         } else {
             LOGGER.warning("The configuration file is probably malformed, there is no queries part.");
@@ -201,6 +196,7 @@ public abstract class GenericReader  {
         }
         final QueryList statique = queries.getStatique();
         if (statique != null) {
+            final Connection connection = datasource.getConnection();
             final Statement stmt   = connection.createStatement();
             for (Query query : statique.getQuery()) {
                 processStatiqueQuery(query, stmt);
@@ -211,6 +207,7 @@ public abstract class GenericReader  {
                 }
             }
             stmt.close();
+            connection.close();
         }
     }
     
@@ -250,11 +247,15 @@ public abstract class GenericReader  {
     protected List<String> getMainQueryResult() throws MetadataIoException {
         final List<String> result = new ArrayList<String>();
         try {
-            final ResultSet res = mainStatement.executeQuery();
+            final Connection connection  = datasource.getConnection();
+            final PreparedStatement stmt = connection.prepareStatement(mainStatement);
+            final ResultSet res          = stmt.executeQuery();
             while (res.next()) {
                 result.add(res.getString(1));
             }
             res.close();
+            stmt.close();
+            connection.close();
         } catch (SQLException ex) {
             throw new MetadataIoException("SQL Exception while executing main query: " + ex.getMessage());
         }
@@ -308,12 +309,12 @@ public abstract class GenericReader  {
      */
     protected Values loadData(final List<String> variables, final List<String> parameters) throws MetadataIoException {
 
-        final Set<LockedPreparedStatement> subStmts = new HashSet<LockedPreparedStatement>();
+        final Set<String> subStmts = new HashSet<String>();
         final Values staticValues = new Values();
         for (String var : variables) {
             if (unboundedVariable.contains(var)) continue;
             
-            final LockedPreparedStatement stmt = getStatementFromVar(var);
+            final String stmt = getStatementFromVar(var);
             if (stmt != null) {
                 if (!subStmts.contains(stmt)) {
                     subStmts.add(stmt);
@@ -364,14 +365,18 @@ public abstract class GenericReader  {
      * @param subSingleStmts
      * @param subMultiStmts
      */
-    private Values loading(final List<String> parameters, final Set<LockedPreparedStatement> subStmts) throws MetadataIoException {
+    private Values loading(final List<String> parameters, final Set<String> subStmts) throws MetadataIoException {
         final Values values = new Values();
         
         //we extract the single values
-        for (LockedPreparedStatement stmt : subStmts) {
+        for (String sql : subStmts) {
             try {
+                final Connection connection  = datasource.getConnection();
+                final PreparedStatement stmt = connection.prepareStatement(sql);
                 fillStatement(stmt, parameters);
-                fillValues(stmt, statements.get(stmt), values);
+                fillValues(stmt, sql, statements.get(sql), values);
+                stmt.close();
+                connection.close();
             } catch (SQLException ex) {
                 /*
                  * If we get the error code 17008 (oracle),
@@ -383,9 +388,9 @@ public abstract class GenericReader  {
                     LOGGER.log(Level.WARNING, "detected a connection lost:{0}", ex.getMessage());
                     reloadConnection();
                 }
-                logError(statements.get(stmt), ex, stmt.getSql());
+                logError(statements.get(sql), ex, sql);
             } catch (IllegalArgumentException ex) {
-                logError(statements.get(stmt), ex, stmt.getSql());
+                logError(statements.get(sql), ex, sql);
             }
         }
         return values;
@@ -397,7 +402,7 @@ public abstract class GenericReader  {
      * @param stmt
      * @param parameters
      */
-    private void fillStatement(final LockedPreparedStatement stmt, List<String> parameters) throws SQLException {
+    private void fillStatement(final PreparedStatement stmt, List<String> parameters) throws SQLException {
         if (parameters == null) {
             parameters = new ArrayList<String>();
         }
@@ -451,9 +456,9 @@ public abstract class GenericReader  {
      * @param values
      * @throws SQLException
      */
-    private void fillValues(final LockedPreparedStatement stmt, final List<String> varNames, final Values values) throws SQLException {
+    private void fillValues(final PreparedStatement stmt, final String sql, final List<String> varNames, final Values values) throws SQLException {
 
-        LOGGER.log(Level.FINER, "ExecuteQuery:{0}", stmt.getSql());
+        LOGGER.log(Level.FINER, "ExecuteQuery:{0}", sql);
         final ResultSet result = stmt.executeQuery();
         while (result.next()) {
             for (String varName : varNames) {
@@ -478,8 +483,8 @@ public abstract class GenericReader  {
      * @param varName
      * @return
      */
-    private LockedPreparedStatement getStatementFromVar(final String varName) {
-        for (LockedPreparedStatement stmt : statements.keySet()) {
+    private String getStatementFromVar(final String varName) {
+        for (String stmt : statements.keySet()) {
             final List<String> vars = statements.get(stmt);
             if (vars.contains(varName)) {
                 return stmt;
@@ -541,7 +546,7 @@ public abstract class GenericReader  {
                isReconnecting = true;
                LOGGER.info("refreshing the connection");
                final BDD db    = configuration.getBdd();
-               this.connection = db.getFreshConnection();
+               // TODO still needed ?
                initStatement();
                isReconnecting  = false;
 
@@ -558,20 +563,7 @@ public abstract class GenericReader  {
      */
     public void destroy() {
         LOGGER.info("destroying generic reader");
-        try {
-            if (mainStatement != null) {
-                mainStatement.close();
-                mainStatement = null;
-            }
-
-            for (LockedPreparedStatement stmt : statements.keySet()) {
-                stmt.close();
-            }
-            statements.clear();
-            connection.close();
-
-        } catch (SQLException ex) {
-            LOGGER.severe("SQLException while destroying Generic metadata reader");
-        }
+        statements.clear();
+        // do nothing anymore
     }
 }
