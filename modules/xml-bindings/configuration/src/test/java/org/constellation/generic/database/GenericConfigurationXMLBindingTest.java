@@ -103,6 +103,7 @@ public class GenericConfigurationXMLBindingTest {
         "        <connectURL>http://somehost/blablabla</connectURL>"                   + '\n' +
         "        <user>bobby</user>"                                                   + '\n' +
         "        <password>juanito</password>"                                         + '\n' +
+        "        <sharedConnection>false</sharedConnection>"                           + '\n' +
         "    </bdd>"                                                                   + '\n' +
         "    <customparameters>"                                                       + '\n' +
         "        <entry>"                                                              + '\n' +
@@ -180,6 +181,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
+        "            <sharedConnection>false</sharedConnection>"                   + '\n' +                
         "        </bdd>"                                                           + '\n' +
         "        <customparameters/>"                                              + '\n' +
         "    </ns2:SMLConfiguration>"                                              + '\n' +
@@ -189,6 +191,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
+        "            <sharedConnection>false</sharedConnection>"                   + '\n' +                         
         "        </bdd>"                                                           + '\n' +
         "        <customparameters/>"                                              + '\n' +
         "    </ns2:OMConfiguration>"                                               + '\n' +
@@ -198,6 +201,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
+        "            <sharedConnection>false</sharedConnection>"                   + '\n' +                        
         "        </bdd>"                                                           + '\n' +
         "        <customparameters/>"                                              + '\n' +
         "    </ns2:extensions>"                                                    + '\n' +
@@ -228,6 +232,7 @@ public class GenericConfigurationXMLBindingTest {
         "        <connectURL>http://somehost/blablabla</connectURL>"                   + '\n' +
         "        <user>bobby</user>"                                                   + '\n' +
         "        <password>juanito</password>"                                         + '\n' +
+        "         <sharedConnection>false</sharedConnection>"                          + '\n' +                
         "    </bdd>"                                                                   + '\n' +
         "    <queries>"                                                                + '\n' +
         "        <parameters>"                                                         + '\n' +
