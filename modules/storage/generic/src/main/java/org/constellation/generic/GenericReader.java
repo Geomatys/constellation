@@ -121,6 +121,10 @@ public abstract class GenericReader  {
             final BDD bdd = configuration.getBdd();
             if (bdd != null) {
                 this.datasource = bdd.getPooledDataSource();
+                //try to connect
+                final Connection c = datasource.getConnection();
+                c.close();
+                
                 initStatement();
             } else {
                 throw new MetadataIoException("The database par of the generic configuration file is null");

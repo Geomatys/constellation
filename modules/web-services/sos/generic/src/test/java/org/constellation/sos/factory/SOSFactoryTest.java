@@ -93,7 +93,7 @@ public class SOSFactoryTest {
             ObservationReader or = omFactory.getObservationReader(DataSourceType.GENERIC, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertTrue(ex.getMessage().contains("No suitable driver found for SomeUrl"));
+            assertTrue("was:" + ex.getMessage(), ex.getMessage().contains("No suitable driver found for SomeUrl"));
         }
         assertTrue(exLaunched);
     }
