@@ -1601,7 +1601,9 @@ public class SOSworker extends AbstractWorker {
                 } else {
                     final List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
                     features.add(buildFeatureProperty(singleResult));
-                    return new FeatureCollectionType("feature-collection-1", null, null, features);
+                    final FeatureCollectionType collection = new FeatureCollectionType("feature-collection-1", null, null, features);
+                    collection.computeBounds();
+                    return collection;
                 }
             }
 
@@ -1616,7 +1618,9 @@ public class SOSworker extends AbstractWorker {
                     features.add(buildFeatureProperty(feature));
                 }
             }
-            return new FeatureCollectionType("feature-collection-1", null, null, features);
+            final FeatureCollectionType collection = new FeatureCollectionType("feature-collection-1", null, null, features);
+            collection.computeBounds();
+                    return collection;
         }
 
         if (request.getLocation() != null && request.getLocation().getSpatialOps() != null) {
@@ -1634,7 +1638,9 @@ public class SOSworker extends AbstractWorker {
                     for (SamplingFeature feature : result) {
                         features.add(buildFeatureProperty(feature));
                     }
-                    return new FeatureCollectionType("feature-collection-1", null, null, features);
+                    final FeatureCollectionType collection = new FeatureCollectionType("feature-collection-1", null, null, features);
+                    collection.computeBounds();
+                    return collection;
 
                 // if there is no response we send an error
                 } else {
