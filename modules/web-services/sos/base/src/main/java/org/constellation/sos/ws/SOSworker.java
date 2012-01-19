@@ -1590,6 +1590,8 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
         }
 
+        AbstractFeatureType result = null;
+        
         // we return a single result
         if (request.getFeatureOfInterestId().size() == 1) {
             final SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0));
@@ -1603,7 +1605,7 @@ public class SOSworker extends AbstractWorker {
                     features.add(buildFeatureProperty(singleResult));
                     final FeatureCollectionType collection = new FeatureCollectionType("feature-collection-1", null, null, features);
                     collection.computeBounds();
-                    return collection;
+                    result = collection;
                 }
             }
 
@@ -1620,27 +1622,27 @@ public class SOSworker extends AbstractWorker {
             }
             final FeatureCollectionType collection = new FeatureCollectionType("feature-collection-1", null, null, features);
             collection.computeBounds();
-                    return collection;
+            result = collection;
         }
 
         if (request.getLocation() != null && request.getLocation().getSpatialOps() != null) {
             final SpatialOpsType spatialFilter = request.getLocation().getSpatialOps().getValue();
             if (spatialFilter instanceof BBOXType) {
-                final List<SamplingFeature> result = spatialFiltering((BBOXType) spatialFilter);
+                final List<SamplingFeature> results = spatialFiltering((BBOXType) spatialFilter);
                 
                 // we return a single result
-                if (result.size() == 1) {
-                    return (AbstractFeatureType) result.get(0);
+                if (results.size() == 1) {
+                    result = (AbstractFeatureType) results.get(0);
 
                 // we return a feature collection
-                } else if (result.size() > 1) {
+                } else if (results.size() > 1) {
                     final List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
-                    for (SamplingFeature feature : result) {
+                    for (SamplingFeature feature : results) {
                         features.add(buildFeatureProperty(feature));
                     }
                     final FeatureCollectionType collection = new FeatureCollectionType("feature-collection-1", null, null, features);
                     collection.computeBounds();
-                    return collection;
+                    result = collection;
 
                 // if there is no response we send an error
                 } else {
@@ -1650,9 +1652,9 @@ public class SOSworker extends AbstractWorker {
                 throw new CstlServiceException("Only the filter BBOX is upported for now", OPERATION_NOT_SUPPORTED);
             }
         }
-        // TODO never reach
+
         LOGGER.log(logLevel, "GetFeatureOfInterest processed in {0}ms", (System.currentTimeMillis() - start));
-        return null;
+        return result;
     }
 
     public AbstractTimePrimitiveType getFeatureOfInterestTime(final GetFeatureOfInterestTime request) throws CstlServiceException {
