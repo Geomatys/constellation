@@ -176,6 +176,15 @@
                             </gmd:northBoundLatitude>
                         </gmd:EX_GeographicBoundingBox>
                     </gmd:geographicElement>
+                    <gmd:temporalElement>
+                        <gmd:EX_TemporalExtent>
+                            <gmd:extent>
+                                <gml:TimeInstant gml:id="extent">
+                                    <gml:timePosition>2005-09-22T00:00:00+02:00</gml:timePosition>
+                                </gml:TimeInstant>
+                            </gmd:extent>
+                        </gmd:EX_TemporalExtent>
+                    </gmd:temporalElement>
                     <gmd:verticalElement>
                         <gmd:EX_VerticalExtent>
                             <gmd:minimumValue>
