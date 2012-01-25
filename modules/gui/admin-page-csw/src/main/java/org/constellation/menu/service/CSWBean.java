@@ -37,6 +37,7 @@ import org.mapfaces.model.UploadedFile;
 // portlet upload
 import javax.portlet.ActionRequest;
 import org.apache.commons.fileupload.FileItem;
+import org.mdweb.sql.DatabaseUpdater;
 
 /**
  *
@@ -331,6 +332,54 @@ public class CSWBean extends AbstractServiceBean {
             }
         }
         
+    }
+    
+    public boolean getNeedBuildDatabase() {
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            try {
+                if (config.getBdd() != null) {
+                    final DataSource ds    = config.getBdd().getDataSource();
+                    final DatabaseCreator dbCreator = new DatabaseCreator(ds, true);
+                    return dbCreator.structurePresent();
+                }
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "Error while looking for database structure presence", ex);
+            }
+        }
+        return true;
+    }
+    
+    public void updateDatabase() {
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            try {
+                if (config.getBdd() != null) {
+                    final DataSource ds    = config.getBdd().getDataSource();
+                    final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                    dbUpdater.upgradeDatabase();                
+                }
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "Error while updating the database", ex);
+            }
+        }
+        
+    }
+    
+    public boolean getNeedUpdateDatabase() {
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            try {
+                if (config.getBdd() != null) {
+                    final DataSource ds    = config.getBdd().getDataSource();
+                    final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                    return dbUpdater.isToUpgradeDatabase();              
+                }
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "Error while looking for database upgrade", ex);
+            }
+        }
+        return false;
     }
     
     /**

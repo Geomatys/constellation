@@ -86,7 +86,10 @@
                     </tbody>            
                 </mf:CustomHtml>
                 <mf:CustomHtml tag="div" id="createdb" style="text-align: right;">
-                    <h:commandButton action="#{cswBean.buildDatabase}" value="#{cswBean.i18n['buildDatabase']}" rendered="#{cswBean.configType == 'mdweb'}"/>
+                    <h:commandButton action="#{cswBean.buildDatabase}" value="#{cswBean.i18n['buildDatabase']}" rendered="#{cswBean.configType == 'mdweb' and cswBean.needBuildDatabase}"/>
+                </mf:CustomHtml>
+                 <mf:CustomHtml tag="div" id="updatedb" style="text-align: right;">
+                    <h:commandButton action="#{cswBean.updateDatabase}" value="#{cswBean.i18n['updateDatabase']}" rendered="#{cswBean.configType == 'mdweb' and cswBean.needUpdateDatabase}"/>
                 </mf:CustomHtml>
             </div>
             <table> 
