@@ -242,11 +242,13 @@ public class SOSBean extends AbstractServiceBean{
      * @param omUserPass the omUserPass to set
      */
     public void setOmUserPass(String omUserPass) {
-        if (configurationObject instanceof SOSConfiguration) {
-            final SOSConfiguration config = (SOSConfiguration) configurationObject;
-            config.getOMConfiguration().getBdd().setPassword(omUserPass);
+        if (!omUserPass.isEmpty()) {
+            if (configurationObject instanceof SOSConfiguration) {
+                final SOSConfiguration config = (SOSConfiguration) configurationObject;
+                config.getOMConfiguration().getBdd().setPassword(omUserPass);
+            }
+            this.omUserPass = omUserPass;
         }
-        this.omUserPass = omUserPass;
     }
 
     /**
@@ -373,12 +375,14 @@ public class SOSBean extends AbstractServiceBean{
     /**
      * @param smlUserPass the smlUserPass to set
      */
-    public void setSmlUserPass(String smlUserPass) {
-        if (configurationObject instanceof SOSConfiguration) {
-            final SOSConfiguration config = (SOSConfiguration) configurationObject;
-            config.getSMLConfiguration().getBdd().setPassword(smlUserPass);
+    public void setSmlUserPass(final String smlUserPass) {
+        if (!smlUserPass.isEmpty())
+            if (configurationObject instanceof SOSConfiguration) {
+                final SOSConfiguration config = (SOSConfiguration) configurationObject;
+                config.getSMLConfiguration().getBdd().setPassword(smlUserPass);
+            }
+            this.smlUserPass = smlUserPass;
         }
-        this.smlUserPass = smlUserPass;
     }
 
     /**
@@ -564,7 +568,7 @@ public class SOSBean extends AbstractServiceBean{
                     try {
                         final DataSource ds = smlConfig.getBdd().getDataSource();
                         if (ds != null) {
-                            final DatabaseCreator dbCreator = new DatabaseCreator(ds, false);
+                            final DatabaseCreator dbCreator = new DatabaseCreator(ds, true);
                             dbCreator.createMetadataDatabase();
                         }
                     } catch (SQLException ex) {
