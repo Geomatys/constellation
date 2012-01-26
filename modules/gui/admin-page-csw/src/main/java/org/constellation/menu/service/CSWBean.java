@@ -251,14 +251,16 @@ public class CSWBean extends AbstractServiceBean {
      * @param userPass the userPass to set
      */
     public void setUserPass(String userPass) {
-        if (configurationObject instanceof Automatic) {
-            final Automatic config = (Automatic) configurationObject;
-            if (config.getBdd() == null) {
-                config.setBdd(new BDD());
+        if (!userPass.isEmpty()) {
+            if (configurationObject instanceof Automatic) {
+                final Automatic config = (Automatic) configurationObject;
+                if (config.getBdd() == null) {
+                    config.setBdd(new BDD());
+                }
+                config.getBdd().setPassword(userPass);
             }
-            config.getBdd().setPassword(userPass);
+            this.userPass = userPass;
         }
-        this.userPass = userPass;
     }
     
     /**
@@ -340,14 +342,19 @@ public class CSWBean extends AbstractServiceBean {
             try {
                 if (config.getBdd() != null) {
                     final DataSource ds    = config.getBdd().getDataSource();
-                    final DatabaseCreator dbCreator = new DatabaseCreator(ds, true);
-                    return dbCreator.structurePresent();
+                    if (ds != null) {
+                        final DatabaseCreator dbCreator = new DatabaseCreator(ds, true);
+                        return dbCreator.validConnection() && !dbCreator.structurePresent();
+                    } else {
+                       LOGGER.finer("No datasource available for build");
+                       return false;
+                    } 
                 }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while looking for database structure presence", ex);
             }
         }
-        return true;
+        return false;
     }
     
     public void updateDatabase() {
@@ -357,7 +364,9 @@ public class CSWBean extends AbstractServiceBean {
                 if (config.getBdd() != null) {
                     final DataSource ds    = config.getBdd().getDataSource();
                     final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
-                    dbUpdater.upgradeDatabase();                
+                    if (dbUpdater.isToUpgradeDatabase()) {
+                        dbUpdater.upgradeDatabase();          
+                    }      
                 }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while updating the database", ex);
@@ -372,8 +381,14 @@ public class CSWBean extends AbstractServiceBean {
             try {
                 if (config.getBdd() != null) {
                     final DataSource ds    = config.getBdd().getDataSource();
-                    final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
-                    return dbUpdater.isToUpgradeDatabase();              
+                    if (ds != null) {
+                        final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                        if (dbUpdater.validConnection() && dbUpdater.structurePresent()) {
+                            return dbUpdater.isToUpgradeDatabase();
+                        }
+                    } else {
+                        LOGGER.finer("No datasource available for update");
+                    }
                 }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while looking for database upgrade", ex);

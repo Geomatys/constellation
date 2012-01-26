@@ -62,15 +62,24 @@
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{cswBean.i18n['dbURL']}"/></td>
-                                <td><h:inputText value="#{cswBean.connectURL}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{cswBean.connectURL}" style="width:50%;">
+                                        <a4j:support event="onblur" reRender="createdb, updatedb"/>
+                                    </h:inputText>
+                                </td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{cswBean.i18n['user']}"/></td>
-                                <td><h:inputText value="#{cswBean.userName}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{cswBean.userName}" style="width:50%;">
+                                    <a4j:support event="onblur" reRender="createdb, updatedb"/>
+                                    </h:inputText>
+                                </td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{cswBean.i18n['passwd']}"/></td>
-                                <td><h:inputSecret value="#{cswBean.userPass}" style="width:50%;"/></td>
+                                <td><h:inputSecret value="#{cswBean.userPass}" style="width:50%;">
+                                    <a4j:support event="onblur" reRender="createdb, updatedb"/>
+                                    </h:inputSecret>
+                                </td>
                             </tr>
                             <tr>
                     		<td><h:outputText value="#{cswBean.i18n['indexOnlyPublished']}"/></td>
