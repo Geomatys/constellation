@@ -275,6 +275,8 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 return obj;
             } catch (CoverageStoreException ex) {
                 throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
+            } catch (IllegalArgumentException ex) {
+                throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
             } finally {
                 try {
                     reader.dispose();
