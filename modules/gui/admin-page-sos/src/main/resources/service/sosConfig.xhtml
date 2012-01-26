@@ -34,9 +34,9 @@
             </span>
        </div>
        <br/>
-        <div class="rounded">
+        <div class="rounded" >
             SOS Configuration
-            <div class="rounded">
+             <mf:Div styleClass="rounded" id="divOM">
 		O&amp;M configuration
                 <br/><br/>
                 <h:selectOneMenu value="#{sosBean.omConfigType}">
@@ -64,29 +64,38 @@
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['dbURL']}"/></td>
-                                <td><h:inputText value="#{sosBean.omConnectURL}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{sosBean.omConnectURL}" style="width:50%;">
+                                        <a4j:support event="onblur" reRender="divOM"/>
+                                    </h:inputText>
+                                </td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['user']}"/></td>
-                                <td><h:inputText value="#{sosBean.omUserName}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{sosBean.omUserName}" style="width:50%;">
+                                        <a4j:support event="onblur" reRender="divOM"/>
+                                    </h:inputText>
+                                </td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['passwd']}"/></td>
-                                <td><h:inputSecret value="#{sosBean.omUserPass}" style="width:50%;"/></td>
+                                <td><h:inputSecret value="#{sosBean.omUserPass}" style="width:50%;">
+                                        <a4j:support event="onblur" reRender="divOM"/>
+                                    </h:inputSecret>
+                                </td>
                             </tr>
-                            <tr>
-                                <td><h:outputText value="#{sosBean.i18n['postgisFolder']}"/></td>
-                                <td><h:inputText value="#{sosBean.omPostgisDir}" style="width:50%;"/></td>
-                            </tr>
+                            <mf:CustomHtml tag="tr" id="postgis">
+                                <td><h:outputText value="#{sosBean.i18n['postgisFolder']}" id="postgisFolder" rendered="#{sosBean.needBuildOMDatabase}"/></td>
+                                <td><h:inputText value="#{sosBean.omPostgisDir}" style="width:50%;" id="postgisValue" rendered="#{sosBean.needBuildOMDatabase}"/></td>
+                            </mf:CustomHtml>
                         </mf:case>
                     </mf:switch>   
                     </tbody>          
                 </mf:CustomHtml>
 
                 <mf:CustomHtml tag="div" id="createdbOM" style="text-align: right;">
-                    <h:commandButton action="#{sosBean.buildOMDatabase}" value="#{sosBean.i18n['buildOMDatabase']}" rendered="#{sosBean.omConfigType == 'postgrid'}"/>
+                    <h:commandButton action="#{sosBean.buildOMDatabase}" value="#{sosBean.i18n['buildOMDatabase']}" rendered="#{sosBean.omConfigType == 'postgrid' and sosBean.needBuildOMDatabase}"/>
                 </mf:CustomHtml>
-            </div>
+            </mf:Div>
             <div class="rounded">
                 SensorML configuration
                 <br/><br/>

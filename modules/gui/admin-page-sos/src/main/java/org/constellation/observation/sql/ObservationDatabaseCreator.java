@@ -20,7 +20,9 @@ package org.constellation.observation.sql;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
@@ -52,17 +54,69 @@ public class ObservationDatabaseCreator {
         }
         
         final Connection con  = dataSource.getConnection();
-        
-        final PostgisInstaller pgInstaller = new PostgisInstaller(con);
-        pgInstaller.run("CREATE TRUSTED PROCEDURAL LANGUAGE 'plpgsql' HANDLER plpgsql_call_handler VALIDATOR plpgsql_validator;");
-        pgInstaller.run("CREATE SCHEMA postgis;");
-        pgInstaller.run(postgisInstall);
-        final ScriptRunner sr = new ScriptRunner(con);
-        execute("org/constellation/observation/structure_observations.sql", sr);
-        LOGGER.info("O&M database created");
+        try {
+            final PostgisInstaller pgInstaller = new PostgisInstaller(con);
+            // not needed in pg 9.1
+            try {
+                pgInstaller.run("CREATE TRUSTED PROCEDURAL LANGUAGE 'plpgsql' HANDLER plpgsql_call_handler VALIDATOR plpgsql_validator;");
+            } catch (SQLException ex) {
+                LOGGER.log(Level.FINER, "unable to create plpgsql lanquage", ex);
+            }
+            pgInstaller.run("CREATE SCHEMA postgis;");
+            pgInstaller.run(postgisInstall);
+            final ScriptRunner sr = new ScriptRunner(con);
+            execute("org/constellation/observation/structure_observations.sql", sr);
+            LOGGER.info("O&M database created");
 
-        sr.close(false);
-        con.close();
+            sr.close(false);
+        } finally {
+            con.close();
+        }
+    }
+    
+    public static boolean structurePresent(final DataSource source) {
+        if (source != null) {
+            Connection con = null;
+            try  {
+                con = source.getConnection();
+                final Statement stmt = con.createStatement();
+                ResultSet result = stmt.executeQuery("SELECT * FROM \"version\"");
+                boolean exist = result.next();
+                result.close();
+                if (!exist) {
+                    stmt.close();
+                    return false;
+                }
+                
+                result = stmt.executeQuery("SELECT * FROM \"observation\".\"phenomenons\"");
+                exist = result.next();
+                result.close();
+                stmt.close();
+                return exist;
+            } catch(SQLException ex) {
+                LOGGER.log(Level.FINER, "missing table in OM database", ex);
+            } finally {
+                if (con != null) {
+                    try {
+                        con.close();
+                    } catch (SQLException ex) {
+                        LOGGER.log(Level.WARNING, "unable to close connection", ex);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    public static boolean validConnection(final DataSource source) {
+        try {
+            final Connection con = source.getConnection();
+            con.close();
+            return true;
+        } catch (SQLException ex) {
+            LOGGER.log(Level.FINER, "unable to connect", ex);
+        }
+        return false;
     }
     
     /**

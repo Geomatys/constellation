@@ -376,7 +376,7 @@ public class SOSBean extends AbstractServiceBean{
      * @param smlUserPass the smlUserPass to set
      */
     public void setSmlUserPass(final String smlUserPass) {
-        if (!smlUserPass.isEmpty())
+        if (!smlUserPass.isEmpty()) {
             if (configurationObject instanceof SOSConfiguration) {
                 final SOSConfiguration config = (SOSConfiguration) configurationObject;
                 config.getSMLConfiguration().getBdd().setPassword(smlUserPass);
@@ -584,7 +584,7 @@ public class SOSBean extends AbstractServiceBean{
     public void buildOMDatabase() {
         if (configurationObject instanceof SOSConfiguration) {
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
-            final Automatic omConfig = config.getSMLConfiguration();
+            final Automatic omConfig = config.getOMConfiguration();
             try {
                 if (omConfig != null) {
                     if (omConfig.getBdd() != null) {
@@ -605,6 +605,29 @@ public class SOSBean extends AbstractServiceBean{
         }
     }
     
+    public boolean getNeedBuildOMDatabase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final Automatic omConfig = config.getOMConfiguration();
+            if (omConfig != null) {
+                if (omConfig.getBdd() != null) {
+                    try {
+                        final DataSource ds = omConfig.getBdd().getDataSource();
+                        if (ds != null) {
+                            return ObservationDatabaseCreator.validConnection(ds) && !ObservationDatabaseCreator.structurePresent(ds);
+                        } else {
+                            LOGGER.info("No datasource available for build");
+                            return false;
+                        }
+                    } catch (SQLException ex) {
+                        LOGGER.log(Level.WARNING, "Error while looking for database structure presence", ex);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public boolean getNeedBuildMDWDatabase() {
         if (configurationObject instanceof SOSConfiguration) {
             final SOSConfiguration config = (SOSConfiguration) configurationObject;

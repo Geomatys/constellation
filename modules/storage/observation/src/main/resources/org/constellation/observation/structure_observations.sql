@@ -5,6 +5,12 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET escape_string_warning = off;
 
+CREATE TABLE public."version" (
+    "number"   character varying(10) NOT NULL
+);
+
+INSERT INTO "version" VALUES ('0.8.3');
+
 CREATE SCHEMA "sos";
 CREATE SCHEMA "observation";
 
