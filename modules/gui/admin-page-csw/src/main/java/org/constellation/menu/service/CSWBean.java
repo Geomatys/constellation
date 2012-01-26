@@ -326,8 +326,10 @@ public class CSWBean extends AbstractServiceBean {
             try {
                 if (config.getBdd() != null) {
                     final DataSource ds    = config.getBdd().getDataSource();
-                    final DatabaseCreator dbCreator = new DatabaseCreator(ds, true);
-                    dbCreator.createMetadataDatabase();
+                    if (ds != null) {
+                        final DatabaseCreator dbCreator = new DatabaseCreator(ds, true);
+                        dbCreator.createMetadataDatabase();
+                    }
                 }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while creating the database", ex);
@@ -363,9 +365,11 @@ public class CSWBean extends AbstractServiceBean {
             try {
                 if (config.getBdd() != null) {
                     final DataSource ds    = config.getBdd().getDataSource();
-                    final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
-                    if (dbUpdater.isToUpgradeDatabase()) {
-                        dbUpdater.upgradeDatabase();          
+                    if (ds != null) {
+                        final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                        if (dbUpdater.isToUpgradeDatabase()) {
+                            dbUpdater.upgradeDatabase();          
+                        }
                     }      
                 }
             } catch (SQLException ex) {

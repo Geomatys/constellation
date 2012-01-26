@@ -28,8 +28,10 @@ import javax.sql.DataSource;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
+import org.constellation.generic.database.Automatic;
 import org.constellation.observation.sql.ObservationDatabaseCreator;
 import org.mdweb.sql.DatabaseCreator;
+import org.mdweb.sql.DatabaseUpdater;
 
 /**
  *
@@ -556,12 +558,21 @@ public class SOSBean extends AbstractServiceBean{
     public void buildMDWDatabase() {
         if (configurationObject instanceof SOSConfiguration) {
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
-            try {
-                final DataSource ds = config.getSMLConfiguration().getBdd().getDataSource();
-                final DatabaseCreator dbCreator = new DatabaseCreator(ds, false);
-                dbCreator.createMetadataDatabase();
-            } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, "Error while creating the database", ex);
+            final Automatic smlConfig = config.getSMLConfiguration();
+            if (smlConfig != null) {
+                if (smlConfig.getBdd() != null) {
+                    try {
+                        final DataSource ds = smlConfig.getBdd().getDataSource();
+                        if (ds != null) {
+                            final DatabaseCreator dbCreator = new DatabaseCreator(ds, false);
+                            dbCreator.createMetadataDatabase();
+                        }
+                    } catch (SQLException ex) {
+                        LOGGER.log(Level.WARNING, "Error while creating the mdweb database", ex);
+                    }
+                }
+            } else {
+                LOGGER.warning("no SML configuration in sos config");
             }
         }
     }
@@ -569,15 +580,99 @@ public class SOSBean extends AbstractServiceBean{
     public void buildOMDatabase() {
         if (configurationObject instanceof SOSConfiguration) {
             final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final Automatic omConfig = config.getSMLConfiguration();
             try {
-                final DataSource ds = config.getOMConfiguration().getBdd().getDataSource();
-                final File postgisInstall = new File(omPostgisDir);
-                ObservationDatabaseCreator.createObservationDatabase(ds, postgisInstall);
+                if (omConfig != null) {
+                    if (omConfig.getBdd() != null) {
+                        final DataSource ds = omConfig.getBdd().getDataSource();
+                        if (ds != null) {
+                            final File postgisInstall = new File(omPostgisDir);
+                            ObservationDatabaseCreator.createObservationDatabase(ds, postgisInstall);
+                        }
+                    }
+                } else {
+                    LOGGER.warning("no OM configuration in sos config");
+                }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while creating the database", ex);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, "Error while creating the database", ex);
             }
         }
+    }
+    
+    public boolean getNeedBuildMDWDatabase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final Automatic smlConfig = config.getSMLConfiguration();
+            if (smlConfig != null) {
+                if (smlConfig.getBdd() != null) {
+                    try {
+                        final DataSource ds = smlConfig.getBdd().getDataSource();
+                        if (ds != null) {
+                            final DatabaseCreator dbCreator = new DatabaseCreator(ds, true);
+                            return dbCreator.validConnection() && !dbCreator.structurePresent();
+                        } else {
+                            LOGGER.finer("No datasource available for build");
+                            return false;
+                        }
+                    } catch (SQLException ex) {
+                        LOGGER.log(Level.WARNING, "Error while looking for database structure presence", ex);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    public void updateMDWDatabase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final Automatic smlConfig = config.getSMLConfiguration();
+            if (smlConfig != null) {
+                if (smlConfig.getBdd() != null) {
+                    try {
+                        final DataSource ds = smlConfig.getBdd().getDataSource();
+                        if (ds != null) {
+                            final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                            if (dbUpdater.isToUpgradeDatabase()) {
+                                dbUpdater.upgradeDatabase();
+                            }
+                        }
+                    } catch (SQLException ex) {
+                        LOGGER.log(Level.WARNING, "Error while updating the SML mdweb database", ex);
+                    }
+                }
+            } else {
+                LOGGER.warning("no SML configuration in sos config");
+            }
+        }
+    }
+    
+    public boolean getNeedUpdateMDWDatabase() {
+        if (configurationObject instanceof SOSConfiguration) {
+            final SOSConfiguration config = (SOSConfiguration) configurationObject;
+            final Automatic smlConfig = config.getSMLConfiguration();
+            if (smlConfig != null) {
+                if (smlConfig.getBdd() != null) {
+                    try {
+                        final DataSource ds = smlConfig.getBdd().getDataSource();
+                        if (ds != null) {
+                            final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                            if (dbUpdater.validConnection() && dbUpdater.structurePresent()) {
+                                return dbUpdater.isToUpgradeDatabase();
+                            }
+                        } else {
+                            LOGGER.finer("No datasource available for update");
+                        }
+                    } catch (SQLException ex) {
+                        LOGGER.log(Level.WARNING, "Error while looking for database upgrade", ex);
+                    }
+                }
+            } else {
+                LOGGER.warning("no SML configuration in sos config");
+            }
+        }
+        return false;
     }
 }

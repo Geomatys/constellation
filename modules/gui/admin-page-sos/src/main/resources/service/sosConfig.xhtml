@@ -116,15 +116,24 @@
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['dbURL']}"/></td>
-                            <td><h:inputText value="#{sosBean.smlConnectURL}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{sosBean.smlConnectURL}" style="width:50%;">
+                                        <a4j:support event="onblur" reRender="createdbSML, updatedbSML"/>
+                                    </h:inputText>
+                                </td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['user']}"/></td>
-                            <td><h:inputText value="#{sosBean.smlUserName}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{sosBean.smlUserName}" style="width:50%;">
+                                        <a4j:support event="onblur" reRender="createdbSML, updatedbSML"/>
+                                    </h:inputText>
+                                </td>
                             </tr>
                             <tr>
                                 <td><h:outputText value="#{sosBean.i18n['passwd']}"/></td>
-                            <td><h:inputSecret value="#{sosBean.smlUserPass}" style="width:50%;"/></td>
+                                <td><h:inputSecret value="#{sosBean.smlUserPass}" style="width:50%;">
+                                        <a4j:support event="onblur" reRender="createdbSML, updatedbSML"/>
+                                    </h:inputSecret>
+                                </td>
                             </tr>
                         </mf:case>
                     </mf:switch>   
@@ -133,7 +142,10 @@
                 </mf:CustomHtml>
 
                 <mf:CustomHtml tag="div" id="createdbSML" style="text-align: right;">
-                    <h:commandButton action="#{sosBean.buildMDWDatabase}" value="#{sosBean.i18n['buildMDWDatabase']}" rendered="#{sosBean.smlConfigType == 'mdweb'}"/>
+                    <h:commandButton action="#{sosBean.buildMDWDatabase}" value="#{sosBean.i18n['buildMDWDatabase']}" rendered="#{sosBean.smlConfigType == 'mdweb' and sosBean.needBuildMDWDatabase}"/>
+                </mf:CustomHtml>
+                <mf:CustomHtml tag="div" id="updatedbSML" style="text-align: right;">
+                    <h:commandButton action="#{sosBean.updateMDWDatabase}" value="#{sosBean.i18n['updateMDWDatabase']}" rendered="#{sosBean.smlConfigType == 'mdweb' and sosBean.needUpdateMDWDatabase}"/>
                 </mf:CustomHtml>
             </div>   
             <table style="width:100%;"> 
