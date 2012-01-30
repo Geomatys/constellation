@@ -69,6 +69,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
             store = CoverageStoreFinder.getCoverageStore(factoryconfig);
             names = store.getNames();
         } catch (DataStoreException ex) {
+            names = Collections.EMPTY_SET;
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
         

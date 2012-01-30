@@ -282,3 +282,12 @@ tr.mouseHighLight_alt:hover{
     background: #eeeeee;
 } 
 
+.header2 {
+    padding: 4px;
+    margin: 4px;
+    border-color: #C2CcD6;
+    border-style: solid solid solid solid;
+    border-width: 1px;
+    border-radius : 10px;
+    -moz-border-radius : 10px;
+}

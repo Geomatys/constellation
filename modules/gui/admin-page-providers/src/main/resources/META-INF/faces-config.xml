@@ -48,5 +48,12 @@
         <managed-bean-class>org.constellation.menu.provider.ShapefileBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
+    
+    <!-- coverage-store provider -->
+    <managed-bean>
+        <managed-bean-name>coveragestoreBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.CoverageStoreBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
         
 </faces-config>
