@@ -176,4 +176,11 @@ public interface LayerDetails {
      * Returns the type of provider for a {@linkplain Layer layer}.
      */
     TYPE getType();
+    
+    /**
+     * Origine source of this data can be :
+     * FeatureCollection, CoverageRefence, null.
+     */
+    Object getOrigin();
+    
 }

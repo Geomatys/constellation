@@ -28,13 +28,9 @@ import static org.junit.Assert.*;
  */
 public class WMTSWorkerTest {
 
-    
-
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
-
-
 
     @AfterClass
     public static void tearDownClass() throws Exception {
@@ -48,74 +44,4 @@ public class WMTSWorkerTest {
     public void tearDown() throws Exception {
     }
 
-    @Test
-    public void getLettersFromIntTest() throws Exception {
-
-        String result = DefaultWMTSWorker.getLettersFromInt(0, 25);
-        String expResult = "A";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getLettersFromInt(0, 26);
-        expResult = "AA";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getLettersFromInt(26, 120);
-        expResult = "BA";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getLettersFromInt(51, 120);
-        expResult = "BZ";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getLettersFromInt(52, 120);
-        expResult = "CA";
-
-        result = DefaultWMTSWorker.getLettersFromInt(52, 800);
-        expResult = "ACA";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getLettersFromInt(1000, 1275);
-        expResult = "BMM";
-
-        assertEquals(expResult, result);
-    }
-
-     @Test
-    public void getNumbersFromIntTest() throws Exception {
-
-        String result = DefaultWMTSWorker.getNumbersFromInt(0, 9);
-        String expResult = "1";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getNumbersFromInt(0, 11);
-        expResult = "01";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getNumbersFromInt(12, 120);
-        expResult = "013";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getNumbersFromInt(121, 1300);
-        expResult = "0122";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getNumbersFromInt(121, 11300);
-        expResult = "00122";
-
-        assertEquals(expResult, result);
-
-        result = DefaultWMTSWorker.getNumbersFromInt(121, 121300);
-        expResult = "000122";
-
-        assertEquals(expResult, result);
-     }
 }

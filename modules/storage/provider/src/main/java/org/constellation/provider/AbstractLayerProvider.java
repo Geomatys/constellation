@@ -66,6 +66,28 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
         return LayerDetails.class;
     }
 
+    @Override
+    public boolean contains(Name key) {
+        for(Name n : getKeys()){
+            if(DefaultName.match(n, key)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Fill namespace on name is not present.
+     */
+    protected Name fullyQualified(Name key){
+        for(Name n : getKeys()){
+            if(DefaultName.match(n, key)){
+                return n;
+            }
+        }
+        return key;
+    }
+    
     /**
      * {@inheritDoc }
      */

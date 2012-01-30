@@ -154,6 +154,11 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-coveragestore</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-shapefile</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -208,6 +213,11 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-coveragestore</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-shapefile</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -257,6 +267,11 @@
                 </dependency>
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-coveragestore</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-style-sld</artifactId>
                     <version>${project.version}</version>
                 </dependency>
@@ -287,6 +302,11 @@
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-coveragesql</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-coveragestore</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -326,6 +346,11 @@
                 <dependency>
                     <groupId>org.constellation.storage</groupId>
                     <artifactId>cstl-store-data-coveragefile</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-coveragestore</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>

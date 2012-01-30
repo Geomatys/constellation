@@ -80,6 +80,10 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-svg</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-clients-core</artifactId>
     </dependency>
   </dependencies>

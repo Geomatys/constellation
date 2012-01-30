@@ -71,6 +71,10 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-wmts</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-client-wmts</artifactId>
+    </dependency>
 
     <!-- for debugging, netcdf ifremer readers -->
     <!--<dependency>

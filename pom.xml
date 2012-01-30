@@ -583,6 +583,31 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-coverageio-store</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-osm-tms</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-googlemaps</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-wmsc</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-wmts</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-svg</artifactId>
                 <version>${geotoolkit-pending.version}</version>
             </dependency>

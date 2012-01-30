@@ -104,6 +104,7 @@
 	<module>provider</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
+        <module>provider-data-coveragestore</module>
         <module>provider-data-om</module>
         <module>provider-data-postgis</module>
         <module>provider-data-shapefile</module>
@@ -118,6 +119,7 @@
 	<module>provider</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
+        <module>provider-data-coveragestore</module>
         <module>provider-data-om</module>
         <module>provider-data-postgis</module>
         <module>provider-data-shapefile</module>
@@ -132,6 +134,7 @@
 	<module>provider</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
+        <module>provider-data-coveragestore</module>
         <module>provider-data-om</module>
         <module>provider-data-postgis</module>
         <module>provider-data-shapefile</module>
@@ -146,6 +149,7 @@
 	<module>provider</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
+        <module>provider-data-coveragestore</module>
         <module>provider-data-om</module>
         <module>provider-data-postgis</module>
         <module>provider-data-shapefile</module>

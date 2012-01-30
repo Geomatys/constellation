@@ -82,6 +82,11 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         return name;
     }
 
+    @Override
+    public Object getOrigin(){
+        return null;
+    }
+    
     /**
      * Returns the time range of this layer. The default implementation invoked
      * {@link #getAvailableTimes()} and extract the first and last date from it.
@@ -238,4 +243,6 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         }
         return null;
     }
+    
+    
 }

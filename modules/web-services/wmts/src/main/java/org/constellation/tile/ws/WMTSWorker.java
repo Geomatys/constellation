@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 
 //Constellation dependencies
 import java.io.File;
+import java.io.InputStream;
 
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
@@ -64,6 +65,6 @@ public interface WMTSWorker extends Worker {
      * @param getTile The {@linkplain GetTile get tile} request done on this service.
      * @throws CstlServiceException
      */
-    File getTile(final GetTile getTile) throws CstlServiceException;
+    StreamReference getTile(final GetTile getTile) throws CstlServiceException;
 
 }
