@@ -508,16 +508,18 @@ public class Query {
         }
         StringBuilder mainQuery = new StringBuilder("SELECT ");
         for (Select sel : select) {
-            for (Column col : sel.getCol()) {
-                String varName        = col.getVar();
-                final String varValue = col.getSql();
-                if (varName != null && !"*".equals(varValue)) {
-                    if (":$".equals(varName)) {
-                        varName = "ID";
+            if (sel != null) {
+                for (Column col : sel.getCol()) {
+                    String varName        = col.getVar();
+                    final String varValue = col.getSql();
+                    if (varName != null && !"*".equals(varValue)) {
+                        if (":$".equals(varName)) {
+                            varName = "ID";
+                        }
+                        mainQuery.append(varValue).append(" AS ").append(varName).append(',');
+                    } else {
+                        mainQuery.append(varValue).append(',');
                     }
-                    mainQuery.append(varValue).append(" AS ").append(varName).append(',');
-                } else {
-                    mainQuery.append(varValue).append(',');
                 }
             }
         }
