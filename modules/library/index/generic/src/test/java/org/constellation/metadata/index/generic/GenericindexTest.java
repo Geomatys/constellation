@@ -446,26 +446,6 @@ public class GenericindexTest {
         assertEquals(expectedResult, result);
         
         /**
-         * Test 2 date search: TempExtent_begin before 01/01/1985
-         */
-        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101 \"19850101\"}", nullFilter, SerialChainFilter.AND);
-        result = indexSearcher.doSearch(spatialQuery);
-
-        for (String s: result)
-            resultReport = resultReport + s + '\n';
-
-        logger.log(Level.FINER, "DateSearch 2:\n{0}", resultReport);
-
-        expectedResult = new ArrayList<String>();
-        expectedResult.add("39727_22_19750113062500");
-        expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("CTDF02");
-        
-        assertEquals(expectedResult, result);
-
-        
-
-        /**
          * Test 4 date search: date = 26/01/2009
          */
         spatialQuery = new SpatialQuery("date:\"20090126\"", nullFilter, SerialChainFilter.AND);
@@ -542,6 +522,24 @@ public class GenericindexTest {
         expectedResult.add("CTDF02");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
 
+        assertEquals(expectedResult, result);
+        
+        /**
+         * Test 2 date search: TempExtent_begin before 01/01/1985
+         */
+        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101 \"19850101\"}", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        logger.log(Level.FINER, "DateSearch 2:\n{0}", resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("39727_22_19750113062500");
+        expectedResult.add("11325_158_19640418141800");
+        expectedResult.add("CTDF02");
+        
         assertEquals(expectedResult, result);
     }
     /**
