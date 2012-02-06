@@ -148,7 +148,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 final DataSource source    =    thesaurusDB.getPooledDataSource();
                 final String schema        = thesaurusDB.getSchema();
                 final boolean derby        = !thesaurusDB.isPostgres();
-                final ThesaurusDatabase th = new ThesaurusDatabase(source, schema, null, "", derby);
+                final ThesaurusDatabase th = new ThesaurusDatabase(source, schema, derby);
                 thesaurusList.add(th);
 
             } catch (SQLException ex) {
