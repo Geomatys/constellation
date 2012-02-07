@@ -286,7 +286,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final ProviderService service = services.get(serviceName);
         if (service != null) {
 
-            final ParameterValueReader reader = new ParameterValueReader(service.getServiceDescriptor());
+            ParameterDescriptorGroup desc = service.getServiceDescriptor();
+            desc = (ParameterDescriptorGroup)desc.descriptor("source");
+            final ParameterValueReader reader = new ParameterValueReader(desc);
+        
             try {
                 // we read the soruce parameter to add
                 reader.setInput(objectRequest);

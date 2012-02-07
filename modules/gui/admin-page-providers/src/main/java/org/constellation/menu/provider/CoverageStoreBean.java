@@ -131,8 +131,9 @@ public class CoverageStoreBean extends I18NBean{
         final ExternalContext ext = context.getExternalContext();
         final String id = ext.getRequestParameterMap().get("PROVIDER_ID");
         final ConstellationServer server = getServer();
-        final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) server.providers.getSourceDescriptor(SERVICE_NAME);
-        final ParameterValueGroup param = (ParameterValueGroup) server.providers.getProviderConfiguration(id, desc);
+        final ParameterDescriptorGroup servicedesc = (ParameterDescriptorGroup) server.providers.getServiceDescriptor(SERVICE_NAME);
+        final ParameterDescriptorGroup sourcedesc = (ParameterDescriptorGroup)servicedesc.descriptor("source");
+        final ParameterValueGroup param = (ParameterValueGroup) server.providers.getProviderConfiguration(id, sourcedesc);
         
         current.setToUpdate(param);
         gotoEditPage();
