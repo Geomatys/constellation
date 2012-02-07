@@ -617,11 +617,14 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                     //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
                 }
             }
-            reader.dispose();
-        } catch (CoverageStoreException ex) {
-            throw new MetadataIoException("Error while closing ImageCoverage readerl\ncause: " + ex.getMessage(), ex, NO_APPLICABLE_CODE);
-
-        } 
+            
+        } finally {
+            try {
+                reader.dispose();
+            } catch (CoverageStoreException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+        }
         
         Collections.sort(result);
         return result;
