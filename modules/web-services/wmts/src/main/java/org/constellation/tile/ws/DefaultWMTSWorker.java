@@ -49,7 +49,9 @@ import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.*;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.wmts.WMTSUtilities;
@@ -215,7 +217,9 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     final PyramidSet set = model.getPyramidSet();
                     final String name = n.getLocalPart();
                     
-                    final Envelope env = set.getEnvelope();
+                    Envelope env = set.getEnvelope();
+                    
+                    env = CRS.transform(env, DefaultGeographicCRS.WGS84);
                     
                     final BoundingBoxType bbox = new WGS84BoundingBoxType(
                             env.getMinimum(0),
