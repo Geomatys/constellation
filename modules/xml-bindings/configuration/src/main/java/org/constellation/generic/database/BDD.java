@@ -92,6 +92,15 @@ public class BDD {
     public BDD() {
 
     }
+    
+    public BDD(final BDD that) {
+        this.className        = that.className;
+        this.connectURL       = that.connectURL;
+        this.password         = that.password;
+        this.schema           = that.schema;
+        this.sharedConnection = that.sharedConnection;
+        this.user             = that.user;
+    }
 
     /**
      * Build a new DataSource informations.
