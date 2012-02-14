@@ -135,7 +135,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         final String namespace = value(AbstractDataStoreFactory.NAMESPACE, storeConfig);
         DataStore candidate = null;
         try {
-            candidate = DataStoreFinder.getDataStore(storeConfig);
+            candidate = DataStoreFinder.get(storeConfig);
         } catch (DataStoreException ex) {
             getLogger().log(Level.WARNING, ex.getLocalizedMessage(),ex);
         }

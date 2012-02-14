@@ -47,7 +47,7 @@ public class CoverageStoreProviderService extends AbstractProviderService
     
     static {
         final List<ParameterDescriptorGroup> descs = new ArrayList<ParameterDescriptorGroup>();
-        final Iterator<CoverageStoreFactory> ite = CoverageStoreFinder.getAllCoverageStores();
+        final Iterator<CoverageStoreFactory> ite = CoverageStoreFinder.getAllFactories();
         while(ite.hasNext()){
             //copy the descriptor with a minimum number of zero
             final ParameterDescriptorGroup desc = ite.next().getParametersDescriptor();

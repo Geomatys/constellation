@@ -66,7 +66,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         }
         try {
             //create the store
-            store = CoverageStoreFinder.getCoverageStore(factoryconfig);
+            store = CoverageStoreFinder.get(factoryconfig);
             if(store == null){
                 throw new DataStoreException("Could not create coverage store for parameters : "+factoryconfig);
             }

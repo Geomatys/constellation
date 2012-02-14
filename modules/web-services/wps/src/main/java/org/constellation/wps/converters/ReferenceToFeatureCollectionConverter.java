@@ -121,7 +121,7 @@ public final class ReferenceToFeatureCollectionConverter extends SimpleConverter
                     final Map<String, Serializable> parameters = new HashMap<String, Serializable>();
                     parameters.put("url", new URL(source.get("href")));
                     
-                    final DataStore store = DataStoreFinder.getDataStore(parameters);
+                    final DataStore store = DataStoreFinder.get(parameters);
 
                     if(store == null){
                         throw new NonconvertibleObjectException("Invalid URL");
