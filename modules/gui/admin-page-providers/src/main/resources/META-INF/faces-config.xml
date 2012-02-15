@@ -49,10 +49,15 @@
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
     
-    <!-- coverage-store provider -->
+    <!-- store provider -->
     <managed-bean>
         <managed-bean-name>coveragestoreBean</managed-bean-name>
         <managed-bean-class>org.constellation.menu.provider.CoverageStoreBean</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>serverstoreBean</managed-bean-name>
+        <managed-bean-class>org.constellation.menu.provider.ServerStoreBean</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>
         

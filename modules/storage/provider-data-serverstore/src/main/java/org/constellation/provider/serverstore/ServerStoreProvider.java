@@ -14,17 +14,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.coveragestore;
+package org.constellation.provider.serverstore;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
-import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.DefaultCoverageStoreLayerDetails;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.*;
+import org.geotoolkit.client.Server;
+import org.geotoolkit.client.ServerFinder;
 import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.data.DataStore;
 import org.geotoolkit.storage.DataStoreException;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
@@ -34,12 +33,12 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageStoreProvider extends AbstractLayerProvider{
+public class ServerStoreProvider extends AbstractLayerProvider{
 
-    private CoverageStore store;
+    private Server server;
     private Set<Name> names;
 
-    public CoverageStoreProvider(ProviderService service, ParameterValueGroup param){
+    public ServerStoreProvider(ProviderService service, ParameterValueGroup param){
         super(service,param);
     }
 
@@ -61,17 +60,25 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         }
         
         if(factoryconfig == null){
-            getLogger().log(Level.WARNING, "No configuration for coverage store source.");
+            getLogger().log(Level.WARNING, "No configuration for server store source.");
             names = Collections.EMPTY_SET;
             return;
         }
         try {
             //create the store
-            store = CoverageStoreFinder.get(factoryconfig);
-            if(store == null){
-                throw new DataStoreException("Could not create coverage store for parameters : "+factoryconfig);
+            server = ServerFinder.get(factoryconfig);
+            if(server == null){
+                throw new DataStoreException("Could not create server store for parameters : "+factoryconfig);
             }
-            names = store.getNames();
+            
+            if(server instanceof DataStore){
+                names = ((DataStore)server).getNames();
+            }else if(server instanceof CoverageStore){
+                names = ((CoverageStore)server).getNames();
+            }else{
+                names = Collections.EMPTY_SET;
+            }
+            
         } catch (DataStoreException ex) {
             names = Collections.EMPTY_SET;
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
@@ -82,9 +89,8 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
     @Override
     public synchronized void dispose() {
         super.dispose();
-        if(store != null){
-            store.dispose();
-            store = null;
+        if(server != null){
+            server = null;
             names = null;
         }
     }
@@ -103,11 +109,19 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         if(!contains(key)){
             return null;
         }
-        try {
-            return new DefaultCoverageStoreLayerDetails(key, store.getCoverageReference(key));
-        } catch (DataStoreException ex) {
-            getLogger().log(Level.WARNING, ex.getMessage(), ex);
+        
+        if(server instanceof DataStore){
+            final DataStore store = (DataStore) server;
+            return new DefaultDataStoreLayerDetails(key, store, null);
+        }else if(server instanceof CoverageStore){
+            final CoverageStore store = (CoverageStore) server;
+            try {
+                return new DefaultCoverageStoreLayerDetails(key, store.getCoverageReference(key));
+            } catch (DataStoreException ex) {
+                getLogger().log(Level.WARNING, ex.getMessage(), ex);
+            }
         }
+        
         return null;
     }
 

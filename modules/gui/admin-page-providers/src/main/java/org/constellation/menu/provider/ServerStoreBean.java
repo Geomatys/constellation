@@ -18,20 +18,20 @@
 package org.constellation.menu.provider;
 
 /**
- * Coverage-Store configuration bean.
+ * Server-Store configuration bean.
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageStoreBean extends StoreBean{
-
-    public static final String SERVICE_NAME = "coverage-store";
-            
-    public CoverageStoreBean(){
+public class ServerStoreBean extends StoreBean{
+    
+    public static final String SERVICE_NAME = "server-store";
+    
+    public ServerStoreBean(){
         super(SERVICE_NAME,
-              "/provider/coverageStore.xhtml",
-              "/provider/coverageStoreConfig.xhtml",
+              "/provider/serverStore.xhtml",
+              "/provider/serverStoreConfig.xhtml",
               "provider.overview",
-              "provider.coverageStore");
+              "provider.serverStore");
     }
 
 }

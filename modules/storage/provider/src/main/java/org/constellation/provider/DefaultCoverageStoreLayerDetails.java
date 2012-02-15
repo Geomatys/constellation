@@ -14,13 +14,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.coveragestore;
+package org.constellation.provider;
 
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.*;
 import org.constellation.ServiceDef.Query;
-import org.constellation.provider.AbstractLayerDetails;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.exception.PortrayalException;
@@ -41,14 +40,14 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  *
  * @author Johann Sorel (Geomatys)
  */
-class CoverageStoreLayerDetails extends AbstractLayerDetails {
+public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
 
     private static final MutableStyle DEFAULT = 
             new DefaultStyleFactory().style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER);
     
     private final CoverageReference ref;
     
-    CoverageStoreLayerDetails(Name name, CoverageReference ref){
+    public DefaultCoverageStoreLayerDetails(Name name, CoverageReference ref){
         super(name, Collections.EMPTY_LIST);
         this.ref = ref;
     }

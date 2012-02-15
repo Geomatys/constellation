@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration of "provider" module from Constellation project.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.constellation</groupId>
+    <artifactId>storage</artifactId>
+    <version>0.8-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Module description.
+  -->
+  <groupId>org.constellation.storage</groupId>
+  <artifactId>cstl-store-data-serverstore</artifactId>
+  <packaging>jar</packaging>
+  <name>Provider for data : Server Store</name>
+  <description>
+    These packages provide access to distant server datas.
+  </description>
+
+
+
+  <!--
+    Developers and contributors.
+  -->
+  <developers>
+    <developer>
+      <id>jsorel</id>
+      <name>Johann Sorel</name>
+      <email>johann.sorel@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <!--
+    Required dependencies for building. These dependencies wil be included into
+    the JARs list that Maven will put into the directory "target/binaries".
+  -->
+  <dependencies>
+    <dependency>
+        <groupId>org.constellation.storage</groupId>
+        <artifactId>cstl-store-provider</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-client-osm-tms</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-client-googlemaps</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-client-wmsc</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-client-wmts</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <scope>compile</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>
