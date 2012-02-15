@@ -27,14 +27,14 @@ import org.constellation.configuration.ProvidersReport;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageStoreItem extends AbstractMenuItem{
+public class DataStoreItem extends AbstractMenuItem{
 
-    public CoverageStoreItem() {
+    public DataStoreItem() {
         super(new String[]{
-                "/provider/coverageStore.xhtml",
-                "/provider/coverageStoreConfig.xhtml"},
-            "provider.coverageStore",
-            new Path(PROVIDERS_PATH,"→ Coverage-Store", "/provider/coverageStore.xhtml", null,210)
+                "/provider/dataStore.xhtml",
+                "/provider/dataStoreConfig.xhtml"},
+            "provider.dataStore",
+            new Path(PROVIDERS_PATH,"→ Data-Store", "/provider/dataStore.xhtml", null,220)
             );
     }
 
@@ -43,7 +43,7 @@ public class CoverageStoreItem extends AbstractMenuItem{
         if(server == null) return false;
         final ProvidersReport report = server.providers.listProviders();
         if(report == null) return false;
-        return report.getProviderService(CoverageStoreBean.SERVICE_NAME) != null;
+        return report.getProviderService(DataStoreBean.SERVICE_NAME) != null;
     }
     
 }

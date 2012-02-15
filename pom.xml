@@ -762,6 +762,31 @@
                 <version>${geotoolkit-pending.version}</version>
                 <classifier>tests</classifier>
             </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-jdbc-mysql</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-gpx</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-csv</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-dbf</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-osm-xml</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
 
             <!--
         Database drivers. They are usually needed only for testing purpose (see

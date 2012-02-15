@@ -34,7 +34,7 @@ public class ServerStoreItem extends AbstractMenuItem{
                 "/provider/serverStore.xhtml",
                 "/provider/serverStoreConfig.xhtml"},
             "provider.serverStore",
-            new Path(PROVIDERS_PATH,"Server-Store", "/provider/serverStore.xhtml", null,230)
+            new Path(PROVIDERS_PATH,"→ Server-Store", "/provider/serverStore.xhtml", null,230)
             );
     }
 

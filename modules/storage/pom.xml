@@ -104,6 +104,7 @@
 	<module>provider</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
+        <module>provider-data-datastore</module>
         <module>provider-data-coveragestore</module>
         <module>provider-data-serverstore</module>
         <module>provider-data-om</module>
