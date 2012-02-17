@@ -165,6 +165,8 @@ public final class MetadataUtilities {
             }
             assertEqualsMode(expResult.getIdentificationInfo(), result.getIdentificationInfo(), mode);
         }
+        assertEqualsMode(expResult.getContentInfo(), result.getContentInfo(), mode);
+        assertEqualsMode(expResult.getDistributionInfo(), result.getDistributionInfo(), mode);
         assertEqualsMode(expResult, result, mode);
     }
     
