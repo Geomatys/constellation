@@ -44,6 +44,14 @@ public class CstlAuthSetup implements SetupService {
     
     @Override
     public void initialize(Properties properties, boolean reinit) {
+        //force loading driver.
+        //some container like tomcat 7.0.21+ disable drivers at startup
+        try {
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+        } catch (ClassNotFoundException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+        }
+        
         final File authDir          = ConfigDirectory.getAuthConfigDirectory();
         final File authDbProperties = ConfigDirectory.getAuthConfigFile();
         if (!authDbProperties.exists()) {
