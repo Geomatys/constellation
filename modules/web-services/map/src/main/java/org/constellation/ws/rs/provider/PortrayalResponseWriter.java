@@ -18,6 +18,7 @@
 package org.constellation.ws.rs.provider;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -29,16 +30,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-
 import org.constellation.portrayal.internal.CstlPortrayalService;
 import org.constellation.portrayal.internal.PortrayalResponse;
-
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.display2d.service.CanvasDef;
-import org.geotoolkit.display2d.service.OutputDef;
-import org.geotoolkit.display2d.service.DefaultPortrayalService;
-import org.geotoolkit.display2d.service.SceneDef;
-import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.display2d.service.*;
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -51,21 +46,15 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
 
     private static final Logger LOGGER = Logging.getLogger(PortrayalResponseWriter.class);
 
-    @Override
-    public long getSize(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt) {
-        return -1;
-    }
-
-    @Override
-    public void writeTo(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt,
-            final MultivaluedMap<String, Object> h, final OutputStream out) throws IOException, WebApplicationException {
+    private int prepare(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt) throws IOException{
+        
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
         
         OutputDef outdef = r.getOutputDef();
         if(outdef == null){
             outdef = new OutputDef(mt.toString(), out);
         }
         outdef.setOutput(out);
-        
         
         BufferedImage img = r.getImage();
         if(img != null){
@@ -95,11 +84,31 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
                 }
             }
         }
+        
+        final byte[] result = out.toByteArray();
+        r.setBuffer(result);
+        return result.length;
+    }
+    
+    @Override
+    public long getSize(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt) {
+        try {
+            return prepare(r, c, t, as, mt);
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+        }
+        return -1;
+    }
 
+    @Override
+    public void writeTo(final PortrayalResponse r, final Class<?> c, final Type t, final Annotation[] as, final MediaType mt,
+            final MultivaluedMap<String, Object> h, OutputStream out) throws IOException, WebApplicationException {
+        out.write(r.getBuffer());
     }
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type genericType, final Annotation[] annotations, final MediaType mediaType) {
         return PortrayalResponse.class.isAssignableFrom(type);
     }
+        
 }

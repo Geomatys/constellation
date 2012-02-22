@@ -36,6 +36,7 @@ public final class PortrayalResponse {
     private final ViewDef viewDef;
     private final OutputDef outputDef;
     private BufferedImage image;
+    private byte[] buffer;
 
     public PortrayalResponse(CanvasDef canvasDef, SceneDef sceneDef, ViewDef viewDef, OutputDef outputDef) {
         this.canvasDef = canvasDef;
@@ -44,7 +45,7 @@ public final class PortrayalResponse {
         this.outputDef = outputDef;
         this.image = null;
     }
-
+        
     public PortrayalResponse(BufferedImage image) {
         this.canvasDef = null;
         this.sceneDef = null;
@@ -76,6 +77,14 @@ public final class PortrayalResponse {
 
     public ViewDef getViewDef() {
         return viewDef;
+    }
+
+    public byte[] getBuffer() {
+        return buffer;
+    }
+
+    public void setBuffer(byte[] buffer) {
+        this.buffer = buffer;
     }
     
 }
