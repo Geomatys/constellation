@@ -102,7 +102,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
 
     @Override
     public boolean isQueryable(Query query) {
-        return false;
+        return true;
     }
 
     @Override
