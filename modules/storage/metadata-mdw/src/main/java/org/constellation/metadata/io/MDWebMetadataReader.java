@@ -899,7 +899,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         if (className.equalsIgnoreCase("CharacterString")) {
             return String.class;
-        } else if (className.equalsIgnoreCase("Date")) {
+        } else if (className.equalsIgnoreCase("Date") || className.equalsIgnoreCase("DateTime")) {
             return Date.class;
         } else if (className.equalsIgnoreCase("PT_FreeText")) {
             return DefaultInternationalString.class;
