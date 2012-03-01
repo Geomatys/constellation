@@ -92,6 +92,10 @@ public class CoverageSQLProviderService extends AbstractProviderService
 
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         final CoverageSQLProvider provider = new CoverageSQLProvider(this,ps);
         ps = ProviderParameters.getOrCreate(COVERAGESQL_DESCRIPTOR, ps);
         final ParameterValue<?> val = ps.parameter(ConfigurationKey.URL.name());

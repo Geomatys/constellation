@@ -60,6 +60,10 @@ public class PostGisProviderService extends AbstractProviderService<Name,LayerDe
     
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         try {
             final PostGisProvider provider = new PostGisProvider(this,ps);
             ps = getOrCreate(PARAMETERS_DESCRIPTOR, ps);

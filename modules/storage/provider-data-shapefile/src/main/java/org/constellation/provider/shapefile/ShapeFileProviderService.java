@@ -69,6 +69,10 @@ public class ShapeFileProviderService extends AbstractProviderService
 
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         try {
             final ShapeFileProvider provider = new ShapeFileProvider(this,ps);
             ps = getOrCreate(SOURCE_CONFIG_DESCRIPTOR, ps);

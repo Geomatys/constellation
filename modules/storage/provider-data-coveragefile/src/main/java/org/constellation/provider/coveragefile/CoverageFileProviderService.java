@@ -70,6 +70,10 @@ public class CoverageFileProviderService extends AbstractProviderService<Name,La
     
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         try {
             final CoverageFileProvider provider = new CoverageFileProvider(this,ps);
             ps = ProviderParameters.getOrCreate(SOURCE_CONFIG_DESCRIPTOR, ps);

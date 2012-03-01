@@ -84,6 +84,10 @@ public class CoverageStoreProviderService extends AbstractProviderService
 
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         final CoverageStoreProvider provider = new CoverageStoreProvider(this,ps);
         getLogger().log(Level.INFO, "[PROVIDER]> coverage-store provider created.");
         return provider;

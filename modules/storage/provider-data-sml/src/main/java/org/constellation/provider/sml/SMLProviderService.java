@@ -60,6 +60,10 @@ public class SMLProviderService extends AbstractProviderService<Name,LayerDetail
     
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         try {
             final SMLProvider provider = new SMLProvider(this,ps);
             ps = getOrCreate(PARAMETERS_DESCRIPTOR, ps);

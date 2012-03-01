@@ -84,6 +84,10 @@ public class DataStoreProviderService extends AbstractProviderService
 
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         final DataStoreProvider provider = new DataStoreProvider(this,ps);
         getLogger().log(Level.INFO, "[PROVIDER]> data-store provider created.");
         return provider;

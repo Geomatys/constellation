@@ -84,6 +84,10 @@ public class ServerStoreProviderService extends AbstractProviderService
 
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         final ServerStoreProvider provider = new ServerStoreProvider(this,ps);
         getLogger().log(Level.INFO, "[PROVIDER]> server-store provider created.");
         return provider;

@@ -62,6 +62,10 @@ public class OMProviderService extends AbstractProviderService
     
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         try {
             final OMProvider provider = new OMProvider(this,ps);
             ps = getOrCreate(PARAMETERS_DESCRIPTOR, ps);

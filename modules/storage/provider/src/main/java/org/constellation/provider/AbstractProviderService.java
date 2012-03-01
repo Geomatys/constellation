@@ -19,8 +19,11 @@ package org.constellation.provider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Logger;
-
+import org.constellation.provider.configuration.ProviderParameters;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.util.logging.Logging;
+import org.opengis.metadata.quality.ConformanceResult;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -50,6 +53,13 @@ public abstract class AbstractProviderService<K,V,P extends Provider<K,V>> imple
         return name;
     }
 
+    @Override
+    public boolean canProcess(final ParameterValueGroup params) {
+        final ConformanceResult result = Parameters.isValid(params, 
+                getServiceDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
+        return (result != null) && Boolean.TRUE.equals(result.pass());
+    }
+    
     @Override
     public Collection<? extends P> getAdditionalProviders() {
         return Collections.emptyList();

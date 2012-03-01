@@ -33,13 +33,23 @@ public interface ProviderService<K,V,P extends Provider<K,V>> {
 
     /**
      * Description of the complete service parameters.
+     * @return 
      */
     ParameterDescriptorGroup getServiceDescriptor();
     
     /**
      * Description of the single source in the service parameters.
+     * @return 
      */
     GeneralParameterDescriptor getSourceDescriptor();
+    
+    /**
+     * Check if the given parameter can be handle
+     * 
+     * @param params
+     * @return true if the given parameter can be processed
+     */
+    boolean canProcess(final ParameterValueGroup params);
     
     /**
      * Create a provider for the given configuration.

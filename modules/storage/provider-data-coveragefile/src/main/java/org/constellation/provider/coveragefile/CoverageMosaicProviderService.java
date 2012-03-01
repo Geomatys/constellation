@@ -71,6 +71,10 @@ public class CoverageMosaicProviderService extends AbstractProviderService
     
     @Override
     public LayerProvider createProvider(ParameterValueGroup ps) {
+        if(!canProcess(ps)){
+            return null;
+        }
+        
         try {
             final CoverageMosaicProvider provider = new CoverageMosaicProvider(this,ps);
             ps = ProviderParameters.getOrCreate(SOURCE_CONFIG_DESCRIPTOR, ps);
