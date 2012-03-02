@@ -33,6 +33,7 @@ import org.constellation.admin.service.ConstellationServer;
 import org.constellation.bean.MenuItem.Path;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotoolkit.util.logging.Logging;
+import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 
@@ -53,11 +54,11 @@ public final class MenuBean extends I18NBean {
 
     private static final OutlineRowStyler STYLER = new OutlineRowStyler() {
         @Override
-        public String getRowStyle(TreeNode node) {
+        public String getRowStyle(final UIOutline outline, TreeNode node) {
             return null;
         }
         @Override
-        public String getRowClass(TreeNode node) {
+        public String getRowClass(final UIOutline outline, TreeNode node) {
 
             String candidate = "";
             if(node.getChildCount() > 0){

@@ -17,6 +17,7 @@
 package org.constellation.bean;
 
 import javax.swing.tree.TreeNode;
+import org.mapfaces.component.outline.UIOutline;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 
 /**
@@ -31,12 +32,12 @@ public class HighLightRowStyler implements OutlineRowStyler{
     protected HighLightRowStyler(){}
     
     @Override
-    public String getRowStyle(final TreeNode node) {
+    public String getRowStyle(final UIOutline outline, final TreeNode node) {
         return "";
     }
 
     @Override
-    public String getRowClass(final TreeNode node) {
+    public String getRowClass(final UIOutline outline, final TreeNode node) {
         final TreeNode parent = node.getParent();
         if (node.getParent() != null) {
             final int index = parent.getIndex(node);

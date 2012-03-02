@@ -33,6 +33,7 @@ import org.constellation.configuration.StringTreeNode;
 
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.util.logging.Logging;
+import org.mapfaces.component.outline.UIOutline;
 
 import org.mapfaces.i18n.I18NBean;
 import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
@@ -61,14 +62,14 @@ public class TaskManagerBean extends I18NBean{
     public static final OutlineRowStyler ROW_STYLER = new OutlineRowStyler() {
 
         @Override
-        public String getRowStyle(final TreeNode node) {
+        public String getRowStyle(final UIOutline outline, final TreeNode node) {
             final DefaultMutableTreeNode mn = (DefaultMutableTreeNode) node;
             final Object obj = mn.getUserObject();
             return "";
         }
 
         @Override
-        public String getRowClass(final TreeNode node) {
+        public String getRowClass(final UIOutline outline, final TreeNode node) {
             return "";
         }
     };

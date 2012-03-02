@@ -61,6 +61,7 @@
             <h:outputText value="#{node.userObject.id}" rendered="#{mf:isInstance(node.userObject,'Source')}"/>
             <h:commandLink action="#{bean.removeSource}" rendered="#{mf:isInstance(node.userObject,'Source')}" styleClass="logout">
                 <f:param name="NodeId" value="#{sourceLayers.nodeIndex}" />
+                <f:param name="outlineID" value="#{sourceLayers.clientId}" />
                 &#160;
                 <img src="#{facesContext.externalContext.requestContextPath}/service.cancel.png.mfRes" style="border:none;vertical-align:middle;" />
                 #{bean.i18n['remove']}

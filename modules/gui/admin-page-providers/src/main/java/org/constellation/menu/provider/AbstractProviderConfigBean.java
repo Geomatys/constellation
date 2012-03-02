@@ -46,6 +46,7 @@ import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.logging.Logging;
+import org.mapfaces.component.outline.UIOutline;
 
 import org.mapfaces.facelet.parametereditor.ParameterModelAdaptor;
 import org.mapfaces.facelet.parametereditor.ParameterTreeModel;
@@ -86,8 +87,8 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     private final OutlineRowStyler ROW_STYLER = new HighLightRowStyler() {
         
         @Override
-        public String getRowClass(TreeNode node) {
-            String candidate = super.getRowClass(node);
+        public String getRowClass(final UIOutline outline, final TreeNode node) {
+            String candidate = super.getRowClass(outline, node);
        
             if(node.equals(configuredInstance)){
                 candidate += " active";

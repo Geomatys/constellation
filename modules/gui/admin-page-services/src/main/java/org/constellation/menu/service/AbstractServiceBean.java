@@ -61,6 +61,8 @@ import org.mapfaces.renderkit.html.outline.OutlineRowStyler;
 // portlet upload
 import javax.portlet.ActionRequest;
 import org.apache.commons.fileupload.FileItem;
+import org.mapfaces.component.outline.UIOutline;
+import org.mapfaces.utils.FacesUtils;
 
 /**
  * Abstract JSF Bean for service administration interface.
@@ -73,7 +75,7 @@ public class AbstractServiceBean extends I18NBean {
     public static final OutlineRowStyler ROW_STYLER = new OutlineRowStyler() {
 
         @Override
-        public String getRowStyle(TreeNode node) {
+        public String getRowStyle(final UIOutline outline, final TreeNode node) {
             final DefaultMutableTreeNode mn = (DefaultMutableTreeNode) node;
             final Object obj = mn.getUserObject();
             if(obj instanceof Source){
@@ -91,7 +93,7 @@ public class AbstractServiceBean extends I18NBean {
         }
 
         @Override
-        public String getRowClass(TreeNode node) {
+        public String getRowClass(final UIOutline outline, final TreeNode node) {
             return "";
         }
     };
@@ -299,8 +301,11 @@ public class AbstractServiceBean extends I18NBean {
         final FacesContext context = FacesContext.getCurrentInstance();
         final ExternalContext ext = context.getExternalContext();
         final Integer index = Integer.valueOf(ext.getRequestParameterMap().get("NodeId"));
+         final String outlineId = ext.getRequestParameterMap().get("outlineID");
+
+        final UIOutline outline = (UIOutline) FacesUtils.findComponentByClientId(context, context.getViewRoot(), outlineId);
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode) 
-                OutlineDataModel.getNode((TreeNode)treemodel.getRoot(), index);
+                OutlineDataModel.getNode(outline, (TreeNode)treemodel.getRoot(), index);
         
         treemodel.removeProperty(new TreePath(OutlineDataModel.getTreePath(node)));
     }
