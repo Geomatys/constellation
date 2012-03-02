@@ -212,6 +212,7 @@ public final class GrizzlyServer {
 
                     final ParameterValueGroup source = config.addGroup(
                             SLDProviderService.SOURCE_DESCRIPTOR.getName().getCode());
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("sldSrc");
                     final ParameterValueGroup sourceConfig = source.groups(SLDProviderService.SOURCE_CONFIG_DESCRIPTOR.getName().getCode()).get(0);
                     sourceConfig.parameter(SLDProviderService.FOLDER_DESCRIPTOR.getName().getCode()).setValue(
                             outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/styles");
