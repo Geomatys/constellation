@@ -52,7 +52,17 @@
                         <mf:case condition="#{cswBean.configType == 'filesystem'}" fallthrought="false">
                             <tr>
                                 <td><h:outputText value="#{cswBean.i18n['dataDirectory']}"/></td>
-                            <td><h:inputText value="#{cswBean.dataDirectory}" style="width:50%;"/></td>
+                                <td><h:inputText value="#{cswBean.dataDirectory}" style="width:50%;"/></td>
+                            </tr>
+                        </mf:case>
+                        <mf:case condition="#{cswBean.configType == 'netcdf'}" fallthrought="false">
+                            <tr>
+                                <td><h:outputText value="#{cswBean.i18n['dataDirectory']}"/></td>
+                                <td><h:inputText value="#{cswBean.dataDirectory}" style="width:50%;"/></td>
+                            </tr>
+                            <tr>
+                                <td><h:outputText value="#{cswBean.i18n['ncmlFile']}"/></td>
+                                <td><h:selectBooleanCheckbox value="#{cswBean.ncmlFile}"/></td> 
                             </tr>
                         </mf:case>
                         <mf:case condition="#{cswBean.configType == 'mdweb'}" fallthrought="false">

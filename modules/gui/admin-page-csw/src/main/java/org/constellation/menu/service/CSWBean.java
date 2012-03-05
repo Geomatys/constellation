@@ -66,6 +66,8 @@ public class CSWBean extends AbstractServiceBean {
     
     private boolean indexInternalRecordset;
     
+    private boolean ncmlFile;
+    
     public CSWBean() {
         super(Specification.CSW,
                 "/service/csw.xhtml",
@@ -77,6 +79,7 @@ public class CSWBean extends AbstractServiceBean {
         final List<SelectItem> selectItems = new ArrayList<SelectItem>();
         selectItems.add(new SelectItem("mdweb"));
         selectItems.add(new SelectItem("filesystem"));
+        selectItems.add(new SelectItem("netcdf"));
         return selectItems;
     }
     
@@ -305,6 +308,27 @@ public class CSWBean extends AbstractServiceBean {
             config.setIndexInternalRecordset(indexInternalRecordset);
         }
         this.indexInternalRecordset = indexInternalRecordset;
+    }
+    
+    public boolean getNcmlFile() {
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            final String ext = config.getCustomparameters().get("netcdfExtension");
+            this.ncmlFile = ".ncml".equals(ext);
+        }
+        return ncmlFile;
+    }
+
+    public void setNcmlFile(boolean ncmlFile) {
+        if (configurationObject instanceof Automatic) {
+            final Automatic config = (Automatic) configurationObject;
+            if  (ncmlFile) {
+                config.getCustomparameters().put("netcdfExtension", ".ncml");
+            } else {
+                config.getCustomparameters().remove("netcdfExtension");
+            }
+        }
+        this.ncmlFile = ncmlFile;
     }
     
     
