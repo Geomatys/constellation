@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 // constellation dependecies
@@ -84,7 +85,7 @@ public abstract class GenericReader  {
     /**
      * A map of static variable to replace in the statements.
      */
-    private HashMap<String, String> staticParameters = new HashMap<String, String>();
+    private HashMap<String, Object> staticParameters = new HashMap<String, Object>();
 
     /**
      * A flag indicating that the service is trying to reconnect the database.
@@ -143,7 +144,7 @@ public abstract class GenericReader  {
      * @param staticParameters
      * @throws CstlServiceException
      */
-    protected GenericReader(final Map<List<String>, Values> debugValues, final HashMap<String, String> staticParameters) throws MetadataIoException {
+    protected GenericReader(final Map<List<String>, Values> debugValues, final HashMap<String, Object> staticParameters) throws MetadataIoException {
         advancedJdbcDriver = true;
         debugMode          = true;
         configuration      = null;
@@ -151,7 +152,7 @@ public abstract class GenericReader  {
         if (staticParameters != null) {
             this.staticParameters = staticParameters;
         } else {
-            this.staticParameters = new HashMap<String, String>();
+            this.staticParameters = new HashMap<String, Object>();
         }
     }
 
@@ -194,9 +195,11 @@ public abstract class GenericReader  {
      * @throws SQLException
      */
     private void intStaticParameters(final Queries queries) throws SQLException {
-        staticParameters         = queries.getParameters();
-        if (staticParameters == null) {
-            staticParameters = new HashMap<String, String>();
+        staticParameters = new HashMap<String, Object>();
+        if (queries.getParameters() != null) {
+            for (Entry<String, String> entry : queries.getParameters().entrySet()) {
+                staticParameters.put(entry.getKey(), entry.getValue());
+            }
         }
         final QueryList statique = queries.getStatique();
         if (statique != null) {
@@ -325,7 +328,7 @@ public abstract class GenericReader  {
                 }
             } else {
                 
-                final String staticValue = staticParameters.get(var);
+                final Object staticValue = staticParameters.get(var);
                 if (staticValue != null) {
                     staticValues.addToValue(var, staticValue);
                 } else {
@@ -469,10 +472,11 @@ public abstract class GenericReader  {
                 final int columnIndex = result.findColumn(varName);
                 final int type        = result.getMetaData().getColumnType(columnIndex);
                 if (type == java.sql.Types.INTEGER || type == java.sql.Types.SMALLINT) {
-                    values.addToValue(varName, Integer.toString(result.getInt(varName)));
+                    values.addToValue(varName, result.getInt(varName));
                 } else if (type == java.sql.Types.DOUBLE) {
-                    final double d = result.getDouble(varName);
-                    values.addToValue(varName, Double.toString(result.getDouble(varName)));
+                    values.addToValue(varName, result.getDouble(varName));
+                } else if (type == java.sql.Types.TIMESTAMP) {
+                    values.addToValue(varName, result.getTimestamp(varName));
                 } else {
                     values.addToValue(varName, result.getString(varName));
                 }

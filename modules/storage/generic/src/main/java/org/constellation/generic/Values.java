@@ -37,13 +37,13 @@ public class Values {
     /**
      * A Map of (varName) - (list of values) refreshed at every request.
      */
-    private final Map<String, List<String>> values;
+    private final Map<String, List<Object>> values;
 
     /**
      * Build a new values container.
      */
     public Values() {
-        values = new HashMap<String, List<String>>();
+        values = new HashMap<String, List<Object>>();
     }
 
     /**
@@ -53,11 +53,11 @@ public class Values {
      * @param singleValue   A map of (variable name) - (value)
      * @param multipleValue A map of (variable name) - (list of values)
      */
-    public Values(final Map<String, List<String>> values) {
+    public Values(final Map<String, List<Object>> values) {
         if (values != null) {
             this.values = values;
         } else {
-            this.values = new HashMap<String, List<String>>();
+            this.values = new HashMap<String, List<Object>>();
         }
     }
 
@@ -68,7 +68,22 @@ public class Values {
      * @return
      */
     public String getVariable(final String variable) {
-        final List<String> result = values.get(variable);
+        final List<Object> result = values.get(variable);
+        if (result != null && result.size() > 0) {
+            if (result.size() > 1) {
+                LOGGER.log(Level.WARNING, "retrieving single value for variable:{0} but the is multiple values", variable);
+            }
+            if (result.get(0) != null) {
+                return result.get(0).toString();
+            } else {
+                return null;
+            }
+        }
+        return null;
+    }
+    
+    public Object getTypedVariable(final String variable) {
+        final List<Object> result = values.get(variable);
         if (result != null && result.size() > 0) {
             if (result.size() > 1) {
                 LOGGER.log(Level.WARNING, "retrieving single value for variable:{0} but the is multiple values", variable);
@@ -86,11 +101,28 @@ public class Values {
      */
     public List<String> getVariables(final String variable) {
         if (values != null) {
-            List<String> result = values.get(variable);
-            if (result == null) {
-                result = new ArrayList<String>();
+            final List<Object> typedResults = values.get(variable);
+            if (typedResults == null) {
+                return new ArrayList<String>();
+            }
+            final List<String> result = new ArrayList<String>(); 
+            for (Object typedResult : typedResults) {
+                if (typedResult != null) {
+                    result.add(typedResult.toString());
+                }
             }
             return result;
+        }
+        return null;
+    }
+    
+    public List<Object> getTypedVariables(final String variable) {
+        if (values != null) {
+            final List<Object> typedResults = values.get(variable);
+            if (typedResults == null) {
+                return new ArrayList<Object>();
+            }
+            return typedResults;
         }
         return null;
     }
@@ -101,13 +133,13 @@ public class Values {
      * @param varName The name of the variable.
      * @param value   The value to add.
      */
-    public void addToValue(final String varName, final String value) {
+    public void addToValue(final String varName, final Object value) {
         if (values.get(varName) == null) {
-           values.put(varName, new ArrayList<String>());
+           values.put(varName, new ArrayList<Object>());
         }
         values.get(varName).add(value);
     }
-
+    
     /**
      * Add all the map of the specified Values to the current map.
      *
@@ -123,9 +155,9 @@ public class Values {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Values]").append('\n');
-        for (Entry<String, List<String>> entry : values.entrySet()) {
+        for (Entry<String, List<Object>> entry : values.entrySet()) {
             sb.append(entry.getKey()).append(':').append('\n');
-            for (String val : entry.getValue()) {
+            for (Object val : entry.getValue()) {
                 sb.append('\t').append(val).append('\n');
             }
         }

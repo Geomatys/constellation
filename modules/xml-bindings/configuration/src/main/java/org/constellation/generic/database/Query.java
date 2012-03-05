@@ -494,7 +494,7 @@ public class Query {
      * @return A SQL query string.
      */
     public String buildSQLQuery() {
-        return buildSQLQuery(new HashMap<String, String>());
+        return buildSQLQuery(new HashMap<String, Object>());
     }
     /**
      * Return an textual SQL query for a preparedStatement (contains '?').
@@ -502,9 +502,9 @@ public class Query {
      * @param staticParameters A map of varName/varValue to replace in the SQL text.
      * @return
      */
-    public String buildSQLQuery(HashMap<String, String> staticParameters) {
+    public String buildSQLQuery(HashMap<String, Object> staticParameters) {
         if (staticParameters == null) {
-            staticParameters = new HashMap<String, String>();
+            staticParameters = new HashMap<String, Object>();
         }
         StringBuilder mainQuery = new StringBuilder("SELECT ");
         for (Select sel : select) {
@@ -556,11 +556,11 @@ public class Query {
 
                 String sql = w.getvalue();
                 while (sql.indexOf(varBegin) != -1 && sql.indexOf('}') != -1) {
-                    final String paramName = sql.substring(sql.indexOf(varBegin) + 3, sql.indexOf('}'));
-                    final String paramValues = staticParameters.get(paramName);
+                    final String paramName   = sql.substring(sql.indexOf(varBegin) + 3, sql.indexOf('}'));
+                    final Object paramValues = staticParameters.get(paramName);
                     if (paramValues != null) {
                         final String s = sql.substring(sql.indexOf(varBegin), sql.indexOf('}') + 1);
-                        sql = sql.replace(s, paramValues);
+                        sql = sql.replace(s, paramValues.toString());
 
                     } else {
                         final String s = sql.substring(sql.indexOf(varBegin), sql.indexOf('}') + 1);

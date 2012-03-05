@@ -55,7 +55,7 @@ public class GenericConfigurationTest {
     @Test
     public void queryBuilderTest() throws Exception {
 
-        HashMap<String, String> parameters = new HashMap<String, String>();
+        HashMap<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("staticVar01", "something");
         parameters.put("staticVar02", "blavl, bloub");
 

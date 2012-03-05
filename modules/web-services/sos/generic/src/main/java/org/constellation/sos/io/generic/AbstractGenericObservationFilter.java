@@ -59,7 +59,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
     /**
      * A map of static variable to replace in the statements.
      */
-    protected HashMap<String, String> staticParameters = new HashMap<String, String>();
+    protected HashMap<String, Object> staticParameters = new HashMap<String, Object>();
     
     /**
      *  The current query built by the sos worker in the scope of a getObservation/getResult request.
