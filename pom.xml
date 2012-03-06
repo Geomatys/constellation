@@ -28,7 +28,7 @@
     <groupId>org.constellation</groupId>
     <artifactId>constellation-sdi</artifactId>
     <packaging>pom</packaging>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.9-SNAPSHOT</version>
     <name>Constellation Spatial Data Infrastructure</name>
     <url>http://www.constellation-sdi.org</url>
 
@@ -165,7 +165,7 @@
         <geotoolkit.version>3.x-SNAPSHOT</geotoolkit.version>
         <geotoolkit-pending.version>3.x-SNAPSHOT</geotoolkit-pending.version>
         <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
-        <mapfaces.version>0.8-SNAPSHOT</mapfaces.version>
+        <mapfaces.version>0.9-SNAPSHOT</mapfaces.version>
         <jersey.version>1.11</jersey.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
@@ -799,7 +799,7 @@
             <dependency>
                 <groupId>postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>9.0-801.jdbc4</version>
+                <version>9.1-901.jdbc4</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
@@ -817,13 +817,13 @@
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derby</artifactId>
-                <version>10.8.1.2</version>
+                <version>10.8.2.2</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.derby</groupId>
                 <artifactId>derbyLocale_fr</artifactId>
-                <version>10.8.1.2</version>
+                <version>10.8.2.2</version>
                 <scope>runtime</scope>
             </dependency>
 

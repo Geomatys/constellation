@@ -403,7 +403,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public String getInfos() {
-        return "Constellation Postgrid O&M Filter 0.8";
+        return "Constellation Postgrid O&M Filter 0.9";
     }
 
     /**

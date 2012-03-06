@@ -476,7 +476,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      */
     @Override
     public String getInfos() {
-        return "Constellation Postgrid Generic O&M Reader 0.8";
+        return "Constellation Postgrid Generic O&M Reader 0.9";
     }
 
     /**

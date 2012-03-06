@@ -319,7 +319,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      */
     @Override
     public String getInfos() {
-        return "Constellation Lucene O&M Filter 0.8";
+        return "Constellation Lucene O&M Filter 0.9";
     }
 
     /**

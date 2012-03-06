@@ -338,7 +338,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      */
     @Override
     public String getInfos() {
-        return "Constellation Generic O&M Filter 0.8";
+        return "Constellation Generic O&M Filter 0.9";
     }
 
     /**
