@@ -40,6 +40,7 @@ import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
@@ -67,6 +68,7 @@ import org.opengis.style.Symbolizer;
  */
 public class RandomStyleFactory extends Factory {
 
+    private static final Logger LOGGER   = Logging.getLogger(RandomStyleFactory.class);
     private final MutableStyleFactory sf = (MutableStyleFactory)FactoryFinder.getStyleFactory(null);
     private final FilterFactory ff       = FactoryFinder.getFilterFactory(null);
     private final String[] pointShapes   = {"square", "circle", "triangle", "star", "cross", "x"};
@@ -176,16 +178,20 @@ public class RandomStyleFactory extends Factory {
 
         try {
             final AttributeDescriptor att = featureType.getGeometryDescriptor();
-            final AttributeType type = att.getType();
+            if (att != null) {
+                final AttributeType type = att.getType();
 
-            final Class cla = type.getBinding();
+                final Class cla = type.getBinding();
 
-            if (cla.equals(Polygon.class) || cla.equals(MultiPolygon.class)) {
-                ps = sf.polygonSymbolizer();
-            } else if (cla.equals(LineString.class) || cla.equals(MultiLineString.class)) {
-                ps = sf.lineSymbolizer();
-            } else if (cla.equals(Point.class) || cla.equals(MultiPoint.class)) {
-                ps = sf.pointSymbolizer();
+                if (cla.equals(Polygon.class) || cla.equals(MultiPolygon.class)) {
+                    ps = sf.polygonSymbolizer();
+                } else if (cla.equals(LineString.class) || cla.equals(MultiLineString.class)) {
+                    ps = sf.lineSymbolizer();
+                } else if (cla.equals(Point.class) || cla.equals(MultiPoint.class)) {
+                    ps = sf.pointSymbolizer();
+                }
+            } else {
+                LOGGER.warning("no geometric descriptor in feature type");
             }
 
         } catch (Exception ex) {
