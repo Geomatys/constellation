@@ -17,11 +17,11 @@
 
 package org.constellation.tile.ws.rs;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URI;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Produces;
@@ -30,9 +30,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.constellation.tile.ws.StreamReference;
+import org.geotoolkit.coverage.TileReference;
 import org.geotoolkit.internal.io.IOUtilities;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.logging.Logging;
 
 /**
@@ -41,35 +40,50 @@ import org.geotoolkit.util.logging.Logging;
  */
 @Provider
 @Produces("image/*")
-public class StreamResponseWriter implements MessageBodyWriter<StreamReference>  {
+public class StreamResponseWriter implements MessageBodyWriter<TileReference>  {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.map.ws.rs");
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
-        return StreamReference.class.isAssignableFrom(type);
+        return TileReference.class.isAssignableFrom(type);
     }
 
     @Override
-    public long getSize(final StreamReference t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
+    public long getSize(final TileReference t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
         return -1;
     }
 
     @Override
-    public void writeTo(final StreamReference t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt,
+    public void writeTo(final TileReference t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt,
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         
-        InputStream input = null;
+        Object input = t.getInput();
+        
+        //try to write the content of the tile if it's alredy in a binary form
+        final InputStream stream;
+        if(input instanceof byte[]){
+            stream = new ByteArrayInputStream((byte[])input);
+        }else if(input instanceof InputStream){
+            stream = (InputStream)input;
+        }else if(input instanceof URL){
+            stream = ((URL)input).openStream();
+        }else if(input instanceof URI){
+            stream = ((URI)input).toURL().openStream();
+        }else if(input instanceof File){
+            stream = new FileInputStream((File)input);
+        }else{
+            LOGGER.log(Level.WARNING, "Unsupported tyle type : {0}", input.getClass());
+            return;
+        }
+        
         try {
-            input = t.getStream();
-            IOUtilities.copy(input, out);
-        } catch (DataStoreException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            IOUtilities.copy(stream, out);
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } finally {
-            if(input != null){
-                input.close();
+            if(stream != null){
+                stream.close();
             }
         }
     }

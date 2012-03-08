@@ -18,13 +18,9 @@ package org.constellation.tile.ws;
 
 //J2SE dependencies
 import java.awt.image.BufferedImage;
-
-//Constellation dependencies
-import java.io.File;
-import java.io.InputStream;
-
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
+import org.geotoolkit.coverage.TileReference;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
@@ -65,6 +61,6 @@ public interface WMTSWorker extends Worker {
      * @param getTile The {@linkplain GetTile get tile} request done on this service.
      * @throws CstlServiceException
      */
-    StreamReference getTile(final GetTile getTile) throws CstlServiceException;
+    TileReference getTile(final GetTile getTile) throws CstlServiceException;
 
 }

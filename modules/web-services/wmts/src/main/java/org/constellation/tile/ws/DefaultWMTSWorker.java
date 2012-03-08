@@ -430,7 +430,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      * {@inheritDoc}
      */
     @Override
-    public StreamReference getTile(GetTile request) throws CstlServiceException {
+    public TileReference getTile(GetTile request) throws CstlServiceException {
         
         //1 LAYER NOT USED FOR NOW
         final Name layerName = Util.parseLayerName(request.getLayer());
@@ -525,8 +525,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             }
             
             final Map hints = new HashMap();
-            final StreamReference response = new StreamReference(mosaic, columnIndex, rowIndex, hints);
-            return response;
+            final TileReference tile = mosaic.getTile(columnIndex, rowIndex, hints);
+            return tile;
                 
         }catch(Exception ex){
             throw new CstlServiceException("No layer for name : " + layerName , INVALID_PARAMETER_VALUE, "layerName");
