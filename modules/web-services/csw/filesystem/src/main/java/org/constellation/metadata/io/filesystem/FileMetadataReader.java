@@ -649,7 +649,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 results.addAll(getAllEntries(f));
             } else {
                 // throw or continue to the next file?
-                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
+                //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
             }
         }
         return results;
