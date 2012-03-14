@@ -508,6 +508,11 @@
             <!-- Geotoolkit-pending version -->
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-widgets-swing-pending</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-utility-pending</artifactId>
                 <version>${geotoolkit-pending.version}</version>
             </dependency>
@@ -588,7 +593,52 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-osm</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-client-osm-tms</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-csw</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-ignrm</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-wms</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-ncwms</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-sos</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-wcs</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-wps</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-client-wfs</artifactId>
                 <version>${geotoolkit-pending.version}</version>
             </dependency>
             <dependency>

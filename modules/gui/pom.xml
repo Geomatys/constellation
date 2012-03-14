@@ -97,6 +97,7 @@
 
     <modules>
         <module>cstl-client</module>
+        <module>admin-swing</module>
         <module>admin-base</module>
         <module>admin-page-cstl</module>
         <module>admin-page-jvm</module>
@@ -107,10 +108,10 @@
         <module>admin-page-provider-coveragesql</module>
         <module>admin-page-sld</module>
         <module>admin-page-services</module>
-	<module>admin-page-wmts</module>
-	<module>admin-page-wms</module>
-	<module>admin-page-wcs</module>
-	<module>admin-page-wfs</module>
+        <module>admin-page-wmts</module>
+        <module>admin-page-wms</module>
+        <module>admin-page-wcs</module>
+        <module>admin-page-wfs</module>
         <module>admin-page-csw</module>
         <module>admin-page-sos</module>
         <module>admin-page-wps</module>
