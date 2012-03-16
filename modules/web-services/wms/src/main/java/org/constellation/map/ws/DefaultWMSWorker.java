@@ -413,7 +413,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
              */
             final Name fullLayerName = layer.getName();
             final String layerName;
-            if (fullLayerName.getNamespaceURI() != null) {
+            if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {
                 layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
             } else {
                 layerName = fullLayerName.getLocalPart();
