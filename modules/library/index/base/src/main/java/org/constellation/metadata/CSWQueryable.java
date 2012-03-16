@@ -292,6 +292,13 @@ public final class CSWQueryable {
         paths.add("ISO 19115-2:MI_Metadata:contentInfo:illuminationElevationAngle");
         ISO_QUERYABLE.put("IlluminationElevation", paths);
         
+        /*
+         *  processing level
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:contentInfo:processingLevelCode:code");
+        paths.add("ISO 19115-2:MI_Metadata:contentInfo:processingLevelCode:code");
+        ISO_QUERYABLE.put("ProcessingLevel", paths);
        
         
         /**
