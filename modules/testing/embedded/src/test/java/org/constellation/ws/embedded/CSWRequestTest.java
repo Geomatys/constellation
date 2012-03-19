@@ -32,18 +32,7 @@ import java.util.ArrayList;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.v202.Capabilities;
-import org.geotoolkit.csw.xml.v202.DomainValuesType;
-import org.geotoolkit.csw.xml.v202.ElementSetNameType;
-import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
-import org.geotoolkit.csw.xml.v202.GetDomainResponseType;
-import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
-import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
-import org.geotoolkit.csw.xml.v202.GetRecordsType;
-import org.geotoolkit.csw.xml.v202.ListOfValuesType;
-import org.geotoolkit.csw.xml.v202.ObjectFactory;
-import org.geotoolkit.csw.xml.v202.QueryConstraintType;
-import org.geotoolkit.csw.xml.v202.QueryType;
+import org.geotoolkit.csw.xml.v202.*;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 
@@ -58,6 +47,8 @@ import static org.junit.Assert.*;
 public class CSWRequestTest extends AbstractTestRequest {
 
     private static final String CSW_POST_URL = "http://localhost:9090/csw/default?";
+    
+    private static final String CSW2_POST_URL = "http://localhost:9090/csw/csw2?";
 
     private static final String CSW_GETCAPABILITIES_URL = "http://localhost:9090/csw/default?request=GetCapabilities&service=CSW&version=2.0.2";
 
@@ -229,9 +220,9 @@ public class CSWRequestTest extends AbstractTestRequest {
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
-        final QueryConstraintType constraint = new QueryConstraintType("identifier='urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f'", "1.1.0");
-        final QueryType query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        final GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 10, query, null);
+        QueryConstraintType constraint = new QueryConstraintType("identifier='urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f'", "1.1.0");
+        QueryType query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 10, query, null);
                 
         postRequestObject(conec, request);
         Object result = unmarshallResponse(conec);
@@ -240,6 +231,83 @@ public class CSWRequestTest extends AbstractTestRequest {
 
         GetRecordsResponseType grResult = (GetRecordsResponseType) result;
         assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
+        
+        /**
+         * get all the records
+         */
+        conec = getCapsUrl.openConnection();
+        
+        constraint = new QueryConstraintType("identifier like '%%'", "1.1.0");
+        query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 20, query, null);
+                
+        postRequestObject(conec, request);
+        result = unmarshallResponse(conec);
+
+        assertTrue(result instanceof GetRecordsResponseType);
+
+        grResult = (GetRecordsResponseType) result;
+        
+        assertEquals(12, grResult.getSearchResults().getAbstractRecord().size());
 
     }
+    
+    @Test
+    public void testDistributedCSWGetRecords() throws Exception {
+
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL(CSW2_POST_URL);
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        QueryConstraintType constraint = new QueryConstraintType("identifier like '%%'", "1.1.0");
+        QueryType query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        DistributedSearchType dist = new DistributedSearchType(1);
+        GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 20, query, dist);
+                
+        postRequestObject(conec, request);
+        Object result = unmarshallResponse(conec);
+
+        assertTrue(result instanceof GetRecordsResponseType);
+
+        GetRecordsResponseType grResult = (GetRecordsResponseType) result;
+        assertEquals(13, grResult.getSearchResults().getAbstractRecord().size());
+        
+        
+        
+        // no distribution
+        conec = getCapsUrl.openConnection();
+        
+        constraint = new QueryConstraintType("identifier like '%%'", "1.1.0");
+        query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 20, query, null);
+                
+        postRequestObject(conec, request);
+        result = unmarshallResponse(conec);
+
+        assertTrue(result instanceof GetRecordsResponseType);
+
+        grResult = (GetRecordsResponseType) result;
+        
+        assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
+        
+        // distribution with 0 hopcount
+        conec = getCapsUrl.openConnection();
+        
+        constraint = new QueryConstraintType("identifier like '%%'", "1.1.0");
+        query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        dist = new DistributedSearchType(0);
+        request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 20, query, dist);
+                
+        postRequestObject(conec, request);
+        result = unmarshallResponse(conec);
+
+        assertTrue(result instanceof GetRecordsResponseType);
+
+        grResult = (GetRecordsResponseType) result;
+        
+        assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
+     }
 }

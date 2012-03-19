@@ -74,26 +74,11 @@ import static org.constellation.metadata.CSWConstants.*;
 //geotoolkit dependencies
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.ws.AbstractWorker;
+import org.geotoolkit.csw.xml.*;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.csw.xml.AbstractCswRequest;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
-import org.geotoolkit.csw.xml.CswXmlFactory;
-import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.ElementSetName;
-import org.geotoolkit.csw.xml.GetDomain;
-import org.geotoolkit.csw.xml.GetRecordById;
-import org.geotoolkit.csw.xml.GetRecordByIdResponse;
-import org.geotoolkit.csw.xml.GetRecordsRequest;
-import org.geotoolkit.csw.xml.GetCapabilities;
-import org.geotoolkit.csw.xml.Harvest;
-import org.geotoolkit.csw.xml.Transaction;
-import org.geotoolkit.csw.xml.DescribeRecord;
-import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.GetDomainResponse;
-import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.AcknowledgementType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
@@ -543,8 +528,6 @@ public class CSWworker extends AbstractWorker {
         }
 
         //we prepare the response document
-        Capabilities c = null; 
-        
         ServiceIdentification si = null;
         ServiceProvider       sp = null;
         OperationsMetadata    om = null;
@@ -692,7 +675,7 @@ public class CSWworker extends AbstractWorker {
         }
             
             
-        c = new Capabilities(si, sp, om, CSW_202_VERSION, null, fc);
+        final Capabilities c = new Capabilities(si, sp, om, CSW_202_VERSION, null, fc);
 
         LOGGER.log(logLevel, "GetCapabilities request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return c;
@@ -887,7 +870,8 @@ public class CSWworker extends AbstractWorker {
         //we look for distributed queries
         DistributedResults distributedResults = new DistributedResults();
         if (catalogueHarvester != null) {
-            if (request.getDistributedSearch() != null) {
+            final DistributedSearch dSearch = request.getDistributedSearch();
+            if (dSearch != null && dSearch.getHopCount() > 0) {
                 int distributedStartPosition;
                 int distributedMaxRecord;
                 if (startPos > results.size()) {
@@ -897,6 +881,8 @@ public class CSWworker extends AbstractWorker {
                     distributedStartPosition = 1;
                     distributedMaxRecord     = maxRecord - results.size();
                 }
+                //decrement the hopCount
+                dSearch.setHopCount(dSearch.getHopCount() - 1);
                 distributedResults = catalogueHarvester.transferGetRecordsRequest(request, cascadedCSWservers, distributedStartPosition, distributedMaxRecord);
             }
         }
@@ -1743,7 +1729,7 @@ public class CSWworker extends AbstractWorker {
      * {@inheritDoc }
      */
     @Override
-    public void setLogLevel(Level logLevel) {
+    public final void setLogLevel(Level logLevel) {
         this.logLevel = logLevel;
         if (indexSearcher != null) {
             indexSearcher.setLogLevel(logLevel);
