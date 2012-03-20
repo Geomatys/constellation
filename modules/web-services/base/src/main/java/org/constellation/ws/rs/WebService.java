@@ -53,6 +53,7 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.ws.ExceptionCode.*;
+import org.geotoolkit.util.StringUtilities;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.Versioned;
@@ -295,23 +296,29 @@ public abstract class WebService {
      * Treat the incoming POST request encoded in kvp.
      * for each parameters in the request it fill the httpContext.
      *
+     * @param request
      * @return an image or xml response.
      */
     @POST
     @Consumes("application/x-www-form-urlencoded")
-    public Response doPOSTKvp(String request){
-        final StringTokenizer tokens = new StringTokenizer(request, "&");
+    public Response doPOSTKvp(final String request) {
+        /**
+         * decode string that can be encoded to utf8 url. ie : image%2Fpng will
+         * be image/png
+         */
+        final String params = StringUtilities.decodeUTF8URL(request);
+        final StringTokenizer tokens = new StringTokenizer(params, "&");
         final StringBuilder log = new StringBuilder("request POST kvp: ");
-        log.append(request).append('\n');
+        log.append(params).append('\n');
         while (tokens.hasMoreTokens()) {
-            final String token      = tokens.nextToken().trim();
-            final int equalsIndex   = token.indexOf('=');
-            final String paramName  = token.substring(0, equalsIndex);
+            final String token = tokens.nextToken().trim();
+            final int equalsIndex = token.indexOf('=');
+            final String paramName = token.substring(0, equalsIndex);
             final String paramValue = token.substring(equalsIndex + 1);
             // special case for XML request parameter
             if ("request".equalsIgnoreCase(paramName) && (paramValue.startsWith("<") || paramValue.startsWith("%3C"))) {
-                final String xml = Util.decodeUTF8URL(paramValue);
-                final InputStream in = new ByteArrayInputStream(xml.getBytes()); 
+                final String xml = StringUtilities.decodeUTF8URL(paramValue);
+                final InputStream in = new ByteArrayInputStream(xml.getBytes());
                 return doPOSTXml(in);
             }
             log.append("put: ").append(paramName).append("=").append(paramValue).append('\n');
