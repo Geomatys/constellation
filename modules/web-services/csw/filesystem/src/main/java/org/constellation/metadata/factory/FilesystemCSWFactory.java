@@ -23,6 +23,7 @@ import java.io.File;
 // J2SE dependencies
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
 
 // Constellation dependencies
 import org.constellation.configuration.DataSourceType;
@@ -66,6 +67,11 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
         return DataSourceType.FILESYSTEM.equals(type);
     }
     
+    @Override
+    public List<DataSourceType> availableType() {
+        return Arrays.asList(DataSourceType.FILESYSTEM);
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -99,7 +105,10 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc}@Override
+    public List<DataSourceType> availableType() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
      */
     @Override
     public CatalogueHarvester getCatalogueHarvester(Automatic configuration, MetadataWriter writer) throws MetadataIoException {

@@ -18,15 +18,16 @@
 
 package org.constellation.metadata.factory;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.Arrays;
+
+// Constellation dependencies
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.FilterParser;
 import org.constellation.configuration.DataSourceType;
-import java.io.File;
-
-// Constellation dependencies
-import java.util.List;
-import java.util.Map;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -53,6 +54,14 @@ import static org.constellation.generic.database.Automatic.*;
  * @author Guilhem Legal (Geomatys)
  */
 public class MDWebCSWFactory implements AbstractCSWFactory {
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DataSourceType> availableType() {
+        return Arrays.asList(DataSourceType.MDWEB);
+    }
 
     /**
      * {@inheritDoc}

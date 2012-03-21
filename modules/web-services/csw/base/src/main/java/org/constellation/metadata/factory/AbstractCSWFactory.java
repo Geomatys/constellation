@@ -51,6 +51,11 @@ public interface AbstractCSWFactory {
     boolean factoryMatchType(final DataSourceType type);
     
     /**
+     * Return a list of supported datasource type
+     */
+    List<DataSourceType> availableType();
+    
+    /**
      * Return a Metadata reader for the specified dataSource type.
      *
      * @param configuration A configuration object containing all the information to use the dataSource.

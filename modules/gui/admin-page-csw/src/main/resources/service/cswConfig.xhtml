@@ -100,6 +100,12 @@
                                 <td><h:selectBooleanCheckbox value="#{cswBean.indexInternalRecordset}"/></td> 
                             </tr>
                         </mf:case>
+                        <mf:default>
+                            <tr>
+                                <td></td>
+                    		<td><h:outputText value="#{cswBean.i18n['unsupportedDatasourceType']}"/></td>
+                            </tr>
+                        </mf:default>
                     </mf:switch>   
 
                     </tbody>            

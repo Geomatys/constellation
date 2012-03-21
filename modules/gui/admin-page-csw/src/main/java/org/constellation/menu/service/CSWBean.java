@@ -77,9 +77,22 @@ public class CSWBean extends AbstractServiceBean {
 
     public List<SelectItem> getConfigTypes() {
         final List<SelectItem> selectItems = new ArrayList<SelectItem>();
-        selectItems.add(new SelectItem("mdweb"));
-        selectItems.add(new SelectItem("filesystem"));
-        selectItems.add(new SelectItem("netcdf"));
+        final ConstellationServer server = getServer();
+        if (server != null) {
+             List<String> sources = server.csws.getAvailableDataSourceType();
+             for (String source : sources) {
+                 selectItems.add(new SelectItem(source));
+             }
+             // we look for an unsupported datasource type
+             if (configurationObject instanceof Automatic) {
+                final Automatic config = (Automatic) configurationObject;
+                final String currentConfigType = config.getFormat();
+                if (!sources.contains(currentConfigType)) {
+                    LOGGER.info("unsupported config type:" + currentConfigType);
+                    selectItems.add(new SelectItem(currentConfigType));
+                }
+            }
+        }
         return selectItems;
     }
     

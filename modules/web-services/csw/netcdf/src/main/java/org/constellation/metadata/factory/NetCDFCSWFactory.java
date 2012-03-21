@@ -17,13 +17,15 @@
  */
 package org.constellation.metadata.factory;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.Arrays;
+
 import org.constellation.filter.FilterParser;
 import org.constellation.metadata.harvest.ByIDHarvester;
 import org.constellation.metadata.harvest.FileSystemHarvester;
 import org.constellation.metadata.harvest.DefaultCatalogueHarvester;
-import java.io.File;
-import java.util.List;
-import java.util.Map;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
@@ -49,6 +51,14 @@ import static org.constellation.generic.database.Automatic.*;
  */
 public class NetCDFCSWFactory implements AbstractCSWFactory {
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DataSourceType> availableType() {
+        return Arrays.asList(DataSourceType.NETCDF);
+    }
+    
     /**
      * {@inheritDoc}
      */

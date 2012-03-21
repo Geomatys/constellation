@@ -65,12 +65,13 @@ public final class QueryConstants {
     public static final String REQUEST_DELETE_TASK      = "deleteTask";
     
     //CSW operations
-    public static final String REQUEST_REFRESH_INDEX    = "refreshIndex"; 
-    public static final String REQUEST_IMPORT_RECORDS   = "importRecords"; 
-    public static final String REQUEST_METADATA_EXIST   = "metadataExist"; 
+    public static final String REQUEST_REFRESH_INDEX         = "refreshIndex"; 
+    public static final String REQUEST_IMPORT_RECORDS        = "importRecords"; 
+    public static final String REQUEST_METADATA_EXIST        = "metadataExist"; 
+    public static final String REQUEST_AVAILABLE_SOURCE_TYPE = "getCSWDatasourceType"; 
     
     //Service operations
-    public static final String REQUEST_UPDATE_CAPABILITIES = "updateCapabilities"; 
+    public static final String REQUEST_UPDATE_CAPABILITIES   = "updateCapabilities"; 
     
     private QueryConstants(){}
     

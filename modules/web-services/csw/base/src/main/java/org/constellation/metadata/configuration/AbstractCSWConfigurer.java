@@ -41,6 +41,7 @@ import javax.xml.bind.Unmarshaller;
 // constellation dependencies
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.StringList;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.generic.database.BDD;
@@ -154,6 +155,10 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         
         if ("UpdateVocabularies".equalsIgnoreCase(request)) {
             return updateVocabularies();
+        }
+        
+        if ("GetCSWDatasourceType".equalsIgnoreCase(request)) {
+            return getAvailableCSWDataSourceType();
         }
 
         if ("UpdateContacts".equalsIgnoreCase(request)) {
@@ -670,5 +675,19 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             }
         }
         return results;
+    }
+
+    private StringList getAvailableCSWDataSourceType() {
+        final List<DataSourceType> sources = new ArrayList<DataSourceType>();
+        final Iterator<AbstractCSWFactory> ite = ServiceRegistry.lookupProviders(AbstractCSWFactory.class);
+        while (ite.hasNext()) {
+            AbstractCSWFactory currentFactory = ite.next();
+            sources.addAll(currentFactory.availableType());
+        }
+        final StringList result = new StringList();
+        for (DataSourceType source : sources) {
+            result.getList().add(source.getName());
+        }
+        return result;
     }
 }
