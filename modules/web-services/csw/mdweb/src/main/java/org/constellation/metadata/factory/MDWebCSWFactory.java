@@ -42,7 +42,7 @@ import org.constellation.metadata.harvest.FileSystemHarvester;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 import static org.constellation.generic.database.Automatic.*;
@@ -99,8 +99,8 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public AbstractIndexSearcher getIndexSearcher(File configDirectory, String serviceID) throws IndexingException {
-        return new AbstractIndexSearcher(configDirectory, serviceID);
+    public LuceneIndexSearcher getIndexSearcher(File configDirectory, String serviceID) throws IndexingException {
+        return new LuceneIndexSearcher(configDirectory, serviceID);
     }
 
     /**

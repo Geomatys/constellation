@@ -99,7 +99,7 @@ import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.ogc.xml.v110.FilterCapabilities;
 import org.geotoolkit.ogc.xml.v110.SortByType;
@@ -151,7 +151,7 @@ public class CSWworker extends AbstractWorker {
     /**
      * A lucene index searcher to make quick search on the metadatas.
      */
-    private AbstractIndexSearcher indexSearcher;
+    private LuceneIndexSearcher indexSearcher;
     
     /**
      * A filter parser which create lucene query from OGC filter

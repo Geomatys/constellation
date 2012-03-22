@@ -39,7 +39,7 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.io.netcdf.NetCDFMetadataReader;
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 import static org.constellation.generic.database.Automatic.*;
@@ -95,8 +95,8 @@ public class NetCDFCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public AbstractIndexSearcher getIndexSearcher(final File configDir, final String serviceID) throws IndexingException {
-        return new AbstractIndexSearcher(configDir, serviceID);
+    public LuceneIndexSearcher getIndexSearcher(final File configDir, final String serviceID) throws IndexingException {
+        return new LuceneIndexSearcher(configDir, serviceID);
     }
 
     /**

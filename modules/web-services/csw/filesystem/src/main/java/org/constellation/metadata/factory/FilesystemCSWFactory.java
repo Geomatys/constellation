@@ -48,7 +48,7 @@ import static org.constellation.generic.database.Automatic.*;
 
 // GeotoolKit dependencies
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 /**
@@ -100,8 +100,8 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public AbstractIndexSearcher getIndexSearcher(File configDirectory, String serviceID) throws IndexingException {
-        return new AbstractIndexSearcher(configDirectory, serviceID);
+    public LuceneIndexSearcher getIndexSearcher(File configDirectory, String serviceID) throws IndexingException {
+        return new LuceneIndexSearcher(configDirectory, serviceID);
     }
 
     /**

@@ -1397,7 +1397,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
-            return null;
+            return new ArrayList<String>();
         }
     }
     

@@ -36,7 +36,7 @@ import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.util.FileUtilities;
 
 //Junit dependencies
@@ -61,7 +61,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_35), Level.FINER);
         indexer.destroy();
         
-        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_35));
+        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_35));
         indexSearcher.setLogLevel(Level.FINER);
     }
 

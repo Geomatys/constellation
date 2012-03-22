@@ -49,14 +49,14 @@ import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 
 /**
  *  A Lucene searcher for an index connected to an O&M DataSource.
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class LuceneObservationSearcher extends AbstractIndexSearcher {
+public class LuceneObservationSearcher extends LuceneIndexSearcher {
 
     /**
      * Build a new index searcher with the index located in the specified directory.

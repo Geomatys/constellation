@@ -26,7 +26,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.filter.FilterFactory2;
@@ -41,7 +41,7 @@ public abstract class AbstractAnalyzerTest {
 
     protected static final Logger logger = Logging.getLogger("org.constellation.metadata.index.generic");
 
-    protected static AbstractIndexSearcher indexSearcher;
+    protected static LuceneIndexSearcher indexSearcher;
 
     public static List<Object> fillTestData() throws JAXBException {
         List<Object> result       = new ArrayList<Object>();

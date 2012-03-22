@@ -33,7 +33,7 @@ import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.util.FileUtilities;
 
 //Junit dependencies
@@ -58,7 +58,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new KeywordAnalyzer(), Level.FINER);
         indexer.destroy();
         
-        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new KeywordAnalyzer());
+        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new KeywordAnalyzer());
         indexSearcher.setLogLevel(Level.FINER);
     }
 

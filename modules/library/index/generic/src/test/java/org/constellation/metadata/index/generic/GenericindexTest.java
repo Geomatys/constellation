@@ -50,7 +50,7 @@ import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
@@ -80,7 +80,7 @@ public class GenericindexTest {
 
     private static final Logger logger = Logging.getLogger("org.constellation.metadata");
 
-    private static AbstractIndexSearcher indexSearcher;
+    private static LuceneIndexSearcher indexSearcher;
 
     private static GenericIndexer indexer;
     
@@ -92,7 +92,7 @@ public class GenericindexTest {
         FileUtilities.deleteDirectory(configDirectory);
         List<Object> object       = fillTestData();
         indexer                   = new GenericIndexer(object, null, configDirectory, "");
-        indexSearcher             = new AbstractIndexSearcher(configDirectory, "");
+        indexSearcher             = new LuceneIndexSearcher(configDirectory, "");
         //indexer.setLogLevel(Level.FINER);
         //indexSearcher.setLogLevel(Level.FINER);
         

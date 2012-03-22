@@ -53,7 +53,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
@@ -81,7 +81,7 @@ public class MdwebIndexTest {
     
     private static final Logger logger = Logging.getLogger("org.constellation.metadata");
 
-    private static AbstractIndexSearcher indexSearcher;
+    private static LuceneIndexSearcher indexSearcher;
 
     private static MDWebIndexer indexer;
 
@@ -117,7 +117,7 @@ public class MdwebIndexTest {
         Automatic configuration = new Automatic("mdweb", bdd);
         configuration.setConfigurationDirectory(configDirectory);
         indexer                 = new MDWebIndexer(configuration, "");
-        indexSearcher           = new AbstractIndexSearcher(configDirectory, "");
+        indexSearcher           = new LuceneIndexSearcher(configDirectory, "");
         indexer.setLogLevel(Level.FINER);
         indexSearcher.setLogLevel(Level.FINER);
 

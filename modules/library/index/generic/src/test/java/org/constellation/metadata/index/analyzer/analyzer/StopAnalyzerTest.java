@@ -35,7 +35,7 @@ import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.util.FileUtilities;
 
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -59,7 +59,7 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         List<Object> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StopAnalyzer(Version.LUCENE_35), Level.FINER);
         indexer.destroy();
-        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_35));
+        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_35));
         indexSearcher.setLogLevel(Level.FINER);
     }
 

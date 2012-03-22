@@ -35,7 +35,7 @@ import org.constellation.metadata.io.MetadataWriter;
 
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 /**
@@ -100,7 +100,7 @@ public interface AbstractCSWFactory {
      * @return  a Lucene index searcher for the specified dataSource type.
      * @throws IndexingException
      */
-    AbstractIndexSearcher getIndexSearcher(final File configDir, final String serviceID) throws IndexingException;
+    LuceneIndexSearcher getIndexSearcher(final File configDir, final String serviceID) throws IndexingException;
 
     /**
      * Return a catalog harvester in the specified implementation type.
