@@ -278,7 +278,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         final List<Double> minys = extractPositions(form, queryableSet.get("SouthBoundLatitude"));
         try {
             if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
-                addBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
+                addBoundingBox(doc, minxs, maxxs, minys, maxys, 268435540);
                 return true;
             } else {
                 LOGGER.log(Level.WARNING,NOT_SPATIALLY_INDEXABLE + "{0}\n cause: missing coordinates.", getIdentifier(form));
