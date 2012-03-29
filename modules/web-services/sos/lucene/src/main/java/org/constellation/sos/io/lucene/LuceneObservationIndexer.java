@@ -30,8 +30,10 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.util.Version;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.Utils;
 import org.constellation.ws.CstlServiceException;
@@ -66,7 +68,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
      * @param serviceID  The identifier, if there is one, of the index/service.
      */
     public LuceneObservationIndexer(Automatic configuration, String serviceID) throws IndexingException {
-        super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer());
+        super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer(Version.LUCENE_35));
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             observationDirectory = new File(dataDirectory, "observations");
@@ -80,9 +82,9 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
         } else {
             throw new IndexingException("The data directory does not exist: ");
         }
-        if (create)
+        if (create) {
             createIndex();
-
+        }
     }
 
     /**
@@ -93,13 +95,13 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
         LOGGER.info("Creating lucene index for Filesystem observations please wait...");
 
         final long time = System.currentTimeMillis();
-        IndexWriter writer;
         int nbObservation = 0;
         int nbTemplate    = 0;
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
-            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_35, analyzer);
+            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
 
             // getting the objects list and index avery item in the IndexWriter.
             for (File observationFile : observationDirectory.listFiles()) {
@@ -132,13 +134,13 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
+            LOGGER.log(Level.SEVERE,CORRUPTED_SINGLE_MSG + "{0}", ex.getMessage());
             throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
         } catch (LockObtainFailedException ex) {
-            LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
+            LOGGER.log(Level.SEVERE,LOCK_SINGLE_MSG + "{0}", ex.getMessage());
             throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
+            LOGGER.log(Level.SEVERE,IO_SINGLE_MSG + "{0}", ex.getMessage());
             throw new IndexingException("IOException while indexing documents.", ex);
         } catch (JAXBException ex) {
             String msg = ex.getMessage();
@@ -159,14 +161,14 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
      * {@inheritDoc}
      */
     @Override
-    public void createIndex(List<ObservationType> observations) throws IndexingException {
+    public void createIndex(final List<ObservationType> observations) throws IndexingException {
         LOGGER.info("Creating lucene index for Filesystem observations please wait...");
 
         final long time = System.currentTimeMillis();
-        IndexWriter writer;
         final int nbObservations = observations.size();
         try {
-            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
+            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_35, analyzer);
+            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
 
             for (ObservationType observation : observations) {
                 indexDocument(writer, observation);
@@ -175,13 +177,13 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            LOGGER.warning(CORRUPTED_SINGLE_MSG + ex.getMessage());
+            LOGGER.log(Level.WARNING,CORRUPTED_SINGLE_MSG + "{0}", ex.getMessage());
             throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
         } catch (LockObtainFailedException ex) {
-            LOGGER.warning(LOCK_SINGLE_MSG + ex.getMessage());
+            LOGGER.log(Level.WARNING,LOCK_SINGLE_MSG + "{0}", ex.getMessage());
             throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
-            LOGGER.warning(IO_SINGLE_MSG + ex.getMessage());
+            LOGGER.log(Level.WARNING,IO_SINGLE_MSG + "{0}", ex.getMessage());
             throw new IndexingException("SQLException while indexing documents.", ex);
         }
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\n" +
