@@ -41,6 +41,7 @@ import org.apache.lucene.document.Field;
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.util.NullArgumentException;
 
 import static org.constellation.metadata.CSWQueryable.*;
 /**
@@ -173,7 +174,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             } else if (value instanceof Number) {
                 indexNumericField(fieldName, (Number) value, doc);
             } else if (value != null){
-                LOGGER.warning("unexpected type for field:" + value.getClass());
+                LOGGER.log(Level.WARNING, "unexpected type for field:{0}", value.getClass());
             }
         }
     }
@@ -227,7 +228,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             fieldType = 'l';
         } else {
             fieldType = 'u';
-            LOGGER.severe("Unexpected Number type:" + numValue.getClass().getName());
+            LOGGER.log(Level.WARNING, "Unexpected Number type:{0}", numValue.getClass().getName());
         }
         addNumericField(fieldName, fieldType);
         addNumericField(fieldName + "_sort", fieldType);
@@ -280,18 +281,21 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         final List<Double> maxxs = extractPositions(form, queryableSet.get("EastBoundLongitude"));
         final List<Double> maxys = extractPositions(form, queryableSet.get("NorthBoundLatitude"));
         final List<Double> minys = extractPositions(form, queryableSet.get("SouthBoundLatitude"));
-
-        if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
-            if (minxs.size() == 1) {
-                addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
-                return true;
-            } else if (minxs.size() > 0) {
-                addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
-                return true;
+        try {
+            if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
+                if (minxs.size() == 1) {
+                    addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
+                    return true;
+                } else if (minxs.size() > 0) {
+                    addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
+                    return true;
+                }
+            } else {
+                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(form) + "\n cause: missing coordinates."
+                        + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
             }
-        } else {
-            LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(form) + "\n cause: missing coordinates."
-                    + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
+        } catch (NullArgumentException ex) {
+            throw new IndexingException("error while spatially indexing:" + doc.get("id"), ex);
         }
         return false;
     }
