@@ -177,7 +177,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
      * {@inheritDoc}
      */
     @Override
-    protected Document createDocument(final ObservationType observation) {
+    protected Document createDocument(final ObservationType observation, final int docid) {
         // make a new, empty document
         final Document doc = new Document();
 

@@ -92,10 +92,11 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     * @return A Lucene document.
     */
     @Override
-    protected Document createDocument(final A metadata) throws IndexingException {
+    protected Document createDocument(final A metadata, final int docId) throws IndexingException {
         // make a new, empty document
         final Document doc = new Document();
-
+        doc.add(new Field("docid", docId + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
+         
         indexSpecialField(metadata, doc);
 
         final StringBuilder anyText     = new StringBuilder();
