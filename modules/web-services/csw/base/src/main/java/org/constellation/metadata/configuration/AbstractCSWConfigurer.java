@@ -61,7 +61,7 @@ import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.lucene.index.AbstractIndexer.IndexDirectoryFilter;
+import org.geotoolkit.lucene.index.IndexDirectoryFilter;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 

@@ -20,10 +20,6 @@ package org.constellation.metadata.index;
 // J2SE dependencies
 import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.document.NumericField;
-import java.util.Properties;
-import org.geotoolkit.util.FileUtilities;
-import org.apache.lucene.index.IndexWriter;
-import java.io.IOException;
 import java.util.Map.Entry;
 import java.io.File;
 import java.util.ArrayList;
@@ -56,8 +52,6 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
     private final Map<String, List<String>> additionalQueryable;
     
-    private final Map<String, String> numericFields = new HashMap<String, String>();
-
     /**
      * Build a new CSW metadata indexer.
      *
@@ -283,16 +277,10 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         final List<Double> minys = extractPositions(form, queryableSet.get("SouthBoundLatitude"));
         try {
             if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
-                if (minxs.size() == 1) {
-                    addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
-                    return true;
-                } else if (minxs.size() > 0) {
-                    addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
-                    return true;
-                }
+                addBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
+                return true;
             } else {
-                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(form) + "\n cause: missing coordinates."
-                        + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
+                LOGGER.log(Level.WARNING,NOT_SPATIALLY_INDEXABLE + "{0}\n cause: missing coordinates.", getIdentifier(form));
             }
         } catch (NullArgumentException ex) {
             throw new IndexingException("error while spatially indexing:" + doc.get("id"), ex);
@@ -326,46 +314,6 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         return coordinate;
     }
 
-    /**
-     * Add a numeric fields to the current list.
-     * 
-     * @param fieldName
-     * @param numberType 
-     */
-    protected void addNumericField(final String fieldName, final Character numberType) {
-        if (numericFields.get(fieldName) == null) {
-            numericFields.put(fieldName, numberType.toString());
-        }
-    }
-    
-    /**
-     * Store the numeric fields in a properties file int the index directory
-     */
-    protected void storeNumericFieldsFile() {
-        final File indexDirectory   = getFileDirectory();
-        final File numericFieldFile = new File(indexDirectory, "numericFields.properties");
-        final Properties prop       = new Properties();
-        prop.putAll(numericFields);
-        try {
-            FileUtilities.storeProperties(prop, numericFieldFile);
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, "Unable to store the numeric fields properties file.", ex);
-        }
-        
-    }
-    
-    protected void stopIndexation(final IndexWriter writer, final String serviceID) throws IOException {
-        // writer.optimize(); no longer justified
-        writer.close();
-        FileUtilities.deleteDirectory(getFileDirectory());
-        if (indexationToStop.contains(serviceID)) {
-            indexationToStop.remove(serviceID);
-        }
-        if (indexationToStop.isEmpty()) {
-            stopIndexing = false;
-        }
-    }
-    
     /**
      * Extract some values from a metadata object using  the list of paths.
      * 

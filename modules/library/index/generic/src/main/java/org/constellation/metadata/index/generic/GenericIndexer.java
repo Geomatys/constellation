@@ -19,7 +19,6 @@ package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,10 +39,6 @@ import java.util.logging.Level;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.SimpleFSDirectory;
-import org.apache.lucene.util.Version;
 
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
@@ -132,85 +127,26 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * {@inheritDoc}
      */
     @Override
-    public void createIndex() throws IndexingException {
-        LOGGER.log(logLevel, "(light memory) Creating lucene index for Generic database please wait...");
-        final long time = System.currentTimeMillis();
-        int nbEntries = 0;
+    protected List<String> getAllIdentifiers() throws IndexingException {
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_35, analyzer);
-            final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
-            final String serviceID       = getServiceID();
-            
-            // TODO getting the objects list and index avery item in the IndexWriter.
-            final List<String> ids = reader.getAllIdentifiers();
-            nbEntries = ids.size();
-            LOGGER.log( Level.INFO, "{0} metadata to index (light memory mode)", nbEntries);
-            for (String id : ids) {
-                if (!stopIndexing && !indexationToStop.contains(serviceID)) {
-                    try {
-                        final Object entry = reader.getMetadata(id, AbstractMetadataReader.ISO_19115);
-                        indexDocument(writer, entry);
-                    } catch (MetadataIoException ex) {
-                        LOGGER.warning("Metadata IO exeption while indexing metadata: " + id + " " + ex.getMessage() + "\nmove to next metadata...");
-                    }
-                } else {
-                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
-                     stopIndexation(writer, serviceID);
-                     return;
-                }
-            }
-            // writer.optimize(); no longer justified
-            writer.close();
-            
-            // we store the numeric fields in a properties file int the index directory
-            storeNumericFieldsFile();
-
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "IOException while indexing document: {0}", ex.getMessage());
-            throw new IndexingException("IOException while indexing documents.", ex);
+            return reader.getAllIdentifiers();
         } catch (MetadataIoException ex) {
-            LOGGER.log(Level.SEVERE, "CstlServiceException while indexing document: {0}", ex.getMessage());
-            throw new IndexingException("CstlServiceException while indexing documents.", ex);
+            throw new IndexingException("Metadata_IOException while reading all identifiers", ex);
         }
-        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\nDocuments indexed: " + nbEntries);
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createIndex(final List<Object> toIndex) throws IndexingException {
-        LOGGER.log(logLevel, "Creating lucene index for Generic database please wait...");
-        final long time = System.currentTimeMillis();
-        int nbEntries = 0;
+    protected Object getEntry(final String identifier) throws IndexingException {
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_35, analyzer);
-            final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
-            final String serviceID       = getServiceID();
-            
-            nbEntries = toIndex.size();
-            for (Object entry : toIndex) {
-                if (!stopIndexing && !indexationToStop.contains(serviceID)) {
-                    indexDocument(writer, entry);
-                } else {
-                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
-                     stopIndexation(writer, serviceID);
-                     return;
-                }
-            }
-            // writer.optimize(); no longer justified
-            writer.close();
-
-            // we store the numeric fields in a properties file int the index directory
-            storeNumericFieldsFile();
-            
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, IO_SINGLE_MSG, ex);
+            return reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115);
+        } catch (MetadataIoException ex) {
+            throw new IndexingException("Metadata_IOException while reading entry for:" + identifier, ex);
         }
-        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\n" +
-                " documents indexed: " + nbEntries);
     }
-
+    
     /**
      * {@inheritDoc}
      */

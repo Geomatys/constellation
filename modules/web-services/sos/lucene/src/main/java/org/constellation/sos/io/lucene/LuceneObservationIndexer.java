@@ -91,6 +91,22 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
      * {@inheritDoc}
      */
     @Override
+    protected List<String> getAllIdentifiers() throws IndexingException {
+        throw new UnsupportedOperationException("not used in this implementation");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ObservationType getEntry(final String identifier) throws IndexingException {
+        throw new UnsupportedOperationException("not used in this implementation");
+    }
+    
+     /**
+     * {@inheritDoc}
+     */
+    @Override
     public void createIndex() throws IndexingException {
         LOGGER.info("Creating lucene index for Filesystem observations please wait...");
 
@@ -161,40 +177,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
      * {@inheritDoc}
      */
     @Override
-    public void createIndex(final List<ObservationType> observations) throws IndexingException {
-        LOGGER.info("Creating lucene index for Filesystem observations please wait...");
-
-        final long time = System.currentTimeMillis();
-        final int nbObservations = observations.size();
-        try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_35, analyzer);
-            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
-
-            for (ObservationType observation : observations) {
-                indexDocument(writer, observation);
-            }
-            // writer.optimize(); no longer justified
-            writer.close();
-
-        } catch (CorruptIndexException ex) {
-            LOGGER.log(Level.WARNING,CORRUPTED_SINGLE_MSG + "{0}", ex.getMessage());
-            throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
-        } catch (LockObtainFailedException ex) {
-            LOGGER.log(Level.WARNING,LOCK_SINGLE_MSG + "{0}", ex.getMessage());
-            throw new IndexingException(LOCK_MULTI_MSG, ex);
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING,IO_SINGLE_MSG + "{0}", ex.getMessage());
-            throw new IndexingException("SQLException while indexing documents.", ex);
-        }
-        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\n" +
-                     nbObservations + " documents indexed.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Document createDocument(ObservationType observation) {
+    protected Document createDocument(final ObservationType observation) {
         // make a new, empty document
         final Document doc = new Document();
 

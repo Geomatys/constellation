@@ -18,7 +18,6 @@
 package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,10 +32,6 @@ import javax.sql.DataSource;
 // Apache Lucene dependencies
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.SimpleFSDirectory;
-import org.apache.lucene.util.Version;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
@@ -154,17 +149,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      * {@inheritDoc}
      */
     @Override
-    public void createIndex() throws IndexingException {
-        LOGGER.log(logLevel, "(light memory) Creating lucene index for MDWeb database please wait...");
-
-        final long time  = System.currentTimeMillis();
-        int nbRecordSets = 0;
-        int nbForms      = 0;
+    protected List<String> getAllIdentifiers() throws IndexingException {
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_35, analyzer);
-            final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
-            final String serviceID       = getServiceID();
-            
             // getting the objects list and index avery item in the IndexWriter.
             final List<RecordSet> cats = mdWebReader.getRecordSets();
             final List<RecordSet> catToIndex = new ArrayList<RecordSet>();
@@ -175,7 +161,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                     } else {
                         LOGGER.log(logLevel, "RecordSet:{0} is internal we exclude it.", r.getCode());
                     }
-               }
+                }
                 if (indexExternalRecordset) {
                     if (r.getExposure() == EXPOSURE.EXTERNAL) {
                         catToIndex.add(r);
@@ -184,77 +170,24 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                     }
                 }
             }
-            
-            nbRecordSets = cats.size();
-            final List<String> results = mdWebReader.getAllIdentifiers(catToIndex, indexOnlyPusblishedMetadata);
-            LOGGER.log(logLevel, "{0} forms to read.", results.size());
-            for (String entry : results) {
-                if (!stopIndexing && !indexationToStop.contains(serviceID)) {
-                    final Form form = mdWebReader.getForm(entry);
-                    indexDocument(writer, form);
-                    nbForms++;
-                } else {
-                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
-                     stopIndexation(writer, serviceID);
-                     return;
-                }
-            }
-            // writer.optimize(); no longer justified
-            writer.close();
-            
-            // we store the numeric fields in a properties file int the index directory
-            storeNumericFieldsFile();
-
-        } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
+            return mdWebReader.getAllIdentifiers(catToIndex, indexOnlyPusblishedMetadata);
         } catch (MD_IOException ex) {
-            LOGGER.log(Level.SEVERE, "SQLException while indexing document: {0}", ex.getMessage());
-            throw new IndexingException("SQLException while indexing documents.", ex);
+            throw new IndexingException("MD_IOException while reading all identifiers", ex);
         }
-        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\nRecordSets: " +
-                nbRecordSets + " documents indexed: " + nbForms + ".");
     }
-
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createIndex(List<Form> forms) throws IndexingException {
-        LOGGER.log(logLevel, "Creating lucene index for MDWeb database please wait...");
-
-        final long time = System.currentTimeMillis();
-        final int nbRecordSets = 0;
-        int nbForms = 0;
+    protected Form getEntry(final String identifier) throws IndexingException {
         try {
-            final IndexWriterConfig conf = new IndexWriterConfig(Version.LUCENE_35, analyzer);
-            final IndexWriter writer     = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), conf);
-            final String serviceID       = getServiceID();
-            nbForms = forms.size();
-            for (Form form : forms) {
-                if (!stopIndexing && !indexationToStop.contains(serviceID)) {
-                    indexDocument(writer, form);
-                } else {
-                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
-                     stopIndexation(writer, serviceID);
-                     return;
-                }
-            }
-            // writer.optimize(); no longer justified
-            writer.close();
-
-            // we store the numeric fields in a properties file int the index directory
-            storeNumericFieldsFile();
-            
-        } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
+            return mdWebReader.getForm(identifier);
+        } catch (MD_IOException ex) {
+            throw new IndexingException("MD_IOException while reading entry for:" + identifier, ex);
         }
-        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\nRecordSets: " +
-                nbRecordSets + " documents indexed: " + nbForms + ".");
     }
-
+    
     /**
      * {@inheritDoc}
      */
