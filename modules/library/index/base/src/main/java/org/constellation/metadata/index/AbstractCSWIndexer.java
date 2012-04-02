@@ -108,7 +108,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             indexQueryableSet(doc, metadata, isoQueryable, anyText);
 
             //we add the geometry parts
-            alreadySpatiallyIndexed = indexSpatialPart(doc, metadata, isoQueryable);
+            alreadySpatiallyIndexed = indexSpatialPart(doc, metadata, isoQueryable, 268435540);
 
         } else if (isEbrim30(metadata)) {
            // TODO
@@ -124,7 +124,8 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
         //we add the geometry parts if its nor already indexed
         if (!alreadySpatiallyIndexed) {
-            indexSpatialPart(doc, metadata, dcQueryable);
+            //TODO find the real srid instead of static 4326
+            indexSpatialPart(doc, metadata, dcQueryable, 4326);
         }
 
         // we add to the index the special queryable elements
@@ -265,12 +266,12 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      * @param doc The current Lucene document.
      * @param form The metadata records to spatially index.
      * @param queryableSet A set of queryable Term.
-     * @param ordinal
+     * @param srid the coordinate reference system SRID
      *
      * @return true if the indexation succeed
      * @throws MD_IOException
      */
-    protected boolean indexSpatialPart(Document doc, A form, Map<String, List<String>> queryableSet) throws IndexingException {
+    private boolean indexSpatialPart(Document doc, A form, Map<String, List<String>> queryableSet, int srid) throws IndexingException {
 
         final List<Double> minxs = extractPositions(form, queryableSet.get("WestBoundLongitude"));
         final List<Double> maxxs = extractPositions(form, queryableSet.get("EastBoundLongitude"));
@@ -278,7 +279,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         final List<Double> minys = extractPositions(form, queryableSet.get("SouthBoundLatitude"));
         try {
             if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
-                addBoundingBox(doc, minxs, maxxs, minys, maxys, 268435540);
+                addBoundingBox(doc, minxs, maxxs, minys, maxys, srid);
                 return true;
             } else {
                 LOGGER.log(Level.WARNING,NOT_SPATIALLY_INDEXABLE + "{0}\n cause: missing coordinates.", getIdentifier(form));
