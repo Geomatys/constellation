@@ -26,16 +26,10 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.MissingResourceException;
-import java.util.Properties;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.sql.DataSource;
@@ -135,6 +129,20 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     private final Map<Standard, List<Standard>> standardMapping = new HashMap<Standard, List<Standard>>();
 
+    /**
+     * Record the date format in the metadata.
+     */
+    protected static final List<DateFormat> DATE_FORMAT = new ArrayList<DateFormat>();
+    static {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        df.setTimeZone(TimeZone.getDefault());
+        DATE_FORMAT.add(df);
+        
+        df = new SimpleDateFormat("yyyy-MM-dd");
+        df.setTimeZone(TimeZone.getDefault());
+        DATE_FORMAT.add(df);
+    }
+    
     /**
      * Build a new metadata writer.
      *
@@ -605,8 +613,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
             String value;
             if (object instanceof java.util.Date) {
-                synchronized (DATE_FORMAT) {
-                    value = DATE_FORMAT.get(1).format(object);
+                final java.util.Date d = (java.util.Date) object;
+                Calendar c = new GregorianCalendar();
+                c.setTime(d);
+                if (c.get(Calendar.HOUR) == 0 && c.get(Calendar.MINUTE) == 0 && c.get(Calendar.SECOND) == 0 && c.get(Calendar.MILLISECOND) == 0) {
+                    synchronized (DATE_FORMAT) {
+                        value = DATE_FORMAT.get(1).format(object);
+                        System.out.println("formatted to:" + value);
+                    }
+                } else {
+                    synchronized (DATE_FORMAT) {
+                        value = DATE_FORMAT.get(0).format(object);
+                        System.out.println("formatted to:" + value);
+                    }
                 }
             } else if (object.getClass().isEnum()){
                 value =  object.toString().toLowerCase(Locale.US);

@@ -487,7 +487,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 if (textValue == null || textValue.isEmpty()) {
                     return null;
                 }
-                return TemporalUtilities.parseDateSafe(textValue,true);
+                return TemporalUtilities.parseDateSafe(textValue,true, true);
 
             } else if (classe.equals(Boolean.class)) {
                 if (textValue == null || textValue.isEmpty() || textValue.equals("null")) {
