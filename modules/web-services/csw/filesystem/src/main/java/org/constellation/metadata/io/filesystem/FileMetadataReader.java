@@ -569,11 +569,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         
                      //continue to the next file   
                     } catch (JAXBException ex) {
-                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\n" +
-                                "cause: " + ex.getMessage());
+                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\ncause: " + ex.getMessage());
                     } catch (IllegalArgumentException ex) {
-                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\n"
-                                + "cause: " + ex.getMessage());
+                        LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled\ncause: " + ex.getMessage());
                     }
                 } else {
                     result.addAll(getAllValuesFromPaths(paths, metadataFile));
@@ -604,7 +602,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * {@inheritDoc}
      */
     @Override
-    public List<String> executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException {
+    public String[] executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException {
         throw new MetadataIoException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 

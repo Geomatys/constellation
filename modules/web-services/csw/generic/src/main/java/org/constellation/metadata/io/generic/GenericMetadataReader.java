@@ -193,7 +193,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * {@inheritDoc}
      */
     @Override
-    public List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
+    public String[] executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
         throw new MetadataIoException("Not supported int this implementation.");
     }
 

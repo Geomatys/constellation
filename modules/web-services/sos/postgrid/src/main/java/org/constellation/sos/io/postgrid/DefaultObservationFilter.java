@@ -24,9 +24,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
@@ -378,10 +376,10 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public List<String> filterObservation() throws CstlServiceException {
+    public Set<String> filterObservation() throws CstlServiceException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
-            final List<String> results       = new ArrayList<String>();
+            final Set<String> results       = new LinkedHashSet<String>();
             final Statement currentStatement = connection.createStatement();
             final ResultSet result           = currentStatement.executeQuery(sqlRequest.toString());
             while (result.next()) {

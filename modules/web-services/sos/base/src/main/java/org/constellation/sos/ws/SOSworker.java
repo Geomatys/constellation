@@ -25,17 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
@@ -1229,7 +1219,7 @@ public class SOSworker extends AbstractWorker {
             // case (1)
             if (!(localOmFilter instanceof ObservationFilterReader)) {
                 matchingResult = new ArrayList<Observation>();
-                final List<String> observationIDs = localOmFilter.filterObservation();
+                final Set<String> observationIDs = localOmFilter.filterObservation();
                 for (String observationID : observationIDs) {
                     matchingResult.add(omReader.getObservation(observationID, resultModel));
                 }

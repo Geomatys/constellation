@@ -17,10 +17,7 @@
 
 package org.constellation.sos.io.lucene;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
@@ -306,7 +303,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public List<String> filterObservation() throws CstlServiceException {
+    public Set<String> filterObservation() throws CstlServiceException {
         try {
             return searcher.doSearch(new SpatialQuery(luceneRequest.toString()));
         } catch(SearchingException ex) {

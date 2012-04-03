@@ -18,6 +18,7 @@
 package org.constellation.sos.io;
 
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
@@ -161,7 +162,7 @@ public interface ObservationFilter {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    List<String> filterObservation() throws CstlServiceException;
+    Set<String> filterObservation() throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.

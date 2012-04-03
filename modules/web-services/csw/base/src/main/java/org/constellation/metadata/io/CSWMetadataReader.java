@@ -21,6 +21,7 @@ package org.constellation.metadata.io;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
@@ -80,7 +81,7 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return
      * @throws MetadataIoException
      */
-    List<String> executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException;
+    String[] executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException;
 
     /**
      * Set the global level of log for information message.

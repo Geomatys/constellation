@@ -26,16 +26,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 
@@ -800,7 +792,7 @@ public class CSWworker extends AbstractWorker {
                                           NO_APPLICABLE_CODE, "startPosition");
         }
 
-        List<String> results;
+        final String[] results;
         if (outputSchema.equals(EBRIM_30) || outputSchema.equals(EBRIM_25)) {
            
             // build the sql query from the specified filter
@@ -866,6 +858,7 @@ public class CSWworker extends AbstractWorker {
             // we try to execute the query
             results = executeLuceneQuery(luceneQuery);
         }
+        final int nbResults = results.length;
         
         //we look for distributed queries
         DistributedResults distributedResults = new DistributedResults();
@@ -874,12 +867,12 @@ public class CSWworker extends AbstractWorker {
             if (dSearch != null && dSearch.getHopCount() > 0) {
                 int distributedStartPosition;
                 int distributedMaxRecord;
-                if (startPos > results.size()) {
-                    distributedStartPosition = startPos - results.size();
+                if (startPos > nbResults) {
+                    distributedStartPosition = startPos - nbResults;
                     distributedMaxRecord     = maxRecord;
                 } else {
                     distributedStartPosition = 1;
-                    distributedMaxRecord     = maxRecord - results.size();
+                    distributedMaxRecord     = maxRecord - nbResults;
                 }
                 //decrement the hopCount
                 dSearch.setHopCount(dSearch.getHopCount() - 1);
@@ -888,7 +881,7 @@ public class CSWworker extends AbstractWorker {
         }
         
         int nextRecord         = startPos + maxRecord;
-        final int totalMatched = results.size() + distributedResults.nbMatched;
+        final int totalMatched = nbResults + distributedResults.nbMatched;
         
         if (nextRecord > totalMatched)
             nextRecord = 0;
@@ -896,8 +889,8 @@ public class CSWworker extends AbstractWorker {
         final int maxDistributed = distributedResults.additionalResults.size();
         int max = (startPos - 1) + maxRecord;
         
-        if (max > results.size()) {
-            max = results.size();
+        if (max > nbResults) {
+            max = nbResults;
         }
         LOGGER.log(Level.FINER, "local max = " + max + " distributed max = " + maxDistributed);
 
@@ -914,7 +907,7 @@ public class CSWworker extends AbstractWorker {
 
         // we return only the number of result matching
         if (resultType.equals(ResultType.HITS)) {
-            searchResults = new SearchResultsType(id, (ElementSetType)set, results.size(), nextRecord);
+            searchResults = new SearchResultsType(id, (ElementSetType)set, nbResults, nextRecord);
 
         // we return a list of Record
         } else if (resultType.equals(ResultType.RESULTS)) {
@@ -923,15 +916,16 @@ public class CSWworker extends AbstractWorker {
             final List<Object> records                     = new ArrayList<Object>();
             try {
                 for (int i = startPos -1; i < max; i++) {
-                    final Object obj = mdReader.getMetadata(results.get(i), mode, set, elementName);
-                    if (obj == null && (max + 1) < results.size()) {
+                    final Object obj = mdReader.getMetadata(results[i], mode, set, elementName);
+                    if (obj == null && (max + 1) < nbResults) {
                         max++;
 
                     } else if (obj != null) {
-                        if (mode == DUBLINCORE)
+                        if (mode == DUBLINCORE) {
                             abstractRecords.add((AbstractRecordType)obj);
-                        else
+                        } else {
                             records.add(obj);
+                        }
                     }
                 }
             } catch (MetadataIoException ex) {
@@ -991,10 +985,11 @@ public class CSWworker extends AbstractWorker {
      * @return
      * @throws CstlServiceException
      */
-    private List<String> executeLuceneQuery(final SpatialQuery query) throws CstlServiceException {
+    private String[] executeLuceneQuery(final SpatialQuery query) throws CstlServiceException {
         LOGGER.log(Level.FINE, "Lucene query obtained:{0}", query);
         try {
-            return indexSearcher.doSearch(query);
+            final Set<String> results = indexSearcher.doSearch(query);
+            return results.toArray(new String[results.size()]);
         
         } catch (SearchingException ex) {
             throw new CstlServiceException("The service has throw an exception while making identifier lucene request",
@@ -1374,7 +1369,7 @@ public class CSWworker extends AbstractWorker {
                         throw new CstlServiceException(ex.getMessage(), ex, ex.getExceptionCode(), ex.getLocator());
                     }
                     // we try to execute the query
-                    final List<String> results = executeLuceneQuery(luceneQuery);
+                    final String[] results = executeLuceneQuery(luceneQuery);
 
                     try {
                         for (String metadataID : results) {
@@ -1424,7 +1419,7 @@ public class CSWworker extends AbstractWorker {
                     
                     // we try to execute the query
                     try {
-                        final List<String> results = executeLuceneQuery(luceneQuery);
+                        final String[] results = executeLuceneQuery(luceneQuery);
                         for (String metadataID : results) {
                             boolean updated;
                             if (updateRequest.getAny() != null) {

@@ -23,9 +23,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 
 // Constellation dependencies
@@ -311,11 +309,11 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public List<String> filterObservation() throws CstlServiceException {
+    public Set<String> filterObservation() throws CstlServiceException {
         final String request = currentQuery.buildSQLQuery();
         LOGGER.log(Level.INFO, "request:{0}", request);
         try {
-            final List<String> results       = new ArrayList<String>();
+            final Set<String> results        = new LinkedHashSet<String>();
             final Connection connection      = acquireConnection();
             final Statement currentStatement = connection.createStatement();
             final ResultSet result           = currentStatement.executeQuery(request);

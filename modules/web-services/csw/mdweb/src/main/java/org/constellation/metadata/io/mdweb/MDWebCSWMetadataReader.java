@@ -22,12 +22,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
@@ -775,9 +770,10 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public List<String> executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException {
+    public String[] executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException {
         try {
-            return mdReader.executeFilterQuery(sqlQuery);
+            final Set<String> results = mdReader.executeFilterQuery(sqlQuery);
+            return results.toArray(new String[results.size()]);
         } catch (MD_IOException ex) {
            throw new MetadataIoException("The service has throw an SQL exception while making ebrim request:" + '\n' +
                                          "Cause: " + ex.getMessage(), NO_APPLICABLE_CODE);

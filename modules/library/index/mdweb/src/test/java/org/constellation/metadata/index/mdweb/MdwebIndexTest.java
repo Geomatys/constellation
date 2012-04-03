@@ -23,8 +23,7 @@ import java.util.Iterator;
 import org.mdweb.model.storage.TextValue;
 import java.io.File;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -157,14 +156,14 @@ public class MdwebIndexTest {
          * Test 1 simple search: title = 90008411.ctd
          */
         SpatialQuery spatialQuery = new SpatialQuery("Title:\"90008411.ctd\"", nullFilter, SerialChainFilter.AND);
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
         //expectedResult.add("42292_9s_19900610041000");
 
@@ -183,7 +182,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_9s_19900610041000");
@@ -213,7 +212,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
@@ -229,7 +228,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "SimpleSearch 4:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("40510_145_19930221211500");
         
 
@@ -246,7 +245,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "SimpleSearch 5:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("40510_145_19930221211500");
         
 
@@ -267,14 +266,14 @@ public class MdwebIndexTest {
          * Test 1 numeric search: CloudCover < 60
          */
         SpatialQuery spatialQuery = new SpatialQuery("CloudCover:{-2147483648 TO 60}", nullFilter, SerialChainFilter.AND);
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "numericComparisonSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
 
@@ -292,7 +291,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "numericComparisonSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
 
 
@@ -340,7 +339,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "numericComparisonSearch 5:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_5p_19900609195600");
         
@@ -359,7 +358,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "numericComparisonSearch 6:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
 
         //issues here it found
@@ -377,7 +376,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "numericComparisonSearch 7:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         //expectedResult.add("42292_5p_19900609195600");
 
         //issues here it didn't find
@@ -399,14 +398,14 @@ public class MdwebIndexTest {
          * Test 1 simple search: title = title1
          */
         SpatialQuery spatialQuery = new SpatialQuery("Title:90008411*", nullFilter, SerialChainFilter.AND);
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         
@@ -425,7 +424,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
 
 
@@ -482,7 +481,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
 
         //issues here it found
@@ -504,14 +503,14 @@ public class MdwebIndexTest {
          * Test 1 date search: date after 25/01/2009
          */
         SpatialQuery spatialQuery = new SpatialQuery("date:{\"20090125\" 30000101}", nullFilter, SerialChainFilter.AND);
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_9s_19900610041000");
@@ -530,7 +529,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "DateSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("CTDF02");
@@ -548,7 +547,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "DateSearch 3:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
@@ -566,7 +565,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "DateSearch 4:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_9s_19900610041000");
@@ -584,7 +583,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "DateSearch 5:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_9s_19900610041000");
@@ -603,7 +602,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "DateSearch 6:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         
@@ -630,14 +629,14 @@ public class MdwebIndexTest {
         SortField sf = new SortField("identifier_sort", SortField.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
         expectedResult.add("39727_22_19750113062500");
@@ -670,7 +669,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         expectedResult.add("cat-1");
@@ -704,7 +703,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("cat-1"); // TODO why cat-1 in first he is not indexable
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("CTDF02");
@@ -738,7 +737,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7k7");
         expectedResult.add("28644bf0-5d9d-4ebd-bef0-f2b0b2067b26");
@@ -772,7 +771,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
 
         // i don't why we have the good order here
         expectedResult.add("39727_22_19750113062500");
@@ -797,7 +796,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
 
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_5p_19900609195600");
@@ -829,14 +828,14 @@ public class MdwebIndexTest {
         LuceneOGCFilter sf = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", sf, SerialChainFilter.AND);
 
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("CTDF02");
@@ -863,7 +862,7 @@ public class MdwebIndexTest {
 
         logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("40510_145_19930221211500");

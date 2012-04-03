@@ -245,7 +245,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 final String childIdentifier = identifier.substring(separator + 1);
                 return getFileFromPathIdentifier(childIdentifier, child, ext);
             } else {
-                LOGGER.warning(child.getPath() + " is not a  directory.");
+                LOGGER.log(Level.WARNING, "{0} is not a  directory.", child.getPath());
                 return null;
             }
         }
@@ -316,7 +316,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                         final Method getter = ReflectionUtilities.getGetterFromName(qn.getLocalPart(), RecordType.class);
                         final Object param  = ReflectionUtilities.invokeMethod(record, getter);
 
-                        Method setter = null;
+                        final Method setter;
                         if (param != null) {
                             setter = ReflectionUtilities.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
                         } else {
@@ -642,7 +642,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * {@inheritDoc}
      */
     @Override
-    public List<String> executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException {
+    public String[] executeEbrimSQLQuery(final String sqlQuery) throws MetadataIoException {
         throw new MetadataIoException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 

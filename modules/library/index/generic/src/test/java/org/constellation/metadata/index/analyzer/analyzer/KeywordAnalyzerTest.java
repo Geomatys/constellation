@@ -21,7 +21,9 @@ package org.constellation.metadata.index.analyzer;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.apache.lucene.analysis.KeywordAnalyzer;
@@ -92,7 +94,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
          * Test 1 simple search: title = 90008411.ctd
          */
         SpatialQuery spatialQuery = new SpatialQuery("Title:\"90008411.ctd\"", nullFilter, SerialChainFilter.AND);
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
@@ -100,7 +102,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
         // the result we want are this
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
@@ -119,7 +121,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
@@ -140,7 +142,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
@@ -157,7 +159,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 4:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
@@ -176,7 +178,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 5:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
 
         assertEquals(expectedResult, result);
@@ -193,7 +195,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 6:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
@@ -214,7 +216,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "simpleSearch 7:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("CTDF02");
 
         assertEquals(expectedResult, result);
@@ -234,14 +236,14 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
          * Test 1 simple search: title = title1
          */
         SpatialQuery spatialQuery = new SpatialQuery("Title:90008411*", nullFilter, SerialChainFilter.AND);
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
 
@@ -259,11 +261,11 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
 
         // it didn't find any result (why???)
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
 
         assertEquals(expectedResult, result);
 
@@ -279,7 +281,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 3:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         assertTrue(result.contains("39727_22_19750113062500"));
         assertTrue(result.contains("40510_145_19930221211500"));
         assertTrue(result.contains("42292_5p_19900609195600"));
@@ -298,11 +300,11 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
 
         // ERROR it didn't find any result (why???)
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         
         assertEquals(expectedResult, result);
 
@@ -318,7 +320,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
@@ -326,7 +328,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
 
         // ERROR it didn't find any result (why???)
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
 
         assertEquals(expectedResult, result);
 
@@ -346,14 +348,14 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
          * Test 1 date search: date after 25/01/2009
          */
         SpatialQuery spatialQuery = new SpatialQuery("date:{20090125 30000101}", nullFilter, SerialChainFilter.AND);
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
@@ -380,14 +382,14 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         SortField sf = new SortField("identifier_sort", SortField.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("40510_145_19930221211500");
@@ -412,7 +414,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("CTDF02");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
@@ -437,7 +439,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("CTDF02");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
@@ -462,7 +464,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
@@ -495,14 +497,14 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
         LuceneOGCFilter sf = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", sf, SerialChainFilter.AND);
 
-        List<String> result = indexSearcher.doSearch(spatialQuery);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
         logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
-        List<String> expectedResult = new ArrayList<String>();
+        Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
@@ -529,7 +531,7 @@ public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
         logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
-        expectedResult = new ArrayList<String>();
+        expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
