@@ -39,7 +39,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
-import static org.constellation.query.Query.*;
+import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.geotoolkit.wps.xml.v100.DataInputsType;
 
@@ -157,7 +157,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
             String request = "";
             // if the request is not an xml request we fill the request parameter.
             if (objectRequest == null) {
-                request = getParameter(KEY_REQUEST, true);
+                request = getParameter(REQUEST_PARAMETER, true);
                 objectRequest = adaptQuery(request);
             }
 
@@ -212,7 +212,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
             }
 
             throw new CstlServiceException("This service can not handle the requested operation: " + objectRequest + ".",
-                                           OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
+                                           OPERATION_NOT_SUPPORTED, REQUEST_PARAMETER.toLowerCase());
 
         } catch (CstlServiceException ex) {
             /*
@@ -255,9 +255,9 @@ public class WPSService extends OGCWebService<WPSWorker> {
     }
 
     private Object adaptKvpGetCapabilitiesRequest() throws CstlServiceException {
-        if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase(WPS_SERVICE)) {
+        if (!getParameter(SERVICE_PARAMETER, true).equalsIgnoreCase(WPS_SERVICE)) {
             throw new CstlServiceException("The parameter SERVICE must be specified as WPS",
-                    MISSING_PARAMETER_VALUE, KEY_SERVICE.toLowerCase());
+                    MISSING_PARAMETER_VALUE, SERVICE_PARAMETER.toLowerCase());
         }
 
         final ServiceDef finalVersion = ServiceDef.WPS_1_0_0;
@@ -271,12 +271,12 @@ public class WPSService extends OGCWebService<WPSWorker> {
             return capabilities;
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
         }
     }
 
     private RequestBaseType adaptKvpDescribeProcessRequest() throws CstlServiceException {
-        final String strVersion = getParameter(KEY_VERSION, true);
+        final String strVersion = getParameter(VERSION_PARAMETER, true);
         isVersionSupported(strVersion);
         final ServiceDef serviceDef = getVersionFromNumber(strVersion);
 
@@ -311,7 +311,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
             return describe;
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
         }
     }
 
@@ -319,7 +319,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
 
         throw new UnsupportedOperationException("Not yet implemented");
 
-//        final String strVersion = getParameter(KEY_VERSION, true);
+//        final String strVersion = getParameter(VERSION_PARAMETER, true);
 //        isVersionSupported(strVersion);
 //        final ServiceDef serviceDef = getVersionFromNumber(strVersion);
 //
@@ -337,7 +337,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
 //            return exec;
 //        } else {
 //            throw new CstlServiceException("The version number specified for this request " +
-//                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+//                    "is not handled.", VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
 //        }
 
     }
@@ -393,7 +393,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
 //                        literalInput.s
 //                        data.setLiteralData(null);
 //                    }else{
-//                        throw new CstlServiceException("Undefine input data type", INVALID_REQUEST, KEY_VERSION.toLowerCase());
+//                        throw new CstlServiceException("Undefine input data type", INVALID_REQUEST, VERSION_PARAMETER.toLowerCase());
 //                    }
 //                }
 //                input.setData(data);
@@ -426,11 +426,11 @@ public class WPSService extends OGCWebService<WPSWorker> {
                         continue;
                     }else{
                         throw new CstlServiceException("Invalid DataInputs format, unrecognized parameter"
-                                +att.getKey(), INVALID_REQUEST, KEY_VERSION.toLowerCase());
+                                +att.getKey(), INVALID_REQUEST, VERSION_PARAMETER.toLowerCase());
                     }
                 }
                 if(inputRef.getHref() == null){
-                    throw new CstlServiceException("The href parameter value is mendatory", MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
+                    throw new CstlServiceException("The href parameter value is mendatory", MISSING_PARAMETER_VALUE, VERSION_PARAMETER.toLowerCase());
                 }
                 
                 input.setReference(inputRef);
@@ -502,7 +502,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 } else if (splitAttribute.length == 1){
                     attributsMap.put(splitAttribute[0], null);
                 }else{
-                    throw new CstlServiceException("Invalid DataInputs format", INVALID_FORMAT, KEY_VERSION.toLowerCase());
+                    throw new CstlServiceException("Invalid DataInputs format", INVALID_FORMAT, VERSION_PARAMETER.toLowerCase());
                 }
             }
             inputMap.put(inputIdent,attributsMap);

@@ -64,23 +64,24 @@
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-jaxp-gml</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.constellation.web-services</groupId>
-            <artifactId>cstl-web-map</artifactId>
+            <artifactId>cstl-web-ogc</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+         <dependency>
+            <groupId>org.constellation.library</groupId>
+            <artifactId>cstl-lib-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-xml-wps</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-datastore-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-shapefile</artifactId>

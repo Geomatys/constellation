@@ -73,6 +73,11 @@ public final class QueryConstants {
     //Service operations
     public static final String REQUEST_UPDATE_CAPABILITIES   = "updateCapabilities"; 
     
+    //basic parameters
+    public static final String REQUEST_PARAMETER = "REQUEST";
+    public static final String SERVICE_PARAMETER = "SERVICE";
+    public static final String VERSION_PARAMETER = "VERSION";
+    
     private QueryConstants(){}
     
 }

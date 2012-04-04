@@ -137,6 +137,12 @@
         <module>csw</module>
       </modules>
     </profile>
+    <profile>
+      <id>wps</id>
+      <modules>
+        <module>wps</module>
+      </modules>
+    </profile>
   </profiles>
 
 

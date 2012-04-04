@@ -485,6 +485,16 @@
             </dependencies>
         </profile>
         <profile>
+            <id>wps</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-wps</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>withsvg</id>
             <dependencies>
                 <dependency>

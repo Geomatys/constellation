@@ -149,7 +149,7 @@ import org.geotoolkit.wps.xml.v100.SupportedUOMsType;
 import org.geotoolkit.wps.xml.v100.UOMsType;
 
 import org.opengis.util.NoSuchIdentifierException;
-import static org.constellation.query.Query.*;
+import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wps.ws.WPSConstant.*;
 
 /**
@@ -303,7 +303,7 @@ public class WPSWorker extends AbstractWorker {
 
         if (!(service.equalsIgnoreCase(WPS_SERVICE))) {
             throw new CstlServiceException("The version number specified for this request "
-                    + "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    + "is not handled.", VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
         }
         
         List<String> versionsAccepted = new ArrayList<String>();
@@ -324,7 +324,7 @@ public class WPSWorker extends AbstractWorker {
            return getCapabilities100((org.geotoolkit.wps.xml.v100.GetCapabilities) request);
         } else {
             throw new CstlServiceException("The version number specified for this request "
-                    + "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    + "is not handled.", VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
         }
         
     }
@@ -388,21 +388,21 @@ public class WPSWorker extends AbstractWorker {
         final String service = request.getService();
         if (!(service.equalsIgnoreCase(WPS_SERVICE))) {
             throw new CstlServiceException("The version number specified for this request "
-                    + "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    + "is not handled.", VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
         }
 
         final String version = request.getVersion().toString();
 
         if (version.isEmpty()) {
             throw new CstlServiceException("The parameter VERSION must be specified.",
-                    MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
+                    MISSING_PARAMETER_VALUE, VERSION_PARAMETER.toLowerCase());
         }
 
         if (version.equals(ServiceDef.WPS_1_0_0.version.toString())) {
             return describeProcess100((org.geotoolkit.wps.xml.v100.DescribeProcess) request);
         } else {
             throw new CstlServiceException("The version number specified for this discribeProcess request "
-                    + "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
+                    + "is not handled.", NO_APPLICABLE_CODE, VERSION_PARAMETER.toLowerCase());
         }
     }
 
@@ -566,20 +566,20 @@ public class WPSWorker extends AbstractWorker {
         final String service = request.getService();
         if (!(service.equalsIgnoreCase(WPS_SERVICE))) {
             throw new CstlServiceException("The version number specified for this request "
-                    + "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    + "is not handled.", VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
         }
 
         final String version = request.getVersion().toString();
         if (version.isEmpty()) {
             throw new CstlServiceException("The parameter VERSION must be specified.",
-                    MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
+                    MISSING_PARAMETER_VALUE, VERSION_PARAMETER.toLowerCase());
         }
 
         if (version.equals(ServiceDef.WPS_1_0_0.version.toString())) {
             return execute100((org.geotoolkit.wps.xml.v100.Execute) request);
         } else {
             throw new CstlServiceException("The version number specified for this discribeProcess request "
-                    + "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
+                    + "is not handled.", NO_APPLICABLE_CODE, VERSION_PARAMETER.toLowerCase());
         }
     }
 
@@ -1073,9 +1073,9 @@ public class WPSWorker extends AbstractWorker {
         try {
             processDesc = ProcessFinder.getProcessDescriptor(processFactory, processName);
         } catch (IllegalArgumentException ex) {
-            throw new CstlServiceException(ex, INVALID_REQUEST, KEY_VERSION.toLowerCase());
+            throw new CstlServiceException(ex, INVALID_REQUEST, VERSION_PARAMETER.toLowerCase());
         } catch (NoSuchIdentifierException ex) {
-            throw new CstlServiceException(ex, INVALID_REQUEST, KEY_VERSION.toLowerCase());
+            throw new CstlServiceException(ex, INVALID_REQUEST, VERSION_PARAMETER.toLowerCase());
         }
         return processDesc;
     }

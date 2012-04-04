@@ -177,6 +177,12 @@
         <module>observation</module>
       </modules>
     </profile>
+    <profile>
+      <id>wps</id>
+      <modules>
+        <module/>
+      </modules>
+    </profile>
   </profiles>
 
   <!-- =========================================================== -->

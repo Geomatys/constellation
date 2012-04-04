@@ -237,6 +237,12 @@
                 <constellation.services.packages>${constellation.config};${constellation.feature}</constellation.services.packages>
             </properties>
         </profile>
+        <profile>
+            <id>wps</id>
+            <properties>
+                <constellation.services.packages>${constellation.config};${constellation.wps}</constellation.services.packages>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencyManagement>
