@@ -992,7 +992,7 @@ public class CSWworker extends AbstractWorker {
             return results.toArray(new String[results.size()]);
         
         } catch (SearchingException ex) {
-            throw new CstlServiceException("The service has throw an exception while making identifier lucene request",
+            throw new CstlServiceException("The service has throw an exception while making identifier lucene request", ex,
                                              NO_APPLICABLE_CODE);
         }
     }
