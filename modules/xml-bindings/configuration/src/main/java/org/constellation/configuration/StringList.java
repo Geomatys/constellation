@@ -18,11 +18,13 @@
 package org.constellation.configuration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -34,17 +36,51 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class StringList {
 
     @XmlElement(name="Entry")
-    private List<String> list;
+    private Collection<String> list;
+    
+    public StringList() {
+        
+    }
+    
+    public StringList(final Collection<String> list) {
+        this.list = list;
+    }
 
-    public List<String> getList() {
+    public Collection<String> getList() {
         if(list == null){
             list = new ArrayList<String>();
         }
         return list;
     }
 
-    public void setList(final List<String> list) {
+    public void setList(final Collection<String> list) {
         this.list = list;
     }
     
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[StringList]:\n");
+        if (list != null) {
+            for (String s : list) {
+                sb.append(s).append(",");
+            }
+        }
+        return sb.toString();
+    }
+    
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof StringList) {
+            final StringList that = (StringList) obj;
+            return Utilities.equals(this.list, that.list);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 11 * hash + (this.list != null ? this.list.hashCode() : 0);
+        return hash;
+    }
 }

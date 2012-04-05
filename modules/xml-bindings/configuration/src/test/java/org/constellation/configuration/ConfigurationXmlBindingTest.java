@@ -8,8 +8,7 @@ package org.constellation.configuration;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -265,5 +264,54 @@ public class ConfigurationXmlBindingTest {
         s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
         s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
         return s;
+    }
+    
+    @Test
+    public void stringListMarshalingTest() throws Exception {
+        final List<String> list = new ArrayList<String>();
+        list.add("value1");
+        list.add("value2");
+        final StringList sl = new StringList(list);
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(sl, sw);
+
+        String expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:StringList >" + '\n'
+                + "    <ns2:Entry>value1</ns2:Entry>" + '\n'
+                + "    <ns2:Entry>value2</ns2:Entry>" + '\n'
+                + "</ns2:StringList>\n";
+
+        String result = removeXmlns(sw.toString());
+        assertEquals(expresult, result);
+        
+        final Set<String> set = new HashSet<String>();
+        set.add("value1");
+        set.add("value2");
+        final StringList slSet = new StringList(set);
+        sw = new StringWriter();
+        marshaller.marshal(slSet, sw);
+        
+        result = removeXmlns(sw.toString());
+        assertEquals(expresult, result);
+    }
+    
+    @Test
+    public void stringListUnMarshalingTest() throws Exception {
+        final List<String> list = new ArrayList<String>();
+        list.add("value1");
+        list.add("value2");
+        final StringList expResult = new StringList(list);
+
+
+        String xml = 
+                  "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:StringList xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
+                + "    <ns2:Entry>value1</ns2:Entry>" + '\n'
+                + "    <ns2:Entry>value2</ns2:Entry>" + '\n'
+                + "</ns2:StringList>\n";
+
+
+        Object result =  unmarshaller.unmarshal(new StringReader(xml));
+        assertEquals(expResult, result);
     }
 }
