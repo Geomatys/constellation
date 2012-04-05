@@ -19,11 +19,7 @@ package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
@@ -149,7 +145,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      * {@inheritDoc}
      */
     @Override
-    protected List<String> getAllIdentifiers() throws IndexingException {
+    protected Collection<String> getAllIdentifiers() throws IndexingException {
         try {
             // getting the objects list and index avery item in the IndexWriter.
             final List<RecordSet> cats = mdWebReader.getRecordSets();

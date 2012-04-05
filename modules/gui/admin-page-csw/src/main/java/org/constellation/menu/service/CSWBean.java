@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import javax.faces.context.FacesContext;
@@ -79,7 +80,7 @@ public class CSWBean extends AbstractServiceBean {
         final List<SelectItem> selectItems = new ArrayList<SelectItem>();
         final ConstellationServer server = getServer();
         if (server != null) {
-             List<String> sources = server.csws.getAvailableDataSourceType();
+             Collection<String> sources = server.csws.getAvailableDataSourceType();
              for (String source : sources) {
                  selectItems.add(new SelectItem(source));
              }

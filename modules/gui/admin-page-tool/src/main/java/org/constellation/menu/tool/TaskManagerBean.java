@@ -17,10 +17,7 @@
 
 package org.constellation.menu.tool;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 import javax.faces.context.FacesContext;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -122,7 +119,7 @@ public class TaskManagerBean extends I18NBean{
             final DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
             final ConstellationServer server = getServer();
             if (server != null) {
-                final List<String> values = server.tasks.listProcess().getList();
+                final Collection<String> values = server.tasks.listProcess().getList();
                 final Map<String,DefaultMutableTreeNode> authorities = new HashMap<String, DefaultMutableTreeNode>();
 
                 for(String value : values){

@@ -335,7 +335,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @throws MD_IOException
      */
     private void initContactMap() throws MD_IOException {
-        final List<Form> contactForms = mdWriter.getContacts();
+        final Collection<Form> contactForms = mdWriter.getContacts();
         if (contactForms.size() > 0) {
             LOGGER.log(Level.INFO, "initiazing {0} contacts", contactForms.size());
             final MDWebMetadataReader reader = new MDWebMetadataReader(mdWriter);

@@ -17,11 +17,7 @@
 
 package org.constellation.sos.io.mdweb;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 // JAXB dependencies
 import java.util.logging.Level;
@@ -130,7 +126,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
      * {@inheritDoc}
      */
     @Override
-    public List<String> getSensorNames() throws CstlServiceException {
+    public Collection<String> getSensorNames() throws CstlServiceException {
         try {
             final RecordSet smlCat = mdReader.getRecordSet("SMLC");
             if (smlCat != null) {

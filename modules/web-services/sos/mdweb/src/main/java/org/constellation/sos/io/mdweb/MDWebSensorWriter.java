@@ -25,10 +25,7 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 
 // JAXB dependencies
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Level;
 
 // Constellation dependencies
@@ -174,7 +171,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         try {
 
             final RecordSet smlCat      = mdWriter.getRecordSet("SMLC");
-            final List<String> allIdentifier = mdWriter.getAllIdentifiers(Arrays.asList(smlCat), false);
+            final Collection<String> allIdentifier = mdWriter.getAllIdentifiers(Arrays.asList(smlCat), false);
 
             for (String identifier : allIdentifier) {
                 LOGGER.log(Level.FINER, "sensor id: {0}", identifier);

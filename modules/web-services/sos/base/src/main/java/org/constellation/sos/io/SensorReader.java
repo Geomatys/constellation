@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io;
 
+import java.util.Collection;
 import java.util.List;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
@@ -43,7 +44,7 @@ public interface SensorReader {
      * @return All sensor ID's.
      * @throws org.constellation.ws.CstlServiceException
      */
-    List<String> getSensorNames() throws CstlServiceException;
+    Collection<String> getSensorNames() throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.

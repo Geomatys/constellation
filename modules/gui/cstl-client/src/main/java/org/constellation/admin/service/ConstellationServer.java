@@ -28,6 +28,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
@@ -1384,7 +1385,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return false;
         }
         
-        public List<String> getAvailableDataSourceType() {
+        public Collection<String> getAvailableDataSourceType() {
             try {
                 final String url = getURL() + "configuration?request=" + REQUEST_AVAILABLE_SOURCE_TYPE;
                 Object response = sendRequest(url, null);

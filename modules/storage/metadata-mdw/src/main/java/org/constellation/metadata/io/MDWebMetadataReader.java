@@ -29,15 +29,8 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
@@ -1180,7 +1173,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         final List<Object> results = new ArrayList<Object>();
         try {
             final List<RecordSet> recordSets = mdReader.getRecordSets();
-            final List<Form> forms           = mdReader.getAllForm(recordSets);
+            final Collection<Form> forms     = mdReader.getAllForm(recordSets);
             for (Form f: forms) {
                 results.add(getObjectFromForm("no cache", f, -1));
             }
