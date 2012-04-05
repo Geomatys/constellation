@@ -96,7 +96,7 @@ public class NetCDFCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public LuceneIndexSearcher getIndexSearcher(final File configDir, final String serviceID) throws IndexingException {
-        return new LuceneIndexSearcher(configDir, serviceID);
+        return new LuceneIndexSearcher(configDir, serviceID, null, true);
     }
 
     /**

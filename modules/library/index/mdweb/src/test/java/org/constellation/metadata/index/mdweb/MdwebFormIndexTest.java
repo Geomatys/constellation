@@ -128,7 +128,7 @@ public class MdwebFormIndexTest {
         
         final MDWebIndexer indexer    = new MDWebIndexer(configuration, "");
         indexer.destroy();
-        indexSearcher                   = new LuceneIndexSearcher(configDirectory, "");
+        indexSearcher                   = new LuceneIndexSearcher(configDirectory, "", null, true);
         indexSearcher.setLogLevel(LOG_LEVEL);
     }
 

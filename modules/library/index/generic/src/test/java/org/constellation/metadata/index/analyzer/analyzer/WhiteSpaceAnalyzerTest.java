@@ -63,7 +63,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_35), Level.FINER);
         indexer.destroy();
         
-        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_35));
+        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new WhitespaceAnalyzer(Version.LUCENE_35), true);
         indexSearcher.setLogLevel(Level.FINER);
     }
 

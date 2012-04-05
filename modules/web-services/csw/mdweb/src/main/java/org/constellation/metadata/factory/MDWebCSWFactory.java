@@ -100,7 +100,7 @@ public class MDWebCSWFactory implements AbstractCSWFactory {
      */
     @Override
     public LuceneIndexSearcher getIndexSearcher(File configDirectory, String serviceID) throws IndexingException {
-        return new LuceneIndexSearcher(configDirectory, serviceID);
+        return new LuceneIndexSearcher(configDirectory, serviceID, null, true);
     }
 
     /**

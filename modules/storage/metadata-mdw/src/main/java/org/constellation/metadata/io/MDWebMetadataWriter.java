@@ -619,12 +619,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 if (c.get(Calendar.HOUR) == 0 && c.get(Calendar.MINUTE) == 0 && c.get(Calendar.SECOND) == 0 && c.get(Calendar.MILLISECOND) == 0) {
                     synchronized (DATE_FORMAT) {
                         value = DATE_FORMAT.get(1).format(object);
-                        System.out.println("formatted to:" + value);
                     }
                 } else {
                     synchronized (DATE_FORMAT) {
                         value = DATE_FORMAT.get(0).format(object);
-                        System.out.println("formatted to:" + value);
                     }
                 }
             } else if (object.getClass().isEnum()){

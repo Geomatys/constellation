@@ -60,7 +60,7 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         List<Object> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new ClassicAnalyzer(Version.LUCENE_35), Level.FINER);
         indexer.destroy();
-        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new ClassicAnalyzer(Version.LUCENE_35));
+        indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new ClassicAnalyzer(Version.LUCENE_35), true);
         indexSearcher.setLogLevel(Level.FINER);
         
     }
