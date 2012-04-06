@@ -18,10 +18,7 @@
 
 package org.constellation.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -61,6 +58,16 @@ public final class Util {
     
     private Util() {}
 
+    /**
+     * This should be a class loader from the main constellation application.
+     */
+    private static final ClassLoader baseClassLoader;
+
+    //we try to load this variable at the start by reading a properties file
+    static {
+        baseClassLoader = Thread.currentThread().getContextClassLoader();
+    }
+    
     /**
      * Return an marshallable Object from an url
      */
@@ -179,5 +186,20 @@ public final class Util {
             name = new QName(layerName);
         }
         return name;
+    }
+    
+    public static File getWebappDiretory() {
+        final URL url = baseClassLoader.getResource("org/constellation/util/Util.class");
+        String path = url.toString();
+        path = path.substring(path.lastIndexOf(':') + 1); // we remove the file type
+        final int separator = path.indexOf('!'); // we remove the path inside the jar
+        if (separator != -1) {
+            path = path.substring(0, separator);
+        }
+        File f = new File(path);
+        f = f.getParentFile(); // lib
+        f = f.getParentFile(); // WEB-INF
+        f = f.getParentFile(); // webapp root
+        return f;
     }
 }
