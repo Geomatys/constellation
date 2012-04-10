@@ -10,4 +10,4 @@ syntax: regexp
 target$
 ^tmp$
 derby.log$ 
-modules/testing/cite/engine/*
+modules/testing/cite/engine/components/*
