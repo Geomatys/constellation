@@ -1428,6 +1428,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         final HttpURLConnection conec = (HttpURLConnection) source.openConnection();
         getClientSecurity().secure(conec);
         Object response = null;
+        applySessionId(conec);
 
         try {
 
@@ -1439,7 +1440,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 if (put) {
                     conec.setRequestMethod("PUT");
                 }
-
                 if (request instanceof GeneralParameterValue) {
                     final ParameterValueWriter writer = new ParameterValueWriter();
                     try {
@@ -1550,9 +1550,10 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         final URLConnection conec = source.openConnection();
         getClientSecurity().secure(conec);
         Object response = null;
+        applySessionId(conec);
 
         try {
-
+            
             // for a POST request
             if (request != null) {
 
