@@ -53,15 +53,79 @@
     </developer>
   </developers>
 
+  <!--
+    By default, build all webservices. Several profiles are defined
+    to specifically build a webservice.
+  -->
+  <profiles>
+    <profile>
+      <id>all</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>server</module>
+        <module>xacml</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>wms</id>
+      <modules>
+        <module>server</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>wmswcs</id>
+      <modules>
+        <module>server</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>wmts</id>
+      <modules>
+        <module>server</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>wcs</id>
+      <modules>
+        <module>server</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>sos</id>
+      <modules>
+        <module/>
+      </modules>
+    </profile>
+    <profile>
+      <id>wfs</id>
+      <modules>
+        <module>server</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>csw</id>
+      <modules>
+        <module/>
+      </modules>
+    </profile>
+    <profile>
+      <id>wps</id>
+      <modules>
+        <module/>
+      </modules>
+    </profile>
+  </profiles>
+
+
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>server</module>
     <module>scheduler</module>
     <module>process</module>
     <module>testing</module>
-    <module>xacml</module>
     <module>auth</module>
   </modules>
 
