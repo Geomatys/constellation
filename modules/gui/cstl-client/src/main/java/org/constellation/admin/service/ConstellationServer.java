@@ -1228,7 +1228,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                         +"&authority=" + authority 
                         +"&code=" + code
                         +"&id=" + id
-                        +"&title=" + title 
+                        +"&title=" + URLEncoder.encode(title, "UTF-8")
                         +"&step=" + step;
                 Object response = sendRequest(url, parameters);
                 if (response instanceof AcknowlegementType) {
