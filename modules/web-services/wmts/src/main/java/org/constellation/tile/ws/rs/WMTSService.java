@@ -317,24 +317,12 @@ public class WMTSService extends GridWebService<WMTSWorker> {
     @GET
     @Path("{version}/{caps}")
     public Response processGetCapabilitiesRestful(@PathParam("version") final String version,
-                                                  @PathParam("caps") final String resourcename)
-                                                                     
-    {
-        ServiceDef serviceDef = null;
+                                                  @PathParam("caps") final String resourcename) {
         try {
-            final String serviceId = getParameter("serviceId", false);
-            WMTSWorker worker = workersMap.get(serviceId);
-            if (worker == null) {
-                throw new CstlServiceException(NOT_WORKING,
-                                              NO_APPLICABLE_CODE);
-            }
             final GetCapabilities gc = createNewGetCapabilitiesRequestRestful(version);
-            serviceDef = getVersionFromNumber(gc.getVersion());
-            return Response.ok(worker.getCapabilities(gc), MimeType.TEXT_XML).build();
-
+            return treatIncomingRequest(gc);
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, serviceDef);
-
+            return processExceptionResponse(ex, null);
         }
     }
 
@@ -357,24 +345,16 @@ public class WMTSService extends GridWebService<WMTSWorker> {
                                           @PathParam("tileMatrix") final String tileMatrix,
                                           @PathParam("tileRow") final String tileRow,
                                           @PathParam("tileCol") final String tileCol,
-                                          @PathParam("format") final String format)
-    {
+                                          @PathParam("format") final String format) {
         try {
-            final String serviceId = getParameter("serviceId", false);
-            final WMTSWorker worker = workersMap.get(serviceId);
-            if (worker == null) {
-                throw new CstlServiceException(NOT_WORKING,
-                                              NO_APPLICABLE_CODE);
-            }
-            final GetTile gt = createNewGetTileRequestRestful(layer, tileMatrixSet, tileMatrix,
-                    tileRow, tileCol, format, null);
             final String mimeType;
             try {
                 mimeType = ImageIOUtilities.formatNameToMimeType(format);
             } catch (IIOException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
-            return Response.ok(worker.getTile(gt), mimeType).build();
+            final GetTile gt = createNewGetTileRequestRestful(layer, tileMatrixSet, tileMatrix, tileRow, tileCol, mimeType, null);
+            return treatIncomingRequest(gt);
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, null);
         }

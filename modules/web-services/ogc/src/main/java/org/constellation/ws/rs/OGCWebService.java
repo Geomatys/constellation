@@ -95,7 +95,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * A map of service worker.
      * TODO this attribute must be set to private when will fix the WFS service
      */
-    protected final Map<String, W> workersMap;
+    private final Map<String, W> workersMap;
 
     /**
      * Initialize the basic attributes of a web serviceType.
