@@ -232,13 +232,12 @@ public class WPSService extends OGCWebService<WPSWorker> {
          logException(ex);
 
         // SEND THE HTTP RESPONSE
-        final ExceptionResponse report;
         if (serviceDef == null) {
             serviceDef = ServiceDef.WPS_1_0_0;
         }
-        final String locator = ex.getLocator();
-        final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
-        report = new ExceptionReport(ex.getMessage(), code, locator, serviceDef.exceptionVersion.toString());
+        final String exceptionCode   = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
+        final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
+                                                     serviceDef.exceptionVersion.toString());
         return Response.ok(report, MimeType.TEXT_XML).build();
     }
 
