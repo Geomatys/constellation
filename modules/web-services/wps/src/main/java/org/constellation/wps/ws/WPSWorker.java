@@ -19,15 +19,11 @@ package org.constellation.wps.ws;
 import com.vividsolutions.jts.geom.Geometry;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
@@ -41,7 +37,6 @@ import org.geotoolkit.ows.xml.v110.DomainMetadataType;
 import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.util.converter.ConverterRegistry;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.converter.ObjectConverter;
 import org.geotoolkit.wps.xml.v100.ComplexDataType;
@@ -60,12 +55,8 @@ import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
 import org.geotoolkit.wps.xml.v100.ProcessOfferings;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.wps.xml.v100.ComplexDataCombinationType;
-import org.geotoolkit.wps.xml.v100.ComplexDataCombinationsType;
-import org.geotoolkit.wps.xml.v100.ComplexDataDescriptionType;
 import org.geotoolkit.wps.xml.v100.DataType;
 import org.geotoolkit.wps.xml.v100.OutputDataType;
-import org.geotoolkit.wps.xml.v100.SupportedComplexDataInputType;
 import org.geotoolkit.wps.xml.v100.SupportedComplexDataType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.wps.xml.v100.CRSsType;
@@ -78,13 +69,7 @@ import org.geotoolkit.wps.xml.v100.ResponseDocumentType;
 import org.geotoolkit.wps.xml.v100.ResponseFormType;
 import org.geotoolkit.wps.xml.v100.StatusType;
 import org.geotoolkit.wps.xml.v100.ProcessStartedType;
-import org.geotoolkit.data.FeatureIterator;
-import org.geotoolkit.feature.FeatureTypeBuilder;
-import org.geotoolkit.feature.type.DefaultFeatureType;
-import org.geotoolkit.feature.type.DefaultGeometryType;
-import org.geotoolkit.feature.type.DefaultPropertyDescriptor;
 import org.geotoolkit.geometry.isoonjts.GeometryUtils;
-import org.geotoolkit.geometry.jts.JTS;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
@@ -95,13 +80,9 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.feature.Feature;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.util.FactoryException;
-import org.opengis.feature.Property;
-import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -124,104 +105,6 @@ import static org.constellation.wps.ws.WPSConstant.*;
  */
 public class WPSWorker extends AbstractWorker {
 
-    /**
-     * List of literal converters. Used to convert a String to an Object like AffineTransform, Coodinate Reference System, ...
-     */
-//    public static final List LITERAL_CONVERTERS = UnmodifiableArrayList.wrap(
-//            StringToFeatureCollectionConverter.getInstance(),
-//            StringToUnitConverter.getInstance(),
-//            StringToGeometryConverter.getInstance(),
-//            StringToCRSConverter.getInstance(),
-//            StringToAffineTransformConverter.getInstance(),
-//            StringToFilterConverter.getInstance(),
-//            StringToSortByConverter.getInstance(),
-//            StringToNumberRangeConverter.getInstance());
-//    /**
-//     * List of reference converters.Used to extract an Object from a Reference like an URL. For example to a Feature or FeatureCollection,
-//     * to a Geometry or a coverage.
-//     */
-//    public static final List REFERENCE_CONVERTERS = UnmodifiableArrayList.wrap(
-//            ReferenceToFeatureCollectionConverter.getInstance(),
-//            ReferenceToFeatureConverter.getInstance(),
-//            ReferenceToFeatureTypeConverter.getInstance(),
-//            ReferenceToFileConverter.getInstance(),
-//            ReferenceToGeometryConverter.getInstance(),
-//            ReferenceToGridCoverage2DConverter.getInstance(),
-//            ReferenceToGridCoverageReaderConverter.getInstance());
-//    /**
-//     * List of complex converters
-//     */
-//    public static final List COMPLEX_CONVERTERS = UnmodifiableArrayList.wrap(
-//            ComplexToFeatureCollectionConverter.getInstance(),
-//            ComplexToFeatureCollectionArrayConverter.getInstance(),
-//            ComplexToFeatureConverter.getInstance(),
-//            ComplexToFeatureArrayConverter.getInstance(),
-//            ComplexToFeatureTypeConverter.getInstance(),
-//            ComplexToGeometryConverter.getInstance(),
-//            ComplexToGeometryArrayConverter.getInstance());
-//    /**
-//     * List of output complex converters. They used to convert an output from a process into a complex WPS output like GML.
-//     */
-//    public static final List OUTPUT_COMPLEX_CONVERTERS = UnmodifiableArrayList.wrap(
-//            GeometryToComplexConverter.getInstance(),
-//            GeometryArrayToComplexConverter.getInstance(),
-//            FeatureToComplexConverter.getInstance(),
-//            FeatureCollectionToComplexConverter.getInstance());
-//    /**
-//     * List of supported <b>input</b> Class for a Complex <b>input</b>.
-//     */
-//    public static final List COMPLEX_INPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
-//            Feature.class,
-//            FeatureCollection.class,
-//            Feature[].class,
-//            FeatureCollection[].class,
-//            FeatureType.class,
-//            Geometry.class);
-//    /**
-//     * List of supported <b>output</b> Class for a Complex <b>output</b>.
-//     */
-//    public static final List COMPLEX_OUTPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
-//            Feature.class,
-//            FeatureCollection.class,
-//            Geometry.class,
-//            Geometry[].class);
-//    /**
-//     * List of supported <b>input</b> Class for a Literal <b>input</b>.
-//     */
-//    public static final List LITERAL_INPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
-//            Number.class, Boolean.class, String.class,
-//            Unit.class,
-//            AffineTransform.class,
-//            org.opengis.filter.Filter.class,
-//            CoordinateReferenceSystem.class,
-//            SortBy[].class,
-//            NumberRange[].class);
-//    /**
-//     * List of supported <b>output</b> Class for a Literal <b>output</b>.
-//     */
-//    public static final List LITERAL_OUPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
-//            Number.class, Boolean.class, String.class,
-//            Unit.class,
-//            AffineTransform.class,
-//            CoordinateReferenceSystem.class);
-//
-//    /*
-//     * List of supported <b>input</b> Class for a Reference <b>input</b>.
-//     */
-//    public static final List REFERENCE_INPUT_TYPE_LIST = UnmodifiableArrayList.wrap(
-//            Feature.class,
-//            FeatureCollection.class,
-//            Geometry.class,
-//            File.class,
-//            FeatureType.class,
-//            FeatureExtend.class,
-//            GridCoverage2D.class,
-//            GridCoverageReader.class);
-//    /*
-//     * List of supported <b>output</b> Class for a Reference <b>output</b>.
-//     */
-//    public static final List REFERENCE_OUTPUT_TYPE_LIST = UnmodifiableArrayList.wrap();
-    
     /**
      * Supported CRS.
      */
@@ -515,12 +398,12 @@ public class WPSWorker extends AbstractWorker {
                         in.setLiteralData(literal);
                         
                     }else{
-                        throw new CstlServiceException("Process output not supported.", OPERATION_NOT_SUPPORTED);
+                        throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
                     }
                     
                     dataInputs.getInput().add(in);
                 } else {
-                    throw new CstlServiceException("Process parameter invalid", OPERATION_NOT_SUPPORTED);
+                    throw new CstlServiceException("Process parameter invalid", NO_APPLICABLE_CODE);
                 }
             }
             descriptionType.setDataInputs(dataInputs);
@@ -561,11 +444,11 @@ public class WPSWorker extends AbstractWorker {
 
                         out.setLiteralOutput(literal);
                     }else{
-                        throw new CstlServiceException("Process output not supported.", OPERATION_NOT_SUPPORTED);
+                        throw new CstlServiceException("Process output not supported.", NO_APPLICABLE_CODE);
                     }
 
                 } else {
-                    throw new CstlServiceException("Process parameter invalid", OPERATION_NOT_SUPPORTED);
+                    throw new CstlServiceException("Process parameter invalid", NO_APPLICABLE_CODE);
                 }
 
                 dataOutput.getOutput().add(out);
@@ -1114,4 +997,3 @@ public class WPSWorker extends AbstractWorker {
         }
     }
 }
-

@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
@@ -42,12 +41,9 @@ import org.constellation.ws.rs.OGCWebService;
 
 import org.geotoolkit.wps.xml.v100.DataInputsType;
 
-import org.geotoolkit.ows.xml.ExceptionResponse;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
-import org.geotoolkit.ows.xml.v110.GetCapabilitiesType;
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.DataType;
 import org.geotoolkit.wps.xml.v100.DescribeProcess;

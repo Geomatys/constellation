@@ -494,7 +494,7 @@ public final class WPSIO {
                 return false;
             }
             final KeyTuple other = (KeyTuple) obj;
-            if (this.clazz != other.clazz && (this.clazz == null || !this.clazz.equals(other.clazz) || !other.clazz.isAssignableFrom(this.clazz))) {
+            if (this.clazz != other.clazz && (this.clazz == null || (!this.clazz.equals(other.clazz) && !other.clazz.isAssignableFrom(this.clazz)))) {
                 return false;
             }
             if (this.type != other.type) {
@@ -509,7 +509,6 @@ public final class WPSIO {
         @Override
         public int hashCode() {
             int hash = 3;
-            hash = 41 * hash + (this.clazz != null ? this.clazz.hashCode() : 0);
             hash = 41 * hash + (this.type != null ? this.type.hashCode() : 0);
             hash = 41 * hash + (this.from != null ? this.from.hashCode() : 0);
             return hash;

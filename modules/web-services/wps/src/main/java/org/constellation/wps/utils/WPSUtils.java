@@ -148,8 +148,8 @@ public class WPSUtils {
     }
 
     /**
-     * Extract the process name from a process identifier. e.g :
-     * urn:geomatys:wps:math:add return add.
+     * Extract the process name from a process identifier. 
+     * e.g : urn:geomatys:wps:math:add return add.
      *
      * @param identifier
      * @return process name.
