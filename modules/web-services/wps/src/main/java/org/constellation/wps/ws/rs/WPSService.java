@@ -44,7 +44,7 @@ import static org.constellation.wps.ws.WPSConstant.*;
 import org.geotoolkit.wps.xml.v100.DataInputsType;
 
 import org.geotoolkit.ows.xml.ExceptionResponse;
-import org.geotoolkit.ows.xml.v100.ExceptionReport;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
 import org.geotoolkit.ows.xml.v110.GetCapabilitiesType;

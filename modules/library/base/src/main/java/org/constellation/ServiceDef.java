@@ -61,7 +61,7 @@ public enum ServiceDef {
     THW(Specification.THW, Organization.NONE, null, Profile.NONE, null, false),
 
     //WPS services definitions
-    WPS_1_0_0(Specification.WPS, Organization.OGC, "1.0.0", Profile.NONE, "1.0.0", true);
+    WPS_1_0_0(Specification.WPS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true);
 
 
     /**
