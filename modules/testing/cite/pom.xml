@@ -103,6 +103,11 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-wps</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-sos-filesystem</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -342,6 +347,7 @@
                 <service>wfs-1.1.0</service>
                 <service>sos-1.0.0</service>
                 <service>csw-2.0.2</service>
+                <service>wps-1.0.0</service>
               </services>
             </configuration>
           </plugin>
@@ -442,6 +448,31 @@
             <configuration>
               <services>
                 <service>wfs-1.1.0</service>
+              </services>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>cite_wps</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.constellation.testing</groupId>
+            <artifactId>cstl-test-cite</artifactId>
+            <version>${project.version}</version>
+            <executions>
+              <execution>
+                <phase>test</phase>
+                <goals>
+                  <goal>cite</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <services>
+                <service>wps-1.0.0</service>
               </services>
             </configuration>
           </plugin>
