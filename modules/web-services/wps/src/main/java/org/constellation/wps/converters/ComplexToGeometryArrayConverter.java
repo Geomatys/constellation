@@ -41,7 +41,7 @@ public final class ComplexToGeometryArrayConverter extends SimpleConverter<Map<S
     private ComplexToGeometryArrayConverter(){
     }
 
-    public static ComplexToGeometryArrayConverter getInstance(){
+    public static synchronized ComplexToGeometryArrayConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ComplexToGeometryArrayConverter();
         }

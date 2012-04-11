@@ -41,7 +41,7 @@ public final class GeometryToComplexConverter extends SimpleConverter<Geometry, 
     private GeometryToComplexConverter(){
     }
 
-    public static GeometryToComplexConverter getInstance(){
+    public static synchronized GeometryToComplexConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new GeometryToComplexConverter();
         }

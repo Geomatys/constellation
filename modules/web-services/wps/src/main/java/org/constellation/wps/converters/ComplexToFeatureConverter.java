@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
+import org.constellation.wps.utils.WPSUtils;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
@@ -54,7 +55,7 @@ public final class ComplexToFeatureConverter extends SimpleConverter<Map<String,
     private ComplexToFeatureConverter(){
     }
 
-    public static ComplexToFeatureConverter getInstance(){
+    public static synchronized ComplexToFeatureConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ComplexToFeatureConverter();
         }
@@ -108,7 +109,7 @@ public final class ComplexToFeatureConverter extends SimpleConverter<Map<String,
         
         //Fix featureType CRS
         try {
-            return (Feature) WPSWorker.fixFeature((Feature)extractData);
+            return (Feature) WPSUtils.fixFeature((Feature)extractData);
         } catch (CstlServiceException ex) {
            throw new NonconvertibleObjectException(ex);
         }

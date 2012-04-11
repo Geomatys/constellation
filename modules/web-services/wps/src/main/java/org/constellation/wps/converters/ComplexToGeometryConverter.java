@@ -40,7 +40,7 @@ public final class ComplexToGeometryConverter extends SimpleConverter<Map<String
     private ComplexToGeometryConverter(){
     }
 
-    public static ComplexToGeometryConverter getInstance(){
+    public static synchronized ComplexToGeometryConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ComplexToGeometryConverter();
         }

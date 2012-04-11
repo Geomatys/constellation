@@ -16,6 +16,12 @@
  */
 package org.constellation.wps.ws;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.util.collection.UnmodifiableArrayList;
+
 
 /**
  *  WPS Constants
@@ -44,13 +50,24 @@ public final class WPSConstant {
     /**
      * Request parameters.
      */
+    public static final String GETCAPABILITIES = "GetCapabilities";
     public static final String DESCRIBEPROCESS = "DescribeProcess";
     public static final String EXECUTE = "Execute";
-    public static final String GETCAPABILITIES = "GetCapabilities";
+    
+    
+    public static final String IDENTIFER_PARAMETER = "IDENTIFIER";
+    public static final String LANGUAGE_PARAMETER = "LANGUAGE";
+    public static final String ACCEPT_VERSIONS_PARAMETER = "ACCEPTVERSIONS";
 
     /* Maximum size in megabytes for a complex input */
-    public static final int MAX_MB_INPUT_COMPLEX = 10;
+    public static final int MAX_MB_INPUT_COMPLEX = 100;
+    
     
     /* Default Coordinate Reference System  */
     public static final String DEFAULT_CRS = "EPSG:4326";
+    
+    /** 
+     * Process identifier prefix to uniquely identifies process using OGC URN code.
+     */
+    public static final String PROCESS_PREFIX = "urn:geomatys:wps:";
 }

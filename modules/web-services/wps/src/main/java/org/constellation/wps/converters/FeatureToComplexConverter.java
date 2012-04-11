@@ -41,7 +41,7 @@ public final class FeatureToComplexConverter extends SimpleConverter<Feature, Co
     private FeatureToComplexConverter(){
     }
 
-    public static FeatureToComplexConverter getInstance(){
+    public static synchronized FeatureToComplexConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new FeatureToComplexConverter();
         }

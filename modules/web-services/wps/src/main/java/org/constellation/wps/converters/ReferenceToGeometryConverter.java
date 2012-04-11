@@ -54,7 +54,7 @@ public final class ReferenceToGeometryConverter extends SimpleConverter<Map<Stri
     private ReferenceToGeometryConverter(){
     }
 
-    public static ReferenceToGeometryConverter getInstance(){
+    public static synchronized ReferenceToGeometryConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ReferenceToGeometryConverter();
         }

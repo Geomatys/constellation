@@ -42,7 +42,7 @@ public final class GeometryArrayToComplexConverter extends SimpleConverter<Geome
     private GeometryArrayToComplexConverter(){
     }
 
-    public static GeometryArrayToComplexConverter getInstance(){
+    public static synchronized GeometryArrayToComplexConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new GeometryArrayToComplexConverter();
         }

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
+import org.constellation.wps.utils.WPSUtils;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
@@ -49,7 +50,7 @@ public final class ComplexToFeatureArrayConverter extends SimpleConverter<Map<St
     private ComplexToFeatureArrayConverter(){
     }
 
-    public static ComplexToFeatureArrayConverter getInstance(){
+    public static synchronized ComplexToFeatureArrayConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ComplexToFeatureArrayConverter();
         }
@@ -83,7 +84,7 @@ public final class ComplexToFeatureArrayConverter extends SimpleConverter<Map<St
                     //enable to read the FeatureType into the FeatureCollection schema
                     fcollReader.setReadEmbeddedFeatureType(true); 
                     Feature f = (Feature)fcollReader.read(data.get(i));
-                    f = (Feature)WPSWorker.fixFeature(f);
+                    f = (Feature)WPSUtils.fixFeature(f);
                     features.add(f);
                 }
                 return features.toArray(new Feature[features.size()]);

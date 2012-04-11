@@ -48,7 +48,7 @@ public final class ReferenceToGridCoverageReaderConverter extends SimpleConverte
     private ReferenceToGridCoverageReaderConverter(){
     }
 
-    public static ReferenceToGridCoverageReaderConverter getInstance(){
+    public static synchronized ReferenceToGridCoverageReaderConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ReferenceToGridCoverageReaderConverter();
         }

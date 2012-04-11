@@ -46,7 +46,7 @@ public final class ComplexToFeatureTypeConverter extends SimpleConverter<Map<Str
     private ComplexToFeatureTypeConverter(){
     }
 
-    public static ComplexToFeatureTypeConverter getInstance(){
+    public static synchronized ComplexToFeatureTypeConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ComplexToFeatureTypeConverter();
         }

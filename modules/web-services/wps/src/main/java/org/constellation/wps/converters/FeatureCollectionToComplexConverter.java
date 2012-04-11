@@ -42,7 +42,7 @@ public final class FeatureCollectionToComplexConverter extends SimpleConverter<F
     private FeatureCollectionToComplexConverter(){
     }
 
-    public static FeatureCollectionToComplexConverter getInstance(){
+    public static synchronized FeatureCollectionToComplexConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new FeatureCollectionToComplexConverter();
         }

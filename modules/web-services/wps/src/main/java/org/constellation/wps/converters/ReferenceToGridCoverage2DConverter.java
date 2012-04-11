@@ -45,7 +45,7 @@ public final class ReferenceToGridCoverage2DConverter extends SimpleConverter<Ma
     private ReferenceToGridCoverage2DConverter(){
     }
 
-    public static ReferenceToGridCoverage2DConverter getInstance(){
+    public static synchronized ReferenceToGridCoverage2DConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ReferenceToGridCoverage2DConverter();
         }

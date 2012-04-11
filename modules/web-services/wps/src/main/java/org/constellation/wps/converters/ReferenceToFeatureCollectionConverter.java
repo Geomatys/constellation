@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
+import org.constellation.wps.utils.WPSUtils;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -61,7 +62,7 @@ public final class ReferenceToFeatureCollectionConverter extends SimpleConverter
     private ReferenceToFeatureCollectionConverter(){
     }
 
-    public static ReferenceToFeatureCollectionConverter getInstance(){
+    public static synchronized ReferenceToFeatureCollectionConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ReferenceToFeatureCollectionConverter();
         }
@@ -99,7 +100,7 @@ public final class ReferenceToFeatureCollectionConverter extends SimpleConverter
                     }
                     
                     FeatureCollection fcoll = (FeatureCollection)fcollReader.read(new URL(source.get("href")));
-                     fcoll = (FeatureCollection) WPSWorker.fixFeature(fcoll);
+                     fcoll = (FeatureCollection) WPSUtils.fixFeature(fcoll);
                     return fcoll;
 
                 } catch (CstlServiceException ex) {

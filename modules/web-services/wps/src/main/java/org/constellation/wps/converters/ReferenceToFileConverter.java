@@ -50,7 +50,7 @@ public final class ReferenceToFileConverter extends SimpleConverter<Map<String,S
     private ReferenceToFileConverter(){
     }
 
-    public static ReferenceToFileConverter getInstance(){
+    public static synchronized ReferenceToFileConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ReferenceToFileConverter();
         }

@@ -23,6 +23,8 @@ import java.net.URL;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
+import org.constellation.wps.utils.WPSMimeType;
+import org.constellation.wps.utils.WPSUtils;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -54,7 +56,7 @@ public final class ReferenceToFeatureConverter extends SimpleConverter<Map<Strin
     private ReferenceToFeatureConverter(){
     }
 
-    public static ReferenceToFeatureConverter getInstance(){
+    public static synchronized ReferenceToFeatureConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ReferenceToFeatureConverter();
         }
@@ -76,8 +78,11 @@ public final class ReferenceToFeatureConverter extends SimpleConverter<Map<Strin
             if (source.get("mime") == null) {
                 throw new NonconvertibleObjectException("Invalid reference input : typeMime can't be null.");
             }
+            final String mime = source.get("mime");
             //XML
-            if(source.get("mime").equalsIgnoreCase(MimeType.TEXT_XML)){
+            if(mime.equalsIgnoreCase(WPSMimeType.TEXT_XML.getValue()) || 
+                    mime.equalsIgnoreCase(WPSMimeType.TEXT_GML.getValue()) || 
+                    mime.equalsIgnoreCase(WPSMimeType.APP_GML.getValue())){
                  try {
                     final XmlFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
                     JAXPStreamFeatureReader featReader;
@@ -91,7 +96,7 @@ public final class ReferenceToFeatureConverter extends SimpleConverter<Map<Strin
                     }
                     
                     Feature feat = (Feature)featReader.read(new URL(source.get("href")));
-                    feat = (Feature) WPSWorker.fixFeature(feat);
+                    feat = (Feature) WPSUtils.fixFeature(feat);
                     return feat;
 
                 } catch (CstlServiceException ex) {

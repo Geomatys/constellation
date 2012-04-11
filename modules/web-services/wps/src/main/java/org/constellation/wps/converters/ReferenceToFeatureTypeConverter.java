@@ -51,7 +51,7 @@ public final class ReferenceToFeatureTypeConverter extends SimpleConverter<Map<S
     private ReferenceToFeatureTypeConverter(){
     }
 
-    public static ReferenceToFeatureTypeConverter getInstance(){
+    public static synchronized ReferenceToFeatureTypeConverter getInstance(){
         if(INSTANCE == null){
             INSTANCE = new ReferenceToFeatureTypeConverter();
         }
