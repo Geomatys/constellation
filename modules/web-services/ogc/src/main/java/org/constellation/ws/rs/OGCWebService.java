@@ -794,6 +794,13 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     /**
+     * Return the number of instance if the web-service
+     */
+    protected int getWorkerMapSize() {
+        return workersMap.size();
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @PreDestroy

@@ -86,7 +86,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WPSMarshallerPool.getInstance());
 
-        LOGGER.log(Level.INFO, "WPS REST service running ({0} instances)\n", workersMap.size());
+        LOGGER.log(Level.INFO, "WPS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
     @Override

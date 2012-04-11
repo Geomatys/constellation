@@ -107,7 +107,7 @@ public class WCSService extends GridWebService<WCSWorker> {
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WCSMarshallerPool.getInstance());
 
-        LOGGER.log(Level.INFO, "WCS REST service running ({0} instances)\n", workersMap.size());
+        LOGGER.log(Level.INFO, "WCS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
     /**

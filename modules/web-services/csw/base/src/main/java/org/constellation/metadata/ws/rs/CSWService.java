@@ -102,7 +102,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     public CSWService() {
         super(ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());
-        LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", workersMap.size());
+        LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
     /**
@@ -112,7 +112,7 @@ public class CSWService extends OGCWebService<CSWworker> {
     protected CSWService(final Map<String, CSWworker> workers) {
         super(workers, ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());
-        LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", workersMap.size());
+        LOGGER.log(Level.INFO, "CSW REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
     /**
