@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import javax.measure.unit.SI;
 import javax.xml.bind.JAXBException;
 
 import org.geotoolkit.process.ProcessException;
@@ -35,6 +36,7 @@ import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.CodeType;
 import org.geotoolkit.ows.xml.v110.DomainMetadataType;
 import org.geotoolkit.ows.xml.v110.LanguageStringType;
+import org.geotoolkit.ows.xml.v110.AllowedValues;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
@@ -73,6 +75,10 @@ import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
+import org.geotoolkit.process.ProcessingRegistry;
+import org.geotoolkit.wps.xml.v100.LiteralOutputType;
+import org.geotoolkit.wps.xml.v100.SupportedUOMsType;
+import org.geotoolkit.wps.xml.v100.UOMsType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -86,16 +92,12 @@ import org.opengis.util.FactoryException;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import org.constellation.wps.utils.WPSUtils;
 import org.constellation.ServiceDef;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.process.ProcessingRegistry;
-import org.geotoolkit.wps.xml.v100.LiteralOutputType;
-import org.geotoolkit.wps.xml.v100.SupportedUOMsType;
-import org.geotoolkit.wps.xml.v100.UOMsType;
 
 import static org.constellation.api.QueryConstants.*;
-import org.constellation.wps.utils.WPSUtils;
 import static org.constellation.wps.ws.WPSConstant.*;
 
 /**
@@ -391,9 +393,19 @@ public class WPSWorker extends AbstractWorker {
                         if (paramDesc.getDefaultValue() != null) {
                             literal.setDefaultValue(paramDesc.getDefaultValue().toString()); //default value if enable
                         }
-                        literal.setAnyValue(new AnyValue());
+                        
+                        if(paramDesc.getUnit() != null){
+                            literal.setUOMs(WPSUtils.generateUOMs(paramDesc));
+                        }
+                        //AllowedValues setted
+                        if(paramDesc.getValidValues() != null && !paramDesc.getValidValues().isEmpty()){
+                            literal.setAllowedValues(new AllowedValues(paramDesc.getValidValues()));
+                        }else{
+                            literal.setAnyValue(new AnyValue());
+                        }
+                        literal.setValuesReference(null);
                         literal.setDataType(WPSUtils.createDataType(clazz));
-                        literal.setUOMs(WPS_SUPPORTED_UOM);
+                        
 
                         in.setLiteralData(literal);
                         
@@ -439,8 +451,10 @@ public class WPSWorker extends AbstractWorker {
                     } else if (WPSIO.isSupportedLiteralOutputClass(clazz)) {
 
                         final LiteralOutputType literal = new LiteralOutputType();
-                        literal.setUOMs(WPS_SUPPORTED_UOM);
                         literal.setDataType(WPSUtils.createDataType(clazz));
+                        if(paramDesc.getUnit() != null){
+                            literal.setUOMs(WPSUtils.generateUOMs(paramDesc));
+                        }
 
                         out.setLiteralOutput(literal);
                     }else{

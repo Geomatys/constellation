@@ -17,30 +17,22 @@
 package org.constellation.wps.utils;
 
 import com.vividsolutions.jts.geom.Geometry;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
+import java.util.*;
 import java.util.logging.Logger;
-import org.constellation.ws.CstlServiceException;
+import javax.measure.unit.NonSI;
+import javax.measure.unit.SI;
+import javax.measure.unit.Unit;
+
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
-import org.opengis.util.NoSuchIdentifierException;
-
 import org.geotoolkit.ows.xml.v110.CodeType;
 import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.wps.xml.v100.ProcessBriefType;
 import org.geotoolkit.util.ArgumentChecks;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.wps.ws.WPSConstant.*;
-import org.constellation.wps.ws.WPSIO;
-import org.constellation.wps.ws.WPSWorker;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.feature.FeatureTypeBuilder;
@@ -53,18 +45,29 @@ import org.geotoolkit.util.converter.ConverterRegistry;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.converter.ObjectConverter;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.wps.xml.v100.*;
+import org.geotoolkit.wps.xml.v100.SupportedUOMsType;
+import org.geotoolkit.wps.xml.v100.UOMsType;
+import org.geotoolkit.wps.xml.v100.SupportedComplexDataInputType;
+import org.geotoolkit.wps.xml.v100.ComplexDataCombinationsType;
+import org.geotoolkit.wps.xml.v100.ComplexDataCombinationType;
+import org.geotoolkit.wps.xml.v100.ComplexDataDescriptionType;
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.PropertyDescriptor;
-import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
+import org.opengis.util.NoSuchIdentifierException;
 
+import org.opengis.util.FactoryException;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.wps.ws.WPSIO;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.constellation.wps.ws.WPSConstant.*;
 /**
  * Set of utilities method used by WPS worker.
  *
@@ -215,6 +218,42 @@ public class WPSUtils {
             return result.toString();
         }
         return value;
+    }
+    
+    /**
+     * Generate supported UOM (Units) for a given ParameterDescriptor. 
+     * If this descriptor have default unit, supported UOM returned will be 
+     * all the compatible untis to the default one.
+     * 
+     * @param param
+     * @return SupportedUOMsType or null if the parameter does'nt have any default unit.
+     */
+    static public SupportedUOMsType generateUOMs(final ParameterDescriptor param){
+        if(param != null && param.getUnit() != null){
+            final Unit unit = param.getUnit();
+            final Set<Unit<?>> siUnits = SI.getInstance().getUnits();
+            final Set<Unit<?>> nonisUnits = NonSI.getInstance().getUnits();
+            
+            final SupportedUOMsType supportedUOMsType = new SupportedUOMsType();
+            final SupportedUOMsType.Default defaultUOM = new SupportedUOMsType.Default();
+            final UOMsType supportedUOM = new UOMsType();
+            
+            defaultUOM.setUOM(new DomainMetadataType(unit.toString(), null));
+            for (Unit u : siUnits) {
+                if(unit.isCompatible(u)){
+                    supportedUOM.getUOM().add(new DomainMetadataType(u.toString(), null));
+                }
+            }
+            for (Unit u : nonisUnits) {
+                if(unit.isCompatible(u)){
+                    supportedUOM.getUOM().add(new DomainMetadataType(u.toString(), null));
+                }
+            }
+            supportedUOMsType.setDefault(defaultUOM);
+            supportedUOMsType.setSupported(supportedUOM);
+            return supportedUOMsType;
+        }
+        return null;
     }
 
     /**
