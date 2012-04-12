@@ -522,8 +522,8 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 + "      In order to access this service, you must form a valid request.\n"
                 + "    </p\n"
                 + "    <p>\n"
-                + "      Try using a <a href=\"" + getServiceURL() + "wps"
-                + "?service=WPS&request=GetCapabilities&AcceptVersions=1.0.0\""
+                + "      Try using a <a href=\"" + getUriContext().getAbsolutePath().toString()
+                + "?service=WPS&request=GetCapabilities\""
                 + ">Get Capabilities</a> request to obtain the 'Capabilities'<br>\n"
                 + "      document which describes the resources available on this server.\n"
                 + "    </p>\n"
