@@ -171,7 +171,7 @@ public abstract class GenericReader  {
             
             //initialize the main statement
             if (queries.getMain() != null) {
-                final Query mainQuery = queries.getMain().getQuery();
+                final Query mainQuery = queries.getMain();
                 mainStatement         = mainQuery.buildSQLQuery(staticParameters);
             }
 
