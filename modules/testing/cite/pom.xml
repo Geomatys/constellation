@@ -347,7 +347,7 @@
                 <service>wfs-1.1.0</service>
                 <service>sos-1.0.0</service>
                 <service>csw-2.0.2</service>
-                <!--service>wps-1.0.0</service-->
+                <service>wps-1.0.0</service>
               </services>
             </configuration>
           </plugin>

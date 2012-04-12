@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ctl:package 
+	xmlns:execute="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/Execute.xml"
+	xmlns:wpsFunctions="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/functions.xml"
+	xmlns:ctl="http://www.occamlab.com/ctl"  
+	xmlns:html="http://www.w3.org/1999/xhtml" 	
+	xmlns:saxon="http://saxon.sf.net/" 
+	xmlns:tep="http://teamengine.sourceforge.net/parsers" 
+	xmlns:xi="http://www.w3.org/2001/XInclude" 
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:parsers="http://www.occamlab.com/te/parsers"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+	xmlns:xows="http://www.opengeospatial.net/ows"
+	xmlns:ows="http://www.opengis.net/ows/1.1" 
+	xmlns:gml="http://www.opengis.net/gml" 
+	xmlns:wps="http://www.opengis.net/wps/1.0.0"	
+	xmlns:xml="http://www.w3.org/XML/1998/namespace">
+<!--*****************************************************************************************************************************************************************************-->		
+		
+</ctl:package>

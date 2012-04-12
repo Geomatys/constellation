@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ctl:package
+    xmlns:wpsFunctions="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/functions.xml"
+    xmlns:ctl="http://www.occamlab.com/ctl"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:wms="http://www.opengis.net/wms"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:parsers="http://www.occamlab.com/te/parsers"
+    xmlns:ows="http://www.opengis.net/ows/1.1"
+    xmlns:gml="http://www.opengis.net/gml"
+    xmlns:wps="http://www.opengis.net/wps/1.0.0"
+    xmlns:ogc="http://www.opengis.net/ogc">
+
+
+    <ctl:function name="wpsFunctions:exceptionElement">
+        <ctl:param name="exceptionResponse">The exception repsonse</ctl:param>
+        <ctl:description>Return the Exception element of an ows:ExceptionReport </ctl:description>
+        <ctl:code>
+            <xsl:copy-of select="$exceptionResponse//ows:ExceptionReport/ows:Exception" />
+        </ctl:code>
+    </ctl:function>
+	
+    <ctl:function name="wpsFunctions:exceptionCode">
+        <ctl:param name="exceptionResponse">The exception response</ctl:param>
+        <ctl:description>Return the @exceptionCode attribute of an ows:ExceptionReport </ctl:description>
+        <ctl:code>
+            <xsl:variable name="exceptionElement" select="wpsFunctions:exceptionElement($exceptionResponse)"/>
+            <xsl:value-of select="$exceptionElement/@exceptionCode" />
+        </ctl:code>
+    </ctl:function>
+
+    <ctl:function name="wpsFunctions:exceptionCodeLocator">
+        <ctl:param name="exceptionResponse">The exception response</ctl:param>
+        <ctl:description>Return the @locator attribute of an ows:ExceptionReport </ctl:description>
+        <ctl:code>
+            <xsl:variable name="exceptionElement" select="wpsFunctions:exceptionElement($exceptionResponse)"/>
+            <xsl:value-of select="$exceptionElement/@locator" />
+        </ctl:code>
+    </ctl:function>
+
+    <ctl:function name="wpsFunctions:getExceptionInfo">
+        <ctl:param name="exceptionReport">The exception report</ctl:param>
+        <ctl:return>The Exception Code and Locator of an exception report</ctl:return>
+        <ctl:code>
+            <xsl:variable name="exceptionElement" select="$exceptionReport//ows:ExceptionReport/ows:Exception" />
+            <xsl:variable name="exceptionCodeValue" select="$exceptionElement/@exceptionCode" />
+            <xsl:variable name="locatorValue" select="$exceptionElement/@locator" />
+            <xsl:value-of select="concat('Exception Report (exceptionCode, locator):  ',$exceptionCodeValue,',',$locatorValue)" />
+        </ctl:code>
+    </ctl:function>
+	
+    <!--Validates an ExceptionReport and checks for specific exceptionCode and locator values-->
+    <ctl:function name="wpsFunctions:checkExceptionReport">
+        <ctl:param name="exceptionReport">The exception report to check</ctl:param>
+        <ctl:param name="exceptionCodeToCheck">The exceptionCode to check</ctl:param>
+        <ctl:param name="locatorToCheck">The locator to check (a * can be provided to indicate that any locator value is allowed)</ctl:param>
+        <ctl:return>True/false depending on whether or not the exception report is valid</ctl:return>
+        <ctl:description></ctl:description>
+        <ctl:code>
+            <xsl:variable name="exceptionElement" select="$exceptionReport//ows:ExceptionReport/ows:Exception" />
+            <xsl:variable name="exceptionCodeValue" select="$exceptionElement/@exceptionCode" />
+            <xsl:variable name="locatorValue" select="$exceptionElement/@locator" />
+            <xsl:choose>
+                <xsl:when test="$locatorToCheck='*'">
+                    <xsl:value-of select="($exceptionCodeToCheck=$exceptionCodeValue)" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="($exceptionCodeToCheck=$exceptionCodeValue) and (contains(lower-case(string($locatorValue)), lower-case($locatorToCheck)))" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </ctl:code>
+    </ctl:function>
+    
+	
+    <ctl:function name="wpsFunctions:dateTimeFromISO">
+        <ctl:param name="dateString"></ctl:param>
+        <ctl:description>Convert a valid ISO 8601 date time to a valid XSL datetime. 
+            It is assumed that dateString has already passed "wpsFunctions:isValidDate".
+            dateString is assumed to at least have a year month and day
+        </ctl:description>
+        <ctl:code>
+            <xsl:variable name="dateStringNoSpace" select="replace(normalize-space($dateString), ' ', 'T')"/>	
+            <xsl:variable name="newDateString" select="replace($dateString, 'Z', '')"/>			
+            <xsl:choose>
+                <xsl:when test="contains($newDateString, '.')"> <!-- if it passed validation and has a "." in it, it should be fine -->				
+                    <xsl:value-of select="xsd:dateTime($newDateString)"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:variable name="appendString" select="'T00:00:00+00:00'"/>
+                    <xsl:variable name="newDateStringLngth" select="string-length($newDateString)"/>
+                    <xsl:variable name="appendStringLength" select="string-length($appendString)"/>
+                    <xsl:variable name="totalStringLength"	select="25"/>
+                    <xsl:variable name="substringToAppend" select="substring($appendString, $appendStringLength - ($totalStringLength - $newDateStringLngth) + 1)"/>
+                    <xsl:variable name="returnValue" select="concat($newDateString, $substringToAppend)"/>			
+                    <xsl:value-of select="xsd:dateTime($returnValue)"/>
+                </xsl:otherwise>
+            </xsl:choose>
+			
+        </ctl:code>
+    </ctl:function>
+	
+
+    <ctl:function name="wpsFunctions:isValidDate">
+        <ctl:param name="dateString">The date to be tested</ctl:param>
+        <ctl:description>Check whether a date is a valid ISO 8601 date with at least a day included, or one of the valid constants.</ctl:description>
+        <ctl:code>	
+            <xsl:variable name="isoDateFormatRegex" select="'^([0-9]{4})(-([0-9]{2})(-([0-9]{2})(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?(Z|(([-+])([0-9]{2})(:([0-9]{2}))?))?)?))$'"/>
+            <xsl:variable name="validDateRegex" select="'^[0-9]{4}-(((0[13578]|(10|12))-(0[1-9]|[1-2][0-9]|3[0-1]))|(02-(0[1-9]|[1-2][0-9]))|((0[469]|11)-(0[1-9]|[1-2][0-9]|30)))$'"/>
+            <xsl:variable name="datePortion" select="substring($dateString, 1, 10)"/>						
+            <xsl:value-of select="(matches($dateString, $isoDateFormatRegex) 
+								and matches($datePortion, $validDateRegex))"/>
+        </ctl:code>
+    </ctl:function>
+	
+    <ctl:function name="wpsFunctions:isValidTimePeriodPosition">
+        <ctl:param name="timePosition">The time position to be tested</ctl:param>
+        <ctl:description>Determine whether a time position is valid</ctl:description>
+        <ctl:code>
+            <xsl:variable name="indeterminateValue" select="$timePosition//@indeterminatePosition"/>
+            <xsl:choose>
+                <xsl:when test="$timePosition=''">
+                    <xsl:value-of select="$indeterminateValue = 'now' or $indeterminateValue = 'unknown'"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="((not($indeterminateValue) or $indeterminateValue = 'before' or $indeterminateValue = 'after')
+												and
+												wpsFunctions:isValidDate($timePosition)='true')"/>
+                </xsl:otherwise>
+            </xsl:choose>				
+        </ctl:code>
+    </ctl:function>
+
+    <ctl:function name="wpsFunctions:timeToCompare">
+        <ctl:param name="timePosition">The time position to be tested</ctl:param>
+        <ctl:description>If indeterminate Position = NOW, set to current time, else leave it alone</ctl:description>
+        <ctl:code>
+            <xsl:variable name="indeterminateValue" select="$timePosition//@indeterminatePosition"/>
+            <xsl:choose>
+                <xsl:when test="$indeterminateValue='now'">
+                    <xsl:value-of select="current-dateTime()"/>
+                </xsl:when>
+                <xsl:otherwise>
+						<!--<xsl:value-of select="current-dateTime()"/>-->
+                    <xsl:value-of select="$timePosition"/>
+                </xsl:otherwise>
+            </xsl:choose>				
+        </ctl:code>
+    </ctl:function>
+	
+	<!-- perhaps this could use the wps schema to instead of hard coded values -->
+    <ctl:function name="wpsFunctions:isValidOperationName">
+        <ctl:param name="operationName">The name of the WPS operation</ctl:param>
+        <ctl:return>True/False depending on whether the name is one of the valid WPS operations.</ctl:return>
+        <ctl:description>Determines whether the operation name is valid</ctl:description>
+        <ctl:code>
+            <xsl:value-of select="($operationName='GetCapabilities'
+	                                    or $operationName='Execute'
+					    or $operationName='DescribeProcess')"/>																					
+        </ctl:code>
+    </ctl:function>	
+	
+
+    <ctl:function name="wpsFunctions:isValidURN">
+        <ctl:param name="urnString">The URN to validate</ctl:param>
+        <ctl:return>True/False depending on whether or not the URN is valid</ctl:return>
+        <ctl:description>Determines if a procedure URN is valid</ctl:description>
+        <ctl:code>
+            <xsl:variable name="urnRegexNoVersion" select="'^urn:ogc(:(\w|\(|\)|\+|,|-|\.|=|\$|_|!|\*|''|@|;)+)+$'"/>
+            <xsl:variable name="urnRegexWithVersion" select="'^urn:ogc(:(\w|\(|\)|\+|,|-|\.|=|\$|_|!|\*|''|@|;)+)+:(([0-9])+(\.([0-9]+))*)*(:(\w|\(|\)|\+|,|-|\.|=|\$|_|!|\*|''|@|;)+)+$'"/>
+            <xsl:value-of select="(matches($urnString, $urnRegexNoVersion,'i') or matches($urnString, $urnRegexWithVersion,'i'))"/>	
+        </ctl:code>
+    </ctl:function>
+	
+
+	
+    <ctl:function name="wpsFunctions:isValidDefinitionURN">
+        <ctl:param name="urnString">The URN to validate</ctl:param>
+        <ctl:return>True/False depending on whether or not the URN is valid</ctl:return>
+        <ctl:description>Determines if a definition URN is valid. Note that the "version" part is optional</ctl:description>
+        <ctl:code>
+            <xsl:variable name="urnRegexNoVersion" select="'^urn:ogc:def(:(\w|\(|\)|\+|,|-|\.|=|\$|_|!|\*|''|@|;)+)+$'"/>
+            <xsl:variable name="urnRegexWithVersion" select="'^urn:ogc:def(:(\w|\(|\)|\+|,|-|\.|=|\$|_|!|\*|''|@|;)+)+:(([0-9])+(\.([0-9]+))*)*(:(\w|\(|\)|\+|,|-|\.|=|\$|_|!|\*|''|@|;)+)+$'"/>
+            <xsl:value-of select="(matches($urnString, $urnRegexNoVersion,'i') or matches($urnString, $urnRegexWithVersion,'i'))"/>							
+        </ctl:code>
+    </ctl:function>	
+
+    <ctl:function name="wpsFunctions:isValidMIMETypeFormat">
+        <ctl:param name="responseFormat">The respsonseFormat to validate</ctl:param>
+        <ctl:return>True/False depending on whether the input is a valid MIME type based on ows:owsCommon.xsd</ctl:return>
+        <ctl:description>Determines if a definition URN is valid</ctl:description>
+        <ctl:code>		
+            <xsl:choose>
+                <xsl:when test="starts-with($responseFormat,'text/xml')">
+                    <xsl:value-of select="wpsFunctions:isValidTextXMLFormat($responseFormat)"/>				
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="(matches($responseFormat,'^(application|audio|image|text|video|message|multipart|model)/.+(;\s*.+=.+)*','i'))"/>
+                </xsl:otherwise>
+            </xsl:choose>
+			<!--xsl:value-of select="(matches($responseFormat,'^text/xml;subtype=.*(OM|TML).*','i'))"/-->
+        </ctl:code>
+    </ctl:function>	
+
+    <ctl:function name="wpsFunctions:isValidTextXMLFormat">
+        <ctl:param name="responseFormat">The respsonseFormat to validate</ctl:param>
+        <ctl:return>True/False depending on whether the input is a valid MIME type based on ows:owsCommon.xsd</ctl:return>
+        <ctl:description>Determines if a definition URN is valid</ctl:description>
+        <ctl:code>		
+            <xsl:value-of select="(matches($responseFormat,'^text/xml;\s*subtype=&quot;?.+/[0-9].&quot;?','i'))"/>						
+        </ctl:code>
+    </ctl:function>
+	
+
+    <ctl:function name="wpsFunctions:operationPostURL">
+        <ctl:param name="capabilitiesDocument">The capabilities document</ctl:param>
+        <ctl:param name="operation">The operation for which the URL is reqested</ctl:param>
+        <ctl:return>Post URL of given operation</ctl:return>
+        <ctl:description>Returns post URL of given operation</ctl:description>
+        <ctl:code>
+            <xsl:value-of select="$capabilitiesDocument//ows:Operation[@name=$operation]/ows:DCP/ows:HTTP/ows:Post/@xlink:href"/>						         
+        </ctl:code>
+    </ctl:function>	
+
+    <ctl:function name="wpsFunctions:operationVersion">
+        <ctl:param name="capabilitiesDocument">The capabilities document</ctl:param>
+        <ctl:param name="operation">The operation for which the URL is reqested</ctl:param>
+        <ctl:return>Post URL of given operation</ctl:return>
+        <ctl:description>Returns post URL of given operation</ctl:description>
+        <ctl:code>
+            <xsl:value-of select="$capabilitiesDocument//ows:Operation[@name=$operation]/ows:Parameter[@name='version']//ows:AllowedValues/ows:Value | 
+								  $capabilitiesDocument//ows:ServiceIdentification//ows:ServiceTypeVersion"/>																
+        </ctl:code>
+    </ctl:function>	
+
+    <ctl:function name="wpsFunctions:capabilitiesFirstProcess">
+        <ctl:param name="capabilitiesDocument">The capabilities document</ctl:param>        
+        <ctl:return>The first process for DescribeProcess advertised in the capabilities document</ctl:return>
+        <ctl:description>Return a valid process identifier for use in calling DescribeProcess</ctl:description>
+        <ctl:code>
+            <xsl:value-of select="$capabilitiesDocument//wps:Process[1]//ows:Identifier"/>																
+        </ctl:code>
+    </ctl:function>	
+
+	
+    <ctl:function name="wpsFunctions:schemaPath">
+        <ctl:param name="schemaRoot">The location of the schemas</ctl:param>
+        <ctl:param name="version">The numeric version of the schema</ctl:param>
+        <ctl:param name="encoding">The name of the service or encoding to be used</ctl:param>
+        <ctl:param name="filename">Filename of schema file</ctl:param>	
+        <ctl:code>			
+            <xsl:value-of select="concat($schemaRoot, $encoding, '/', $version, '/', $filename)"/>
+        </ctl:code>
+    </ctl:function>
+
+    <ctl:function name="wpsFunctions:exceptionReportSchemaPath">
+        <ctl:param name="schemaRoot">The location of the schemas</ctl:param>
+        <ctl:param name="owsVersion">The numeric version of the schema</ctl:param>
+        <ctl:code>			
+            <xsl:value-of select="wpsFunctions:schemaPath($schemaRoot, $owsVersion, 'ows', 'owsExceptionReport.xsd')"/>
+        </ctl:code>
+    </ctl:function>
+
+	<!--Validates response against schema-->
+	<!-- this function is overloaded, there are two versions -->
+	<!-- one version accepts the full path to the schema file as a parameter -->
+	<!-- the other constructs the path from parts -->
+    <ctl:function name="wpsFunctions:xmlValidatingParser">
+        <ctl:param name="schemaFile">schemaFile</ctl:param>
+        <ctl:description>Standard CTL XMLValidatingParser</ctl:description>
+        <ctl:code>						
+            <xsl:choose>
+                <xsl:when test="starts-with($schemaFile,'http')">
+                    <parsers:XMLValidatingParser ignoreErrors="false">
+                        <parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>
+                        <parsers:schemas>
+                            <parsers:schema type="url">
+                                <xsl:value-of select="$schemaFile"/>								
+                            </parsers:schema>							
+                        </parsers:schemas>
+                    </parsers:XMLValidatingParser>	
+                </xsl:when>
+                <xsl:otherwise>
+                    <parsers:XMLValidatingParser ignoreErrors="false">
+                        <parsers:schemas>
+                            <parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>						
+                            <parsers:schema type="file">
+                                <xsl:value-of select="$schemaFile"/>
+                            </parsers:schema>						
+                        </parsers:schemas>
+                    </parsers:XMLValidatingParser>
+                </xsl:otherwise>
+            </xsl:choose>				
+        </ctl:code>
+    </ctl:function>
+
+	
+    <ctl:function name="wpsFunctions:xmlValidatingParser">
+        <ctl:param name="schemaRoot">The location of the schemas</ctl:param>
+        <ctl:param name="version">The numeric version of the schema</ctl:param>
+        <ctl:param name="encoding">The name of the service or encoding to be used</ctl:param>
+        <ctl:param name="filename">Filenam of schema file</ctl:param>
+        <ctl:description>Standard CTL XMLValidatingParser</ctl:description>
+        <ctl:code>				
+            <xsl:variable name="schemaFile" select="wpsFunctions:schemaPath($schemaRoot, $version, $encoding, $filename)"/>
+            <xsl:copy-of select="wpsFunctions:xmlValidatingParser($schemaFile)"/>
+        </ctl:code>
+    </ctl:function>
+
+	
+    <ctl:function name="wpsFunctions:total-seconds-from-duration">
+        <ctl:param name="duration"/> 
+        <ctl:code>
+            <xsl:value-of select="$duration div xsd:dayTimeDuration('PT1S')"/>   
+        </ctl:code>
+    </ctl:function>
+
+    <ctl:function name="wpsFunctions:dayTimeDurationFromSeconds">
+        <ctl:param name="seconds"/> 
+        <ctl:code>
+            <xsl:value-of select="xsd:dayTimeDuration('PT1S') * $seconds"/>
+        </ctl:code>
+    </ctl:function>
+	
+    <ctl:function name="wpsFunctions:sampleTimeIsInRange">
+        <ctl:param name="sampleTime"/> 
+        <ctl:param name="time1"/> 
+        <ctl:param name="time2"/> 
+        <ctl:code>
+            <xsl:variable name="beginSampleTime" select="wpsFunctions:beginTimePosition($sampleTime)"/>
+            <xsl:variable name="endSampleTime" select="wpsFunctions:endTimePosition($sampleTime)"/>
+            <xsl:choose>
+                <xsl:when test="$beginSampleTime != '' and (xsd:dateTime(wpsFunctions:dateTimeFromISO($beginSampleTime)) &lt; xsd:dateTime($time1))">					
+                    <xsl:value-of select="'false'"/>
+                </xsl:when>
+                <xsl:when test="$beginSampleTime != '' and (xsd:dateTime(wpsFunctions:dateTimeFromISO($beginSampleTime)) &gt; xsd:dateTime($time2))">
+                    <xsl:value-of select="'false'"/>
+                </xsl:when>
+                <xsl:when test="$endSampleTime != '' and (xsd:dateTime(wpsFunctions:dateTimeFromISO($endSampleTime)) &lt; xsd:dateTime($time1))">
+                    <xsl:value-of select="'false'"/>
+                </xsl:when>
+                <xsl:when test="$endSampleTime != '' and (xsd:dateTime(wpsFunctions:dateTimeFromISO($endSampleTime)) &gt; xsd:dateTime($time2))">
+                    <xsl:value-of select="'false'"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="'true'"/>
+                </xsl:otherwise>				
+            </xsl:choose>
+        </ctl:code>
+    </ctl:function>
+
+    <ctl:function name="wpsFunctions:describeProcess">
+        <ctl:param name="postURL"></ctl:param>
+        <ctl:param name="version"></ctl:param>
+        <ctl:param name="processIdentifier"></ctl:param>
+        <ctl:param name="schemaFile"></ctl:param>	
+        <ctl:code>
+            <xsl:variable name="describeProcess">
+                <ctl:request>
+                    <ctl:url>
+                        <xsl:value-of select="$postURL"/>
+                    </ctl:url>
+                    <ctl:method>post</ctl:method>
+
+                    <ctl:body>
+                        <DescribeProcess 								
+                            service="WPS" 
+                            xmlns="http://www.opengis.net/wps/1.0.0" 								
+                            xmlns:ows="http://www.opengis.net/ows/1.1" 								
+                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <xsl:attribute name="version">
+                                <xsl:value-of select="$version"/>
+                            </xsl:attribute>															
+                            <ows:Identifier>
+                                <xsl:value-of select="$processIdentifier"/>
+                            </ows:Identifier>
+                        </DescribeProcess>				
+                    </ctl:body>				
+
+                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">
+                        <ctl:with-param name="schemaFile" select="$schemaFile"/>										
+                    </ctl:call-function>									
+
+                </ctl:request>	
+            </xsl:variable>		
+            <xsl:copy-of select="$describeProcess"/>
+        </ctl:code>
+    </ctl:function>
+</ctl:package>

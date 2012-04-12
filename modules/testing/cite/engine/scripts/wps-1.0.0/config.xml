@@ -1,0 +1,19 @@
+<config>
+	<organization>
+		<name>OGC</name>
+	</organization>
+	<standard>
+		<name>WPS</name>
+	</standard>
+	<version>
+		<name>1.0</name>
+	</version>
+	<suite>
+		<namespace-uri>http://www.opengis.net/wps/1.0.0/namespace-uri>
+		<prefix>wps</prefix>
+		<local-name>suite</local-name>
+	</suite>
+	<source>ctl</source>
+	<web>web</web>
+</config>
+
