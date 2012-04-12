@@ -34,7 +34,7 @@ public class Queries {
 
     private HashMap<String, String> parameters;
 
-    private QueryPropertyType main;
+    private Query main;
 
     private QueryList statique;
     
@@ -54,7 +54,7 @@ public class Queries {
      * @param main The main SQL query (normally used to retrieve all the identifiers)
      * @param queryList The SQL queries.
      */
-    public Queries(final QueryPropertyType main, final QueryList queryList) {
+    public Queries(final Query main, final QueryList queryList) {
         this.main       = main;
         this.queryList  = queryList;
     }
@@ -67,7 +67,7 @@ public class Queries {
      * @param queryList The SQL queries.
      * @param parameters a map of varName/varValue.
      */
-    public Queries(final QueryPropertyType main, final QueryList queryList, final HashMap<String, String> parameters) {
+    public Queries(final Query main, final QueryList queryList, final HashMap<String, String> parameters) {
         this.main       = main;
         this.queryList  = queryList;
         this.parameters = parameters;
@@ -77,7 +77,7 @@ public class Queries {
      * Return the mainQuery.
      * @return
      */
-    public QueryPropertyType getMain() {
+    public Query getMain() {
         return main;
     }
 

@@ -74,14 +74,6 @@ public class ObjectFactory {
     }
     
     /**
-     * Create an instance of {@link QueryPropertyType }
-     * 
-     */
-    public QueryPropertyType createQueryPropertyType() {
-        return new QueryPropertyType();
-    }
-    
-    /**
      * Create an instance of {@link Queries }
      * 
      */

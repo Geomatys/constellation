@@ -80,6 +80,8 @@ public class GenericConfigurationXMLBindingTest {
         Query mquery = new Query("multiQuery1", new Select(Arrays.asList(new Column("var02", "pp.name"), new Column("var03", "tr.id"))),
                                                 new From("physical_parameter pp, transduction tr"),
                                                 new Where("tr.parameter=pp.id"));
+        
+        Query mainQuery = new Query("mainQuery", new Select("varx", "p.main"), new From("physical_test pt"));
 
         Orderby order = new Orderby();
         order.setSens("ASC");
@@ -88,7 +90,7 @@ public class GenericConfigurationXMLBindingTest {
 
         QueryList multi = new QueryList(Arrays.asList(query, mquery));
 
-        Queries queries = new Queries(null, multi, parameters);
+        Queries queries = new Queries(mainQuery, multi, parameters);
         Automatic config = new Automatic("MDWEB", bdd, queries);
         config.putParameter("testParam", "paramValue");
         StringWriter sw = new StringWriter();
@@ -122,6 +124,15 @@ public class GenericConfigurationXMLBindingTest {
         "                <value>blavl, bloub</value>"                                  + '\n' +
         "            </entry>"                                                         + '\n' +
         "        </parameters>"                                                        + '\n' +
+        "        <main name=\"mainQuery\">"                                            + '\n' +
+        "            <select>"                                                         + '\n' +
+        "                <col>"                                                        + '\n' +
+        "                    <var>varx</var>"                                          + '\n' +
+        "                    <sql>p.main</sql>"                                        + '\n' +
+        "                </col>"                                                       + '\n' +
+        "            </select>"                                                        + '\n' +
+        "            <from>physical_test pt</from>"                                    + '\n' +
+        "        </main>"                                                              + '\n' +
         "        <queryList>"                                                          + '\n' +
 	"            <query name=\"singleQuery1\">"                                    + '\n' +
         "                <select>"                                                     + '\n' +
@@ -245,7 +256,16 @@ public class GenericConfigurationXMLBindingTest {
         "                <value>blavl, bloub</value>"                                  + '\n' +
         "            </entry>"                                                         + '\n' +
         "        </parameters>"                                                        + '\n' +
-        "        <queryList>"                                                             + '\n' +
+        "        <main name=\"mainQuery\">"                                            + '\n' +
+        "            <select>"                                                         + '\n' +
+        "                <col>"                                                        + '\n' +
+        "                    <var>varx</var>"                                          + '\n' +
+        "                    <sql>p.main</sql>"                                        + '\n' +
+        "                </col>"                                                       + '\n' +
+        "            </select>"                                                        + '\n' +
+        "            <from>physical_test pt</from>"                                    + '\n' +
+        "        </main>"                                                              + '\n' +
+        "        <queryList>"                                                          + '\n' +
 	"            <query name=\"singleQuery1\">"                                    + '\n' +
         "                <select>"                                                     + '\n' +
         "                    <col>"                                                    + '\n' +
@@ -293,6 +313,8 @@ public class GenericConfigurationXMLBindingTest {
         Query mquery = new Query("multiQuery1", new Select(Arrays.asList(new Column("var02", "pp.name"), new Column("var03", "tr.id"))),
                                                 new From("physical_parameter pp, transduction tr"),
                                                 new Where("tr.parameter=pp.id"));
+        
+        Query mainQuery = new Query("mainQuery", new Select("varx", "p.main"), new From("physical_test pt"));
 
         Orderby order = new Orderby();
         order.setSens("ASC");
@@ -301,7 +323,7 @@ public class GenericConfigurationXMLBindingTest {
         
         QueryList multi = new QueryList(Arrays.asList(query, mquery));
 
-        Queries queries     = new Queries(null, multi, parameters);
+        Queries queries     = new Queries(mainQuery, multi, parameters);
         Automatic expResult = new Automatic("MDWEB", bdd, queries);
 
         assertEquals(expResult, result);
