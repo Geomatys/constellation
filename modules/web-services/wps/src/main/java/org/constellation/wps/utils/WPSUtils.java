@@ -112,7 +112,7 @@ public class WPSUtils {
         brief.setIdentifier(new CodeType(buildProcessIdentifier(processDesc)));
         brief.setTitle(new LanguageStringType(processDesc.getIdentifier().getAuthority().getTitle().toString() + " : " + processDesc.getIdentifier().getCode()));
         brief.setAbstract(new LanguageStringType(processDesc.getProcedureDescription().toString()));
-        brief.setProcessVersion(null);
+        brief.setProcessVersion(WPS_1_0_0);
         brief.setWSDL(null);
 
         return brief;
