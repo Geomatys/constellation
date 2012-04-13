@@ -220,7 +220,16 @@
         <ctl:code>
             <xsl:value-of select="$capabilitiesDocument//ows:Operation[@name=$operation]/ows:DCP/ows:HTTP/ows:Post/@xlink:href"/>						         
         </ctl:code>
-    </ctl:function>	
+    </ctl:function>
+    <ctl:function name="wpsFunctions:operationGetURL">
+        <ctl:param name="capabilitiesDocument">The capabilities document</ctl:param>
+        <ctl:param name="operation">The operation for which the URL is reqested</ctl:param>
+        <ctl:return>Get URL of given operation</ctl:return>
+        <ctl:description>Returns get URL of given operation</ctl:description>
+        <ctl:code>
+            <xsl:value-of select="$capabilitiesDocument//ows:Operation[@name=$operation]/ows:DCP/ows:HTTP/ows:Get/@xlink:href"/>						         
+        </ctl:code>
+    </ctl:function>
 
     <ctl:function name="wpsFunctions:operationVersion">
         <ctl:param name="capabilitiesDocument">The capabilities document</ctl:param>
@@ -382,6 +391,35 @@
                     </ctl:call-function>									
 
                 </ctl:request>	
+            </xsl:variable>		
+            <xsl:copy-of select="$describeProcess"/>
+        </ctl:code>
+    </ctl:function>
+    
+    <ctl:function name="wpsFunctions:describeProcessGET">
+        <ctl:param name="getURL"></ctl:param>
+        <ctl:param name="version"></ctl:param>
+        <ctl:param name="processIdentifier"></ctl:param>
+        <ctl:param name="schemaFile"></ctl:param>	
+        <ctl:code>
+            <xsl:variable name="describeProcess">
+                <ctl:request>
+                    <ctl:url>
+                        <xsl:value-of select="$getURL"/>
+                    </ctl:url>
+                    <ctl:method>get</ctl:method>
+                    <ctl:param name="service">WPS</ctl:param>
+                    <ctl:param name="version">
+                        <xsl:value-of select="$version" />
+                    </ctl:param>
+                    <ctl:param name="request">DescribeProcess</ctl:param>
+                    <ctl:param name="identifier">
+                        <xsl:value-of select="$processIdentifier"/>
+                    </ctl:param>      													
+                    <ctl:call-function name="wpsFunctions:xmlValidatingParser">
+                        <ctl:with-param name="schemaFile" select="$schemaFile"/>						
+                    </ctl:call-function>						
+                </ctl:request>
             </xsl:variable>		
             <xsl:copy-of select="$describeProcess"/>
         </ctl:code>
