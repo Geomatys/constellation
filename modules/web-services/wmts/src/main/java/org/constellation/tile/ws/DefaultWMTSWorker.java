@@ -30,7 +30,6 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
-import org.constellation.register.RegisterException;
 import org.constellation.tile.visitor.CSVGraphicVisitor;
 import org.constellation.tile.visitor.GMLGraphicVisitor;
 import org.constellation.tile.visitor.HTMLGraphicVisitor;
@@ -52,6 +51,7 @@ import org.geotoolkit.ows.xml.v110.*;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.wmts.WMTSUtilities;
@@ -75,11 +75,6 @@ import org.opengis.geometry.Envelope;
  */
 public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     
-    /**
-     * The current MIME type of return
-     */
-    private String outputFormat;
-
     /**
      * A list of supported MIME type
      */
@@ -134,7 +129,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             boolean found = false;
             for (String form: formats.getOutputFormat()) {
                 if (ACCEPTED_OUTPUT_FORMATS.contains(form)) {
-                    outputFormat = form;
                     found = true;
                 }
             }
@@ -142,9 +136,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 throw new CstlServiceException("accepted format : text/xml, application/xml",
                                                  INVALID_PARAMETER_VALUE, "acceptFormats");
             }
-
-        } else {
-            this.outputFormat = MimeType.APP_XML;
         }
 
         //we prepare the response document
@@ -294,19 +285,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
         
     }
-
-    private static List<String> getRootDirectories() throws CstlServiceException {
-
-        List<String> rootDirectories;
-        try { // WE catch the exception from either service version
-            rootDirectories = Cstl.getRegister().getRootDirectory();
-
-        } catch (RegisterException regex) {
-            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
-        }
-        return rootDirectories;
-    }
-
 
     /**
      * {@inheritDoc}
@@ -528,8 +506,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             final TileReference tile = mosaic.getTile(columnIndex, rowIndex, hints);
             return tile;
                 
-        }catch(Exception ex){
-            throw new CstlServiceException("No layer for name : " + layerName , INVALID_PARAMETER_VALUE, "layerName");
+        } catch(DataStoreException ex) {
+            throw new CstlServiceException("Unexpected error : " + ex.getMessage(), ex , NO_APPLICABLE_CODE);
         }
         
     }
