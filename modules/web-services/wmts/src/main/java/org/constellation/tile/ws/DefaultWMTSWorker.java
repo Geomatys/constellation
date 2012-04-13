@@ -61,6 +61,7 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.coverage.Coverage;
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
+import org.opengis.referencing.operation.TransformException;
 
 /**
  * Working part of the WMTS service.
@@ -262,7 +263,9 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     }
                     
                     outputLayers.add(outputLayer);
-                }catch(Exception ex){
+                } catch(DataStoreException ex) {
+                    LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+                } catch(TransformException ex) {
                     LOGGER.log(Level.WARNING, ex.getMessage(),ex);
                 }
             }
