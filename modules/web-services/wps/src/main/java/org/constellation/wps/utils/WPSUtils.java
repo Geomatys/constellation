@@ -59,7 +59,6 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
 
 import org.opengis.util.FactoryException;
@@ -113,8 +112,8 @@ public class WPSUtils {
 
         final ProcessBriefType brief = new ProcessBriefType();
         brief.setIdentifier(new CodeType(buildProcessIdentifier(processDesc)));
-        brief.setTitle(new LanguageStringType(processDesc.getIdentifier().getAuthority().getTitle().toString() + " : " + processDesc.getIdentifier().getCode()));
-        brief.setAbstract(new LanguageStringType(processDesc.getProcedureDescription().toString()));
+        brief.setTitle(capitalizeFirstLetter(processDesc.getIdentifier().getCode()));
+        brief.setAbstract(capitalizeFirstLetter(processDesc.getProcedureDescription().toString()));
         brief.setProcessVersion(WPS_1_0_0);
         brief.setWSDL(null);
 
@@ -208,16 +207,16 @@ public class WPSUtils {
      * Return the given String with the first letter to upper case.
      * 
      * @param value
-     * @return String
+     * @return LanguageStringType
      */
-    public static String capitalizeFirstLetter(final String value) {
+    public static LanguageStringType capitalizeFirstLetter(final String value) {
         if (value != null && !value.isEmpty()) {
           
             final StringBuilder result = new StringBuilder(value);
             result.replace(0, 1, result.substring(0, 1).toUpperCase());
-            return result.toString();
+            return new LanguageStringType(result.toString());
         }
-        return value;
+        return new LanguageStringType(value);
     }
     
     /**

@@ -120,9 +120,10 @@ public final class WPSIO {
                     new DataInfo(false, WPSMimeType.TEXT_GML,  Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, ReferenceToGeometryConverter.getInstance()), //GML
                     new DataInfo(true,  WPSMimeType.APP_GML,   Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, ReferenceToGeometryConverter.getInstance()) //GML
                 ));
-        IOCLASSMAP.put(new KeyTuple(com.vividsolutions.jts.geom.Geometry.class, IOType.INPUT, DataType.LITERAL), UnmodifiableArrayList.wrap(
-                    new DataInfo(false, WPSMimeType.NONE,  Encoding.NONE, Schema.NONE, StringToGeometryConverter.getInstance()) //WKT
-                ));
+        //Literal INPUT
+//        IOCLASSMAP.put(new KeyTuple(com.vividsolutions.jts.geom.Geometry.class, IOType.INPUT, DataType.LITERAL), UnmodifiableArrayList.wrap(
+//                    new DataInfo(false, WPSMimeType.NONE,  Encoding.NONE, Schema.NONE, StringToGeometryConverter.getInstance()) //WKT
+//                ));
         //Complex OUTPUT
         IOCLASSMAP.put(new KeyTuple(com.vividsolutions.jts.geom.Geometry.class, IOType.OUTPUT, DataType.COMPLEX), UnmodifiableArrayList.wrap(
                     new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToComplexConverter.getInstance()), //XML

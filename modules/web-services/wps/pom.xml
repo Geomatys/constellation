@@ -48,11 +48,19 @@
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-processing-quartz</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-processing-math</artifactId>
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-processing-vector</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-processing-jts-geometry</artifactId>
         </dependency>
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>

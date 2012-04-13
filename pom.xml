@@ -804,6 +804,11 @@
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
+                <artifactId>geotk-processing-jts-geometry</artifactId>
+                <version>${geotoolkit-pending.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-xml-wps</artifactId>
                 <version>${geotoolkit-pending.version}</version>
             </dependency>

@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.measure.unit.SI;
 import javax.xml.bind.JAXBException;
 
 import org.geotoolkit.process.ProcessException;
@@ -34,7 +33,6 @@ import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.ows.xml.v110.AnyValue;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.CodeType;
-import org.geotoolkit.ows.xml.v110.DomainMetadataType;
 import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.ows.xml.v110.AllowedValues;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -77,8 +75,6 @@ import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.process.ProcessingRegistry;
 import org.geotoolkit.wps.xml.v100.LiteralOutputType;
-import org.geotoolkit.wps.xml.v100.SupportedUOMsType;
-import org.geotoolkit.wps.xml.v100.UOMsType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -99,6 +95,7 @@ import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wps.ws.WPSConstant.*;
+import org.geotoolkit.wps.xml.v100.*;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -130,27 +127,7 @@ public class WPSWorker extends AbstractWorker {
         }
         WPS_SUPPORTED_CRS.setSupported(supportedCRS);
     }
-    
-    /**
-     * Supported UOM
-     */
-    private static final SupportedUOMsType WPS_SUPPORTED_UOM;
-    static{
-        WPS_SUPPORTED_UOM = new SupportedUOMsType();
-        final SupportedUOMsType.Default defaultUOM = new SupportedUOMsType.Default();
-        final UOMsType supportedUOM = new UOMsType();
-
-        defaultUOM.setUOM(new DomainMetadataType("m", null));
-
-        supportedUOM.getUOM().add(new DomainMetadataType("m", null));
-        supportedUOM.getUOM().add(new DomainMetadataType("km", null));
-        supportedUOM.getUOM().add(new DomainMetadataType("cm", null));
-        supportedUOM.getUOM().add(new DomainMetadataType("mm", null));
-
-        WPS_SUPPORTED_UOM.setDefault(defaultUOM);
-        WPS_SUPPORTED_UOM.setSupported(supportedUOM);
-    }
-    
+        
     /**
      * List of process descriptor avaible.
      */
@@ -168,7 +145,6 @@ public class WPSWorker extends AbstractWorker {
     }
     
     
-
     /**
      * Constructor.
      *
@@ -333,24 +309,22 @@ public class WPSWorker extends AbstractWorker {
         descriptions.setVersion(WPS_1_0_0);
 
         for (CodeType identifier : request.getIdentifier()) {
-
-            final ProcessDescriptionType descriptionType = new ProcessDescriptionType();
-            descriptionType.setIdentifier(identifier);          //Process Identifier
-            descriptionType.setProcessVersion(WPS_1_0_0);
-            descriptionType.setWSDL(null);                      //TODO WSDL
-            descriptionType.setStatusSupported(false);          //TODO support process status
-            descriptionType.setStoreSupported(false);           //TODO support process storage
-            
-
+  
             // Find the process
             final ProcessDescriptor processDesc = WPSUtils.getProcessDescriptor(identifier.getValue());
             if (!WPSUtils.isSupportedProcess(processDesc)) {
                 throw new CstlServiceException("Process "+ identifier.getValue() +" not supported by the service.",
                         NO_APPLICABLE_CODE);
             }
-
-            descriptionType.setTitle(new LanguageStringType(processDesc.getIdentifier().getCode()));                //Process Title
-            descriptionType.setAbstract(new LanguageStringType(processDesc.getProcedureDescription().toString()));  //Process abstract
+            
+            final ProcessDescriptionType descriptionType = new ProcessDescriptionType();
+            descriptionType.setIdentifier(identifier);          //Process Identifier
+            descriptionType.setTitle(WPSUtils.capitalizeFirstLetter(processDesc.getIdentifier().getCode()));                //Process Title
+            descriptionType.setAbstract(WPSUtils.capitalizeFirstLetter(processDesc.getProcedureDescription().toString()));  //Process abstract
+            descriptionType.setProcessVersion(WPS_1_0_0);
+            descriptionType.setWSDL(null);                      //TODO WSDL
+            descriptionType.setStatusSupported(false);          //TODO support process status
+            descriptionType.setStoreSupported(false);           //TODO support process storage
 
             // Get process input and output descriptors
             final ParameterDescriptorGroup input = processDesc.getInputDescriptor();
@@ -369,8 +343,8 @@ public class WPSWorker extends AbstractWorker {
 
                     // Parameter informations
                     in.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, paramDesc, WPSIO.IOType.INPUT)));
-                    in.setTitle(new LanguageStringType(WPSUtils.capitalizeFirstLetter(paramDesc.getName().getCode())));
-                    in.setAbstract(new LanguageStringType(paramDesc.getRemarks().toString()));
+                    in.setTitle(WPSUtils.capitalizeFirstLetter(paramDesc.getName().getCode()));
+                    in.setAbstract(WPSUtils.capitalizeFirstLetter(paramDesc.getRemarks().toString()));
 
                     //set occurs
                     in.setMaxOccurs(BigInteger.valueOf(paramDesc.getMaximumOccurs()));
@@ -433,8 +407,8 @@ public class WPSWorker extends AbstractWorker {
 
                     //parameter informations
                     out.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, paramDesc, WPSIO.IOType.OUTPUT)));
-                    out.setTitle(new LanguageStringType(WPSUtils.capitalizeFirstLetter(paramDesc.getName().getCode())));
-                    out.setAbstract(new LanguageStringType(paramDesc.getRemarks().toString()));
+                    out.setTitle(WPSUtils.capitalizeFirstLetter(paramDesc.getName().getCode()));
+                    out.setAbstract(WPSUtils.capitalizeFirstLetter(paramDesc.getRemarks().toString()));
 
                     //input class
                     final Class clazz = paramDesc.getValueClass();
@@ -445,7 +419,7 @@ public class WPSWorker extends AbstractWorker {
 
                         //Complex type (XML, raster, ...)
                     } else if (WPSIO.isSupportedComplexOutputClass(clazz)) {
-                        out.setComplexOutput((SupportedComplexDataType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT));
+                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT));
 
                         //Simple object (Integer, double) and Object which need a conversion from String like affineTransform or Geometry
                     } else if (WPSIO.isSupportedLiteralOutputClass(clazz)) {
@@ -487,28 +461,36 @@ public class WPSWorker extends AbstractWorker {
     public Object execute(Execute request) throws CstlServiceException {
         isWorking();
 
-        //if requested SERVICE param is different than WPS
+        
+        //check SERVICE=WPS
         if (!request.getService().equalsIgnoreCase(WPS_SERVICE)) {
-            throw new CstlServiceException("The parameter SERVICE must be specified as WPS",
+            throw new CstlServiceException("The parameter "+ SERVICE_PARAMETER +" must be specified as WPS",
                     INVALID_PARAMETER_VALUE, SERVICE_PARAMETER.toLowerCase());
         }
+        
+        //check LANGUAGE=en-EN
+        if(request.getLanguage() != null && !request.getLanguage().equalsIgnoreCase(WPS_LANG)){
+            throw new CstlServiceException("The specified "+ LANGUAGE_PARAMETER +" is not handled by the service. ",
+                    INVALID_PARAMETER_VALUE, LANGUAGE_PARAMETER.toLowerCase());
+        }
 
-        final String version = request.getVersion().toString();
-        if (version.isEmpty()) {
-            throw new CstlServiceException("The parameter VERSION must be specified.",
+        //check mandatory version is not missing.
+        if (request.getVersion() == null || request.getVersion().isEmpty()) {
+            throw new CstlServiceException("The parameter " + VERSION_PARAMETER + " must be specified.",
                     MISSING_PARAMETER_VALUE, VERSION_PARAMETER.toLowerCase());
         }
 
-        if (version.equals(ServiceDef.WPS_1_0_0.version.toString())) {
+        //check VERSION=1.0.0
+        if (request.getVersion().equals(ServiceDef.WPS_1_0_0.version.toString())) {
             return execute100((org.geotoolkit.wps.xml.v100.Execute) request);
         } else {
-            throw new CstlServiceException("The version number specified for this discribeProcess request "
-                    + "is not handled.", NO_APPLICABLE_CODE, VERSION_PARAMETER.toLowerCase());
+             throw new CstlServiceException("The specified " + VERSION_PARAMETER + " number is not handled by the service.",
+                    VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
         }
     }
 
     /**
-     * Execute a process in wps v1.0
+     * Execute a process in wps v1.0.0.
      *
      * @param request
      * @return
