@@ -67,6 +67,9 @@ import org.constellation.wps.ws.WPSIO;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.wps.ws.WPSConstant.*;
+import org.geotoolkit.wps.xml.v100.*;
+import org.opengis.parameter.ParameterDescriptorGroup;
+
 /**
  * Set of utilities method used by WPS worker.
  *
@@ -82,7 +85,7 @@ public class WPSUtils {
     /**
      * Return the process descriptor from a process identifier
      *
-     * @param identifier like "urn:geomatys:wps:math:add"
+     * @param identifier like "urn:ogc:geomatys:wps:math:add"
      * @return ProcessDescriptor
      * @throws CstlServiceException in case of an unknown process identifier.
      */
@@ -121,8 +124,7 @@ public class WPSUtils {
     }
 
     /**
-     * Build OGC URN unique identifier for a process from his process
-     * descriptor.
+     * Build OGC URN unique identifier for a process from his process descriptor.
      *
      * @param processDesc
      * @return
@@ -133,8 +135,7 @@ public class WPSUtils {
     }
 
     /**
-     * Extract the factory name from a process identifier. e.g :
-     * urn:geomatys:wps:math:add return math.
+     * Extract the factory name from a process identifier. e.g : urn:ogc:geomatys:wps:math:add return math.
      *
      * @param identifier
      * @return factory name.
@@ -150,8 +151,7 @@ public class WPSUtils {
     }
 
     /**
-     * Extract the process name from a process identifier. 
-     * e.g : urn:geomatys:wps:math:add return add.
+     * Extract the process name from a process identifier. e.g : urn:ogc:geomatys:wps:math:add return add.
      *
      * @param identifier
      * @return process name.
@@ -167,8 +167,8 @@ public class WPSUtils {
     }
 
     /**
-     * Extract the factory name and the process name from a process identifier.
-     * e.g : urn:geomatys:wps:math:add return math:add.
+     * Extract the factory name and the process name from a process identifier. e.g : urn:ogc:geomatys:wps:math:add return
+     * math:add.
      *
      * @param identifier
      * @return factoryName:processName.
@@ -182,9 +182,8 @@ public class WPSUtils {
     }
 
     /**
-     * Generate process INPUT/OUPTUT identifiers based on process identifier.
-     * e.g : urn:geomatys:wps:math:add:input:number1,
-     * urn:geomatys:wps:math:add:ouput:result
+     * Generate process INPUT/OUPTUT identifiers based on process identifier. e.g :
+     * urn:ogc:geomatys:wps:math:add:input:number1, urn:ogc:geomatys:wps:math:add:ouput:result
      *
      * @param procDesc
      * @param input
@@ -204,47 +203,58 @@ public class WPSUtils {
     }
 
     /**
+     * Extract the process INPUT/OUPTUT code. e.g : urn:ogc:geomatys:wps:math:add:input:number1 will return number1
+     *
+     * @param identifier Input/Output identifier.
+     * @return string code.
+     */
+    public static String extractProcessIOCode(final String identifier) {
+        ArgumentChecks.ensureNonNull("identifier", identifier);
+
+        return identifier.substring(identifier.lastIndexOf(":") + 1, identifier.length());
+    }
+
+    /**
      * Return the given String with the first letter to upper case.
-     * 
+     *
      * @param value
      * @return LanguageStringType
      */
     public static LanguageStringType capitalizeFirstLetter(final String value) {
         if (value != null && !value.isEmpty()) {
-          
+
             final StringBuilder result = new StringBuilder(value);
             result.replace(0, 1, result.substring(0, 1).toUpperCase());
             return new LanguageStringType(result.toString());
         }
         return new LanguageStringType(value);
     }
-    
+
     /**
-     * Generate supported UOM (Units) for a given ParameterDescriptor. 
-     * If this descriptor have default unit, supported UOM returned will be 
-     * all the compatible untis to the default one.
-     * 
+     * Generate supported UOM (Units) for a given ParameterDescriptor. If this descriptor have default unit, supported
+     * UOM returned will be all the compatible untis to the default one.
+     *
      * @param param
      * @return SupportedUOMsType or null if the parameter does'nt have any default unit.
      */
-    static public SupportedUOMsType generateUOMs(final ParameterDescriptor param){
-        if(param != null && param.getUnit() != null){
+    static public SupportedUOMsType generateUOMs(final ParameterDescriptor param) {
+        if (param != null && param.getUnit() != null) {
             final Unit unit = param.getUnit();
             final Set<Unit<?>> siUnits = SI.getInstance().getUnits();
             final Set<Unit<?>> nonisUnits = NonSI.getInstance().getUnits();
-            
+
             final SupportedUOMsType supportedUOMsType = new SupportedUOMsType();
             final SupportedUOMsType.Default defaultUOM = new SupportedUOMsType.Default();
             final UOMsType supportedUOM = new UOMsType();
-            
+
             defaultUOM.setUOM(new DomainMetadataType(unit.toString(), null));
             for (Unit u : siUnits) {
-                if(unit.isCompatible(u)){
+                if (unit.isCompatible(u)) {
                     supportedUOM.getUOM().add(new DomainMetadataType(u.toString(), null));
                 }
             }
             for (Unit u : nonisUnits) {
-                if(unit.isCompatible(u)){
+                if (unit.isCompatible(u)) {
                     supportedUOM.getUOM().add(new DomainMetadataType(u.toString(), null));
                 }
             }
@@ -327,9 +337,8 @@ public class WPSUtils {
     }
 
     /**
-     * Convert a string to a binding class. If the binding class isn't a
-     * primitive like Integer, Double, .. we search into the converter list if
-     * found a match.
+     * Convert a string to a binding class. If the binding class isn't a primitive like Integer, Double, .. we search
+     * into the converter list if found a match.
      *
      * @param data string to convert
      * @param binding wanted class
@@ -479,11 +488,9 @@ public class WPSUtils {
     }
 
     /**
-     * Fix a FeatureType in spread the geometry CRS from a feature to the
-     * geometry descriptor CRS
+     * Fix a FeatureType in spread the geometry CRS from a feature to the geometry descriptor CRS
      *
-     * @param featureIN feature with geometry used to fix the geometry
-     * descriptor
+     * @param featureIN feature with geometry used to fix the geometry descriptor
      * @param type the featureType to fix
      * @throws CstlServiceException
      */
@@ -552,7 +559,108 @@ public class WPSUtils {
 
         complex.setDefault(complexComb);
         complex.setSupported(complexCombs);
-        complex.setMaximumMegabytes(BigInteger.valueOf(MAX_MB_INPUT_COMPLEX));
+
+        //Set MaximumMegabyte only for the complex input descritpion
+        if (ioType == WPSIO.IOType.INPUT) {
+            complex.setMaximumMegabytes(BigInteger.valueOf(MAX_MB_INPUT_COMPLEX));
+        }
         return complex;
+    }
+
+    public static void checkValidInputOuputRequest(final ProcessDescriptor processDesc, final Execute request) throws CstlServiceException {
+
+        //check inputs
+        final List<String> inputIdentifiers = extractRequestInputIdentifiers(request);
+        final ParameterDescriptorGroup inputDescriptorGroup = processDesc.getInputDescriptor();
+        final Map<String, Boolean> inputDescMap = desciptorsAsMap(inputDescriptorGroup);
+        checkIOIdentifiers(inputDescMap, inputIdentifiers, WPSIO.IOType.INPUT);
+
+        //check outputs
+        final List<String> outputIdentifiers = extractRequestOutputIdentifiers(request);
+        final ParameterDescriptorGroup outputDescriptorGroup = processDesc.getOutputDescriptor();
+        final Map<String, Boolean> outputDescMap = desciptorsAsMap(outputDescriptorGroup);
+        checkIOIdentifiers(outputDescMap, outputIdentifiers, WPSIO.IOType.OUTPUT);
+       
+    }
+
+    public static List<String> extractRequestInputIdentifiers(final Execute request) {
+
+        final List<String> identifiers = new ArrayList<String>();
+        if (request != null && request.getDataInputs() != null) {
+            final DataInputsType dataInput = request.getDataInputs();
+
+            final List<InputType> inputs = dataInput.getInput();
+            for (final InputType in : inputs) {
+                identifiers.add(in.getIdentifier().getValue());
+            }
+        }
+        return identifiers;
+    }
+
+    public static List<String> extractRequestOutputIdentifiers(final Execute request) {
+
+        final List<String> identifiers = new ArrayList<String>();
+        if (request != null && request.getResponseForm() != null) {
+            final ResponseFormType responseForm = request.getResponseForm();
+
+            if (responseForm.getRawDataOutput() != null) {
+                identifiers.add(responseForm.getRawDataOutput().getIdentifier().getValue());
+
+            } else if (responseForm.getResponseDocument() != null && responseForm.getResponseDocument().getOutput() != null) {
+
+                final List<DocumentOutputDefinitionType> outputs = responseForm.getResponseDocument().getOutput();
+                for (final DocumentOutputDefinitionType out : outputs) {
+                    identifiers.add(out.getIdentifier().getValue());
+                }
+            }
+        }
+        return identifiers;
+    }
+
+    private static Map<String, Boolean> desciptorsAsMap(final ParameterDescriptorGroup descGroup) {
+
+        final Map<String, Boolean> map = new HashMap<String, Boolean>();
+        if (descGroup != null && descGroup.descriptors() != null) {
+            final List<GeneralParameterDescriptor> descriptors = descGroup.descriptors();
+
+            for (final GeneralParameterDescriptor geneDesc : descriptors) {
+                if (geneDesc instanceof ParameterDescriptor) {
+                    final ParameterDescriptor desc = (ParameterDescriptor) geneDesc;
+                    map.put(desc.getName().getCode(), new Boolean(desc.getMinimumOccurs() > 0));
+                }
+            }
+        }
+        return map;
+    }
+
+    private static void checkIOIdentifiers(final Map<String, Boolean> descMap, final List<String> requestIdentifiers, final WPSIO.IOType iotype) 
+            throws CstlServiceException {
+
+        final String type = iotype == WPSIO.IOType.INPUT ? "INPUT" : "OUTPUT" ;
+        
+        if (descMap.isEmpty() && !requestIdentifiers.isEmpty()) {
+            throw new CstlServiceException("This process have no inputs.", INVALID_PARAMETER_VALUE, "input"); //process have no inputs
+        } else {
+            if (requestIdentifiers.isEmpty() && descMap.containsValue(Boolean.TRUE)) {
+              throw new CstlServiceException("Mandatory parameter(s) missing.", MISSING_PARAMETER_VALUE); 
+            } else {
+                //check for Unknow parameter.
+                for (final String identifier : requestIdentifiers) {
+                    if (!descMap.containsKey(WPSUtils.extractProcessIOCode(identifier))) {
+                        throw new CstlServiceException("Unknow " + type + " parameter : " + identifier + ".", INVALID_PARAMETER_VALUE, identifier); 
+                    }
+                }
+                //check for missing parameters.
+                if (descMap.containsValue(Boolean.TRUE)) {
+                    for (Map.Entry<String, Boolean> entry : descMap.entrySet()) {
+                        if (entry.getValue() == Boolean.TRUE) {
+                            if (!requestIdentifiers.contains(entry.getKey())) {
+                                throw new CstlServiceException("Mandatory parameter(s) missing.", MISSING_PARAMETER_VALUE); 
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

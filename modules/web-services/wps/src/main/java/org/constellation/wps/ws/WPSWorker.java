@@ -119,9 +119,9 @@ public class WPSWorker extends AbstractWorker {
         //Supported CRS.
         final CRSsType supportedCRS = new CRSsType();
         final Set<String> allAuth = CRS.getSupportedAuthorities(true);
-        for (String auth : allAuth) {
+        for (final String auth : allAuth) {
             final Set<String> allCodes = CRS.getSupportedCodes(auth);
-            for (String code : allCodes) {
+            for (final String code : allCodes) {
                 supportedCRS.getCRS().add(auth + ":" + code);
             }
         }
@@ -137,7 +137,7 @@ public class WPSWorker extends AbstractWorker {
         final Iterator<ProcessingRegistry> factoryIte = ProcessFinder.getProcessFactories();
         while (factoryIte.hasNext()) {
             final ProcessingRegistry factory = factoryIte.next();
-            for (ProcessDescriptor descriptor : factory.getDescriptors()) {
+            for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
                 descList.add(descriptor);
             }
         }
@@ -314,13 +314,13 @@ public class WPSWorker extends AbstractWorker {
         descriptions.setService(WPS_SERVICE);
         descriptions.setVersion(WPS_1_0_0);
 
-        for (CodeType identifier : request.getIdentifier()) {
+        for (final CodeType identifier : request.getIdentifier()) {
   
             // Find the process
             final ProcessDescriptor processDesc = WPSUtils.getProcessDescriptor(identifier.getValue());
             if (!WPSUtils.isSupportedProcess(processDesc)) {
                 throw new CstlServiceException("Process "+ identifier.getValue() +" not supported by the service.",
-                        NO_APPLICABLE_CODE);
+                        INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
             }
             
             final ProcessDescriptionType descriptionType = new ProcessDescriptionType();
@@ -340,7 +340,7 @@ public class WPSWorker extends AbstractWorker {
             //  Process Input parameters
             ///////////////////////////////
             final ProcessDescriptionType.DataInputs dataInputs = new ProcessDescriptionType.DataInputs();
-            for (GeneralParameterDescriptor param : input.descriptors()) {
+            for (final GeneralParameterDescriptor param : input.descriptors()) {
                 
                 // If the Parameter Descriptor isn't a GroupeParameterDescriptor
                 if (param instanceof ParameterDescriptor) {
@@ -398,7 +398,9 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Process parameter invalid", NO_APPLICABLE_CODE);
                 }
             }
-            descriptionType.setDataInputs(dataInputs);
+            if(!dataInputs.getInput().isEmpty()){
+                descriptionType.setDataInputs(dataInputs);
+            }
 
              ///////////////////////////////
             //  Process Output parameters
@@ -503,20 +505,26 @@ public class WPSWorker extends AbstractWorker {
      * @throws CstlServiceException
      */
     private Object execute100(Execute request) throws CstlServiceException {
-        if (request.getIdentifier() == null) {
-            throw new CstlServiceException("The parameter Identifier must be specified.",
-                    MISSING_PARAMETER_VALUE, "identifier");
+        
+         //check mandatory IDENTIFIER is not missing.
+        if (request.getIdentifier() == null ||  request.getIdentifier().getValue() == null ||request.getIdentifier().getValue().isEmpty()) {
+            throw new CstlServiceException("The parameter " + IDENTIFER_PARAMETER + " must be specified.",
+                    MISSING_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
         }
+        
         final StatusType status = new StatusType();
-        LOGGER.info("LOG -> Process : " + request.getIdentifier().getValue());
+        LOGGER.log(Level.INFO, "Process Execute : " + request.getIdentifier().getValue());
         //Find the process
         final ProcessDescriptor processDesc = WPSUtils.getProcessDescriptor(request.getIdentifier().getValue());
 
         if (!WPSUtils.isSupportedProcess(processDesc)) {
-            throw new CstlServiceException("Process not supported by the service.",
-                    OPERATION_NOT_SUPPORTED, request.getIdentifier().getValue());
+            throw new CstlServiceException("Process "+ request.getIdentifier().getValue() +" not supported by the service.",
+                        INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
         }
 
+        //check requested INPUT/OUTPUT. Throw an CstlException otherwise.
+        WPSUtils.checkValidInputOuputRequest(processDesc, request);
+        
         //status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" found.");
 
         boolean isOutputRaw = false; // the default output is a ResponseDocument
@@ -563,25 +571,22 @@ public class WPSWorker extends AbstractWorker {
         } else if (respDoc != null) {
 
             isLineage = respDoc.isLineage();
-
-            // Status and storage desactivated for now
             useStatus = respDoc.isStatus();
-            //useStorage = respDoc.isStoreExecuteResponse();
+            useStorage = respDoc.isStoreExecuteResponse();
 
+            //outputs
             wantedOutputs = respDoc.getOutput();
 
             response = new ExecuteResponse();
             response.setService(WPS_SERVICE);
             response.setVersion(WPS_1_0_0);
             response.setLang(WPS_LANG);
-            response.setServiceInstance(null);      //TODO getCapabilities URL
+            response.setServiceInstance(getServiceUrl());
 
             //Give a bief process description into the execute response
             response.setProcess(WPSUtils.generateProcessBrief(processDesc));
-
-            LOGGER.info("LOG -> Lineage=" + isLineage);
-            LOGGER.info("LOG -> Storage=" + useStorage);
-            LOGGER.info("LOG -> Status=" + useStatus);
+            
+            LOGGER.log(Level.INFO, "Request : [Lineage=" + isLineage + ", Storage=" + useStorage + ", Status=" + useStatus +"]");
 
             if (isLineage) {
                 //Inputs
@@ -600,45 +605,27 @@ public class WPSWorker extends AbstractWorker {
                 response.setStatus(status);
             }
         } else {
+            throw new CstlServiceException("ResponseFrom element not present. This should be a RawData or a ResponseDocument", MISSING_PARAMETER_VALUE );
         }
+        
         //Input temporary files used by the process. In order to delete them at the end of the process.
         List<File> files = null;
 
         //Create Process and Inputs
         final ParameterValueGroup in = processDesc.getInputDescriptor().createValue();
 
-        /**
-         * ****************
-         * Process INPUT
-         *****************
-         */
-        final List<InputType> requestInputData = request.getDataInputs().getInput();
+        ///////////////////////
+        //   Process INPUT
+        //////////////////////
+        List<InputType> requestInputData = new ArrayList<InputType>();
+        if(request.getDataInputs() != null && request.getDataInputs().getInput() != null){
+            requestInputData = request.getDataInputs().getInput();
+        }
         final List<GeneralParameterDescriptor> processInputDesc = processDesc.getInputDescriptor().descriptors();
 
-        /*
-         * Check for a missing input parameter
-         */
-        if (requestInputData.size() != processInputDesc.size()) {
-            for (GeneralParameterDescriptor generalParameterDescriptor : processInputDesc) {
-                boolean inputFound = false;
-                final String processInputID = generalParameterDescriptor.getName().getCode();
-                for (InputType inputRequest : requestInputData) {
-                    if (inputRequest.getIdentifier().getValue().equals(processInputID)) {
-                        inputFound = true;
-                    }
-                }
-                // if the parameter is not found and if it's a mandatory parameter
-                if (!inputFound) {
-                    if (generalParameterDescriptor.getMinimumOccurs() != 0) {
-                        throw new CstlServiceException("Mandatory input parameter is"
-                                + "missing.", MISSING_PARAMETER_VALUE, processInputID);
-                    }
-                }
-            }
-        }
 
         //Fill input process with there default values
-        for (GeneralParameterDescriptor inputGeneDesc : processDesc.getInputDescriptor().descriptors()) {
+        for (final GeneralParameterDescriptor inputGeneDesc : processInputDesc) {
 
             if (inputGeneDesc instanceof ParameterDescriptor) {
                 final ParameterDescriptor inputDesc = (ParameterDescriptor) inputGeneDesc;
@@ -652,43 +639,58 @@ public class WPSWorker extends AbstractWorker {
         }
 
         //Each input from the request
-        for (InputType inputRequest : requestInputData) {
+        for (final InputType inputRequest : requestInputData) {
 
-            if (inputRequest.getIdentifier() == null) {
+            if (inputRequest.getIdentifier() == null || inputRequest.getIdentifier().getValue() == null || inputRequest.getIdentifier().getValue().isEmpty()) {
                 throw new CstlServiceException("Missing input Identifier.", INVALID_PARAMETER_VALUE);
             }
 
             final String inputIdentifier = inputRequest.getIdentifier().getValue();
+            final String inputIdentifierCode = WPSUtils.extractProcessIOCode(inputIdentifier);
 
-            //Check if it's a valid input identifier
-            final List<GeneralParameterDescriptor> processInputList = processDesc.getInputDescriptor().descriptors();
-            boolean existInput = false;
-            for (GeneralParameterDescriptor processInput : processInputList) {
-                if (processInput.getName().getCode().equals(inputIdentifier)) {
-                    existInput = true;
+            //Check if it's a valid input identifier and hold it if found.
+            ParameterDescriptor inputDescriptor = null;
+            for (final GeneralParameterDescriptor processInput : processInputDesc) {
+                if (processInput.getName().getCode().equals(inputIdentifierCode) && processInput instanceof ParameterDescriptor) {
+                    inputDescriptor = (ParameterDescriptor) processInput;
+                    break;
                 }
             }
-            if (!existInput) {
-                throw new CstlServiceException("Unknow input Identifier.", INVALID_PARAMETER_VALUE, inputIdentifier);
+            if (inputDescriptor != null) {
+                throw new CstlServiceException("Invalid or unknow input Identifier.", INVALID_PARAMETER_VALUE, inputIdentifier);
             }
 
-            final GeneralParameterDescriptor inputGeneralDescriptor = processDesc.getInputDescriptor().descriptor(inputIdentifier);
-            ParameterDescriptor inputDescriptor;
-
-            if (inputGeneralDescriptor instanceof ParameterDescriptor) {
-                inputDescriptor = (ParameterDescriptor) inputGeneralDescriptor;
+            boolean isReference = false;
+            boolean isBBox = false;
+            boolean isComplex = false;
+            boolean isLiteral = false;
+            
+            if(inputRequest.getReference() != null){
+                isReference = true;
             } else {
-                throw new CstlServiceException("The input Identifier is invalid.", INVALID_PARAMETER_VALUE, inputIdentifier);
+                if(inputRequest.getData() != null){
+                    final DataType dataType = inputRequest.getData(); 
+                    if(dataType.getBoundingBoxData() != null){
+                        isBBox = true;
+                    } else if(dataType.getComplexData() != null){
+                        isComplex = true;
+                    } else if(dataType.getLiteralData() != null){
+                        isLiteral = true;
+                    } else {
+                        throw new CstlServiceException("Input Data element not found.");
+                    }
+                }
+                throw new CstlServiceException("Input doesn't have data or reference.");
             }
+            
 
             /*
              * Get expected input Class from the process input
              */
             final Class expectedClass = inputDescriptor.getValueClass();
 
-
             Object dataValue = null;
-            LOGGER.info("Expected Class = " + expectedClass.getCanonicalName());
+            LOGGER.log(Level.INFO, "Input : " + inputIdentifier + " : expected Class " + expectedClass.getCanonicalName());
 
             /*
              * A referenced input data
@@ -700,7 +702,7 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Reference value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
                 }
 
-                LOGGER.info("LOG -> Input -> Reference");
+                LOGGER.log(Level.INFO,"LOG -> Input -> Reference");
                 final String href = inputRequest.getReference().getHref();
                 final String method = inputRequest.getReference().getMethod();
                 final String mime = inputRequest.getReference().getMimeType();
@@ -727,7 +729,7 @@ public class WPSWorker extends AbstractWorker {
                  * BoundingBox data
                  */
                 if (inputRequest.getData().getBoundingBoxData() != null) {
-                    LOGGER.info("LOG -> Input -> Boundingbox");
+                    LOGGER.log(Level.INFO,"LOG -> Input -> Boundingbox");
                     final BoundingBoxType bBox = inputRequest.getData().getBoundingBoxData();
                     final List<Double> lower = bBox.getLowerCorner();
                     final List<Double> upper = bBox.getUpperCorner();
@@ -760,7 +762,7 @@ public class WPSWorker extends AbstractWorker {
                         throw new CstlServiceException("Complex value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
                     }
 
-                    LOGGER.info("LOG -> Input -> Complex");
+                    LOGGER.log(Level.INFO,"LOG -> Input -> Complex");
 
                     final ComplexDataType complex = inputRequest.getData().getComplexData();
                     final String mime = complex.getMimeType();
@@ -774,7 +776,7 @@ public class WPSWorker extends AbstractWorker {
                     } else {
 
                         final List<Object> inputObject = new ArrayList<Object>();
-                        for (Object obj : content) {
+                        for (final Object obj : content) {
                             if (obj != null) {
                                 if (!(obj instanceof String)) {
                                     inputObject.add(obj);
@@ -801,14 +803,14 @@ public class WPSWorker extends AbstractWorker {
                         throw new CstlServiceException("Literal value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
                     }
 
-                    LOGGER.info("LOG -> Input -> Literal");
+                    LOGGER.log(Level.INFO,"LOG -> Input -> Literal");
 
                     final LiteralDataType literal = inputRequest.getData().getLiteralData();
                     final String data = literal.getValue();
 
                     //convert String into expected type
                     dataValue = WPSUtils.convertFromString(data, expectedClass);
-                    LOGGER.info("DEBUG -> Input -> Literal -> Value=" + dataValue);
+                    LOGGER.log(Level.INFO,"DEBUG -> Input -> Literal -> Value=" + dataValue);
 
                 } else {
                     throw new CstlServiceException("Invalid input data type.", INVALID_REQUEST, inputIdentifier);
@@ -825,7 +827,7 @@ public class WPSWorker extends AbstractWorker {
         }
 
         //Give input parameter to the process
-        final org.geotoolkit.process.Process proc = processDesc.createProcess(in);
+        final org.geotoolkit.process.Process process = processDesc.createProcess(in);
 
         //Status
         final ProcessStartedType started = new ProcessStartedType();
@@ -836,16 +838,15 @@ public class WPSWorker extends AbstractWorker {
         //Run the process
         final ParameterValueGroup result;
         try {
-            result = proc.call();
+            result = process.call();
         } catch (ProcessException ex) {
-            throw new CstlServiceException("Process execution failed");
+            //TODO handle process failed.
+            throw new CstlServiceException("Process execution failed", ex, null);
         }
 
-        /**
-         * ****************
-         * Process OUTPUT *
-         *****************
-         */
+        ///////////////////////
+        //   Process OUTPUT
+        //////////////////////
         /*
          * Storage data
          */
@@ -860,9 +861,9 @@ public class WPSWorker extends AbstractWorker {
              * Raw Data returned
              */
             if (isOutputRaw) {
-                LOGGER.info("LOG -> Output -> Raw");
+                LOGGER.log(Level.INFO, "LOG -> Output -> Raw");
                 final Object outputValue = result.parameter(rawOutputID).getValue();
-                LOGGER.info("DEBUG -> Output -> Raw -> Value=" + outputValue);
+                LOGGER.log(Level.INFO,"DEBUG -> Output -> Raw -> Value=" + outputValue);
 
                 if (outputValue instanceof Geometry) {
                     try {
@@ -886,10 +887,10 @@ public class WPSWorker extends AbstractWorker {
                  * DocumentResponse returned
                  */
             } else {
-                LOGGER.info("LOG -> Output -> Document");
+                LOGGER.log(Level.INFO,"LOG -> Output -> Document");
                 final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
                 //Process Outputs
-                for (GeneralParameterDescriptor outputDescriptor : processDesc.getOutputDescriptor().descriptors()) {
+                for (final GeneralParameterDescriptor outputDescriptor : processDesc.getOutputDescriptor().descriptors()) {
 
                     final OutputDataType outData = new OutputDataType();
 
@@ -917,7 +918,7 @@ public class WPSWorker extends AbstractWorker {
                          * Bounding Box
                          */
                         if (outClass.equals(Envelope.class)) {
-                            LOGGER.info("LOG -> Output -> BoundingBox");
+                            LOGGER.log(Level.INFO,"LOG -> Output -> BoundingBox");
                             org.opengis.geometry.Envelope envelop = (org.opengis.geometry.Envelope) outputValue;
 
                             data.setBoundingBoxData(new BoundingBoxType(envelop));
@@ -926,10 +927,10 @@ public class WPSWorker extends AbstractWorker {
                              * Complex
                              */
                         } else if (WPSIO.isSupportedComplexOutputClass(outClass)) {
-                            LOGGER.info("LOG -> Output -> Complex");
+                            LOGGER.log(Level.INFO,"LOG -> Output -> Complex");
                             final ComplexDataType complex = new ComplexDataType();
 
-                            for (DocumentOutputDefinitionType wO : wantedOutputs) {
+                            for (final DocumentOutputDefinitionType wO : wantedOutputs) {
                                 if (wO.getIdentifier().getValue().equals(outputIdentifier)) {
                                     complex.setEncoding(wO.getEncoding());
                                     complex.setMimeType(wO.getMimeType());
@@ -956,7 +957,7 @@ public class WPSWorker extends AbstractWorker {
                              * Literal
                              */
                         } else if (WPSIO.isSupportedLiteralOutputClass(outClass)) {
-                            LOGGER.info("LOG -> Output -> Literal");
+                            LOGGER.log(Level.INFO,"LOG -> Output -> Literal");
                             final LiteralDataType literal = new LiteralDataType();
                             literal.setDataType(outClass.getCanonicalName());
                             if (outputValue == null) {
@@ -989,7 +990,7 @@ public class WPSWorker extends AbstractWorker {
 
                 //Delete input temporary files 
                 if (files != null) {
-                    for (File f : files) {
+                    for (final File f : files) {
                         f.delete();
                     }
                 }
