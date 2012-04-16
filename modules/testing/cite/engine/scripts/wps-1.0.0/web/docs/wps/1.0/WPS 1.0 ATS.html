@@ -60,78 +60,53 @@
   <body>
     <div class="header">
 
-      <a href="http://www.galdosinc.com/">
+      <a href="http://www.gematys.com/">
         <img alt="OGC logo" src="http://www.opengeospatial.org/themes/ogc/logo.png" />
       </a>
     </div>
-    <h1>Annex A - Abstract Test Suite for the Sensor Observation Service 1.0</h1>
+    <h1>Annex A - Abstract Test Suite for the Web Processing Service 1.0.0</h1>
     
     <div class="authorgroup">
     <dl>
-      <dt><strong>Scott Fairgrieve</strong></dt>
-      <dd>Editor</dd>
-      <dd>Northrop Grumman IT TASC</dd>
-      <dd><code><a class="email" href="mailto:scott.fairgrieve@ngc.com">scott.fairgrieve@ngc.com</a></code></dd>
-      <dt><strong>Thomas Ingold</strong></dt>
-      <dd>Northgrop Grumman IT TASC</dd>
-      <dd><code><a class="email" href="mailto:thomas.ingold@ngc.com">thomas.ingold@ngc.com</a></code></dd>
-      <dt><strong>Walter C. Rizzardi</strong></dt>
-      <dd>Northgrop Grumman IT TASC</dd>
-      <dd><code><a class="email" href="mailto:walter.rizzardi@ngc.com">walter.rizzardi@ngc.com</a></code></dd>
-      <dt><strong>Alexander C. Walkowski</strong></dt>
-      <dd>Institute for Geoinformatics, University of Muenster</dd>
-      <dd><code><a class="email" href="mailto:walkowski@uni-muenster.de">walkowski@uni-muenster.de</a></code></dd>
-      
+       <dt><strong>Guilhem Legal</strong></dt>
+      <dd>Geomatys</dd>
+      <dd><code><a class="email" href="mailto:guilhem.legal@geomatys.com">guilhem.legal@geomatys.com</a></code></dd>
+      <dt><strong>Quentin Boileau</strong></dt>
+      <dd>Geomatys</dd>
+      <dd><code><a class="email" href="mailto:quentin.boileau@geomatys.com">quentin.boileau@geomatys.com</a></code></dd>
 
     </dl>
     </div>
     
     <div id="revhistory" class="revhistory">
-      <table border="1" summary="Revision history">
-        <tr>
-          <th colspan="2">Revision History</th>
-        </tr>
-        <tr>
-		  <td>Revision 0.1</td>
-		  <td>2007-10-2</td>
-		</tr>
-		<tr>
-		  <td colspan="2">Updated to adopt standard ATS structure (ISO 19105).  Included ATS cases from the ATS developed for OWS Common by Richard Martell.</td>
-		</tr>
-		<tr>
-		  <td>Revision 0.0</td>
-          <td>2007-09-27</td>
-        </tr>
-        <tr>
-          <td colspan="2">Initial draft.</td>
-        </tr>
-      </table>
-
+        <table border="1" summary="Revision history">
+            <tr>
+                <th colspan="2">Revision History</th>
+            </tr>
+            <tr>
+                <td>Revision 0.0</td>
+                <td>2012-04-16</td>
+            </tr>
+            <tr>
+                <td colspan="2">Initial draft.</td>
+            </tr>
+        </table>
     </div>
     
     <div class="abstract">
     <h4 id="overview">Overview</h4>
     <p>This document is an abstract test suite (ATS): a compendium of test 
-    assertions applicable to all implementations of the Sensor Observation Service specification. 
+    assertions applicable to all implementations of the Web Processing Service specification. 
     An ATS provides a basis for developing an executable test suite (ETS) to 
     verify that the implementation under test (IUT) conforms to all relevant 
     functional specifications.</p>
     
     <p>The abstract test cases (assertions) are organized into test groups 
-    that correspond to distinct conformance classes or sets of capabilities defined in the SOS v1.0 specification [OGC 06-009r5].  The following mandatory (core profile) test groups are defined:</p>
+    that correspond to distinct conformance classes or sets of capabilities defined in the WPS v1.0.0 specification [OGC 06-009r5].  The following mandatory (core profile) test groups are defined:</p>
     <ol>
-	  <li><strong>Level 1 (Core)</strong> - Provides tests for the core, mandatory operations of the SOS</li>
-      <!--<li><strong>General</strong> - Verify that all requests are compliant with the appropriate schemas.</li>
-
-      <li><strong>GetCapabilities</strong> - Allows clients to retrieve service metadata about a specific service instance.  No &quot;request&quot; parameter is included, since the element name specifies the specific operation.</li>
-      
-      <li><strong>DescribeSensor</strong> - Designed to retrieve the highest level of detail about the platforms and sensors associated with an SOS.</li>
-      
-      <li><strong>GetObservation</strong> - Designed to query a service to retrieve observation data structured according to the Observation and Measurement specification.</li>-->
+	  <li><strong>Level 1 (Core)</strong> - Provides tests for the core, mandatory operations of the WPS</li>
    </ol>
       
-      <!--<p>Operations defined as optional in the SOS v1.0 specification are not tested.  These operations include RegisterSensor, InsertObservation, GetObservationById, GetResult, GetFeatureOfInterest, GetFeatureOfInterestTime, DescribeFeatureType, DescribeObservationType, and DescribeResultModel.</p>-->
-    
     </div>
     
     <div class="sources">
@@ -139,20 +114,20 @@
       <ul>
         
         <li id="OGC-05-008"><a href="http://portal.opengeospatial.org/files/?artifact_id=8798">
-        OpenGIS Web Services Common Specification, Version 1.0.</a> (OGC 05-008)</li>
+        OpenGIS Web Services Common Specification, Version 1.1.</a> (OGC 05-008)</li>
         <li id="OGC-06-023r1"><a href="http://portal.opengeospatial.org/files/?artifact_id=4700">
         Definition Identifier URNs in OGC Namespace, Version 1.1.0 (OGC 06-023r1)</a> 
         (ISO/CD 19136, OGC 03-105r1)</li>
-        <li id="OGC-06-009r5"><a href="http://portal.opengeospatial.org/files/?artifact_id=20994">
-        OpenGIS Sensor Observation Service Implementation Specification, Version 1.0 (OGC 06-009r5)</a></li>
+        <li id="OGC-06-009r7"><a href="http://portal.opengeospatial.org/files/?artifact_id=24151&amp;version=3">
+        OpenGIS Web Processing Service Implementation Specification, Version 1.0.0(OGC 06-009r7)</a></li>
       </ul>
     </div>
 	
 <h4>What is tested</h4>
 <ul>
-  <li>GetCapabilities, <i>GET</i> method</i></li>
-  <li>DescribeSenor, <i>POST</i> method</li>
-  <li>GetObservation, <i>POST</i> method</li>
+  <li>GetCapabilities, <i>GET</i> method</li>
+  <li>DescribeProcess, <i>GET</i>/<i>POST</i> method</li>
+  <li>Execute, <i>GET</i>/<i>POST</i> method</li>
 </ul>
 
 <BR>
@@ -160,8 +135,6 @@
 <ul>
 	<li>n/a</li>
 </ul>
-
-
 
 
 <br>	
@@ -172,11 +145,7 @@
 			<tr><td>gml</td><td>-</td><td>http://www.opengis.net/gml</td></tr>
 			<tr><td>ows</td><td>-</td><td>http://www.opengis.net/ows/1.1</td></tr>
 			<tr><td>ogc</td><td>-</td><td>http://www.opengis.net/ogc</td></tr>
-			<tr><td>om</td><td>-</td><td>http://www.opengis.net/om/1.0</td></tr>
-			<tr><td>sensorML v1.0.1</td><td>-</td><td>http://www.opengis.net/sensorML/1.0.1</td></tr>
-			<tr><td>sensorML v1.0</td><td>-</td><td>http://www.opengis.net/sensorML/1.0</td></tr>
-			<tr><td>sos</td><td>-</td><td>http://www.opengis.net/sos/1.0</td></tr>	
-			<tr><td>tml</td><td>-</td><td>http://www.opengis.net/tml</td></tr>
+			<tr><td>wps</td><td>-</td><td>http://www.opengis.net/wps/1.0.0</td></tr>	
 		</table>
 	</li>
 </ul>
@@ -185,21 +154,18 @@
 <ul>All schemas used for validation in these tests can be found at:  <a href="http://schemas.opengis.net/">http://schemas.opengis.net/</a>
 </ul>		
     
-<hr />
+<hr/>
     <div class="toc">
       <h4 id="toc">Table of Contents</h4>
 
       <ol class="test-groups">
-		<li><a href="#ows">OWS</a></li>
-        <li><a href="#general">General Module</a></li>
-		<li><a href="#core">Core Module</a></li>
-        <!--<li><a href="#module2">GetCapabilities</a></li>
-        <li><a href="#module3">DescribeSensor</a></li>
-        <li><a href="#module4">GetObservation</a></li>-->
+         <li><a href="#ows">OWS</a></li>
+         <li><a href="#general">General Module</a></li>
+         <li><a href="#core">Core Module</a></li>
       </ol>
     </div>
-    <!--***********-->
-<!--OWS Tests-->
+<!--***********-->
+<!-- OWS Tests -->
 <!--***********-->
 <div class="section" lang="en" xml:lang="en">
 <div xmlns="" class="titlepage">
@@ -739,7 +705,7 @@ assertion holds; fail otherwise.</td>
 <div>
 <div xmlns="http://www.w3.org/1999/xhtml" class="abstract">
 <p class="title"><b>Purpose</b></p>
-<p>The <code class="code">General</code> test group includes general assertions that relate to all operations of an SOS implementation.</p>
+<p>The <code class="code">General</code> test group includes general assertions that relate to all operations of an WPS implementation.</p>
 </div>
 </div>
 </div>
@@ -747,27 +713,27 @@ assertion holds; fail otherwise.</td>
 <div class="list-of-tables">
 <p><b>List of Tables</b></p>
 <dl>
-<dt>2.1. <a href="#SOS.General-InvalidRequest">Invalid Request</a></dt>
-<dt>2.2. <a href="#SOS.General-ValidResponse">Valid Response</a></dt>
+<dt>2.1. <a href="#WPS.General-InvalidRequest">Invalid Request</a></dt>
+<dt>2.2. <a href="#WPS.General-ValidResponse">Valid Response</a></dt>
 </dl>
 </div>
-<div class="atc"><a id="SOS.General-InvalidRequest"></a>
+<div class="atc"><a id="WPS.General-InvalidRequest"></a>
 <table summary="Verify that an invalid request produces an appropriate response from the server." border="1">
 <caption>Table 2.1. General - Invalid Request</caption>
 <tbody>
 <tr class="identifier">
 <td class="rowhead">Test case identifier</td>
-<td>SOS.General-InvalidRequest</td>
+<td>WPS.General-InvalidRequest</td>
 </tr>
 <tr class="purpose">
 <td class="rowhead">Test purpose</td>
 <td>
-<p>Sending a request that is non-conformant to a schema associated with an SOS operation causes the server to return a valid error report message with an <code class="code">exceptionCode</code> value of InvalidRequest.</p>
+<p>Sending a request that is non-conformant to a schema associated with an WPS operation causes the server to return a valid error report message with an <code class="code">exceptionCode</code> value of InvalidRequest.</p>
 </td>
 </tr>
 <tr class="method">
 <td class="rowhead">Test method</td>
-<td>Send several test documents that are invalid according to the schemas associated with some of the SOS operations (i.e. the mandatory operations).  Pass if the service returns a valid exception message with an <code class="code">exceptionCode</code> value of InvalidRequest; fail otherwise.</td>
+<td>Send several test documents that are invalid according to the schemas associated with some of the WPS operations (i.e. the mandatory operations).  Pass if the service returns a valid exception message with an <code class="code">exceptionCode</code> value of InvalidRequest; fail otherwise.</td>
 </tr>
 <tr class="reference">
 <td class="rowhead">Reference</td>
@@ -788,13 +754,13 @@ assertion holds; fail otherwise.</td>
 </tbody>
 </table>
 </div>
-<div class="atc"><a id="SOS.General-ValidResponse"></a>
+<div class="atc"><a id="WPS.General-ValidResponse"></a>
 <table summary="Verify that a response entity is schema-valid" border="1">
 <caption>Table 2.2. General - Valid Response</caption>
 <tbody>
 <tr class="identifier">
 <td class="rowhead">Test case identifier</td>
-<td>SOS.General-ValidResponse</td>
+<td>WPS.General-ValidResponse</td>
 </tr>
 <tr class="purpose">
 <td class="rowhead">Test purpose</td>
@@ -832,59 +798,41 @@ fail otherwise.</td>
 
     <h2 class="title"><a id="core"/>3. Core</h2>
     <h4>Purpose</h4>
-    <p>The <code class="code">Core</code> test group includes tests for the core, mandatory operations of the SOS.  These operations include GetCapabilities, DescribeSensor, and GetObservation.  Operations defined as optional in the SOS v1.0 specification are not tested.  These operations include RegisterSensor, InsertObservation, GetObservationById, GetResult, GetFeatureOfInterest, GetFeatureOfInterestTime, DescribeFeatureType, DescribeObservationType, and DescribeResultModel.</p>
+    <p>The <code class="code">Core</code> test group includes tests for the core, mandatory operations of the WPS.  These operations include GetCapabilities, DescribeProcess, and Execute.  </p>
     
-	<div class="list-of-tables">
-    <h4>List of Tables</h4>
+    <div class="list-of-tables">
+        <h4>List of Tables</h4>
 
-    <dl>
-    <!--Note:  Handled by OWS Common tests.  <dt>3.1. <a href="#SOS.Behavior-2">GetCapabilities - KVP Request parameter name case-insensitivity</a></dt>-->
-    <dt>3.1. <a href="#SOS.GetCapabilities-KVPRequestParameterHandling">GetCapabilities - KVP Request Parameter Handling</a></dt>
-    <dt>3.2. <a href="#SOS.GetCapabilities-KVPRequestServiceParameterHandling">GetCapabilities - KVP Request Service Parameter Handling</a></dt>
-    <dt>3.3. <a href="#SOS.GetCapabilities-KVPRequestRequestParameterHandling">GetCapabilities - KVP Request Request Parameter Handling</a></dt>
-    <!--Note:  Handled by General tests.  <dt>3.5. <a href="#SOS.Behavior-6">GetCapabilities - XML Request Invalid Request</a></dt>-->
-    <dt>3.4. <a href="#SOS.GetCapabilities-OperationsMetadataMandatoryOperations">GetCapabilities - OperationsMetadata Mandatory Operations</a></dt>
-    <dt>3.5. <a href="#SOS.GetCapabilities-OperationsMetadaOptionalOperations">GetCapabilities - OperationsMetada Optional Operations</a></dt>
-    <dt>3.6. <a href="#SOS.GetCapabilities-ResponseContentsValidTime">GetCapabilities - Response Contents Valid Time</a></dt>
-    <dt>3.7. <a href="#SOS.GetCapabilities-ResponseContentsValidProcedure">GetCapabilities - Response Contents Valid Procedure</a></dt>
-    <dt>3.8. <a href="#SOS.GetCapabilities-ResponseContentsValidObservedProperty">GetCapabilities - Response Contents Valid ObservedProperty</a></dt>
-    <dt>3.9. <a href="#SOS.GetCapabilities-ResponseContentsValidResponseFormat">GetCapabilities - Response Contents Valid ResponseFormat</a></dt>
-    <dt>3.10. <a href="#SOS.GetCapabilities-ResponseContentsValidResultModel">GetCapabilities - Response Contents Valid ResultModel</a></dt>
-    <dt>3.11. <a href="#SOS.DescribeSensor-RequestInvalidMIMEType">DescribeSensor - Request Invalid MIME Type</a></dt>
-    <dt>3.12. <a href="#SOS.DescribeSensor-RequestInvalidProcedure">DescribeSensor - Request Invalid Procedure</a></dt>
-    <dt>3.13. <a href="#SOS.DescribeSensor-ResponseMatchingResponseFormat">DescribeSensor - Response Matching ResponseFormat</a></dt>
-    <dt>3.14. <a href="#SOS.DescribeSensor-ResponseMatchingProcedure">DescribeSensor - Response Matching Procedure</a></dt>
-    <dt>3.15. <a href="#SOS.GetObservation-RequestInvalidSRSName">GetObservation - Request Invalid SRSName</a></dt>
-    <dt>3.16. <a href="#SOS.GetObservation-RequestInvalidOffering">GetObservation - Request Invalid Offering</a></dt>
-    <dt>3.17. <a href="#SOS.GetObservation-RequestInvalidEventTime">GetObservation - Request Invalid EventTime</a></dt>
-    <dt>3.18. <a href="#SOS.GetObservation-RequestInvalidProcedure">GetObservation - Request Invalid Procedure</a></dt>
-    <dt>3.19. <a href="#SOS.GetObservation-RequestInvalidObservedProperty">GetObservation - Request Invalid ObservedProperty</a></dt>
-    <dt>3.20. <a href="#SOS.GetObservation-RequestInvalidFeatureOfInterest">GetObservation - Request Invalid FeatureOfInterest</a></dt>
-    <dt>3.21. <a href="#SOS.GetObservation-RequestInvalidResult">GetObservation - Request Invalid Result</a></dt>
-    <dt>3.22. <a href="#SOS.GetObservation-RequestInvalidResponseFormat">GetObservation - Request Invalid ResponseFormat</a></dt>
-    <dt>3.23. <a href="#SOS.GetObservation-RequestInvalidResultModel">GetObservation - Request Invalid ResultModel</a></dt>
-    <dt>3.24. <a href="#SOS.GetObservation-RequestInvalidResponseMode">GetObservation - Request Invalid ResponseMode</a></dt>
-    <dt>3.25. <a href="#SOS.GetObservation-ResponseMatchingSRSData">GetObservation - Response Matching SRS Data</a></dt>
-    <dt>3.26. <a href="#SOS.GetObservation-ResponseMatchingProcedureData">GetObservation - Response Matching Procedure Data</a></dt>
-    <dt>3.27. <a href="#SOS.GetObservation-ResponseMatchingObservedPropertyData">GetObservation - Response Matching ObservedProperty Data</a></dt>
-    <dt>3.28. <a href="#SOS.GetObservation-ResponseAdvertisedEventTimeData">GetObservation - Response Advertised EventTime Data</a></dt>
-    <dt>3.29. <a href="#SOS.GetObservation-ResponseMatchingEventTimeData">GetObservation - Response Matching EventTime Data</a></dt> 
-    <dt>3.30. <a href="#SOS.GetObservation-ResponseMatchingFeatureOfInterestData">GetObservation - Response Matching FeatureOfInterest Data</a></dt>
-    <dt>3.32. <a href="#SOS.GetObservation-ResponseMatchingResponseFormatData">GetObservation - Response Matching ResponseFormat Data</a></dt>
-    <dt>3.33. <a href="#SOS.GetCapabilities-ResponseContentsValidResponseMode">GetCapabilities - Response Contents Valid ResponseMode</a></dt>
-    <!--<dt>3.34. <a href="#SOS.GetObservation-ResponseMatchingResponseMode">GetObservation - Response Matching ResponseMode</a></dt>-->
+        <dl>
+            <!--Note:  Handled by OWS Common tests.  <dt>3.1. <a href="#WPS.Behavior-2">GetCapabilities - KVP Request parameter name case-insensitivity</a></dt>-->
+            <dt>3.1. <a href="#WPS.GetCapabilities-KVPRequestParameterHandling">GetCapabilities - KVP Request Parameter Handling</a></dt>
+            <dt>3.2. <a href="#WPS.GetCapabilities-KVPRequestServiceParameterHandling">GetCapabilities - KVP Request Service Parameter Handling</a></dt>
+            <dt>3.3. <a href="#WPS.GetCapabilities-KVPRequestRequestParameterHandling">GetCapabilities - KVP Request Request Parameter Handling</a></dt>
+            <!--Note:  Handled by General tests.  <dt>3.5. <a href="#WPS.Behavior-6">GetCapabilities - XML Request Invalid Request</a></dt>-->
+            <dt>3.4. <a href="#WPS.GetCapabilities-OperationsMetadataMandatoryOperations">GetCapabilities - OperationsMetadata Mandatory Operations</a></dt>
+            <dt>3.5. <a href="#WPS.GetCapabilities-OperationsMetadaOptionalOperations">GetCapabilities - OperationsMetada Optional Operations</a></dt>
+            <dt>3.6. <a href="#WPS.GetCapabilities-ResponseContentsValidTime">GetCapabilities - Response Contents Valid Time</a></dt>
+            <dt>3.7. <a href="#WPS.GetCapabilities-ResponseContentsValidProcedure">GetCapabilities - Response Contents Valid Procedure</a></dt>
+            <dt>3.8. <a href="#WPS.GetCapabilities-ResponseContentsValidObservedProperty">GetCapabilities - Response Contents Valid ObservedProperty</a></dt>
+            <dt>3.9. <a href="#WPS.GetCapabilities-ResponseContentsValidResponseFormat">GetCapabilities - Response Contents Valid ResponseFormat</a></dt>
+            <dt>3.10. <a href="#WPS.GetCapabilities-ResponseContentsValidResultModel">GetCapabilities - Response Contents Valid ResultModel</a></dt>
+            <dt>3.11. <a href="#WPS.DescribeSensor-RequestInvalidMIMEType">DescribeSensor - Request Invalid MIME Type</a></dt>
+            <dt>3.12. <a href="#WPS.DescribeSensor-RequestInvalidProcedure">DescribeSensor - Request Invalid Procedure</a></dt>
+            <dt>3.13. <a href="#WPS.DescribeSensor-ResponseMatchingResponseFormat">DescribeSensor - Response Matching ResponseFormat</a></dt>
+            <dt>3.14. <a href="#WPS.DescribeSensor-ResponseMatchingProcedure">DescribeSensor - Response Matching Procedure</a></dt>
+            <dt>3.15. <a href="#WPS.GetObservation-RequestInvalidSRSName">GetObservation - Request Invalid SRSName</a></dt>
 	</dl>
     </div>
     
     <!--<div class="atc">
-    <a id="SOS.Behavior-2" />
+    <a id="WPS.Behavior-2" />
     <table summary="Some other behaviour" frame="border">
       <caption>Table 3.1. GetCapabilities - KVP parameter name case-insensitivity</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-KVPRequestCaseInsensitivity</td>
+          <td>WPS.GetCapabilities-KVPRequestCaseInsensitivity</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -914,14 +862,14 @@ fail otherwise.</td>
     </div>
 -->
     <div class="atc">
-    <a id="SOS.GetCapabilities-KVPRequestParameterHandling" />
+    <a id="WPS.GetCapabilities-KVPRequestParameterHandling" />
     <table summary="Verify that the server handles missing parameters correctly." frame="border">
       <caption>Table 3.1. GetCapabilities - KVP Request Parameter Handling</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-KVPRequestParameterHandling</td>
+          <td>WPS.GetCapabilities-KVPRequestParameterHandling</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -952,23 +900,23 @@ fail otherwise.</td>
 	</div>
 	
     <div class="atc">
-    <a id="SOS.GetCapabilities-KVPRequestServiceParameterHandling" />
+    <a id="WPS.GetCapabilities-KVPRequestServiceParameterHandling" />
     <table summary="Verify that the server handles invalid service key values correctly." frame="border">
       <caption>Table 3.2. GetCapabilities - Request service parameter handling</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-KVPRequestServiceParameterHandling</td>
+          <td>WPS.GetCapabilities-KVPRequestServiceParameterHandling</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
 
-          <td>The server returns a valid error report message with an <code class="code">exceptionCode</code> of InvalidParameterValue when the service key value is not SOS. </td>
+          <td>The server returns a valid error report message with an <code class="code">exceptionCode</code> of InvalidParameterValue when the service key value is not WPS. </td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check the server returns a valid error report message with an exception code of InvalidParameterValue when the service key value is not SOS.  Pass if the server returns a valid error report message with an exception code of InvalideParameterValue; fail otherwise.</td>
+          <td>Check the server returns a valid error report message with an exception code of InvalidParameterValue when the service key value is not WPS.  Pass if the server returns a valid error report message with an exception code of InvalideParameterValue; fail otherwise.</td>
         </tr>
         <tr class="reference">
 
@@ -990,14 +938,14 @@ fail otherwise.</td>
     </div>
 	
     <div class="atc">
-    <a id="SOS.GetCapabilities-KVPRequestRequestParameterHandling" />
+    <a id="WPS.GetCapabilities-KVPRequestRequestParameterHandling" />
     <table summary="Verify that the server handles invalid request key values correctly." frame="border">
       <caption>Table 3.3. GetCapabilities - KVP Request Request Parameter Handling</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-KVPRequestRequestParameterHandling</td>
+          <td>WPS.GetCapabilities-KVPRequestRequestParameterHandling</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1006,7 +954,7 @@ fail otherwise.</td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check the server returns a valid error report message with an <code class="code">exceptionCode</code> of InvalidRequest when the request key value is not SOS.  Pass if the server returns a valid error report message with an exception code of InvalideParameterValue; fail otherwise.</td>
+          <td>Check the server returns a valid error report message with an <code class="code">exceptionCode</code> of InvalidRequest when the request key value is not WPS.  Pass if the server returns a valid error report message with an exception code of InvalideParameterValue; fail otherwise.</td>
         </tr>
         <tr class="reference">
 
@@ -1028,14 +976,14 @@ fail otherwise.</td>
     </div>
 	
     <!--<div class="atc">
-    <a id="SOS.Behavior-6" />
+    <a id="WPS.Behavior-6" />
     <table summary="Some other behaviour" frame="border">
       <caption>Table 3.5. GetCapabilities - XML Request Invalid Request</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-XMLRequestInvalidRequest</td>
+          <td>WPS.GetCapabilities-XMLRequestInvalidRequest</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1044,7 +992,7 @@ fail otherwise.</td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check that the server produces a valid error report message with an exceptionCode value of InvalidRequest if the GetCapabilities request is non-conformant to the associated schema (including if a value of SOS is not provided for the service parameter).  Pass if the server returns a valid error report message with an exception code of InvalideRequest; fail otherwise.</td>
+          <td>Check that the server produces a valid error report message with an exceptionCode value of InvalidRequest if the GetCapabilities request is non-conformant to the associated schema (including if a value of WPS is not provided for the service parameter).  Pass if the server returns a valid error report message with an exception code of InvalideRequest; fail otherwise.</td>
         </tr>
         <tr class="reference">
 
@@ -1065,23 +1013,23 @@ fail otherwise.</td>
     </div>-->
 	
     <div class="atc">
-    <a id="SOS.GetCapabilities-OperationsMetadataMandatoryOperations" />
-    <table summary="Verify that the OperationsMetadata section advertises the mandatory operations of the SOS." frame="border">
+    <a id="WPS.GetCapabilities-OperationsMetadataMandatoryOperations" />
+    <table summary="Verify that the OperationsMetadata section advertises the mandatory operations of the WPS." frame="border">
       <caption>Table 3.4. GetCapabilities - OperationsMetadata Mandatory Operations</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-OperationMetadataMandatoryOperations</td>
+          <td>WPS.GetCapabilities-OperationMetadataMandatoryOperations</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
 
-          <td>The OperationsMetadata section lists the mandatory operations of the SOS.</td>
+          <td>The OperationsMetadata section lists the mandatory operations of the WPS.</td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check that the OperationsMetadata section lists the mandatory operations of the SOS.  Pass if assertion holds; fail otherwise.</td>
+          <td>Check that the OperationsMetadata section lists the mandatory operations of the WPS.  Pass if assertion holds; fail otherwise.</td>
         </tr>
         <tr class="reference">
 
@@ -1103,23 +1051,23 @@ fail otherwise.</td>
 	</div>
     
     <div class="atc">
-    <a id="SOS.GetCapabilities-OperationsMetadaOptionalOperations" />
-    <table summary="Verify that any non-mandatory operations listed in the OperationsMetadata section are valid SOS operation names.  This is still up for debate and will probably not be part of the final tests." frame="border">
+    <a id="WPS.GetCapabilities-OperationsMetadaOptionalOperations" />
+    <table summary="Verify that any non-mandatory operations listed in the OperationsMetadata section are valid WPS operation names.  This is still up for debate and will probably not be part of the final tests." frame="border">
       <caption>Table 3.5. GetCapabilities - OperationsMetadata Optional Operations</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-OperationMetadataOptionalOperations</td>
+          <td>WPS.GetCapabilities-OperationMetadataOptionalOperations</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
 
-          <td>Any non-mandatory operations advertised in the OperationsMetadata section have valid SOS method names.</td>
+          <td>Any non-mandatory operations advertised in the OperationsMetadata section have valid WPS method names.</td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check that any non-mandatory operations advertised in the OperationsMetadata section have valid SOS method names.  Pass if assertion holds; fail otherwise.</td>
+          <td>Check that any non-mandatory operations advertised in the OperationsMetadata section have valid WPS method names.  Pass if assertion holds; fail otherwise.</td>
         </tr>
         <tr class="reference">
 
@@ -1141,14 +1089,14 @@ fail otherwise.</td>
     </div>
 	
    <div class="atc">
-    <a id="SOS.GetCapabilities-ResponseContentsValidTime" />
+    <a id="WPS.GetCapabilities-ResponseContentsValidTime" />
     <table summary="Verify that the time values provided for each ObservationOffering are valid." frame="border">
       <caption>Table 3.6. GetCapabilities - Response Contents Valid Time</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-ResponseContentsValidTime</td>
+          <td>WPS.GetCapabilities-ResponseContentsValidTime</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1178,14 +1126,14 @@ fail otherwise.</td>
     </div>
 	
     <div class="atc">
-    <a id="SOS.GetCapabilities-ResponseContentsValidProcedure" />
+    <a id="WPS.GetCapabilities-ResponseContentsValidProcedure" />
     <table summary="Verify that the procedure values provided for each ObservationOffering are valid." frame="border">
       <caption>Table 3.7. GetCapabilities - Response Contents Valid Procedure</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-ResponseContentsValidProcedure</td>
+          <td>WPS.GetCapabilities-ResponseContentsValidProcedure</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1215,14 +1163,14 @@ fail otherwise.</td>
     </div>
 	
    <div class="atc">
-    <a id="SOS.GetCapabilities-ResponseContentsValidObservedProperty" />
+    <a id="WPS.GetCapabilities-ResponseContentsValidObservedProperty" />
     <table summary="Verify that the observedProperty values provided for each ObservationOffering are valid.  See document OGC 05-010 for correct formatting of definition URN." frame="border">
       <caption>Table 3.8. GetCapabilities - Response Contents Valid ObservedProperty</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-ResponseContentsValidObservedProperty</td>
+          <td>WPS.GetCapabilities-ResponseContentsValidObservedProperty</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1252,14 +1200,14 @@ fail otherwise.</td>
     </div>
 	
      <div class="atc">
-    <a id="SOS.GetCapabilities-ResponseContentsValidResponseFormat" />
+    <a id="WPS.GetCapabilities-ResponseContentsValidResponseFormat" />
     <table summary="Verify that the responseFormat values provided for each ObservationOffering are valid MIME types." frame="border">
       <caption>Table 3.9. GetCapabilities - Response Contents Valid ResponseFormat</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-ResponseContentsValidResponseFormat</td>
+          <td>WPS.GetCapabilities-ResponseContentsValidResponseFormat</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1289,14 +1237,14 @@ fail otherwise.</td>
     </div>
 	
     <div class="atc">
-    <a id="SOS.GetCapabilities-ResponseContentsValidResultModel" />
+    <a id="WPS.GetCapabilities-ResponseContentsValidResultModel" />
     <table summary="Verify that the resultModel values provided for each ObservationOffering are valid." frame="border">
       <caption>Table 3.10. GetCapabilities - Response Contents Valid ResultModel</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-ResponseContentsValidResultModel</td>
+          <td>WPS.GetCapabilities-ResponseContentsValidResultModel</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1335,22 +1283,22 @@ fail otherwise.</td>
     <!--<div class="list-of-tables">
     <h4>List of Tables</h4>
     <dl>
-    <dt>14. <a href="#SOS.Behavior-14">Request Invalid MIMEType</a></dt>
-    <dt>15. <a href="#SOS.Behavior-15">Request Invalid Procedure</a></dt>
-    <dt>16. <a href="#SOS.Behavior-16">Response Matching Response Format</a></dt>
-    <dt>17. <a href="#SOS.Behavior-17">Response Matching Procedure</a></dt>
+    <dt>14. <a href="#WPS.Behavior-14">Request Invalid MIMEType</a></dt>
+    <dt>15. <a href="#WPS.Behavior-15">Request Invalid Procedure</a></dt>
+    <dt>16. <a href="#WPS.Behavior-16">Response Matching Response Format</a></dt>
+    <dt>17. <a href="#WPS.Behavior-17">Response Matching Procedure</a></dt>
     </dl>
     </div>-->
     
     <div class="atc">
-    <a id="SOS.DescribeSensor-RequestInvalidMIMEType" />
+    <a id="WPS.DescribeSensor-RequestInvalidMIMEType" />
     <table summary="Verify that the server handles invalid MIME types in the outputFormat parameter correctly." frame="border">
       <caption>Table 3.11. DescribeSensor - Request Invalid MIME Type</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.DescribeSensor-RequestInvalidMIMEType</td>
+          <td>WPS.DescribeSensor-RequestInvalidMIMEType</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1380,14 +1328,14 @@ fail otherwise.</td>
     </div>
     
     <div class="atc">
-    <a id="SOS.DescribeSensor-RequestInvalidProcedure" />
+    <a id="WPS.DescribeSensor-RequestInvalidProcedure" />
     <table summary="Verify that the server handles an invalid procedure in the request correctly." frame="border">
       <caption>Table 3.12. DescribeSensor - Request Invalid Procedure</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.DescribeSensor-RequestInvalidProcedure</td>
+          <td>WPS.DescribeSensor-RequestInvalidProcedure</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1417,14 +1365,14 @@ fail otherwise.</td>
     </div>
 	
     <div class="atc">
-    <a id="SOS.DescribeSensor-ResponseMatchingResponseFormat" />
+    <a id="WPS.DescribeSensor-ResponseMatchingResponseFormat" />
     <table summary="Verify that the format of the returned document matches the requested outputFormat (i.e. SensorML, OM, etc.)" frame="border">
       <caption>Table 3.13. DescribeSensor - Response Matching Response Format</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.DescribeSensor-ResponseMatchingResponseFormat</td>
+          <td>WPS.DescribeSensor-ResponseMatchingResponseFormat</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1454,14 +1402,14 @@ fail otherwise.</td>
     </div>
 	
     <div class="atc">
-    <a id="SOS.DescribeSensor-ResponseMatchingProcedure" />
+    <a id="WPS.DescribeSensor-ResponseMatchingProcedure" />
     <table summary="Verify that the unique identifier for the sensor in the returned document matches the Procedure in the request" frame="border">
       <caption>Table 3.14. DescribeSensor - Response Matching Procedure</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.DescribeSensor-ResponseMatchingProcedure</td>
+          <td>WPS.DescribeSensor-ResponseMatchingProcedure</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1489,50 +1437,16 @@ fail otherwise.</td>
       </tbody>
     </table>
 	</div>
-
-
- <!--<div class="section">
-
-    <h2 class="title"><a id="module4"/>4. GetObservation</h2>
-    <h4>Purpose</h4>
-    <p>The <code class="code">GetObservation</code> test group includes assertions 
-    covering the following capabilities: Correct handling of SRSName, Offering, invalid event time, invalid procedure, invalid observed property, invalid feature of interest, invalid result, invalid response format, invalid result model, invalid response mode, matching of SRS Data, matching procedure data, matching observed property data, advertised event time data, matching event time data, matching feature of interest data, matching result data, matching response format data, and matching result model.</p>
--->    
-    <!--<div class="list-of-tables">
-    <h4>List of Tables</h4>
-    <dl>
-    <dt>18. <a href="#SOS.Behavior-18">Request Invalid SRS Name</a></dt>
-    <dt>19. <a href="#SOS.Behavior-19">Request Invalid Offering</a></dt>
-    <dt>20. <a href="#SOS.Behavior-20">Request Invalid Event Time</a></dt>
-    <dt>21. <a href="#SOS.Behavior-21">Request Invalid Procedure</a></dt>
-    <dt>22. <a href="#SOS.Behavior-22">Request Invalid Observed Property</a></dt>
-    <dt>23. <a href="#SOS.Behavior-23">Request Invalid Feature Of Interest</a></dt>
-    <dt>24. <a href="#SOS.Behavior-24">Request Invalid Result</a></dt>
-    <dt>25. <a href="#SOS.Behavior-25">Request Invalid Response Format</a></dt>
-    <dt>26. <a href="#SOS.Behavior-26">Request Invalid Result Model</a></dt>
-    <dt>27. <a href="#SOS.Behavior-27">Request Invalid Response Mode</a></dt>
-    <dt>28. <a href="#SOS.Behavior-28">Response Matching SRS Data</a></dt>
-    <dt>29. <a href="#SOS.Behavior-29">Response Matching Procedure Data</a></dt>
-     <dt>30. <a href="#SOS.Behavior-30">Response Matching Observed Property Data</a></dt>
-     <dt>31. <a href="#SOS.Behavior-31">Response Advertised Event Time Data</a></dt>
-     <dt>32. <a href="#SOS.Behavior-32">Response Matching Event Time Data</a></dt> 
-     <dt>33. <a href="#SOS.Behavior-33">Response Matching Feature of Interest Data</a></dt>
-     <dt>34. <a href="#SOS.Behavior-34">Response Matching Result Data</a></dt>
-     <dt>35. <a href="#SOS.Behavior-35">Response Matching Response Format Data</a></dt>
-     <dt>36. <a href="#SOS.Behavior-36">Response Matching Result Model</a></dt>
-     <dt>37. <a href="#SOS.Behavior-37">Response Matching Response Mode</a></dt>
-    </dl>
-    </div>-->
     
     <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidSRSName" />
+    <a id="WPS.GetObservation-RequestInvalidSRSName" />
     <table summary="Verify that an invalid srsName in the request produces a valid error message.  This includes providing an empty srsName element or providing an srsName that is not advertised for the requested offering." frame="border">
       <caption>Table 3.15. GetObservation - Request Invalid SRSName</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidSRSName</td>
+          <td>WPS.GetObservation-RequestInvalidSRSName</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
@@ -1560,674 +1474,7 @@ fail otherwise.</td>
       </tbody>
     </table>
     </div>
-	
-    <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidOffering" />
-    <table summary="Verify that an invalid offering in the request produces a valid error message.  This includes specifying no offering or an offering value that is not advertised in the Capabilities document." frame="border">
-      <caption>Table 3.16. GetObservation - Request Invalid Offering</caption>
 
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidOffering</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>An invalid offering in the request produces a valid error message. </td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that an invalid offering in the request produces a valid error message.    Pass if an invalid offering in the request produces a valid error message; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.4.2, p. 30; cl. 8.4.4, p. 31</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-        <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidEventTime" />
-    <table summary="Verify that an invalid eventTime in the request produces a valid error message." frame="border">
-      <caption>Table 3.17. GetObservation - Request Invalid EventTime</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidEventTime</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>An invalid eventTime in the request produces a valid error message.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that an invalid eventTime in the request produces a valid error message.  Pass if an invalid eventTime in the request produces a valid error message; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30; 8.4.4, p. 31</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-    <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidProcedure" />
-    <table summary="Verify that an invalid procedure in the request produces a valid error message.  This includes providing an empty procedure element or providing one or more procedures that are not advertised for the requested offering in the Capabilities document." frame="border">
-      <caption>Table 3.18. GetObservation - Request Invalid Procedure</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidProcedure</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>An invalid procedure in the request produces a valid error message.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that an invalid procedure in the request produces a valid error message.  Pass if an invalid procedure in the request produces a valid error message; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30; 8.4.4, p. 31</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-    <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidObservedProperty" />
-    <table summary="Verify that one or more invalid observedProperty values cause the server to return a valid error message.  This includes providing empty observedProperty elements or providing observedProperty values that do not correspond with the observedProperty values advertised in the Capabilities document for the requested offering." frame="border">
-      <caption>Table 3.19. GetObservation - Request Invalid Observed Property</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidObservedProperty</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>Supplying one or more invalid observedProperty values in the request produces a valid error message.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that supplying one or more invalid observedProperty values in the request produces a valid error message.  Pass if an invalid observedProperty value produces a valid error message; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30; 8.4.4, p. 31</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-        <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidFeatureOfInterest" />
-    <table summary="Verify that an invalid named gml feature in the featureOfInterest value of the request causes the server to produce a valid error message.  This includes providing an empty featureOfInterest element or providing a named gml feature value in the featureOfInterest that does not correspond with the featureOfInterest values advertised in the Capabilities document for the requested offering." frame="border">
-      <caption>Table 3.20. GetObservation - Request Invalid Feature Of Interest</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidFeatureOfInterest</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>Supplying one or more invalid featureOfInterest values in the request produces a valid error message.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that supplying one or more invalid featureOfInterest values in the request produces a valid error message.  Pass if one or more invalid featureOfInterest values in the request produces a valid error message; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30; 8.4.4, p. 31</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-    <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidResult" />
-    <table summary="Verify that supplying an invalid value in the result parameter produces a valid error message.  This includes providing an empty result element or providing a result element that is not advertised in the Filter_Capabilities section of the Capabilities document." frame="border">
-      <caption>Table 3.21. GetObservation - Request Invalid Result</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidResult</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>Providing an invalid value in the result field produces a valid error message.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that providing an invalid value in the result field produces a valid error message.  Pass if a valid error message is produced from providing an invalid value in the result field; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30; 8.4.4, p. 31</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-      <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidResponseFormat" />
-    <table summary="Verify that providing an invalid outputFormat value in the request produces a valid error message.  This includes any outputFormat value that is not advertised by the requested offering in the Capabilities document." frame="border">
-      <caption>Table 3.22. GetObservation - Request Invalid Response Format</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidResponseFormat</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>Providing an invalid outputFormat value produces a valid error message.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that providing an invalid outputFormat value produces a valid error message.  Pass if an invalid outputFormat produces a valid error message; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30; 8.4.4, p. 31</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-    <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidResultModel" />
-    <table summary="Verify that providing an invalid resultModel value in the request produces a valid error message.  This includes any resultModel value that is not advertised by the requested offering in the Capabilities document." frame="border">
-      <caption>Table 3.23. GetObservation - Request Invalid Result Model</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidResultModel</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>Providing an invalid resultModel in the request produces a valid error message.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that providing an invalid resultModel in the request produces a valid error message.  Pass if providing an invalid resultModel in the request produces a valid error message; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30; 8.4.4, p. 31</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>     
-    </div>
-	
-        <div class="atc">
-    <a id="SOS.GetObservation-RequestInvalidResponseMode" />
-    <table summary="Verify that providing an invalid responseMode in the request produces a valid error message.  This includes any responseMode that is not advertised by the requested offering in the Capabilities document." frame="border">
-      <caption>Table 3.24. GetObservation - Request Invalid Response Mode</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-RequestInvalidResponseMode</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>Providing an invalid responseMode in the request produces a valid error message.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that providing an invalid responseMode in the request produces a valid error message.  Pass if providing an invalid responseMode in the request produces a valid error mesage; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>: 8.2.3.2, p.25</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>     
-    </div>
-	
-   <div class="atc">
-    <a id="SOS.GetObservation-ResponseMatchingSRSData" />
-    <table summary="Verify that the srs of the returned data is in the correct format given the requested srsName." frame="border">
-      <caption>Table 3.25. GetObservation - Response Matching SRS Data</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-ResponseMatchingSRSData</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>If an srsName value is supplied in the request, then the srs of the response data is valid according to the format specified by the requested srsName.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check if a srsName value is supplied in the request, then the srs of the response data is valid according to the format specified by the requested srsName.  Pass if assertion holds; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table> 
-    </div>
-	
-<div class="atc">
-    <a id="SOS.GetObservation-ResponseMatchingProcedureData" />
-    <table summary="Verify that the procedure value(s) in the response match or are a subset of the procedure value(s) specified in the request." frame="border">
-      <caption>Table 3.26. GetObservation - Response Matching Procedure Data</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-ResponseMatchingProcedureData</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>The procedure value(s) in the response match or a subset of the procedure value(s) specified in the request.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that the procedure value(s) in the response match or are a subset of the procedure value(s) specified in the request.  Pass if assertion holds; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table> 
-    </div>
-	
-    <div class="atc">
-    <a id="SOS.GetObservation-ResponseMatchingObservedPropertyData" />
-    <table summary="Verify that the observedProperty value(s) in the response match or are a subset of the observedProperty value(s) specified in the request." frame="border">
-      <caption>Table 3.27. GetObservation - Response Matching Observed Property Data</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-ResponseMatchingObservedPropertyData</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>The observedProperty value(s) in the response match or are a subset of the observedProperty value(s) specified in the request.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check the observedProperty value(s) in the response match or are a subset of the observedProperty value(s) specified in the request.  Pass if assertion holds; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table> 
-    </div>
-	
-   <div class="atc">
-    <a id="SOS.GetObservation-ResponseAdvertisedEventTimeData" />
-    <table summary="Verify that requesting data for the advertised eventTime for each offering returns one or more observations." frame="border">
-      <caption>Table 3.28. GetObservation - Response Advertised Event Time Data</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-ResponseAdvertisedEventTimeData</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>The server returns one or more observations when the advertised eventTime for the requested offering is supplied in a valid request.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that the server returns one or more observations when the advertised eventTime for the requested offering is supplied in a valid request.  Pass if one more observations are returned when supplied a valid request; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table> 
-    </div>
-	
-   <div class="atc">
-    <a id="SOS.GetObservation-ResponseMatchingEventTimeData" />
-    <table summary="Verify that the time values in the response data fall within the requested eventTime.  If no eventTime is specified, then any data from any time period matching the other request parameters must be returned.  If the requested eventTime range falls outside of the advertised eventTime range and overlaps the advertised event time range, then the data returned should fall within the advertised eventTime range for the requested offering." frame="border">
-      <caption>Table 3.29. GetObservation - Response Matching Event Time Data</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-ResponseMatchingEventTimeData</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>The time value(s) in the response data fall within the requested eventTime.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check the time value(s) in the response data fall within the requested eventTime.  Pass if assertion holds; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30</li>
-            </ul>
-          </td>
-        </tr>
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table> 
-    </div>
-	
-   <div class="atc">
-    <a id="SOS.GetObservation-ResponseMatchingFeatureOfInterestData" />
-    <table summary="Verify that the featureOfInterest values in the response data match the requested featureOfInterest for a named gml feature or fall within the requested spatial extents for a spatially defined featureOfInterest" frame="border">
-      <caption>Table 3.30. GetObservation - Response Matching Feature of Interest Data</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-ResponseMatchingFeatureOfInterestData</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>The featureOfInterest value(s) in the response match or fall within the spatial extent identified in the featureOfInterest value specified in the request.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check the featureOfInterest value(s) in the response match or fall within the spatial extent identified in the featureOfInterest value specified in the request.  Pass if assertion holds; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30</li>
-            </ul>
-          </td>
-        </tr>
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table> 
-    </div>
-	
-	
-    <div class="atc">
-    <a id="SOS.GetObservation-ResponseMatchingResponseFormatData" />
-    <table summary="Verify that the format of the response data matches the requested format supplied in the responseFormat parameter.  If the requested responseFormat is TML, then the response will be an O &amp; M document with a link to the TML stream." frame="border">
-      <caption>Table 3.32. GetObservation - Response Matching Response Format Data</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-ResponseMatchingResponseFormatData</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td> The format of the response data matches the format supplied in the responseFormat parameter of the request.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that the format of the response data matches the format supplied in the responseFormat parameter of the request.  Pass if assertion holds; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30</li>
-            </ul>
-          </td>
-        </tr>
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-
-<!--	
-     <div class="atc">
-    <a id="SOS.GetObservation-ResponseMatchingResponseMode" />
-    <table summary="Verify that the format of the response data matches the requested responseMode." frame="border">
-      <caption>Table 3.34. GetObservation - Response Matching Response Mode</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetObservation-ResponseMatchingResponseMode</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>The format of the response data matches the requested responseMode.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that the format of the response data matches the requested responseMode.  Pass if assertion holds; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  8.4.2, p. 30</li>
-            </ul>
-          </td>
-        </tr>
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table> 
-    </div>
--->
-
-    <div class="atc">
-    <a id="SOS.GetCapabilities-ResponseContentsValidResponseMode" />
-    <table summary="Verify that the resultModel values provided for each ObservationOffering are valid." frame="border">
-      <caption>Table 3.33. GetCapabilities - Response Contents Valid ResponseMode</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>SOS.GetCapabilities-ResponseContentsValidResponseMode</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td> If an ObservationOffering provides the responseMode element, then the responseMode element contains a value that is one of the valid responseMode values.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check if an ObservationOffering provides the responseMode element, then the responseMode element contains a value that is one of the valid responseMode values.  Pass if assertions hold; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>: 8.2.3.2, p.25</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-	</div>
-
-    
     </div>
   </body>
 </html>
