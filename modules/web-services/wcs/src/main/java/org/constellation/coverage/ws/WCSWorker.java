@@ -24,6 +24,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -208,6 +210,15 @@ public final class WCSWorker extends LayerWorker {
         if (isStarted) {
             LOGGER.log(Level.INFO, "WCS worker {0} running", id);
         }
+        
+        //listen to changes on the providers to clear the getcapabilities cache
+        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                refreshUpdateSequence();
+                CAPS_RESPONSE.clear();
+            }
+        });
     }
 
     /**

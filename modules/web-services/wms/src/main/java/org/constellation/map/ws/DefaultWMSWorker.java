@@ -183,6 +183,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                refreshUpdateSequence();
                 CAPS_RESPONSE.clear();
             }
         });

@@ -98,8 +98,10 @@ public abstract class AbstractWorker implements Worker {
      * A Policy Decision Point (PDP) if some security constraints have been defined.
      */
     protected SimplePDP pdp = null;
+    
+    private long currentUpdateSequence = System.currentTimeMillis();
 
-    public AbstractWorker(String id, File configurationDirectory, Specification specification) {
+    public AbstractWorker(final String id, final File configurationDirectory, final Specification specification) {
         this.id = id;
         this.configurationDirectory = configurationDirectory;
         this.specification = specification;
@@ -109,7 +111,7 @@ public abstract class AbstractWorker implements Worker {
      * {@inheritDoc }
      */
     @Override
-    public void setServiceUrl(String serviceUrl) {
+    public void setServiceUrl(final String serviceUrl) {
         this.serviceUrl = serviceUrl + specification.toString().toLowerCase() + '/' + id + '?';
     }
 
@@ -130,7 +132,7 @@ public abstract class AbstractWorker implements Worker {
      * {@inheritDoc }
      */
     @Override
-    public void setLogLevel(Level logLevel) {
+    public void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
     }
 
@@ -238,7 +240,7 @@ public abstract class AbstractWorker implements Worker {
      * {@inheritDoc}
      */
     @Override
-    public boolean isAuthorized(String ip, String referer) {
+    public boolean isAuthorized(final String ip, final String referer) {
         return true;
     }
 
@@ -248,5 +250,19 @@ public abstract class AbstractWorker implements Worker {
     @Override
     public boolean isSecured() {
         return false;
+    }
+
+    /**
+     * @return the currentUpdateSequence
+     */
+    protected long getCurrentUpdateSequence() {
+        return currentUpdateSequence;
+    }
+    
+    /**
+     * Set the current date to the updateSequence parameter
+     */
+    protected void refreshUpdateSequence() {
+        currentUpdateSequence = System.currentTimeMillis();
     }
 }

@@ -18,6 +18,8 @@ package org.constellation.tile.ws;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.ParseException;
 import java.util.*;
@@ -94,6 +96,13 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMTS worker {0} running", id);
         }
+        //listen to changes on the providers to clear the getcapabilities cache
+        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                refreshUpdateSequence();
+            }
+        });
     }
 
     @Override

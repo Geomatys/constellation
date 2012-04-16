@@ -17,6 +17,8 @@
 
 package org.constellation.wfs.ws;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -159,6 +161,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (isStarted) {
             LOGGER.log(Level.INFO, "WFS worker {0} running", id);
         }
+        
+        //listen to changes on the providers to clear the getcapabilities cache
+        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                refreshUpdateSequence();
+            }
+        });
     }
 
     @Override
