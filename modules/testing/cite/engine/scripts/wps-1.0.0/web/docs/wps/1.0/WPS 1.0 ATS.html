@@ -118,8 +118,8 @@
         <li id="OGC-06-023r1"><a href="http://portal.opengeospatial.org/files/?artifact_id=4700">
         Definition Identifier URNs in OGC Namespace, Version 1.1.0 (OGC 06-023r1)</a> 
         (ISO/CD 19136, OGC 03-105r1)</li>
-        <li id="OGC-06-009r7"><a href="http://portal.opengeospatial.org/files/?artifact_id=24151&amp;version=3">
-        OpenGIS Web Processing Service Implementation Specification, Version 1.0.0(OGC 06-009r7)</a></li>
+        <li id="OGC-05-007r1"><a href="http://portal.opengeospatial.org/files/?artifact_id=24151&amp;version=3">
+        OpenGIS Web Processing Service Implementation Specification, Version 1.0.0(OGC 05-007r7)</a></li>
       </ul>
     </div>
 	
@@ -130,14 +130,11 @@
   <li>Execute, <i>GET</i>/<i>POST</i> method</li>
 </ul>
 
-<BR>
 <h4>Test Data</h4>
 <ul>
-	<li>n/a</li>
+    <li>n/a</li>
 </ul>
 
-
-<br>	
 <h4>Namespaces</h4>
 <ul>
 	<li><h4>Service being tested must use these namespaces:</h4>
@@ -149,9 +146,10 @@
 		</table>
 	</li>
 </ul>
-<br>
+
 <h4>Schemas</h4>
-<ul>All schemas used for validation in these tests can be found at:  <a href="http://schemas.opengis.net/">http://schemas.opengis.net/</a>
+<ul>
+    <li>All schemas used for validation in these tests can be found at:  <a href="http://schemas.opengis.net/">http://schemas.opengis.net/</a></li>
 </ul>		
     
 <hr/>
@@ -169,526 +167,498 @@
 <!--***********-->
 <div class="section" lang="en" xml:lang="en">
 <div xmlns="" class="titlepage">
-<div>
-<div>
-<h2 xmlns="http://www.w3.org/1999/xhtml" class="title"><a id=
-"ows"></a>1. OWS</h2>
-</div>
-<div>
-<div xmlns="http://www.w3.org/1999/xhtml" class="abstract">
-<p class="title"><b>Purpose</b></p>
-<p>The <code class="code">OWS</code> test group includes assertions
-that are common to all OGC Web Service (OWS) implementations. The
-component test cases shall apply to all services based on the OWS
-1.0 specification (OGC 05-008).</p>
-</div>
-</div>
-</div>
+    <div>
+        <div>
+            <h2 class="title"><a id="ows"></a>1. OWS</h2>
+        </div>
+        <div>
+            <div class="abstract">
+                <p class="title"><b>Purpose</b></p>
+                <p>The <code class="code">OWS</code> test group includes assertions
+                that are common to all OGC Web Service (OWS) implementations. The
+                component test cases shall apply to all services based on the OWS
+                1.0 specification (OGC 05-008).</p>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="list-of-tables">
-<p><b>List of Tables</b></p>
-<dl>
-<dt>1.1. <a href="#OWS.ClientError">Client error</a></dt>
-<dt>1.2. <a href="#OWS.ContentType">Content-Type response
-header</a></dt>
-<dt>1.3. <a href="#OWS.CaseInsensitiveKvpNames">KVP parameter
-names</a></dt>
-<dt>1.4. <a href="#OWS.GetCapabilities">GetCapabilities
-request</a></dt>
-<dt>1.5. <a href="#OWS.GetCapabilities-Exceptions">GetCapabilities -
-Exceptions</a></dt>
-<dt>1.6. <a href=
-"#OWS.GetCapabilities-AcceptVersions">GetCapabilities -
-AcceptVersions parameter</a></dt>
-<dt>1.7. <a href="#OWS.GetCapabilities-Sections">GetCapabilities -
-Sections parameter</a></dt>
-<dt>1.8. <a href="#OWS.GetCapabilities-AcceptFormats">GetCapabilities
-- AcceptFormats parameter</a></dt>
-</dl>
+    <p><b>List of Tables</b></p>
+    <dl>
+        <dt>1.1. <a href="#OWS.ClientError">Client error</a></dt>
+        <dt>1.2. <a href="#OWS.ContentType">Content-Type response header</a></dt>
+        <dt>1.3. <a href="#OWS.CaseInsensitiveKvpNames">KVP parameter names</a></dt>
+        <dt>1.4. <a href="#OWS.GetCapabilities">GetCapabilities request</a></dt>
+        <dt>1.5. <a href="#OWS.GetCapabilities-Exceptions">GetCapabilities - Exceptions</a></dt>
+        <dt>1.6. <a href="#OWS.GetCapabilities-AcceptVersions">GetCapabilities - AcceptVersions parameter</a></dt>
+        <dt>1.7. <a href="#OWS.GetCapabilities-Sections">GetCapabilities - Sections parameter</a></dt>
+        <dt>1.8. <a href="#OWS.GetCapabilities-AcceptFormats">GetCapabilities - AcceptFormats parameter</a></dt>
+    </dl>
 </div>
-<div class="atc"><a id="OWS.ClientError"></a>
-<p class="title"><b>Table&nbsp;1.1.&nbsp;Client error</b></p>
-<div class="atc-contents">
-<table summary="Client error" border="1">
-<colgroup>
-<col />
-<col /></colgroup>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>OWS.ClientError</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>
-<p>All of the following assertions must hold for the response to an
-invalid request:</p>
-<div class="orderedlist">
-<ol type="1">
-<li>
-<p><a id="OWS.ClientError-1"></a>the response entity is a valid
-exception report having &lt;ows:ExceptionReport&gt; as the document
-element;</p>
-</li>
-<li>
-<p><a id="OWS.ClientError-2"></a>the value of the <code class=
-"code"><code class="code">exceptionCode</code></code> attribute specifies the appropriate
-code value.</p>
-</li>
-</ol>
-</div>
-</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Check the content of the response. Pass if all assertions hold;
-fail otherwise.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 8.1, p.
-32; cl. 8.2, p. 32-33; cl. 8.5, p. 35.</p>
-</li>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 8.3,
-Table 19</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
+<div class="atc">
+    <a id="OWS.ClientError"></a>
+    <p class="title"><b>Table&nbsp;1.1.&nbsp;Client error</b></p>
+    <div class="atc-contents">
+        <table summary="Client error" border="1">
+            <colgroup>
+                <col />
+                <col /></colgroup>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>OWS.ClientError</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>
+                        <p>All of the following assertions must hold for the response to an invalid request:</p>
+                        <div class="orderedlist">
+                            <ol type="1">
+                                <li>
+                                    <p><a id="OWS.ClientError-1"></a>the response entity is a valid
+                                        exception report having &lt;ows:ExceptionReport&gt; as the document
+                                        element;</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.ClientError-2"></a>the value of the 
+                                        <code class="code"><code class="code">exceptionCode</code></code> attribute specifies the appropriate code value.
+                                    </p>
+                                </li>
+                            </ol>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Check the content of the response. Pass if all assertions hold; fail otherwise.</td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 8.1, p.32; cl. 8.2, p. 32-33; cl. 8.5, p. 35.</p>
+                                </li>
+                                <li>
+                                    <p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 8.3,Table 19</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <br class="atc-break" />
-<div class="atc"><a id="OWS.ContentType"></a>
-<p class="title"><b>Table&nbsp;1.2.&nbsp;Content-Type response
-header</b></p>
-<div class="atc-contents">
-<table summary="Content-Type response header" border="1">
-<colgroup>
-<col />
-<col /></colgroup>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>OWS.ContentType</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>The Content-Type entity header correctly identifies the media
-type of the message body.</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Check the value of the Content-Type entity header. Pass if the
-field value correctly identifies the media type of the message
-body; fail otherwise.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 11.7,
-p.61</p>
-</li>
-<li>
-<p><a class="link" href=
-"http://www.iana.org/assignments/media-types/">IANA media type
-registry</a></p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
+<div class="atc">
+    <a id="OWS.ContentType"></a>
+    <p class="title"><b>Table&nbsp;1.2.&nbsp;Content-Type response header</b></p>
+    <div class="atc-contents">
+        <table summary="Content-Type response header" border="1">
+            <colgroup>
+                <col/>
+                <col/>
+            </colgroup>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>OWS.ContentType</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>The Content-Type entity header correctly identifies the media type of the message body.</td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Check the value of the Content-Type entity header. Pass if the
+                        field value correctly identifies the media type of the message
+                        body; fail otherwise.
+                    </td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p>
+                                        <a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 11.7,p.61
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <a class="link" href="http://www.iana.org/assignments/media-types/">IANA media type registry</a>
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <br class="atc-break" />
 <div class="atc"><a id="OWS.CaseInsensitiveKvpNames"></a>
-<p class="title"><b>Table&nbsp;1.3.&nbsp;KVP parameter names</b></p>
-<div class="atc-contents">
-<table summary="KVP parameter names" border="1">
-<colgroup>
-<col />
-<col /></colgroup>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>OWS.CaseInsensitiveKvpNames</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>Parameter names in a KVP-encoded request are handled in a
-case-insensitive manner.</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Check the handling of parameter names in KVP-encoded requests
-(GET, POST with "application/x-www-form-urlencoded" content type).
-Pass if the expected response is produced when upper-, lower-, and
-mixed-case parameter names are provided; fail otherwise.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 11.5.2,
-p. 56</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
+    <p class="title"><b>Table&nbsp;1.3.&nbsp;KVP parameter names</b></p>
+    <div class="atc-contents">
+        <table summary="KVP parameter names" border="1">
+            <colgroup>
+                <col/>
+                <col/>
+            </colgroup>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>OWS.CaseInsensitiveKvpNames</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>Parameter names in a KVP-encoded request are handled in a case-insensitive manner.</td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Check the handling of parameter names in KVP-encoded requests
+                        (GET, POST with "application/x-www-form-urlencoded" content type).
+                        Pass if the expected response is produced when upper-, lower-, and
+                        mixed-case parameter names are provided; fail otherwise.</td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 11.5.2,p. 56</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <br class="atc-break" />
 <div class="atc"><a id="OWS.GetCapabilities"></a>
-<p class="title"><b>Table&nbsp;1.4.&nbsp;GetCapabilities
-request</b></p>
-<div class="atc-contents">
-<table summary="GetCapabilities request" border="1">
-<colgroup>
-<col />
-<col /></colgroup>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>OWS.GetCapabilities</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>The GetCapabilities request is implemented.</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Verify that the GetCapabilities request is implemented and
-supports the GET and/or POST method bindings.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.1, p.
-10</p>
-</li>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.2.2;
-cl. 7.2.3</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
+    <p class="title"><b>Table&nbsp;1.4.&nbsp;GetCapabilities request</b></p>
+    <div class="atc-contents">
+        <table summary="GetCapabilities request" border="1">
+            <colgroup>
+                <col/>
+                <col/>
+            </colgroup>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>OWS.GetCapabilities</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>The GetCapabilities request is implemented.</td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Verify that the GetCapabilities request is implemented and supports the GET and/or POST method bindings.</td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p>
+                                        <a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.1, p.10
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.2.2;cl. 7.2.3
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <br class="atc-break" />
-<div class="atc"><a id="OWS.GetCapabilities-Exceptions"></a>
-<p class="title"><b>Table&nbsp;1.5.&nbsp;GetCapabilities -
-Exceptions</b></p>
-<div class="atc-contents">
-<table summary="GetCapabilities - Exceptions" border="1">
-<colgroup>
-<col />
-<col /></colgroup>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>OWS.GetCapabilities-Exceptions</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>
-<p>An exception report is returned in response to any of the
-following conditions:</p>
-<div class="orderedlist">
-<ol type="1">
-<li>
-<p><a id="OWS.GetCapabilities-Exceptions-1"></a>missing required
-request parameter</p>
-</li>
-<li>
-<p><a id="OWS.GetCapabilities-Exceptions-2"></a>invalid request
-parameter value</p>
-</li>
-<li>
-<p><a id="OWS.GetCapabilities-Exceptions-3"></a>version negotiation
-failed</p>
-</li>
-<li>
-<p><a id="OWS.GetCapabilities-Exceptions-4"></a>invalid update
-sequence</p>
-</li>
-<li>
-<p><a id="OWS.GetCapabilities-Exceptions-5"></a>an error occurs
-that prevents successful request processing</p>
-</li>
-</ol>
-</div>
-</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Pass if any of the relevant circumstances apply and the
-response message body contains a valid exception report; fail
-otherwise.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.4.1,
-Table 5, p.19</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
+<div class="atc">
+    <a id="OWS.GetCapabilities-Exceptions"></a>
+    <p class="title"><b>Table&nbsp;1.5.&nbsp;GetCapabilities - Exceptions</b></p>
+    <div class="atc-contents">
+        <table summary="GetCapabilities - Exceptions" border="1">
+            <colgroup>
+                <col/>
+                <col/>
+            </colgroup>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>OWS.GetCapabilities-Exceptions</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>
+                        <p>An exception report is returned in response to any of the following conditions:</p>
+                        <div class="orderedlist">
+                            <ol type="1">
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-Exceptions-1"></a>missing required request parameter</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-Exceptions-2"></a>invalid request parameter value</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-Exceptions-3"></a>version negotiation failed</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-Exceptions-4"></a>invalid update sequence</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-Exceptions-5"></a>an error occurs that prevents successful request processing</p>
+                                </li>
+                            </ol>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Pass if any of the relevant circumstances apply and the
+                        response message body contains a valid exception report; fail
+                        otherwise.</td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.4.1, Table 5, p.19</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <br class="atc-break" />
 <div class="atc"><a id="OWS.GetCapabilities-AcceptVersions"></a>
-<p class="title"><b>Table&nbsp;1.6.&nbsp;GetCapabilities -
-AcceptVersions parameter</b></p>
-<div class="atc-contents">
-<table summary="GetCapabilities - AcceptVersions parameter" border=
-"1">
-<colgroup>
-<col />
-<col /></colgroup>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>OWS.GetCapabilities-AcceptVersions</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>
-<p>The response to a GetCapabilities request containing the
-<code class="code">AcceptVersions</code> parameter must satisfy the
-applicable assertion:</p>
-<div class="orderedlist">
-<ol type="1">
-<li>
-<p><a id="OWS.GetCapabilities-AcceptVersions-1"></a>it contains a
-complete representation of the capabilities document corresponding
-to the first supported version in the list;</p>
-</li>
-<li>
-<p><a id="OWS.GetCapabilities-AcceptVersions-2"></a>if no version
-in the list is supported, it contains an exception with
-<code class="code">exceptionCode</code>="VersionNegotiationFailed";</p>
-</li>
-<li>
-<p><a id="OWS.GetCapabilities-AcceptVersions-3"></a>if no value is
-specified <span class="emphasis"><em>or</em></span> the parameter
-is not included, it contains the latest available capabilities
-document.</p>
-</li>
-</ol>
-</div>
-</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Verify processing of the <code class=
-"code">AcceptVersion</code> request parameter. Pass if the relevant
-assertion holds; fail otherwise.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.3.2, p.
-16</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
+    <p class="title"><b>Table&nbsp;1.6.&nbsp;GetCapabilities - AcceptVersions parameter</b></p>
+    <div class="atc-contents">
+        <table summary="GetCapabilities - AcceptVersions parameter" border="1">
+            <colgroup>
+                <col/>
+                <col/>
+            </colgroup>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>OWS.GetCapabilities-AcceptVersions</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>
+                        <p>The response to a GetCapabilities request containing the
+                            <code class="code">AcceptVersions</code> parameter must satisfy the applicable assertion:</p>
+                        <div class="orderedlist">
+                            <ol type="1">
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-AcceptVersions-1"></a>it contains a
+                                        complete representation of the capabilities document corresponding
+                                        to the first supported version in the list;</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-AcceptVersions-2"></a>if no version
+                                        in the list is supported, it contains an exception with
+                                        <code class="code">exceptionCode</code>="VersionNegotiationFailed";</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-AcceptVersions-3"></a>if no value is
+                                        specified <span class="emphasis"><em>or</em></span> the parameter
+                                        is not included, it contains the latest available capabilities
+                                        document.</p>
+                                </li>
+                            </ol>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Verify processing of the <code class="code">AcceptVersion</code> request parameter. Pass if the relevant assertion holds; fail otherwise.</td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.3.2, p.16</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <br class="atc-break" />
 <div class="atc"><a id="OWS.GetCapabilities-Sections"></a>
-<p class="title"><b>Table&nbsp;1.7.&nbsp;GetCapabilities - Sections
-parameter</b></p>
-<div class="atc-contents">
-<table summary="GetCapabilities - Sections parameter" border="1">
-<colgroup>
-<col />
-<col /></colgroup>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>OWS.GetCapabilities-Sections</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>
-<p>The response to a GetCapabilities request containing the
-<code class="code">Sections</code> parameter must satisfy the
-applicable assertion:</p>
-<div class="orderedlist">
-<ol type="1">
-<li>
-<p><a id="OWS.GetCapabilities-Sections-1"></a>if one or more
-section names are provided, it contains an abbreviated capabilities
-document that includes only those child elements with matching
-local names;</p>
-</li>
-<li>
-<p><a id="OWS.GetCapabilities-Sections-2"></a>if no value is
-provided, it contains a minimal capabilities document that omits
-all optional child elements;</p>
-</li>
-<li>
-<p><a id="OWS.GetCapabilities-Sections-3"></a>if not specified, it
-contains a complete representation of the capabilities
-document.</p>
-</li>
-</ol>
-</div>
-</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Verify processing of the <code class="code">Sections</code>
-request parameter. Pass if the relevant assertion holds; fail
-otherwise.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.3.3,
-p.17</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
+    <p class="title"><b>Table&nbsp;1.7.&nbsp;GetCapabilities - Sections parameter</b></p>
+    <div class="atc-contents">
+        <table summary="GetCapabilities - Sections parameter" border="1">
+            <colgroup>
+                <col/>
+                <col/>
+            </colgroup>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>OWS.GetCapabilities-Sections</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>
+                        <p>The response to a GetCapabilities request containing the <code class="code">Sections</code> parameter must satisfy the applicable assertion:</p>
+                        <div class="orderedlist">
+                            <ol type="1">
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-Sections-1"></a>if one or more
+                                        section names are provided, it contains an abbreviated capabilities
+                                        document that includes only those child elements with matching
+                                        local names;</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-Sections-2"></a>if no value is
+                                        provided, it contains a minimal capabilities document that omits
+                                        all optional child elements;</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-Sections-3"></a>if not specified, it
+                                        contains a complete representation of the capabilities
+                                        document.</p>
+                                </li>
+                            </ol>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Verify processing of the <code class="code">Sections</code>
+                        request parameter. Pass if the relevant assertion holds; fail
+                        otherwise.</td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.3.3,p.17</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <br class="atc-break" />
 <div class="atc"><a id="OWS.GetCapabilities-AcceptFormats"></a>
-<p class="title"><b>Table&nbsp;1.8.&nbsp;GetCapabilities -
-AcceptFormats parameter</b></p>
-<div class="atc-contents">
-<table summary="GetCapabilities - AcceptFormats parameter" border=
-"1">
-<colgroup>
-<col />
-<col /></colgroup>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>OWS.GetCapabilities-AcceptFormats</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>
-<p>The response to a GetCapabilities request containing the
-<code class="code">AcceptFormats</code> parameter must satisfy the
-applicable assertion:</p>
-<div class="orderedlist">
-<ol type="1">
-<li>
-<p><a id="OWS.GetCapabilities-AcceptFormats-1"></a>if one or more
-preferred formats are supplied, it contains a capabilities document
-in the supported format (media type) that is most preferred;</p>
-</li>
-<li>
-<p><a id="OWS.GetCapabilities-AcceptFormats-2"></a>if no value is
-supplied <span class="emphasis"><em>or</em></span> if none of the
-supplied media types are supported, it contains the default (XML)
-representation.</p>
-</li>
-</ol>
-</div>
-</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Verify processing of the <code class=
-"code">AcceptFormats</code> request parameter. Pass if the relevant
-assertion holds; fail otherwise.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.3.5, p.
-18</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
+    <p class="title"><b>Table&nbsp;1.8.&nbsp;GetCapabilities - AcceptFormats parameter</b></p>
+    <div class="atc-contents">
+        <table summary="GetCapabilities - AcceptFormats parameter" border="1">
+            <colgroup>
+                <col/>
+                <col/>
+            </colgroup>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>OWS.GetCapabilities-AcceptFormats</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>
+                        <p>The response to a GetCapabilities request containing the
+                            <code class="code">AcceptFormats</code> parameter must satisfy the
+                            applicable assertion:</p>
+                        <div class="orderedlist">
+                            <ol type="1">
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-AcceptFormats-1"></a>if one or more
+                                        preferred formats are supplied, it contains a capabilities document
+                                        in the supported format (media type) that is most preferred;</p>
+                                </li>
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-AcceptFormats-2"></a>if no value is
+                                        supplied <span class="emphasis"><em>or</em></span> if none of the
+                                        supplied media types are supported, it contains the default (XML)
+                                        representation.</p>
+                                </li>
+                            </ol>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Verify processing of the <code class="code">AcceptFormats</code> request parameter. Pass if the relevant assertion holds; fail otherwise.</td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: cl. 7.3.5, p.18</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 </div>
 
@@ -696,105 +666,104 @@ assertion holds; fail otherwise.</td>
 <!--General Tests-->
 <!--***********-->
 <div class="section" lang="en" xml:lang="en">
-<div xmlns="" class="titlepage">
-<div>
-<div>
-<h2 xmlns="http://www.w3.org/1999/xhtml" class="title"><a id=
-"general"></a>2. General</h2>
-</div>
-<div>
-<div xmlns="http://www.w3.org/1999/xhtml" class="abstract">
-<p class="title"><b>Purpose</b></p>
-<p>The <code class="code">General</code> test group includes general assertions that relate to all operations of an WPS implementation.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="list-of-tables">
-<p><b>List of Tables</b></p>
-<dl>
-<dt>2.1. <a href="#WPS.General-InvalidRequest">Invalid Request</a></dt>
-<dt>2.2. <a href="#WPS.General-ValidResponse">Valid Response</a></dt>
-</dl>
-</div>
-<div class="atc"><a id="WPS.General-InvalidRequest"></a>
-<table summary="Verify that an invalid request produces an appropriate response from the server." border="1">
-<caption>Table 2.1. General - Invalid Request</caption>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>WPS.General-InvalidRequest</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>
-<p>Sending a request that is non-conformant to a schema associated with an WPS operation causes the server to return a valid error report message with an <code class="code">exceptionCode</code> value of InvalidRequest.</p>
-</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Send several test documents that are invalid according to the schemas associated with some of the WPS operations (i.e. the mandatory operations).  Pass if the service returns a valid exception message with an <code class="code">exceptionCode</code> value of InvalidRequest; fail otherwise.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: ?</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="atc"><a id="WPS.General-ValidResponse"></a>
-<table summary="Verify that a response entity is schema-valid" border="1">
-<caption>Table 2.2. General - Valid Response</caption>
-<tbody>
-<tr class="identifier">
-<td class="rowhead">Test case identifier</td>
-<td>WPS.General-ValidResponse</td>
-</tr>
-<tr class="purpose">
-<td class="rowhead">Test purpose</td>
-<td>
-<p>A response entity is schema-valid.</p>
-</td>
-</tr>
-<tr class="method">
-<td class="rowhead">Test method</td>
-<td>Check the content of the response. Pass if the response is schema-valid;
-fail otherwise.</td>
-</tr>
-<tr class="reference">
-<td class="rowhead">Reference</td>
-<td>
-<div class="itemizedlist">
-<ul>
-<li>
-<p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: ?</p>
-</li>
-</ul>
-</div>
-</td>
-</tr>
-<tr class="type">
-<td class="rowhead">Test type</td>
-<td>Capability</td>
-</tr>
-</tbody>
-</table>
-</div>
+    <div xmlns="" class="titlepage">
+        <div>
+            <div>
+                <h2 class="title"><a id="general"></a>2. General</h2>
+            </div>
+            <div>
+                <div class="abstract">
+                    <p class="title"><b>Purpose</b></p>
+                    <p>The <code class="code">General</code> test group includes general assertions that relate to all operations of an WPS implementation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="list-of-tables">
+        <p><b>List of Tables</b></p>
+        <dl>
+            <dt>2.1. <a href="#WPS.General-InvalidRequest">Invalid Request</a></dt>
+            <dt>2.2. <a href="#WPS.General-ValidResponse">Valid Response</a></dt>
+        </dl>
+    </div>
+    <div class="atc">
+        <a id="WPS.General-InvalidRequest"></a>
+        <table summary="Verify that an invalid request produces an appropriate response from the server." border="1">
+            <caption>Table 2.1. General - Invalid Request</caption>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>WPS.General-InvalidRequest</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>
+                        <p>Sending a request that is non-conformant to a schema associated with an WPS operation causes the server to return a valid error report message with an <code class="code">exceptionCode</code> value of InvalidRequest.</p>
+                    </td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Send several test documents that are invalid according to the schemas associated with some of the WPS operations (i.e. the mandatory operations).  Pass if the service returns a valid exception message with an <code class="code">exceptionCode</code> value of InvalidRequest; fail otherwise.</td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: ?</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="atc"><a id="WPS.General-ValidResponse"></a>
+        <table summary="Verify that a response entity is schema-valid" border="1">
+            <caption>Table 2.2. General - Valid Response</caption>
+            <tbody>
+                <tr class="identifier">
+                    <td class="rowhead">Test case identifier</td>
+                    <td>WPS.General-ValidResponse</td>
+                </tr>
+                <tr class="purpose">
+                    <td class="rowhead">Test purpose</td>
+                    <td>
+                        <p>A response entity is schema-valid.</p>
+                    </td>
+                </tr>
+                <tr class="method">
+                    <td class="rowhead">Test method</td>
+                    <td>Check the content of the response. Pass if the response is schema-valid; fail otherwise.</td>
+                </tr>
+                <tr class="reference">
+                    <td class="rowhead">Reference</td>
+                    <td>
+                        <div class="itemizedlist">
+                            <ul>
+                                <li>
+                                    <p><a class="xref" href="#OGC-05-008">OGC 05-008</a>: ?</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="type">
+                    <td class="rowhead">Test type</td>
+                    <td>Capability</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-	<div class="section">
+<div class="section">
 
     <h2 class="title"><a id="core"/>3. Core</h2>
     <h4>Purpose</h4>
