@@ -102,7 +102,7 @@
     functional specifications.</p>
     
     <p>The abstract test cases (assertions) are organized into test groups 
-    that correspond to distinct conformance classes or sets of capabilities defined in the WPS v1.0.0 specification [OGC 06-009r5].  The following mandatory (core profile) test groups are defined:</p>
+    that correspond to distinct conformance classes or sets of capabilities defined in the WPS v1.0.0 specification [OGC 05-007r7].  The following mandatory (core profile) test groups are defined:</p>
     <ol>
 	  <li><strong>Level 1 (Core)</strong> - Provides tests for the core, mandatory operations of the WPS</li>
    </ol>
@@ -118,7 +118,7 @@
         <li id="OGC-06-023r1"><a href="http://portal.opengeospatial.org/files/?artifact_id=4700">
         Definition Identifier URNs in OGC Namespace, Version 1.1.0 (OGC 06-023r1)</a> 
         (ISO/CD 19136, OGC 03-105r1)</li>
-        <li id="OGC-05-007r1"><a href="http://portal.opengeospatial.org/files/?artifact_id=24151&amp;version=3">
+        <li id="OGC-05-007r7"><a href="http://portal.opengeospatial.org/files/?artifact_id=24151&amp;version=3">
         OpenGIS Web Processing Service Implementation Specification, Version 1.0.0(OGC 05-007r7)</a></li>
       </ul>
     </div>
@@ -137,14 +137,14 @@
 
 <h4>Namespaces</h4>
 <ul>
-	<li><h4>Service being tested must use these namespaces:</h4>
-		<table>	
-			<tr><td>gml</td><td>-</td><td>http://www.opengis.net/gml</td></tr>
-			<tr><td>ows</td><td>-</td><td>http://www.opengis.net/ows/1.1</td></tr>
-			<tr><td>ogc</td><td>-</td><td>http://www.opengis.net/ogc</td></tr>
-			<tr><td>wps</td><td>-</td><td>http://www.opengis.net/wps/1.0.0</td></tr>	
-		</table>
-	</li>
+    <li><h4>Service being tested must use these namespaces:</h4>
+        <table>	
+            <tr><td>gml</td><td>-</td><td>http://www.opengis.net/gml</td></tr>
+            <tr><td>ows</td><td>-</td><td>http://www.opengis.net/ows/1.1</td></tr>
+            <tr><td>ogc</td><td>-</td><td>http://www.opengis.net/ogc</td></tr>
+            <tr><td>wps</td><td>-</td><td>http://www.opengis.net/wps/1.0.0</td></tr>	
+        </table>
+    </li>
 </ul>
 
 <h4>Schemas</h4>
@@ -767,69 +767,23 @@
 
     <h2 class="title"><a id="core"/>3. Core</h2>
     <h4>Purpose</h4>
-    <p>The <code class="code">Core</code> test group includes tests for the core, mandatory operations of the WPS.  These operations include GetCapabilities, DescribeProcess, and Execute.  </p>
+    <p>The <code class="code">Core</code> test group includes tests for the core, mandatory operations of the WPS.  These operations include GetCapabilities, DescribeProcess, and Execute.</p>
     
     <div class="list-of-tables">
         <h4>List of Tables</h4>
-
         <dl>
-            <!--Note:  Handled by OWS Common tests.  <dt>3.1. <a href="#WPS.Behavior-2">GetCapabilities - KVP Request parameter name case-insensitivity</a></dt>-->
             <dt>3.1. <a href="#WPS.GetCapabilities-KVPRequestParameterHandling">GetCapabilities - KVP Request Parameter Handling</a></dt>
             <dt>3.2. <a href="#WPS.GetCapabilities-KVPRequestServiceParameterHandling">GetCapabilities - KVP Request Service Parameter Handling</a></dt>
             <dt>3.3. <a href="#WPS.GetCapabilities-KVPRequestRequestParameterHandling">GetCapabilities - KVP Request Request Parameter Handling</a></dt>
-            <!--Note:  Handled by General tests.  <dt>3.5. <a href="#WPS.Behavior-6">GetCapabilities - XML Request Invalid Request</a></dt>-->
             <dt>3.4. <a href="#WPS.GetCapabilities-OperationsMetadataMandatoryOperations">GetCapabilities - OperationsMetadata Mandatory Operations</a></dt>
-            <dt>3.5. <a href="#WPS.GetCapabilities-OperationsMetadaOptionalOperations">GetCapabilities - OperationsMetada Optional Operations</a></dt>
-            <dt>3.6. <a href="#WPS.GetCapabilities-ResponseContentsValidTime">GetCapabilities - Response Contents Valid Time</a></dt>
-            <dt>3.7. <a href="#WPS.GetCapabilities-ResponseContentsValidProcedure">GetCapabilities - Response Contents Valid Procedure</a></dt>
-            <dt>3.8. <a href="#WPS.GetCapabilities-ResponseContentsValidObservedProperty">GetCapabilities - Response Contents Valid ObservedProperty</a></dt>
-            <dt>3.9. <a href="#WPS.GetCapabilities-ResponseContentsValidResponseFormat">GetCapabilities - Response Contents Valid ResponseFormat</a></dt>
-            <dt>3.10. <a href="#WPS.GetCapabilities-ResponseContentsValidResultModel">GetCapabilities - Response Contents Valid ResultModel</a></dt>
-            <dt>3.11. <a href="#WPS.DescribeSensor-RequestInvalidMIMEType">DescribeSensor - Request Invalid MIME Type</a></dt>
-            <dt>3.12. <a href="#WPS.DescribeSensor-RequestInvalidProcedure">DescribeSensor - Request Invalid Procedure</a></dt>
-            <dt>3.13. <a href="#WPS.DescribeSensor-ResponseMatchingResponseFormat">DescribeSensor - Response Matching ResponseFormat</a></dt>
-            <dt>3.14. <a href="#WPS.DescribeSensor-ResponseMatchingProcedure">DescribeSensor - Response Matching Procedure</a></dt>
-            <dt>3.15. <a href="#WPS.GetObservation-RequestInvalidSRSName">GetObservation - Request Invalid SRSName</a></dt>
+            <dt>3.5. <a href="#WPS.GetCapabilities-ResponseContentsValidProccesIdentifier">GetCapabilities - Response Contents Valid Process Identifier</a></dt>
+            <dt>3.6. <a href="#WPS.DescribeProcess-RequestInvalidLanguage">DescribeProcess - Request Invalid Language</a></dt>
+            <dt>3.7. <a href="#WPS.DescribeProcess-RequestInvalidIdentifier">DescribeProcess - Request Invalid Process Identifier</a></dt>
+            <dt>3.8. <a href="#WPS.DescribeProcess-ResponseMatchingProcessIdentifier">DescribeProcess - Response Matching Process Identifier</a></dt>
+            <dt>3.9. <a href="#WPS.Execute-RequestInvalidIdentifier">Execute - Request Invalid Identifier</a></dt>
 	</dl>
     </div>
     
-    <!--<div class="atc">
-    <a id="WPS.Behavior-2" />
-    <table summary="Some other behaviour" frame="border">
-      <caption>Table 3.1. GetCapabilities - KVP parameter name case-insensitivity</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>WPS.GetCapabilities-KVPRequestCaseInsensitivity</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>Parameter names in a KVP-encoded request are handled in a case-insensitive manner.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check the handling of parameter names in KVP-encoded requests.  Pass if the expected response is produced when upper-, lower-, and mixed-case parameter names are provided; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-05-008">Not in spec</a></li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
--->
     <div class="atc">
     <a id="WPS.GetCapabilities-KVPRequestParameterHandling" />
     <table summary="Verify that the server handles missing parameters correctly." frame="border">
@@ -855,8 +809,8 @@
           <td>
             <ul>
               <li><a class="xref" href="#OGC-05-008">OGC 05-008</a>:  cl. 8</li>
-			  <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.2.4, p. 25</li>
-			</ul>
+	      <li><a class="xref" href="#OGC-05-007r7">OGC-05-007r7</a>: 8.3.7 p. 16</li>
+	    </ul>
           </td>
         </tr>
 
@@ -893,7 +847,7 @@
           <td>
             <ul>
               <li><a class="xref" href="#OGC-05-008">OGC 05-008</a>:  cl. 8</li>
-			  <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.2.4, p. 25</li>
+	      <li><a class="xref" href="#OGC-05-007r7">OGC-05-007r7</a>: 8.3.7 p. 16</li>
             </ul>
           </td>
         </tr>
@@ -931,7 +885,7 @@
           <td>
             <ul>
               <li><a class="xref" href="#OGC-05-008">OGC 05-008</a>:  cl. 8</li>
-			  <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.2.4, p. 25</li>
+	      <li><a class="xref" href="#OGC-05-007r7">OGC-05-007r7</a>: 8.3.7 p. 16</li>
             </ul>
           </td>
         </tr>
@@ -943,43 +897,6 @@
       </tbody>
     </table>
     </div>
-	
-    <!--<div class="atc">
-    <a id="WPS.Behavior-6" />
-    <table summary="Some other behaviour" frame="border">
-      <caption>Table 3.5. GetCapabilities - XML Request Invalid Request</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>WPS.GetCapabilities-XMLRequestInvalidRequest</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>Verify that the server handles an invalid GetCapabilities request correctly.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that the server produces a valid error report message with an exceptionCode value of InvalidRequest if the GetCapabilities request is non-conformant to the associated schema (including if a value of WPS is not provided for the service parameter).  Pass if the server returns a valid error report message with an exception code of InvalideRequest; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="" onClick="return (false);">OGC 05-008:  ?</a></li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>-->
 	
     <div class="atc">
     <a id="WPS.GetCapabilities-OperationsMetadataMandatoryOperations" />
@@ -1006,7 +923,7 @@
           <td>
             <ul>
               <li><a class="xref" href="#OGC-05-008">OGC 05-008</a>:  ?</li>
-			  <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  ?</li>
+	      <li><a class="xref" href="#OGC-05-007r7">OGC-05-007r7</a>: ?</li>
             </ul>
           </td>
         </tr>
@@ -1020,72 +937,32 @@
 	</div>
     
     <div class="atc">
-    <a id="WPS.GetCapabilities-OperationsMetadaOptionalOperations" />
-    <table summary="Verify that any non-mandatory operations listed in the OperationsMetadata section are valid WPS operation names.  This is still up for debate and will probably not be part of the final tests." frame="border">
-      <caption>Table 3.5. GetCapabilities - OperationsMetadata Optional Operations</caption>
+    <a id="WPS.GetCapabilities-ResponseContentsValidProccesIdentifier" />
+    <table summary="Verify that the identifiers values provided for each Process are valid." frame="border">
+      <caption>Table 3.5. GetCapabilities - Response Contents Valid Process Identifier</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>WPS.GetCapabilities-OperationMetadataOptionalOperations</td>
+          <td>WPS.GetCapabilities-ResponseContentsValidProccesIdentifier</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
 
-          <td>Any non-mandatory operations advertised in the OperationsMetadata section have valid WPS method names.</td>
+          <td> If a Process provides the identifier element, then the identifier element must be a valid URN.</td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check that any non-mandatory operations advertised in the OperationsMetadata section have valid WPS method names.  Pass if assertion holds; fail otherwise.</td>
+          <td>Check if a Process provides the identifier element, then the identifier element  must be a valid URN..  Pass if assertions hold; fail otherwise.</td>
         </tr>
         <tr class="reference">
-
           <th>Reference</th>
           <td>
             <ul>
-              <li><a class="xref" href="#OGC-05-008">OGC 05-008</a>:  ?</li>
-			  <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  ?</li>
+              <li><a class="xref" href="#OGC-05-007r7">OGC-05-007r7</a>: 6.4 p.7</li>
             </ul>
           </td>
         </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-   <div class="atc">
-    <a id="WPS.GetCapabilities-ResponseContentsValidTime" />
-    <table summary="Verify that the time values provided for each ObservationOffering are valid." frame="border">
-      <caption>Table 3.6. GetCapabilities - Response Contents Valid Time</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>WPS.GetCapabilities-ResponseContentsValidTime</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>The values in the time element for each ObservationOffering are valid time values (ISO 8601) or are valid named times (i.e. indeterminate, now, etc.).  If a time period is specified, then the beginTime must come before the endTime or be equal to the endTime.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that the values in the time element for each ObservationOffering are valid time values (ISO 8601) or are valid named times (i.e. indeterminate, now, etc.).  If a time period is specified, then the beginTime must come before the endTime or be equal to the endTime.  Pass if time the values in the time element are valid time values; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.2.3.2, p.25</li>
-            </ul>
-          </td>
-        </tr>
-
         <tr class="type">
           <th>Test type</th>
           <td>Capability</td>
@@ -1095,195 +972,28 @@
     </div>
 	
     <div class="atc">
-    <a id="WPS.GetCapabilities-ResponseContentsValidProcedure" />
-    <table summary="Verify that the procedure values provided for each ObservationOffering are valid." frame="border">
-      <caption>Table 3.7. GetCapabilities - Response Contents Valid Procedure</caption>
+    <a id="WPS.DescribeProcess-RequestInvalidLanguage" />
+    <table summary="Verify that the server handles invalid language in the language parameter correctly." frame="border">
+      <caption>Table 3.6. DescribeProcess - Request Invalid Language</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>WPS.GetCapabilities-ResponseContentsValidProcedure</td>
+          <td>WPS.DescribeProcess-RequestInvalidLanguage</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
-
-          <td>The values in the procedure element(s) for each ObservationOffering contain a value and are valid URNs.</td>
+          <td>Supplying an invalid Language (not advertised in the capabilities document)the language parameter produces a valid error report message. </td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check that the values in the procedure element(s) for each ObservationOffering contain a value and are valid URNs according to the OGC URN scheme.  Pass if values in the procedure element(s) contain a value and are valid URNs; fail otherwise.</td>
+          <td>Check that supplying an invalid language (not advertised in the capabilities document) for the language produces a valid error report message.  Pass if an invalid language produces a valid error report; fail otherwise.</td>
         </tr>
         <tr class="reference">
-
           <th>Reference</th>
           <td>
             <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.2.3.2, p.25</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-   <div class="atc">
-    <a id="WPS.GetCapabilities-ResponseContentsValidObservedProperty" />
-    <table summary="Verify that the observedProperty values provided for each ObservationOffering are valid.  See document OGC 05-010 for correct formatting of definition URN." frame="border">
-      <caption>Table 3.8. GetCapabilities - Response Contents Valid ObservedProperty</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>WPS.GetCapabilities-ResponseContentsValidObservedProperty</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>The values in the observedProperty element(s) for each ObservationOffering contain a value and are valid URNs. See document OGC 05-010 for correct formatting of definition URN.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that the values in the observedProperty element(s) for each ObservationOffering contain a value and are valid URNs according to the OGC URN scheme.  Pass if the values in the observedProperty element(s) contain a value and are valid URNs; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.2.3.2, p.25</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-     <div class="atc">
-    <a id="WPS.GetCapabilities-ResponseContentsValidResponseFormat" />
-    <table summary="Verify that the responseFormat values provided for each ObservationOffering are valid MIME types." frame="border">
-      <caption>Table 3.9. GetCapabilities - Response Contents Valid ResponseFormat</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>WPS.GetCapabilities-ResponseContentsValidResponseFormat</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>The values in the responseFormat element(s) for each ObservationOffering contain a value and are valid MIME types.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that the values in the responseFormat element(s) for each ObservationOffering contain a value and are valid MIME types.  Pass if assertions hold; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.2.3.2, p.25</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-    </div>
-	
-    <div class="atc">
-    <a id="WPS.GetCapabilities-ResponseContentsValidResultModel" />
-    <table summary="Verify that the resultModel values provided for each ObservationOffering are valid." frame="border">
-      <caption>Table 3.10. GetCapabilities - Response Contents Valid ResultModel</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>WPS.GetCapabilities-ResponseContentsValidResultModel</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td> If an ObservationOffering provides the resultModel element, then the resultModel element must be in the om:Observation substitution group and is typically om:Observation or a specialized extension.  Value must be namespace-qualified.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check if an ObservationOffering provides the resultModel element, then the resultModel element must be in the om:Observation substitution group and is typically om:Observation or a specialized extension.  Value must be namespace-qualified.  Pass if assertions hold; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>: 8.2.3.2, p.25</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-	</div>
-	
-    <!--<div class="section">
-
-    <h2 class="title"><a id="module3"/>3. DescribeSensor</h2>
-    <h4>Purpose</h4>
-    <p>The <code class="code">DescribeSensor</code> test group includes assertions 
-    covering the following capabilities: Correct handling of MIMEType, Response Formatting and correct procedureId matching and handling.</p>
-    -->
-    <!--<div class="list-of-tables">
-    <h4>List of Tables</h4>
-    <dl>
-    <dt>14. <a href="#WPS.Behavior-14">Request Invalid MIMEType</a></dt>
-    <dt>15. <a href="#WPS.Behavior-15">Request Invalid Procedure</a></dt>
-    <dt>16. <a href="#WPS.Behavior-16">Response Matching Response Format</a></dt>
-    <dt>17. <a href="#WPS.Behavior-17">Response Matching Procedure</a></dt>
-    </dl>
-    </div>-->
-    
-    <div class="atc">
-    <a id="WPS.DescribeSensor-RequestInvalidMIMEType" />
-    <table summary="Verify that the server handles invalid MIME types in the outputFormat parameter correctly." frame="border">
-      <caption>Table 3.11. DescribeSensor - Request Invalid MIME Type</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>WPS.DescribeSensor-RequestInvalidMIMEType</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>Supplying an invalid MIME type (not advertised in the capabilities document) or no MIME type for the outputFormat produces a valid error report message. </td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that supplying an invalid MIME type (not advertised in the capabilities document) or no MIME type for the outputFormat produces a valid error report message.  Pass if an invalid MIME type or no MIME type produces a valid error report; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.3.2, p. 27; cl. 8.3.4, p. 27</li>
+              <li><a class="xref" href="#OGC-05-007r7">OGC-05-007r7</a>:  cl. 9.3.3 p. 30</li>
             </ul>
           </td>
         </tr>
@@ -1297,30 +1007,29 @@
     </div>
     
     <div class="atc">
-    <a id="WPS.DescribeSensor-RequestInvalidProcedure" />
-    <table summary="Verify that the server handles an invalid procedure in the request correctly." frame="border">
-      <caption>Table 3.12. DescribeSensor - Request Invalid Procedure</caption>
+    <a id="WPS.DescribeProcess-RequestInvalidIdentifier" />
+    <table summary="Verify that the server handles an invalid process identifier in the request correctly." frame="border">
+      <caption>Table 3.7. DescribeProcess - Request Invalid Process Identifier</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>WPS.DescribeSensor-RequestInvalidProcedure</td>
+          <td>WPS.DescribeProcess-RequestInvalidIdentifier</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
 
-          <td>Supplying an invalid procedure (not advertised in the capabilities document) or no procedure for the procedure produces a valid error report message.</td>
+          <td>Supplying an invalid process identifier (not advertised in the capabilities document) or no process identifier for the identifier produces a valid error report message.</td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check that supplying an invalid Procedure (not advertised in the capabilities document) or no Procedure for the Procedure produces a valid error report message.  Pass if an invalid Procedure or no Procedure produces a valid error report message; fail otherwise.</td>
+          <td>Check that supplying an invalid Process Identifier (not advertised in the capabilities document) or no Process Identifier for the Identifier produces a valid error report message.  Pass if an invalid process identifier or no process identifier produces a valid error report message; fail otherwise.</td>
         </tr>
         <tr class="reference">
-
           <th>Reference</th>
           <td>
             <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.3.2, p. 27; cl. 8.3.4, p. 27</li>
+              <li><a class="xref" href="#OGC-05-007r7">OGC-05-007r7</a>:  cl. 9.3.3 p. 30</li>
             </ul>
           </td>
         </tr>
@@ -1334,30 +1043,28 @@
     </div>
 	
     <div class="atc">
-    <a id="WPS.DescribeSensor-ResponseMatchingResponseFormat" />
-    <table summary="Verify that the format of the returned document matches the requested outputFormat (i.e. SensorML, OM, etc.)" frame="border">
-      <caption>Table 3.13. DescribeSensor - Response Matching Response Format</caption>
+    <a id="WPS.DescribeProcess-ResponseMatchingProcessIdentifier" />
+    <table summary="Verify that the identifier of the returned document matches the requested process identifier" frame="border">
+      <caption>Table 3.8. DescribeProcess - Response Matching ResponseFormat</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>WPS.DescribeSensor-ResponseMatchingResponseFormat</td>
+          <td>WPS.DescribeProcess-ResponseMatchingProcessIdentifier</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
-
-          <td>The format of the response document matches the outputFormat specified in the request and is valid according to the outputFormat schema.</td>
+          <td>The identifier of the response document matches the process identifier specified in the request and is valid according to the response schema.</td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check that the format of the response document matches the outputFormat specified in the request and is valid according to the outputFormat schema.  Pass if assertion holds; fail otherwise.</td>
+          <td>Check that the identifier of the response document matches the process identifier specified in the request and is valid according to the response schema.  Pass if assertion holds; fail otherwise.</td>
         </tr>
         <tr class="reference">
-
           <th>Reference</th>
           <td>
             <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.3.3, p. 27</li>
+              <li><a class="xref" href="#OGC-05-007r7">OGC-05-007r7</a>:  cl. 9.3.1, p. 18</li>
             </ul>
           </td>
         </tr>
@@ -1371,67 +1078,29 @@
     </div>
 	
     <div class="atc">
-    <a id="WPS.DescribeSensor-ResponseMatchingProcedure" />
-    <table summary="Verify that the unique identifier for the sensor in the returned document matches the Procedure in the request" frame="border">
-      <caption>Table 3.14. DescribeSensor - Response Matching Procedure</caption>
+    <a id="WPS.Execute-RequestInvalidIdentifier" />
+    <table summary="Verify that an invalid process identifier in the request produces a valid error message.  This includes providing an empty identifier element or providing an identifier that is not advertised in the capabilities document." frame="border">
+      <caption>Table 3.9. Execute - Request Invalid Process Identifier</caption>
 
       <tbody>
         <tr class="identifier">
           <th>Test case identifier</th>
-          <td>WPS.DescribeSensor-ResponseMatchingProcedure</td>
+          <td>WPS.Execute-RequestInvalidIdentifier</td>
         </tr>
         <tr class="purpose">
           <th>Test purpose</th>
 
-          <td>The unique identifier in the response document matches the procedure specified in the request.</td>
+          <td>An invalid process identifier in the request produces a valid error message.</td>
         </tr>
         <tr class="method">
           <th>Test method</th>
-          <td>Check that the unique identifier in the response document matches the Procedure specified in the request.  Pass if assertion holds; fail otherwise.</td>
+          <td>Check that an invalid process identifier in the request produces a valid error message.  Pass if an invalid process identifier produces a valid error message; fail otherwise.</td>
         </tr>
         <tr class="reference">
-
           <th>Reference</th>
           <td>
             <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.3.3, p. 27</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="type">
-          <th>Test type</th>
-          <td>Capability</td>
-        </tr>
-      </tbody>
-    </table>
-	</div>
-    
-    <div class="atc">
-    <a id="WPS.GetObservation-RequestInvalidSRSName" />
-    <table summary="Verify that an invalid srsName in the request produces a valid error message.  This includes providing an empty srsName element or providing an srsName that is not advertised for the requested offering." frame="border">
-      <caption>Table 3.15. GetObservation - Request Invalid SRSName</caption>
-
-      <tbody>
-        <tr class="identifier">
-          <th>Test case identifier</th>
-          <td>WPS.GetObservation-RequestInvalidSRSName</td>
-        </tr>
-        <tr class="purpose">
-          <th>Test purpose</th>
-
-          <td>An invalid srsName in the request produces a valid error message.</td>
-        </tr>
-        <tr class="method">
-          <th>Test method</th>
-          <td>Check that an invalid srsName in the request produces a valid error message.  Pass if an invalid srsName produces a valid error message; fail otherwise.</td>
-        </tr>
-        <tr class="reference">
-
-          <th>Reference</th>
-          <td>
-            <ul>
-              <li><a class="xref" href="#OGC-06-009r5">OGC 06-009r5</a>:  cl. 8.4.2, p. 30; cl. 8.4.4, p. 31</li>
+              <li><a class="xref" href="#OGC-05-007r7">OGC-05-007r7</a>:  cl. 10.3.3 p. 48</li>
             </ul>
           </td>
         </tr>
