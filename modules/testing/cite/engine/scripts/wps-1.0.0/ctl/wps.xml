@@ -460,7 +460,11 @@
 
 								<ctl:message select="'********************************************************'"/>
 								<ctl:message select="''"/>									
-								<!-- TODO add execute test -->
+								<ctl:call-test name="execute:core-WPS.Execute-POST-RequestInvalidIdentifier.1">							
+									<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>
+									<ctl:with-param name="postURL" select="$executePostURL"/>
+									<ctl:with-param name="executeVersion" select="$executeVersion"/>
+								</ctl:call-test>
 							</xsl:otherwise>					
 						</xsl:choose>		
 
