@@ -659,6 +659,12 @@ public class SOSworker extends AbstractWorker {
             this.outputFormat = MimeType.APPLICATION_XML;
         }
         
+        //set the current updateSequence parameter
+        final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
+        if (returnUS) {
+            return new Capabilities("1.0.0", getCurrentUpdateSequence());
+        }
+        
         //we prepare the different parts response document
         ServiceIdentification si = null;
         ServiceProvider       sp = null;

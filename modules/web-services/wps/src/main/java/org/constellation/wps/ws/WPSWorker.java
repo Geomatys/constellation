@@ -225,6 +225,12 @@ public class WPSWorker extends AbstractWorker {
      */
     private WPSCapabilitiesType getCapabilities100(final GetCapabilities request) throws CstlServiceException {
 
+        //set the current updateSequence parameter
+        final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
+        if (returnUS) {
+            return new WPSCapabilitiesType("1.0.0", getCurrentUpdateSequence());
+        }
+        
         // We unmarshall the static capabilities document.
         final WPSCapabilitiesType staticCapabilities;
         try {

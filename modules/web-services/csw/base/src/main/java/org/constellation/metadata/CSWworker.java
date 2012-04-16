@@ -497,6 +497,12 @@ public class CSWworker extends AbstractWorker {
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
+        //set the current updateSequence parameter
+        final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
+        if (returnUS) {
+            return new Capabilities("2.0.2", getCurrentUpdateSequence());
+        }
+        
         /*
          final AcceptFormats formats = requestCapabilities.getAcceptFormats();
         
