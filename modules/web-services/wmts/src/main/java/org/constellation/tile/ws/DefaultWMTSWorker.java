@@ -134,6 +134,13 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
+        
+        //set the current updateSequence parameter
+        final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
+        if (returnUS) {
+            return new Capabilities("1.0.0", getCurrentUpdateSequence());
+        }
+        
         final AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 ) {
             boolean found = false;

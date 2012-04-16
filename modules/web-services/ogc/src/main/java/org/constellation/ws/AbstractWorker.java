@@ -255,8 +255,8 @@ public abstract class AbstractWorker implements Worker {
     /**
      * @return the currentUpdateSequence
      */
-    protected long getCurrentUpdateSequence() {
-        return currentUpdateSequence;
+    protected String getCurrentUpdateSequence() {
+        return Long.toString(currentUpdateSequence);
     }
     
     /**
@@ -264,5 +264,22 @@ public abstract class AbstractWorker implements Worker {
      */
     protected void refreshUpdateSequence() {
         currentUpdateSequence = System.currentTimeMillis();
+    }
+    
+    protected boolean returnUpdateSequenceDocument(final String updateSequence) throws CstlServiceException {
+        if (updateSequence == null) {
+            return false;
+        }
+        try {
+            final long sequenceNumber = Long.parseLong(updateSequence);
+            if (sequenceNumber == currentUpdateSequence) {
+                return true;
+            } else if (sequenceNumber > currentUpdateSequence) {
+                throw new CstlServiceException("The update sequence parameter is invalid (higher value than the current)", OWSExceptionCode.INVALID_UPDATE_SEQUENCE, "updateSequence");
+            }
+            return false;
+        } catch(NumberFormatException ex) {
+            throw new CstlServiceException("The update sequence must be an integer", ex, OWSExceptionCode.INVALID_PARAMETER_VALUE, "updateSequence");
+        }
     }
 }

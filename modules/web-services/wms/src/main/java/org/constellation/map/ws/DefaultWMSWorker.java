@@ -128,6 +128,8 @@ import org.opengis.sld.StyledLayerDescriptor;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
+import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
+import org.geotoolkit.wms.xml.v130.*;
 
 
 /**
@@ -255,22 +257,23 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         final AbstractRequest request;
+        final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
-            request = WMSConstant.REQUEST_111;
+            request          = WMSConstant.REQUEST_111;
+            exceptionFormats = WMSConstant.EXCEPTION_111;
         } else {
-            request = WMSConstant.REQUEST_130;
+            request          = WMSConstant.REQUEST_130;
+            exceptionFormats = WMSConstant.EXCEPTION_130;
         }
         request.updateURL(getServiceUrl());
         inCapabilities.getCapability().setRequest(request);
-
-        final List<String> exceptionFormats;
-        if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
-            exceptionFormats = WMSConstant.EXCEPTION_111;
-        } else {
-            exceptionFormats = WMSConstant.EXCEPTION_130;
-        }
         inCapabilities.getCapability().setExceptionFormats(exceptionFormats);
 
+        //set the current updateSequence parameter
+        final boolean returnUS = returnUpdateSequenceDocument(getCapab.getUpdateSequence());
+        if (returnUS) {
+            throw new CstlServiceException("th update sequence paramter is equal to the current", CURRENT_UPDATE_SEQUENCE, "updateSequence");
+        }
 
         //Build the list of layers
         final List<AbstractLayer> outputLayers = new ArrayList<AbstractLayer>();
@@ -328,9 +331,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             /*
              * Dimension: the available date
              */
-            String defaut = null;
             AbstractDimension dim;
-            SortedSet<Date> dates = null;
+            SortedSet<Date> dates;
             try {
                 dates = layer.getAvailableTimes();
             } catch (DataStoreException ex) {
@@ -341,7 +343,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 final PeriodUtilities periodFormatter = new PeriodUtilities(df);
-                defaut = df.format(dates.last());
+                final String defaut = df.format(dates.last());
                 dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
                     new org.geotoolkit.wms.xml.v111.Dimension("time", "ISO8601", defaut, null) :
                     new org.geotoolkit.wms.xml.v130.Dimension("time", "ISO8601", defaut, null);
@@ -352,8 +354,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             /*
              * Dimension: the available elevation
              */
-            defaut = null;
-            SortedSet<Number> elevations = null;
+            SortedSet<Number> elevations;
             try {
                 elevations = layer.getAvailableElevations();
             } catch (DataStoreException ex) {
@@ -361,7 +362,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 elevations = null;
             }
             if (elevations != null && !(elevations.isEmpty())) {
-                defaut = elevations.first().toString();
+                final String defaut = elevations.first().toString();
                 dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
                     new org.geotoolkit.wms.xml.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
                     new org.geotoolkit.wms.xml.v130.Dimension("elevation", "EPSG:5030", defaut, null);
@@ -380,7 +381,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             /*
              * Dimension: the dimension range
              */
-            defaut = null;
             final MeasurementRange<?>[] ranges = layer.getSampleValueRanges();
             /* If the layer has only one sample dimension, then we can apply the dim_range
              * parameter. Otherwise it can be a multiple sample dimensions layer, and we
@@ -390,7 +390,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 final MeasurementRange<?> firstRange = ranges[0];
                 final double minRange = firstRange.getMinimum();
                 final double maxRange = firstRange.getMaximum();
-                defaut = minRange + "," + maxRange;
+                final String defaut = minRange + "," + maxRange;
                 final Unit<?> u = firstRange.getUnits();
                 final String unit = (u != null) ? u.toString() : null;
                 String unitSymbol;

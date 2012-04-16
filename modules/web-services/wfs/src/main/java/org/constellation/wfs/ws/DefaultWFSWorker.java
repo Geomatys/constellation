@@ -194,6 +194,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
+        
+        //set the current updateSequence parameter
+        final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
+        if (returnUS) {
+            return new WFSCapabilitiesType("1.1.0", getCurrentUpdateSequence());
+        }
 
         FeatureTypeListType ftl  = null;
         OperationsMetadata om    = null;

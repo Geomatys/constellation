@@ -107,6 +107,7 @@ import org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilityType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilityType.Request;
+import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.Capabilities;
 import org.geotoolkit.wcs.xml.v111.Contents;
 import org.geotoolkit.wcs.xml.v111.CoverageDescriptionType;
@@ -129,7 +130,6 @@ import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
-import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.opengis.geometry.Envelope;
 import org.opengis.feature.type.Name;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -150,9 +150,10 @@ import org.opengis.coverage.grid.RectifiedGrid;
  * to the worker methods as a parameter.
  * </p>
  *
- * @version 0.5
+ * @version 0.9
  *
  * @author Cédric Briançon (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
 public final class WCSWorker extends LayerWorker {
@@ -608,6 +609,16 @@ public final class WCSWorker extends LayerWorker {
         if (version.isEmpty()) {
             // For the moment the only version that we really support is this one.
             version = "1.0.0";
+        }
+        
+        //set the current updateSequence parameter
+        final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
+        if (returnUS) {
+            if (version.equals("1.0.0")) {
+                return new WCSCapabilitiesType(getCurrentUpdateSequence());
+            } else {
+                return new Capabilities(version, getCurrentUpdateSequence());
+            }
         }
 
         // If the getCapabilities response is in cache, we just return it.
