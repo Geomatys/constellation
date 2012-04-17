@@ -76,6 +76,7 @@ import org.constellation.query.wms.WMSQuery;
 import org.geotoolkit.util.PeriodUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import static org.constellation.api.CommonConstants.*;
 
 //Geotoolkit dependencies
 import org.geotoolkit.display.exception.PortrayalException;
@@ -152,20 +153,6 @@ import org.geotoolkit.wms.xml.v130.*;
  */
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
-    /*
-     * Default declareded CRS codes for each layer in the getCapabilities
-     */
-    private static final List<String> DEFAULT_CRS = new ArrayList<String>();
-    static {
-        DEFAULT_CRS.add("EPSG:4326");
-        DEFAULT_CRS.add("CRS:84");
-        DEFAULT_CRS.add("EPSG:3395");
-        DEFAULT_CRS.add("EPSG:3857");
-        DEFAULT_CRS.add("EPSG:27571");
-        DEFAULT_CRS.add("EPSG:27572");
-        DEFAULT_CRS.add("EPSG:27573");
-        DEFAULT_CRS.add("EPSG:27574");
-    }
     /**
      * Output responses of a GetCapabilities request.
      */
