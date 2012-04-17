@@ -190,8 +190,7 @@
         <dt>1.4. <a href="#OWS.GetCapabilities">GetCapabilities request</a></dt>
         <dt>1.5. <a href="#OWS.GetCapabilities-Exceptions">GetCapabilities - Exceptions</a></dt>
         <dt>1.6. <a href="#OWS.GetCapabilities-AcceptVersions">GetCapabilities - AcceptVersions parameter</a></dt>
-        <dt>1.7. <a href="#OWS.GetCapabilities-Sections">GetCapabilities - Sections parameter</a></dt>
-        <dt>1.8. <a href="#OWS.GetCapabilities-AcceptFormats">GetCapabilities - AcceptFormats parameter</a></dt>
+        <dt>1.7. <a href="#OWS.GetCapabilities-UpdateSequence">GetCapabilities - UpdateSequence parameter</a></dt>
     </dl>
 </div>
 <div class="atc">
@@ -534,10 +533,10 @@
     </div>
 </div>
 <br class="atc-break" />
-<div class="atc"><a id="OWS.GetCapabilities-Sections"></a>
-    <p class="title"><b>Table&nbsp;1.7.&nbsp;GetCapabilities - Sections parameter</b></p>
+<div class="atc"><a id="OWS.GetCapabilities-UpdateSequence"></a>
+    <p class="title"><b>Table&nbsp;1.7.&nbsp;GetCapabilities - UpdateSequence parameter</b></p>
     <div class="atc-contents">
-        <table summary="GetCapabilities - Sections parameter" border="1">
+        <table summary="GetCapabilities - UpdateSequence parameter" border="1">
             <colgroup>
                 <col/>
                 <col/>
@@ -545,29 +544,17 @@
             <tbody>
                 <tr class="identifier">
                     <td class="rowhead">Test case identifier</td>
-                    <td>OWS.GetCapabilities-Sections</td>
+                    <td>OWS.GetCapabilities-UpdateSequence</td>
                 </tr>
                 <tr class="purpose">
                     <td class="rowhead">Test purpose</td>
                     <td>
-                        <p>The response to a GetCapabilities request containing the <code class="code">Sections</code> parameter must satisfy the applicable assertion:</p>
+                        <p>The response to a GetCapabilities request containing the <code class="code">UpdateSequence</code> parameter must satisfy the applicable assertion:</p>
                         <div class="orderedlist">
                             <ol type="1">
                                 <li>
-                                    <p><a id="OWS.GetCapabilities-Sections-1"></a>if one or more
-                                        section names are provided, it contains an abbreviated capabilities
-                                        document that includes only those child elements with matching
-                                        local names;</p>
-                                </li>
-                                <li>
-                                    <p><a id="OWS.GetCapabilities-Sections-2"></a>if no value is
-                                        provided, it contains a minimal capabilities document that omits
-                                        all optional child elements;</p>
-                                </li>
-                                <li>
-                                    <p><a id="OWS.GetCapabilities-Sections-3"></a>if not specified, it
-                                        contains a complete representation of the capabilities
-                                        document.</p>
+                                    <p><a id="OWS.GetCapabilities-UpdateSequence-1"></a>GetCapabilities with an incorrect updatesequence ('9999999999'), 
+                                        if higher than the update sequence on the current capabilities document give an exception.</p>
                                 </li>
                             </ol>
                         </div>
@@ -575,7 +562,7 @@
                 </tr>
                 <tr class="method">
                     <td class="rowhead">Test method</td>
-                    <td>Verify processing of the <code class="code">Sections</code>
+                    <td>Verify processing of the <code class="code">UpdateSequence</code>
                         request parameter. Pass if the relevant assertion holds; fail
                         otherwise.</td>
                 </tr>
@@ -585,68 +572,7 @@
                         <div class="itemizedlist">
                             <ul>
                                 <li>
-                                    <p><a class="xref" href="#OGC-06-121r3">OGC 06-121r3</a>: cl. 7.3.3,p.20</p>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="type">
-                    <td class="rowhead">Test type</td>
-                    <td>Capability</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-<br class="atc-break" />
-<div class="atc"><a id="OWS.GetCapabilities-AcceptFormats"></a>
-    <p class="title"><b>Table&nbsp;1.8.&nbsp;GetCapabilities - AcceptFormats parameter</b></p>
-    <div class="atc-contents">
-        <table summary="GetCapabilities - AcceptFormats parameter" border="1">
-            <colgroup>
-                <col/>
-                <col/>
-            </colgroup>
-            <tbody>
-                <tr class="identifier">
-                    <td class="rowhead">Test case identifier</td>
-                    <td>OWS.GetCapabilities-AcceptFormats</td>
-                </tr>
-                <tr class="purpose">
-                    <td class="rowhead">Test purpose</td>
-                    <td>
-                        <p>The response to a GetCapabilities request containing the
-                            <code class="code">AcceptFormats</code> parameter must satisfy the
-                            applicable assertion:</p>
-                        <div class="orderedlist">
-                            <ol type="1">
-                                <li>
-                                    <p><a id="OWS.GetCapabilities-AcceptFormats-1"></a>if one or more
-                                        preferred formats are supplied, it contains a capabilities document
-                                        in the supported format (media type) that is most preferred;</p>
-                                </li>
-                                <li>
-                                    <p><a id="OWS.GetCapabilities-AcceptFormats-2"></a>if no value is
-                                        supplied <span class="emphasis"><em>or</em></span> if none of the
-                                        supplied media types are supported, it contains the default (XML)
-                                        representation.</p>
-                                </li>
-                            </ol>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="method">
-                    <td class="rowhead">Test method</td>
-                    <td>Verify processing of the <code class="code">AcceptFormats</code> request parameter. Pass if the relevant assertion holds; fail otherwise.</td>
-                </tr>
-                <tr class="reference">
-                    <td class="rowhead">Reference</td>
-                    <td>
-                        <div class="itemizedlist">
-                            <ul>
-                                <li>
-                                    <p><a class="xref" href="#OGC-06-121r3">OGC 06-121r3</a>: cl. 7.3.5, p.21</p>
+                                    <p><a class="xref" href="#OGC-06-121r3">OGC 06-121r3</a>: cl. 7.3.4,p.21</p>
                                 </li>
                             </ul>
                         </div>
@@ -786,7 +712,7 @@
     
     <div class="atc">
     <a id="WPS.GetCapabilities-KVPRequestParameterHandling" />
-    <table summary="Verify that the server handles missing parameters correctly." frame="border">
+    <table summary="Verify that the server handles missing parameters correctly." border="1">
       <caption>Table 3.1. GetCapabilities - KVP Request Parameter Handling</caption>
 
       <tbody>
@@ -824,7 +750,7 @@
 	
     <div class="atc">
     <a id="WPS.GetCapabilities-KVPRequestServiceParameterHandling" />
-    <table summary="Verify that the server handles invalid service key values correctly." frame="border">
+    <table summary="Verify that the server handles invalid service key values correctly." border="1">
       <caption>Table 3.2. GetCapabilities - Request service parameter handling</caption>
 
       <tbody>
@@ -862,7 +788,7 @@
 	
     <div class="atc">
     <a id="WPS.GetCapabilities-KVPRequestRequestParameterHandling" />
-    <table summary="Verify that the server handles invalid request key values correctly." frame="border">
+    <table summary="Verify that the server handles invalid request key values correctly." border="1">
       <caption>Table 3.3. GetCapabilities - KVP Request Request Parameter Handling</caption>
 
       <tbody>
@@ -900,7 +826,7 @@
 	
     <div class="atc">
     <a id="WPS.GetCapabilities-OperationsMetadataMandatoryOperations" />
-    <table summary="Verify that the OperationsMetadata section advertises the mandatory operations of the WPS." frame="border">
+    <table summary="Verify that the OperationsMetadata section advertises the mandatory operations of the WPS." border="1">
       <caption>Table 3.4. GetCapabilities - OperationsMetadata Mandatory Operations</caption>
 
       <tbody>
@@ -938,7 +864,7 @@
     
     <div class="atc">
     <a id="WPS.GetCapabilities-ResponseContentsValidProccesIdentifier" />
-    <table summary="Verify that the identifiers values provided for each Process are valid." frame="border">
+    <table summary="Verify that the identifiers values provided for each Process are valid." border="1">
       <caption>Table 3.5. GetCapabilities - Response Contents Valid Process Identifier</caption>
 
       <tbody>
@@ -973,7 +899,7 @@
 	
     <div class="atc">
     <a id="WPS.DescribeProcess-RequestInvalidLanguage" />
-    <table summary="Verify that the server handles invalid language in the language parameter correctly." frame="border">
+    <table summary="Verify that the server handles invalid language in the language parameter correctly." border="1">
       <caption>Table 3.6. DescribeProcess - Request Invalid Language</caption>
 
       <tbody>
@@ -1008,7 +934,7 @@
     
     <div class="atc">
     <a id="WPS.DescribeProcess-RequestInvalidIdentifier" />
-    <table summary="Verify that the server handles an invalid process identifier in the request correctly." frame="border">
+    <table summary="Verify that the server handles an invalid process identifier in the request correctly." border="1">
       <caption>Table 3.7. DescribeProcess - Request Invalid Process Identifier</caption>
 
       <tbody>
@@ -1044,7 +970,7 @@
 	
     <div class="atc">
     <a id="WPS.DescribeProcess-ResponseMatchingProcessIdentifier" />
-    <table summary="Verify that the identifier of the returned document matches the requested process identifier" frame="border">
+    <table summary="Verify that the identifier of the returned document matches the requested process identifier" border="1">
       <caption>Table 3.8. DescribeProcess - Response Matching ResponseFormat</caption>
 
       <tbody>
@@ -1079,7 +1005,7 @@
 	
     <div class="atc">
     <a id="WPS.Execute-RequestInvalidIdentifier" />
-    <table summary="Verify that an invalid process identifier in the request produces a valid error message.  This includes providing an empty identifier element or providing an identifier that is not advertised in the capabilities document." frame="border">
+    <table summary="Verify that an invalid process identifier in the request produces a valid error message.  This includes providing an empty identifier element or providing an identifier that is not advertised in the capabilities document." border="1">
       <caption>Table 3.9. Execute - Request Invalid Process Identifier</caption>
 
       <tbody>
