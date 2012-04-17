@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -52,14 +53,19 @@ public class FormatURL {
 
     }
 
-    public FormatURL(String format, String href) {
+    public FormatURL(final String format, final String href) {
         this.format = format;
         if (href != null) {
             this.onlineResource = new Reference(href);
         }
     }
+    
+    public FormatURL(final String format, final Reference href) {
+        this.format = format;
+        this.onlineResource = href;
+    }
 
-    public FormatURL(String name, String type, String format, String href) {
+    public FormatURL(final String name, final String type, final String format, final String href) {
         this.name   = name;
         this.type   = type;
         this.format = format;
@@ -67,14 +73,27 @@ public class FormatURL {
             this.onlineResource = new Reference(href);
         }
     }
+    public FormatURL(final String name, final String type, final String format, final Reference href) {
+        this.name   = name;
+        this.type   = type;
+        this.format = format;
+        this.onlineResource = href;
+    }
 
-    public FormatURL(Integer width, Integer height, String format, String href) {
+    public FormatURL(final Integer width, final Integer height, final String format, final String href) {
         this.width  = width;
         this.height = height;
         this.format = format;
         if (href != null) {
             this.onlineResource = new Reference(href);
         }
+    }
+    
+    public FormatURL(final Integer width,final Integer height, final String format, final Reference ref) {
+        this.width  = width;
+        this.height = height;
+        this.format = format;
+        this.onlineResource = ref;
     }
 
     /**
@@ -159,5 +178,55 @@ public class FormatURL {
      */
     public void setHeight(Integer height) {
         this.height = height;
+    }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[FormatURL]");
+        if (width != null) {
+            sb.append("width=").append(width).append('\n');
+        }
+        if (type != null) {
+            sb.append("type=").append(type).append('\n');
+        }
+        if (onlineResource != null) {
+            sb.append("onlineResource=").append(onlineResource).append('\n');
+        }
+        if (name != null) {
+            sb.append("name=").append(name).append('\n');
+        }
+        if (format != null) {
+            sb.append("format=").append(format).append('\n');
+        }
+        if (height != null) {
+            sb.append("height=").append(height).append('\n');
+        }
+        return sb.toString();
+    }
+    
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof FormatURL) {
+            final FormatURL that = (FormatURL) obj;
+            return Utilities.equals(this.width,   that.width) &&
+                   Utilities.equals(this.type,     that.type) &&
+                   Utilities.equals(this.onlineResource,  that.onlineResource) &&
+                   Utilities.equals(this.name,         that.name) &&
+                   Utilities.equals(this.format,       that.format) &&
+                   Utilities.equals(this.height,       that.height);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 97 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 97 * hash + (this.width != null ? this.width.hashCode() : 0);
+        hash = 97 * hash + (this.height != null ? this.height.hashCode() : 0);
+        hash = 97 * hash + (this.format != null ? this.format.hashCode() : 0);
+        hash = 97 * hash + (this.onlineResource != null ? this.onlineResource.hashCode() : 0);
+        return hash;
     }
 }

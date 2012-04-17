@@ -20,6 +20,7 @@ package org.constellation.configuration;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -88,5 +89,40 @@ public class AttributionType {
      */
     public void setLogoURL(FormatURL logoURL) {
         this.logoURL = logoURL;
+    }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[AttributionType]");
+        if (logoURL != null) {
+            sb.append("logoURL=").append(logoURL).append('\n');
+        }
+        if (onlineResource != null) {
+            sb.append("onlineResource=").append(onlineResource).append('\n');
+        }
+        if (title != null) {
+            sb.append("title=").append(title).append('\n');
+        }
+        return sb.toString();
+    }
+    
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof AttributionType) {
+            final AttributionType that = (AttributionType) obj;
+            return Utilities.equals(this.logoURL,        that.logoURL) &&
+                   Utilities.equals(this.onlineResource, that.onlineResource) &&
+                   Utilities.equals(this.title,          that.title);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 23 * hash + (this.onlineResource != null ? this.onlineResource.hashCode() : 0);
+        hash = 23 * hash + (this.logoURL != null ? this.logoURL.hashCode() : 0);
+        return hash;
     }
 }

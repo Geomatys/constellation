@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -41,11 +42,11 @@ public class Layers {
 
     }
 
-    public Layers(List<Source> source) {
+    public Layers(final List<Source> source) {
         this.source = source;
     }
 
-    public Layers(Layer mainLayer, List<Source> source) {
+    public Layers(final Layer mainLayer, final List<Source> source) {
         this.source    = source;
         this.mainLayer = mainLayer;
     }
@@ -63,7 +64,7 @@ public class Layers {
     /**
      * @param source the source to set
      */
-    public void setSource(List<Source> source) {
+    public void setSource(final List<Source> source) {
         this.source = source;
     }
 
@@ -77,7 +78,25 @@ public class Layers {
     /**
      * @param mainLayer the mainLayer to set
      */
-    public void setMainLayer(Layer mainLayer) {
+    public void setMainLayer(final Layer mainLayer) {
         this.mainLayer = mainLayer;
+    }
+    
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Layers) {
+            final Layers that = (Layers) obj;
+            return Utilities.equals(this.mainLayer, that.mainLayer) &&
+                   Utilities.equals(this.source, that.source);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.mainLayer != null ? this.mainLayer.hashCode() : 0);
+        hash = 37 * hash + (this.source != null ? this.source.hashCode() : 0);
+        return hash;
     }
 }

@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -48,7 +49,7 @@ public class Source {
 
     }
 
-    public Source(String id, Boolean loadAll, List<Layer> include, List<Layer> exclude) {
+    public Source(final String id, final Boolean loadAll, final List<Layer> include, final List<Layer> exclude) {
         this.id      = id;
         this.loadAll = loadAll;
         if (exclude != null) {
@@ -108,7 +109,7 @@ public class Source {
     /**
      * @param include the include to set
      */
-    public void setInclude(List<Layer> include) {
+    public void setInclude(final List<Layer> include) {
         this.include = new LayerList(include);
     }
 
@@ -129,7 +130,7 @@ public class Source {
      * @param name
      * @return
      */
-    public boolean isExcludedLayer(QName name) {
+    public boolean isExcludedLayer(final QName name) {
         for (Layer layer : getExclude()) {
             final QName layerName = layer.getName();
             /*
@@ -157,7 +158,7 @@ public class Source {
      * @param name
      * @return
      */
-    public Layer isIncludedLayer(QName name) {
+    public Layer isIncludedLayer(final QName name) {
         for (Layer layer : getInclude()) {
             final QName layerName = layer.getName();
             /*
@@ -181,7 +182,7 @@ public class Source {
     /**
      * @param exclude the exclude to set
      */
-    public void setExclude(List<Layer> exclude) {
+    public void setExclude(final List<Layer> exclude) {
         this.exclude = new LayerList(exclude);
     }
 
@@ -191,6 +192,28 @@ public class Source {
         sb.append(" id=").append(id);
         sb.append(" LoadAll=").append(loadAll);
         return sb.toString();
+    }
+    
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Source) {
+            final Source that = (Source) obj;
+            return Utilities.equals(this.exclude, that.exclude) &&
+                   Utilities.equals(this.id,      that.id)      &&
+                   Utilities.equals(this.include, that.include) &&
+                   Utilities.equals(this.loadAll, that.loadAll);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 29 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 29 * hash + (this.loadAll != null ? this.loadAll.hashCode() : 0);
+        hash = 29 * hash + (this.include != null ? this.include.hashCode() : 0);
+        hash = 29 * hash + (this.exclude != null ? this.exclude.hashCode() : 0);
+        return hash;
     }
 
 }

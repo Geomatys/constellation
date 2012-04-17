@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -199,5 +200,80 @@ public class Layer {
      */
     public void setCrs(final List<String> crs) {
         this.crs = crs;
+    }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[Layer]");
+        if (abstrac != null) {
+            sb.append("abstract=").append(abstrac).append('\n');
+        }
+        if (attribution != null) {
+            sb.append("attribution:\n").append(attribution).append('\n');
+        }
+        if (authorityURL != null) {
+            sb.append("authorityURL:\n").append(authorityURL).append('\n');
+        }
+        if (crs != null) {
+            sb.append("crs:\n").append(crs).append('\n');
+        }
+        if (dataURL != null) {
+            sb.append("dataURL:\n").append(dataURL).append('\n');
+        }
+        if (identifier != null) {
+            sb.append("identifier:\n").append(identifier).append('\n');
+        }
+        if (keywords != null) {
+            sb.append("keywords:\n").append(keywords).append('\n');
+        }
+        if (metadataURL != null) {
+            sb.append("metadataURL:\n").append(metadataURL).append('\n');
+        }
+        if (name != null) {
+            sb.append("name:\n").append(name).append('\n');
+        }
+        if (opaque != null) {
+            sb.append("opaque:\n").append(opaque).append('\n');
+        }
+        if (title != null) {
+            sb.append("title:\n").append(title).append('\n');
+        }
+        return sb.toString();
+    }
+    
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Layer) {
+            final Layer that = (Layer) obj;
+            return Utilities.equals(this.abstrac,      that.abstrac) &&
+                   Utilities.equals(this.attribution,  that.attribution) &&
+                   Utilities.equals(this.authorityURL, that.authorityURL) &&
+                   Utilities.equals(this.crs,          that.crs) &&
+                   Utilities.equals(this.dataURL,      that.dataURL) &&
+                   Utilities.equals(this.identifier,   that.identifier) &&
+                   Utilities.equals(this.keywords,     that.keywords) &&
+                   Utilities.equals(this.metadataURL,  that.metadataURL) &&
+                   Utilities.equals(this.name,         that.name) &&
+                   Utilities.equals(this.opaque,       that.opaque) &&
+                   Utilities.equals(this.title,        that.title);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 79 * hash + (this.title != null ? this.title.hashCode() : 0);
+        hash = 79 * hash + (this.abstrac != null ? this.abstrac.hashCode() : 0);
+        hash = 79 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
+        hash = 79 * hash + (this.metadataURL != null ? this.metadataURL.hashCode() : 0);
+        hash = 79 * hash + (this.dataURL != null ? this.dataURL.hashCode() : 0);
+        hash = 79 * hash + (this.authorityURL != null ? this.authorityURL.hashCode() : 0);
+        hash = 79 * hash + (this.identifier != null ? this.identifier.hashCode() : 0);
+        hash = 79 * hash + (this.attribution != null ? this.attribution.hashCode() : 0);
+        hash = 79 * hash + (this.opaque != null ? this.opaque.hashCode() : 0);
+        hash = 79 * hash + (this.crs != null ? this.crs.hashCode() : 0);
+        return hash;
     }
 }

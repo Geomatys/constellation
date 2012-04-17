@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.geotoolkit.gui.swing.tree.Trees;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -42,11 +43,11 @@ public class LayerContext {
 
     }
 
-    public LayerContext(Layers layers) {
+    public LayerContext(final Layers layers) {
         this.layers = layers;
     }
 
-    public LayerContext(Layers layers, String security) {
+    public LayerContext(final Layers layers, final String security) {
         this.layers = layers;
         this.security = security;
     }
@@ -126,4 +127,23 @@ public class LayerContext {
         return sb.toString();
     }
 
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof LayerContext) {
+            final LayerContext that = (LayerContext) obj;
+            return Utilities.equals(this.layers, that.layers) &&
+                   Utilities.equals(this.security, that.security) &&
+                   Utilities.equals(this.supportedLanguages, that.supportedLanguages);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + (this.layers != null ? this.layers.hashCode() : 0);
+        hash = 97 * hash + (this.security != null ? this.security.hashCode() : 0);
+        hash = 97 * hash + (this.supportedLanguages != null ? this.supportedLanguages.hashCode() : 0);
+        return hash;
+    }
 }

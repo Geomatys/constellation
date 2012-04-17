@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -43,11 +44,17 @@ public class Reference {
         
     }
 
-    public Reference(String href) {
+    public Reference(final String href) {
         this.href      = href;
     }
 
-    public Reference(String authority, String value) {
+    public Reference(final String authority, final String value) {
+        this.authority = authority;
+        this.value     = value;
+    }
+    
+    public Reference(final String href, final String authority, final String value) {
+        this.href      = href;
         this.authority = authority;
         this.value     = value;
     }
@@ -93,4 +100,40 @@ public class Reference {
     public void setValue(String value) {
         this.value = value;
     }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[Reference]");
+        if (authority != null) {
+            sb.append("authority=").append(authority).append('\n');
+        }
+        if (href != null) {
+            sb.append("href=").append(href).append('\n');
+        }
+        if (value != null) {
+            sb.append("value=").append(value).append('\n');
+        }
+        return sb.toString();
+    }
+    
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Reference) {
+            final Reference that = (Reference) obj;
+            return Utilities.equals(this.authority, that.authority) &&
+                   Utilities.equals(this.href,      that.href) &&
+                   Utilities.equals(this.value,     that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.href != null ? this.href.hashCode() : 0);
+        hash = 97 * hash + (this.authority != null ? this.authority.hashCode() : 0);
+        hash = 97 * hash + (this.value != null ? this.value.hashCode() : 0);
+        return hash;
+    }
+
 }
