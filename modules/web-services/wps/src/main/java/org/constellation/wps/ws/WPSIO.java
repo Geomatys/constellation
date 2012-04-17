@@ -24,13 +24,13 @@ import org.constellation.wps.converters.*;
 import org.constellation.wps.utils.WPSMimeType;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.process.converters.*;
-import org.geotoolkit.process.vector.sort.SortBy;
 import org.geotoolkit.util.NumberRange;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.util.converter.SimpleConverter;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
