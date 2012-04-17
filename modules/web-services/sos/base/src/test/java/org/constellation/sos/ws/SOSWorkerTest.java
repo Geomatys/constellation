@@ -112,7 +112,7 @@ public class SOSWorkerTest {
         AcceptVersionsType acceptVersions = new AcceptVersionsType("2.0.0");
         SectionsType sections             = new SectionsType("All");
         AcceptFormatsType acceptFormats   = new AcceptFormatsType(MimeType.TEXT_XML);
-        GetCapabilities request           = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
+        GetCapabilities request           = new GetCapabilities(acceptVersions, sections, acceptFormats, null, "SOS");
 
         boolean exLaunched = false;
         try {
@@ -172,7 +172,7 @@ public class SOSWorkerTest {
         AcceptVersionsType acceptVersions = new AcceptVersionsType("1.0.0");
         SectionsType sections             = new SectionsType("All");
         AcceptFormatsType acceptFormats   = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
+        request = new GetCapabilities(acceptVersions, sections, acceptFormats, null, "SOS");
 
         result = worker.getCapabilities(request);
 
@@ -193,7 +193,7 @@ public class SOSWorkerTest {
         acceptVersions = new AcceptVersionsType("1.0.0");
         sections       = new SectionsType("OperationsMetadata");
         acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
+        request = new GetCapabilities(acceptVersions, sections, acceptFormats, null, "SOS");
 
         result = worker.getCapabilities(request);
 
@@ -211,7 +211,7 @@ public class SOSWorkerTest {
         acceptVersions = new AcceptVersionsType("1.0.0");
         sections       = new SectionsType("ServiceProvider");
         acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
+        request = new GetCapabilities(acceptVersions, sections, acceptFormats, null, "SOS");
 
         result = worker.getCapabilities(request);
 
@@ -229,7 +229,7 @@ public class SOSWorkerTest {
         acceptVersions = new AcceptVersionsType("1.0.0");
         sections       = new SectionsType("ServiceIdentification");
         acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
+        request = new GetCapabilities(acceptVersions, sections, acceptFormats, null, "SOS");
 
         result = worker.getCapabilities(request);
 
@@ -247,7 +247,7 @@ public class SOSWorkerTest {
         acceptVersions = new AcceptVersionsType("1.0.0");
         sections       = new SectionsType("Contents");
         acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
+        request = new GetCapabilities(acceptVersions, sections, acceptFormats, null, "SOS");
 
         result = worker.getCapabilities(request);
 
