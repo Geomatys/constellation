@@ -18,8 +18,6 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
-import javax.xml.bind.Marshaller;
-import org.geotoolkit.ogc.xml.v110.FilterType;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
@@ -41,6 +39,7 @@ import static org.constellation.test.utils.MetadataUtilities.*;
 import static org.constellation.metadata.CSWConstants.*;
 
 // geotoolkit dependencies
+import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
@@ -179,7 +178,7 @@ public class CSWworkerTest {
         AcceptVersionsType acceptVersions = new AcceptVersionsType("2.0.2");
         SectionsType sections             = new SectionsType("All");
         AcceptFormatsType acceptFormats   = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
+        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, null, "CSW");
 
         result = worker.getCapabilities(request);
 
@@ -196,7 +195,7 @@ public class CSWworkerTest {
         acceptVersions = new AcceptVersionsType("2.0.2");
         sections       = new SectionsType("OperationsMetadata");
         acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request        = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
+        request        = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, null, "CSW");
 
         result         = worker.getCapabilities(request);
 
@@ -213,7 +212,7 @@ public class CSWworkerTest {
         acceptVersions = new AcceptVersionsType("2.0.2");
         sections       = new SectionsType("ServiceProvider");
         acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
+        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, null, "CSW");
 
         result = worker.getCapabilities(request);
 
@@ -230,7 +229,7 @@ public class CSWworkerTest {
         acceptVersions = new AcceptVersionsType("2.0.2");
         sections       = new SectionsType("ServiceIdentification");
         acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
-        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
+        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, null, "CSW");
 
         result = worker.getCapabilities(request);
 
@@ -247,7 +246,7 @@ public class CSWworkerTest {
         acceptVersions = new AcceptVersionsType("2.0.4");
         sections       = new SectionsType("All");
         acceptFormats  = new AcceptFormatsType(MimeType.TEXT_XML);
-        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
+        request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, null, "CSW");
 
         boolean exLaunched = false;
         try {
