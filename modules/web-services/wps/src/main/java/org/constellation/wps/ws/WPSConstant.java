@@ -62,10 +62,7 @@ public final class WPSConstant {
     /* Maximum size in megabytes for a complex input */
     public static final int MAX_MB_INPUT_COMPLEX = 100;
     
-    
-    /* Default Coordinate Reference System  */
-    public static final String DEFAULT_CRS = "EPSG:4326";
-    
+   
     /** 
      * Process identifier prefix to uniquely identifies process using OGC URN code.
      */

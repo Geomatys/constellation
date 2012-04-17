@@ -94,6 +94,7 @@ import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.api.QueryConstants.*;
+import static org.constellation.api.CommonConstants.*;
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.geotoolkit.wps.xml.v100.*;
 
@@ -113,18 +114,12 @@ public class WPSWorker extends AbstractWorker {
 
         //Default CRS.
         final SupportedCRSsType.Default defaultCRS = new SupportedCRSsType.Default();
-        defaultCRS.setCRS(DEFAULT_CRS);
+        defaultCRS.setCRS(DEFAULT_CRS.get(0));
         WPS_SUPPORTED_CRS.setDefault(defaultCRS);
 
         //Supported CRS.
         final CRSsType supportedCRS = new CRSsType();
-        final Set<String> allAuth = CRS.getSupportedAuthorities(true);
-        for (final String auth : allAuth) {
-            final Set<String> allCodes = CRS.getSupportedCodes(auth);
-            for (final String code : allCodes) {
-                supportedCRS.getCRS().add(auth + ":" + code);
-            }
-        }
+        supportedCRS.getCRS().addAll(DEFAULT_CRS);
         WPS_SUPPORTED_CRS.setSupported(supportedCRS);
     }
         
@@ -138,6 +133,7 @@ public class WPSWorker extends AbstractWorker {
         while (factoryIte.hasNext()) {
             final ProcessingRegistry factory = factoryIte.next();
             for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
+                System.out.println(descriptor.getIdentifier().getAuthority()+" : "+descriptor.getIdentifier().getCode());
                 descList.add(descriptor);
             }
         }
@@ -656,7 +652,7 @@ public class WPSWorker extends AbstractWorker {
                     break;
                 }
             }
-            if (inputDescriptor != null) {
+            if (inputDescriptor == null) {
                 throw new CstlServiceException("Invalid or unknow input Identifier.", INVALID_PARAMETER_VALUE, inputIdentifier);
             }
 
@@ -665,22 +661,24 @@ public class WPSWorker extends AbstractWorker {
             boolean isComplex = false;
             boolean isLiteral = false;
             
-            if(inputRequest.getReference() != null){
+            if (inputRequest.getReference() != null) {
                 isReference = true;
             } else {
-                if(inputRequest.getData() != null){
+                if (inputRequest.getData() != null) {
+                    
                     final DataType dataType = inputRequest.getData(); 
-                    if(dataType.getBoundingBoxData() != null){
+                    if (dataType.getBoundingBoxData() != null) {
                         isBBox = true;
-                    } else if(dataType.getComplexData() != null){
+                    } else if (dataType.getComplexData() != null) {
                         isComplex = true;
-                    } else if(dataType.getLiteralData() != null){
+                    } else if (dataType.getLiteralData() != null) {
                         isLiteral = true;
                     } else {
                         throw new CstlServiceException("Input Data element not found.");
                     }
+                } else {
+                    throw new CstlServiceException("Input doesn't have data or reference.");
                 }
-                throw new CstlServiceException("Input doesn't have data or reference.");
             }
             
 
@@ -692,11 +690,12 @@ public class WPSWorker extends AbstractWorker {
             Object dataValue = null;
             LOGGER.log(Level.INFO, "Input : " + inputIdentifier + " : expected Class " + expectedClass.getCanonicalName());
 
-            /*
-             * A referenced input data
+            
+            /**
+             * Handle referenced input data.
              */
-            if (inputRequest.getReference() != null) {
-
+            if (isReference) {
+                
                 //Check if the expected class is supproted for literal using
                 if (!WPSIO.isSupportedReferenceInputClass(expectedClass)) {
                     throw new CstlServiceException("Reference value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
@@ -719,108 +718,100 @@ public class WPSWorker extends AbstractWorker {
                     }
                     files.add((File) dataValue);
                 }
+            }
+         
+            
+            /**
+             * Handle Bbox input data.
+             */
+            if (isBBox) {
+                LOGGER.log(Level.INFO, "LOG -> Input -> Boundingbox");
+                final BoundingBoxType bBox = inputRequest.getData().getBoundingBoxData();
+                final List<Double> lower = bBox.getLowerCorner();
+                final List<Double> upper = bBox.getUpperCorner();
+                final String crs = bBox.getCrs();
+                final int dimension = bBox.getDimensions();
 
-                /*
-                 * Encapsulated data into the Execute Request
-                 */
-            } else if (inputRequest.getData() != null) {
+                //Check if it's a 2D boundingbox
+                if (dimension != 2 || lower.size() != 2 || upper.size() != 2) {
+                    throw new CstlServiceException("Invalid data input : Only 2 dimension boundingbox supported.", OPERATION_NOT_SUPPORTED, inputIdentifier);
+                }
 
-                /*
-                 * BoundingBox data
-                 */
-                if (inputRequest.getData().getBoundingBoxData() != null) {
-                    LOGGER.log(Level.INFO,"LOG -> Input -> Boundingbox");
-                    final BoundingBoxType bBox = inputRequest.getData().getBoundingBoxData();
-                    final List<Double> lower = bBox.getLowerCorner();
-                    final List<Double> upper = bBox.getUpperCorner();
-                    final String crs = bBox.getCrs();
-                    final int dimension = bBox.getDimensions();
+                CoordinateReferenceSystem crsDecode;
+                try {
+                    crsDecode = CRS.decode(crs);
+                } catch (FactoryException ex) {
+                    throw new CstlServiceException("Invalid data input : CRS not supported.",
+                            ex, OPERATION_NOT_SUPPORTED, inputIdentifier);
+                }
 
-                    //Check if it's a 2D boundingbox
-                    if (dimension != 2 || lower.size() != 2 || upper.size() != 2) {
-                        throw new CstlServiceException("Invalid data input : Only 2 dimension boundingbox supported.", OPERATION_NOT_SUPPORTED, inputIdentifier);
-                    }
+                final Envelope envelop = GeometryUtils.createCRSEnvelope(crsDecode, lower.get(0), lower.get(1), upper.get(0), upper.get(1));
+                dataValue = envelop;
+            }
+            
+            /**
+             * Handle Complex input data.
+             */
+            if (isComplex) {
+                //Check if the expected class is supproted for complex using
+                if (!WPSIO.isSupportedComplexInputClass(expectedClass)) {
+                    throw new CstlServiceException("Complex value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
+                }
 
-                    CoordinateReferenceSystem crsDecode;
-                    try {
-                        crsDecode = CRS.decode(crs);
-                    } catch (FactoryException ex) {
-                        throw new CstlServiceException("Invalid data input : CRS not supported.",
-                                ex, OPERATION_NOT_SUPPORTED, inputIdentifier);
-                    }
+                LOGGER.log(Level.INFO, "LOG -> Input -> Complex");
 
-                    final Envelope envelop = GeometryUtils.createCRSEnvelope(crsDecode, lower.get(0), lower.get(1), upper.get(0), upper.get(1));
-                    dataValue = envelop;
+                final ComplexDataType complex = inputRequest.getData().getComplexData();
+                final String mime = complex.getMimeType();
+                final String encoding = complex.getEncoding();
+                final List<Object> content = complex.getContent();
+                final String schema = complex.getSchema();
 
-                    /*
-                     * Complex data (XML, raster, ...)
-                     */
-                } else if (inputRequest.getData().getComplexData() != null) {
-
-                    //Check if the expected class is supproted for complex using
-                    if (!WPSIO.isSupportedComplexInputClass(expectedClass)) {
-                        throw new CstlServiceException("Complex value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
-                    }
-
-                    LOGGER.log(Level.INFO,"LOG -> Input -> Complex");
-
-                    final ComplexDataType complex = inputRequest.getData().getComplexData();
-                    final String mime = complex.getMimeType();
-                    final String encoding = complex.getEncoding();
-                    final List<Object> content = complex.getContent();
-                    final String schema = complex.getSchema();
-
-                    if (content.size() <= 0) {
-                        throw new CstlServiceException("Missing data input value.", INVALID_PARAMETER_VALUE, inputIdentifier);
-
-                    } else {
-
-                        final List<Object> inputObject = new ArrayList<Object>();
-                        for (final Object obj : content) {
-                            if (obj != null) {
-                                if (!(obj instanceof String)) {
-                                    inputObject.add(obj);
-                                }
-                            }
-                        }
-
-                        if (inputObject == null) {
-                            throw new CstlServiceException("Invalid data input value : Empty value.", INVALID_PARAMETER_VALUE, inputIdentifier);
-                        }
-
-                        /*
-                         * Extract Data from inputObject array
-                         */
-                        dataValue = WPSUtils.extractComplexInput(expectedClass, inputObject, schema, mime, encoding, inputIdentifier);
-                    }
-
-                    /*
-                     * Literal data
-                     */
-                } else if (inputRequest.getData().getLiteralData() != null) {
-                    //Check if the expected class is supproted for literal using
-                    if (!WPSIO.isSupportedLiteralInputClass(expectedClass)) {
-                        throw new CstlServiceException("Literal value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
-                    }
-
-                    LOGGER.log(Level.INFO,"LOG -> Input -> Literal");
-
-                    final LiteralDataType literal = inputRequest.getData().getLiteralData();
-                    final String data = literal.getValue();
-
-                    //convert String into expected type
-                    dataValue = WPSUtils.convertFromString(data, expectedClass);
-                    LOGGER.log(Level.INFO,"DEBUG -> Input -> Literal -> Value=" + dataValue);
+                if (content.size() <= 0) {
+                    throw new CstlServiceException("Missing data input value.", INVALID_PARAMETER_VALUE, inputIdentifier);
 
                 } else {
-                    throw new CstlServiceException("Invalid input data type.", INVALID_REQUEST, inputIdentifier);
+
+                    final List<Object> inputObject = new ArrayList<Object>();
+                    for (final Object obj : content) {
+                        if (obj != null) {
+                            if (!(obj instanceof String)) {
+                                inputObject.add(obj);
+                            }
+                        }
+                    }
+
+                    if (inputObject == null) {
+                        throw new CstlServiceException("Invalid data input value : Empty value.", INVALID_PARAMETER_VALUE, inputIdentifier);
+                    }
+
+                    /*
+                     * Extract Data from inputObject array
+                     */
+                    dataValue = WPSUtils.extractComplexInput(expectedClass, inputObject, schema, mime, encoding, inputIdentifier);
                 }
-            } else {
-                throw new CstlServiceException("Invalid input data format.", INVALID_REQUEST, inputIdentifier);
+            }
+            
+            /**
+             * Handle Literal input data.
+             */
+            if (isLiteral) {
+                //Check if the expected class is supproted for literal using
+                if (!WPSIO.isSupportedLiteralInputClass(expectedClass)) {
+                    throw new CstlServiceException("Literal value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
+                }
+
+                LOGGER.log(Level.INFO, "LOG -> Input -> Literal");
+
+                final LiteralDataType literal = inputRequest.getData().getLiteralData();
+                final String data = literal.getValue();
+
+                //convert String into expected type
+                dataValue = WPSUtils.convertFromString(data, expectedClass);
+                LOGGER.log(Level.INFO, "DEBUG -> Input -> Literal -> Value=" + dataValue);
             }
 
             try {
-                in.parameter(inputIdentifier).setValue(dataValue);
+                in.parameter(inputIdentifierCode).setValue(dataValue);
             } catch (InvalidParameterValueException ex) {
                 throw new CstlServiceException("Invalid data input value.", ex, INVALID_PARAMETER_VALUE, inputIdentifier);
             }
@@ -875,7 +866,6 @@ public class WPSWorker extends AbstractWorker {
                     } catch (FactoryException ex) {
                         throw new CstlServiceException(ex);
                     }
-
                 }
 
                 if (outputValue instanceof Envelope) {
@@ -931,7 +921,8 @@ public class WPSWorker extends AbstractWorker {
                             final ComplexDataType complex = new ComplexDataType();
 
                             for (final DocumentOutputDefinitionType wO : wantedOutputs) {
-                                if (wO.getIdentifier().getValue().equals(outputIdentifier)) {
+                                final String wantedOutputIdentifier = WPSUtils.extractProcessIOCode(wO.getIdentifier().getValue());
+                                if (outputIdentifier.equals(wantedOutputIdentifier)) {
                                     complex.setEncoding(wO.getEncoding());
                                     complex.setMimeType(wO.getMimeType());
                                     complex.setSchema(wO.getSchema());

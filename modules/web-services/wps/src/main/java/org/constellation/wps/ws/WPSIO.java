@@ -31,6 +31,7 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -267,6 +268,17 @@ public final class WPSIO {
                     new DataInfo(true, WPSMimeType.NONE, Encoding.NONE, Schema.NONE, StringToFilterConverter.getInstance()) 
                 ));
         
+        /* BBOX Envelop opengis */
+        // input
+        IOCLASSMAP.put(new KeyTuple(Envelope.class, IOType.INPUT, DataType.BBOX), UnmodifiableArrayList.wrap(
+                    new DataInfo(true, WPSMimeType.NONE, Encoding.NONE, Schema.NONE, null) 
+                ));
+        
+        //output
+        IOCLASSMAP.put(new KeyTuple(Envelope.class, IOType.OUTPUT, DataType.BBOX), UnmodifiableArrayList.wrap(
+                    new DataInfo(true, WPSMimeType.NONE, Encoding.NONE, Schema.NONE, null) 
+                ));
+                
     }
     /**
      * Private constructor.
@@ -400,7 +412,7 @@ public final class WPSIO {
             if(IOCLASSMAP.containsKey(key)){
                 final List<DataInfo> infos = IOCLASSMAP.get(key);
                 for (final DataInfo dataInfo : infos) {
-                    if(WPSMimeType.valueOf(mimeType).equals(dataInfo.getMime())){
+                    if(WPSMimeType.customValueOf(mimeType).equals(dataInfo.getMime())){
                         return dataInfo.getConverter();
                     }
                 }

@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * MimeType list based on OGC 12-029 paper.
- * 
+ *
  * @author Quentin Boileau (Geomatys)
  */
 public enum WPSMimeType {
@@ -46,13 +46,29 @@ public enum WPSMimeType {
     //not recommended in paper
     TEXT_XML("text/xml"),
     TEXT_GML("text/gml");
-    
     private String mime;
+
     private WPSMimeType(final String mime) {
         this.mime = mime;
     }
 
     public String getValue() {
         return mime;
+    }
+
+    public static WPSMimeType customValueOf(final String str) {
+
+        if (str == null) {
+            return NONE;
+        }
+
+        for (final WPSMimeType mime : values()) {
+            if (mime.getValue() != null) {
+                if (mime.getValue().equalsIgnoreCase(str)) {
+                    return mime;
+                }
+            }
+        }
+        return NONE;
     }
 }
