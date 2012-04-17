@@ -64,20 +64,20 @@ public class RefreshIndex extends AbstractCstlProcess {
     // traitement //////////////////////////////////////////////////////////////
     
     @Override
-    public ParameterValueGroup call() {
+    public void execute() {
         
         //jobs can be called concurently, so they may overlaps each other
         //we avoid it with this flag
         if (!ACTIVE.compareAndSet(false, true)) {
             //we skip this run
-            return null;
+            return;
         }
 
         //verify if constellation is runing
         if (!constellationRunning()) {
             console(FOREGROUND_RED,"constellation unreachable FAILED",FOREGROUND_DEFAULT,"\n");
             ACTIVE.set(false);
-            return null;
+            return;
         }
         
         try{
@@ -89,7 +89,7 @@ public class RefreshIndex extends AbstractCstlProcess {
         }
 
         console("\n");
-        return null;
+        return;
     }
 
     /**
