@@ -26,14 +26,13 @@ public class AddProcess extends AbstractProcess{
     }
     
     @Override
-    public ParameterValueGroup call() {
+    public void execute() {
         
         final double first = (Double)inputParameters.parameter("first").getValue();   
         final double second = (Double)inputParameters.parameter("second").getValue();       
         
         Double result = first + second;     
         outputParameters.parameter("result").setValue(result);
-        return outputParameters;
     }
     
 }
