@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -132,17 +131,6 @@ public class WPSWorker extends AbstractWorker {
      * List of process descriptor avaible.
      */
     private final List<ProcessDescriptor> ProcessDescriptorList = new ArrayList<ProcessDescriptor>();
-    static {
-        final List<ProcessDescriptor> descList = new ArrayList<ProcessDescriptor>();
-        final Iterator<ProcessingRegistry> factoryIte = ProcessFinder.getProcessFactories();
-        while (factoryIte.hasNext()) {
-            final ProcessingRegistry factory = factoryIte.next();
-            for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
-                descList.add(descriptor);
-            }
-        }
-    }
-    
     
     /**
      * Constructor.
@@ -887,7 +875,7 @@ public class WPSWorker extends AbstractWorker {
 
                 //convert String into expected type
                 dataValue = WPSUtils.convertFromString(data, expectedClass);
-                LOGGER.log(Level.INFO, "DEBUG -> Input -> Literal -> Value=" + dataValue);
+                LOGGER.log(Level.INFO, "DEBUG -> Input -> Literal -> Value={0}", dataValue);
             }
 
             try {
@@ -934,7 +922,7 @@ public class WPSWorker extends AbstractWorker {
             if (isOutputRaw) {
                 LOGGER.log(Level.INFO, "LOG -> Output -> Raw");
                 final Object outputValue = result.parameter(rawOutputID).getValue();
-                LOGGER.log(Level.INFO,"DEBUG -> Output -> Raw -> Value=" + outputValue);
+                LOGGER.log(Level.INFO, "DEBUG -> Output -> Raw -> Value={0}", outputValue);
 
                 if (outputValue instanceof Geometry) {
                     try {
