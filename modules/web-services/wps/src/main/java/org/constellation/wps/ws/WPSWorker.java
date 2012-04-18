@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.ows.xml.v110.AnyValue;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.CodeType;
@@ -57,7 +57,6 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.wps.xml.v100.DataType;
 import org.geotoolkit.wps.xml.v100.OutputDataType;
-import org.geotoolkit.wps.xml.v100.SupportedComplexDataType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.wps.xml.v100.CRSsType;
 import org.geotoolkit.wps.xml.v100.SupportedCRSsType;
@@ -75,6 +74,7 @@ import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.process.ProcessingRegistry;
 import org.geotoolkit.wps.xml.v100.LiteralOutputType;
+import org.geotoolkit.wps.xml.v100.*;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -87,16 +87,19 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.util.FactoryException;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.NoSuchIdentifierException;
 
 import org.constellation.wps.utils.WPSUtils;
 import org.constellation.ServiceDef;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
-
+import org.constellation.configuration.Process;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.configuration.ProcessFactory;
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.api.CommonConstants.*;
 import static org.constellation.wps.ws.WPSConstant.*;
-import org.geotoolkit.wps.xml.v100.*;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -104,7 +107,9 @@ import org.geotoolkit.wps.xml.v100.*;
  * @author Quentin Boileau
  */
 public class WPSWorker extends AbstractWorker {
-
+    
+    private final ProcessContext context;
+    
     /**
      * Supported CRS.
      */
@@ -126,18 +131,16 @@ public class WPSWorker extends AbstractWorker {
     /**
      * List of process descriptor avaible.
      */
-    private static final List<ProcessDescriptor> PROCESS_DESCRIPTOR_LIST;
+    private final List<ProcessDescriptor> ProcessDescriptorList = new ArrayList<ProcessDescriptor>();
     static {
         final List<ProcessDescriptor> descList = new ArrayList<ProcessDescriptor>();
         final Iterator<ProcessingRegistry> factoryIte = ProcessFinder.getProcessFactories();
         while (factoryIte.hasNext()) {
             final ProcessingRegistry factory = factoryIte.next();
             for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
-                System.out.println(descriptor.getIdentifier().getAuthority()+" : "+descriptor.getIdentifier().getCode());
                 descList.add(descriptor);
             }
         }
-        PROCESS_DESCRIPTOR_LIST = UnmodifiableArrayList.wrap(descList.toArray(new ProcessDescriptor[descList.size()]));
     }
     
     
@@ -149,9 +152,85 @@ public class WPSWorker extends AbstractWorker {
      */
     public WPSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WPS);
-        isStarted = true;
+        ProcessContext candidate          = null;
+        if (configurationDirectory != null) {
+            final File lcFile = new File(configurationDirectory, "processContext.xml");
+            if (lcFile.exists()) {
+                Unmarshaller unmarshaller = null;
+                try {
+                    unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    Object obj   = unmarshaller.unmarshal(lcFile);
+                    if (obj instanceof ProcessContext) {
+                        candidate = (ProcessContext) obj;
+                        isStarted = true;
+                    } else {
+                        startError = "The process context File does not contain a ProcessContext object";
+                        isStarted  = false;
+                        LOGGER.log(Level.WARNING, startError);
+                    }
+                } catch (JAXBException ex) {
+                    startError = "JAXBExeception while unmarshalling the process context File";
+                    isStarted  = false;
+                    LOGGER.log(Level.WARNING, startError, ex);
+                } finally {
+                    if (unmarshaller != null) {
+                        GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                    }
+                }
+            } else {
+                startError = "The configuration file processContext.xml has not been found";
+                isStarted = false;
+                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: ", id);
+            }
+        } else {
+            startError = "The configuration directory has not been found";
+            isStarted  = false;
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
+        }
+        this.context = candidate;
+        fillProcessList();
+        
         if (isStarted) {
             LOGGER.log(Level.INFO, "WPS worker {0} running", id);
+        }
+    }
+    
+    private void fillProcessList() {
+        if (context != null) {
+            // Load all process from all factory
+            if (Boolean.TRUE == context.getProcesses().getLoadAll()) {
+                final Iterator<ProcessingRegistry> factoryIte = ProcessFinder.getProcessFactories();
+                while (factoryIte.hasNext()) {
+                    final ProcessingRegistry factory = factoryIte.next();
+                    for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
+                        ProcessDescriptorList.add(descriptor);
+                    }
+                }
+            } else {
+                for (ProcessFactory processFactory : context.getProcessFactories()) {
+                    final ProcessingRegistry factory = ProcessFinder.getProcessFactory(processFactory.getAutorityCode());
+                    if (factory != null) {
+                        if (Boolean.TRUE == processFactory.getLoadAll()) {
+                            for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
+                                ProcessDescriptorList.add(descriptor);
+                            }
+                        } else {
+                            for (Process process : processFactory.getInclude().getProcess()) {
+                                try {
+                                    final ProcessDescriptor desc = factory.getDescriptor(process.getId());
+                                    if (desc != null) {
+                                        ProcessDescriptorList.add(desc);
+                                    }
+                                } catch (NoSuchIdentifierException ex) {
+                                    LOGGER.log(Level.WARNING, "Unable to find a process named:" + process.getId() + " in factory " + processFactory.getAutorityCode(), ex);
+                                }
+                            }
+                        }
+                    } else {
+                        LOGGER.log(Level.WARNING, "No process factory found for authorityCode:{0}", processFactory.getAutorityCode());
+                    }
+                }
+            }
         }
     }
 
@@ -239,13 +318,14 @@ public class WPSWorker extends AbstractWorker {
 
         final ProcessOfferings offering = new ProcessOfferings();
 
-        for (final ProcessDescriptor procDesc : PROCESS_DESCRIPTOR_LIST) {
+        for (final ProcessDescriptor procDesc : ProcessDescriptorList) {
             if (WPSUtils.isSupportedProcess(procDesc)) {
                 offering.getProcess().add(WPSUtils.generateProcessBrief(procDesc));
             }
         }
 
         staticCapabilities.setProcessOfferings(offering);
+        staticCapabilities.setUpdateSequence(getCurrentUpdateSequence());
         return staticCapabilities;
     }
 
@@ -509,7 +589,7 @@ public class WPSWorker extends AbstractWorker {
         }
         
         final StatusType status = new StatusType();
-        LOGGER.log(Level.INFO, "Process Execute : " + request.getIdentifier().getValue());
+        LOGGER.log(Level.INFO, "Process Execute : {0}", request.getIdentifier().getValue());
         //Find the process
         final ProcessDescriptor processDesc = WPSUtils.getProcessDescriptor(request.getIdentifier().getValue());
 

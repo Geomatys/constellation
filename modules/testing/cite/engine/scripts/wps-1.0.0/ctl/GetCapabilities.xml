@@ -236,9 +236,9 @@
 		
     <ctl:test name="getCapabilities:core-WPS.GetCapabilities-ResponseContentsValidProccesIdentifier.1">
         <ctl:param name="capabilitiesDocument"/>
-        <ctl:assertion>The values in the identifier element(s) for each ObservationOffering contain a value and are valid URNs.</ctl:assertion>
+        <ctl:assertion>The values in the identifier element(s) for each Process contain a value and are valid URNs.</ctl:assertion>
         <ctl:comment>Check that the values in the identifier element(s) for each Process contain a value and are valid URNs according to the OGC URN scheme.  Pass if values in the procedure element(s) contain a value and are valid URNs; fail otherwise.</ctl:comment>
-        <ctl:link title="Verify that the procedure values provided for each ObservationOffering are valid.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-ResponseContentsValidProcedure</ctl:link>
+        <ctl:link title="Verify that the procedure values provided for each Process are valid.">docs/wps/1.0/WPS 1.0 ATS.html#WPS.GetCapabilities-ResponseContentsValidProcedure</ctl:link>
         <ctl:code>			
 		
             <xsl:for-each select="$capabilitiesDocument//wps:Process//ows:Identifier">				

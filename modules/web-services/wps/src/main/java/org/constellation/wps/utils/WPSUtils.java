@@ -350,7 +350,7 @@ public class WPSUtils {
         Object convertedData = null; //resulting Object
         try {
 
-            ObjectConverter<String, T> converter = null;//converter
+            ObjectConverter<String, T> converter;//converter
             try {
                 //try to convert into a primitive type
                 converter = ConverterRegistry.system().converter(String.class, binding);
@@ -496,8 +496,6 @@ public class WPSUtils {
      */
     public static void fixFeatureType(final Feature featureIN, DefaultFeatureType type) throws CstlServiceException {
 
-        CoordinateReferenceSystem extractCRS = null;
-
         final FeatureTypeBuilder ftb = new FeatureTypeBuilder();
         ftb.copy(type);
 
@@ -507,7 +505,7 @@ public class WPSUtils {
                 try {
                     final String propertyName = property.getName().getLocalPart();
                     final Geometry propertyGeom = (Geometry) property.getValue();
-                    extractCRS = JTS.findCoordinateReferenceSystem(propertyGeom);
+                    final CoordinateReferenceSystem extractCRS = JTS.findCoordinateReferenceSystem(propertyGeom);
 
                     final Iterator<PropertyDescriptor> ite = type.getDescriptors().iterator();
 
@@ -540,13 +538,11 @@ public class WPSUtils {
         final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
-        ComplexDataDescriptionType complexDesc = null;
-
         final List<WPSIO.DataInfo> infos = WPSIO.IOCLASSMAP.get(new WPSIO.KeyTuple(attributeClass, ioType, WPSIO.DataType.COMPLEX));
 
         for (WPSIO.DataInfo inputClass : infos) {
 
-            complexDesc = new ComplexDataDescriptionType();
+            final ComplexDataDescriptionType complexDesc = new ComplexDataDescriptionType();
             complexDesc.setEncoding(inputClass.getEncoding().getValue());   //Encoding
             complexDesc.setMimeType(inputClass.getMime().getValue());       //Mime
             complexDesc.setSchema(inputClass.getSchema().getValue());       //URL to xsd schema
@@ -626,7 +622,7 @@ public class WPSUtils {
             for (final GeneralParameterDescriptor geneDesc : descriptors) {
                 if (geneDesc instanceof ParameterDescriptor) {
                     final ParameterDescriptor desc = (ParameterDescriptor) geneDesc;
-                    map.put(desc.getName().getCode(), new Boolean(desc.getMinimumOccurs() > 0));
+                    map.put(desc.getName().getCode(), desc.getMinimumOccurs() > 0);
                 }
             }
         }

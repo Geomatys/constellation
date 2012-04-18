@@ -269,6 +269,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         final GetCapabilities capabilities = new GetCapabilities();
         capabilities.setService(getParameter(SERVICE_PARAMETER, true));
         capabilities.setLanguage(getParameter(LANGUAGE_PARAMETER, false));
+        capabilities.setUpdateSequence(getParameter(UPDATESEQUENCE_PARAMETER, false));
         
         final String acceptVersionsParam = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
         if(acceptVersionsParam!= null){
@@ -514,7 +515,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      */
     private String getIndexPage() {
         return "<html>\n"
-                + "  <title>Constellation WCS</title>\n"
+                + "  <title>Constellation WPS</title>\n"
                 + "  <body>\n"
                 + "    <h1><i>Constellation:</i></h1>\n"
                 + "    <h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Web Processing Service</h1>\n"

@@ -51,10 +51,14 @@ public class ProcessContext {
         this.security = security;
     }
 
+    public Processes getProcesses() {
+        return processes;
+    }
+    
     /**
      * @return the layers
      */
-    public List<ProcessFactory> getProcesses() {
+    public List<ProcessFactory> getProcessFactories() {
         if (processes == null) {
             processes = new Processes();
             return processes.getFactory();
@@ -104,7 +108,7 @@ public class ProcessContext {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(Trees.toString("ProcessContext", getProcesses()));
+        sb.append(Trees.toString("ProcessContext", getProcessFactories()));
         if (security != null && !security.isEmpty()) {
             sb.append("Security=").append(security);
         }

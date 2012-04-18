@@ -82,6 +82,10 @@ public class ObjectFactory {
     public LayerContext createLayerContext() {
         return new LayerContext();
     }
+    
+    public ProcessContext createProcessContext() {
+        return new ProcessContext();
+    }
 
     public LayerList createLayerList() {
         return new LayerList();

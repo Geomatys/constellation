@@ -19,6 +19,7 @@ package org.constellation.configuration;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 /**
@@ -28,6 +29,9 @@ import javax.xml.bind.annotation.XmlElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Processes {
+    
+    @XmlAttribute(name="load_all")
+    private Boolean loadAll;
     
     @XmlElement(name="ProcessFactory")
     private List<ProcessFactory> factory;
@@ -52,5 +56,19 @@ public class Processes {
      */
     public void setFactory(final List<ProcessFactory> factory) {
         this.factory = factory;
+    }
+
+    /**
+     * @return the loadAll
+     */
+    public Boolean getLoadAll() {
+        return loadAll;
+    }
+
+    /**
+     * @param loadAll the loadAll to set
+     */
+    public void setLoadAll(Boolean loadAll) {
+        this.loadAll = loadAll;
     }
 }
