@@ -51,11 +51,11 @@ public final class SOSConstants {
 
     public static final String SOS = "SOS";
     public static final String VERSION = "1.0.0";
-    public static final String SERVICE = "service";
     public static final String ALL = "All";
     public static final String OFFERING = "offering";
     public static final String EVENT_TIME = "eventTime";
     public static final String PROCEDURE = "procedure";
+    public static final String OUTPUT_FORMAT = "OUTPUTFORMAT";
     public static final String OBSERVATION_TEMPLATE = "observationTemplate";
     public static final String RESPONSE_MODE = "responseMode";
     public static final String RESPONSE_FORMAT = "responseFormat";

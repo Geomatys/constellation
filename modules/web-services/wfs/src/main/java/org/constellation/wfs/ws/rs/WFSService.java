@@ -18,52 +18,51 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
-import java.io.StringReader;
-import javax.ws.rs.core.MultivaluedMap;
-import java.util.HashMap;
-import org.geotoolkit.wfs.xml.v110.BaseRequestType;
-import javax.xml.stream.events.Namespace;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.lang.reflect.Method;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLEventReader;
-import org.constellation.ws.rs.GridWebService;
-import javax.ws.rs.core.MediaType;
 import java.io.File;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Namespace;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
 import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 // constellation dependencies
-import javax.xml.bind.JAXBElement;
+import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ServiceDef;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
 
-import static org.constellation.query.Query.*;
+import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wfs.ws.WFSConstants.*;
 
 // Geotoolkit dependencies
@@ -89,6 +88,7 @@ import org.geotoolkit.wfs.xml.v110.LockType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
+import org.geotoolkit.wfs.xml.v110.BaseRequestType;
 import org.geotoolkit.xml.MarshallerPool;
 
 import org.opengis.filter.sort.SortOrder;
@@ -157,7 +157,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             // if the request is not an xml request we fill the request parameter.
             final RequestBase request;
             if (objectRequest == null) {
-                request = adaptQuery(getParameter(KEY_REQUEST, true));
+                request = adaptQuery(getParameter(REQUEST_PARAMETER, true));
             } else if (objectRequest instanceof RequestBase) {
                 request = (RequestBase) objectRequest;
             } else {
@@ -313,8 +313,8 @@ public class WFSService extends GridWebService<WFSWorker> {
     private DescribeFeatureTypeType createNewDescribeFeatureTypeRequest() throws CstlServiceException {
         String outputFormat   = getParameter("outputFormat", false);
         final String handle   = getParameter(HANDLE, false);
-        final String service  = getParameter(SERVICE, true);
-        final String version  = getParameter(VERSION, true);
+        final String service  = getParameter(SERVICE_PARAMETER, true);
+        final String version  = getParameter(VERSION_PARAMETER, true);
 
         if (outputFormat == null) {
             outputFormat = "text/xml; subtype=gml/3.1.1";
@@ -329,7 +329,7 @@ public class WFSService extends GridWebService<WFSWorker> {
     }
 
     private GetCapabilitiesType createNewGetCapabilitiesRequest() throws CstlServiceException {
-        String version = getParameter("acceptVersions", false);
+        String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
         AcceptVersionsType versions;
         if (version != null) {
             if (version.indexOf(',') != -1) {
@@ -339,13 +339,15 @@ public class WFSService extends GridWebService<WFSWorker> {
         } else {
              versions = new AcceptVersionsType("1.1.0");
         }
+        
+        final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
-        final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+        final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
 
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
         final SectionsType sections;
-        final String section = getParameter("Sections", false);
+        final String section = getParameter(SECTIONS_PARAMETER, false);
         if (section != null && !section.equalsIgnoreCase("All")) {
             final List<String> requestedSections = new ArrayList<String>();
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
@@ -367,8 +369,8 @@ public class WFSService extends GridWebService<WFSWorker> {
         return new GetCapabilitiesType(versions,
                                        sections,
                                        formats,
-                                       null,
-                                       getParameter(SERVICE, true));
+                                       updateSequence,
+                                       getParameter(SERVICE_PARAMETER, true));
 
     }
 
@@ -384,8 +386,8 @@ public class WFSService extends GridWebService<WFSWorker> {
             }
 
         }
-        final String service = getParameter(SERVICE, true);
-        final String version = getParameter(VERSION, true);
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        final String version = getParameter(VERSION_PARAMETER, true);
         final String handle  = getParameter(HANDLE,  false);
         String outputFormat  = getParameter("outputFormat", false);
 
@@ -507,8 +509,8 @@ public class WFSService extends GridWebService<WFSWorker> {
     }
 
     private GetGmlObjectType createNewGetGmlObjectRequest() throws CstlServiceException {
-        final String service      = getParameter(SERVICE, true);
-        final String version      = getParameter(VERSION, true);
+        final String service      = getParameter(SERVICE_PARAMETER, true);
+        final String version      = getParameter(VERSION_PARAMETER, true);
         final String handle       = getParameter(HANDLE,  false);
         final String outputFormat = getParameter("outputFormat", false);
         final String id           = getParameter("gmlobjectid", true);
@@ -518,8 +520,8 @@ public class WFSService extends GridWebService<WFSWorker> {
     }
 
     private LockFeatureType createNewLockFeatureRequest() throws CstlServiceException {
-        final String service  = getParameter(SERVICE, true);
-        final String version  = getParameter(VERSION, true);
+        final String service  = getParameter(SERVICE_PARAMETER, true);
+        final String version  = getParameter(VERSION_PARAMETER, true);
         final String handle   = getParameter(HANDLE,  false);
 
         final String lockAct  = getParameter("lockAction",  false);
@@ -565,8 +567,8 @@ public class WFSService extends GridWebService<WFSWorker> {
     }
 
     private TransactionType createNewTransactionRequest() throws CstlServiceException {
-        final String service      = getParameter(SERVICE, true);
-        final String version      = getParameter(VERSION, true);
+        final String service      = getParameter(SERVICE_PARAMETER, true);
+        final String version      = getParameter(VERSION_PARAMETER, true);
         final String handle       = getParameter(HANDLE,  false);
         final String relAct       = getParameter("releaseAction",  false);
         AllSomeType releaseAction = null;

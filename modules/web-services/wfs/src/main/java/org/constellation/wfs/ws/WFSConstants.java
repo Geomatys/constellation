@@ -53,8 +53,6 @@ public final class WFSConstants {
     private WFSConstants() {}
 
     public static final String HANDLE    = "handle";
-    public static final String SERVICE   = "service";
-    public static final String VERSION   = "version";
     public static final String NAMESPACE = "namespace";
     public static final String FILTER    = "filter";
 

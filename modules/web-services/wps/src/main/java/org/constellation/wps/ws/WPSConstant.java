@@ -57,7 +57,6 @@ public final class WPSConstant {
     
     public static final String IDENTIFER_PARAMETER = "IDENTIFIER";
     public static final String LANGUAGE_PARAMETER = "LANGUAGE";
-    public static final String ACCEPT_VERSIONS_PARAMETER = "ACCEPTVERSIONS";
 
     /* Maximum size in megabytes for a complex input */
     public static final int MAX_MB_INPUT_COMPLEX = 100;

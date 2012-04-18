@@ -68,6 +68,11 @@
       <artifactId>cstl-web-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
      <!-- geotoolkit dependencies -->
     <dependency>

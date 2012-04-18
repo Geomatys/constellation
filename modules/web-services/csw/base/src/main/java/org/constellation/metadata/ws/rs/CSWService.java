@@ -18,13 +18,7 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
-import org.constellation.generic.database.BDD;
-import javax.xml.bind.Unmarshaller;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import java.util.logging.Level;
-import org.constellation.ws.WebServiceUtilities;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +31,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 //JAXB dependencies
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
@@ -51,6 +48,12 @@ import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.utils.SerializerResponse;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.WebServiceUtilities;
+import org.constellation.generic.database.BDD;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+
+import static org.constellation.api.QueryConstants.*;
+import static org.constellation.metadata.CSWConstants.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWResponse;
@@ -85,7 +88,6 @@ import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.metadata.CSWConstants.*;
 
 /**
  * RestFul CSW service.
@@ -327,7 +329,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      */
     private GetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
         
-        String version = getParameter("acceptVersions", false);
+        String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
         AcceptVersionsType versions;
         if (version != null) {
             if (version.indexOf(',') != -1) {
@@ -338,11 +340,13 @@ public class CSWService extends OGCWebService<CSWworker> {
              versions = new AcceptVersionsType("2.0.2");
         }
                     
-        final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
-                        
+        final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
+        
+        final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
+        
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid. 
-        final String section = getParameter("Sections", false);
+        final String section = getParameter(SECTIONS_PARAMETER, false);
         List<String> requestedSections = new ArrayList<String>();
         if (section != null && !section.equalsIgnoreCase("All")) {
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
@@ -363,8 +367,8 @@ public class CSWService extends OGCWebService<CSWworker> {
         return new GetCapabilitiesType(versions,
                                        sections,
                                        formats,
-                                       null,
-                                       getParameter(SERVICE, true));
+                                       updateSequence,
+                                       getParameter(SERVICE_PARAMETER, true));
         
     }
     
@@ -374,8 +378,8 @@ public class CSWService extends OGCWebService<CSWworker> {
      */
     private GetRecordsType createNewGetRecordsRequest() throws CstlServiceException {
         
-        final String version    = getParameter(VERSION, true);
-        final String service    = getParameter(SERVICE, true);
+        final String version    = getParameter(VERSION_PARAMETER, true);
+        final String service    = getParameter(SERVICE_PARAMETER, true);
         
         //we get the value of result type, if not set we put default value "HITS"
         final String resultTypeName = getParameter("RESULTTYPE", false);
@@ -574,8 +578,8 @@ public class CSWService extends OGCWebService<CSWworker> {
      */
     private GetRecordByIdType createNewGetRecordByIdRequest() throws CstlServiceException {
     
-        final String version    = getParameter(VERSION, true);
-        final String service    = getParameter(SERVICE, true);
+        final String version    = getParameter(VERSION_PARAMETER, true);
+        final String service    = getParameter(SERVICE_PARAMETER, true);
         
         String eSetName         = getParameter("ELEMENTSETNAME", false);
         ElementSetType elementSet = ElementSetType.SUMMARY;
@@ -623,8 +627,8 @@ public class CSWService extends OGCWebService<CSWworker> {
      */
     private DescribeRecordType createNewDescribeRecordRequest() throws CstlServiceException {
     
-        final String version    = getParameter(VERSION, true);
-        final String service    = getParameter(SERVICE, true);
+        final String version    = getParameter(VERSION_PARAMETER, true);
+        final String service    = getParameter(SERVICE_PARAMETER, true);
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
@@ -678,8 +682,8 @@ public class CSWService extends OGCWebService<CSWworker> {
      */
     private GetDomainType createNewGetDomainRequest() throws CstlServiceException {
     
-        final String version    = getParameter(VERSION, true);
-        final String service    = getParameter(SERVICE, true);
+        final String version    = getParameter(VERSION_PARAMETER, true);
+        final String service    = getParameter(SERVICE_PARAMETER, true);
         
         //not supported by the ISO profile
         final String parameterName = getParameter("PARAMETERNAME", false);
@@ -698,8 +702,8 @@ public class CSWService extends OGCWebService<CSWworker> {
      */
     private HarvestType createNewHarvestRequest() throws CstlServiceException {
     
-        final String version      = getParameter(VERSION, true);
-        final String service      = getParameter(SERVICE, true);
+        final String version      = getParameter(VERSION_PARAMETER, true);
+        final String service      = getParameter(SERVICE_PARAMETER, true);
         final String source       = getParameter("SOURCE", true);
         final String resourceType = getParameter("RESOURCETYPE", true);
         String resourceFormat     = getParameter("RESOURCEFORMAT", false);

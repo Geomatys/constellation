@@ -79,7 +79,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
-
+import static org.constellation.api.QueryConstants.*;
 
 /**
  * The REST facade to an OGC Web Map Service, implementing versions 1.1.1 and
@@ -128,12 +128,12 @@ public class WMSService extends GridWebService<WMSWorker> {
 
         ServiceDef version = null;
         try {
-            final String request = (String) getParameter(KEY_REQUEST, true);
+            final String request = (String) getParameter(REQUEST_PARAMETER, true);
             logParameters();
 
             //Handle user's requests.
             if (GETMAP.equalsIgnoreCase(request) || MAP.equalsIgnoreCase(request)) {
-                String versionSt = getParameter(KEY_VERSION, false);
+                String versionSt = getParameter(VERSION_PARAMETER, false);
                 if (versionSt == null) {
                     versionSt = getParameter(KEY_WMTVER, false);
                 }
@@ -149,7 +149,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                 return Response.ok(map, requestMap.getFormat()).build();
             }
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
-                String versionSt = getParameter(KEY_VERSION, false);
+                String versionSt = getParameter(VERSION_PARAMETER, false);
                 if (versionSt == null) {
                     versionSt = getParameter(KEY_WMTVER, false);
                 }
@@ -181,7 +181,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                     version = ServiceDef.WMS_1_1_1_SLD;
                     versionSt = version.version.toString();
                 } else {
-                    versionSt = getParameter(KEY_VERSION, false);
+                    versionSt = getParameter(VERSION_PARAMETER, false);
                     if (versionSt == null) {
                         // For backward compatibility with WMS 1.0.0, we try to find the version number
                         // from the WMTVER parameter too.
@@ -204,7 +204,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                 return Response.ok(legend, requestLegend.getFormat()).build();
             }
             if (DESCRIBELAYER.equalsIgnoreCase(request)) {
-                String versionSt = getParameter(KEY_VERSION, false);
+                String versionSt = getParameter(VERSION_PARAMETER, false);
                 if (versionSt == null) {
                     versionSt = getParameter(KEY_WMTVER, false);
                 }
@@ -298,10 +298,10 @@ public class WMSService extends GridWebService<WMSWorker> {
      * @throws CstlServiceException
      */
     private GetCapabilities adaptGetCapabilities(final String version) throws CstlServiceException {
-        final String service = getParameter(KEY_SERVICE, true);
+        final String service = getParameter(SERVICE_PARAMETER, true);
         if (!ServiceDef.Specification.WMS.toString().equalsIgnoreCase(service)) {
             throw new CstlServiceException("Invalid service specified. Should be WMS.",
-                    INVALID_PARAMETER_VALUE, KEY_SERVICE.toLowerCase());
+                    INVALID_PARAMETER_VALUE, SERVICE_PARAMETER.toLowerCase());
         }
         final String language = getParameter(KEY_LANGUAGE, false);
         if (version == null) {
@@ -329,7 +329,9 @@ public class WMSService extends GridWebService<WMSWorker> {
             format = (ServiceDef.WMS_1_1_1_SLD.version.equals(bestVersion.version)) ?
                      MimeType.APP_WMS_XML : MimeType.TEXT_XML;
         }
-        return new GetCapabilities(bestVersion.version, format, language);
+        final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
+        
+        return new GetCapabilities(bestVersion.version, format, language, updateSequence);
     }
 
     /**

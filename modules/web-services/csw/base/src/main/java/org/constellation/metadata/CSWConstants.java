@@ -33,8 +33,7 @@ public abstract class CSWConstants {
      */
     public static final String CSW_202_VERSION = "2.0.2";
     public static final String CSW = "CSW";
-    public static final String VERSION = "VERSION";
-    public static final String SERVICE = "service";
+    
     public static final String OUTPUT_SCHEMA = "outputSchema";
     public static final String TYPENAMES = "TypeNames";
     public static final String FILTER_CAPABILITIES = "Filter_Capabilities";

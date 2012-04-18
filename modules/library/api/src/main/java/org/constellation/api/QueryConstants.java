@@ -78,6 +78,9 @@ public final class QueryConstants {
     public static final String SERVICE_PARAMETER = "SERVICE";
     public static final String VERSION_PARAMETER = "VERSION";
     public static final String UPDATESEQUENCE_PARAMETER = "UPDATESEQUENCE";
+    public static final String ACCEPT_VERSIONS_PARAMETER = "ACCEPTVERSIONS";
+    public static final String ACCEPT_FORMATS_PARAMETER = "AcceptFormats";
+    public static final String SECTIONS_PARAMETER = "Sections";
     
     private QueryConstants(){}
     

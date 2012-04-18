@@ -59,6 +59,7 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
+import static org.constellation.api.QueryConstants.*;
 import static org.constellation.metadata.io.AbstractMetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
@@ -484,11 +485,11 @@ public class CSWworker extends AbstractWorker {
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals(CSW)) {
-                throw new CstlServiceException("service must be \"CSW\"!", INVALID_PARAMETER_VALUE, SERVICE);
+                throw new CstlServiceException("service must be \"CSW\"!", INVALID_PARAMETER_VALUE, SERVICE_PARAMETER);
             }
         } else {
             throw new CstlServiceException("Service must be specified!",
-                                             MISSING_PARAMETER_VALUE, SERVICE);
+                                             MISSING_PARAMETER_VALUE, SERVICE_PARAMETER);
         }
         final AcceptVersions versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
@@ -1618,11 +1619,11 @@ public class CSWworker extends AbstractWorker {
             if (request.getService() != null) {
                 if (!request.getService().equals(CSW))  {
                     throw new CstlServiceException("service must be \"CSW\"!",
-                                                  INVALID_PARAMETER_VALUE, SERVICE);
+                                                  INVALID_PARAMETER_VALUE, SERVICE_PARAMETER);
                 }
             } else {
                 throw new CstlServiceException("service must be specified!",
-                                              MISSING_PARAMETER_VALUE, SERVICE);
+                                              MISSING_PARAMETER_VALUE, SERVICE_PARAMETER);
             }
             if (request.getVersion()!= null) {
                 /*

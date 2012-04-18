@@ -41,6 +41,7 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 import static org.constellation.query.Query.*;
+import static org.constellation.api.QueryConstants.*;
 import static org.constellation.coverage.ws.WCSConstant.*;
 
 // Geotoolkit dependencies
@@ -138,7 +139,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             String request = "";
             // if the request is not an xml request we fill the request parameter.
             if (objectRequest == null) {
-                request = getParameter(KEY_REQUEST, true);
+                request = getParameter(REQUEST_PARAMETER, true);
                 objectRequest = adaptQuery(request);
             }
 
@@ -317,16 +318,18 @@ public class WCSService extends GridWebService<WCSWorker> {
 //            }
 //        }
 //        final ServiceDef finalVersion = getBestVersion(inputVersion);
+        
+        final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
         final ServiceDef finalVersion = ServiceDef.WCS_1_0_0;
         if (finalVersion.equals(ServiceDef.WCS_1_0_0)) {
-            return new org.geotoolkit.wcs.xml.v100.GetCapabilitiesType(getParameter(KEY_SECTION, false), null);
+            return new org.geotoolkit.wcs.xml.v100.GetCapabilitiesType(getParameter(KEY_SECTION, false), updateSequence);
         } else if (finalVersion.equals(ServiceDef.WCS_1_1_1)) {
-            final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+            final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
 
             //We transform the String of sections in a list.
             //In the same time we verify that the requested sections are valid.
-            final String section = getParameter("Sections", false);
+            final String section = getParameter(SECTIONS_PARAMETER, false);
             final List<String> requestedSections;
             if (section != null) {
                 requestedSections = new ArrayList<String>();
@@ -346,7 +349,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             }
             final SectionsType sections = new SectionsType(requestedSections);
             final AcceptVersionsType versions = new AcceptVersionsType(ServiceDef.WCS_1_1_1.version.toString());
-            return new org.geotoolkit.wcs.xml.v111.GetCapabilitiesType(versions, sections, formats, null);
+            return new org.geotoolkit.wcs.xml.v111.GetCapabilitiesType(versions, sections, formats, updateSequence);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
@@ -383,7 +386,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * @throws CstlServiceException
      */
     private GetCoverage adaptKvpGetCoverageRequest() throws CstlServiceException {
-        final String strVersion = getParameter(KEY_VERSION, true);
+        final String strVersion = getParameter(VERSION_PARAMETER, true);
         isVersionSupported(strVersion);
         final ServiceDef serviceDef = getVersionFromNumber(strVersion);
         if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import javax.imageio.IIOException;
+
+// Jersey dependencies
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -34,12 +36,11 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
 import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.tile.ws.DefaultWMTSWorker;
-import static org.constellation.ws.ExceptionCode.*;
-import static org.constellation.query.Query.KEY_REQUEST;
-import static org.constellation.query.Query.KEY_SERVICE;
-import static org.constellation.query.Query.KEY_VERSION;
-import org.geotoolkit.ows.xml.RequestBase;
 
+import static org.constellation.ws.ExceptionCode.*;
+import static org.constellation.api.QueryConstants.*;
+
+import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -103,7 +104,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
             // if the request is not an xml request we fill the request parameter.
             final RequestBase request;
             if (objectRequest == null) {
-                request = adaptQuery(getParameter(KEY_REQUEST, true));
+                request = adaptQuery(getParameter(REQUEST_PARAMETER, true));
             } else if (objectRequest instanceof RequestBase) {
                 request = (RequestBase) objectRequest;
             } else {
@@ -160,7 +161,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      */
     private GetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
 
-        String version = getParameter("acceptVersions", false);
+        String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
         AcceptVersionsType versions;
         if (version != null) {
             if (version.indexOf(',') != -1) {
@@ -171,11 +172,11 @@ public class WMTSService extends GridWebService<WMTSWorker> {
              versions = new AcceptVersionsType("1.0.0");
         }
 
-        final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+        final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
 
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
-        final String section = getParameter("Sections", false);
+        final String section = getParameter(SECTIONS_PARAMETER, false);
         List<String> requestedSections = new ArrayList<String>();
         if (section != null && !section.equalsIgnoreCase("All")) {
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
@@ -193,11 +194,12 @@ public class WMTSService extends GridWebService<WMTSWorker> {
             requestedSections = SectionsType.getExistingSections("1.1.1");
         }
         final SectionsType sections     = new SectionsType(requestedSections);
+        final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
         return new GetCapabilities(versions,
                                    sections,
                                    formats,
-                                   null,
-                                   getParameter(KEY_SERVICE, true));
+                                   updateSequence,
+                                   getParameter(SERVICE_PARAMETER, true));
 
     }
 
@@ -229,8 +231,8 @@ public class WMTSService extends GridWebService<WMTSWorker> {
         gfi.setI(Integer.valueOf(getParameter("I", true)));
         gfi.setJ(Integer.valueOf(getParameter("J", true)));
         gfi.setInfoFormat(getParameter("infoformat", true));
-        gfi.setService(getParameter(KEY_SERVICE, true));
-        gfi.setVersion(getParameter(KEY_VERSION, true));
+        gfi.setService(getParameter(SERVICE_PARAMETER, true));
+        gfi.setVersion(getParameter(VERSION_PARAMETER, true));
         return gfi;
     }
 
@@ -245,8 +247,8 @@ public class WMTSService extends GridWebService<WMTSWorker> {
         // Mandatory parameters
         getTile.setFormat(getParameter("format", true));
         getTile.setLayer(getParameter("layer", true));
-        getTile.setService(getParameter(KEY_SERVICE, true));
-        getTile.setVersion(getParameter(KEY_VERSION, true));
+        getTile.setService(getParameter(SERVICE_PARAMETER, true));
+        getTile.setVersion(getParameter(VERSION_PARAMETER, true));
         getTile.setTileCol(Integer.valueOf(getParameter("TileCol", true)));
         getTile.setTileRow(Integer.valueOf(getParameter("TileRow", true)));
         getTile.setTileMatrix(getParameter("TileMatrix", true));

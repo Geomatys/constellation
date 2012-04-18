@@ -55,6 +55,7 @@ import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.Normalizer.*;
@@ -628,11 +629,11 @@ public class SOSworker extends AbstractWorker {
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals(SOS)) {
                 throw new CstlServiceException("service must be \"SOS\"!",
-                                                 INVALID_PARAMETER_VALUE, SERVICE);
+                                                 INVALID_PARAMETER_VALUE, SERVICE_PARAMETER);
             }
         } else {
             throw new CstlServiceException("Service must be specified!",
-                                             MISSING_PARAMETER_VALUE, SERVICE);
+                                             MISSING_PARAMETER_VALUE, SERVICE_PARAMETER);
         }
         final AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
@@ -1432,7 +1433,7 @@ public class SOSworker extends AbstractWorker {
     }
     
     private String getResultValues(final Timestamp tBegin, final Timestamp tEnd, final DataArray array, final List<EventTime> eventTimes) throws CstlServiceException {
-        String values = null;
+        String values;
         
         //for multiple observations we parse the brut values (if we got a time constraint)
         if (tBegin != null && tEnd != null) {
@@ -2083,10 +2084,10 @@ public class SOSworker extends AbstractWorker {
         if (request != null) {
             if (request.getService() != null) {
                 if (!request.getService().equals(SOS))  {
-                    throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, SERVICE);
+                    throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, SERVICE_PARAMETER);
                 }
             } else {
-                throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, SERVICE);
+                throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, SERVICE_PARAMETER);
             }
             if (request.getVersion()!= null) {
                 if (!request.getVersion().toString().equals(VERSION)) {

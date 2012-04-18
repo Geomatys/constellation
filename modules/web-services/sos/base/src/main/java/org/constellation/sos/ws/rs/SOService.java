@@ -45,6 +45,9 @@ import org.constellation.ws.rs.OGCWebService;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.ws.MimeType;
 
+import static org.constellation.api.QueryConstants.*;
+import static org.constellation.sos.ws.SOSConstants.*;
+
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -103,7 +106,7 @@ public class SOService extends OGCWebService<SOSworker> {
 
             final RequestBase request;
             if (objectRequest == null) {
-                request = adaptQuery(getParameter("REQUEST", true));
+                request = adaptQuery(getParameter(REQUEST_PARAMETER, true));
             } else if (objectRequest instanceof RequestBase) {
                 request = (RequestBase) objectRequest;
             } else {
@@ -308,7 +311,7 @@ public class SOService extends OGCWebService<SOSworker> {
      */
     private GetCapabilities createNewGetCapabilities() throws CstlServiceException {
 
-        String version = getParameter("acceptVersions", false);
+        String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
         AcceptVersionsType versions;
         if (version != null) {
             if (version.indexOf(',') != -1) {
@@ -319,11 +322,13 @@ public class SOService extends OGCWebService<SOSworker> {
             versions = new AcceptVersionsType("1.0.0");
         }
 
-        final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+        final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
 
+        final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
+        
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
-        final String section = getParameter("Sections", false);
+        final String section = getParameter(SECTIONS_PARAMETER, false);
         List<String> requestedSections = new ArrayList<String>();
         if (section != null && !section.equalsIgnoreCase("All")) {
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
@@ -344,8 +349,8 @@ public class SOService extends OGCWebService<SOSworker> {
         return new GetCapabilities(versions,
                                    sections,
                                    formats,
-                                   null,
-                                   getParameter("SERVICE", true));
+                                   updateSequence,
+                                   getParameter(SERVICE_PARAMETER, true));
 
     }
 
@@ -354,10 +359,10 @@ public class SOService extends OGCWebService<SOSworker> {
      */
     private DescribeSensor createDescribeSensor() throws CstlServiceException {
 
-        return new DescribeSensor(getParameter("VERSION", true),
-                                  getParameter("SERVICE", true),
-                                  getParameter("PROCEDURE", true),
-                                  getParameter("OUTPUTFORMAT", true));
+        return new DescribeSensor(getParameter(VERSION_PARAMETER, true),
+                                  getParameter(SERVICE_PARAMETER, true),
+                                  getParameter(PROCEDURE, true),
+                                  getParameter(OUTPUT_FORMAT, true));
 
 
     }
@@ -365,6 +370,6 @@ public class SOService extends OGCWebService<SOSworker> {
     private GetFeatureOfInterest createGetFeatureOfInterest() throws CstlServiceException {
         final String featureID = getParameter("FeatureOfInterestId", true);
         final List<String> fidList = StringUtilities.toStringList(featureID);
-        return new GetFeatureOfInterest(getParameter("VERSION", true),getParameter("SERVICE", true), fidList);
+        return new GetFeatureOfInterest(getParameter(VERSION_PARAMETER, true),getParameter(SERVICE_PARAMETER, true), fidList);
     }
 }
