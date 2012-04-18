@@ -257,6 +257,8 @@ offering. Enter the grid resolutions below.</p>
                <ctl:param name="version">1.0.0</ctl:param>
             </ctl:request>
          </xsl:variable>
+         <xsl:variable name="VAR_HIGH_UPDATESEQUENCE">9999999999999</xsl:variable>
+         <xsl:variable name="VAR_LOW_UPDATESEQUENCE">1</xsl:variable>
          <xsl:variable name="VAR_WCS_COVERAGE_1_RESX">10</xsl:variable>
          <xsl:variable name="VAR_WCS_COVERAGE_1_RESY">10</xsl:variable>
          <xsl:variable name="VAR_WCS_FORMAT_1_HEADER">image/png</xsl:variable>

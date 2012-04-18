@@ -127,6 +127,7 @@ import org.geotoolkit.ows.xml.v110.MetadataType;
 import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
@@ -612,7 +613,7 @@ public final class WCSWorker extends LayerWorker {
         }
         
         //set the current updateSequence parameter
-        final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
+        final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence(), version);
         if (returnUS) {
             if (version.equals("1.0.0")) {
                 return new WCSCapabilitiesType(getCurrentUpdateSequence());
@@ -801,9 +802,12 @@ public final class WCSWorker extends LayerWorker {
         // The ContentMetadata has finally been filled, we can now return the response.
         if (contentMeta) {
             contentMetadata.setVersion(ServiceDef.WCS_1_0_0.version.toString());
+            final WCSCapabilitiesType response = new WCSCapabilitiesType(contentMetadata);
+            response.setUpdateSequence(getCurrentUpdateSequence());
             return new WCSCapabilitiesType(contentMetadata);
         } else {
             responsev100.setContentMetadata(contentMetadata);
+            responsev100.setUpdateSequence(getCurrentUpdateSequence());
             return responsev100;
         }
     }
@@ -857,7 +861,7 @@ public final class WCSWorker extends LayerWorker {
             //we update the url in the static part. TODO
             om.updateURL(getServiceUrl());
         }
-        final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), null, null);
+        final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), getCurrentUpdateSequence(), null);
 
         // if the user does not request the contents section we can return the result.
         if (!requestedSections.contains("Contents") && !requestedSections.contains(all)) {
@@ -1219,6 +1223,37 @@ public final class WCSWorker extends LayerWorker {
         return namedLayerName;
     }
 
+    /**
+     * Overriden from AbstractWorker because in version 1.0.0 the behaviour is different when the request updateSequence 
+     * is equal to the current.
+     * 
+     * @param updateSequence
+     * @param version
+     * @return
+     * @throws CstlServiceException 
+     */
+    private boolean returnUpdateSequenceDocument(final String updateSequence, final String version) throws CstlServiceException {
+        if (updateSequence == null) {
+            return false;
+        }
+        if ("1.0.0".equals(version)) {
+            try {
+                final long sequenceNumber = Long.parseLong(updateSequence);
+                final long currentUpdateSequence = Long.parseLong(getCurrentUpdateSequence());
+                if (sequenceNumber == currentUpdateSequence) {
+                    throw new CstlServiceException("The update sequence parameter is equal to the current", CURRENT_UPDATE_SEQUENCE, "updateSequence");
+                } else if (sequenceNumber > currentUpdateSequence) {
+                    throw new CstlServiceException("The update sequence parameter is invalid (higher value than the current)", INVALID_UPDATE_SEQUENCE, "updateSequence");
+                }
+                return false;
+            } catch(NumberFormatException ex) {
+                throw new CstlServiceException("The update sequence must be an integer", ex, INVALID_PARAMETER_VALUE, "updateSequence");
+            }
+        } else {
+            return returnUpdateSequenceDocument(updateSequence);
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */
