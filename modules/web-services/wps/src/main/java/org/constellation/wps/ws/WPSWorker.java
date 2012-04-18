@@ -295,12 +295,7 @@ public class WPSWorker extends AbstractWorker {
         }
         
         // We unmarshall the static capabilities document.
-        final WPSCapabilitiesType staticCapabilities;
-        try {
-            staticCapabilities = (WPSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WPS_1_0_0.version.toString(), ServiceDef.Specification.WPS.toString());
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex);
-        }
+        final WPSCapabilitiesType staticCapabilities = (WPSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WPS_1_0_0.version.toString(), ServiceDef.Specification.WPS.toString());
 
         staticCapabilities.getOperationsMetadata().updateURL(getServiceUrl());
 

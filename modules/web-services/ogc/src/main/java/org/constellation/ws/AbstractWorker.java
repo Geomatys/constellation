@@ -148,7 +148,7 @@ public abstract class AbstractWorker implements Worker {
      *
      * @throws JAXBException if an error occurs during the unmarshall of the document.
      */
-    protected Object getStaticCapabilitiesObject(final String version, final String service) throws JAXBException {
+    protected Object getStaticCapabilitiesObject(final String version, final String service) throws CstlServiceException {
         return getStaticCapabilitiesObject(version, service, null);
     }
 
@@ -165,7 +165,7 @@ public abstract class AbstractWorker implements Worker {
      *
      * @throws JAXBException if an error occurs during the unmarshall of the document.
      */
-    protected Object getStaticCapabilitiesObject(final String version, final String service, final String language) throws JAXBException {
+    protected Object getStaticCapabilitiesObject(final String version, final String service, final String language) throws CstlServiceException {
         final String fileName;
         if (language == null) {
             fileName = service + "Capabilities" + version + ".xml";
@@ -201,6 +201,8 @@ public abstract class AbstractWorker implements Worker {
                 capabilities.put(fileName, response);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, "Unable to close the skeleton capabilities input stream.", ex);
+            } catch (JAXBException ex) {
+                throw new CstlServiceException("JAXb exception while unmarshaling static capabilities file", ex, OWSExceptionCode.NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
                     getMarshallerPool().release(unmarshaller);

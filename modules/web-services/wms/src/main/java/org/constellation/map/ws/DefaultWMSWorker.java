@@ -236,13 +236,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return CAPS_RESPONSE.get(keyCache);
         }
 
-        //Generate the correct URL in the static part. ?TODO: clarify this.
-        final AbstractWMSCapabilities inCapabilities;
-        try {
-            inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS", currentLanguage);
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        }
+        final AbstractWMSCapabilities inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS", currentLanguage);
+        
         final AbstractRequest request;
         final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {

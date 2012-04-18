@@ -679,12 +679,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         // we load the skeleton capabilities
-        Capabilities skeletonCapabilities;
-        try {
-            skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "SOS");
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        }
+        final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "SOS");
         
         final Capabilities localCapabilities;
         if (keepCapabilities) {

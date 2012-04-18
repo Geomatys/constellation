@@ -169,12 +169,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         }
 
         // we load the skeleton capabilities
-        Capabilities skeletonCapabilities;
-        try {
-            skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "WMTS");
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        }
+        final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "WMTS");
 
         if (skeletonCapabilities == null) {
             throw new CstlServiceException("the service was unable to find the metadata for capabilities operation", NO_APPLICABLE_CODE);

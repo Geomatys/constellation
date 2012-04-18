@@ -519,12 +519,7 @@ public class CSWworker extends AbstractWorker {
         */
 
         // we load the skeleton capabilities
-        Capabilities skeletonCapabilities;
-        try {
-            skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        }
+        final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
 
         //we prepare the response document
         ServiceIdentification si = null;
@@ -1255,12 +1250,7 @@ public class CSWworker extends AbstractWorker {
                 if (pointLocation != -1) {
 
                     // we load the skeleton capabilities
-                    Capabilities skeletonCapabilities;
-                    try {
-                        skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
-                    } catch (JAXBException ex) {
-                        throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                    }
+                    final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
 
                     final String operationName = token.substring(0, pointLocation);
                     final String parameter     = token.substring(pointLocation + 1);

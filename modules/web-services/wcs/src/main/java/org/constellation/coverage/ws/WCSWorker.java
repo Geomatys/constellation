@@ -689,12 +689,7 @@ public final class WCSWorker extends LayerWorker {
         }
 
         // We unmarshall the static capabilities document.
-        final WCSCapabilitiesType staticCapabilities;
-        try {
-            staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex);
-        }
+        final WCSCapabilitiesType staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
         
         if (requestedSection == null || "/WCS_Capabilities/Capability".equals(requestedSection) || "/".equals(requestedSection))
         {
@@ -838,12 +833,7 @@ public final class WCSWorker extends LayerWorker {
         }
 
         // We unmarshall the static capabilities document.
-        final Capabilities staticCapabilities;
-        try {
-            staticCapabilities = (Capabilities) getStaticCapabilitiesObject(ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex);
-        }
+        final Capabilities staticCapabilities = (Capabilities) getStaticCapabilitiesObject(ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
         
         ServiceIdentification si = null;
         ServiceProvider sp       = null;

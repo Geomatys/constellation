@@ -188,12 +188,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, false, true);
 
-        final WFSCapabilitiesType inCapabilities;
-        try {
-            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(actingVersion.version.toString(), "WFS");
-        } catch (JAXBException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        }
+        final WFSCapabilitiesType inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(actingVersion.version.toString(), "WFS");
         
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
