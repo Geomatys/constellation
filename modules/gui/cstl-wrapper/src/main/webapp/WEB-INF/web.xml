@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" metadata-complete="true" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
+    <display-name>Constellation</display-name>
+    
+    <!-- constellation installer -->
     <listener>
         <listener-class>org.constellation.Installer</listener-class>
     </listener>
-    <display-name>Constellation</display-name>
-
+    
     <!-- Shiro filter handling security access -->
     <filter>
         <filter-name>Shiro</filter-name>
@@ -16,6 +18,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!-- JSF administration -->
     <context-param>
          <param-name>facelets.RESOURCE_RESOLVER</param-name>
          <param-value>org.mapfaces.resolver.JARFaceletsResolver</param-value>
@@ -68,7 +71,6 @@
         <filter-class>org.ajax4jsf.Filter</filter-class>
     </filter>
 
-
     <filter-mapping>
         <filter-name>ajax4jsf</filter-name>
         <servlet-name>Faces Servlet</servlet-name>
@@ -105,7 +107,6 @@
         <url-pattern>/faces/*</url-pattern>
     </servlet-mapping>
 
-
     <servlet>
         <servlet-name>Mapfaces Resource Servlet</servlet-name>
         <servlet-class>org.mapfaces.servlet.ResourceServlet</servlet-class>
@@ -120,6 +121,10 @@
         <url-pattern>/mfRes/*</url-pattern>
     </servlet-mapping>
 
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
     <!--                                            --> 
     <!-- REST Servlet for constellation web service -->
     <!--                                            -->
@@ -133,14 +138,14 @@
         </init-param>
         <init-param>
           <param-name>com.sun.jersey.config.property.packages</param-name>
-             <!-- To disable CSW            service remove packageName: org.constellation.metadata.ws.rs                             -->
-             <!-- To enable  SOS            service add    packageName: org.constellation.sos.ws.rs                                  -->
-             <!-- To enable  GeoDRM         service add    packageName: org.constellation.security.ws                                -->
-             <!-- To enabme  Security for WMS       add    packageName: org.constellation.security.wms                               -->
-             <!-- To disable configuration  service remove packageName: org.constellation.configuration.ws                           -->
-             <!-- To disable new WMS        service remove packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
-             <!-- To disable new WCS        service remove packageName: org.constellation.coverage.ws.rs                             -->
-          <!--param-value>org.constellation.configuration.ws;org.constellation.metadata.ws.rs;org.constellation.map.ws.rs;org.constellation.ws.rs.provider;org.constellation.coverage.ws.rs</param-value-->
+             <!-- To enable configuration  service add packageName: org.constellation.configuration.ws                           -->
+             <!-- To enable CSW            service add packageName: org.constellation.metadata.ws.rs                             -->
+             <!-- To enable SOS            service add packageName: org.constellation.sos.ws.rs                                  -->
+             <!-- To enable WMS            service add packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
+             <!-- To enable WCS            service add packageName: org.constellation.coverage.ws.rs                             -->
+             <!-- To enable WPS            service add packageName: org.constellation.wps.ws.rs                                  -->
+             <!-- To enable WFS            service add packageName: org.constellation.wfs.ws.rs                                  -->
+             <!-- To enable WMTS           service add packageName: org.constellation.wmts.ws.rs                                 -->
           <param-value>${constellation.services.packages}</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -150,69 +155,18 @@
         <url-pattern>/WS/*</url-pattern>
     </servlet-mapping>
     
-    <!--                                                        --> 
-    <!-- SOAP servlet for constellation web service for Tomcat  -->
-    
-    <!-- In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in the web-app tag (at the top of this document)
+    <!--  SOAP enabling
+         
+         In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in the web-app tag (at the top of this document)
          In Tomcat   : 1) Uncomment the WSServletContextListener listener.
-                       2) Enable each service by uncommenting the servlet block. 
-                       3) Rename the file sun-jaxws.xml.backup  in sun-jaxws.xml and uncomment the endpoint you want to enable.
+                       2) Rename the file sun-jaxws.xml.backup  in sun-jaxws.xml and uncomment the endpoint you want to enable.
            
      -->
-
-    <!--                                       --> 
-    <!-- If using SOAP uncomment this listener -->
-    <!--                                       --> 
     <!--listener>
         <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
     </listener-->
 
-    <!--                                                                            --> 
-    <!-- to enable the SOS service SOAP (in tomcat) uncomment the following servlet -->
-    <!--                                                                            --> 
-    <!--servlet>
-        <servlet-name>SOService</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>SOService</servlet-name>
-        <url-pattern>/WS-SOAP/sos/*</url-pattern>
-    </servlet-mapping-->
-
-    <!--                                                                            --> 
-    <!-- to enable the CSW service SOAP (in tomcat) uncomment the following servlet -->
-    <!--                                                                            --> 
-    <!--servlet>
-        <servlet-name>CSWService</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>CSWService</servlet-name>
-        <url-pattern>/WS-SOAP/csw/*</url-pattern>
-    </servlet-mapping-->
-
-    <!--                                                                             --> 
-    <!-- to enable the WMTS service SOAP (in tomcat) uncomment the following servlet -->
-    <!--                                                                             --> 
-    <!--servlet>
-        <servlet-name>WMTSService</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>WMTSService</servlet-name>
-        <url-pattern>/WS-SOAP/wmts/*</url-pattern>
-    </servlet-mapping-->
-
-
-
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
-
-   <session-config>
+    <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
 

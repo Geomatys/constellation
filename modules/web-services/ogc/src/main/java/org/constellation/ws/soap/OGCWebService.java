@@ -112,7 +112,6 @@ public abstract class OGCWebService<W extends Worker> {
      * @param workers A map of worker id / worker.
      */
     public OGCWebService(final Map<String, W> workers, final Specification spec) {
-        super();
 
         this.specification = spec;
         this.workersMap    = workers;

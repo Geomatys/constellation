@@ -79,7 +79,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * {@inheritDoc}
      */
     @Override
-    protected SOSworker createWorker(File instanceDirectory) {
+    protected SOSworker createWorker(final File instanceDirectory) {
         return new SOSworker(instanceDirectory.getName(), instanceDirectory);
     }
     

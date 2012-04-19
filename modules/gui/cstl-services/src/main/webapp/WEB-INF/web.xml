@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" metadata-complete="true" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
+    <display-name>constellation</display-name>
+
+    <!-- constellation installer -->
     <listener>
         <listener-class>org.constellation.Installer</listener-class>
     </listener>
     
-    <display-name>constellation</display-name>
-
     <!-- Shiro filter handling security access -->
     <filter>
         <filter-name>Shiro</filter-name>
@@ -27,14 +28,14 @@
         </init-param>
         <init-param>
           <param-name>com.sun.jersey.config.property.packages</param-name>
-             <!-- To disable CSW            service remove packageName: org.constellation.metadata.ws.rs                             -->
-             <!-- To enable  SOS            service add    packageName: org.constellation.sos.ws.rs                                  -->
-             <!-- To enable  GeoDRM         service add    packageName: org.constellation.security.ws                                -->
-             <!-- To enabme  Security for WMS       add    packageName: org.constellation.security.wms                               -->
-             <!-- To disable configuration  service remove packageName: org.constellation.configuration.ws                           -->
-             <!-- To disable new WMS        service remove packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
-             <!-- To disable new WCS        service remove packageName: org.constellation.coverage.ws.rs                             -->
-          <!--param-value>org.constellation.configuration.ws;org.constellation.metadata.ws.rs;org.constellation.map.ws.rs;org.constellation.ws.rs.provider;org.constellation.coverage.ws.rs</param-value-->
+             <!-- To enable configuration  service add packageName: org.constellation.configuration.ws                           -->
+             <!-- To enable CSW            service add packageName: org.constellation.metadata.ws.rs                             -->
+             <!-- To enable SOS            service add packageName: org.constellation.sos.ws.rs                                  -->
+             <!-- To enable WMS            service add packageName: org.constellation.map.ws.rs;org.constellation.ws.rs.provider -->
+             <!-- To enable WCS            service add packageName: org.constellation.coverage.ws.rs                             -->
+             <!-- To enable WPS            service add packageName: org.constellation.wps.ws.rs                                  -->
+             <!-- To enable WFS            service add packageName: org.constellation.wfs.ws.rs                                  -->
+             <!-- To enable WMTS           service add packageName: org.constellation.wmts.ws.rs                                 -->
           <param-value>${constellation.services.packages}</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -44,107 +45,19 @@
         <url-pattern>/WS/*</url-pattern>
     </servlet-mapping>
     
+     <!--  SOAP enabling
+         
+         In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in the web-app tag (at the top of this document)
+         In Tomcat   : 1) Uncomment the WSServletContextListener listener.
+                       2) Rename the file sun-jaxws.xml.backup  in sun-jaxws.xml and uncomment the endpoint you want to enable.
+           
+     -->
+    <!--listener>
+        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
+    </listener-->
+
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-
-    <!-- here is a tag to use TOMCAT pooled connection datasource  -->
-
-    <!--resource-ref>
-        <description>postgreSQL Datasource example</description>
-        <res-ref-name>jdbc/observation</res-ref-name>
-        <res-type>javax.sql.DataSource</res-type>
-        <res-auth>Container</res-auth>
-    </resource-ref-->
-
-    <!-- SOAP servlet for constellation web service for Tomcat  
-    
-      In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in the web-app tag (at the top of this document)
-      In Tomcat   : Enable each service by uncommenting the servlet block -->
-
-    
-
-    <!-- to enable the SOS service SOAP (in tomcat) uncomment the following servlet -->
-    <!--listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-    </listener>
-    <servlet>
-        <servlet-name>SOService</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>SOService</servlet-name>
-        <url-pattern>/WS-SOAP/sos/*</url-pattern>
-    </servlet-mapping-->
-
-    <!-- to enable the CSW service SOAP (in tomcat) uncomment the following servlet -->
-    <!--listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-    </listener>
-    <servlet>
-        <servlet-name>CSWService</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>CSWService</servlet-name>
-        <url-pattern>/WS-SOAP/sos/*</url-pattern>
-    </servlet-mapping-->
-
-    <!-- to enable the WMTS service SOAP (in tomcat) uncomment the following servlet -->
-    <!--listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-    </listener>
-    <servlet>
-        <servlet-name>WMTSService</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>WMTSService</servlet-name>
-        <url-pattern>/WS-SOAP/wmts/*</url-pattern>
-    </servlet-mapping-->
-
-    
-    <!--
-        Security role name.
-        - In the case of sun-based application server (like glassfish), this fields is mapped
-          into the sun-web.xml file to the group name defined in the container.
-        - For Tomcat, this role name is directly tested against the realm.
-          The sun-web.xml is not used.
-    >
-    <login-config>
-        <auth-method>BASIC</auth-method>
-    </login-config>
-    
-
-    <security-role>
-        <role-name>cstladmin</role-name>
-    </security-role-->
-
-    <!-- Secured all GET and POST requests done on the configuration webservice>
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Constellation secured service</web-resource-name>
-            <url-pattern>/WS/configuration</url-pattern>
-            <url-pattern>/WS/wms/admin</url-pattern>
-            <url-pattern>/WS/wmts/admin</url-pattern>
-            <url-pattern>/WS/wcs/admin</url-pattern>
-            <url-pattern>/WS/csw/admin</url-pattern>
-            <url-pattern>/WS/sos/admin</url-pattern>
-            <url-pattern>/WS/wfs/admin</url-pattern>
-            <url-pattern>/WS/wps/admin</url-pattern>
-            <http-method>GET</http-method>
-            <http-method>POST</http-method>
-        </web-resource-collection>
-        <auth-constraint>
-            <description>User must be logged in as an administrator to use this service.</description>
-            <role-name>cstladmin</role-name>
-        </auth-constraint>
-    </security-constraint-->
 
 </web-app>
