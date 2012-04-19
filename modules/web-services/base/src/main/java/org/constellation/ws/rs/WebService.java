@@ -49,7 +49,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 // Constellation dependencies
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.ws.ExceptionCode.*;

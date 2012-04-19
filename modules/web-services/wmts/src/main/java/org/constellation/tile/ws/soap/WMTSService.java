@@ -58,7 +58,7 @@ public class WMTSService extends OGCWebService<WMTSWorker>{
      */
     public WMTSService() {
        super(Specification.WMTS);
-       LOGGER.log(Level.INFO, "WMTS SOAP service running ({0} instances)\n", workersMap.size());
+       LOGGER.log(Level.INFO, "WMTS SOAP service running ({0} instances)\n", getWorkerMapSize());
     }
 
     /**

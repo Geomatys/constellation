@@ -73,7 +73,7 @@ public abstract class OGCWebService<W extends Worker> {
      * A map of service worker.
      * TODO this attribute must be set to private when will fix the WFS service
      */
-    protected final Map<String, W> workersMap;
+    private final Map<String, W> workersMap;
 
 
     private final Specification specification;
@@ -99,22 +99,6 @@ public abstract class OGCWebService<W extends Worker> {
          */
         workersMap = new HashMap<String, W>();
         buildWorkerMap();
-    }
-
-    /**
-     * Initialize the basic attributes of a web serviceType.
-     * the worker Map here is fill by the subClasse, this is not the best behavior.
-     * This constructor is here to keep compatibility with old version.
-     *
-     * @param supportedVersions A list of the supported version of this serviceType.
-     *                          The first version specified <strong>MUST</strong> be the highest
-     *                          one, the best one.
-     * @param workers A map of worker id / worker.
-     */
-    public OGCWebService(final Map<String, W> workers, final Specification spec) {
-
-        this.specification = spec;
-        this.workersMap    = workers;
     }
 
     private File getServiceDirectory() {
@@ -208,6 +192,12 @@ public abstract class OGCWebService<W extends Worker> {
         }
     }
 
+    /**
+     * Return the number of instance if the web-service
+     */
+    protected int getWorkerMapSize() {
+        return workersMap.size();
+    }
 
     @PreDestroy
     public void destroy() {

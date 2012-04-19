@@ -72,7 +72,7 @@ public class SOService extends OGCWebService<SOSworker> {
      */
     public SOService() throws CstlServiceException {
        super(Specification.SOS);
-       LOGGER.log(Level.INFO, "SOS SOAP service running ({0} instances)\n", workersMap.size());
+       LOGGER.log(Level.INFO, "SOS SOAP service running ({0} instances)\n", getWorkerMapSize());
     }
 
     /**
