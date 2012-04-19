@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProcessContext xmlns="http://www.constellation.org/config">
-    <processes load_all="true"/>
+    <processes>
+        <ProcessFactory load_all="true" autorityCode="jts"/>
+    </processes>
 </ProcessContext>

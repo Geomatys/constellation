@@ -184,79 +184,18 @@
 <div class="list-of-tables">
     <p><b>List of Tables</b></p>
     <dl>
-        <dt>1.1. <a href="#OWS.ClientError">Client error</a></dt>
-        <dt>1.2. <a href="#OWS.ContentType">Content-Type response header</a></dt>
-        <dt>1.3. <a href="#OWS.CaseInsensitiveKvpNames">KVP parameter names</a></dt>
-        <dt>1.4. <a href="#OWS.GetCapabilities">GetCapabilities request</a></dt>
-        <dt>1.5. <a href="#OWS.GetCapabilities-Exceptions">GetCapabilities - Exceptions</a></dt>
-        <dt>1.6. <a href="#OWS.GetCapabilities-AcceptVersions">GetCapabilities - AcceptVersions parameter</a></dt>
-        <dt>1.7. <a href="#OWS.GetCapabilities-UpdateSequence">GetCapabilities - UpdateSequence parameter</a></dt>
+        <dt>1.1. <a href="#OWS.ContentType">Content-Type response header</a></dt>
+        <dt>1.2. <a href="#OWS.CaseInsensitiveKvpNames">KVP parameter names</a></dt>
+        <dt>1.3. <a href="#OWS.GetCapabilities">GetCapabilities request</a></dt>
+        <dt>1.4. <a href="#OWS.GetCapabilities-Exceptions">GetCapabilities - Exceptions</a></dt>
+        <dt>1.5. <a href="#OWS.GetCapabilities-AcceptVersions">GetCapabilities - AcceptVersions parameter</a></dt>
+        <dt>1.6. <a href="#OWS.GetCapabilities-UpdateSequence">GetCapabilities - UpdateSequence parameter</a></dt>
     </dl>
-</div>
-<div class="atc">
-    <a id="OWS.ClientError"></a>
-    <p class="title"><b>Table&nbsp;1.1.&nbsp;Client error</b></p>
-    <div class="atc-contents">
-        <table summary="Client error" border="1">
-            <colgroup>
-                <col />
-                <col /></colgroup>
-            <tbody>
-                <tr class="identifier">
-                    <td class="rowhead">Test case identifier</td>
-                    <td>OWS.ClientError</td>
-                </tr>
-                <tr class="purpose">
-                    <td class="rowhead">Test purpose</td>
-                    <td>
-                        <p>All of the following assertions must hold for the response to an invalid request:</p>
-                        <div class="orderedlist">
-                            <ol type="1">
-                                <li>
-                                    <p><a id="OWS.ClientError-1"></a>the response entity is a valid
-                                        exception report having &lt;ows:ExceptionReport&gt; as the document
-                                        element;</p>
-                                </li>
-                                <li>
-                                    <p><a id="OWS.ClientError-2"></a>the value of the 
-                                        <code class="code"><code class="code">exceptionCode</code></code> attribute specifies the appropriate code value.
-                                    </p>
-                                </li>
-                            </ol>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="method">
-                    <td class="rowhead">Test method</td>
-                    <td>Check the content of the response. Pass if all assertions hold; fail otherwise.</td>
-                </tr>
-                <tr class="reference">
-                    <td class="rowhead">Reference</td>
-                    <td>
-                        <div class="itemizedlist">
-                            <ul>
-                                <li>
-                                    <p><a class="xref" href="#OGC-06-121r3">OGC 06-121r3</a>: cl. 8.1, p.42; cl. 8.2, p. 43; cl. 8.5, p. 45.</p>
-                                </li>
-                                <li>
-                                    <p><a class="xref" href="#OGC-06-121r3">OGC 06-121r3</a>: cl. 8.3,Table 25</p>
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr class="type">
-                    <td class="rowhead">Test type</td>
-                    <td>Capability</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
 </div>
 <br class="atc-break" />
 <div class="atc">
     <a id="OWS.ContentType"></a>
-    <p class="title"><b>Table&nbsp;1.2.&nbsp;Content-Type response header</b></p>
+    <p class="title"><b>Table&nbsp;1.1.&nbsp;Content-Type response header</b></p>
     <div class="atc-contents">
         <table summary="Content-Type response header" border="1">
             <colgroup>
@@ -309,7 +248,7 @@
 <br class="atc-break" />
 <div class="atc">
     <a id="OWS.CaseInsensitiveKvpNames"></a>
-    <p class="title"><b>Table&nbsp;1.3.&nbsp;KVP parameter names</b></p>
+    <p class="title"><b>Table&nbsp;1.2.&nbsp;KVP parameter names</b></p>
     <div class="atc-contents">
         <table summary="KVP parameter names" border="1">
             <colgroup>
@@ -354,7 +293,7 @@
 </div>
 <br class="atc-break" />
 <div class="atc"><a id="OWS.GetCapabilities"></a>
-    <p class="title"><b>Table&nbsp;1.4.&nbsp;GetCapabilities request</b></p>
+    <p class="title"><b>Table&nbsp;1.3.&nbsp;GetCapabilities request</b></p>
     <div class="atc-contents">
         <table summary="GetCapabilities request" border="1">
             <colgroup>
@@ -404,7 +343,7 @@
 <br class="atc-break" />
 <div class="atc">
     <a id="OWS.GetCapabilities-Exceptions"></a>
-    <p class="title"><b>Table&nbsp;1.5.&nbsp;GetCapabilities - Exceptions</b></p>
+    <p class="title"><b>Table&nbsp;1.4.&nbsp;GetCapabilities - Exceptions</b></p>
     <div class="atc-contents">
         <table summary="GetCapabilities - Exceptions" border="1">
             <colgroup>
@@ -469,7 +408,7 @@
 </div>
 <br class="atc-break" />
 <div class="atc"><a id="OWS.GetCapabilities-AcceptVersions"></a>
-    <p class="title"><b>Table&nbsp;1.6.&nbsp;GetCapabilities - AcceptVersions parameter</b></p>
+    <p class="title"><b>Table&nbsp;1.5.&nbsp;GetCapabilities - AcceptVersions parameter</b></p>
     <div class="atc-contents">
         <table summary="GetCapabilities - AcceptVersions parameter" border="1">
             <colgroup>
@@ -534,7 +473,7 @@
 </div>
 <br class="atc-break" />
 <div class="atc"><a id="OWS.GetCapabilities-UpdateSequence"></a>
-    <p class="title"><b>Table&nbsp;1.7.&nbsp;GetCapabilities - UpdateSequence parameter</b></p>
+    <p class="title"><b>Table&nbsp;1.6.&nbsp;GetCapabilities - UpdateSequence parameter</b></p>
     <div class="atc-contents">
         <table summary="GetCapabilities - UpdateSequence parameter" border="1">
             <colgroup>
@@ -553,8 +492,14 @@
                         <div class="orderedlist">
                             <ol type="1">
                                 <li>
-                                    <p><a id="OWS.GetCapabilities-UpdateSequence-1"></a>GetCapabilities with an incorrect updatesequence ('9999999999'), 
-                                        if higher than the update sequence on the current capabilities document give an exception.</p>
+                                    <p><a id="OWS.GetCapabilities-UpdateSequence-1"></a>GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value lower than the current update sequence value,
+                                         returns valid capabilities XML.</p>
+                                </li>
+                            </ol>
+                            <ol type="2">
+                                <li>
+                                    <p><a id="OWS.GetCapabilities-UpdateSequence-2"></a>GetCapabilities request is made with an UPDATESEQUENCE parameter set to the current update sequence value,
+                                         returns capabilities XML with only "version" and "update sequence parameter".</p>
                                 </li>
                             </ol>
                         </div>

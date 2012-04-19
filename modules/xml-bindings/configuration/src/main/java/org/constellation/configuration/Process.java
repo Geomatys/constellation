@@ -16,13 +16,19 @@
  */
 package org.constellation.configuration;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
  * @since 0.9
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Process {
     
+    @XmlAttribute
     private String id;
 
     /**

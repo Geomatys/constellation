@@ -258,6 +258,111 @@ public class ConfigurationXmlBindingTest {
     }
     
     /**
+     * Test processContext Marshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void processContextMarshalingTest() throws Exception {
+        List<ProcessFactory> factories = new ArrayList<ProcessFactory>();
+        ProcessFactory s1 = new ProcessFactory();
+        s1.setAutorityCode("source1");
+        s1.setLoadAll(true);
+        ProcessFactory s2 = new ProcessFactory();
+        s2.setAutorityCode("source2");
+        s2.setLoadAll(true);
+        factories.add(s1);
+        factories.add(s2);
+        ProcessContext context = new ProcessContext(new Processes(factories));
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(context, sw);
+
+        String expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:ProcessContext >" + '\n'
+                + "    <ns2:processes>" + '\n'
+                + "        <ns2:ProcessFactory load_all=\"true\" autorityCode=\"source1\"/>" + '\n'
+                + "        <ns2:ProcessFactory load_all=\"true\" autorityCode=\"source2\"/>" + '\n'
+                + "    </ns2:processes>" + '\n'
+                + "</ns2:ProcessContext>\n";
+
+        String result = removeXmlns(sw.toString());
+        assertEquals(expresult, result);
+
+        factories = new ArrayList<ProcessFactory>();
+        List<Process> exclude = new ArrayList<Process>();
+        Process l1 = new Process();
+        l1.setId("process1");
+        Process l2 = new Process();
+        l2.setId("process2");
+        exclude.add(l1);
+        exclude.add(l2);
+        s1 = new ProcessFactory();
+        s1.setExclude(new ProcessList(exclude));
+        s1.setLoadAll(true);
+        s1.setAutorityCode("source1");
+        s2 = new ProcessFactory();
+        s2.setLoadAll(true);
+        s2.setAutorityCode("source2");
+        factories.add(s1);
+        factories.add(s2);
+        context = new ProcessContext(new Processes(factories));
+        sw = new StringWriter();
+        marshaller.marshal(context, sw);
+
+        expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:ProcessContext >" + '\n'
+                + "    <ns2:processes>" + '\n'
+                + "        <ns2:ProcessFactory load_all=\"true\" autorityCode=\"source1\">" + '\n'
+                + "            <ns2:exclude>" + '\n'
+                + "                <ns2:Process id=\"process1\"/>" + '\n'
+                + "                <ns2:Process id=\"process2\"/>" + '\n'
+                + "            </ns2:exclude>" + '\n'
+                + "        </ns2:ProcessFactory>" + '\n'
+                + "        <ns2:ProcessFactory load_all=\"true\" autorityCode=\"source2\"/>" + '\n'
+                + "    </ns2:processes>" + '\n'
+                + "</ns2:ProcessContext>\n";
+
+        result =  removeXmlns(sw.toString());
+        assertEquals(expresult, result);
+
+        factories = new ArrayList<ProcessFactory>();
+        List<Process> include = new ArrayList<Process>();
+        l1 = new Process();
+        l1.setId("process1");
+        l2 = new Process();
+        l2.setId("process2");
+        include.add(l1);
+        include.add(l2);
+        s1 = new ProcessFactory();
+        s1.setInclude(new ProcessList(include));
+        s1.setAutorityCode("source1");
+        s2 = new ProcessFactory();
+        s2.setLoadAll(true);
+        s2.setAutorityCode("source2");
+        factories.add(s1);
+        factories.add(s2);
+        context = new ProcessContext(new Processes(factories));
+        sw = new StringWriter();
+        marshaller.marshal(context, sw);
+
+        expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:ProcessContext >" + '\n'
+                + "    <ns2:processes>" + '\n'
+                + "        <ns2:ProcessFactory autorityCode=\"source1\">" + '\n'
+                + "            <ns2:include>" + '\n'
+                + "                <ns2:Process id=\"process1\"/>" + '\n'
+                + "                <ns2:Process id=\"process2\"/>" + '\n'
+                + "            </ns2:include>" + '\n'
+                + "        </ns2:ProcessFactory>" + '\n'
+                + "        <ns2:ProcessFactory load_all=\"true\" autorityCode=\"source2\"/>" + '\n'
+                + "    </ns2:processes>" + '\n'
+                + "</ns2:ProcessContext>\n";
+
+        result =  removeXmlns(sw.toString());
+        assertEquals(expresult, result);
+    }
+    
+    /**
      * Test layerContext Marshalling.
      *
      * @throws java.lang.Exception

@@ -25,12 +25,12 @@
         <param name="capabilitiesResponseContentType">The expected HTTP header content type of the GetCapabilities response (i.e. text/xml)</param>
         <param name="exceptionReportSchemaLocation">The location of the ExceptionReport schema for the version of OWS Common being tested</param>
         <param name="exceptionReportSchemaType">The type of resource specified in the exceptionReportSchemaLocation above (i.e. url, file, resource).  Corresponds with the CTL XMLValidatingParser schema type attribute.</param>
+        <param name="updatesequenceHigh">A value that is lexically higher than the current updateSequence value</param>
+        <param name="updatesequenceLow">A value that is lexically lower than the current updateSequence value</param>
         <ctl:assertion>
             Run test group for GetCapabilities requests using the GET method. Target endpoint is {$serviceURL//ows:OperationsMetadata/ows:Operation[@name='GetCapabilities']/ows:DCP/ows:HTTP/ows:Get/@xlink:href}.
         </ctl:assertion>
         <ctl:code>
-        <!--ClientError-->
-        <!--How to test?-->
         <!--The GetCapabilities operation is implemented-->
             <ctl:message select="concat('ServiceURL: ',$serviceURL)"/>
             <ctl:message>**********************************************************************</ctl:message>
@@ -44,42 +44,9 @@
                 <ctl:with-param name="exceptionReportSchemaLocation" select="$exceptionReportSchemaLocation" />
                 <ctl:with-param name="exceptionReportSchemaType" select="$exceptionReportSchemaType" />
                 <ctl:with-param name="capabilitiesRootElementName" select="$capabilitiesRootElementName" />
+                <ctl:with-param name="updatesequenceHigh" select="$updatesequenceHigh" />
+                <ctl:with-param name="updatesequenceLow" select="$updatesequenceLow" />
             </ctl:call-test>
-            <ctl:message>**********************************************************************</ctl:message>
-            <ctl:call-test name="owsTests:ows-OWS.GetCapabilities.2">
-                <ctl:with-param name="serviceURL" select="$serviceURL"/>
-                <ctl:with-param name="serviceType" select="$serviceType" />
-                <ctl:with-param name="serviceVersion" select="$serviceVersion" />
-                <ctl:with-param name="responseSchemaLocation" select="$capabilitiesResponseSchemaLocation" />
-                <ctl:with-param name="responseSchemaType" select="$capabilitiesResponseSchemaType" />
-                <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName" />
-            </ctl:call-test>
-            <ctl:message>**********************************************************************</ctl:message>
-            <ctl:call-test name="owsTests:ows-OWS.GetCapabilities.3">
-                <ctl:with-param name="serviceURL" select="$serviceURL"/>
-                <ctl:with-param name="serviceType" select="$serviceType" />
-                <ctl:with-param name="serviceVersion" select="$serviceVersion" />
-                <ctl:with-param name="responseSchemaLocation" select="$capabilitiesResponseSchemaLocation" />
-                <ctl:with-param name="responseSchemaType" select="$capabilitiesResponseSchemaType" />
-                <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName" />
-            </ctl:call-test>
-            <ctl:message>**********************************************************************</ctl:message>
-            <ctl:call-test name="owsTests:ows-OWS.GetCapabilities.4">
-                <ctl:with-param name="serviceURL" select="$serviceURL"/>
-                <ctl:with-param name="serviceVersion" select="$serviceVersion" />
-                <ctl:with-param name="responseSchemaLocation" select="$exceptionReportSchemaLocation" />
-                <ctl:with-param name="responseSchemaType" select="$exceptionReportSchemaType" />
-            </ctl:call-test>
-            <ctl:message>**********************************************************************</ctl:message>
-            <ctl:call-test name="owsTests:ows-OWS.GetCapabilities.5">
-                <ctl:with-param name="serviceURL" select="$serviceURL"/>
-                <ctl:with-param name="serviceType" select="$serviceType" />
-                <ctl:with-param name="serviceVersion" select="$serviceVersion" />
-                <ctl:with-param name="responseSchemaLocation" select="$capabilitiesResponseSchemaLocation" />
-                <ctl:with-param name="responseSchemaType" select="$capabilitiesResponseSchemaType" />
-                <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName" />
-            </ctl:call-test>
-
         </ctl:code>
     </ctl:test>
     
@@ -94,6 +61,8 @@
         <param name="exceptionReportSchemaLocation" />
         <param name="exceptionReportSchemaType" />
         <param name="capabilitiesRootElementName" />
+        <param name="updatesequenceHigh" />
+        <param name="updatesequenceLow" />
         <assertion>The GET method request must be supported (using HTTP GET).</assertion>
         <comment>GetCapabilities by GET.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root element matches the provided root element.</comment>
         <link>OWS.GetCapabilities</link>
@@ -157,6 +126,17 @@
                                 <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName" />
                                 <ctl:with-param name="expectedContentType" select="$capabilitiesResponseContentType" />
                             </ctl:call-test>
+                             <!--Case insensitive KVP names-->
+                            <ctl:message>**********************************************************************</ctl:message>
+                            <ctl:message select="''"/>
+                            <ctl:call-test name="owsTests:ows-OWS.CaseInsensitiveKvpNames.1">
+                                <ctl:with-param name="serviceURL" select="$serviceURL"/>
+                                <ctl:with-param name="serviceType" select="$serviceType" />
+                                <ctl:with-param name="serviceVersion" select="$serviceVersion" />
+                                <ctl:with-param name="responseSchemaLocation" select="$capabilitiesResponseSchemaLocation" />
+                                <ctl:with-param name="responseSchemaType" select="$capabilitiesResponseSchemaType" />
+                                <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName" />
+                            </ctl:call-test>
                             <!--Exceptions-->
                             <!--Missing required request parameter-->
                             <ctl:message>**********************************************************************</ctl:message>
@@ -187,16 +167,17 @@
                                 <ctl:with-param name="exceptionReportSchemaType" select="$exceptionReportSchemaType" />
                             </ctl:call-test>
                             <!--Invalid update sequence-->
-                            <xsl:if test="not(string($capabilitiesDocument//@updateSequence)='')">
+                            <xsl:if test="not(string($capabilitiesDocument//@updateSequence)='') and $updatesequenceHigh!=''">
                                 <ctl:message>**********************************************************************</ctl:message>
                                 <ctl:message select="''"/>
-                                <ctl:message>updateSequence is supported for GetCapabilities requests.  Running updateSequence tests...</ctl:message>
+                                <ctl:message>updateSequence is supported for GetCapabilities requests.  Running updateSequence exception tests...</ctl:message>
                                 <ctl:call-test name="owsTests:ows-OWS.GetCapabilities-Exceptions.4">
                                     <ctl:with-param name="serviceURL" select="$serviceURL"/>
                                     <ctl:with-param name="serviceType" select="$serviceType" />
                                     <ctl:with-param name="serviceVersion" select="$serviceVersion" />
                                     <ctl:with-param name="exceptionReportSchemaLocation" select="$exceptionReportSchemaLocation" />
-                                    <ctl:with-param name="exceptionReportSchemaType" select="$exceptionReportSchemaType" />	  
+                                    <ctl:with-param name="exceptionReportSchemaType" select="$exceptionReportSchemaType" />
+                                    <ctl:with-param name="updatesequenceHigh" select="$updatesequenceHigh"/>
                                 </ctl:call-test>
                             </xsl:if>		
                             <!--An error occurs that prevents successful request processing-->
@@ -208,17 +189,6 @@
                                 <ctl:with-param name="serviceVersion" select="$serviceVersion" />
                                 <ctl:with-param name="exceptionReportSchemaLocation" select="$exceptionReportSchemaLocation" />
                                 <ctl:with-param name="exceptionReportSchemaType" select="$exceptionReportSchemaType" />
-                            </ctl:call-test>
-                            <!--Case insensitive KVP names-->
-                            <ctl:message>**********************************************************************</ctl:message>
-                            <ctl:message select="''"/>
-                            <ctl:call-test name="owsTests:ows-OWS.CaseInsensitiveKvpNames.1">
-                                <ctl:with-param name="serviceURL" select="$serviceURL"/>
-                                <ctl:with-param name="serviceType" select="$serviceType" />
-                                <ctl:with-param name="serviceVersion" select="$serviceVersion" />
-                                <ctl:with-param name="responseSchemaLocation" select="$capabilitiesResponseSchemaLocation" />
-                                <ctl:with-param name="responseSchemaType" select="$capabilitiesResponseSchemaType" />
-                                <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName" />
                             </ctl:call-test>
                             <!--AcceptVersions tests-->
                             <ctl:message>**********************************************************************</ctl:message>
@@ -251,6 +221,30 @@
                                 <ctl:with-param name="exceptionReportSchemaLocation" select="$exceptionReportSchemaLocation"/>
                                 <ctl:with-param name="exceptionReportSchemaType" select="$exceptionReportSchemaType"/>
                             </ctl:call-test>
+                            <!--valid update sequence-->
+                            <xsl:if test="not(string($capabilitiesDocument//@updateSequence)='') and $updatesequenceLow!=''">
+                                <ctl:message>**********************************************************************</ctl:message>
+                                <ctl:message select="''"/>
+                                <ctl:message>updateSequence is supported for GetCapabilities requests.  Running updateSequence tests...</ctl:message>
+                                <ctl:call-test name="owsTests:ows-OWS.GetCapabilities-UpdateSequence.1">
+                                    <ctl:with-param name="serviceURL" select="$serviceURL"/>
+                                    <ctl:with-param name="serviceType" select="$serviceType" />
+                                    <ctl:with-param name="serviceVersion" select="$serviceVersion" />
+                                    <ctl:with-param name="responseSchemaLocation" select="$capabilitiesResponseSchemaLocation"/>
+                                    <ctl:with-param name="responseSchemaType" select="$capabilitiesResponseSchemaType"/>
+                                    <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName"/>
+                                    <ctl:with-param name="updatesequenceLow" select="$updatesequenceLow"/>
+                                </ctl:call-test>
+                                <ctl:call-test name="owsTests:ows-OWS.GetCapabilities-UpdateSequence.2">
+                                    <ctl:with-param name="serviceURL" select="$serviceURL"/>
+                                    <ctl:with-param name="serviceType" select="$serviceType" />
+                                    <ctl:with-param name="serviceVersion" select="$serviceVersion" />
+                                    <ctl:with-param name="responseSchemaLocation" select="$capabilitiesResponseSchemaLocation"/>
+                                    <ctl:with-param name="responseSchemaType" select="$capabilitiesResponseSchemaType"/>
+                                    <ctl:with-param name="rootElementName" select="$capabilitiesRootElementName"/> 
+                                    <ctl:with-param name="updatesequenceCurrent" select="string($capabilitiesDocument//@updateSequence)"/>
+                                </ctl:call-test>
+                            </xsl:if>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:otherwise>
@@ -841,6 +835,7 @@
         <param name="serviceVersion" />
         <param name="exceptionReportSchemaLocation" />
         <param name="exceptionReportSchemaType" />
+        <param name="updatesequenceHigh" />
         <assertion>In the event that a GetCapabilities request cannot be processed for any reason, the response entity shall include an exception report. The exception code must be one of those listed in Table 5.</assertion>
         <comment>GetCapabilities with an incorrect updatesequence ('9999999999999'), if higher than the update sequence on the current capabilities document give an exception.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an ows:ExceptionReport document; (3) the ExceptionReport shall have the 'InvalidUpdateSequence' exception code.</comment>
         <link>ows-1.0.0-metadata-atc5</link>
@@ -849,7 +844,7 @@
             <ctl:message>GetCapabilities with an incorrect updatesequence (9999999999999), if higher than the update sequence on the current capabilities document give an exception.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an ows:ExceptionReport document; (3) the ExceptionReport shall have the &quot;InvalidUpdateSequence&quot; exception code.</ctl:message>
             <ctl:message select="concat('Service parameter: ', $serviceType)"/>
             <ctl:message select="concat('Version parameter: ', $serviceVersion)"/>
-            <ctl:message select="concat('UpdateSequence parameter: ', '9999999999999')"/>
+            <ctl:message select="concat('UpdateSequence parameter: ', $updatesequenceHigh)"/>
             <xsl:variable name="request1">
                 <request>
                     <url>
@@ -863,7 +858,9 @@
                         <xsl:value-of select="$serviceVersion" />
                     </param>
                     <param name="request">GetCapabilities</param>
-                    <param name="updatesequence">9999999999999</param>
+                    <param name="updatesequence">
+                        <xsl:value-of select="$updatesequenceHigh" />
+                    </param>
                     <parsers:XMLValidatingParser>
                         <parsers:schemas>
                             <parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>
@@ -968,192 +965,20 @@
         </code>
     </test>
     
-    <test name="owsTests:ows-OWS.GetCapabilities.2">
-        <param name="serviceURL"/>
-        <param name="serviceType" />
-        <param name="serviceVersion" />
-        <param name="responseSchemaLocation" />
-        <param name="responseSchemaType" />
-        <param name="rootElementName" />
-        <assertion>All OGC web services must implement the GetCapabilities request to provide an XML representation of service metadata.</assertion>
-        <comment>Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an $rootElementName document.</comment>
-        <link>ows-1.0.0-metadata-atc1</link>
-        <link>OGC 05-008c1, 7.1, p.10</link>
-        <code>
-            <ctl:message select="concat('Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an ', $rootElementName, ' document.')"/>
-            <xsl:variable name="request1">
-                <request>
-                    <url>
-                        <xsl:value-of select="$serviceURL"/>
-                    </url>
-                    <method>get</method>
-                    <param name="service">
-                        <xsl:value-of select="$serviceType" />
-                    </param>
-                    <param name="version">
-                        <xsl:value-of select="$serviceVersion" />
-                    </param>
-                    <param name="request">GetCapabilities</param>
-                    <parsers:XMLValidatingParser>
-                        <parsers:schemas>
-                            <parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>
-                            <parsers:schema>
-                                <xsl:attribute name="type">
-                                    <xsl:value-of select="$responseSchemaType" />
-                                </xsl:attribute>
-                                <xsl:value-of select="$responseSchemaLocation" />
-                            </parsers:schema>
-                        </parsers:schemas>
-                    </parsers:XMLValidatingParser>
-                </request>
-            </xsl:variable>
-
-            <xsl:choose>
-                <xsl:when test="not($request1/*)">
-                    <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
-                    <ctl:fail/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:variable name="request1Root" select="local-name-from-QName(node-name($request1/*[1]))" />
-                    <xsl:if test="not($request1Root=$rootElementName)">
-                        <ctl:message>FAILURE:  The root element from the response to a GetCapabilities request does not match the expected root element of "
-                            <xsl:value-of select="$rootElementName" />"
-                        </ctl:message>
-                        <ctl:message select="concat('Root element was: &quot;', $request1Root, '&quot;')"/>
-                        <ctl:fail />
-                    </xsl:if>
-                </xsl:otherwise>
-            </xsl:choose>		
-				
-        </code>
-    </test>
-	
-    <test name="owsTests:ows-OWS.GetCapabilities.3">
-        <param name="serviceURL"/>
-        <param name="serviceType" />
-        <param name="serviceVersion" />
-        <param name="responseSchemaLocation" />
-        <param name="responseSchemaType" />
-        <param name="rootElementName" />
-        <assertion>A KVP-encoded GetCapabilities request shall include the following query parameters: service=WxS request=GetCapabilities, where WxS is a mnemonic label for a service type. See Table 2 for definitions of optional query parameters.</assertion>
-        <comment>GetCapabilities with version of $serviceVersion and service of $serviceType.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an $rootElementName document; (3) the response version must be what was requested.</comment>
-        <link>ows-1.0.0-metadata-atc2</link>      
-        <link>OGC 05-008c1, 7.2.2, p.12 (Table 2)</link>
-        <code>
-            <ctl:message select="concat('GetCapabilities with version of $serviceVersion and service of &quot;',$serviceType ,'&quot;. Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an $rootElementName document; (3) the response version must be what was requested.')"/>
-            <xsl:variable name="request1">
-                <request>
-                    <url>
-                        <xsl:value-of select="$serviceURL"/>
-                    </url>
-                    <method>get</method>
-                    <param name="request">GetCapabilities</param>
-                    <param name="service">
-                        <xsl:value-of select="$serviceType" />
-                    </param>
-                    <param name="version">
-                        <xsl:value-of select="$serviceVersion" />
-                    </param>
-                    <parsers:XMLValidatingParser>
-                        <parsers:schemas>
-                            <parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>
-                            <parsers:schema>
-                                <xsl:attribute name="type">
-                                    <xsl:value-of select="$responseSchemaType" />
-                                </xsl:attribute>
-                                <xsl:value-of select="$responseSchemaLocation" />
-                            </parsers:schema>
-                        </parsers:schemas>
-                    </parsers:XMLValidatingParser>
-                </request>
-            </xsl:variable>
-
-            <xsl:choose>
-                <xsl:when test="not($request1/*)">
-                    <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
-                    <ctl:fail/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:variable name="request1Root" select="local-name-from-QName(node-name($request1/*[1]))" />
-                    <xsl:if test="not($request1Root=$rootElementName)">
-                        <ctl:message>FAILURE:  The root element from the response to a GetCapabilities request does not match the expected root element of "
-                            <xsl:value-of select="$rootElementName" />"
-                        </ctl:message>
-                        <ctl:message select="concat('Root element was: &quot;', $request1Root, '&quot;')"/>
-                        <ctl:fail />
-                    </xsl:if>
-                </xsl:otherwise>
-            </xsl:choose>		
-			
-        </code>
-    </test>
-	
-    <test name="owsTests:ows-OWS.GetCapabilities.4">
-        <param name="serviceURL"/>
-        <param name="serviceVersion" />
-        <param name="responseSchemaLocation" />
-        <param name="responseSchemaType" />
-        <assertion>A KVP-encoded GetCapabilities request shall include the following query parameters: service=WxS request=GetCapabilities, where WxS is a mnemonic label for a service type. See Table 2 for definitions of optional query parameters.</assertion>
-        <comment>GetCapabilities with version of $serviceVersion and no service.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an ows:ExceptionReport document.</comment>	  
-        <link>ows-1.0.0-metadata-atc2</link>  
-        <link>OGC 05-008c1, 7.2.2, p.12 (Table 2)</link>
-        <code>
-            <ctl:message select="concat('GetCapabilities with version of ', $serviceVersion, ' and no service.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an ows:ExceptionReport document.')"/>	
-            <xsl:variable name="request1">
-                <request>
-                    <url>
-                        <xsl:value-of select="$serviceURL"/>
-                    </url>
-                    <method>get</method>
-                    <param name="request">GetCapabilities</param>
-                    <param name="version">
-                        <xsl:value-of select="$serviceVersion" />
-                    </param>
-                    <parsers:XMLValidatingParser>
-                        <parsers:schemas>
-                            <parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>
-                            <parsers:schema>
-                                <xsl:attribute name="type">
-                                    <xsl:value-of select="$responseSchemaType" />
-                                </xsl:attribute>
-                                <xsl:value-of select="$responseSchemaLocation" />
-                            </parsers:schema>
-                        </parsers:schemas>
-                    </parsers:XMLValidatingParser>
-                </request>
-            </xsl:variable>		
-
-            <!--TODO:  Fix this-->
-            <xsl:choose>
-                <xsl:when test="not($request1/*)">
-                    <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
-                    <ctl:fail/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:if test="not($request1/ows:ExceptionReport)">
-                        <ctl:message>FAILURE:  The root element from the response to a GetCapabilities request does not match the expected root element of ExceptionReport</ctl:message>						
-                        <ctl:fail />
-                    </xsl:if>
-                </xsl:otherwise>
-            </xsl:choose>		
-				
-        </code>
-    </test>
-	
-    <test name="owsTests:ows-OWS.GetCapabilities.5">
-        <param name="serviceURL"/>
-        <param name="serviceType" />
-        <param name="serviceVersion" />
-        <param name="responseSchemaLocation" />
-        <param name="responseSchemaType" />
-        <param name="rootElementName" />
-        <assertion>A KVP-encoded GetCapabilities request shall include the following query parameters: service=WxS request=GetCapabilities, where WxS is a mnemonic label for a service type. See Table 2 for definitions of optional query parameters.</assertion>
-        <comment>GetCapabilities with no version and service of $serviceType.  Version negotiation, sends latest copy.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an $rootElementName document; (3) the response version must be what was requested.</comment>
-        <link>ows-1.0.0-metadata-atc2</link>  
-        <link>OGC 05-008c1, 7.2.2, p.12 (Table 2)</link>
-        <code>
-            <ctl:message select="concat('GetCapabilities with no version and service of &quot;', $serviceType, '&quot;.  Version negotiation, sends latest copy.  Pass if all of the following conditions are true: (1) the response is schema valid; (2) the root document is an $rootElementName document; (3) the response version must be what was requested')"/>		
-            <xsl:variable name="request1">
+    <test name="owsTests:ows-OWS.GetCapabilities-UpdateSequence.1">
+      <param name="serviceURL"/>
+      <param name="serviceType" />
+      <param name="serviceVersion" />
+      <param name="responseSchemaLocation" />
+      <param name="responseSchemaType" />
+      <param name="rootElementName" />
+      <param name="updatesequenceLow" />
+      <assertion>When a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value lower than the current update sequence value, then the server returns capabilities XML.</assertion>
+      <comment>Table 3, row 4</comment>
+      <comment><![CDATA[Check for valid  XML where /WCS_Capabilities exists]]></comment>
+      <link title="OGC 03-065r6: cl. 7.2.1">http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding</link>
+      <code>
+         <xsl:variable name="request1">
                 <request>
                     <url>
                         <xsl:value-of select="$serviceURL"/>
@@ -1163,6 +988,9 @@
                     <param name="service">
                         <xsl:value-of select="$serviceType" />
                     </param>
+                    <param name="updatesequence">
+                        <xsl:value-of select="$updatesequenceLow" />
+                    </param>
                     <parsers:XMLValidatingParser>
                         <parsers:schemas>
                             <parsers:schema type="resource">../../wfs-1.1.0/resources/xsd/w3c/xmlschema/1.0/XMLSchema.xsd</parsers:schema>
@@ -1175,9 +1003,9 @@
                         </parsers:schemas>
                     </parsers:XMLValidatingParser>
                 </request>
-            </xsl:variable>			
-
-            <xsl:choose>
+            </xsl:variable>	
+            
+         <xsl:choose>
                 <xsl:when test="not($request1/*)">
                     <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
                     <ctl:fail/>
@@ -1202,14 +1030,90 @@
                         <ctl:fail />
                     </xsl:if>
                 </xsl:otherwise>
-            </xsl:choose>		
+            </xsl:choose>	
+      </code>
+   </test>
+   
+    <test name="owsTests:ows-OWS.GetCapabilities-UpdateSequence.2">
+      <param name="serviceURL"/>
+      <param name="serviceType" />
+      <param name="serviceVersion" />
+      <param name="responseSchemaLocation" />
+      <param name="responseSchemaType" />
+      <param name="rootElementName" />
+      <param name="updatesequenceCurrent" />
+      <assertion>When a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value equal than the current update sequence value, then the server returns capabilities XML with only "version" and "update sequence parameter".</assertion>
+      <comment>Table 3, row 4</comment>
+      <comment><![CDATA[Check for valid  XML where /WCS_Capabilities exists]]></comment>
+      <link title="OGC 03-065r6: cl. 7.2.1">http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding</link>
+      <code>
+            <xsl:variable name="request1">
+                <request>
+                    <url>
+                        <xsl:value-of select="$serviceURL"/>
+                    </url>
+                    <method>get</method>
+                    <param name="request">GetCapabilities</param>				   
+                    <param name="service">
+                        <xsl:value-of select="$serviceType" />
+                    </param>
+                    <param name="updatesequence">
+                        <xsl:value-of select="$updatesequenceCurrent" />
+                    </param>
+                </request>
+            </xsl:variable>	
+            
+         <xsl:choose>
+                <xsl:when test="not($request1/*)">
+                    <ctl:message>FAILURE: Missing or invalid response entity.</ctl:message>
+                    <ctl:fail/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:variable name="request1Root" select="local-name-from-QName(node-name($request1/*[1]))" />
+                    <xsl:variable name="version">
+                        <xsl:value-of select="$request1/*[1]/@version" />
+                    </xsl:variable>
+                    <xsl:variable name="updateSequence">
+                        <xsl:value-of select="$request1/*[1]/@updateSequence" />
+                    </xsl:variable>
+                    <xsl:variable name="nbChild">
+                        <xsl:value-of select="count($request1/*[1]/*)" />
+                    </xsl:variable>
+
+                    <xsl:if test="not($request1Root=$rootElementName)">
+                        <ctl:message>FAILURE:  The root element from the response to a GetCapabilities request does not match the expected root element of "
+                            <xsl:value-of select="$rootElementName" />"
+                        </ctl:message>
+                        <ctl:message select="concat('Root element was: &quot;', $request1Root, '&quot;')"/>
+                        <ctl:fail />
+                    </xsl:if>
+                    <xsl:if test="not($version=$serviceVersion)">
+                        <ctl:message>FAILURE:  The returned value in the version attribute "
+                            <xsl:value-of select="$version" />" does not match the expected version of "
+                            <xsl:value-of select="$serviceVersion" />"
+                        </ctl:message>
+                        <ctl:fail />
+                    </xsl:if>
+                     <xsl:if test="not($updateSequence=$updatesequenceCurrent)">
+                        <ctl:message>FAILURE:  The returned value in the updatesequence attribute "
+                            <xsl:value-of select="$updateSequence" />" does not match the expected updatesequence of "
+                            <xsl:value-of select="$updatesequenceCurrent" />"
+                        </ctl:message>
+                        <ctl:fail />
+                    </xsl:if>
+                    <xsl:if test="$nbChild!=0">
+                        <ctl:message>FAILURE:  The capabilities document must have no children</ctl:message>
+                        <ctl:fail />
+                    </xsl:if>
+               </xsl:otherwise>
+            </xsl:choose>	
 				
-        </code>
-    </test>
-    
-        <!--=========-->
-	<!-- PARSERS -->
-	<!--=========-->
+      </code>
+   </test>
+   
+    <!--=========-->
+    <!-- PARSERS -->
+    <!--=========-->
     
     <ctl:test name="ctl:SchematronValidatingParser">
         <ctl:param name="doc"/>

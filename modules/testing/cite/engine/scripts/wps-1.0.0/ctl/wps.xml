@@ -19,63 +19,82 @@
 	xmlns:wps="http://www.opengis.net/wps/1.0.0"	
 	xmlns:xml="http://www.w3.org/XML/1998/namespace"
 	xmlns:ogc="http://www.opengis.net/ogc"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
->
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
-	<ctl:suite name="wps:suite">		<!--NOTE: Don't forget to update the TARGET_NAMESPACE_URI and docs/wps/1.0/WPS 1.0 ATS.html placeholder values-->
-		<ctl:title>WPS 1.0 Compliance Test Suite</ctl:title>
-		<ctl:description>Verifies that an WPS 1.0.0 implementation complies with a given conformance class.</ctl:description>
+    <ctl:suite name="wps:suite">
+        <ctl:title>WPS 1.0 Compliance Test Suite</ctl:title>
+        <ctl:description>Verifies that an WPS 1.0.0 implementation complies with a given conformance class.</ctl:description>
         <ctl:link>docs/wps/1.0/</ctl:link>		
-		<ctl:starting-test>wps:Main</ctl:starting-test>
-	</ctl:suite>
+        <ctl:starting-test>wps:Main</ctl:starting-test>
+    </ctl:suite>
 	
 	<ctl:test name="wps:Main">
 		<ctl:assertion>The IUT satisfies all applicable assertions.</ctl:assertion>
 		<ctl:code>
 		         
-			<xsl:variable name="form-values">
-                                <!-- TODO fill with real wps url-->
-				<!--ctl:form height="640" width="800">
-					<body>
-						<h2>Compliance test suite for Web Processing Service (WPS) 1.0</h2>
-						<h3>Service metadata</h3>
-						<p>
-						Please provide a URL from which a capabilities document can 
-						be retrieved. Modify the URL template below to specify the 
-						location of an OGC WPS implementation 
-						under test.
-						</p>
-						<blockquote>
-							<table border="1" padding="4" bgcolor="#00ffff">
-								<tr>
-								<td align="left">Service URL:</td>                        
-								<td align="center">
-									<input name="service-url" size="128" 
-									type="text" 
-									value="http://mars.uni-muenster.de:8080/OWS5SOS/sos"/>
-								<value="http://hostname:port/path">
-									<
-									<select name="service-url-ddl">
-										<option value="http://mars.uni-muenster.de:8080/OWS5SOS/sos">http://mars.uni-muenster.de:8080/OWS5SOS/sos</option>							  
-										<option value="http://mars.uni-muenster.de:8080/52nSOSv2/sos">http://mars.uni-muenster.de:8080/52nSOSv2/sos</option>							  
-										<option value="http://10.2.111.55:8080/52n/sos">http://10.2.111.55:8080/52n/sos</option>
-										<option value="http://vast.uah.edu:8080/ows-dev/dopplerSos">http://vast.uah.edu:8080/ows-dev/dopplerSos</option>
-									</select>
-									>
-								</td>
-								</tr>				
-							</table>
-						</blockquote>
-						<input type="submit" value="Start"/>
-					</body>
-				</ctl:form-->
-			</xsl:variable>
+		<!--xsl:variable name="form-values">
+                <ctl:form height="640" width="800">
+                    <body>
+                        <h2>Compliance test suite for Web Processing Service (WPS) 1.0</h2>
+                        <h3>Service metadata</h3>
+                        <p>
+                            Please provide a URL from which a capabilities document can 
+                            be retrieved. Modify the URL template below to specify the 
+                            location of an OGC WPS implementation 
+                            under test.
+                        </p>
+                        <blockquote>
+                            <table border="1" padding="4" bgcolor="#00ffff">
+                                <tr>
+                                    <td align="left">Service URL:</td>                        
+                                    <td align="center">
+                                        <input name="service-url" size="128" type="text" value="http://hostname:port/path"/>
+                                    </td>
+                                </tr>				
+                            </table>
+                        </blockquote>
+                        <h4>UpdateSequence Values</h4>
+                        <br/>
+                        <br/>
+                        <p>The WPS spec allows servers to use an UpdateSequence value for
+                            maintaining cache consistency. If the server advertises an
+                            UpdateSequence value, enter the updateSequence values requested
+                            below.
+                        </p>
+                        <blockquote>
+                            <table border="3" padding="3">
+                                <tr>
+                                    <td align="center">
+                                        <input name="updatesequence-high" size="25" type="text" value=""/>
+                                    </td>
+                                    <td align="left">A value that is lexically higher than the current
+                                        updateSequence value
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <input name="updatesequence-low" size="25" type="text" value=""/>
+                                    </td>
+                                    <td align="left">A value that is lexically lower than the current
+                                        updateSequence value
+                                    </td>
+                                </tr>
+                            </table>
+                        </blockquote>
+                        <input type="submit" value="Start"/>
+                    </body>
+                </ctl:form>
+		</xsl:variable-->
 		 
-		 
-			<!-- Get user input: -->	
+			<!-- Get user input: >	
+                        <xsl:variable name="wps.service.url" select="$form-values/values/value[@key='service-url']"/>
+                        <xsl:variable name="wps.updatesequence.high" select="$form-values/values/value[@key='updatesequence-high']"/>
+                        <xsl:variable name="wps.updatesequence.low" select="$form-values/values/value[@key='updatesequence-low']"/-->
+                        
+                        <!-- headless version -->
 			<xsl:variable name="wps.service.url" select="'http://localhost:9090/wps/default'"/>
-			
-		
+                        <xsl:variable name="wps.updatesequence.high" select="'9999999999999'"/>
+                        <xsl:variable name="wps.updatesequence.low" select="'1'"/>
         
 			<!-- set other "global" variables -->			
 			<xsl:variable name="ogc.schema.root" select="'http://schemas.opengis.net/'"/>
@@ -84,14 +103,24 @@
 			<xsl:variable name="wps.version" select="'1.0.0'"/>		
 			<xsl:variable name="ows.version" select="'1.1.0'"/>
 			<xsl:variable name="exceptionReportSchema" select="wpsFunctions:exceptionReportSchemaPath($ogc.schema.root, $ows.version)"/>
-			<ctl:message select="concat('WPS service URL: ',$wps.service.url)"/>		
+			<ctl:message select="concat('WPS service URL: ',$wps.service.url)"/>	
+                        
+                        <xsl:if test="$wps.updatesequence.high!=''">
+                            <ctl:message select="concat('High value of update sequence: ', $wps.updatesequence.high)"/>
+                        </xsl:if>
+
+                        <xsl:if test="$wps.updatesequence.low!=''">
+                            <ctl:message select="concat('Low value of update sequence: ', $wps.updatesequence.low)"/>
+                        </xsl:if>
 
 		
 			<ctl:call-test name="wps:ows-main">
 				<ctl:with-param name="serviceURL" select="$wps.service.url" />
 				<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema" />
 				<ctl:with-param name="wpsSchemaRoot" select="$wps.schema.root" />
-				<ctl:with-param name="wpsVersion" select="$wps.version" />
+                                <ctl:with-param name="wpsVersion" select="$wps.version" />
+				<ctl:with-param name="updatesequenceHigh" select="$wps.updatesequence.high" />
+                                <ctl:with-param name="updatesequenceLow" select="$wps.updatesequence.low" />
 			</ctl:call-test>
 
 			<ctl:call-test name="wps:general-main">
@@ -116,6 +145,8 @@
 		<ctl:param name="exceptionReportSchema" />
 		<ctl:param name="wpsSchemaRoot"/>
 		<ctl:param name="wpsVersion"/>
+                <ctl:param name="updatesequenceHigh" />
+                <ctl:param name="updatesequenceLow" />
 		<ctl:assertion>All assertions for "ows" conformance are satisfied.</ctl:assertion>
 		<ctl:comment>Test driver for the ows module.</ctl:comment>
 		<ctl:link title="1. OWS">docs/wps/1.0/WPS 1.0 ATS.html#ows</ctl:link>
@@ -133,6 +164,8 @@
 				<ctl:with-param name="capabilitiesResponseContentType" select="string('text/xml')" />
 				<ctl:with-param name="exceptionReportSchemaLocation" select="$exceptionReportSchema"/>
 				<ctl:with-param name="exceptionReportSchemaType" select="string('url')" />
+                                <ctl:with-param name="updatesequenceHigh" select="$updatesequenceHigh" />
+                                <ctl:with-param name="updatesequenceLow" select="$updatesequenceLow" />
 			</ctl:call-test>
 		</ctl:code>
 		</ctl:test>

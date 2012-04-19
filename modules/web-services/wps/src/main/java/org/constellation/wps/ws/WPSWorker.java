@@ -187,6 +187,7 @@ public class WPSWorker extends AbstractWorker {
         if (context != null) {
             // Load all process from all factory
             if (Boolean.TRUE == context.getProcesses().getLoadAll()) {
+                LOGGER.info("Loading all process");
                 final Iterator<ProcessingRegistry> factoryIte = ProcessFinder.getProcessFactories();
                 while (factoryIte.hasNext()) {
                     final ProcessingRegistry factory = factoryIte.next();
@@ -199,6 +200,7 @@ public class WPSWorker extends AbstractWorker {
                     final ProcessingRegistry factory = ProcessFinder.getProcessFactory(processFactory.getAutorityCode());
                     if (factory != null) {
                         if (Boolean.TRUE == processFactory.getLoadAll()) {
+                            LOGGER.log(Level.INFO, "loading all process for factory:{0}", processFactory.getAutorityCode());
                             for (final ProcessDescriptor descriptor : factory.getDescriptors()) {
                                 ProcessDescriptorList.add(descriptor);
                             }
