@@ -1137,6 +1137,34 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     }
 
     /**
+     * Overriden from AbstractWorker because the behaviour is different when the request updateSequence 
+     * is equal to the current.
+     * 
+     * @param updateSequence
+     * @return
+     * @throws CstlServiceException 
+     */
+    @Override
+    protected boolean returnUpdateSequenceDocument(final String updateSequence) throws CstlServiceException {
+        if (updateSequence == null) {
+            return false;
+        }
+        try {
+            final long sequenceNumber = Long.parseLong(updateSequence);
+            final long currentUpdateSequence = Long.parseLong(getCurrentUpdateSequence());
+            if (sequenceNumber == currentUpdateSequence) {
+                throw new CstlServiceException("The update sequence parameter is equal to the current", CURRENT_UPDATE_SEQUENCE, "updateSequence");
+            } else if (sequenceNumber > currentUpdateSequence) {
+                throw new CstlServiceException("The update sequence parameter is invalid (higher value than the current)", INVALID_UPDATE_SEQUENCE, "updateSequence");
+            }
+            return false;
+        } catch(NumberFormatException ex) {
+            throw new CstlServiceException("The update sequence must be an integer", ex, INVALID_PARAMETER_VALUE, "updateSequence");
+        }
+        
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @Override
