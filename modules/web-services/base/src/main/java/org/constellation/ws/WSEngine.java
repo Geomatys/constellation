@@ -16,10 +16,7 @@
  */
 package org.constellation.ws;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
@@ -34,6 +31,8 @@ public final class WSEngine {
      */
     private static final Map<String, Map<String, Worker>> WORKERS_MAP = new HashMap<String, Map<String, Worker>>();
  
+    private static final List<String> REGISTERED_SERVICE = new ArrayList<String>();
+    
     public static Map<String, Worker> getWorkersMap(final String specification) {
         return WORKERS_MAP.get(specification);
     }
@@ -115,5 +114,20 @@ public final class WSEngine {
                 workersMap.remove(serviceID);
             }
         }
+    }
+    
+     /**
+     * Add a service type to the list of registered service if it is not already registred.
+     * 
+     * @param serviceName A service type (CSW, SOS, WMS, ...).
+     */
+    public static void registerService(final String serviceName) {
+        if (!REGISTERED_SERVICE.contains(serviceName)) {
+            REGISTERED_SERVICE.add(serviceName);
+        }
+    }
+    
+    public static List<String> getRegisteredServices() {
+        return REGISTERED_SERVICE;
     }
 }

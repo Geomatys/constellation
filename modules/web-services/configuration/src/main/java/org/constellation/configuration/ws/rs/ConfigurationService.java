@@ -63,6 +63,7 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.ws.ExceptionCode.*;
+import org.constellation.ws.WSEngine;
 
 // Geotoolkit dependencies
 import org.geotoolkit.factory.FactoryRegistry;
@@ -182,7 +183,7 @@ public final class ConfigurationService extends WebService  {
             }
                     
             else if (REQUEST_LIST_SERVICE.equalsIgnoreCase(request)) {    
-                final ServiceReport response = new ServiceReport(REGISTERED_SERVICE);
+                final ServiceReport response = new ServiceReport(WSEngine.getRegisteredServices());
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             } 
             
@@ -197,7 +198,7 @@ public final class ConfigurationService extends WebService  {
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
-            else if ("updateUser".equalsIgnoreCase(request)) {
+            else if (REQUEST_UPDATE_USER.equalsIgnoreCase(request)) {
                 final String userName = getParameter("userName", true);
                 final String password = getParameter("password", true);
                 final String oldLogin = getParameter("oldLogin", true);
@@ -205,18 +206,18 @@ public final class ConfigurationService extends WebService  {
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
-            else if ("deleteUser".equalsIgnoreCase(request)) {
+            else if (REQUEST_DELETE_USER.equalsIgnoreCase(request)) {
                 final String userName = getParameter("userName", true);
                 final AcknowlegementType response = deleteUser(userName);
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
-            else if ("getUserName".equalsIgnoreCase(request)) {
+            else if (REQUEST_GET_USER_NAME.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = getUserName();
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
-            else if ("access".equalsIgnoreCase(request)) {
+            else if (REQUEST_ACCESS.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = new AcknowlegementType("Success", "You have access to the configuration service");
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }

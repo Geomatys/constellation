@@ -19,20 +19,20 @@ package org.constellation.ws.rs;
 
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-// jersey dependencies
-import com.sun.jersey.api.core.HttpContext;
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import org.xml.sax.SAXException;
+
+// jersey dependencies
+import com.sun.jersey.api.core.HttpContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -51,14 +51,14 @@ import javax.xml.validation.SchemaFactory;
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+
 import static org.constellation.ws.ExceptionCode.*;
-import org.geotoolkit.util.StringUtilities;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
-import org.xml.sax.SAXException;
+import org.geotoolkit.util.StringUtilities;
 
 
 /**
@@ -123,8 +123,6 @@ public abstract class WebService {
      */
     protected static final Logger LOGGER = Logging.getLogger(WebService.class);
     
-    protected static final List<String> REGISTERED_SERVICE = new ArrayList<String>();
-
     /**
      * Automatically set by Jersey.
      *
@@ -650,14 +648,4 @@ public abstract class WebService {
      */
     protected abstract MarshallerPool getConfigurationPool();
     
-    /**
-     * Add a service type to the list of registered service if it is not already registred.
-     * 
-     * @param serviceName A service type (CSW, SOS, WMS, ...).
-     */
-    protected static void registerService(final String serviceName) {
-        if (!REGISTERED_SERVICE.contains(serviceName)) {
-            REGISTERED_SERVICE.add(serviceName);
-        }
-    }
 }
