@@ -53,12 +53,11 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.AbstractServer;
+import org.geotoolkit.client.ServerFactory;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.util.ArgumentChecks;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.parameter.Parameters;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
@@ -68,7 +67,6 @@ import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.style.MutableStyle;
 
-import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -86,15 +84,6 @@ import static org.constellation.api.QueryConstants.*;
  */
 public class ConstellationServer<S extends Services, P extends Providers, C extends Csws, T extends Tasks> extends AbstractServer{
     
-    public static final ParameterDescriptor<String> URL_PARAMETER = new DefaultParameterDescriptor("Url",
-            "Server URL",String.class,null,true);
-    public static final ParameterDescriptor<String> USER_PARAMETER = new DefaultParameterDescriptor("User",
-            "User login",String.class,null,true);
-    public static final ParameterDescriptor<String> PASSWORD_PARAMETER = new DefaultParameterDescriptor("Password",
-            "User password",String.class,null,true);
-    public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP =
-            new DefaultParameterDescriptorGroup("Constellation",URL_PARAMETER,USER_PARAMETER,PASSWORD_PARAMETER);
-    
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
 
@@ -105,20 +94,33 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     
     public final String currentUser;
     
-    public ConstellationServer(final ParameterValueGroup value) throws MalformedURLException {
-        this(new URL(Parameters.value(URL_PARAMETER, value)),
-             Parameters.stringValue(USER_PARAMETER, value),
-             Parameters.stringValue(PASSWORD_PARAMETER, value));
-    }
-    
-    
     public ConstellationServer(final URL server, final String user, final String password) {
-        super(server,new BasicAuthenticationSecurity(user, password));
+        super(create(ConstellationServerFactory.PARAMETERS, server, null));
         this.services    = createServiceManager();
         this.providers   = createProviderManager();
         this.csws        = createCswManager();
         this.tasks       = createTaskManager();
-        this.currentUser = user;
+        this.currentUser = Parameters.value(ConstellationServerFactory.USER, parameters);
+        Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters)
+                .setValue(new BasicAuthenticationSecurity(user, password));
+    }
+    
+    public ConstellationServer(ParameterValueGroup params){
+        super(params);
+        this.services    = createServiceManager();
+        this.providers   = createProviderManager();
+        this.csws        = createCswManager();
+        this.tasks       = createTaskManager();
+        this.currentUser = Parameters.value(ConstellationServerFactory.USER, parameters);
+        Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters)
+                .setValue(new BasicAuthenticationSecurity(
+                        Parameters.value(ConstellationServerFactory.USER, params), 
+                        Parameters.value(ConstellationServerFactory.PASSWORD, params)));
+    }
+
+    @Override
+    public ServerFactory getFactory() {
+        return new ConstellationServerFactory();
     }
     
     protected S createServiceManager(){
@@ -138,9 +140,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     }
     
     public static ConstellationServer login(final ParameterValueGroup value) {
-        return login(Parameters.value(URL_PARAMETER, value),
-             Parameters.stringValue(USER_PARAMETER, value),
-             Parameters.stringValue(PASSWORD_PARAMETER, value));
+        return login(Parameters.value(ConstellationServerFactory.URL, value),
+             Parameters.stringValue(ConstellationServerFactory.USER, value),
+             Parameters.stringValue(ConstellationServerFactory.PASSWORD, value));
     }
     
     public static ConstellationServer login(final String serviceURL, 
@@ -180,7 +182,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             final URL url = new URL(str);
             cnx = (HttpURLConnection) url.openConnection();
             getClientSecurity().secure(cnx);
-            stream = AbstractRequest.openRichException(cnx, securityManager);            
+            stream = AbstractRequest.openRichException(cnx, getClientSecurity());            
         } catch (Exception ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage());
             return false;
@@ -1500,7 +1502,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = unmarshallerPool.acquireUnmarshaller();
-                final InputStream responseStream = AbstractRequest.openRichException(conec, securityManager);  
+                final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());  
                 response = unmarshaller.unmarshal(responseStream);
                 if (response instanceof JAXBElement) {
                     JAXBElement element = (JAXBElement) response;
@@ -1574,7 +1576,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             try {
                 final ParameterDescriptorReader reader = new ParameterDescriptorReader();
-                final InputStream responseStream = AbstractRequest.openRichException(conec, securityManager);  
+                final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());  
                 reader.setInput(responseStream);
                 reader.read();
                 response = reader.getDescriptorsRoot();
