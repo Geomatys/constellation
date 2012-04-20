@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.tile.ws;
+package org.constellation.wmts.ws;
 
 import java.util.ArrayList;
 import java.util.Arrays;

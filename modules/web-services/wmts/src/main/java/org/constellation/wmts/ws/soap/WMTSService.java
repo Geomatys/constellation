@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.tile.ws.soap;
+package org.constellation.wmts.ws.soap;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -28,8 +28,8 @@ import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.tile.ws.DefaultWMTSWorker;
-import org.constellation.tile.ws.WMTSWorker;
+import org.constellation.wmts.ws.DefaultWMTSWorker;
+import org.constellation.wmts.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.soap.OGCWebService;

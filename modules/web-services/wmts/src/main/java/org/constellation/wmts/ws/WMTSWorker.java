@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.tile.ws;
+package org.constellation.wmts.ws;
 
 //J2SE dependencies
 import java.awt.image.BufferedImage;

@@ -172,7 +172,7 @@
         <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
         <constellation.metadata-provider>org.constellation.metadata.ws.rs.provider</constellation.metadata-provider>
         <constellation.map>org.constellation.map.ws.rs</constellation.map>
-        <constellation.tile>org.constellation.tile.ws.rs</constellation.tile>
+        <constellation.tile>org.constellation.wmts.ws.rs</constellation.tile>
         <constellation.feature>org.constellation.wfs.ws.rs</constellation.feature>
         <constellation.provider>org.constellation.ws.rs.provider</constellation.provider>
         <constellation.coverage>org.constellation.coverage.ws.rs</constellation.coverage>

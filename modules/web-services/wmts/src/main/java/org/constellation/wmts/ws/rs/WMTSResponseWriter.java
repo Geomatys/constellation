@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.tile.ws.rs;
+package org.constellation.wmts.ws.rs;
 
 import java.io.IOException;
 import java.io.OutputStream;

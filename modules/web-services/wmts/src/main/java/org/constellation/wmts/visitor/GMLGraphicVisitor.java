@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.tile.visitor;
+package org.constellation.wmts.visitor;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

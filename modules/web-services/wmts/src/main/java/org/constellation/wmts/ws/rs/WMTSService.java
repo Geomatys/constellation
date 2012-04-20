@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.tile.ws.rs;
+package org.constellation.wmts.ws.rs;
 
 import com.sun.jersey.spi.resource.Singleton;
 import java.io.File;
@@ -34,8 +34,8 @@ import org.constellation.ServiceDef;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
-import org.constellation.tile.ws.WMTSWorker;
-import org.constellation.tile.ws.DefaultWMTSWorker;
+import org.constellation.wmts.ws.WMTSWorker;
+import org.constellation.wmts.ws.DefaultWMTSWorker;
 
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
