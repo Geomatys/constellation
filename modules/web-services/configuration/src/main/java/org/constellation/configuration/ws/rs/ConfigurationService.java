@@ -292,6 +292,7 @@ public final class ConfigurationService extends WebService  {
         if (cn != null) {
             if (!configurerLock()) {
                 BDD.clearConnectionPool();
+                WSEngine.prepareRestart();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
             } else if (!forced) {
@@ -301,6 +302,7 @@ public final class ConfigurationService extends WebService  {
                     configurer.closeForced();
                 }
                 BDD.clearConnectionPool();
+                WSEngine.prepareRestart();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted (previous indexation was stopped)");
             }

@@ -134,7 +134,7 @@ public class AdminRequestTest extends AbstractTestRequest {
         assertEquals(expResult, obj);
 
          /*
-         * we see the instance has now a status WORKING
+         * we verify tat the instance has now a status WORKING
          */
         URL liUrl = new URL("http://localhost:9090/wms/admin?request=listInstance");
 

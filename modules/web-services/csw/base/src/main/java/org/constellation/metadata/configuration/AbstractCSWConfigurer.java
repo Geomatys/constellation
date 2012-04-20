@@ -56,6 +56,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
 import static org.constellation.ws.ExceptionCode.*;
+import org.constellation.ws.WSEngine;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.FileUtilities;
@@ -595,6 +596,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     protected boolean restart() {
         if (containerNotifier != null) {
             BDD.clearConnectionPool();
+            WSEngine.prepareRestart();
             containerNotifier.reload();
             return true;
         } else {

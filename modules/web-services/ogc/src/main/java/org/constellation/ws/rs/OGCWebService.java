@@ -288,27 +288,16 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
                 specificRestart(identifier);
                 if (identifier == null) {
-                    
                     if (closeFirst) {
                         WSEngine.destroyInstances(serviceName);
-                        buildWorkerMap();
-                    } else {
-                        final Set<Entry<String, Worker>> oldEntries = WSEngine.getEntries(serviceName);
-                        buildWorkerMap();
-                        for (Entry<String, Worker> entry : oldEntries) {
-                            entry.getValue().destroy();
-                        }
                     }
+                    buildWorkerMap();
                 } else {
                     if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
                         if (closeFirst) {
                             WSEngine.shutdownInstance(serviceName, identifier);
-                            buildWorker(identifier);
-                        } else {
-                            Worker oldWorker = WSEngine.getInstance(serviceName, identifier);
-                            buildWorker(identifier);
-                            oldWorker.destroy();
                         }
+                        buildWorker(identifier);
                     } else {
                         throw new CstlServiceException("There is no instance " + identifier, INVALID_PARAMETER_VALUE, "id");
                     }
@@ -316,7 +305,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 return Response.ok(new AcknowlegementType("Success", "instances succefully restarted"), "text/xml").build();
 
             } else if ("start".equalsIgnoreCase(request)) {
-                LOGGER.info("starting a new worker");
+                LOGGER.info("starting an instance");
                 final String identifier = getParameter("id", true);
                 specificRestart(identifier);
                 final AcknowlegementType response;
@@ -480,11 +469,12 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
              * Return a report about the instances in the service.
              */
             } else if ("listInstance".equalsIgnoreCase(request)) {
+                LOGGER.info("listing instances");
                 final List<Instance> instances = new ArrayList<Instance>();
                 // 1- First we list the instance in the map
-                for (Entry<String, Worker> entry : WSEngine.getEntries(serviceName)) {
+                for (Entry<String, Boolean> entry : WSEngine.getEntriesStatus(serviceName)) {
                     final ServiceStatus status;
-                    if (entry.getValue().isStarted()) {
+                    if (entry.getValue()) {
                         status = ServiceStatus.WORKING;
                     } else {
                         status = ServiceStatus.ERROR;

@@ -17,6 +17,9 @@
 package org.constellation.ws;
 
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  *
@@ -26,6 +29,8 @@ public final class WSEngine {
     
     private WSEngine() {}
     
+    private static final Logger LOGGER = Logging.getLogger(WSEngine.class);
+    
     /**
      * A map of service worker.
      */
@@ -33,8 +38,14 @@ public final class WSEngine {
  
     private static final List<String> REGISTERED_SERVICE = new ArrayList<String>();
     
+    private static final List<String> TO_RESTART = new ArrayList<String>();
+    
     public static Map<String, Worker> getWorkersMap(final String specification) {
         return WORKERS_MAP.get(specification);
+    }
+    
+    public static void prepareRestart() {
+        TO_RESTART.addAll(WORKERS_MAP.keySet());
     }
     
     public static int getInstanceSize(final String specification) {
@@ -70,6 +81,10 @@ public final class WSEngine {
     }
     
     public static void destroyInstances(final String specification) {
+        if (TO_RESTART.contains(specification)) {
+            TO_RESTART.remove(specification);
+            return;
+        }
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap != null) {
             for (final Worker worker : workersMap.values()) {
@@ -81,28 +96,44 @@ public final class WSEngine {
     }
     
     public static boolean isSetService(final String specification) {
+        if (TO_RESTART.contains(specification)) {
+            return false;
+        }
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         return workersMap != null;
     }
     
     public static void setServiceInstances(final String specification, final Map<String, Worker> instances) {
-        WORKERS_MAP.put(specification, instances);
+        final Map<String, Worker> oldWorkersMap = WORKERS_MAP.put(specification, instances);
+        if (oldWorkersMap != null && !oldWorkersMap.isEmpty()) {
+            LOGGER.info("Destroying old workers");
+            for (Worker oldWorker : oldWorkersMap.values()) {
+                oldWorker.destroy();
+            }
+        }
     }
     
     public static void addServiceInstance(final String specification, final String serviceID, final Worker instance) {
         Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
-        if (workersMap != null) {
+        if (workersMap == null) {
             workersMap = new HashMap<String, Worker>();
         }
-        workersMap.put(serviceID, instance);
+        final Worker oldWorker = workersMap.put(serviceID, instance);
+        if (oldWorker != null) {
+            LOGGER.info("Destroying old worker");
+            oldWorker.destroy();
+        }
     }
 
-    public static Set<Map.Entry<String, Worker>> getEntries(final String specification) {
+    public static Set<Entry<String, Boolean>> getEntriesStatus(final String specification) {
+        final Set<Map.Entry<String, Boolean>> response = new HashSet<Entry<String, Boolean>>();
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap != null) {
-            return workersMap.entrySet();
+            for (Entry<String, Worker> entry : workersMap.entrySet()) {
+                response.add(new AbstractMap.SimpleEntry<String, Boolean>(entry.getKey(), entry.getValue().isStarted()));
+            }
         }
-        return new HashSet<Map.Entry<String, Worker>>();
+        return response;
     }
     
     public static void shutdownInstance(final String specification, final String serviceID) {

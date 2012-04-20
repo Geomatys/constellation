@@ -57,6 +57,7 @@ public class BDD {
 
     public static final String ORACLE_DRIVER_CLASS = "oracle.jdbc.driver.OracleDriver";
 
+    @Deprecated
     private static final Map<BDD, Connection> CONNECTION_MAP = new HashMap<BDD, Connection>();
     
     /**
@@ -263,6 +264,7 @@ public class BDD {
      *
      * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
      */
+    @Deprecated
     public Connection getConnection() throws SQLException {
         if (sharedConnection) {
             Connection conec = CONNECTION_MAP.get(this);
@@ -286,6 +288,7 @@ public class BDD {
         }
     }
 
+    @Deprecated
     public static void clearConnectionPool() {
         CONNECTION_MAP.clear();
     }
