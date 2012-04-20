@@ -153,18 +153,10 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             return metadataExist(id, metadata);
         }
         
-        if ("UpdateVocabularies".equalsIgnoreCase(request)) {
-            return updateVocabularies();
-        }
-        
         if ("GetCSWDatasourceType".equalsIgnoreCase(request)) {
             return getAvailableCSWDataSourceType();
         }
 
-        if ("UpdateContacts".equalsIgnoreCase(request)) {
-            updateContacts();
-
-        }
         return null;
     }
     
@@ -631,20 +623,6 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         }
     }
     
-    /**
-     * Update all the vocabularies SKOS files and the list of contact.
-     */
-    public AcknowlegementType updateVocabularies() throws CstlServiceException {
-        throw new CstlServiceException("The method updateVocabularies is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
-    }
-
-    /**
-     * Update all the contact retrieved from files and the list of contact.
-     */
-    public AcknowlegementType updateContacts() throws CstlServiceException {
-        throw new CstlServiceException("The method updateContacts is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
-    }
-
     /*
      * Return the configuration directory for the specified instance identifier.
      */

@@ -60,7 +60,10 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import org.constellation.generic.database.BDD;
-        
+
+import static org.constellation.api.QueryConstants.*;
+import static org.constellation.ws.ExceptionCode.*;
+
 // Geotoolkit dependencies
 import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.factory.FactoryRegistry;
@@ -69,9 +72,6 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.ws.ExceptionCode.*;
 
 // Mdweb metamodel auth dependencies
 import org.mdweb.model.auth.AuthenticationException;

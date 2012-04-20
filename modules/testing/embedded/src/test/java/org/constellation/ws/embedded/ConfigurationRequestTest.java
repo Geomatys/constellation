@@ -218,40 +218,6 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
     }
     
     @Test
-    public void testUpdateVocabularies() throws Exception {
-
-        URL niUrl = new URL("http://localhost:9090/configuration?request=UpdateVocabularies");
-
-
-        // for a POST request
-        URLConnection conec = niUrl.openConnection();
-
-        Object obj = unmarshallResponse(conec);
-
-        assertTrue(obj instanceof ExceptionReport);
-        ExceptionReport expResult = new ExceptionReport("The method updateVocabularies is not supported by the current implementation.",  
-                                                         StringUtilities.transformCodeName(ExceptionCode.OPERATION_NOT_SUPPORTED.name()));
-        assertEquals(expResult, obj);
-    }
-    
-    @Test
-    public void testUpdateContacts() throws Exception {
-
-        URL niUrl = new URL("http://localhost:9090/configuration?request=UpdateContacts");
-
-
-        // for a POST request
-        URLConnection conec = niUrl.openConnection();
-
-        Object obj = unmarshallResponse(conec);
-
-        assertTrue(obj instanceof ExceptionReport);
-        ExceptionReport expResult = new ExceptionReport("The method updateContacts is not supported by the current implementation.",  
-                                                         StringUtilities.transformCodeName(ExceptionCode.OPERATION_NOT_SUPPORTED.name()));
-        assertEquals(expResult, obj);
-    }
-    
-    @Test
     public void testListAvailableService() throws Exception {
         URL niUrl = new URL("http://localhost:9090/configuration?request=ListAvailableService");
 
