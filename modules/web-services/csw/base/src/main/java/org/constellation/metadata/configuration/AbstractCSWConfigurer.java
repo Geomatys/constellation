@@ -55,6 +55,8 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
+import static org.constellation.ws.ExceptionCode.*;
+
 // Geotoolkit dependencies
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
@@ -62,8 +64,6 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.IndexDirectoryFilter;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * The base for The CSW configurer.
@@ -509,9 +509,8 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             identifiers.add(token);
         }
         AbstractIndexer indexer  = null;
-        CSWMetadataReader reader = null;
         try {
-            reader  = initReader(id);
+            final CSWMetadataReader reader  = initReader(id);
             final List<Object> objectToIndex = new ArrayList<Object>();
             if (reader != null) {
                 try {

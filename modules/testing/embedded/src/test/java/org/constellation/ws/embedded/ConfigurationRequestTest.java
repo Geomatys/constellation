@@ -29,9 +29,9 @@ import java.net.URL;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ServiceReport;
+import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -89,7 +89,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport expResult = new ExceptionReport("Download operation not implemented",  
-                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()));
+                                                         StringUtilities.transformCodeName(ExceptionCode.OPERATION_NOT_SUPPORTED.name()));
         assertEquals(expResult, obj);
     }
     
@@ -107,7 +107,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport exception = new ExceptionReport("The parameter ID must be specified",  
-                                                         OWSExceptionCode.MISSING_PARAMETER_VALUE.name());
+                                                         StringUtilities.transformCodeName(ExceptionCode.MISSING_PARAMETER_VALUE.name()));
         assertEquals(exception, obj);
         
         
@@ -230,7 +230,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport expResult = new ExceptionReport("The method updateVocabularies is not supported by the current implementation.",  
-                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()));
+                                                         StringUtilities.transformCodeName(ExceptionCode.OPERATION_NOT_SUPPORTED.name()));
         assertEquals(expResult, obj);
     }
     
@@ -247,7 +247,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport expResult = new ExceptionReport("The method updateContacts is not supported by the current implementation.",  
-                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()));
+                                                         StringUtilities.transformCodeName(ExceptionCode.OPERATION_NOT_SUPPORTED.name()));
         assertEquals(expResult, obj);
     }
     

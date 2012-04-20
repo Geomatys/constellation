@@ -65,6 +65,10 @@ public class WMSRequestsTest extends AbstractTestRequest {
     /**
      * URLs which will be tested on the server.
      */
+    private static final String WMS_DEFAULT = "http://localhost:9090/wms/default?";
+    
+    private static final String WMS_WMS1 = "http://localhost:9090/wms/wms1?";
+    
     private static final String WMS_GETCAPABILITIES =
             "http://localhost:9090/wms/default?request=GetCapabilities&service=WMS&version=1.1.1";
 
@@ -293,6 +297,10 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertTrue(bboxGeo.getSouthBoundLatitude() ==  -90d);
         assertTrue(bboxGeo.getEastBoundLongitude() ==  180d);
         assertTrue(bboxGeo.getNorthBoundLatitude() ==   90d);
+        
+        String currentUrl = responseCaps.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().getHref();
+        
+        assertEquals(WMS_DEFAULT, currentUrl);
 
         // Creates a valid GetCapabilities url.
         try {
@@ -315,6 +323,27 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // The layer lake must be included
         layer130 = (org.geotoolkit.wms.xml.v130.Layer) responseCaps130.getLayerFromName("http://www.opengis.net/gml:Lakes");
         assertNotNull(layer130);
+        
+        currentUrl = responseCaps.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().getHref();
+        
+        assertEquals(WMS_WMS1, currentUrl);
+        
+        try {
+            getCapsUrl = new URL(WMS_GETCAPABILITIES);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WMT_MS_Capabilities);
+        
+        currentUrl = responseCaps.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().getHref();
+        
+        assertEquals(WMS_DEFAULT, currentUrl);
+
     }
 
     @Test

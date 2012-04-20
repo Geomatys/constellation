@@ -90,11 +90,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-ows</artifactId>
-      <version>${geotoolkit-pending.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.library</groupId>
       <artifactId>cstl-lib-api</artifactId>
       <version>${project.version}</version>

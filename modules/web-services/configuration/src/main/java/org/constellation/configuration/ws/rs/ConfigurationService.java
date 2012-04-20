@@ -67,12 +67,11 @@ import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 
 import static org.constellation.api.QueryConstants.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.constellation.ws.ExceptionCode.*;
 
 // Mdweb metamodel auth dependencies
 import org.mdweb.model.auth.AuthenticationException;
@@ -270,7 +269,7 @@ public final class ConfigurationService extends WebService  {
      */
     @Override
     protected Response launchException(final String message, final String codeName, final String locator) {
-        final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
+        final ExceptionCode code = ExceptionCode.valueOf(codeName);
         final ExceptionReport report = new ExceptionReport(message, code.name());
         return Response.ok(report, MimeType.TEXT_XML).build();
     }

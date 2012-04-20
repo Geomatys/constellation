@@ -28,19 +28,13 @@ import java.util.logging.Level;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.ws.Endpoint;
+import com.sun.jersey.api.container.grizzly2.servlet.GrizzlyWebContainerFactory;
+import org.constellation.ws.rs.CstlServletContainer;
+import org.glassfish.grizzly.http.server.HttpServer;
 
 import org.geotoolkit.console.CommandLine;
 import org.geotoolkit.console.Option;
 import org.geotoolkit.util.logging.Logging;
-
-
-import com.sun.jersey.api.container.grizzly2.servlet.GrizzlyWebContainerFactory;
-import com.sun.net.httpserver.HttpContext;
-import org.constellation.metadata.ws.soap.CSWService;
-import org.constellation.ws.rs.CstlServletContainer;
-import org.glassfish.grizzly.http.server.HttpServer;
-
-
 
 /**
  * An Abstract class to run the web service in an embedded container.
