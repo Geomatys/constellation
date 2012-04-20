@@ -20,34 +20,32 @@ package org.constellation.configuration.ws.rs;
 import java.util.Arrays;
 import java.io.FileInputStream;
 import java.util.Properties;
-import org.mdweb.io.auth.AuthenticationReader;
-import org.constellation.configuration.ConfigDirectory;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.Context;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
+import java.lang.ref.WeakReference;
 
 // Jersey dependencies
 import javax.annotation.PreDestroy;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.MultivaluedMap;
 import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
-import java.lang.ref.WeakReference;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
-import javax.xml.bind.Unmarshaller;
-import org.constellation.ws.rs.WebService;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
@@ -56,16 +54,17 @@ import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.configuration.filter.ConfigurerFilter;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.generic.database.BDD;
+import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.constellation.generic.database.BDD;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.ws.ExceptionCode.*;
 
 // Geotoolkit dependencies
-import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.util.StringUtilities;
@@ -74,8 +73,9 @@ import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 
 // Mdweb metamodel auth dependencies
-import org.mdweb.model.auth.AuthenticationException;
+import org.mdweb.io.auth.AuthenticationReader;
 import org.mdweb.io.auth.sql.v24.DataSourceAuthenticationReader;
+import org.mdweb.model.auth.AuthenticationException;
 import org.mdweb.model.auth.UserAuthnInfo;
 
 /**
