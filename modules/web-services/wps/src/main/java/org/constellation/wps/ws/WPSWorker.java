@@ -20,11 +20,13 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
@@ -96,9 +98,15 @@ import org.constellation.configuration.Process;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.configuration.ProcessFactory;
+
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.api.CommonConstants.*;
+import org.constellation.configuration.Process;
 import static org.constellation.wps.ws.WPSConstant.*;
+import org.constellation.wps.ws.rs.WPSService;
+import org.geotoolkit.process.*;
+import org.geotoolkit.util.ArgumentChecks;
+import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -106,13 +114,13 @@ import static org.constellation.wps.ws.WPSConstant.*;
  * @author Quentin Boileau
  */
 public class WPSWorker extends AbstractWorker {
-    
+
     private final ProcessContext context;
-    
     /**
      * Supported CRS.
      */
     private static final SupportedCRSsType WPS_SUPPORTED_CRS;
+
     static {
         WPS_SUPPORTED_CRS = new SupportedCRSsType();
 
@@ -126,12 +134,13 @@ public class WPSWorker extends AbstractWorker {
         supportedCRS.getCRS().addAll(DEFAULT_CRS);
         WPS_SUPPORTED_CRS.setSupported(supportedCRS);
     }
-        
+    private static final int TIMEOUT = 30;
+    
     /**
      * List of process descriptor avaible.
      */
     private final List<ProcessDescriptor> ProcessDescriptorList = new ArrayList<ProcessDescriptor>();
-    
+
     /**
      * Constructor.
      *
@@ -140,25 +149,25 @@ public class WPSWorker extends AbstractWorker {
      */
     public WPSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WPS);
-        ProcessContext candidate          = null;
+        ProcessContext candidate = null;
         if (configurationDirectory != null) {
             final File lcFile = new File(configurationDirectory, "processContext.xml");
             if (lcFile.exists()) {
                 Unmarshaller unmarshaller = null;
                 try {
                     unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    Object obj   = unmarshaller.unmarshal(lcFile);
+                    Object obj = unmarshaller.unmarshal(lcFile);
                     if (obj instanceof ProcessContext) {
                         candidate = (ProcessContext) obj;
                         isStarted = true;
                     } else {
                         startError = "The process context File does not contain a ProcessContext object";
-                        isStarted  = false;
+                        isStarted = false;
                         LOGGER.log(Level.WARNING, startError);
                     }
                 } catch (JAXBException ex) {
                     startError = "JAXBExeception while unmarshalling the process context File";
-                    isStarted  = false;
+                    isStarted = false;
                     LOGGER.log(Level.WARNING, startError, ex);
                 } finally {
                     if (unmarshaller != null) {
@@ -172,17 +181,17 @@ public class WPSWorker extends AbstractWorker {
             }
         } else {
             startError = "The configuration directory has not been found";
-            isStarted  = false;
+            isStarted = false;
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         }
         this.context = candidate;
         fillProcessList();
-        
+
         if (isStarted) {
             LOGGER.log(Level.INFO, "WPS worker {0} running", id);
         }
     }
-    
+
     private void fillProcessList() {
         if (context != null) {
             // Load all process from all factory
@@ -248,13 +257,13 @@ public class WPSWorker extends AbstractWorker {
 
         //check SERVICE=WPS
         if (!request.getService().equalsIgnoreCase(WPS_SERVICE)) {
-            throw new CstlServiceException("The parameter "+ SERVICE_PARAMETER +" must be specified as WPS",
+            throw new CstlServiceException("The parameter " + SERVICE_PARAMETER + " must be specified as WPS",
                     INVALID_PARAMETER_VALUE, SERVICE_PARAMETER.toLowerCase());
         }
-        
+
         //check LANGUAGE=en-EN
-        if(request.getLanguage() != null && !request.getLanguage().equalsIgnoreCase(WPS_LANG)){
-             throw new CstlServiceException("The specified "+ LANGUAGE_PARAMETER +" is not handled by the service. ",
+        if (request.getLanguage() != null && !request.getLanguage().equalsIgnoreCase(WPS_LANG)) {
+            throw new CstlServiceException("The specified " + LANGUAGE_PARAMETER + " is not handled by the service. ",
                     INVALID_PARAMETER_VALUE, LANGUAGE_PARAMETER.toLowerCase());
         }
 
@@ -275,7 +284,7 @@ public class WPSWorker extends AbstractWorker {
         if (versionsAccepted == null || versionSupported) {
             return getCapabilities100((org.geotoolkit.wps.xml.v100.GetCapabilities) request);
         } else {
-           throw new CstlServiceException("The specified " + ACCEPT_VERSIONS_PARAMETER + " numbers are not handled by the service.",
+            throw new CstlServiceException("The specified " + ACCEPT_VERSIONS_PARAMETER + " numbers are not handled by the service.",
                     VERSION_NEGOTIATION_FAILED, ACCEPT_VERSIONS_PARAMETER.toLowerCase());
         }
 
@@ -295,7 +304,7 @@ public class WPSWorker extends AbstractWorker {
         if (returnUS) {
             return new WPSCapabilitiesType("1.0.0", getCurrentUpdateSequence());
         }
-        
+
         // We unmarshall the static capabilities document.
         final WPSCapabilitiesType staticCapabilities = (WPSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WPS_1_0_0.version.toString(), ServiceDef.Specification.WPS.toString());
 
@@ -330,13 +339,13 @@ public class WPSWorker extends AbstractWorker {
 
         //check SERVICE=WPS
         if (!request.getService().equalsIgnoreCase(WPS_SERVICE)) {
-            throw new CstlServiceException("The parameter "+ SERVICE_PARAMETER +" must be specified as WPS",
+            throw new CstlServiceException("The parameter " + SERVICE_PARAMETER + " must be specified as WPS",
                     INVALID_PARAMETER_VALUE, SERVICE_PARAMETER.toLowerCase());
         }
-        
+
         //check LANGUAGE=en-EN
-        if(request.getLanguage() != null && !request.getLanguage().equalsIgnoreCase(WPS_LANG)){
-            throw new CstlServiceException("The specified "+ LANGUAGE_PARAMETER +" is not handled by the service. ",
+        if (request.getLanguage() != null && !request.getLanguage().equalsIgnoreCase(WPS_LANG)) {
+            throw new CstlServiceException("The specified " + LANGUAGE_PARAMETER + " is not handled by the service. ",
                     INVALID_PARAMETER_VALUE, LANGUAGE_PARAMETER.toLowerCase());
         }
 
@@ -350,7 +359,7 @@ public class WPSWorker extends AbstractWorker {
         if (request.getVersion().equals(ServiceDef.WPS_1_0_0.version.toString())) {
             return describeProcess100((org.geotoolkit.wps.xml.v100.DescribeProcess) request);
         } else {
-             throw new CstlServiceException("The specified " + VERSION_PARAMETER + " number is not handled by the service.",
+            throw new CstlServiceException("The specified " + VERSION_PARAMETER + " number is not handled by the service.",
                     VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
         }
     }
@@ -376,22 +385,22 @@ public class WPSWorker extends AbstractWorker {
         descriptions.setVersion(WPS_1_0_0);
 
         for (final CodeType identifier : request.getIdentifier()) {
-  
+
             // Find the process
             final ProcessDescriptor processDesc = WPSUtils.getProcessDescriptor(identifier.getValue());
             if (!WPSUtils.isSupportedProcess(processDesc)) {
-                throw new CstlServiceException("Process "+ identifier.getValue() +" not supported by the service.",
+                throw new CstlServiceException("Process " + identifier.getValue() + " not supported by the service.",
                         INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
             }
-            
+
             final ProcessDescriptionType descriptionType = new ProcessDescriptionType();
             descriptionType.setIdentifier(identifier);          //Process Identifier
-            descriptionType.setTitle(WPSUtils.capitalizeFirstLetter(processDesc.getIdentifier().getCode()));                //Process Title
+            descriptionType.setTitle(WPSUtils.buildProcessTitle(processDesc));                //Process Title
             descriptionType.setAbstract(WPSUtils.capitalizeFirstLetter(processDesc.getProcedureDescription().toString()));  //Process abstract
             descriptionType.setProcessVersion(WPS_1_0_0);
             descriptionType.setWSDL(null);                      //TODO WSDL
             descriptionType.setStatusSupported(false);          //TODO support process status
-            descriptionType.setStoreSupported(false);           //TODO support process storage
+            descriptionType.setStoreSupported(WPSService.SUPPORT_STORAGE);
 
             // Get process input and output descriptors
             final ParameterDescriptorGroup input = processDesc.getInputDescriptor();
@@ -402,7 +411,7 @@ public class WPSWorker extends AbstractWorker {
             ///////////////////////////////
             final ProcessDescriptionType.DataInputs dataInputs = new ProcessDescriptionType.DataInputs();
             for (final GeneralParameterDescriptor param : input.descriptors()) {
-                
+
                 // If the Parameter Descriptor isn't a GroupeParameterDescriptor
                 if (param instanceof ParameterDescriptor) {
                     final InputDescriptionType in = new InputDescriptionType();
@@ -428,42 +437,42 @@ public class WPSWorker extends AbstractWorker {
                         in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT));
 
                         //Simple object (Integer, double, ...) and Object which need a conversion from String like affineTransform or WKT Geometry
-                    } else if(WPSIO.isSupportedLiteralInputClass(clazz)){
+                    } else if (WPSIO.isSupportedLiteralInputClass(clazz)) {
                         final LiteralInputType literal = new LiteralInputType();
 
                         if (paramDesc.getDefaultValue() != null) {
                             literal.setDefaultValue(paramDesc.getDefaultValue().toString()); //default value if enable
                         }
-                        
-                        if(paramDesc.getUnit() != null){
+
+                        if (paramDesc.getUnit() != null) {
                             literal.setUOMs(WPSUtils.generateUOMs(paramDesc));
                         }
                         //AllowedValues setted
-                        if(paramDesc.getValidValues() != null && !paramDesc.getValidValues().isEmpty()){
+                        if (paramDesc.getValidValues() != null && !paramDesc.getValidValues().isEmpty()) {
                             literal.setAllowedValues(new AllowedValues(paramDesc.getValidValues()));
-                        }else{
+                        } else {
                             literal.setAnyValue(new AnyValue());
                         }
                         literal.setValuesReference(null);
                         literal.setDataType(WPSUtils.createDataType(clazz));
-                        
+
 
                         in.setLiteralData(literal);
-                        
-                    }else{
+
+                    } else {
                         throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
                     }
-                    
+
                     dataInputs.getInput().add(in);
                 } else {
                     throw new CstlServiceException("Process parameter invalid", NO_APPLICABLE_CODE);
                 }
             }
-            if(!dataInputs.getInput().isEmpty()){
+            if (!dataInputs.getInput().isEmpty()) {
                 descriptionType.setDataInputs(dataInputs);
             }
 
-             ///////////////////////////////
+            ///////////////////////////////
             //  Process Output parameters
             ///////////////////////////////
             final ProcessDescriptionType.ProcessOutputs dataOutput = new ProcessDescriptionType.ProcessOutputs();
@@ -495,12 +504,12 @@ public class WPSWorker extends AbstractWorker {
 
                         final LiteralOutputType literal = new LiteralOutputType();
                         literal.setDataType(WPSUtils.createDataType(clazz));
-                        if(paramDesc.getUnit() != null){
+                        if (paramDesc.getUnit() != null) {
                             literal.setUOMs(WPSUtils.generateUOMs(paramDesc));
                         }
 
                         out.setLiteralOutput(literal);
-                    }else{
+                    } else {
                         throw new CstlServiceException("Process output not supported.", NO_APPLICABLE_CODE);
                     }
 
@@ -530,16 +539,16 @@ public class WPSWorker extends AbstractWorker {
     public Object execute(Execute request) throws CstlServiceException {
         isWorking();
 
-        
+
         //check SERVICE=WPS
         if (!request.getService().equalsIgnoreCase(WPS_SERVICE)) {
-            throw new CstlServiceException("The parameter "+ SERVICE_PARAMETER +" must be specified as WPS",
+            throw new CstlServiceException("The parameter " + SERVICE_PARAMETER + " must be specified as WPS",
                     INVALID_PARAMETER_VALUE, SERVICE_PARAMETER.toLowerCase());
         }
-        
+
         //check LANGUAGE=en-EN
-        if(request.getLanguage() != null && !request.getLanguage().equalsIgnoreCase(WPS_LANG)){
-            throw new CstlServiceException("The specified "+ LANGUAGE_PARAMETER +" is not handled by the service. ",
+        if (request.getLanguage() != null && !request.getLanguage().equalsIgnoreCase(WPS_LANG)) {
+            throw new CstlServiceException("The specified " + LANGUAGE_PARAMETER + " is not handled by the service. ",
                     INVALID_PARAMETER_VALUE, LANGUAGE_PARAMETER.toLowerCase());
         }
 
@@ -553,7 +562,7 @@ public class WPSWorker extends AbstractWorker {
         if (request.getVersion().equals(ServiceDef.WPS_1_0_0.version.toString())) {
             return execute100((org.geotoolkit.wps.xml.v100.Execute) request);
         } else {
-             throw new CstlServiceException("The specified " + VERSION_PARAMETER + " number is not handled by the service.",
+            throw new CstlServiceException("The specified " + VERSION_PARAMETER + " number is not handled by the service.",
                     VERSION_NEGOTIATION_FAILED, VERSION_PARAMETER.toLowerCase());
         }
     }
@@ -566,29 +575,27 @@ public class WPSWorker extends AbstractWorker {
      * @throws CstlServiceException
      */
     private Object execute100(Execute request) throws CstlServiceException {
-        
-         //check mandatory IDENTIFIER is not missing.
-        if (request.getIdentifier() == null ||  request.getIdentifier().getValue() == null ||request.getIdentifier().getValue().isEmpty()) {
+
+        //check mandatory IDENTIFIER is not missing.
+        if (request.getIdentifier() == null || request.getIdentifier().getValue() == null || request.getIdentifier().getValue().isEmpty()) {
             throw new CstlServiceException("The parameter " + IDENTIFER_PARAMETER + " must be specified.",
                     MISSING_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
         }
-        
+
         final StatusType status = new StatusType();
         LOGGER.log(Level.INFO, "Process Execute : {0}", request.getIdentifier().getValue());
         //Find the process
         final ProcessDescriptor processDesc = WPSUtils.getProcessDescriptor(request.getIdentifier().getValue());
 
         if (!WPSUtils.isSupportedProcess(processDesc)) {
-            throw new CstlServiceException("Process "+ request.getIdentifier().getValue() +" not supported by the service.",
-                        INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
+            throw new CstlServiceException("Process " + request.getIdentifier().getValue() + " not supported by the service.",
+                    INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
         }
 
         //check requested INPUT/OUTPUT. Throw an CstlException otherwise.
         WPSUtils.checkValidInputOuputRequest(processDesc, request);
-        
-        //status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" found.");
 
-        boolean isOutputRaw = false; // the default output is a ResponseDocument
+        //status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" found.");
 
         /*
          * Get the requested output form
@@ -597,78 +604,26 @@ public class WPSWorker extends AbstractWorker {
         final OutputDefinitionType rawData = responseForm.getRawDataOutput();
         final ResponseDocumentType respDoc = responseForm.getResponseDocument();
 
-        /*
-         * Raw output data attributs
-         */
-        String rawOutputID = null;
-        String rawOutputMime = null;
-        String rawOutputEncoding = null;
-        String rawOutputSchema = null;
-        String rawOutputUom = null;
 
+        boolean isOutputRaw = rawData != null ? true : false; // the default output is a ResponseDocument
+        boolean isOutputRespDoc = respDoc != null ? true : false;
+
+        if (!isOutputRaw && !isOutputRespDoc) {
+            throw new CstlServiceException("The response form should be defined.", MISSING_PARAMETER_VALUE, "responseForm");
+        }
+
+        final String respDocFileName = UUID.randomUUID().toString();
         /*
          * ResponseDocument attributs
          */
         boolean isLineage = false;
         boolean useStatus = false;
         boolean useStorage = false;
-        ExecuteResponse response = null;
-        List<DocumentOutputDefinitionType> wantedOutputs = null;
+        final List<DocumentOutputDefinitionType> wantedOutputs = respDoc.getOutput();
 
-        /*
-         * Raw Data
-         */
-        if (rawData != null) {
-            isOutputRaw = true;
-            rawOutputID = rawData.getIdentifier().getValue();
-            rawOutputMime = rawData.getMimeType();
-            rawOutputEncoding = rawData.getEncoding();
-            rawOutputSchema = rawData.getSchema();
-            rawOutputUom = rawData.getUom();
+        LOGGER.log(Level.INFO, "Request : [Lineage=" + respDoc.isLineage() + ", Storage=" + respDoc.isStoreExecuteResponse() + ", Status=" + respDoc.isStatus() + "]");
 
-            /*
-             * ResponseDocument
-             */
-        } else if (respDoc != null) {
 
-            isLineage = respDoc.isLineage();
-            useStatus = respDoc.isStatus();
-            useStorage = respDoc.isStoreExecuteResponse();
-
-            //outputs
-            wantedOutputs = respDoc.getOutput();
-
-            response = new ExecuteResponse();
-            response.setService(WPS_SERVICE);
-            response.setVersion(WPS_1_0_0);
-            response.setLang(WPS_LANG);
-            response.setServiceInstance(getServiceUrl());
-
-            //Give a bief process description into the execute response
-            response.setProcess(WPSUtils.generateProcessBrief(processDesc));
-            
-            LOGGER.log(Level.INFO, "Request : [Lineage=" + isLineage + ", Storage=" + useStorage + ", Status=" + useStatus +"]");
-
-            if (isLineage) {
-                //Inputs
-                response.setDataInputs(request.getDataInputs());
-                final OutputDefinitionsType outputsDef = new OutputDefinitionsType();
-                outputsDef.getOutput().addAll(respDoc.getOutput());
-                //Outputs
-                response.setOutputDefinitions(outputsDef);
-            }
-
-            if (useStorage) {
-                response.setStatusLocation(null); //Output data URL
-            }
-
-            if (useStatus) {
-                response.setStatus(status);
-            }
-        } else {
-            throw new CstlServiceException("ResponseFrom element not present. This should be a RawData or a ResponseDocument", MISSING_PARAMETER_VALUE );
-        }
-        
         //Input temporary files used by the process. In order to delete them at the end of the process.
         List<File> files = null;
 
@@ -679,7 +634,7 @@ public class WPSWorker extends AbstractWorker {
         //   Process INPUT
         //////////////////////
         List<InputType> requestInputData = new ArrayList<InputType>();
-        if(request.getDataInputs() != null && request.getDataInputs().getInput() != null){
+        if (request.getDataInputs() != null && request.getDataInputs().getInput() != null) {
             requestInputData = request.getDataInputs().getInput();
         }
         final List<GeneralParameterDescriptor> processInputDesc = processDesc.getInputDescriptor().descriptors();
@@ -699,11 +654,176 @@ public class WPSWorker extends AbstractWorker {
             }
         }
 
-        //Each input from the request
+        //Fill process input with datas from execute request.
+        fillProcessInputFromRequest(in, requestInputData, processInputDesc, files);
+
+
+        ///////////////////////
+        //   RUN Process
+        //////////////////////
+
+
+        //Give input parameter to the process
+        final org.geotoolkit.process.Process process = processDesc.createProcess(in);
+
+        if (isOutputRaw) {
+            final List<GeneralParameterDescriptor> processOutputDesc = processDesc.getOutputDescriptor().descriptors();
+            final ParameterValueGroup result;
+            try {
+                result = process.call();
+            } catch (ProcessException ex) {
+                //TODO handle process failed.
+                throw new CstlServiceException("Process execution failed", ex, null);
+            }
+            return createRawOutput(rawData, processOutputDesc, result);
+
+        } else {
+            final ExecuteResponse response = new ExecuteResponse();
+            process.addListener(new WPSProcessListener(request, response, configurationDirectory, respDocFileName));
+            
+            final Future<ParameterValueGroup> future = WPSService.EXECUTOR.submit(process);
+            
+            ParameterValueGroup result = null;
+            //ask for asynchronous process execution
+            if (useStatus) {
+               
+            } else {
+                 try {
+                    result = future.get(TIMEOUT, TimeUnit.SECONDS);
+
+                } catch (InterruptedException ex) {
+                    throw new CstlServiceException("", ex, NO_APPLICABLE_CODE);
+                } catch (ExecutionException ex) {
+                    throw new CstlServiceException("Process execution failed", ex, NO_APPLICABLE_CODE);
+                } catch (TimeoutException ex) {
+                    ((AbstractProcess) process).cancelProcess();
+                    future.cancel(true);
+                }
+            }
+
+            response.setService(WPS_SERVICE);
+            response.setVersion(WPS_1_0_0);
+            response.setLang(WPS_LANG);
+            response.setServiceInstance(getServiceUrl() + "SERVICE=WPS&amp;REQUEST=GetCapabilities");
+
+            //Give a bief process description into the execute response
+            response.setProcess(WPSUtils.generateProcessBrief(processDesc));
+
+            if (respDoc.isLineage()) {
+                //Inputs
+                response.setDataInputs(request.getDataInputs());
+                final OutputDefinitionsType outputsDef = new OutputDefinitionsType();
+                outputsDef.getOutput().addAll(respDoc.getOutput());
+                //Outputs
+                response.setOutputDefinitions(outputsDef);
+            }
+
+//            fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result);
+//            response.setProcessOutputs(outputs);
+
+            status.setProcessSucceeded("Process " + request.getIdentifier().getValue() + " executed successfully.");
+
+            if (respDoc.isStatus()) {
+                response.setStatus(status);
+            }
+
+            if (respDoc.isStoreExecuteResponse()) {
+                if (!WPSService.SUPPORT_STORAGE) {
+                    throw new CstlServiceException("Storage not supported.", STORAGE_NOT_SUPPORTED, "storeExecuteResponse");
+                }
+                response.setStatusLocation(WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" + respDocFileName); //Output data URL
+                WPSUtils.storeResponseDocument(response, getServiceUrl(), respDocFileName);
+            }
+
+
+            //Delete input temporary files 
+            WPSUtils.cleanTempFiles(files);
+            return response;
+        }
+
+
+
+        //Status
+//        final ProcessStartedType started = new ProcessStartedType();
+//        started.setValue("Process " + request.getIdentifier().getValue() + " is started");
+//        started.setPercentCompleted(0);
+//        status.setProcessStarted(started);
+//
+//        final ParameterValueGroup result;
+//        try {
+//            result = process.call();
+//        } catch (ProcessException ex) {
+//            //TODO handle process failed.
+//            throw new CstlServiceException("Process execution failed", ex, null);
+//        }
+
+        ///////////////////////
+        //   Process OUTPUT
+        //////////////////////
+
+//        final List<GeneralParameterDescriptor> processOutputDesc = processDesc.getOutputDescriptor().descriptors();
+//        final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
+//
+//        response.setService(WPS_SERVICE);
+//        response.setVersion(WPS_1_0_0);
+//        response.setLang(WPS_LANG);
+//        response.setServiceInstance(getServiceUrl() + "SERVICE=WPS&amp;REQUEST=GetCapabilities");
+//
+//        //Give a bief process description into the execute response
+//        response.setProcess(WPSUtils.generateProcessBrief(processDesc));
+//
+//        if (respDoc.isLineage()) {
+//            //Inputs
+//            response.setDataInputs(request.getDataInputs());
+//            final OutputDefinitionsType outputsDef = new OutputDefinitionsType();
+//            outputsDef.getOutput().addAll(respDoc.getOutput());
+//            //Outputs
+//            response.setOutputDefinitions(outputsDef);
+//        }
+//
+//        fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result);
+//        response.setProcessOutputs(outputs);
+//
+//        status.setProcessSucceeded("Process " + request.getIdentifier().getValue() + " executed successfully.");
+//
+//        if (respDoc.isStatus()) {
+//            response.setStatus(status);
+//        }
+//
+//        if (respDoc.isStoreExecuteResponse()) {
+//            if (!WPSService.SUPPORT_STORAGE) {
+//                throw new CstlServiceException("Storage not supported.", STORAGE_NOT_SUPPORTED, "storeExecuteResponse");
+//            }
+//            response.setStatusLocation(WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" + respDocFileName); //Output data URL
+//            WPSUtils.storeResponseDocument(response, getServiceUrl(), respDocFileName);
+//        }
+//
+//
+//        //Delete input temporary files 
+//        WPSUtils.cleanTempFiles(files);
+//        return response;
+    }
+
+    /**
+     * For each inputs in Execute request, this method will find corresponding {@link ParameterDescriptor ParameterDescriptor} input in the
+     * process and fill the {@link ParameterValueGroup ParameterValueGroup} with the data.
+     *
+     * @param in
+     * @param requestInputData
+     * @param processInputDesc
+     * @param files
+     * @throws CstlServiceException
+     */
+    private void fillProcessInputFromRequest(final ParameterValueGroup in, final List<InputType> requestInputData,
+            final List<GeneralParameterDescriptor> processInputDesc, List<File> files) throws CstlServiceException {
+
+        ArgumentChecks.ensureNonNull("in", in);
+        ArgumentChecks.ensureNonNull("requestInputData", requestInputData);
+
         for (final InputType inputRequest : requestInputData) {
 
             if (inputRequest.getIdentifier() == null || inputRequest.getIdentifier().getValue() == null || inputRequest.getIdentifier().getValue().isEmpty()) {
-                throw new CstlServiceException("Missing input Identifier.", INVALID_PARAMETER_VALUE);
+                throw new CstlServiceException("Empty input Identifier.", INVALID_PARAMETER_VALUE);
             }
 
             final String inputIdentifier = inputRequest.getIdentifier().getValue();
@@ -718,20 +838,20 @@ public class WPSWorker extends AbstractWorker {
                 }
             }
             if (inputDescriptor == null) {
-                throw new CstlServiceException("Invalid or unknow input Identifier.", INVALID_PARAMETER_VALUE, inputIdentifier);
+                throw new CstlServiceException("Invalid or unknow input identifier " + inputIdentifier + ".", INVALID_PARAMETER_VALUE, inputIdentifier);
             }
 
             boolean isReference = false;
             boolean isBBox = false;
             boolean isComplex = false;
             boolean isLiteral = false;
-            
+
             if (inputRequest.getReference() != null) {
                 isReference = true;
             } else {
                 if (inputRequest.getData() != null) {
-                    
-                    final DataType dataType = inputRequest.getData(); 
+
+                    final DataType dataType = inputRequest.getData();
                     if (dataType.getBoundingBoxData() != null) {
                         isBBox = true;
                     } else if (dataType.getComplexData() != null) {
@@ -745,7 +865,7 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Input doesn't have data or reference.");
                 }
             }
-            
+
 
             /*
              * Get expected input Class from the process input
@@ -755,23 +875,23 @@ public class WPSWorker extends AbstractWorker {
             Object dataValue = null;
             LOGGER.log(Level.INFO, "Input : " + inputIdentifier + " : expected Class " + expectedClass.getCanonicalName());
 
-            
+
             /**
              * Handle referenced input data.
              */
             if (isReference) {
-                
-                //Check if the expected class is supproted for literal using
-                if (!WPSIO.isSupportedReferenceInputClass(expectedClass)) {
-                    throw new CstlServiceException("Reference value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
-                }
 
-                LOGGER.log(Level.INFO,"LOG -> Input -> Reference");
-                final String href = inputRequest.getReference().getHref();
-                final String method = inputRequest.getReference().getMethod();
-                final String mime = inputRequest.getReference().getMimeType();
-                final String encoding = inputRequest.getReference().getEncoding();
-                final String schema = inputRequest.getReference().getSchema();
+                //Check if the expected class is supported for reference using
+                if (!WPSIO.isSupportedReferenceInputClass(expectedClass)) {
+                    throw new CstlServiceException("The input" + inputIdentifier + " can't handle reference.", INVALID_PARAMETER_VALUE, inputIdentifier);
+                }
+                final InputReferenceType requestedRef = inputRequest.getReference();
+                LOGGER.log(Level.INFO, "LOG -> Input -> Reference");
+                final String href = requestedRef.getHref();
+                final String method = requestedRef.getMethod();
+                final String mime = requestedRef.getMimeType();
+                final String encoding = requestedRef.getEncoding();
+                final String schema = requestedRef.getSchema();
 
                 dataValue = WPSUtils.reachReferencedData(href, method, mime, encoding, schema, expectedClass, inputIdentifier);
                 if (dataValue instanceof FeatureCollection) {
@@ -784,8 +904,8 @@ public class WPSWorker extends AbstractWorker {
                     files.add((File) dataValue);
                 }
             }
-         
-            
+
+
             /**
              * Handle Bbox input data.
              */
@@ -813,7 +933,7 @@ public class WPSWorker extends AbstractWorker {
                 final Envelope envelop = GeometryUtils.createCRSEnvelope(crsDecode, lower.get(0), lower.get(1), upper.get(0), upper.get(1));
                 dataValue = envelop;
             }
-            
+
             /**
              * Handle Complex input data.
              */
@@ -855,7 +975,7 @@ public class WPSWorker extends AbstractWorker {
                     dataValue = WPSUtils.extractComplexInput(expectedClass, inputObject, schema, mime, encoding, inputIdentifier);
                 }
             }
-            
+
             /**
              * Handle Literal input data.
              */
@@ -881,178 +1001,166 @@ public class WPSWorker extends AbstractWorker {
                 throw new CstlServiceException("Invalid data input value.", ex, INVALID_PARAMETER_VALUE, inputIdentifier);
             }
         }
+    }
 
-        //Give input parameter to the process
-        final org.geotoolkit.process.Process process = processDesc.createProcess(in);
+    /**
+     * Fill outputs of the ProcessOutputs object using the process result, the list of requested outputs and the list of
+     * process output desciptors.
+     *
+     * @param outputs
+     * @param wantedOutputs
+     * @param processOutputDesc
+     * @param result
+     * @throws CstlServiceException
+     */
+    public static void fillOutputsFromProcessResult(final ProcessOutputs outputs, final List<DocumentOutputDefinitionType> wantedOutputs,
+            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result) throws CstlServiceException {
 
-        //Status
-        final ProcessStartedType started = new ProcessStartedType();
-        started.setValue("Process " + request.getIdentifier().getValue() + " is started");
-        started.setPercentCompleted(0);
-        //status.setProcessStarted(started);
+        for (final DocumentOutputDefinitionType outputsRequest : wantedOutputs) {
 
-        //Run the process
-        final ParameterValueGroup result;
-        try {
-            result = process.call();
-        } catch (ProcessException ex) {
-            //TODO handle process failed.
-            throw new CstlServiceException("Process execution failed", ex, null);
-        }
+            if (outputsRequest.getIdentifier() == null || outputsRequest.getIdentifier().getValue() == null || outputsRequest.getIdentifier().getValue().isEmpty()) {
+                throw new CstlServiceException("Empty output Identifier.", INVALID_PARAMETER_VALUE);
+            }
 
-        ///////////////////////
-        //   Process OUTPUT
-        //////////////////////
-        /*
-         * Storage data
-         */
-        if (useStorage) {
-            //TODO storage output
-            throw new UnsupportedOperationException("Output storage not yet implemented");
-            /*
-             * No strorage
-             */
-        } else {
-            /*
-             * Raw Data returned
-             */
-            if (isOutputRaw) {
-                LOGGER.log(Level.INFO, "LOG -> Output -> Raw");
-                final Object outputValue = result.parameter(rawOutputID).getValue();
-                LOGGER.log(Level.INFO, "DEBUG -> Output -> Raw -> Value={0}", outputValue);
+            final String outputIdentifier = outputsRequest.getIdentifier().getValue();
+            final String outputIdentifierCode = WPSUtils.extractProcessIOCode(outputIdentifier);
 
-                if (outputValue instanceof Geometry) {
-                    try {
-                        final Geometry jtsGeom = (Geometry) outputValue;
-                        final AbstractGeometryType gmlGeom = JTStoGeometry.toGML(jtsGeom);
-                        return gmlGeom;
-                    } catch (NoSuchAuthorityCodeException ex) {
-                        throw new CstlServiceException(ex);
-                    } catch (FactoryException ex) {
-                        throw new CstlServiceException(ex);
-                    }
+            //Check if it's a valid input identifier and hold it if found.
+            ParameterDescriptor outputDescriptor = null;
+            for (final GeneralParameterDescriptor processInput : processOutputDesc) {
+                if (processInput.getName().getCode().equals(outputIdentifierCode) && processInput instanceof ParameterDescriptor) {
+                    outputDescriptor = (ParameterDescriptor) processInput;
+                    break;
                 }
+            }
+            if (outputDescriptor == null) {
+                throw new CstlServiceException("Invalid or unknow output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier);
+            }
 
-                if (outputValue instanceof Envelope) {
-                    return new BoundingBoxType((Envelope) outputValue);
-                }
-                return outputValue;
+            //output value object.
+            final Object outputValue = result.parameter(outputIdentifierCode).getValue();
 
-                /*
-                 * DocumentResponse returned
-                 */
+            outputs.getOutput().add(createDocumentResponseOutput(outputDescriptor, outputsRequest, outputValue));
+
+        }//end foreach wanted outputs
+
+    }
+
+    /**
+     * Create {@link OutputDataType output} object for one requested output.
+     *
+     * @param outputIdentifier
+     * @param outputDescriptor
+     * @param requestedOutput
+     * @param outputValue
+     * @return
+     * @throws CstlServiceException
+     */
+    public static OutputDataType createDocumentResponseOutput(final ParameterDescriptor outputDescriptor, final DocumentOutputDefinitionType requestedOutput,
+            final Object outputValue) throws CstlServiceException {
+
+        final OutputDataType outData = new OutputDataType();
+
+        final String outputIdentifier = requestedOutput.getIdentifier().getValue();
+        final String outputIdentifierCode = WPSUtils.extractProcessIOCode(outputIdentifier);
+
+        //set Ouput informations
+        outData.setIdentifier(new CodeType(outputIdentifier));
+        outData.setTitle(WPSUtils.capitalizeFirstLetter(outputIdentifierCode));
+        outData.setAbstract(WPSUtils.capitalizeFirstLetter(outputDescriptor.getRemarks().toString()));
+
+        final DataType data = new DataType();
+        final Class outClass = outputDescriptor.getValueClass();
+
+        if (WPSIO.isSupportedBBoxOutputClass(outClass)) {
+            LOGGER.log(Level.INFO, "LOG -> Output -> BoundingBox");
+            org.opengis.geometry.Envelope envelop = (org.opengis.geometry.Envelope) outputValue;
+            data.setBoundingBoxData(new BoundingBoxType(envelop));
+
+        } else if (WPSIO.isSupportedComplexOutputClass(outClass)) {
+            LOGGER.log(Level.INFO, "LOG -> Output -> Complex");
+            final ComplexDataType complex = new ComplexDataType();
+
+            complex.setMimeType(requestedOutput.getMimeType());
+            complex.setEncoding(requestedOutput.getEncoding());
+            complex.setSchema(requestedOutput.getSchema());
+
+            final ObjectConverter converter = WPSIO.getConverter(outClass, WPSIO.IOType.OUTPUT, WPSIO.DataType.COMPLEX, complex.getMimeType());
+
+            if (converter == null) {
+                throw new CstlServiceException("Output complex not supported, no converter found.",
+                        OPERATION_NOT_SUPPORTED, outputIdentifier);
+            }
+
+            try {
+                complex.getContent().addAll((Collection<Object>) converter.convert(outputValue));
+            } catch (NonconvertibleObjectException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, outputIdentifier);
+            }
+
+            data.setComplexData(complex);
+
+        } else if (WPSIO.isSupportedLiteralOutputClass(outClass)) {
+            LOGGER.log(Level.INFO, "LOG -> Output -> Literal");
+            final LiteralDataType literal = new LiteralDataType();
+            literal.setDataType(outClass.getCanonicalName());
+            if (outputValue == null) {
+                literal.setValue(null);
             } else {
-                LOGGER.log(Level.INFO,"LOG -> Output -> Document");
-                final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-                //Process Outputs
-                for (final GeneralParameterDescriptor outputDescriptor : processDesc.getOutputDescriptor().descriptors()) {
+                literal.setValue(outputValue.toString());
+            }
+            data.setLiteralData(literal);
 
-                    final OutputDataType outData = new OutputDataType();
+        } else {
+            throw new CstlServiceException("Process output parameter invalid", MISSING_PARAMETER_VALUE, outputIdentifier);
+        }
+        outData.setData(data);
+        return outData;
+    }
 
-                    //set Ouput informations
-                    final String outputIdentifier = outputDescriptor.getName().getCode();
-                    outData.setIdentifier(new CodeType(outputIdentifier));
-                    outData.setTitle(new LanguageStringType(outputIdentifier));
-                    outData.setAbstract(new LanguageStringType(outputDescriptor.getRemarks().toString()));
+    /**
+     * Handle Raw output.
+     *
+     * @param outputValue
+     * @return
+     * @throws CstlServiceException
+     */
+    private Object createRawOutput(final OutputDefinitionType rawData, final List<GeneralParameterDescriptor> processOutputDesc,
+            final ParameterValueGroup result) throws CstlServiceException {
 
-                    /*
-                     * Output value from process
-                     */
-                    final Object outputValue = result.parameter(outputIdentifier).getValue();
+        final String outputIdentifier = rawData.getIdentifier().getValue();
+        final String outputIdentifierCode = WPSUtils.extractProcessIOCode(outputIdentifier);
 
-                    final DataType data = new DataType();
-                    if (outputDescriptor instanceof ParameterDescriptor) {
-
-                        final ParameterDescriptor outParamDesc = (ParameterDescriptor) outputDescriptor;
-                        /*
-                         * Output Class
-                         */
-                        final Class outClass = outParamDesc.getValueClass();
-
-                        /*
-                         * Bounding Box
-                         */
-                        if (outClass.equals(Envelope.class)) {
-                            LOGGER.log(Level.INFO,"LOG -> Output -> BoundingBox");
-                            org.opengis.geometry.Envelope envelop = (org.opengis.geometry.Envelope) outputValue;
-
-                            data.setBoundingBoxData(new BoundingBoxType(envelop));
-
-                            /*
-                             * Complex
-                             */
-                        } else if (WPSIO.isSupportedComplexOutputClass(outClass)) {
-                            LOGGER.log(Level.INFO,"LOG -> Output -> Complex");
-                            final ComplexDataType complex = new ComplexDataType();
-
-                            for (final DocumentOutputDefinitionType wO : wantedOutputs) {
-                                final String wantedOutputIdentifier = WPSUtils.extractProcessIOCode(wO.getIdentifier().getValue());
-                                if (outputIdentifier.equals(wantedOutputIdentifier)) {
-                                    complex.setEncoding(wO.getEncoding());
-                                    complex.setMimeType(wO.getMimeType());
-                                    complex.setSchema(wO.getSchema());
-                                }
-                            }
-
-                            final ObjectConverter converter = WPSIO.getConverter(outClass, WPSIO.IOType.OUTPUT, WPSIO.DataType.COMPLEX, complex.getMimeType());
-                            
-                            if (converter == null) {
-                                throw new CstlServiceException("Input complex not supported, no converter found.",
-                                        OPERATION_NOT_SUPPORTED, outputIdentifier);
-                            }
-
-                            try {
-                                complex.getContent().addAll((Collection<Object>) converter.convert(outputValue));
-                            } catch (NonconvertibleObjectException ex) {
-                                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, outputIdentifier);
-                            }
-
-                            data.setComplexData(complex);
-
-                            /*
-                             * Literal
-                             */
-                        } else if (WPSIO.isSupportedLiteralOutputClass(outClass)) {
-                            LOGGER.log(Level.INFO,"LOG -> Output -> Literal");
-                            final LiteralDataType literal = new LiteralDataType();
-                            literal.setDataType(outClass.getCanonicalName());
-                            if (outputValue == null) {
-                                literal.setValue(null);
-                            } else {
-                                literal.setValue(outputValue.toString());
-                            }
-                            data.setLiteralData(literal);
-
-                        } else {
-                            throw new CstlServiceException("Process output parameter invalid", OPERATION_NOT_SUPPORTED, outputIdentifier);
-                        }
-                    } else {
-                        throw new CstlServiceException("Process output parameter invalid", OPERATION_NOT_SUPPORTED, outputIdentifier);
-                    }
-
-                    outData.setData(data);
-                    outputs.getOutput().add(outData);
-                }
-
-                response.setProcessOutputs(outputs);
-
-                if (useStatus) {
-                    response.setStatus(new StatusType());
-                }
-                status.setProcessSucceeded("Process " + request.getIdentifier().getValue() + " finiched.");
-                if (useStatus) {
-                    response.setStatus(status);
-                }
-
-                //Delete input temporary files 
-                if (files != null) {
-                    for (final File f : files) {
-                        f.delete();
-                    }
-                }
-
-                return response;
+        //Check if it's a valid input identifier and hold it if found.
+        ParameterDescriptor outputDescriptor = null;
+        for (final GeneralParameterDescriptor processInput : processOutputDesc) {
+            if (processInput.getName().getCode().equals(outputIdentifierCode) && processInput instanceof ParameterDescriptor) {
+                outputDescriptor = (ParameterDescriptor) processInput;
+                break;
             }
         }
+        if (outputDescriptor == null) {
+            throw new CstlServiceException("Invalid or unknow output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier);
+        }
+
+        //output value object.
+        final Object outputValue = result.parameter(outputIdentifierCode).getValue();
+
+        if (outputValue instanceof Geometry) {
+            try {
+
+                final Geometry jtsGeom = (Geometry) outputValue;
+                final AbstractGeometryType gmlGeom = JTStoGeometry.toGML(jtsGeom);
+                return gmlGeom;
+
+            } catch (FactoryException ex) {
+                throw new CstlServiceException(ex);
+            }
+        }
+
+        if (outputValue instanceof Envelope) {
+            return new BoundingBoxType((Envelope) outputValue);
+        }
+        return outputValue;
     }
 }

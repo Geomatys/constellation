@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
@@ -61,7 +63,9 @@ import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.wps.utils.WPSUtils;
 import static org.constellation.wps.ws.WPSConstant.*;
+import org.constellation.wps.ws.WPSScheduler;
 
 /**
  * WPS web service class.
@@ -73,6 +77,13 @@ import static org.constellation.wps.ws.WPSConstant.*;
 public class WPSService extends OGCWebService<WPSWorker> {
 
     /**
+     * Try to create temporary directory.
+     */
+    public static final boolean SUPPORT_STORAGE = WPSUtils.createTempDirectory();
+    
+    public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+    
+    /**
      * Build a new instance of the webService and initialize the JAXB context.
      */
     public WPSService() {
@@ -81,7 +92,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WPSMarshallerPool.getInstance());
-
+        
         LOGGER.log(Level.INFO, "WPS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
@@ -90,6 +101,16 @@ public class WPSService extends OGCWebService<WPSWorker> {
         return new WPSWorker(instanceDirectory.getName(), instanceDirectory);
     }
 
+    @Override
+    public void destroy() {
+        super.destroy();
+        //Delete recursuvly temporary directory.
+        WPSUtils.deleteTempFileOrDirectory(new File(WPSUtils.getTempDirectoryPath()));
+        //Shutdown the WPS scheduler.
+        EXECUTOR.shutdown();
+    }
+
+    
     @Override
     protected void configureInstance(File instanceDirectory, Object configuration) throws CstlServiceException {
         if (configuration instanceof LayerContext) {

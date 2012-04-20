@@ -17,15 +17,24 @@
 package org.constellation.wps.utils;
 
 import com.vividsolutions.jts.geom.Geometry;
+import java.io.File;
+import java.io.IOException;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import org.constellation.util.Util;
 
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
@@ -67,7 +76,11 @@ import org.constellation.wps.ws.WPSIO;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.wps.ws.WPSConstant.*;
+import org.constellation.wps.ws.WPSWorker;
+import org.constellation.wps.ws.rs.WPSService;
+import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.parameter.ParameterDescriptorGroup;
 
 /**
@@ -115,12 +128,25 @@ public class WPSUtils {
 
         final ProcessBriefType brief = new ProcessBriefType();
         brief.setIdentifier(new CodeType(buildProcessIdentifier(processDesc)));
-        brief.setTitle(capitalizeFirstLetter(processDesc.getIdentifier().getCode()));
+        brief.setTitle(buildProcessTitle(processDesc));
         brief.setAbstract(capitalizeFirstLetter(processDesc.getProcedureDescription().toString()));
         brief.setProcessVersion(WPS_1_0_0);
         brief.setWSDL(null);
 
         return brief;
+    }
+
+    /**
+     * Build OGC URN unique identifier for a process from his process descriptor.
+     *
+     * @param processDesc
+     * @return
+     */
+    public static LanguageStringType buildProcessTitle(final ProcessDescriptor processDesc) {
+        ArgumentChecks.ensureNonNull("processDesc", processDesc);
+        final String title = capitalizeFirstLetter(processDesc.getIdentifier().getAuthority().getTitle().toString()).getValue() + " : "
+                + capitalizeFirstLetter(processDesc.getIdentifier().getCode()).getValue();
+        return new LanguageStringType(title);
     }
 
     /**
@@ -167,8 +193,8 @@ public class WPSUtils {
     }
 
     /**
-     * Extract the factory name and the process name from a process identifier. e.g : urn:ogc:geomatys:wps:math:add return
-     * math:add.
+     * Extract the factory name and the process name from a process identifier. e.g : urn:ogc:geomatys:wps:math:add
+     * return math:add.
      *
      * @param identifier
      * @return factoryName:processName.
@@ -196,7 +222,7 @@ public class WPSUtils {
             if (ioType.equals(WPSIO.IOType.INPUT)) {
                 return buildProcessIdentifier(procDesc) + ":input:" + input.getName().getCode();
             } else {
-                return buildProcessIdentifier(procDesc) + ":ouptut:" + input.getName().getCode();
+                return buildProcessIdentifier(procDesc) + ":output:" + input.getName().getCode();
             }
         }
         return null;
@@ -563,22 +589,38 @@ public class WPSUtils {
         return complex;
     }
 
+    /**
+     * Check if all requested inputs/outputs are presente in the process descriptor. Check also if all mandatory
+     * inputs/outputs are specified. If an non allowed input/output is requested or if a mandatory input/output is
+     * missing, an {@link CstlServiceException CstlServiceException} will be throw.
+     *
+     * @param processDesc
+     * @param request
+     * @throws CstlServiceException if an non allowed input/output is requested or if a mandatory input/output is
+     * missing.
+     */
     public static void checkValidInputOuputRequest(final ProcessDescriptor processDesc, final Execute request) throws CstlServiceException {
 
         //check inputs
         final List<String> inputIdentifiers = extractRequestInputIdentifiers(request);
         final ParameterDescriptorGroup inputDescriptorGroup = processDesc.getInputDescriptor();
-        final Map<String, Boolean> inputDescMap = desciptorsAsMap(inputDescriptorGroup);
+        final Map<String, Boolean> inputDescMap = desciptorsAsMap(inputDescriptorGroup, processDesc, WPSIO.IOType.INPUT);
         checkIOIdentifiers(inputDescMap, inputIdentifiers, WPSIO.IOType.INPUT);
 
         //check outputs
         final List<String> outputIdentifiers = extractRequestOutputIdentifiers(request);
         final ParameterDescriptorGroup outputDescriptorGroup = processDesc.getOutputDescriptor();
-        final Map<String, Boolean> outputDescMap = desciptorsAsMap(outputDescriptorGroup);
+        final Map<String, Boolean> outputDescMap = desciptorsAsMap(outputDescriptorGroup, processDesc, WPSIO.IOType.OUTPUT);
         checkIOIdentifiers(outputDescMap, outputIdentifiers, WPSIO.IOType.OUTPUT);
-       
+
     }
 
+    /**
+     * Extract the list of identifiers {@code String} requested in input.
+     *
+     * @param request
+     * @return a list of identifiers
+     */
     public static List<String> extractRequestInputIdentifiers(final Execute request) {
 
         final List<String> identifiers = new ArrayList<String>();
@@ -593,6 +635,12 @@ public class WPSUtils {
         return identifiers;
     }
 
+    /**
+     * Extract the list of identifiers {@code String} requested in output.
+     *
+     * @param request
+     * @return a list of identifiers
+     */
     public static List<String> extractRequestOutputIdentifiers(final Execute request) {
 
         final List<String> identifiers = new ArrayList<String>();
@@ -613,7 +661,15 @@ public class WPSUtils {
         return identifiers;
     }
 
-    private static Map<String, Boolean> desciptorsAsMap(final ParameterDescriptorGroup descGroup) {
+    /**
+     * Build a {@code Map} from a {@link ParameterDescriptorGroup ParameterDescriptorGroup}. The map keys are the parameter identifier as code
+     * and the boolean value the mandatory of the parameter.
+     *
+     * @param descGroup
+     * @return all parameters code and there mandatory value as map.
+     */
+    private static Map<String, Boolean> desciptorsAsMap(final ParameterDescriptorGroup descGroup, final ProcessDescriptor procDesc,
+            final WPSIO.IOType iOType) {
 
         final Map<String, Boolean> map = new HashMap<String, Boolean>();
         if (descGroup != null && descGroup.descriptors() != null) {
@@ -622,40 +678,173 @@ public class WPSUtils {
             for (final GeneralParameterDescriptor geneDesc : descriptors) {
                 if (geneDesc instanceof ParameterDescriptor) {
                     final ParameterDescriptor desc = (ParameterDescriptor) geneDesc;
-                    map.put(desc.getName().getCode(), desc.getMinimumOccurs() > 0);
+                    final String id = buildProcessIOIdentifiers(procDesc, desc, iOType);
+                    map.put(id, desc.getMinimumOccurs() > 0);
                 }
             }
         }
         return map;
     }
 
-    private static void checkIOIdentifiers(final Map<String, Boolean> descMap, final List<String> requestIdentifiers, final WPSIO.IOType iotype) 
+    /**
+     * Confronts the process parameters {@code Map} to the list of requested identifiers for an type of IO
+     * (Input,Output). If there is a missing mandatory parameter in the list of requested identifiers, an {@link CstlServiceException CstlServiceException}
+     * will be throw. If an unknow parameter is requested, it also throw an {@link CstlServiceException CstlServiceException}
+     *
+     * @param descMap - {@code Map} contain all parameters with their mandatory attributes for INPUT or OUTPUT.
+     * @param requestIdentifiers - {@code List} of requested identifiers in INPUT or OUTPUT.
+     * @param iotype - {@link WPSIO.IOType type}.
+     * @throws CstlServiceException for missing or unknow parmeter.
+     */
+    private static void checkIOIdentifiers(final Map<String, Boolean> descMap, final List<String> requestIdentifiers, final WPSIO.IOType iotype)
             throws CstlServiceException {
 
-        final String type = iotype == WPSIO.IOType.INPUT ? "INPUT" : "OUTPUT" ;
-        
+        final String type = iotype == WPSIO.IOType.INPUT ? "INPUT" : "OUTPUT";
+
         if (descMap.isEmpty() && !requestIdentifiers.isEmpty()) {
             throw new CstlServiceException("This process have no inputs.", INVALID_PARAMETER_VALUE, "input"); //process have no inputs
         } else {
-            if (requestIdentifiers.isEmpty() && descMap.containsValue(Boolean.TRUE)) {
-              throw new CstlServiceException("Mandatory parameter(s) missing.", MISSING_PARAMETER_VALUE); 
-            } else {
-                //check for Unknow parameter.
-                for (final String identifier : requestIdentifiers) {
-                    if (!descMap.containsKey(WPSUtils.extractProcessIOCode(identifier))) {
-                        throw new CstlServiceException("Unknow " + type + " parameter : " + identifier + ".", INVALID_PARAMETER_VALUE, identifier); 
-                    }
+            //check for Unknow parameter.
+            for (final String identifier : requestIdentifiers) {
+                if (!descMap.containsKey(identifier)) {
+                    throw new CstlServiceException("Unknow " + type + " parameter : " + identifier + ".", INVALID_PARAMETER_VALUE, identifier);
                 }
-                //check for missing parameters.
-                if (descMap.containsValue(Boolean.TRUE)) {
-                    for (Map.Entry<String, Boolean> entry : descMap.entrySet()) {
-                        if (entry.getValue() == Boolean.TRUE) {
-                            if (!requestIdentifiers.contains(entry.getKey())) {
-                                throw new CstlServiceException("Mandatory parameter(s) missing.", MISSING_PARAMETER_VALUE); 
-                            }
+            }
+            //check for missing parameters.
+            if (descMap.containsValue(Boolean.TRUE)) {
+                for (Map.Entry<String, Boolean> entry : descMap.entrySet()) {
+                    if (entry.getValue() == Boolean.TRUE) {
+                        if (!requestIdentifiers.contains(entry.getKey())) {
+                            throw new CstlServiceException("Mandatory " + type + " parameter " + entry.getKey() + " is missing.", MISSING_PARAMETER_VALUE, entry.getKey());
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Create the temporary directory used for storage.
+     *
+     * @return {@code true} if success, {@code false} if failed.
+     */
+    public static boolean createTempDirectory() {
+        final String tmpDir = getTempDirectoryPath();
+        boolean success = (new File(tmpDir)).mkdirs();
+        if (success) {
+            LOGGER.log(Level.INFO, "Temporary storage directory created at : " + tmpDir);
+        } else {
+            LOGGER.log(Level.WARNING, "Temporary storage directory can't be created at : " + tmpDir);
+        }
+        return success;
+    }
+
+    /**
+     * Delete a file. If the file is a directory, the method will recursivly delete all files before.
+     *
+     * @param file
+     * @return {@code true} if success, {@code false} if failed.
+     */
+    public static boolean deleteTempFileOrDirectory(final File file) {
+        //directory case.
+        if (file.isDirectory()) {
+            String[] children = file.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteTempFileOrDirectory(new File(file, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+
+        boolean success = file.delete();
+        if (success) {
+            LOGGER.log(Level.INFO, "Temporary file " + file.getAbsolutePath() + " deleted.");
+        } else {
+            LOGGER.log(Level.WARNING, "Temporary file " + file.getAbsolutePath() + " can't be deleted.");
+        }
+        return success;
+    }
+
+    /**
+     * Retrurn the absolute path to the temporary directory.
+     *
+     * @return absolut path String.
+     */
+    public static String getTempDirectoryPath() {
+        return Util.getWebappDiretory().getAbsolutePath() + TEMP_FOLDER;
+    }
+
+    public static boolean storeResponseDocument(final ExecuteResponse doc, final String workerURL, final String fileName) {
+
+        final MarshallerPool marshallerPool = WPSMarshallerPool.getInstance();
+        boolean success = false;
+
+        Marshaller marshaller = null;
+        try {
+
+            final File outputFile = new File(getTempDirectoryPath(), fileName);
+            marshaller = marshallerPool.acquireMarshaller();
+            marshaller.marshal(doc, outputFile);
+
+            success = outputFile.exists();
+
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Error during unmarshalling", ex);
+        } finally {
+            marshallerPool.release(marshaller);
+        }
+
+        return success;
+    }
+
+    public static String createTempFile(final Object object, final String workerURL) {
+        ArgumentChecks.ensureNonNull("object", object);
+
+        if (object instanceof ExecuteResponse) {
+
+            final MarshallerPool marshallerPool = WPSMarshallerPool.getInstance();
+            final String fileName = UUID.randomUUID().toString();
+
+            boolean success = false;
+
+            Marshaller marshaller = null;
+            try {
+
+                final File outputFile = new File(getTempDirectoryPath(), fileName);
+                marshaller = marshallerPool.acquireMarshaller();
+                marshaller.marshal(object, outputFile);
+
+                success = outputFile.exists();
+
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, "Error during unmarshalling", ex);
+            } finally {
+                marshallerPool.release(marshaller);
+            }
+
+            if (success) {
+                return getTempDirectoryURL(workerURL) + "/" + fileName;
+            }
+        }
+        return null;
+    }
+
+    public static String getTempDirectoryURL(final String workerURL) {
+        String path = null;
+        try {
+            final URL url = new URL(workerURL);
+            path = url.getProtocol() + "://" + url.getAuthority() + "/" + url.getPath().split("/")[1] + TEMP_FOLDER;
+        } catch (MalformedURLException ex) {
+            LOGGER.log(Level.WARNING, "Error during create file", ex);
+        }
+        return path;
+    }
+
+    public static void cleanTempFiles(List<File> files) {
+        if (files != null) {
+            for (final File f : files) {
+                f.delete();
             }
         }
     }
