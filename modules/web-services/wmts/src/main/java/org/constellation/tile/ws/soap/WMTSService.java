@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.tile.ws.DefaultWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
@@ -49,7 +51,8 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
  *
  * @author Cédric Briançon (Geomatys)
  */
-//@WebService(name = "WMTSpepRegion", serviceName = "WMTSpepRegion")
+@WebService(name = "WMTSService")
+@XmlSeeAlso({org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 public class WMTSService extends OGCWebService<WMTSWorker>{
 

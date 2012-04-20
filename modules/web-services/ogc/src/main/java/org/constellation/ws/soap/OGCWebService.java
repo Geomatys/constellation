@@ -20,21 +20,23 @@ package org.constellation.ws.soap;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PreDestroy;
-
-// Constellation dependencies
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
+
+// Constellation dependencies
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.Worker;
 import org.geotoolkit.util.logging.Logging;
 
 
@@ -69,13 +71,6 @@ public abstract class OGCWebService<W extends Worker> {
      */
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws.soap");
 
-    /**
-     * A map of service worker.
-     * TODO this attribute must be set to private when will fix the WFS service
-     */
-    private final Map<String, W> workersMap;
-
-
     private final Specification specification;
 
     @Resource
@@ -89,16 +84,18 @@ public abstract class OGCWebService<W extends Worker> {
      *                          one, the best one.
      */
     public OGCWebService(final Specification spec) {
-
         LOGGER.log(Level.INFO, "Starting the SOAP {0} service facade.\n", spec.name());
-
         this.specification = spec;
-        
+
         /*
-         * build the map of Workers, by scanning the sub-directories of its service directory.
+         * build the map of Workers, by scanning the sub-directories of its
+         * service directory.
          */
-        workersMap = new HashMap<String, W>();
-        buildWorkerMap();
+        if (!WSEngine.isSetService(specification.name())) {
+            buildWorkerMap();
+        } else {
+            LOGGER.log(Level.INFO, "Workers already set for {0}", specification.name());
+        }
     }
 
     private File getServiceDirectory() {
@@ -124,6 +121,7 @@ public abstract class OGCWebService<W extends Worker> {
      * Scan the configuration directory to instantiate Web service workers.
      */
     private void buildWorkerMap() {
+        final Map<String, Worker> workersMap = new HashMap<String, Worker>();
         final File serviceDirectory = getServiceDirectory();
         if (serviceDirectory != null) {
             for (File instanceDirectory : serviceDirectory.listFiles()) {
@@ -136,6 +134,7 @@ public abstract class OGCWebService<W extends Worker> {
                 }
             }
         }
+        WSEngine.setServiceInstances(specification.name(), workersMap);
     }
 
     /**
@@ -177,18 +176,19 @@ public abstract class OGCWebService<W extends Worker> {
      */
     protected W getCurrentWorker() throws CstlServiceException {
         final String serviceID = extractWorkerID();
-        if (serviceID == null || !workersMap.containsKey(serviceID)) {
+        if (serviceID == null || !WSEngine.serviceInstanceExist(specification.name(), serviceID)) {
             LOGGER.log(Level.WARNING, "Received request on undefined instance identifier:{0}", serviceID);
+            final Set<String> instanceNames = WSEngine.getInstanceNames(specification.name());
             final String msg;
             if (serviceID == null) {
-                msg = "You must specify an instance id.\n available instance:" + workersMap.keySet();
+                msg = "You must specify an instance id.\n available instance:" + instanceNames;
             } else {
-                msg = "Undefined instance id.\n available instance:" + workersMap.keySet();
+                msg = "Undefined instance id.\n available instance:" + instanceNames;
             }
             throw new CstlServiceException(msg);
             // TODO return Response.status(Response.Status.NOT_FOUND).build();
         } else {
-            return workersMap.get(serviceID);
+            return (W) WSEngine.getInstance(specification.name(), serviceID);
         }
     }
 
@@ -196,16 +196,13 @@ public abstract class OGCWebService<W extends Worker> {
      * Return the number of instance if the web-service
      */
     protected int getWorkerMapSize() {
-        return workersMap.size();
+        return WSEngine.getInstanceSize(specification.name());
     }
 
     @PreDestroy
     public void destroy() {
         LOGGER.log(Level.INFO, "Shutting down the SOAP {0} service facade.", specification.name());
-        for (final Worker worker : workersMap.values()) {
-            worker.destroy();
-        }
-        workersMap.clear();
+        WSEngine.destroyInstances(specification.name());
     }
 
 }

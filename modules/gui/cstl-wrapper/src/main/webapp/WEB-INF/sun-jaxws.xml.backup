@@ -2,6 +2,6 @@
 <endpoints version="2.0" xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime">
   <endpoint implementation="org.constellation.sos.ws.soap.SOService"       name="SOService"  url-pattern="/WS-SOAP/sos/*"/>
   <endpoint implementation="org.constellation.metadata.ws.soap.CSWService" name="CSWService" url-pattern="/WS-SOAP/csw/*"/>
-  <endpoint implementation="org.constellation.wmts.ws.soap.WMTSService" name="WMTSService" url-pattern="/WS-SOAP/wmts/*"/>
+  <endpoint implementation="org.constellation.tile.ws.soap.WMTSService" name="WMTSService" url-pattern="/WS-SOAP/wmts/*"/>
   <endpoint implementation="org.constellation.wps.ws.soap.WPSService" name="WPSService" url-pattern="/WS-SOAP/wps/*"/>
 </endpoints>
