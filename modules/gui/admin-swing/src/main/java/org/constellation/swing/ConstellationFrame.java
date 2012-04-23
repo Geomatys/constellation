@@ -19,6 +19,7 @@ package org.constellation.swing;
 import java.net.MalformedURLException;
 import javax.swing.JFrame;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.admin.service.ConstellationServerFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -47,10 +48,10 @@ public final class ConstellationFrame {
         }
         
         
-        final ParameterValueGroup param = ConstellationServer.CSTL_DESCRIPTOR_GROUP.createValue();
-        Parameters.getOrCreate(ConstellationServer.URL_PARAMETER, param).setValue(url);
-        Parameters.getOrCreate(ConstellationServer.USER_PARAMETER, param).setValue(login);
-        Parameters.getOrCreate(ConstellationServer.PASSWORD_PARAMETER, param).setValue(password);
+        final ParameterValueGroup param = ConstellationServerFactory.PARAMETERS.createValue();
+        Parameters.getOrCreate(ConstellationServerFactory.URL, param).setValue(url);
+        Parameters.getOrCreate(ConstellationServerFactory.USER, param).setValue(login);
+        Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, param).setValue(password);
         
         
         final ConstellationServer server = new ConstellationServer(param);
