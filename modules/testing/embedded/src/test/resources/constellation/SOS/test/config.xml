@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cstl:SOSConfiguration xmlns:cstl="http://www.constellation.org/config">
+<cstl:observationFilterType>postgrid</cstl:observationFilterType>
+<cstl:observationReaderType>postgrid</cstl:observationReaderType>
+<cstl:observationWriterType>postgrid</cstl:observationWriterType>
+<cstl:SMLType>filesystem</cstl:SMLType>
+<cstl:profile>transactional</cstl:profile>
+<cstl:observationIdBase>urn:ogc:object:observation:SunSpot:</cstl:observationIdBase>
+<cstl:sensorIdBase>urn:ogc:object:sensor:SunSpot:</cstl:sensorIdBase>
+<cstl:phenomenonIdBase>urn:phenomenon:</cstl:phenomenonIdBase>
+<cstl:observationTemplateIdBase>urn:ogc:object:observationTemplate:SunSpot:</cstl:observationTemplateIdBase>
+<cstl:verifySynchronization>false</cstl:verifySynchronization>
+<cstl:OMConfiguration>
+   <bdd>
+      <className>org.postgresql.Driver</className>
+      <connectURL>jdbc:postgresql://db.geomatys.com:5432/observation</connectURL>
+      <user>test</user>
+      <password>test</password>
+   </bdd>
+</cstl:OMConfiguration>
+<cstl:SMLConfiguration>
+  <dataDirectory>sensor</dataDirectory>
+</cstl:SMLConfiguration>
+</cstl:SOSConfiguration>

@@ -51,6 +51,8 @@ public class CSWRequestTest extends AbstractTestRequest {
     private static final String CSW2_POST_URL = "http://localhost:9090/csw/csw2?";
 
     private static final String CSW_GETCAPABILITIES_URL = "http://localhost:9090/csw/default?request=GetCapabilities&service=CSW&version=2.0.2";
+    
+    private static final String CSW_GETCAPABILITIES_URL2 = "http://localhost:9090/csw/csw2?request=GetCapabilities&service=CSW&version=2.0.2";
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -102,9 +104,40 @@ public class CSWRequestTest extends AbstractTestRequest {
 
 
         // Try to marshall something from the response returned by the server.
-        // The response should be a WMT_MS_Capabilities.
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof Capabilities);
+        
+        Capabilities capa = (Capabilities) obj;
+        
+        String currentURL = capa.getOperationsMetadata().getOperation("getRecords").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
+        
+        assertEquals(CSW_POST_URL, currentURL);
+        
+        
+         // Creates a valid GetCapabilties url.
+        getCapsUrl = new URL(CSW_GETCAPABILITIES_URL2);
+        
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof Capabilities);
+        
+        capa = (Capabilities) obj;
+        
+        currentURL = capa.getOperationsMetadata().getOperation("getRecords").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
+        
+        assertEquals(CSW2_POST_URL, currentURL);
+        
+        
+         // Creates a valid GetCapabilties url.
+        getCapsUrl = new URL(CSW_GETCAPABILITIES_URL);
+        
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof Capabilities);
+        
+        capa = (Capabilities) obj;
+        
+        currentURL = capa.getOperationsMetadata().getOperation("getRecords").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
+        
+        assertEquals(CSW_POST_URL, currentURL);
     }
 
     @Test
