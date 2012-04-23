@@ -71,7 +71,8 @@ public class ConstellationServerFactory extends AbstractServerFactory{
     }
 
     @Override
-    public ConstellationServer create(ParameterValueGroup params) throws DataStoreException {        
+    public ConstellationServer create(ParameterValueGroup params) throws DataStoreException {     
+        checkCanProcessWithError(params);
         final ConstellationServer server = new ConstellationServer(params);        
         return server;
     }
