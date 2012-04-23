@@ -172,7 +172,7 @@ public class WPSUtils {
         if (factAndProcess.contains(":")) {
             return factAndProcess.split(":")[0];
         }
-        throw new CstlServiceException("Invalid process identifier. Must be an URN code like " + PROCESS_PREFIX + ":factory:process",
+        throw new CstlServiceException("Invalid process identifier. Must be an URN code like " + PROCESS_PREFIX + "factory:process",
                 INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
     }
 
@@ -203,7 +203,7 @@ public class WPSUtils {
         if (identifier.contains(PROCESS_PREFIX)) {
             return identifier.replace(PROCESS_PREFIX, "");
         }
-        throw new CstlServiceException("Invalid process identifier. Must be an URN code like " + PROCESS_PREFIX + ":factory:process",
+        throw new CstlServiceException("Invalid process identifier. Must be an URN code like " + PROCESS_PREFIX + "factory:process",
                 INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
     }
 
@@ -766,16 +766,7 @@ public class WPSUtils {
         return success;
     }
 
-    /**
-     * Retrurn the absolute path to the temporary directory.
-     *
-     * @return absolut path String.
-     */
-    public static String getTempDirectoryPath() {
-        return Util.getWebappDiretory().getAbsolutePath() + TEMP_FOLDER;
-    }
-
-    public static boolean storeResponseDocument(final ExecuteResponse doc, final String workerURL, final String fileName) {
+    public static boolean storeResponseDocument(final ExecuteResponse doc, final String fileName) {
 
         final MarshallerPool marshallerPool = WPSMarshallerPool.getInstance();
         boolean success = false;
@@ -830,6 +821,15 @@ public class WPSUtils {
         return null;
     }
 
+     /**
+     * Retrurn the absolute path to the temporary directory.
+     *
+     * @return absolut path String.
+     */
+    public static String getTempDirectoryPath() {
+        return Util.getWebappDiretory().getAbsolutePath() + TEMP_FOLDER;
+    }
+    
     public static String getTempDirectoryURL(final String workerURL) {
         String path = null;
         try {
@@ -848,4 +848,5 @@ public class WPSUtils {
             }
         }
     }
+    
 }

@@ -594,8 +594,7 @@ public class WPSWorker extends AbstractWorker {
 
         //check requested INPUT/OUTPUT. Throw an CstlException otherwise.
         WPSUtils.checkValidInputOuputRequest(processDesc, request);
-
-        //status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" found.");
+        status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" found.");
 
         /*
          * Get the requested output form
@@ -611,17 +610,20 @@ public class WPSWorker extends AbstractWorker {
         if (!isOutputRaw && !isOutputRespDoc) {
             throw new CstlServiceException("The response form should be defined.", MISSING_PARAMETER_VALUE, "responseForm");
         }
+        if(isOutputRespDoc && respDoc.isStatus() && !respDoc.isStoreExecuteResponse()){
+             throw new CstlServiceException("Set the storeExecuteResponse to true if you want to see status in response documents.", INVALID_PARAMETER_VALUE, "storeExecuteResponse");
+        }
 
         final String respDocFileName = UUID.randomUUID().toString();
         /*
          * ResponseDocument attributs
          */
-        boolean isLineage = false;
-        boolean useStatus = false;
-        boolean useStorage = false;
-        final List<DocumentOutputDefinitionType> wantedOutputs = respDoc.getOutput();
+        boolean isLineage = isOutputRespDoc ? respDoc.isLineage() : false;
+        boolean useStatus = isOutputRespDoc ? respDoc.isStatus() : false;
+        boolean useStorage = isOutputRespDoc ? respDoc.isStoreExecuteResponse() : false;
+        final List<DocumentOutputDefinitionType> wantedOutputs = isOutputRespDoc ? respDoc.getOutput() : null;
 
-        LOGGER.log(Level.INFO, "Request : [Lineage=" + respDoc.isLineage() + ", Storage=" + respDoc.isStoreExecuteResponse() + ", Status=" + respDoc.isStatus() + "]");
+        LOGGER.log(Level.INFO, "Request : [Lineage=" + isLineage + ", Storage=" + useStatus + ", Status=" + useStorage + "]");
 
 
         //Input temporary files used by the process. In order to delete them at the end of the process.
@@ -665,30 +667,52 @@ public class WPSWorker extends AbstractWorker {
 
         //Give input parameter to the process
         final org.geotoolkit.process.Process process = processDesc.createProcess(in);
-
+                
+        //Sumbit the process execution to the ExecutorService
+        final List<GeneralParameterDescriptor> processOutputDesc = processDesc.getOutputDescriptor().descriptors();
+        ParameterValueGroup result = null;
+        
         if (isOutputRaw) {
-            final List<GeneralParameterDescriptor> processOutputDesc = processDesc.getOutputDescriptor().descriptors();
-            final ParameterValueGroup result;
+            
+            ////////
+            // RAW Sync no timeout
+            ////////
+            final Future<ParameterValueGroup> future = WPSService.EXECUTOR.submit(process);
             try {
-                result = process.call();
-            } catch (ProcessException ex) {
-                //TODO handle process failed.
-                throw new CstlServiceException("Process execution failed", ex, null);
+                result = future.get();
+
+            } catch (InterruptedException ex) {
+                throw new CstlServiceException("", ex, NO_APPLICABLE_CODE);
+            } catch (ExecutionException ex) {
+                throw new CstlServiceException("Process execution failed", ex, NO_APPLICABLE_CODE);
             }
             return createRawOutput(rawData, processOutputDesc, result);
 
         } else {
+            
             final ExecuteResponse response = new ExecuteResponse();
-            process.addListener(new WPSProcessListener(request, response, configurationDirectory, respDocFileName));
+            response.setService(WPS_SERVICE);
+            response.setVersion(WPS_1_0_0);
+            response.setLang(WPS_LANG);
+            response.setServiceInstance(getServiceUrl() + "SERVICE=WPS&amp;REQUEST=GetCapabilities");
+
+            //Give a bief process description into the execute response
+            response.setProcess(WPSUtils.generateProcessBrief(processDesc));
             
-            final Future<ParameterValueGroup> future = WPSService.EXECUTOR.submit(process);
-            
-            ParameterValueGroup result = null;
-            //ask for asynchronous process execution
-            if (useStatus) {
-               
+            if(useStatus){
+                ////////
+                // DOC Async
+                ////////
+                process.addListener(new WPSProcessListener(request, response, respDocFileName));
+                WPSService.EXECUTOR.submit(process);
+                
             } else {
-                 try {
+               
+                ////////
+                // DOC Sync + timeout
+                ////////
+                final Future<ParameterValueGroup> future = WPSService.EXECUTOR.submit(process);
+                try {
                     result = future.get(TIMEOUT, TimeUnit.SECONDS);
 
                 } catch (InterruptedException ex) {
@@ -699,15 +723,11 @@ public class WPSWorker extends AbstractWorker {
                     ((AbstractProcess) process).cancelProcess();
                     future.cancel(true);
                 }
+                
+                final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
+                fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result);
+                response.setProcessOutputs(outputs);
             }
-
-            response.setService(WPS_SERVICE);
-            response.setVersion(WPS_1_0_0);
-            response.setLang(WPS_LANG);
-            response.setServiceInstance(getServiceUrl() + "SERVICE=WPS&amp;REQUEST=GetCapabilities");
-
-            //Give a bief process description into the execute response
-            response.setProcess(WPSUtils.generateProcessBrief(processDesc));
 
             if (respDoc.isLineage()) {
                 //Inputs
@@ -718,11 +738,6 @@ public class WPSWorker extends AbstractWorker {
                 response.setOutputDefinitions(outputsDef);
             }
 
-//            fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result);
-//            response.setProcessOutputs(outputs);
-
-            status.setProcessSucceeded("Process " + request.getIdentifier().getValue() + " executed successfully.");
-
             if (respDoc.isStatus()) {
                 response.setStatus(status);
             }
@@ -732,76 +747,13 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Storage not supported.", STORAGE_NOT_SUPPORTED, "storeExecuteResponse");
                 }
                 response.setStatusLocation(WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" + respDocFileName); //Output data URL
-                WPSUtils.storeResponseDocument(response, getServiceUrl(), respDocFileName);
+                WPSUtils.storeResponseDocument(response, respDocFileName);
             }
 
-
             //Delete input temporary files 
-            WPSUtils.cleanTempFiles(files);
+            //WPSUtils.cleanTempFiles(files);
             return response;
         }
-
-
-
-        //Status
-//        final ProcessStartedType started = new ProcessStartedType();
-//        started.setValue("Process " + request.getIdentifier().getValue() + " is started");
-//        started.setPercentCompleted(0);
-//        status.setProcessStarted(started);
-//
-//        final ParameterValueGroup result;
-//        try {
-//            result = process.call();
-//        } catch (ProcessException ex) {
-//            //TODO handle process failed.
-//            throw new CstlServiceException("Process execution failed", ex, null);
-//        }
-
-        ///////////////////////
-        //   Process OUTPUT
-        //////////////////////
-
-//        final List<GeneralParameterDescriptor> processOutputDesc = processDesc.getOutputDescriptor().descriptors();
-//        final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-//
-//        response.setService(WPS_SERVICE);
-//        response.setVersion(WPS_1_0_0);
-//        response.setLang(WPS_LANG);
-//        response.setServiceInstance(getServiceUrl() + "SERVICE=WPS&amp;REQUEST=GetCapabilities");
-//
-//        //Give a bief process description into the execute response
-//        response.setProcess(WPSUtils.generateProcessBrief(processDesc));
-//
-//        if (respDoc.isLineage()) {
-//            //Inputs
-//            response.setDataInputs(request.getDataInputs());
-//            final OutputDefinitionsType outputsDef = new OutputDefinitionsType();
-//            outputsDef.getOutput().addAll(respDoc.getOutput());
-//            //Outputs
-//            response.setOutputDefinitions(outputsDef);
-//        }
-//
-//        fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result);
-//        response.setProcessOutputs(outputs);
-//
-//        status.setProcessSucceeded("Process " + request.getIdentifier().getValue() + " executed successfully.");
-//
-//        if (respDoc.isStatus()) {
-//            response.setStatus(status);
-//        }
-//
-//        if (respDoc.isStoreExecuteResponse()) {
-//            if (!WPSService.SUPPORT_STORAGE) {
-//                throw new CstlServiceException("Storage not supported.", STORAGE_NOT_SUPPORTED, "storeExecuteResponse");
-//            }
-//            response.setStatusLocation(WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" + respDocFileName); //Output data URL
-//            WPSUtils.storeResponseDocument(response, getServiceUrl(), respDocFileName);
-//        }
-//
-//
-//        //Delete input temporary files 
-//        WPSUtils.cleanTempFiles(files);
-//        return response;
     }
 
     /**

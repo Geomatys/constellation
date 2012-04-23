@@ -39,15 +39,13 @@ public class WPSProcessListener implements ProcessListener{
     
     private Execute request;
     private ExecuteResponse responseDoc;
-    private File saveDirectory;
     private String fileName;
     private StatusType status;
     boolean useStatus;
     
-    public WPSProcessListener(final Execute request, final ExecuteResponse responseDoc, final File saveDirectory, final String fileName) {
+    public WPSProcessListener(final Execute request, final ExecuteResponse responseDoc, final String fileName) {
         this.request = request;
         this.responseDoc = responseDoc;
-        this.saveDirectory = saveDirectory;
         this.fileName = fileName;
         this.status = responseDoc.getStatus();
         this.useStatus = request.getResponseForm().getResponseDocument().isStatus();
@@ -99,7 +97,7 @@ public class WPSProcessListener implements ProcessListener{
     
     
     private void updateDocument(){
-        WPSUtils.storeResponseDocument(responseDoc, saveDirectory.getAbsolutePath(), fileName);
+        WPSUtils.storeResponseDocument(responseDoc, fileName);
         
     }
     
