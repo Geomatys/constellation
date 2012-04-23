@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.tile.ws;
+package org.constellation.wmts.ws;
 
 import java.awt.Color;
 import java.awt.Rectangle;
@@ -25,6 +25,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
+
+// Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.Layer;
@@ -32,14 +34,16 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
-import org.constellation.tile.visitor.CSVGraphicVisitor;
-import org.constellation.tile.visitor.GMLGraphicVisitor;
-import org.constellation.tile.visitor.HTMLGraphicVisitor;
-import org.constellation.tile.visitor.TextGraphicVisitor;
+import org.constellation.wmts.visitor.CSVGraphicVisitor;
+import org.constellation.wmts.visitor.GMLGraphicVisitor;
+import org.constellation.wmts.visitor.HTMLGraphicVisitor;
+import org.constellation.wmts.visitor.TextGraphicVisitor;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
+
+// Geotoolkit dependencies
 import org.geotoolkit.coverage.*;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
@@ -48,7 +52,6 @@ import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.*;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
@@ -60,6 +63,10 @@ import org.geotoolkit.wmts.WMTSUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.*;
 import org.geotoolkit.xml.MarshallerPool;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// GeoAPI dependencies
 import org.opengis.coverage.Coverage;
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;

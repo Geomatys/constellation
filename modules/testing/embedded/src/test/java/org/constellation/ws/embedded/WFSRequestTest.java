@@ -23,23 +23,18 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
 import java.net.MalformedURLException;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
-import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
-import org.geotoolkit.wfs.xml.v110.GetFeatureType;
-import org.geotoolkit.wfs.xml.v110.InsertResultsType;
-import org.geotoolkit.wfs.xml.v110.InsertedFeatureType;
-import org.geotoolkit.wfs.xml.v110.QueryType;
-import org.geotoolkit.wfs.xml.v110.ResultTypeType;
-import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
-import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
+import org.geotoolkit.wfs.xml.v110.*;
 import org.junit.*;
 import static org.junit.Assume.*;
 import static org.junit.Assert.*;
@@ -51,6 +46,10 @@ import static org.junit.Assert.*;
 public class WFSRequestTest extends AbstractTestRequest {
 
     private static final String WFS_POST_URL = "http://localhost:9090/wfs/default?";
+    private static final String WFS_POST_URL2 = "http://localhost:9090/wfs/test?";
+    
+    private static final String WFS_GETCAPABILITIES_URL = "http://localhost:9090/wfs/default?request=GetCapabilities&version=1.1.0&service=WFS";
+    private static final String WFS_GETCAPABILITIES_URL2 = "http://localhost:9090/wfs/test?request=GetCapabilities&version=1.1.0&service=WFS";
 
     private static final String WFS_GETFEATURE_URL = "http://localhost:9090/wfs/default?request=getFeature&service=WFS&version=1.1.0&"
             + "typename=sa:SamplingPoint&namespace=xmlns(sa=http://www.opengis.net/sampling/1.0)&"
@@ -87,6 +86,65 @@ public class WFSRequestTest extends AbstractTestRequest {
         }
     }
 
+    @Test
+    public void testWFSGetCapabilities() throws JAXBException, IOException {
+
+        // Creates a valid GetCapabilities url.
+        URL getCapsUrl;
+        try {
+            getCapsUrl = new URL(WFS_GETCAPABILITIES_URL);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WCSCapabilitiesType.
+        Object obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WFSCapabilitiesType);
+
+        WFSCapabilitiesType responseCaps = (WFSCapabilitiesType)obj;
+        
+        
+        String currentUrl =  responseCaps.getOperationsMetadata().getOperation("GetCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
+        assertEquals(WFS_POST_URL, currentUrl);
+        
+        try {
+            getCapsUrl = new URL(WFS_GETCAPABILITIES_URL2);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WFSCapabilitiesType.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WFSCapabilitiesType);
+
+        responseCaps = (WFSCapabilitiesType)obj;
+        
+        currentUrl =  responseCaps.getOperationsMetadata().getOperation("GetCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
+        assertEquals(WFS_POST_URL2, currentUrl);
+        
+        
+        try {
+            getCapsUrl = new URL(WFS_GETCAPABILITIES_URL);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WCSCapabilitiesType.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WFSCapabilitiesType);
+
+        responseCaps = (WFSCapabilitiesType)obj;
+        
+        currentUrl =  responseCaps.getOperationsMetadata().getOperation("GetCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
+        assertEquals(WFS_POST_URL, currentUrl);
+    }
+    
     /**
      */
     @Test

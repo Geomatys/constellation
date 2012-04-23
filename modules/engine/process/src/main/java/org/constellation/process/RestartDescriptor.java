@@ -16,8 +16,7 @@
  */
 package org.constellation.process;
 
-import org.constellation.admin.service.ConstellationServer;
-
+import org.constellation.admin.service.ConstellationServerFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.Process;
@@ -46,9 +45,9 @@ public final class RestartDescriptor extends AbstractProcessDescriptor {
             "Type of the WebService.",String.class,null, true);
     public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP =
             new DefaultParameterDescriptorGroup("Constellation",
-                                                 ConstellationServer.URL_PARAMETER,
-                                                 ConstellationServer.USER_PARAMETER,
-                                                 ConstellationServer.PASSWORD_PARAMETER,
+                                                 ConstellationServerFactory.URL,
+                                                 ConstellationServerFactory.USER,
+                                                 ConstellationServerFactory.PASSWORD,
                                                  CSTL_WS_INSTANCE,
                                                  CSTL_WS_TYPE);
     

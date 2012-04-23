@@ -20,34 +20,32 @@ package org.constellation.configuration.ws.rs;
 import java.util.Arrays;
 import java.io.FileInputStream;
 import java.util.Properties;
-import org.mdweb.io.auth.AuthenticationReader;
-import org.constellation.configuration.ConfigDirectory;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.Context;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
+import java.lang.ref.WeakReference;
 
 // Jersey dependencies
 import javax.annotation.PreDestroy;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.MultivaluedMap;
 import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
-import java.lang.ref.WeakReference;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
-import javax.xml.bind.Unmarshaller;
-import org.constellation.ws.rs.WebService;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
@@ -56,27 +54,29 @@ import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.configuration.filter.ConfigurerFilter;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.generic.database.BDD;
+import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import org.constellation.generic.database.BDD;
-        
+
+import static org.constellation.api.QueryConstants.*;
+import static org.constellation.ws.ExceptionCode.*;
+import org.constellation.ws.WSEngine;
+
 // Geotoolkit dependencies
-import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 
-import static org.constellation.api.QueryConstants.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
 // Mdweb metamodel auth dependencies
-import org.mdweb.model.auth.AuthenticationException;
+import org.mdweb.io.auth.AuthenticationReader;
 import org.mdweb.io.auth.sql.v24.DataSourceAuthenticationReader;
+import org.mdweb.model.auth.AuthenticationException;
 import org.mdweb.model.auth.UserAuthnInfo;
 
 /**
@@ -183,7 +183,7 @@ public final class ConfigurationService extends WebService  {
             }
                     
             else if (REQUEST_LIST_SERVICE.equalsIgnoreCase(request)) {    
-                final ServiceReport response = new ServiceReport(REGISTERED_SERVICE);
+                final ServiceReport response = new ServiceReport(WSEngine.getRegisteredServices());
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             } 
             
@@ -198,7 +198,7 @@ public final class ConfigurationService extends WebService  {
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
-            else if ("updateUser".equalsIgnoreCase(request)) {
+            else if (REQUEST_UPDATE_USER.equalsIgnoreCase(request)) {
                 final String userName = getParameter("userName", true);
                 final String password = getParameter("password", true);
                 final String oldLogin = getParameter("oldLogin", true);
@@ -206,18 +206,18 @@ public final class ConfigurationService extends WebService  {
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
-            else if ("deleteUser".equalsIgnoreCase(request)) {
+            else if (REQUEST_DELETE_USER.equalsIgnoreCase(request)) {
                 final String userName = getParameter("userName", true);
                 final AcknowlegementType response = deleteUser(userName);
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
-            else if ("getUserName".equalsIgnoreCase(request)) {
+            else if (REQUEST_GET_USER_NAME.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = getUserName();
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
             
-            else if ("access".equalsIgnoreCase(request)) {
+            else if (REQUEST_ACCESS.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = new AcknowlegementType("Success", "You have access to the configuration service");
                 return Response.ok(response, MediaType.TEXT_XML).build(); 
             }
@@ -270,7 +270,7 @@ public final class ConfigurationService extends WebService  {
      */
     @Override
     protected Response launchException(final String message, final String codeName, final String locator) {
-        final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
+        final ExceptionCode code = ExceptionCode.valueOf(codeName);
         final ExceptionReport report = new ExceptionReport(message, code.name());
         return Response.ok(report, MimeType.TEXT_XML).build();
     }
@@ -292,6 +292,7 @@ public final class ConfigurationService extends WebService  {
         if (cn != null) {
             if (!configurerLock()) {
                 BDD.clearConnectionPool();
+                WSEngine.prepareRestart();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
             } else if (!forced) {
@@ -301,6 +302,7 @@ public final class ConfigurationService extends WebService  {
                     configurer.closeForced();
                 }
                 BDD.clearConnectionPool();
+                WSEngine.prepareRestart();
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted (previous indexation was stopped)");
             }

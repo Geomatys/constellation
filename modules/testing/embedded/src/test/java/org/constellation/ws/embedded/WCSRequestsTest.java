@@ -37,6 +37,7 @@ import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
+import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 
 // JUnit dependencies
 import org.junit.*;
@@ -57,6 +58,9 @@ public class WCSRequestsTest extends AbstractTestRequest {
     /**
      * URLs which will be tested on the server.
      */
+    private static final String WCS_URL  ="http://localhost:9090/wcs/default?SERVICE=WCS&";
+    private static final String WCS_URL2 ="http://localhost:9090/wcs/test?SERVICE=WCS&";
+    
     private static final String WCS_FALSE_REQUEST =
             "http://localhost:9090/wcs/default?request=SomethingElse";
 
@@ -86,6 +90,9 @@ public class WCSRequestsTest extends AbstractTestRequest {
 
     private static final String WCS_GETCAPABILITIES =
             "http://localhost:9090/wcs/default?request=GetCapabilities&service=WCS&version=1.0.0";
+    
+    private static final String WCS_GETCAPABILITIES2 =
+            "http://localhost:9090/wcs/test?request=GetCapabilities&service=WCS&version=1.0.0";
 
     private static final String WCS_DESCRIBECOVERAGE =
             "http://localhost:9090/wcs/default?request=DescribeCoverage&coverage=SST_tests&service=wcs&version=1.0.0";
@@ -201,7 +208,7 @@ public class WCSRequestsTest extends AbstractTestRequest {
     public void testWCSGetCapabilities() throws JAXBException, IOException {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl;
+        URL getCapsUrl;
         try {
             getCapsUrl = new URL(WCS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
@@ -211,10 +218,10 @@ public class WCSRequestsTest extends AbstractTestRequest {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WCSCapabilitiesType.
-        final Object obj = unmarshallResponse(getCapsUrl);
+        Object obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof WCSCapabilitiesType);
 
-        final WCSCapabilitiesType responseCaps = (WCSCapabilitiesType)obj;
+        WCSCapabilitiesType responseCaps = (WCSCapabilitiesType)obj;
         final List<CoverageOfferingBriefType> coverages = responseCaps.getContentMetadata().getCoverageOfferingBrief();
 
         assertNotNull(coverages);
@@ -235,6 +242,44 @@ public class WCSRequestsTest extends AbstractTestRequest {
         if (layerTestFound == false) {
             throw new AssertionError("The layer \""+ LAYER_TEST +"\" was not found in the returned GetCapabilities.");
         }
+        
+        Get get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0);
+        assertEquals(WCS_URL, get.getOnlineResource().getHref());
+        
+        try {
+            getCapsUrl = new URL(WCS_GETCAPABILITIES2);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WCSCapabilitiesType.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WCSCapabilitiesType);
+
+        responseCaps = (WCSCapabilitiesType)obj;
+        
+        get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0);
+        assertEquals(WCS_URL2, get.getOnlineResource().getHref());
+        
+        
+        try {
+            getCapsUrl = new URL(WCS_GETCAPABILITIES);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WCSCapabilitiesType.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WCSCapabilitiesType);
+
+        responseCaps = (WCSCapabilitiesType)obj;
+        
+        get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0);
+        assertEquals(WCS_URL, get.getOnlineResource().getHref());
     }
 
     /**

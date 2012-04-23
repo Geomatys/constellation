@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.tile.ws.soap;
+package org.constellation.wmts.ws.soap;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -23,11 +23,13 @@ import java.io.IOException;
 import java.util.logging.Level;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.tile.ws.DefaultWMTSWorker;
-import org.constellation.tile.ws.WMTSWorker;
+import org.constellation.wmts.ws.DefaultWMTSWorker;
+import org.constellation.wmts.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.soap.OGCWebService;
@@ -49,7 +51,8 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
  *
  * @author Cédric Briançon (Geomatys)
  */
-//@WebService(name = "WMTSpepRegion", serviceName = "WMTSpepRegion")
+@WebService(name = "WMTSService")
+@XmlSeeAlso({org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 public class WMTSService extends OGCWebService<WMTSWorker>{
 

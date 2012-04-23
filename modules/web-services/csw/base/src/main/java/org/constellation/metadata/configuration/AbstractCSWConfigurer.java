@@ -55,6 +55,9 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 
+import static org.constellation.ws.ExceptionCode.*;
+import org.constellation.ws.WSEngine;
+
 // Geotoolkit dependencies
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
@@ -62,8 +65,6 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.IndexDirectoryFilter;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * The base for The CSW configurer.
@@ -153,18 +154,10 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             return metadataExist(id, metadata);
         }
         
-        if ("UpdateVocabularies".equalsIgnoreCase(request)) {
-            return updateVocabularies();
-        }
-        
         if ("GetCSWDatasourceType".equalsIgnoreCase(request)) {
             return getAvailableCSWDataSourceType();
         }
 
-        if ("UpdateContacts".equalsIgnoreCase(request)) {
-            updateContacts();
-
-        }
         return null;
     }
     
@@ -509,9 +502,8 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             identifiers.add(token);
         }
         AbstractIndexer indexer  = null;
-        CSWMetadataReader reader = null;
         try {
-            reader  = initReader(id);
+            final CSWMetadataReader reader  = initReader(id);
             final List<Object> objectToIndex = new ArrayList<Object>();
             if (reader != null) {
                 try {
@@ -604,6 +596,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
     protected boolean restart() {
         if (containerNotifier != null) {
             BDD.clearConnectionPool();
+            WSEngine.prepareRestart();
             containerNotifier.reload();
             return true;
         } else {
@@ -632,20 +625,6 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         }
     }
     
-    /**
-     * Update all the vocabularies SKOS files and the list of contact.
-     */
-    public AcknowlegementType updateVocabularies() throws CstlServiceException {
-        throw new CstlServiceException("The method updateVocabularies is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
-    }
-
-    /**
-     * Update all the contact retrieved from files and the list of contact.
-     */
-    public AcknowlegementType updateContacts() throws CstlServiceException {
-        throw new CstlServiceException("The method updateContacts is not supported by the current implementation.", OPERATION_NOT_SUPPORTED);
-    }
-
     /*
      * Return the configuration directory for the specified instance identifier.
      */

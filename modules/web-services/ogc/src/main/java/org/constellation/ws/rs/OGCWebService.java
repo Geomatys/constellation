@@ -21,11 +21,7 @@ package org.constellation.ws.rs;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
@@ -42,6 +38,7 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.WSEngine;
 
 // Geotoolkit dependencies
 import org.constellation.ws.Worker;
@@ -91,12 +88,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      */
     private final UnmodifiableArrayList<ServiceDef> supportedVersions;
 
-    /**
-     * A map of service worker.
-     * TODO this attribute must be set to private when will fix the WFS service
-     */
-    private final Map<String, W> workersMap;
-
+    final String serviceName;
+    
     /**
      * Initialize the basic attributes of a web serviceType.
      *
@@ -112,18 +105,22 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             throw new IllegalArgumentException("It is compulsory for a web service to have " +
                     "at least one version specified.");
         }
-        final String serviceName = supportedVersions[0].specification.name();
+        serviceName = supportedVersions[0].specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
-        registerService(serviceName);
+        WSEngine.registerService(serviceName);
         
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
 
         /*
-         * build the map of Workers, by scanning the sub-directories of its service directory.
+         * build the map of Workers, by scanning the sub-directories of its
+         * service directory.
          */
-        workersMap = new HashMap<String, W>();
-        buildWorkerMap();
+        if (!WSEngine.isSetService(serviceName)) {
+            buildWorkerMap();
+        } else {
+            LOGGER.log(Level.INFO, "Workers already set for {0}", serviceName);
+        }
     }
 
     /**
@@ -136,7 +133,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      *                          one, the best one.
      * @param workers A map of worker id / worker.
      */
-    public OGCWebService(Map<String, W> workers, final ServiceDef... supportedVersions) {
+    @Deprecated
+    public OGCWebService(Map<String, W> workersMap, final ServiceDef... supportedVersions) {
         super();
 
         if (supportedVersions == null || supportedVersions.length == 0 ||
@@ -144,10 +142,13 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             throw new IllegalArgumentException("It is compulsory for a web service to have " +
                     "at least one version specified.");
         }
+        serviceName = supportedVersions[0].specification.name();
+        LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
+        WSEngine.registerService(serviceName);
 
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
-        this.workersMap        = workers;
+        WSEngine.setServiceInstances(serviceName, (Map<String, Worker>)workersMap);
     }
 
     /**
@@ -183,6 +184,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * Scan the configuration directory to instantiate Web service workers.
      */
     private void buildWorkerMap() {
+        final Map<String, Worker> workersMap = new HashMap<String, Worker>();
         final File serviceDirectory = getServiceDirectory();
         if (serviceDirectory != null && serviceDirectory.isDirectory()) {
             for (File instanceDirectory : serviceDirectory.listFiles()) {
@@ -197,18 +199,19 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
             }
         } else {
-            LOGGER.log(Level.WARNING, "no {0} directory.", supportedVersions.get(0).specification.name());
+            LOGGER.log(Level.WARNING, "no {0} directory.", serviceName);
         }
+        WSEngine.setServiceInstances(serviceName, workersMap);
     }
 
-    private W buildWorker(String identifier) {
+    private W buildWorker(final String identifier) {
         final File serviceDirectory = getServiceDirectory();
         if (serviceDirectory != null) {
             final File instanceDirectory = new File(serviceDirectory, identifier);
             if (instanceDirectory.isDirectory()) {
                 final W newWorker = createWorker(instanceDirectory);
                 if (newWorker != null) {
-                    workersMap.put(instanceDirectory.getName(), newWorker);
+                    WSEngine.addServiceInstance(serviceName, instanceDirectory.getName(), newWorker);
                 }
                 return newWorker;
             } else {
@@ -235,8 +238,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         try {
             final String serviceID = getParameter("serviceId", false);
             // request is send to the specified worker
-            if (serviceID != null && workersMap.containsKey(serviceID)) {
-                final W worker = workersMap.get(serviceID);
+            if (serviceID != null && WSEngine.serviceInstanceExist(serviceName, serviceID)) {
+                final W worker = (W) WSEngine.getInstance(serviceName, serviceID);
                 if (worker.isSecured()) {
                     final String ip = getHttpServletRequest().getRemoteAddr();
                     final String referer = getHttpContext().getRequest().getHeaderValue("referer");
@@ -285,30 +288,16 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
                 specificRestart(identifier);
                 if (identifier == null) {
-                    final Collection<? extends Worker> workers = workersMap.values();
                     if (closeFirst) {
-                        for (final Worker worker : workers) {
-                            worker.destroy();
-                        }
-                        workersMap.clear();
-                        buildWorkerMap();
-                    } else {
-                        buildWorkerMap();
-                        for (final Worker worker : workers) {
-                            worker.destroy();
-                        }
+                        WSEngine.destroyInstances(serviceName);
                     }
+                    buildWorkerMap();
                 } else {
-                    if (workersMap.containsKey(identifier)) {
-                        Worker worker = workersMap.get(identifier);
+                    if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
                         if (closeFirst) {
-                            workersMap.remove(identifier);
-                            worker.destroy();
-                            buildWorker(identifier);
-                        } else {
-                            buildWorker(identifier);
-                            worker.destroy();
+                            WSEngine.shutdownInstance(serviceName, identifier);
                         }
+                        buildWorker(identifier);
                     } else {
                         throw new CstlServiceException("There is no instance " + identifier, INVALID_PARAMETER_VALUE, "id");
                     }
@@ -316,11 +305,11 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 return Response.ok(new AcknowlegementType("Success", "instances succefully restarted"), "text/xml").build();
 
             } else if ("start".equalsIgnoreCase(request)) {
-                LOGGER.info("starting a new worker");
+                LOGGER.info("starting an instance");
                 final String identifier = getParameter("id", true);
                 specificRestart(identifier);
                 final AcknowlegementType response;
-                if (workersMap.containsKey(identifier)) {
+                if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
                     throw new CstlServiceException("The instance " + identifier + " is already started try restart method instead.", INVALID_PARAMETER_VALUE);
                 } else {
                     final Worker worker = buildWorker(identifier);
@@ -339,11 +328,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             } else if ("stop".equalsIgnoreCase(request)) {
                 LOGGER.info("stopping an instance");
                 final String identifier = getParameter("id", true);
-                final W worker = workersMap.get(identifier);
                 final AcknowlegementType response;
-                if (worker != null) {
-                    worker.destroy();
-                    workersMap.remove(identifier);
+                if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
+                    WSEngine.shutdownInstance(serviceName, identifier);
                     response = new AcknowlegementType("Success", "instance succesfully stopped");
                 } else {
                     response = new AcknowlegementType("Error", "The is no running instance named:" + identifier);
@@ -353,13 +340,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             } else if ("delete".equalsIgnoreCase(request)) {
                 LOGGER.info("deleting an instance");
                 final String identifier = getParameter("id", true);
-                final W worker = workersMap.get(identifier);
-                final AcknowlegementType response;
-                if (worker != null) {
-                    worker.destroy();
-                    workersMap.remove(identifier);
-                } 
-                    
+                WSEngine.shutdownInstance(serviceName, identifier);
+                
+                final AcknowlegementType response;    
                 final File serviceDirectory = getServiceDirectory();
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     final File instanceDirectory     = new File (serviceDirectory, identifier);
@@ -409,11 +392,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 final String identifier = getParameter("id", true);
                 final String newName    = getParameter("newName", true);
                 // we stop the current worker
-                final W worker = workersMap.get(identifier);
-                if (worker != null) {
-                    worker.destroy();
-                    workersMap.remove(identifier);
-                } 
+                WSEngine.shutdownInstance(serviceName, identifier); 
                 
                 final AcknowlegementType response;
                 final File serviceDirectory = getServiceDirectory();
@@ -490,11 +469,12 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
              * Return a report about the instances in the service.
              */
             } else if ("listInstance".equalsIgnoreCase(request)) {
+                LOGGER.info("listing instances");
                 final List<Instance> instances = new ArrayList<Instance>();
                 // 1- First we list the instance in the map
-                for (Entry<String, W> entry : workersMap.entrySet()) {
+                for (Entry<String, Boolean> entry : WSEngine.getEntriesStatus(serviceName)) {
                     final ServiceStatus status;
-                    if (entry.getValue().isStarted()) {
+                    if (entry.getValue()) {
                         status = ServiceStatus.WORKING;
                     } else {
                         status = ServiceStatus.ERROR;
@@ -506,7 +486,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     for (File instanceDirectory : serviceDirectory.listFiles()) {
                         final String name = instanceDirectory.getName();
-                        if (instanceDirectory.isDirectory() && !name.startsWith(".") && !workersMap.containsKey(name)) {
+                        if (instanceDirectory.isDirectory() && !name.startsWith(".") && !WSEngine.serviceInstanceExist(serviceName, name)) {
                             instances.add(new Instance(name, ServiceStatus.NOT_STARTED));
                         }
                     }
@@ -798,7 +778,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * Return the number of instance if the web-service
      */
     protected int getWorkerMapSize() {
-        return workersMap.size();
+        return WSEngine.getInstanceSize(serviceName);
     }
     
     /**
@@ -809,10 +789,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     public void destroy() {
         super.destroy();
         LOGGER.log(Level.INFO, "Shutting down the REST {0} service facade.", supportedVersions.get(0).specification.name());
-        for (final Worker worker : workersMap.values()) {
-            worker.destroy();
-        }
-        workersMap.clear();
+        WSEngine.destroyInstances(serviceName);
     }
 
     /**

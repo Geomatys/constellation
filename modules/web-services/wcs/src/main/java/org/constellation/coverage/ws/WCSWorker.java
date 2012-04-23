@@ -623,8 +623,9 @@ public final class WCSWorker extends LayerWorker {
         }
 
         // If the getCapabilities response is in cache, we just return it.
-        if (CAPS_RESPONSE.containsKey(version)) {
-            return CAPS_RESPONSE.get(version);
+        final String keyCache = getId() + version;
+        if (CAPS_RESPONSE.containsKey(keyCache)) {
+            return CAPS_RESPONSE.get(keyCache);
         }
 
         final String format;
@@ -655,7 +656,7 @@ public final class WCSWorker extends LayerWorker {
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
 
-        CAPS_RESPONSE.put(version, response);
+        CAPS_RESPONSE.put(keyCache, response);
         return response;
     }
 
@@ -694,7 +695,7 @@ public final class WCSWorker extends LayerWorker {
         if (requestedSection == null || "/WCS_Capabilities/Capability".equals(requestedSection) || "/".equals(requestedSection))
         {
             //we update the url in the static part.
-            final Request req = WCSConstant.REQUEST_100;
+            final Request req = new Request(WCSConstant.REQUEST_100);
             final String url  = getServiceUrl() + "SERVICE=WCS&";
             req.updateURL(url);
             staticCapabilities.getCapability().setRequest(req);
@@ -847,8 +848,8 @@ public final class WCSWorker extends LayerWorker {
             si = staticCapabilities.getServiceIdentification();
         }
         if (requestedSections.contains("OperationsMetadata") || requestedSections.contains(all)) {
-            om = WCSConstant.OPERATIONS_METADATA_111;
-            //we update the url in the static part. TODO
+            om = new OperationsMetadata(WCSConstant.OPERATIONS_METADATA_111);
+            //we update the url in the static part.
             om.updateURL(getServiceUrl());
         }
         final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), getCurrentUpdateSequence(), null);

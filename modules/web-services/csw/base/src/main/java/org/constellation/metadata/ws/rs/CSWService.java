@@ -111,6 +111,7 @@ public class CSWService extends OGCWebService<CSWworker> {
      * Build a new restful CSW service with multiple workers.
      * used by subClasses.
      */
+    @Deprecated
     protected CSWService(final Map<String, CSWworker> workers) {
         super(workers, ServiceDef.CSW_2_0_2);
         setXMLContext(EBRIMMarshallerPool.getInstance());

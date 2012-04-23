@@ -90,20 +90,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-ows</artifactId>
-      <version>${geotoolkit-pending.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.library</groupId>
       <artifactId>cstl-lib-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <!-- TODO see if we still need to unmarshall skos -->
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-skos</artifactId>
-      <version>${geotoolkit-pending.version}</version>
     </dependency>
   </dependencies>
 

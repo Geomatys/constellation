@@ -29,9 +29,9 @@ import java.net.URL;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ServiceReport;
+import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -89,7 +89,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport expResult = new ExceptionReport("Download operation not implemented",  
-                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()));
+                                                         StringUtilities.transformCodeName(ExceptionCode.OPERATION_NOT_SUPPORTED.name()));
         assertEquals(expResult, obj);
     }
     
@@ -107,7 +107,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         
         assertTrue(obj instanceof ExceptionReport);
         ExceptionReport exception = new ExceptionReport("The parameter ID must be specified",  
-                                                         OWSExceptionCode.MISSING_PARAMETER_VALUE.name());
+                                                         StringUtilities.transformCodeName(ExceptionCode.MISSING_PARAMETER_VALUE.name()));
         assertEquals(exception, obj);
         
         
@@ -218,40 +218,6 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
     }
     
     @Test
-    public void testUpdateVocabularies() throws Exception {
-
-        URL niUrl = new URL("http://localhost:9090/configuration?request=UpdateVocabularies");
-
-
-        // for a POST request
-        URLConnection conec = niUrl.openConnection();
-
-        Object obj = unmarshallResponse(conec);
-
-        assertTrue(obj instanceof ExceptionReport);
-        ExceptionReport expResult = new ExceptionReport("The method updateVocabularies is not supported by the current implementation.",  
-                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()));
-        assertEquals(expResult, obj);
-    }
-    
-    @Test
-    public void testUpdateContacts() throws Exception {
-
-        URL niUrl = new URL("http://localhost:9090/configuration?request=UpdateContacts");
-
-
-        // for a POST request
-        URLConnection conec = niUrl.openConnection();
-
-        Object obj = unmarshallResponse(conec);
-
-        assertTrue(obj instanceof ExceptionReport);
-        ExceptionReport expResult = new ExceptionReport("The method updateContacts is not supported by the current implementation.",  
-                                                         StringUtilities.transformCodeName(OWSExceptionCode.OPERATION_NOT_SUPPORTED.name()));
-        assertEquals(expResult, obj);
-    }
-    
-    @Test
     public void testListAvailableService() throws Exception {
         URL niUrl = new URL("http://localhost:9090/configuration?request=ListAvailableService");
 
@@ -268,8 +234,9 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         assertTrue(result.getAvailableServices().contains("CSW"));
         assertTrue(result.getAvailableServices().contains("WCS"));
         assertTrue(result.getAvailableServices().contains("WFS"));
+        assertTrue(result.getAvailableServices().contains("WPS"));
         
-        assertEquals(result.getAvailableServices().toString(), 5, result.getAvailableServices().size());
+        assertEquals(result.getAvailableServices().toString(), 6, result.getAvailableServices().size());
         
         
     }

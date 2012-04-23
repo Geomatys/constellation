@@ -45,8 +45,11 @@ import static org.junit.Assert.*;
 public class SOSRequestTest extends AbstractTestRequest {
 
     private static final String SOS_POST_URL = "http://localhost:9090/sos/default?";
+    private static final String SOS_POST_URL2 = "http://localhost:9090/sos/test?";
 
     private static final String SOS_GETCAPABILITIES_URL = "http://localhost:9090/sos/default?request=GetCapabilities&service=SOS&version=1.0.0";
+    
+    private static final String SOS_GETCAPABILITIES_URL2 = "http://localhost:9090/sos/test?request=GetCapabilities&service=SOS&version=1.0.0";
     
     private static final String SOS_GETFEATUROFINTEREST_URL = "http://localhost:9090/sos/default?request=GetFeatureOfInterest&service=SOS&version=1.0.0&FeatureOfInterestId=sampling-point-001";
 
@@ -115,13 +118,34 @@ public class SOSRequestTest extends AbstractTestRequest {
         assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), SOS_POST_URL);
 
         // Creates a valid GetCapabilties url.
-        getCapsUrl = new URL(SOS_GETCAPABILITIES_URL);
-
+        getCapsUrl = new URL(SOS_GETCAPABILITIES_URL2);
 
         // Try to marshall something from the response returned by the server.
         // The response should be a Capabilities.
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof Capabilities);
+        
+        c = (Capabilities) obj;
+        
+        op = c.getOperationsMetadata().getOperation("GetObservation");
+        
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), SOS_POST_URL2);
+        
+        // Creates a valid GetCapabilties url.
+        getCapsUrl = new URL(SOS_GETCAPABILITIES_URL);
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof Capabilities);
+        
+        c = (Capabilities) obj;
+        
+        op = c.getOperationsMetadata().getOperation("GetObservation");
+        
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), SOS_POST_URL);
+        
+        
     }
 
     @Test
