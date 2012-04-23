@@ -36,7 +36,7 @@ public final class WSEngine {
      */
     private static final Map<String, Map<String, Worker>> WORKERS_MAP = new HashMap<String, Map<String, Worker>>();
  
-    private static final HashMap<String, ArrayList<String>> REGISTERED_SERVICE = new HashMap<String, ArrayList<String>>();
+    private static final Map<String, List<String>> REGISTERED_SERVICE = new HashMap<String, List<String>>();
     
     private static final List<String> TO_RESTART = new ArrayList<String>();
     
@@ -154,19 +154,19 @@ public final class WSEngine {
      */
     public static void registerService(final String serviceName, final String protocol) {
         if (REGISTERED_SERVICE.containsKey(serviceName)) {
-            final ArrayList<String> protocols = REGISTERED_SERVICE.get(serviceName);
+            final List<String> protocols = REGISTERED_SERVICE.get(serviceName);
             if (!protocols.contains(protocol)) {
                 protocols.add(protocol);
             }
             REGISTERED_SERVICE.put(serviceName, protocols);
         } else {
-            final ArrayList<String> protocols = new ArrayList<String>();
+            final List<String> protocols = new ArrayList<String>();
             protocols.add(protocol);
             REGISTERED_SERVICE.put(serviceName, protocols);
         }
     }
     
-    public static HashMap<String, ArrayList<String>> getRegisteredServices() {
+    public static Map<String, List<String>> getRegisteredServices() {
         return REGISTERED_SERVICE;
     }
 }

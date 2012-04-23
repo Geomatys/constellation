@@ -17,8 +17,8 @@
 
 package org.constellation.bean;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.admin.service.ConstellationServer;
@@ -59,7 +59,7 @@ public abstract class AbstractMenuItem implements MenuItem {
     
     protected boolean serviceAvailable(final ConstellationServer server, final String serviceName) {
         if (server != null) {
-            final HashMap<String, List<String>> availableService = server.services.getAvailableService();
+            final Map<String, List<String>> availableService = server.services.getAvailableService();
             if (availableService.containsKey(serviceName)) {
                 return true;
             } else {

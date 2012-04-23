@@ -20,6 +20,8 @@ package org.constellation.configuration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -34,27 +36,35 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ServiceReport {
     
-    private HashMap<String, ArrayList<String>> availableServices;
+    private List<ServiceProtocol> availableServices = new ArrayList<ServiceProtocol>();
     
     public ServiceReport() {
         
     }
     
-    public ServiceReport(final HashMap<String, ArrayList<String>> availableServices) {
-        this.availableServices = availableServices;
+    public ServiceReport(final Map<String, List<String>> availableServices) {
+        setAvailableServices(availableServices);
     }
 
     /**
      * @return the availableServices
      */
-    public HashMap<String, ArrayList<String>> getAvailableServices() {
-        return availableServices;
+    public Map<String, List<String>> getAvailableServices() {
+        final Map<String, List<String>> response = new HashMap<String, List<String>>();
+        for (ServiceProtocol sp : availableServices) {
+            response.put(sp.getName(), sp.getProtocol());
+        }
+        return response;
     }
 
     /**
      * @param availableServices the availableServices to set
      */
-    public void setAvailableServices(final HashMap<String, ArrayList<String>> availableServices) {
-        this.availableServices = availableServices;
+    public final void setAvailableServices(final Map<String, List<String>> availableServices) {
+        if (availableServices != null) {
+            for (Entry<String, List<String>> entry : availableServices.entrySet()) {
+                this.availableServices.add(new ServiceProtocol(entry.getKey(), entry.getValue()));
+            }
+        }
     }
 }

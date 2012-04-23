@@ -27,9 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
@@ -329,7 +327,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      */
     public final class Services{
         
-        public HashMap<String, ArrayList<String>> getAvailableService() {
+        public Map<String, List<String>> getAvailableService() {
             try {
                 final String url = getURL() + "configuration?request=" + REQUEST_LIST_SERVICE;
                 final Object response = sendRequest(url, null);
@@ -337,15 +335,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     return ((ServiceReport)response).getAvailableServices();
                 } else if (response instanceof ExceptionReport){
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return new HashMap<String, ArrayList<String>>();
+                    return new HashMap<String, List<String>>();
                 } else {
                     LOGGER.warning("The service respond uncorrectly");
-                    return new HashMap<String, ArrayList<String>>();
+                    return new HashMap<String, List<String>>();
                 }
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
-            return new HashMap<String, ArrayList<String>>();
+            return new HashMap<String, List<String>>();
         }
         
         /**
