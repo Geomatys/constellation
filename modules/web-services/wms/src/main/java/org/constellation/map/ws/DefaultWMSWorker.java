@@ -129,8 +129,7 @@ import org.opengis.sld.StyledLayerDescriptor;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
-import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
-import org.geotoolkit.wms.xml.v130.*;
+import org.geotoolkit.wms.xml.v111.Request;
 
 
 /**
@@ -241,10 +240,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final AbstractRequest request;
         final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
-            request          = WMSConstant.REQUEST_111;
+            request          = new Request(WMSConstant.REQUEST_111);
             exceptionFormats = WMSConstant.EXCEPTION_111;
         } else {
-            request          = WMSConstant.REQUEST_130;
+            request          = new org.geotoolkit.wms.xml.v130.Request(WMSConstant.REQUEST_130);
             exceptionFormats = WMSConstant.EXCEPTION_130;
         }
         request.updateURL(getServiceUrl());

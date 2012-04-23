@@ -72,6 +72,9 @@ public class WMSRequestsTest extends AbstractTestRequest {
     private static final String WMS_GETCAPABILITIES =
             "http://localhost:9090/wms/default?request=GetCapabilities&service=WMS&version=1.1.1";
 
+    private static final String WMS_GETCAPABILITIES_WMS1_111 =
+            "http://localhost:9090/wms/wms1?request=GetCapabilities&service=WMS&version=1.1.1";
+    
     private static final String WMS_GETCAPABILITIES_WMS1 =
             "http://localhost:9090/wms/wms1?request=GetCapabilities&service=WMS&version=1.3.0";
 
@@ -304,7 +307,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
 
         // Creates a valid GetCapabilities url.
         try {
-            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1);
+            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1_111);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -312,17 +315,17 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
         obj = unmarshallResponse(getCapsUrl);
-        assertTrue(obj instanceof WMSCapabilities);
+        assertTrue(obj instanceof WMT_MS_Capabilities);
 
-        WMSCapabilities responseCaps130 = (WMSCapabilities)obj;
+        responseCaps = (WMT_MS_Capabilities) obj;
 
         // The layer test must be excluded
-        org.geotoolkit.wms.xml.v130.Layer layer130 = (org.geotoolkit.wms.xml.v130.Layer) responseCaps130.getLayerFromName(LAYER_TEST.getLocalPart());
-        assertNull(layer130);
+        layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());
+        assertNull(layer);
 
         // The layer lake must be included
-        layer130 = (org.geotoolkit.wms.xml.v130.Layer) responseCaps130.getLayerFromName("http://www.opengis.net/gml:Lakes");
-        assertNotNull(layer130);
+        layer = (Layer) responseCaps.getLayerFromName("http://www.opengis.net/gml:Lakes");
+        assertNotNull(layer);
         
         currentUrl = responseCaps.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().getHref();
         
@@ -339,6 +342,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // The response should be a WMT_MS_Capabilities.
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof WMT_MS_Capabilities);
+        responseCaps = (WMT_MS_Capabilities) obj;
         
         currentUrl = responseCaps.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().getHref();
         
