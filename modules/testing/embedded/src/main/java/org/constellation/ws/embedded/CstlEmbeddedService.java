@@ -151,6 +151,7 @@ public class CstlEmbeddedService extends CommandLine {
             "org.constellation.map.ws.rs",
             "org.constellation.coverage.ws.rs",
             "org.constellation.wfs.ws.rs",
+            "org.constellation.wps.ws.rs",
             "org.constellation.sos.ws.rs",
             "org.constellation.configuration.ws.rs",
             "org.constellation.metadata.ws.rs",

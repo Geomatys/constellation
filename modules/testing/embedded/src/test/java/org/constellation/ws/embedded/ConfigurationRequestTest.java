@@ -234,8 +234,9 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         assertTrue(result.getAvailableServices().contains("CSW"));
         assertTrue(result.getAvailableServices().contains("WCS"));
         assertTrue(result.getAvailableServices().contains("WFS"));
+        assertTrue(result.getAvailableServices().contains("WPS"));
         
-        assertEquals(result.getAvailableServices().toString(), 5, result.getAvailableServices().size());
+        assertEquals(result.getAvailableServices().toString(), 6, result.getAvailableServices().size());
         
         
     }
