@@ -17,6 +17,8 @@
 
 package org.constellation.configuration;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -32,27 +34,27 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ServiceReport {
     
-    private List<String> availableServices;
+    private HashMap<String, ArrayList<String>> availableServices;
     
     public ServiceReport() {
         
     }
     
-    public ServiceReport(final List<String> availableServices) {
+    public ServiceReport(final HashMap<String, ArrayList<String>> availableServices) {
         this.availableServices = availableServices;
     }
 
     /**
      * @return the availableServices
      */
-    public List<String> getAvailableServices() {
+    public HashMap<String, ArrayList<String>> getAvailableServices() {
         return availableServices;
     }
 
     /**
      * @param availableServices the availableServices to set
      */
-    public void setAvailableServices(List<String> availableServices) {
+    public void setAvailableServices(final HashMap<String, ArrayList<String>> availableServices) {
         this.availableServices = availableServices;
     }
 }

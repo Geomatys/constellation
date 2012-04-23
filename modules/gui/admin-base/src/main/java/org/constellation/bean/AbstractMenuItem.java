@@ -17,6 +17,7 @@
 
 package org.constellation.bean;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,8 +59,8 @@ public abstract class AbstractMenuItem implements MenuItem {
     
     protected boolean serviceAvailable(final ConstellationServer server, final String serviceName) {
         if (server != null) {
-            final List<String> availableService = server.services.getAvailableService();
-            if (availableService.contains(serviceName)) {
+            final HashMap<String, List<String>> availableService = server.services.getAvailableService();
+            if (availableService.containsKey(serviceName)) {
                 return true;
             } else {
                 LOGGER.log(Level.INFO, "remote server does not embbed a {0} server", serviceName);
