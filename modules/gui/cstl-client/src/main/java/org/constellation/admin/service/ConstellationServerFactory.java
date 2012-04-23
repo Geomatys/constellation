@@ -51,8 +51,6 @@ public class ConstellationServerFactory extends AbstractServerFactory{
                     AbstractServerFactory.IDENTIFIER.getName().getCode(),
                     AbstractServerFactory.IDENTIFIER.getRemarks(), String.class,NAME,true);
     
-    public static final ParameterDescriptor<String> URL = new DefaultParameterDescriptor(
-            "Url","Server URL",String.class,null,true);
     public static final ParameterDescriptor<String> USER = new DefaultParameterDescriptor(
             "User","User login",String.class,null,true);
     public static final ParameterDescriptor<String> PASSWORD = new DefaultParameterDescriptor(

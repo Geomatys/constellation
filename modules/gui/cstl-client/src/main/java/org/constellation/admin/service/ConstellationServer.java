@@ -147,10 +147,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     
     public static ConstellationServer login(final String serviceURL, 
             final String login, final String password) {
-        ArgumentChecks.ensureNonNull("server url", serviceURL);
-        ArgumentChecks.ensureNonNull("user", login);
-        ArgumentChecks.ensureNonNull("password", password);
-        
         final URL url;
         try {
             url = new URL(serviceURL);
@@ -158,8 +154,16 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return null;
         }
+        return login(url, login, password);
+    }
+    
+    public static ConstellationServer login(final URL serviceURL, 
+            final String login, final String password) {
+        ArgumentChecks.ensureNonNull("server url", serviceURL);
+        ArgumentChecks.ensureNonNull("user", login);
+        ArgumentChecks.ensureNonNull("password", password);
         
-        ConstellationServer serviceAdmin = new ConstellationServer(url, login, password);
+        ConstellationServer serviceAdmin = new ConstellationServer(serviceURL, login, password);
         
         //check if the service and logins are valid
         if(!serviceAdmin.authenticate()){
