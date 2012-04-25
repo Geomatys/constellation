@@ -107,7 +107,6 @@ public class ConfigurationXmlBindingTest {
                 + "</ns2:InstanceReport>\n";
 
         String result =  removeXmlns(sw.toString());
-        result =  removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
 
