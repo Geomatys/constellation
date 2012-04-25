@@ -40,9 +40,12 @@ import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
+import org.constellation.wps.utils.WPSUtils;
+
+import static org.constellation.api.QueryConstants.*;
+import static org.constellation.wps.ws.WPSConstant.*;
 
 import org.geotoolkit.wps.xml.v100.DataInputsType;
-
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
@@ -62,10 +65,6 @@ import org.geotoolkit.wps.xml.v100.ResponseFormType;
 import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.api.QueryConstants.*;
-import org.constellation.wps.utils.WPSUtils;
-import static org.constellation.wps.ws.WPSConstant.*;
-import org.constellation.wps.ws.WPSScheduler;
 
 /**
  * WPS web service class.
@@ -81,8 +80,11 @@ public class WPSService extends OGCWebService<WPSWorker> {
      */
     public static final boolean SUPPORT_STORAGE = WPSUtils.createTempDirectory();
     
+    /**
+     * Executor thread pool.
+     */
     public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
-    
+        
     /**
      * Build a new instance of the webService and initialize the JAXB context.
      */
@@ -220,7 +222,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 //if response is a literal
                 if (executeResponse instanceof String || executeResponse instanceof Double
                         || executeResponse instanceof Float || executeResponse instanceof Integer
-                        || executeResponse instanceof Boolean) {
+                        || executeResponse instanceof Boolean || executeResponse instanceof Long) {
                     isTextPlain = true;
                 }
                 if (isTextPlain) {

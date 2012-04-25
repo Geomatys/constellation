@@ -78,6 +78,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.wps.ws.rs.WPSService;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.xml.MarshallerPool;
@@ -662,8 +663,8 @@ public class WPSUtils {
     }
 
     /**
-     * Build a {@code Map} from a {@link ParameterDescriptorGroup ParameterDescriptorGroup}. The map keys are the parameter identifier as code
-     * and the boolean value the mandatory of the parameter.
+     * Build a {@code Map} from a {@link ParameterDescriptorGroup ParameterDescriptorGroup}. The map keys are the
+     * parameter identifier as code and the boolean value the mandatory of the parameter.
      *
      * @param descGroup
      * @return all parameters code and there mandatory value as map.
@@ -766,8 +767,18 @@ public class WPSUtils {
         return success;
     }
 
-    public static boolean storeResponseDocument(final ExecuteResponse doc, final String fileName) {
-
+    /**
+     * Store the given object into a temorary file specified by the given fileName into the temporary folder.
+     * The object to store is marshalled by the {@link WPSMarshallerPool}. If the temporary file already exist
+     * he will be overwrited.
+     * 
+     * @param obj object to marshalle and store to a temporary file.
+     * @param fileName temporary file name.
+     * @return 
+     */
+    public static boolean storeResponse(final Object obj, final String fileName) {
+        ArgumentChecks.ensureNonNull("obj", obj);
+        
         final MarshallerPool marshallerPool = WPSMarshallerPool.getInstance();
         boolean success = false;
 
@@ -776,7 +787,7 @@ public class WPSUtils {
 
             final File outputFile = new File(getTempDirectoryPath(), fileName);
             marshaller = marshallerPool.acquireMarshaller();
-            marshaller.marshal(doc, outputFile);
+            marshaller.marshal(obj, outputFile);
 
             success = outputFile.exists();
 
@@ -785,43 +796,10 @@ public class WPSUtils {
         } finally {
             marshallerPool.release(marshaller);
         }
-
         return success;
     }
 
-    public static String createTempFile(final Object object, final String workerURL) {
-        ArgumentChecks.ensureNonNull("object", object);
-
-        if (object instanceof ExecuteResponse) {
-
-            final MarshallerPool marshallerPool = WPSMarshallerPool.getInstance();
-            final String fileName = UUID.randomUUID().toString();
-
-            boolean success = false;
-
-            Marshaller marshaller = null;
-            try {
-
-                final File outputFile = new File(getTempDirectoryPath(), fileName);
-                marshaller = marshallerPool.acquireMarshaller();
-                marshaller.marshal(object, outputFile);
-
-                success = outputFile.exists();
-
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, "Error during unmarshalling", ex);
-            } finally {
-                marshallerPool.release(marshaller);
-            }
-
-            if (success) {
-                return getTempDirectoryURL(workerURL) + "/" + fileName;
-            }
-        }
-        return null;
-    }
-
-     /**
+    /**
      * Retrurn the absolute path to the temporary directory.
      *
      * @return absolut path String.
@@ -829,18 +807,29 @@ public class WPSUtils {
     public static String getTempDirectoryPath() {
         return Util.getWebappDiretory().getAbsolutePath() + TEMP_FOLDER;
     }
-    
+
+    /**
+     * Return the temporary folder URL. e.g : http://server:port/domain/tempDoc/
+     * 
+     * @param workerURL
+     * @return temporary folder path URL.
+     */
     public static String getTempDirectoryURL(final String workerURL) {
         String path = null;
         try {
             final URL url = new URL(workerURL);
             path = url.getProtocol() + "://" + url.getAuthority() + "/" + url.getPath().split("/")[1] + TEMP_FOLDER;
         } catch (MalformedURLException ex) {
-            LOGGER.log(Level.WARNING, "Error during create file", ex);
+            LOGGER.log(Level.WARNING, "Error during temporary folder URL.", ex);
         }
         return path;
     }
 
+    /**
+     * Clean temporary file used as process inputs.
+     * 
+     * @param files 
+     */
     public static void cleanTempFiles(List<File> files) {
         if (files != null) {
             for (final File f : files) {
@@ -848,5 +837,4 @@ public class WPSUtils {
             }
         }
     }
-    
 }

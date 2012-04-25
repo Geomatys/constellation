@@ -16,19 +16,23 @@
  */
 package org.constellation.wps.ws;
 
-import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.constellation.ServiceDef;
 import org.constellation.wps.utils.WPSUtils;
 import org.constellation.ws.CstlServiceException;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wps.xml.v100.*;
-import org.opengis.parameter.GeneralParameterDescriptor;
 
+import org.opengis.parameter.GeneralParameterDescriptor;
 /**
  *
  * @author Quentin Boileau (Geomatys).
@@ -40,68 +44,93 @@ public class WPSProcessListener implements ProcessListener{
     private Execute request;
     private ExecuteResponse responseDoc;
     private String fileName;
-    private StatusType status;
-    boolean useStatus;
+    private ServiceDef def;
+    private long nextTimestamp;
+    private static final int TIMEOUT = 5000;
     
-    public WPSProcessListener(final Execute request, final ExecuteResponse responseDoc, final String fileName) {
+    public WPSProcessListener(final Execute request, final ExecuteResponse responseDoc, final String fileName, final ServiceDef def) {
         this.request = request;
         this.responseDoc = responseDoc;
         this.fileName = fileName;
-        this.status = responseDoc.getStatus();
-        this.useStatus = request.getResponseForm().getResponseDocument().isStatus();
+        this.def = def;
+        this.nextTimestamp = System.currentTimeMillis() + TIMEOUT;
     }
     
     @Override
-    public void started(ProcessEvent event) {
+    public void started(final ProcessEvent event) {
         LOGGER.log(Level.INFO, "Process {0} is started.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
+        final StatusType status = new StatusType();
         final ProcessStartedType started = new ProcessStartedType();
         started.setValue("Process " + request.getIdentifier().getValue() + " is started");
         started.setPercentCompleted(0);
         status.setProcessStarted(started);
-        updateDocument();
+        responseDoc.setStatus(status);
+        WPSUtils.storeResponse(responseDoc, fileName);
     }
 
     @Override
-    public void progressing(ProcessEvent event) {
-        LOGGER.log(Level.INFO, "Process {0} is progressing : " + event.getProgress() + ".", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
-        status.getProcessStarted().setPercentCompleted((int) event.getProgress());
-        updateDocument();
+    public void progressing(final ProcessEvent event) {
+        final long currentTimestamp = System.currentTimeMillis();
+        if (currentTimestamp >= (nextTimestamp)){
+            //LOGGER.log(Level.INFO, "Process {0} is progressing : {1}.", new Object[]{WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()), event.getProgress()});
+            nextTimestamp += TIMEOUT;
+            final StatusType status = new StatusType();
+            final ProcessStartedType started = new ProcessStartedType();
+            started.setValue("Process " + request.getIdentifier().getValue() + " is pending");
+            started.setPercentCompleted((int) event.getProgress());
+            status.setProcessStarted(started);
+            responseDoc.setStatus(status);
+            WPSUtils.storeResponse(responseDoc, fileName);
+        }
     }
 
     @Override
-    public void completed(ProcessEvent event) {
+    public void completed(final ProcessEvent event) {
         LOGGER.log(Level.INFO, "Process {0} is finished.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
         try {
             final List<GeneralParameterDescriptor> processOutputDesc = event.getSource().getDescriptor().getOutputDescriptor().descriptors();
             final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
             WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput());
+            final StatusType status = new StatusType();
             status.setProcessSucceeded("Process complet.");
             
-            updateDocument();
+            responseDoc.setStatus(status);
+            responseDoc.setProcessOutputs(outputs);
+            WPSUtils.storeResponse(responseDoc, fileName);
         } catch (CstlServiceException ex) {
-            Logger.getLogger(WPSProcessListener.class.getName()).log(Level.SEVERE, null, ex);
             writeException(ex);
-            //TODO handle exception
         }
                
     }
 
     @Override
-    public void failed(ProcessEvent event) {
+    public void failed(final ProcessEvent event) {
         LOGGER.log(Level.INFO, "Process {0} has failed.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
+        final StatusType status = new StatusType();
         final ProcessFailedType processFT = new ProcessFailedType();
         processFT.setExceptionReport(new ExceptionReport(event.getException().getMessage(), null, null, null));
-         status.setProcessFailed(processFT);
-         updateDocument();
+        status.setProcessFailed(processFT);
+        responseDoc.setStatus(status);
+        WPSUtils.storeResponse(responseDoc, fileName);
     }
     
-    
-    private void updateDocument(){
-        WPSUtils.storeResponseDocument(responseDoc, fileName);
+    /**
+     * Write the occured exception in the response file.
+     * 
+     * @param ex 
+     */
+    private void writeException(final CstlServiceException ex){
+
+        final String codeRepresentation;
+        if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
+            codeRepresentation = StringUtilities.transformCodeName(ex.getExceptionCode().name());
+        } else {
+            codeRepresentation = ex.getExceptionCode().name();
+        }
         
-    }
-    
-    private void writeException(Exception ex){
+        final ExceptionReport report = new ExceptionReport(ex.getMessage(), codeRepresentation, ex.getLocator(),
+                                                     def.exceptionVersion.toString());
         
+        WPSUtils.storeResponse(report, fileName);
     }
 }

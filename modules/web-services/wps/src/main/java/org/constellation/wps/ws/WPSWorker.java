@@ -21,20 +21,14 @@ import com.vividsolutions.jts.geom.Geometry;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.ows.xml.v110.AnyValue;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.CodeType;
-import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.ows.xml.v110.AllowedValues;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
@@ -68,7 +62,6 @@ import org.geotoolkit.wps.xml.v100.OutputDefinitionsType;
 import org.geotoolkit.wps.xml.v100.ResponseDocumentType;
 import org.geotoolkit.wps.xml.v100.ResponseFormType;
 import org.geotoolkit.wps.xml.v100.StatusType;
-import org.geotoolkit.wps.xml.v100.ProcessStartedType;
 import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.JTStoGeometry;
@@ -76,6 +69,9 @@ import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.process.ProcessingRegistry;
 import org.geotoolkit.wps.xml.v100.LiteralOutputType;
 import org.geotoolkit.wps.xml.v100.*;
+import org.geotoolkit.process.*;
+import org.geotoolkit.util.ArgumentChecks;
+import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -84,29 +80,23 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.util.FactoryException;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.NoSuchIdentifierException;
-
 import org.constellation.wps.utils.WPSUtils;
 import org.constellation.ServiceDef;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.configuration.Process;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.configuration.ProcessFactory;
+import org.constellation.configuration.Process;
+import org.constellation.wps.ws.rs.WPSService;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.api.CommonConstants.*;
-import org.constellation.configuration.Process;
 import static org.constellation.wps.ws.WPSConstant.*;
-import org.constellation.wps.ws.rs.WPSService;
-import org.geotoolkit.process.*;
-import org.geotoolkit.util.ArgumentChecks;
-import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -614,7 +604,7 @@ public class WPSWorker extends AbstractWorker {
              throw new CstlServiceException("Set the storeExecuteResponse to true if you want to see status in response documents.", INVALID_PARAMETER_VALUE, "storeExecuteResponse");
         }
 
-        final String respDocFileName = UUID.randomUUID().toString();
+        String respDocFileName = UUID.randomUUID().toString();
         /*
          * ResponseDocument attributs
          */
@@ -699,11 +689,22 @@ public class WPSWorker extends AbstractWorker {
             //Give a bief process description into the execute response
             response.setProcess(WPSUtils.generateProcessBrief(processDesc));
             
+            //Lineage option.
+            if (respDoc.isLineage()) {
+                //Inputs
+                response.setDataInputs(request.getDataInputs());
+                final OutputDefinitionsType outputsDef = new OutputDefinitionsType();
+                outputsDef.getOutput().addAll(respDoc.getOutput());
+                //Outputs
+                response.setOutputDefinitions(outputsDef);
+            }
+            
             if(useStatus){
                 ////////
                 // DOC Async
                 ////////
-                process.addListener(new WPSProcessListener(request, response, respDocFileName));
+                response.setStatus(status);
+                process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0));
                 WPSService.EXECUTOR.submit(process);
                 
             } else {
@@ -716,30 +717,20 @@ public class WPSWorker extends AbstractWorker {
                     result = future.get(TIMEOUT, TimeUnit.SECONDS);
 
                 } catch (InterruptedException ex) {
-                    throw new CstlServiceException("", ex, NO_APPLICABLE_CODE);
+                    throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 } catch (ExecutionException ex) {
-                    throw new CstlServiceException("Process execution failed", ex, NO_APPLICABLE_CODE);
+                    throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 } catch (TimeoutException ex) {
                     ((AbstractProcess) process).cancelProcess();
                     future.cancel(true);
+                    throw new CstlServiceException("Process execution timeout. This process is too long and had been canceled,"
+                            + " re-run request with status set to true.", NO_APPLICABLE_CODE);
                 }
                 
                 final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
                 fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result);
                 response.setProcessOutputs(outputs);
-            }
-
-            if (respDoc.isLineage()) {
-                //Inputs
-                response.setDataInputs(request.getDataInputs());
-                final OutputDefinitionsType outputsDef = new OutputDefinitionsType();
-                outputsDef.getOutput().addAll(respDoc.getOutput());
-                //Outputs
-                response.setOutputDefinitions(outputsDef);
-            }
-
-            if (respDoc.isStatus()) {
-                response.setStatus(status);
+                
             }
 
             if (respDoc.isStoreExecuteResponse()) {
@@ -747,7 +738,7 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Storage not supported.", STORAGE_NOT_SUPPORTED, "storeExecuteResponse");
                 }
                 response.setStatusLocation(WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" + respDocFileName); //Output data URL
-                WPSUtils.storeResponseDocument(response, respDocFileName);
+                WPSUtils.storeResponse(response, respDocFileName);
             }
 
             //Delete input temporary files 
@@ -967,7 +958,10 @@ public class WPSWorker extends AbstractWorker {
      */
     public static void fillOutputsFromProcessResult(final ProcessOutputs outputs, final List<DocumentOutputDefinitionType> wantedOutputs,
             final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result) throws CstlServiceException {
-
+        if(result == null){
+            throw new CstlServiceException("Empty process result.", NO_APPLICABLE_CODE);
+        }
+        
         for (final DocumentOutputDefinitionType outputsRequest : wantedOutputs) {
 
             if (outputsRequest.getIdentifier() == null || outputsRequest.getIdentifier().getValue() == null || outputsRequest.getIdentifier().getValue().isEmpty()) {
