@@ -12,7 +12,7 @@
                 <gco:CharacterString>NOAA/NWS/NCEP</gco:CharacterString>
             </gmd:individualName>
             <gmd:role>
-                <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="originator">Originator</gmd:CI_RoleCode>
+                <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="PointOfContact">Point Of Contact</gmd:CI_RoleCode>
             </gmd:role>
         </gmd:CI_ResponsibleParty>
     </gmd:contact>
@@ -117,7 +117,7 @@
                         <gco:CharacterString>NOAA/NWS/NCEP</gco:CharacterString>
                     </gmd:individualName>
                     <gmd:role>
-                        <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="originator">Originator</gmd:CI_RoleCode>
+                        <gmd:CI_RoleCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_RoleCode" codeListValue="PointOfContact">Point Of Contact</gmd:CI_RoleCode>
                     </gmd:role>
                 </gmd:CI_ResponsibleParty>
             </gmd:pointOfContact>
