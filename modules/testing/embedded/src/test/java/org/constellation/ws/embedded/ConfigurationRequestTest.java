@@ -229,12 +229,12 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof ServiceReport);
         final ServiceReport result = (ServiceReport) obj;
-        assertTrue(result.getAvailableServices().contains("WMS"));
-        assertTrue(result.getAvailableServices().contains("SOS"));
-        assertTrue(result.getAvailableServices().contains("CSW"));
-        assertTrue(result.getAvailableServices().contains("WCS"));
-        assertTrue(result.getAvailableServices().contains("WFS"));
-        assertTrue(result.getAvailableServices().contains("WPS"));
+        assertTrue(result.getAvailableServices().containsKey("WMS"));
+        assertTrue(result.getAvailableServices().containsKey("SOS"));
+        assertTrue(result.getAvailableServices().containsKey("CSW"));
+        assertTrue(result.getAvailableServices().containsKey("WCS"));
+        assertTrue(result.getAvailableServices().containsKey("WFS"));
+        assertTrue(result.getAvailableServices().containsKey("WPS"));
         
         assertEquals(result.getAvailableServices().toString(), 6, result.getAvailableServices().size());
         

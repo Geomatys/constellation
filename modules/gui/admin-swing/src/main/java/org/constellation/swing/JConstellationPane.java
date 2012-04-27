@@ -64,7 +64,7 @@ public class JConstellationPane extends JPanel{
         
         //fill all service types -----------------------------------------------
         final List<String> serviceIds = new ArrayList<String>();
-        for(final Object serviceName : server.services.getAvailableService()){
+        for(final Object serviceName : server.services.getAvailableService().keySet()){
             serviceIds.add(serviceName.toString());
         }
         Collections.sort(serviceIds);

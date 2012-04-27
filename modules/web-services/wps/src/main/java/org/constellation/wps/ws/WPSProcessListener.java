@@ -24,7 +24,6 @@ import org.constellation.ServiceDef;
 import org.constellation.wps.utils.WPSUtils;
 import org.constellation.ws.CstlServiceException;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
@@ -45,14 +44,17 @@ public class WPSProcessListener implements ProcessListener{
     private ExecuteResponse responseDoc;
     private String fileName;
     private ServiceDef def;
+    private String serviceURL;
     private long nextTimestamp;
-    private static final int TIMEOUT = 5000;
+    private static final int TIMEOUT = 20000;
     
-    public WPSProcessListener(final Execute request, final ExecuteResponse responseDoc, final String fileName, final ServiceDef def) {
+    public WPSProcessListener(final Execute request, final ExecuteResponse responseDoc, final String fileName, final ServiceDef def,
+            final String serviceURL) {
         this.request = request;
         this.responseDoc = responseDoc;
         this.fileName = fileName;
         this.def = def;
+        this.serviceURL = serviceURL;
         this.nextTimestamp = System.currentTimeMillis() + TIMEOUT;
     }
     
@@ -90,7 +92,7 @@ public class WPSProcessListener implements ProcessListener{
         try {
             final List<GeneralParameterDescriptor> processOutputDesc = event.getSource().getDescriptor().getOutputDescriptor().descriptors();
             final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput());
+            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput(), serviceURL);
             final StatusType status = new StatusType();
             status.setProcessSucceeded("Process complet.");
             

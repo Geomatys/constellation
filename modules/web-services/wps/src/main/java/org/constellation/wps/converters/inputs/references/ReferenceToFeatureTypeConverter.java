@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.wps.converters;
+package org.constellation.wps.converters.inputs.references;
 
 
 import java.io.IOException;
@@ -23,28 +23,21 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
-import org.constellation.ws.MimeType;
+import org.constellation.wps.converters.inputs.AbstractInputConverter;
+import org.constellation.wps.utils.WPSMimeType;
 import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.converter.SimpleConverter;
 import org.opengis.feature.type.FeatureType;
 
 
 
 /**
  * Implementation of ObjectConverter to convert a reference into a FeatureType.
- * Reference is define by a <code>Map<String,String></code> with entries keys :
- * <ul>
- * <li>href : Url to the data</li>
- * <li>mime : mime type of the data like text/xml, ...</li>
- * <li>schema : is the data requires a schema</li>
- * <li>encoding : the data encoding like UTF8, ...</li>
- * <li>method : GET or POST</li>
- * </ul>
- * @author Quentin Boileau
+ *
+ * @author Quentin Boileau (Geomatys).
  */
-public final class ReferenceToFeatureTypeConverter extends SimpleConverter<Map<String,String>, FeatureType> {
+public final class ReferenceToFeatureTypeConverter extends AbstractInputConverter {
 
     private static ReferenceToFeatureTypeConverter INSTANCE;
 
@@ -57,28 +50,22 @@ public final class ReferenceToFeatureTypeConverter extends SimpleConverter<Map<S
         }
         return INSTANCE;
     }
-
-    @Override
-    public Class<? super Map> getSourceClass() {
-        return Map.class;
-    }
-
-    @Override
-    public Class<? extends FeatureType> getTargetClass() {
-        return FeatureType.class ;
-    }
  
     @Override
-    public FeatureType convert(Map<String,String> source) throws NonconvertibleObjectException {
+    public Object convert(Map<String, Object> source) throws NonconvertibleObjectException {
 
-        if (source.get("mime") == null) {
+        final String mime = (String) source.get(IN_MIME);
+        final String href = (String) source.get(IN_HREF);
+        
+        if (source.get(IN_MIME) == null) {
             throw new NonconvertibleObjectException("Invalid reference input : typeMime can't be null.");
         }
         //XML
-        if(source.get("mime").equalsIgnoreCase(MimeType.TEXT_XML)){
+        if (mime.equalsIgnoreCase(WPSMimeType.TEXT_XML.getValue()) || mime.equalsIgnoreCase(WPSMimeType.APP_GML.getValue()) ||
+                mime.equalsIgnoreCase(WPSMimeType.TEXT_GML.getValue())) {
              try {
                 final XmlFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
-                final URL schemaURL = new URL(source.get("href"));
+                final URL schemaURL = new URL(href);
                 final List<FeatureType> ft = xsdReader.read(schemaURL.openStream());
 
                 if(ft.size() != 1){
@@ -95,6 +82,5 @@ public final class ReferenceToFeatureTypeConverter extends SimpleConverter<Map<S
         }else {
              throw new NonconvertibleObjectException("Reference data mime is not supported");
         }
-        
     }
 }

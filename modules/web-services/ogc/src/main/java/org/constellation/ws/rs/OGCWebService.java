@@ -107,7 +107,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
         serviceName = supportedVersions[0].specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
-        WSEngine.registerService(serviceName);
+        WSEngine.registerService(serviceName, "REST");
         
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
@@ -144,7 +144,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
         serviceName = supportedVersions[0].specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
-        WSEngine.registerService(serviceName);
+        WSEngine.registerService(serviceName, "REST");
 
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());

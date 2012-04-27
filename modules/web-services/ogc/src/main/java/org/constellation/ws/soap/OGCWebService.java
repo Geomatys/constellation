@@ -86,7 +86,7 @@ public abstract class OGCWebService<W extends Worker> {
     public OGCWebService(final Specification spec) {
         LOGGER.log(Level.INFO, "Starting the SOAP {0} service facade.\n", spec.name());
         this.specification = spec;
-        WSEngine.registerService(specification.name());
+        WSEngine.registerService(specification.name(), "SOAP");
         
         /*
          * build the map of Workers, by scanning the sub-directories of its

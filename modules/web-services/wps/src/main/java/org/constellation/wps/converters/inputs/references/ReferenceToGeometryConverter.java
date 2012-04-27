@@ -14,40 +14,30 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.wps.converters;
+package org.constellation.wps.converters.inputs.references;
 
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.ws.MimeType;
+import org.constellation.wps.converters.inputs.AbstractInputConverter;
+import org.constellation.wps.utils.WPSMimeType;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.converter.SimpleConverter;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.util.FactoryException;
 
-
-
 /**
  * Implementation of ObjectConverter to convert a reference into a Geometry.
- * Reference is define by a <code>Map<String,String></code> with entries keys :
- * <ul>
- * <li>href : Url to the data</li>
- * <li>mime : mime type of the data like text/xml, ...</li>
- * <li>schema : is the data requires a schema</li>
- * <li>encoding : the data encoding like UTF8, ...</li>
- * <li>method : GET or POST</li>
- * </ul>
- * @author Quentin Boileau
+ * 
+ * @author Quentin Boileau (Geomatys).
  */
-public final class ReferenceToGeometryConverter extends SimpleConverter<Map<String,String>, Geometry> {
+public final class ReferenceToGeometryConverter extends AbstractInputConverter {
 
     private static ReferenceToGeometryConverter INSTANCE;
 
@@ -62,26 +52,21 @@ public final class ReferenceToGeometryConverter extends SimpleConverter<Map<Stri
     }
 
     @Override
-    public Class<? super Map> getSourceClass() {
-        return Map.class;
-    }
-
-    @Override
-    public Class<? extends Geometry> getTargetClass() {
-        return Geometry.class ;
-    }
- 
-    @Override
-    public Geometry convert(Map<String,String> source) throws NonconvertibleObjectException {
+    public Object convert(final Map<String, Object> source) throws NonconvertibleObjectException {
                     
-        if (source.get("mime") == null) {
+        final String mime = (String) source.get(IN_MIME);
+        final String href = (String) source.get(IN_HREF);
+
+        if (mime == null) {
             throw new NonconvertibleObjectException("Invalid reference input : typeMime can't be null.");
         }
-        if(source.get("mime").equalsIgnoreCase(MimeType.TEXT_XML)){
+        if (mime.equalsIgnoreCase(WPSMimeType.TEXT_XML.getValue()) || mime.equalsIgnoreCase(WPSMimeType.APP_GML.getValue()) ||
+                mime.equalsIgnoreCase(WPSMimeType.TEXT_GML.getValue())) {
+            
             Unmarshaller unmarsh = null;
             try {
                 unmarsh = WPSMarshallerPool.getInstance().acquireUnmarshaller();
-                Object value = unmarsh.unmarshal(new URL(source.get("href")));
+                Object value = unmarsh.unmarshal(new URL(href));
                 if(value instanceof JAXBElement){
                     value = ((JAXBElement)value).getValue();
                 }
@@ -104,4 +89,5 @@ public final class ReferenceToGeometryConverter extends SimpleConverter<Map<Stri
          throw new NonconvertibleObjectException("Reference data mime is not supported");
         }
     }
+
 }

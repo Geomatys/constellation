@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.bind.JAXBException;
-import org.geotoolkit.wcs.xml.WCSMarshallerPool;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
 import org.junit.*;
@@ -57,7 +56,6 @@ public class WPSRequestTest  extends AbstractTestRequest {
     
     /**
      * Ensures that a valid GetCapabilities request returns indeed a valid GetCapabilities
-     * document representing the server capabilities in the WCS version 1.0.0 standard.
      */
     @Test
     public void testWPSGetCapabilities() throws JAXBException, IOException {

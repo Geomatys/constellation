@@ -53,65 +53,21 @@
         <dependency>
             <groupId>org.geotoolkit.pending</groupId>
             <artifactId>geotk-widgets-swing-pending</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>geotk-jasperreport</artifactId>
+                    <groupId>org.geotoolkit.pending</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geotk-coverage-sql</artifactId>
+                    <groupId>org.geotoolkit</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.constellation.gui</groupId>
             <artifactId>cstl-client</artifactId>
             <version>${project.version}</version>
-        </dependency>
-    
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-csw</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-ignrm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-ncwms</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-osm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-osm-tms</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-sos</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-wcs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-wfs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-wms</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-wmsc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-wmts</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-client-wps</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
         </dependency>
 
     </dependencies>

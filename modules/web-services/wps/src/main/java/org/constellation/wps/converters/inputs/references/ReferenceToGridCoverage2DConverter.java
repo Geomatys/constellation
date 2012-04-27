@@ -14,31 +14,23 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.wps.converters;
+package org.constellation.wps.converters.inputs.references;
 
 
 import java.util.Map;
+import org.constellation.wps.converters.inputs.AbstractInputConverter;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.converter.SimpleConverter;
 
-
-
 /**
  * Implementation of ObjectConverter to convert a reference into a GridCoverage2D.
- * Reference is define by a <code>Map<String,String></code> with entries keys :
- * <ul>
- * <li>href : Url to the data</li>
- * <li>mime : mime type of the data like text/xml, ...</li>
- * <li>schema : is the data requires a schema</li>
- * <li>encoding : the data encoding like UTF8, ...</li>
- * <li>method : GET or POST</li>
- * </ul>
- * @author Quentin Boileau
+ * 
+ * @author Quentin Boileau (Geomatys).
  */
-public final class ReferenceToGridCoverage2DConverter extends SimpleConverter<Map<String,String>, GridCoverage2D> {
+public final class ReferenceToGridCoverage2DConverter extends AbstractInputConverter {
 
     private static ReferenceToGridCoverage2DConverter INSTANCE;
 
@@ -53,20 +45,10 @@ public final class ReferenceToGridCoverage2DConverter extends SimpleConverter<Ma
     }
 
     @Override
-    public Class<? super Map> getSourceClass() {
-        return Map.class;
-    }
-
-    @Override
-    public Class<? extends GridCoverage2D> getTargetClass() {
-        return GridCoverage2D.class ;
-    }
- 
-    @Override
-    public GridCoverage2D convert(Map<String,String> source) throws NonconvertibleObjectException {
+    public Object convert(final Map<String, Object> source) throws NonconvertibleObjectException {
                     
         try{
-            final GridCoverageReader reader = ReferenceToGridCoverageReaderConverter.getInstance().convert(source);
+            final GridCoverageReader reader = (GridCoverageReader) ReferenceToGridCoverageReaderConverter.getInstance().convert(source);
             return (GridCoverage2D)reader.read(0, null);
         } catch (CoverageStoreException ex) {
             throw new NonconvertibleObjectException("Reference grid coverage invalid input : Can't read coverage",ex);

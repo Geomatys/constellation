@@ -17,6 +17,7 @@
 package org.constellation.swing;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import javax.swing.JFrame;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.admin.service.ConstellationServerFactory;
@@ -49,7 +50,7 @@ public final class ConstellationFrame {
         
         
         final ParameterValueGroup param = ConstellationServerFactory.PARAMETERS.createValue();
-        Parameters.getOrCreate(ConstellationServerFactory.URL, param).setValue(url);
+        Parameters.getOrCreate(ConstellationServerFactory.URL, param).setValue(new URL(url));
         Parameters.getOrCreate(ConstellationServerFactory.USER, param).setValue(login);
         Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, param).setValue(password);
         

@@ -14,16 +14,18 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.wps.converters;
+package org.constellation.wps.converters.outputs.complex;
 
 
 import com.vividsolutions.jts.geom.Geometry;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.converter.SimpleConverter;
+import org.geotoolkit.wps.xml.v100.ComplexDataType;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.util.FactoryException;
 
@@ -35,7 +37,7 @@ import org.opengis.util.FactoryException;
  * 
  * @author Quentin Boileau
  */
-public final class GeometryArrayToComplexConverter extends SimpleConverter<Geometry[], Collection> {
+public final class GeometryArrayToComplexConverter extends AbstractComplexOutputConverter {
 
     private static GeometryArrayToComplexConverter INSTANCE;
 
@@ -48,28 +50,22 @@ public final class GeometryArrayToComplexConverter extends SimpleConverter<Geome
         }
         return INSTANCE;
     }
-
-    @Override
-    public Class<? super Geometry[]> getSourceClass() {
-        return Geometry[].class;
-    }
-
-    @Override
-    public Class<? extends Collection> getTargetClass() {
-        return Collection.class ;
-    }
- 
     
     @Override
-    public Collection convert(Geometry[] source) throws NonconvertibleObjectException {
+    public ComplexDataType convert(final Map<String, Object> source) throws NonconvertibleObjectException {
         
-        final Collection<Object> collec = new ArrayList<Object>();
+        final ComplexDataType complex = new ComplexDataType();
+        
+        complex.setMimeType((String) source.get(OUT_MIME));
+        complex.setSchema((String) source.get(OUT_SCHEMA));
+        complex.setEncoding((String) source.get(OUT_ENCODING));
+        
+        final Geometry[] outGeom = (Geometry[]) source.get(OUT_DATA);
         AbstractGeometryType gmlGeom = null;
-        
         try {
-            for(Geometry jtsGeom : source){
+            for(final Geometry jtsGeom : outGeom){
                 gmlGeom = JTStoGeometry.toGML(jtsGeom);
-                collec.add(gmlGeom);
+                complex.getContent().add(gmlGeom);
             }
         } catch (NoSuchAuthorityCodeException ex) {
            throw new NonconvertibleObjectException(ex);
@@ -77,7 +73,7 @@ public final class GeometryArrayToComplexConverter extends SimpleConverter<Geome
             throw new NonconvertibleObjectException(ex);
         }
       
-        return collec;
+        return complex;
     }
 }
 

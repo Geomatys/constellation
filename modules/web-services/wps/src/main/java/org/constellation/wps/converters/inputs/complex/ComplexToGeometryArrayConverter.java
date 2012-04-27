@@ -14,13 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.wps.converters;
+package org.constellation.wps.converters.inputs.complex;
 
 
 import com.vividsolutions.jts.geom.Geometry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.constellation.wps.converters.inputs.AbstractInputConverter;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
@@ -31,10 +32,10 @@ import org.opengis.util.FactoryException;
 
 /**
  * Implementation of ObjectConverter to convert a complex input into a JTS Geometry array.
- * Complex Input is define by a <code>List</code> of <code>Object</code>
- * @author Quentin Boileau
+ * 
+ * @author Quentin Boileau (Geomatys).
  */
-public final class ComplexToGeometryArrayConverter extends SimpleConverter<Map<String,Object>, Geometry[]> {
+public final class ComplexToGeometryArrayConverter extends AbstractInputConverter {
 
     private static ComplexToGeometryArrayConverter INSTANCE;
 
@@ -49,22 +50,12 @@ public final class ComplexToGeometryArrayConverter extends SimpleConverter<Map<S
     }
 
     @Override
-    public Class<? super Map<String,Object>> getSourceClass() {
-        return Map.class;
-    }
-
-    @Override
-    public Class<? extends Geometry[]> getTargetClass() {
-        return Geometry[].class ;
-    }
- 
-    @Override
-    public Geometry[] convert(Map<String,Object> source) throws NonconvertibleObjectException {
+    public Object convert(Map<String,Object> source) throws NonconvertibleObjectException {
 
         try {                
-            final List<Object> data = (List<Object>) source.get("data");
+            final List<Object> data = (List<Object>) source.get(IN_DATA);
             if(!data.isEmpty()){
-                List<Geometry> geoms = new ArrayList<Geometry>();
+                final List<Geometry> geoms = new ArrayList<Geometry>();
                 for(int i = 0; i<source.size(); i++){
                     geoms.add(GeometrytoJTS.toJTS((AbstractGeometryType) data.get(i)));
                 }

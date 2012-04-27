@@ -14,34 +14,26 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.wps.converters;
+package org.constellation.wps.converters.inputs.references;
 
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import org.constellation.wps.converters.inputs.AbstractInputConverter;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.converter.SimpleConverter;
 
-
-
 /**
  * Implementation of ObjectConverter to convert a reference into a GridCoverageReader.
- * Reference is define by a <code>Map<String,String></code> with entries keys :
- * <ul>
- * <li>href : Url to the data</li>
- * <li>mime : mime type of the data like text/xml, ...</li>
- * <li>schema : is the data requires a schema</li>
- * <li>encoding : the data encoding like UTF8, ...</li>
- * <li>method : GET or POST</li>
- * </ul>
- * @author Quentin Boileau
+ * 
+ * @author Quentin Boileau (Geomatys).
  */
-public final class ReferenceToGridCoverageReaderConverter extends SimpleConverter<Map<String,String>, GridCoverageReader> {
+public final class ReferenceToGridCoverageReaderConverter extends AbstractInputConverter {
 
     private static ReferenceToGridCoverageReaderConverter INSTANCE;
 
@@ -54,22 +46,13 @@ public final class ReferenceToGridCoverageReaderConverter extends SimpleConverte
         }
         return INSTANCE;
     }
-
-    @Override
-    public Class<? super Map> getSourceClass() {
-        return Map.class;
-    }
-
-    @Override
-    public Class<? extends GridCoverageReader> getTargetClass() {
-        return GridCoverageReader.class ;
-    }
  
     @Override
-    public GridCoverageReader convert(Map<String,String> source) throws NonconvertibleObjectException {
+    public Object convert(final Map<String, Object> source) throws NonconvertibleObjectException {
                     
+        final String href = (String) source.get(IN_HREF);
         try {
-            final URL url = new URL(source.get("href"));
+            final URL url = new URL(href);
             return CoverageIO.createSimpleReader(url);
         } catch (MalformedURLException ex) {
             throw new NonconvertibleObjectException("Reference grid coverage invalid input : Malformed url",ex);

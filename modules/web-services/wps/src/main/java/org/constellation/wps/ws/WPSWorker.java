@@ -18,11 +18,12 @@ package org.constellation.wps.ws;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import java.io.File;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
@@ -96,7 +97,10 @@ import org.constellation.wps.ws.rs.WPSService;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.api.CommonConstants.*;
+import org.constellation.wps.converters.outputs.complex.AbstractComplexOutputConverter;
+import org.constellation.wps.converters.outputs.references.AbstractReferenceOutputConverter;
 import static org.constellation.wps.ws.WPSConstant.*;
+import org.geotoolkit.ows.xml.v110.*;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -704,7 +708,7 @@ public class WPSWorker extends AbstractWorker {
                 // DOC Async
                 ////////
                 response.setStatus(status);
-                process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0));
+                process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0, getServiceUrl()));
                 WPSService.EXECUTOR.submit(process);
                 
             } else {
@@ -728,7 +732,7 @@ public class WPSWorker extends AbstractWorker {
                 }
                 
                 final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-                fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result);
+                fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, getServiceUrl());
                 response.setProcessOutputs(outputs);
                 
             }
@@ -954,10 +958,12 @@ public class WPSWorker extends AbstractWorker {
      * @param wantedOutputs
      * @param processOutputDesc
      * @param result
+     * @param serviceURL
      * @throws CstlServiceException
      */
     public static void fillOutputsFromProcessResult(final ProcessOutputs outputs, final List<DocumentOutputDefinitionType> wantedOutputs,
-            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result) throws CstlServiceException {
+            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final String serviceURL) 
+            throws CstlServiceException {
         if(result == null){
             throw new CstlServiceException("Empty process result.", NO_APPLICABLE_CODE);
         }
@@ -985,8 +991,8 @@ public class WPSWorker extends AbstractWorker {
 
             //output value object.
             final Object outputValue = result.parameter(outputIdentifierCode).getValue();
-
-            outputs.getOutput().add(createDocumentResponseOutput(outputDescriptor, outputsRequest, outputValue));
+            
+            outputs.getOutput().add(createDocumentResponseOutput(outputDescriptor, outputsRequest, outputValue, serviceURL));
 
         }//end foreach wanted outputs
 
@@ -999,11 +1005,12 @@ public class WPSWorker extends AbstractWorker {
      * @param outputDescriptor
      * @param requestedOutput
      * @param outputValue
+     * @param serviceURL
      * @return
      * @throws CstlServiceException
      */
     public static OutputDataType createDocumentResponseOutput(final ParameterDescriptor outputDescriptor, final DocumentOutputDefinitionType requestedOutput,
-            final Object outputValue) throws CstlServiceException {
+            final Object outputValue, final String serviceURL) throws CstlServiceException {
 
         final OutputDataType outData = new OutputDataType();
 
@@ -1012,60 +1019,112 @@ public class WPSWorker extends AbstractWorker {
 
         //set Ouput informations
         outData.setIdentifier(new CodeType(outputIdentifier));
-        outData.setTitle(WPSUtils.capitalizeFirstLetter(outputIdentifierCode));
-        outData.setAbstract(WPSUtils.capitalizeFirstLetter(outputDescriptor.getRemarks().toString()));
+        
+        //support custom title.
+        final LanguageStringType titleOut = requestedOutput.getTitle() != null ? 
+                requestedOutput.getTitle() : WPSUtils.capitalizeFirstLetter(outputIdentifierCode);
+        final LanguageStringType abstractOut = requestedOutput.getAbstract() != null ? 
+                requestedOutput.getAbstract() : WPSUtils.capitalizeFirstLetter(outputDescriptor.getRemarks().toString());
+        outData.setTitle(titleOut);
+        outData.setAbstract(abstractOut);
 
-        final DataType data = new DataType();
-        final Class outClass = outputDescriptor.getValueClass();
-
-        if (WPSIO.isSupportedBBoxOutputClass(outClass)) {
-            LOGGER.log(Level.INFO, "LOG -> Output -> BoundingBox");
-            org.opengis.geometry.Envelope envelop = (org.opengis.geometry.Envelope) outputValue;
-            data.setBoundingBoxData(new BoundingBoxType(envelop));
-
-        } else if (WPSIO.isSupportedComplexOutputClass(outClass)) {
-            LOGGER.log(Level.INFO, "LOG -> Output -> Complex");
-            final ComplexDataType complex = new ComplexDataType();
-
-            complex.setMimeType(requestedOutput.getMimeType());
-            complex.setEncoding(requestedOutput.getEncoding());
-            complex.setSchema(requestedOutput.getSchema());
-
-            final ObjectConverter converter = WPSIO.getConverter(outClass, WPSIO.IOType.OUTPUT, WPSIO.DataType.COMPLEX, complex.getMimeType());
-
-            if (converter == null) {
-                throw new CstlServiceException("Output complex not supported, no converter found.",
-                        OPERATION_NOT_SUPPORTED, outputIdentifier);
-            }
-
-            try {
-                complex.getContent().addAll((Collection<Object>) converter.convert(outputValue));
-            } catch (NonconvertibleObjectException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, outputIdentifier);
-            }
-
-            data.setComplexData(complex);
-
-        } else if (WPSIO.isSupportedLiteralOutputClass(outClass)) {
-            LOGGER.log(Level.INFO, "LOG -> Output -> Literal");
-            final LiteralDataType literal = new LiteralDataType();
-            literal.setDataType(outClass.getCanonicalName());
-            if (outputValue == null) {
-                literal.setValue(null);
-            } else {
-                literal.setValue(outputValue.toString());
-            }
-            data.setLiteralData(literal);
-
+        final Class outClass = outputDescriptor.getValueClass(); // output class
+        
+        if (requestedOutput.isAsReference()) {
+            final OutputReferenceType ref = createReferenceOutput(outClass, requestedOutput, outputValue, serviceURL);
+            
+            outData.setReference(ref);
         } else {
-            throw new CstlServiceException("Process output parameter invalid", MISSING_PARAMETER_VALUE, outputIdentifier);
+            
+            final DataType data = new DataType();
+
+            if (WPSIO.isSupportedBBoxOutputClass(outClass)) {
+                LOGGER.log(Level.INFO, "LOG -> Output -> BoundingBox");
+                org.opengis.geometry.Envelope envelop = (org.opengis.geometry.Envelope) outputValue;
+                data.setBoundingBoxData(new BoundingBoxType(envelop));
+
+            } else if (WPSIO.isSupportedComplexOutputClass(outClass)) {
+                LOGGER.log(Level.INFO, "LOG -> Output -> Complex");
+                
+                final Map<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put(AbstractComplexOutputConverter.OUT_DATA, outputValue);
+                parameters.put(AbstractComplexOutputConverter.OUT_TMP_DIR_PATH, WPSUtils.getTempDirectoryPath());
+                parameters.put(AbstractComplexOutputConverter.OUT_TMP_DIR_URL, WPSUtils.getTempDirectoryURL(serviceURL));
+                parameters.put(AbstractComplexOutputConverter.OUT_ENCODING, requestedOutput.getEncoding());
+                parameters.put(AbstractComplexOutputConverter.OUT_MIME, requestedOutput.getMimeType());
+                parameters.put(AbstractComplexOutputConverter.OUT_SCHEMA, requestedOutput.getSchema());
+                    
+                final ObjectConverter converter = WPSIO.getConverter(outClass, WPSIO.IOType.OUTPUT, WPSIO.DataType.COMPLEX, requestedOutput.getMimeType());
+
+                if (converter == null) {
+                    throw new CstlServiceException("Output complex not supported, no converter found.",
+                            OPERATION_NOT_SUPPORTED, outputIdentifier);
+                }
+
+                try {
+                    data.setComplexData((ComplexDataType) converter.convert(parameters));
+                } catch (NonconvertibleObjectException ex) {
+                    throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, outputIdentifier);
+                }
+
+            } else if (WPSIO.isSupportedLiteralOutputClass(outClass)) {
+                LOGGER.log(Level.INFO, "LOG -> Output -> Literal");
+                final LiteralDataType literal = new LiteralDataType();
+                literal.setDataType(outClass.getCanonicalName());
+                if (outputValue == null) {
+                    literal.setValue(null);
+                } else {
+                    literal.setValue(String.valueOf(outputValue));
+                }
+                data.setLiteralData(literal);
+
+            } else {
+                throw new CstlServiceException("Process output parameter invalid", MISSING_PARAMETER_VALUE, outputIdentifier);
+            }
+            
+            outData.setData(data);
         }
-        outData.setData(data);
         return outData;
     }
+    
+    /**
+     * Create reference output.
+     * 
+     * @param clazz
+     * @param requestedOutput
+     * @param outputValue
+     * @param serviceURL
+     * @return
+     * @throws CstlServiceException 
+     */
+    private static OutputReferenceType createReferenceOutput(final Class clazz, final DocumentOutputDefinitionType requestedOutput, 
+            final Object outputValue, final String serviceURL) throws CstlServiceException {
+        
+        try {
+            final Map<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put(AbstractReferenceOutputConverter.OUT_DATA, outputValue);
+            parameters.put(AbstractComplexOutputConverter.OUT_TMP_DIR_PATH, WPSUtils.getTempDirectoryPath());
+            parameters.put(AbstractReferenceOutputConverter.OUT_TMP_DIR_URL, WPSUtils.getTempDirectoryURL(serviceURL));
+            parameters.put(AbstractReferenceOutputConverter.OUT_ENCODING, requestedOutput.getEncoding());
+            parameters.put(AbstractReferenceOutputConverter.OUT_MIME, requestedOutput.getMimeType());
+            parameters.put(AbstractReferenceOutputConverter.OUT_SCHEMA, requestedOutput.getSchema());
+
+            final ObjectConverter converter = WPSIO.getConverter(clazz, WPSIO.IOType.OUTPUT, WPSIO.DataType.REFERENCE, requestedOutput.getMimeType());
+
+            if (converter == null) {
+                throw new CstlServiceException("Reference Output not supported, no converter found.", OPERATION_NOT_SUPPORTED, requestedOutput.getIdentifier().getValue());
+            }
+
+            return (OutputReferenceType) converter.convert(parameters);
+
+        } catch (NonconvertibleObjectException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+    }
+
 
     /**
-     * Handle Raw output.
+     * Handle Raw output. //TODO create raw output converters
      *
      * @param outputValue
      * @return

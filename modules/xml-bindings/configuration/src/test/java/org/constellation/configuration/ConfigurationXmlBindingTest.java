@@ -46,6 +46,45 @@ public class ConfigurationXmlBindingTest {
     }
 
     /**
+     * Test ServiceReport Marshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void serviceReportMarshalingTest() throws Exception {
+        Map<String, List<String>> instances = new HashMap<String, List<String>>();
+        ArrayList<String> prot1 = new ArrayList<String>();
+        prot1.add("REST");
+        instances.put("WMS", prot1);
+        ArrayList<String> prot2 = new ArrayList<String>();
+        prot2.add("REST");
+        prot2.add("SOAP");
+        instances.put("WPS", prot2);
+        ServiceReport report = new ServiceReport(instances);
+
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(report, sw);
+
+        String expresult =
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n' +
+                "<ns2:ServiceReport >" + '\n' +
+                "    <ns2:availableServices>" + '\n' +
+                "        <ns2:name>WPS</ns2:name>" + '\n' +
+                "        <ns2:protocol>REST</ns2:protocol>" + '\n' +
+                "        <ns2:protocol>SOAP</ns2:protocol>" + '\n' +
+                "    </ns2:availableServices>" + '\n' +
+                "    <ns2:availableServices>" + '\n' +
+                "        <ns2:name>WMS</ns2:name>" + '\n' +
+                "        <ns2:protocol>REST</ns2:protocol>" + '\n' +
+                "    </ns2:availableServices>" + '\n' +
+                "</ns2:ServiceReport>\n";
+
+        String result =  removeXmlns(sw.toString());
+        
+        assertEquals(expresult, result);
+    }
+    
+    /**
      * Test InstanceReport Marshalling.
      *
      * @throws java.lang.Exception
@@ -68,7 +107,6 @@ public class ConfigurationXmlBindingTest {
                 + "</ns2:InstanceReport>\n";
 
         String result =  removeXmlns(sw.toString());
-        result =  removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
 

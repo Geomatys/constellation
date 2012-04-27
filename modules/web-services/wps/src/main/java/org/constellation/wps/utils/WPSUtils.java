@@ -35,6 +35,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
+import org.constellation.wps.converters.inputs.AbstractInputConverter;
 
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
@@ -104,7 +105,7 @@ public class WPSUtils {
      * @throws CstlServiceException in case of an unknown process identifier.
      */
     public static ProcessDescriptor getProcessDescriptor(final String identifier) throws CstlServiceException {
-
+      
         final String processFactory = extractFactoryFromIdentifier(identifier);
         final String processName = extractProcessNameFromIdentifier(identifier);
 
@@ -412,10 +413,10 @@ public class WPSUtils {
             final String schema, final String mime, final String encoding, final String inputID) throws CstlServiceException {
 
         final Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("data", inputObject);
-        parameters.put("mime", mime);
-        parameters.put("schema", schema);
-        parameters.put("encoding", encoding);
+        parameters.put(AbstractInputConverter.IN_DATA, inputObject);
+        parameters.put(AbstractInputConverter.IN_MIME, mime);
+        parameters.put(AbstractInputConverter.IN_SCHEMA, schema);
+        parameters.put(AbstractInputConverter.IN_ENCODING, encoding);
 
         final ObjectConverter converter = WPSIO.getConverter(expectedClass, WPSIO.IOType.INPUT, WPSIO.DataType.COMPLEX, mime);
 
@@ -459,11 +460,10 @@ public class WPSUtils {
         }
 
         final Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("href", href);
-        parameters.put("mime", mime);
-        parameters.put("schema", schema);
-        parameters.put("method", method);
-        parameters.put("encoding", encoding);
+        parameters.put(AbstractInputConverter.IN_HREF, href);
+        parameters.put(AbstractInputConverter.IN_MIME, mime);
+        parameters.put(AbstractInputConverter.IN_SCHEMA, schema);
+        parameters.put(AbstractInputConverter.IN_ENCODING, encoding);
 
         final ObjectConverter converter = WPSIO.getConverter(expectedClass, WPSIO.IOType.INPUT, WPSIO.DataType.REFERENCE, mime);
 

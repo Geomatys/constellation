@@ -16,11 +16,28 @@
  */
 package org.constellation.wps.ws;
 
+import org.constellation.wps.converters.outputs.references.GeometryToOutputStream;
+import org.constellation.wps.converters.outputs.references.FeatureToOutputStream;
+import org.constellation.wps.converters.outputs.complex.FeatureCollectionToComplexConverter;
+import org.constellation.wps.converters.outputs.complex.GeometryToComplexConverter;
+import org.constellation.wps.converters.outputs.complex.GeometryArrayToComplexConverter;
+import org.constellation.wps.converters.outputs.complex.FeatureToComplexConverter;
+import org.constellation.wps.converters.inputs.references.ReferenceToGeometryConverter;
+import org.constellation.wps.converters.inputs.references.ReferenceToFeatureConverter;
+import org.constellation.wps.converters.inputs.references.ReferenceToFeatureCollectionConverter;
+import org.constellation.wps.converters.inputs.references.ReferenceToFileConverter;
+import org.constellation.wps.converters.inputs.references.ReferenceToFeatureTypeConverter;
+import org.constellation.wps.converters.inputs.complex.ComplexToFeatureArrayConverter;
+import org.constellation.wps.converters.inputs.complex.ComplexToFeatureCollectionArrayConverter;
+import org.constellation.wps.converters.inputs.complex.ComplexToFeatureConverter;
+import org.constellation.wps.converters.inputs.complex.ComplexToFeatureCollectionConverter;
+import org.constellation.wps.converters.inputs.complex.ComplexToGeometryConverter;
+import org.constellation.wps.converters.inputs.complex.ComplexToGeometryArrayConverter;
+import org.constellation.wps.converters.inputs.complex.ComplexToFeatureTypeConverter;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.*;
 import javax.measure.unit.Unit;
-import org.constellation.wps.converters.*;
 import org.constellation.wps.utils.WPSMimeType;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.process.converters.*;
@@ -67,7 +84,12 @@ public final class WPSIO {
                 new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToComplexConverter.getInstance()), //GML
                 new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToComplexConverter.getInstance()) //GML
                 ));
-
+         //Reference OUTPUT
+        IOCLASSMAP.put(new KeyTuple(Feature.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
+                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()), //XML
+                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()), //GML
+                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()) //GML
+                ));
 
         /*
          * FeatureCollection
@@ -92,7 +114,12 @@ public final class WPSIO {
                 new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureCollectionToComplexConverter.getInstance()), //GML
                 new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureCollectionToComplexConverter.getInstance()) //GML
                 ));
-
+        //Reference OUTPUT
+        IOCLASSMAP.put(new KeyTuple(FeatureCollection.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
+                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()), //XML
+                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()), //GML
+                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()) //GML
+                ));
 
         /*
          * Feature[]
@@ -140,6 +167,12 @@ public final class WPSIO {
                 new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToComplexConverter.getInstance()), //XML
                 new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToComplexConverter.getInstance()), //GML
                 new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToComplexConverter.getInstance()) //GML
+                ));
+        //Reference OUTPUT
+        IOCLASSMAP.put(new KeyTuple(com.vividsolutions.jts.geom.Geometry.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
+                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToOutputStream.getInstance()), //XML
+                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToOutputStream.getInstance()), //GML
+                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToOutputStream.getInstance()) //GML
                 ));
 
 
