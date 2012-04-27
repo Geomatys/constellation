@@ -39,16 +39,16 @@ import org.opengis.feature.type.FeatureType;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class FeatureToOutputStream extends AbstractReferenceOutputConverter {
+public class FeatureToReference extends AbstractReferenceOutputConverter {
 
-    private static FeatureToOutputStream INSTANCE;
+    private static FeatureToReference INSTANCE;
 
-    private FeatureToOutputStream(){
+    private FeatureToReference(){
     }
 
-    public static synchronized FeatureToOutputStream getInstance(){
+    public static synchronized FeatureToReference getInstance(){
         if(INSTANCE == null){
-            INSTANCE = new FeatureToOutputStream();
+            INSTANCE = new FeatureToReference();
         }
         return INSTANCE;
     }
@@ -68,7 +68,10 @@ public class FeatureToOutputStream extends AbstractReferenceOutputConverter {
             ft = ((Feature) data).getType();
         } else if (data instanceof FeatureCollection) {
             ft = ((FeatureCollection) data).getFeatureType();
+        } else {
+            throw new NonconvertibleObjectException("The requested output reference data is not an instance of Feature or FeatureCollection.");
         }
+        
         final String namespace = ft.getName().getURI();
         final Map <String, String> schemaLocation = new HashMap<String, String>();
         

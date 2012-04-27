@@ -16,30 +16,36 @@
  */
 package org.constellation.wps.converters.outputs.references;
 
+import com.vividsolutions.jts.geom.Geometry;
 import java.io.*;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.wps.utils.WPSUtils;
+import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.OutputReferenceType;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.util.FactoryException;
 
 /**
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class GeometryToOutputStream extends AbstractReferenceOutputConverter {
+public class GeometryToReference extends AbstractReferenceOutputConverter {
 
-    private static GeometryToOutputStream INSTANCE;
+    private static GeometryToReference INSTANCE;
 
-    private GeometryToOutputStream(){
+    private GeometryToReference(){
     }
 
-    public static synchronized GeometryToOutputStream getInstance(){
+    public static synchronized GeometryToReference getInstance(){
         if(INSTANCE == null){
-            INSTANCE = new GeometryToOutputStream();
+            INSTANCE = new GeometryToReference();
         }
         return INSTANCE;
     }
@@ -55,6 +61,10 @@ public class GeometryToOutputStream extends AbstractReferenceOutputConverter {
         
         final Object data = source.get(OUT_DATA);
         
+        if ( !(data instanceof Geometry)) {
+            throw new NonconvertibleObjectException("The geometry is not an JTS geometry.");
+        }
+        
         final String randomFileName = UUID.randomUUID().toString();
         Marshaller m = null;
         OutputStream geometryStream = null;
@@ -63,12 +73,15 @@ public class GeometryToOutputStream extends AbstractReferenceOutputConverter {
             final File geometryFile = new File((String) source.get(OUT_TMP_DIR_PATH), randomFileName);
             geometryStream = new FileOutputStream(geometryFile);
             m = WPSMarshallerPool.getInstance().acquireMarshaller();
-            m.marshal( data, geometryStream);
+            m.marshal( JTStoGeometry.toGML((Geometry) data), geometryStream);
+            reference.setSchema((String) source.get(OUT_TMP_DIR_URL) + "/" +randomFileName);
             
+        } catch (FactoryException ex) {
+            throw new NonconvertibleObjectException("Can't convert the JTS geometry to OpenGIS.", ex);
         } catch (FileNotFoundException ex) {
             throw new NonconvertibleObjectException("Can't create output reference file.", ex);
         } catch (JAXBException ex) {
-             throw new NonconvertibleObjectException("JAXB exception while writing the feature collection", ex);
+             throw new NonconvertibleObjectException("JAXB exception while writing the geometry", ex);
         } finally {
             if(m!=null){
                 WPSMarshallerPool.getInstance().release(m);

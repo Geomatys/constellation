@@ -77,9 +77,6 @@ import org.constellation.wps.ws.WPSIO;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.wps.ws.WPSConstant.*;
-import org.constellation.wps.ws.WPSWorker;
-import org.constellation.wps.ws.rs.WPSService;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.xml.MarshallerPool;
@@ -384,7 +381,7 @@ public class WPSUtils {
                 converter = ConverterRegistry.system().converter(String.class, binding);
             } catch (NonconvertibleObjectException ex) {
                 //try to convert with some specified converter
-                converter = WPSIO.getConverter(binding, WPSIO.IOType.INPUT, WPSIO.DataType.LITERAL, null);
+                converter = WPSIO.getConverter(binding, WPSIO.IOType.INPUT, WPSIO.DataType.LITERAL, null, null, null);
 
                 if (converter == null) {
                     throw new CstlServiceException(ex);
@@ -418,7 +415,7 @@ public class WPSUtils {
         parameters.put(AbstractInputConverter.IN_SCHEMA, schema);
         parameters.put(AbstractInputConverter.IN_ENCODING, encoding);
 
-        final ObjectConverter converter = WPSIO.getConverter(expectedClass, WPSIO.IOType.INPUT, WPSIO.DataType.COMPLEX, mime);
+        final ObjectConverter converter = WPSIO.getConverter(expectedClass, WPSIO.IOType.INPUT, WPSIO.DataType.COMPLEX, mime, encoding, schema);
 
         if (converter == null) {
             throw new CstlServiceException("Input complex not supported, no converter found.", OPERATION_NOT_SUPPORTED, inputID);
@@ -465,7 +462,7 @@ public class WPSUtils {
         parameters.put(AbstractInputConverter.IN_SCHEMA, schema);
         parameters.put(AbstractInputConverter.IN_ENCODING, encoding);
 
-        final ObjectConverter converter = WPSIO.getConverter(expectedClass, WPSIO.IOType.INPUT, WPSIO.DataType.REFERENCE, mime);
+        final ObjectConverter converter = WPSIO.getConverter(expectedClass, WPSIO.IOType.INPUT, WPSIO.DataType.REFERENCE, mime, encoding, schema);
 
         if (converter == null) {
             throw new CstlServiceException("Input reference not supported, no converter found.", OPERATION_NOT_SUPPORTED, inputID);

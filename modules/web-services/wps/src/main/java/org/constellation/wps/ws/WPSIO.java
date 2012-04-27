@@ -16,8 +16,8 @@
  */
 package org.constellation.wps.ws;
 
-import org.constellation.wps.converters.outputs.references.GeometryToOutputStream;
-import org.constellation.wps.converters.outputs.references.FeatureToOutputStream;
+import org.constellation.wps.converters.outputs.references.GeometryToReference;
+import org.constellation.wps.converters.outputs.references.FeatureToReference;
 import org.constellation.wps.converters.outputs.complex.FeatureCollectionToComplexConverter;
 import org.constellation.wps.converters.outputs.complex.GeometryToComplexConverter;
 import org.constellation.wps.converters.outputs.complex.GeometryArrayToComplexConverter;
@@ -39,6 +39,7 @@ import java.io.File;
 import java.util.*;
 import javax.measure.unit.Unit;
 import org.constellation.wps.utils.WPSMimeType;
+import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.process.converters.*;
 import org.geotoolkit.util.NumberRange;
@@ -50,6 +51,8 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
@@ -86,9 +89,9 @@ public final class WPSIO {
                 ));
          //Reference OUTPUT
         IOCLASSMAP.put(new KeyTuple(Feature.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()), //XML
-                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()), //GML
-                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()) //GML
+                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()), //XML
+                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()), //GML
+                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()) //GML
                 ));
 
         /*
@@ -116,9 +119,9 @@ public final class WPSIO {
                 ));
         //Reference OUTPUT
         IOCLASSMAP.put(new KeyTuple(FeatureCollection.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()), //XML
-                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()), //GML
-                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToOutputStream.getInstance()) //GML
+                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()), //XML
+                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()), //GML
+                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()) //GML
                 ));
 
         /*
@@ -170,9 +173,9 @@ public final class WPSIO {
                 ));
         //Reference OUTPUT
         IOCLASSMAP.put(new KeyTuple(com.vividsolutions.jts.geom.Geometry.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToOutputStream.getInstance()), //XML
-                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToOutputStream.getInstance()), //GML
-                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToOutputStream.getInstance()) //GML
+                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToReference.getInstance()), //XML
+                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToReference.getInstance()), //GML
+                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToReference.getInstance()) //GML
                 ));
 
 
@@ -477,17 +480,31 @@ public final class WPSIO {
      * @param mimeType
      * @return converter or null if not found.
      */
-    public static SimpleConverter getConverter(final Class clazz, final IOType ioType, final DataType dataType, final String mimeType) {
+    public static SimpleConverter getConverter(final Class clazz, final IOType ioType, final DataType dataType, final String mimeType, 
+            final String encoding, final String schema) throws CstlServiceException {
         if (clazz != null) {
             final KeyTuple key = new KeyTuple(clazz, ioType, dataType);
             if (IOCLASSMAP.containsKey(key)) {
                 final List<DataInfo> infos = IOCLASSMAP.get(key);
+                
+                final WPSMimeType wpsMime = WPSMimeType.customValueOf(mimeType);
+                final Encoding wpsEncoding = Encoding.customValueOf(encoding);
+                final Schema wpsSchema = Schema.customValueOf(schema);
+                
+                final DataInfo candidate = new DataInfo(false, wpsMime, wpsEncoding, wpsSchema, null);
                 for (final DataInfo dataInfo : infos) {
-                    if (WPSMimeType.customValueOf(mimeType).equals(dataInfo.getMime())) {
-                        return dataInfo.getConverter();
+                    if (wpsMime != null && wpsEncoding != null && wpsSchema != null) {
+                        if (dataInfo.equals(candidate)) {
+                            return dataInfo.getConverter();
+                        }
+                    } else {
+                        if (dataInfo.isDefaultIO()) {
+                            return dataInfo.getConverter(); //return the default converter if mime/encoding/schema are not specified.
+                        }
                     }
                 }
-
+                throw new CstlServiceException("A converter can't be found to " + clazz.getCanonicalName() + 
+                        " for " + dataType.toString() + "/" + ioType.toString(), NO_APPLICABLE_CODE);
             }
         }
         return null;
@@ -498,8 +515,10 @@ public final class WPSIO {
      */
     public static enum Encoding {
 
-        NONE(null),
+        NONE(""),
         UTF8("utf-8");
+
+        
         public final String encoding;
 
         private Encoding(final String encoding) {
@@ -509,6 +528,17 @@ public final class WPSIO {
         public String getValue() {
             return encoding;
         }
+        
+        public static Encoding customValueOf(String candidate) {
+            for (final Encoding encoding : values()) {
+                if (encoding.getValue() != null) {
+                    if (encoding.getValue().equalsIgnoreCase(candidate)) {
+                        return encoding;
+                    }
+                }
+            }
+            return null;
+        }
     }
 
     /**
@@ -516,7 +546,7 @@ public final class WPSIO {
      */
     public static enum Schema {
 
-        NONE(null),
+        NONE(""),
         OGC_FEATURE_3_1_1("http://schemas.opengis.net/gml/3.1.1/base/feature.xsd");
         public final String schema;
 
@@ -526,6 +556,17 @@ public final class WPSIO {
 
         public String getValue() {
             return schema;
+        }
+        
+        public static Schema customValueOf(String candidate) {
+            for (final Schema schema : values()) {
+                if (schema.getValue() != null) {
+                    if (schema.getValue().equalsIgnoreCase(candidate)) {
+                        return schema;
+                    }
+                }
+            }
+            return null;
         }
     }
 
@@ -600,6 +641,12 @@ public final class WPSIO {
             hash = 41 * hash + (this.from != null ? this.from.hashCode() : 0);
             return hash;
         }
+
+        @Override
+        public String toString() {
+            return "KeyTuple{" + "clazz=" + clazz + ", type=" + type + ", from=" + from + '}';
+        }
+        
     }
 
     /**
@@ -642,5 +689,37 @@ public final class WPSIO {
         public Schema getSchema() {
             return schema;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            
+            final DataInfo other = (DataInfo) obj;
+            if (this.mime != other.mime) {
+                return false;
+            }
+            if (this.encoding != other.encoding) {
+                return false;
+            }
+            if (this.schema != other.schema) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 43 * hash + (this.mime != null ? this.mime.hashCode() : 0);
+            hash = 43 * hash + (this.encoding != null ? this.encoding.hashCode() : 0);
+            hash = 43 * hash + (this.schema != null ? this.schema.hashCode() : 0);
+            return hash;
+        }
+        
     }
 }

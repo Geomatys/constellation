@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public enum WPSMimeType {
 
-    NONE(null),
+    NONE(""),
     
     IMG_JPEG("image/jpeg"),
     IMG_TIFF("image/tiff"),
@@ -55,12 +55,13 @@ public enum WPSMimeType {
     public String getValue() {
         return mime;
     }
-
+    
+    /**
+     * Search a WPSMimeType from a Sring code.
+     * @param str
+     * @return the searched WPSMimeType or {@code null} if not found.
+     */
     public static WPSMimeType customValueOf(final String str) {
-
-        if (str == null) {
-            return NONE;
-        }
 
         for (final WPSMimeType mime : values()) {
             if (mime.getValue() != null) {
@@ -69,6 +70,6 @@ public enum WPSMimeType {
                 }
             }
         }
-        return NONE;
+        return null;
     }
 }

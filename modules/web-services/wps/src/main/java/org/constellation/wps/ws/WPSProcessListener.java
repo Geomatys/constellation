@@ -16,9 +16,14 @@
  */
 package org.constellation.wps.ws;
 
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.constellation.ServiceDef;
 import org.constellation.wps.utils.WPSUtils;
@@ -63,6 +68,7 @@ public class WPSProcessListener implements ProcessListener{
         LOGGER.log(Level.INFO, "Process {0} is started.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
         final StatusType status = new StatusType();
         final ProcessStartedType started = new ProcessStartedType();
+        status.setCreationTime(getCurrentXMLGregorianCalendar());
         started.setValue("Process " + request.getIdentifier().getValue() + " is started");
         started.setPercentCompleted(0);
         status.setProcessStarted(started);
@@ -77,6 +83,7 @@ public class WPSProcessListener implements ProcessListener{
             //LOGGER.log(Level.INFO, "Process {0} is progressing : {1}.", new Object[]{WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()), event.getProgress()});
             nextTimestamp += TIMEOUT;
             final StatusType status = new StatusType();
+            status.setCreationTime(getCurrentXMLGregorianCalendar());
             final ProcessStartedType started = new ProcessStartedType();
             started.setValue("Process " + request.getIdentifier().getValue() + " is pending");
             started.setPercentCompleted((int) event.getProgress());
@@ -94,6 +101,7 @@ public class WPSProcessListener implements ProcessListener{
             final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
             WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput(), serviceURL);
             final StatusType status = new StatusType();
+            status.setCreationTime(getCurrentXMLGregorianCalendar());
             status.setProcessSucceeded("Process complet.");
             
             responseDoc.setStatus(status);
@@ -109,6 +117,7 @@ public class WPSProcessListener implements ProcessListener{
     public void failed(final ProcessEvent event) {
         LOGGER.log(Level.INFO, "Process {0} has failed.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
         final StatusType status = new StatusType();
+        status.setCreationTime(getCurrentXMLGregorianCalendar());
         final ProcessFailedType processFT = new ProcessFailedType();
         processFT.setExceptionReport(new ExceptionReport(event.getException().getMessage(), null, null, null));
         status.setProcessFailed(processFT);
@@ -134,5 +143,20 @@ public class WPSProcessListener implements ProcessListener{
                                                      def.exceptionVersion.toString());
         
         WPSUtils.storeResponse(report, fileName);
+    }
+    
+    /**
+     * @return the current time in an XMLGregorianCalendar.
+     */
+    private static XMLGregorianCalendar getCurrentXMLGregorianCalendar(){
+        XMLGregorianCalendar xcal = null;
+        try {
+            final GregorianCalendar c = new GregorianCalendar();
+            c.setTime(new Date());
+            xcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+        } catch (DatatypeConfigurationException ex) {
+            LOGGER.log(Level.INFO, "Can't create the creation time of the status.");
+        }
+        return xcal;
     }
 }

@@ -26,6 +26,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.geotoolkit.ows.xml.v110.AnyValue;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
@@ -186,6 +189,9 @@ public class WPSWorker extends AbstractWorker {
         }
     }
 
+    /**
+     * Create process list from context file. 
+     */
     private void fillProcessList() {
         if (context != null) {
             // Load all process from all factory
@@ -199,7 +205,7 @@ public class WPSWorker extends AbstractWorker {
                     }
                 }
             } else {
-                for (ProcessFactory processFactory : context.getProcessFactories()) {
+                for (final ProcessFactory processFactory : context.getProcessFactories()) {
                     final ProcessingRegistry factory = ProcessFinder.getProcessFactory(processFactory.getAutorityCode());
                     if (factory != null) {
                         if (Boolean.TRUE == processFactory.getLoadAll()) {
@@ -208,7 +214,7 @@ public class WPSWorker extends AbstractWorker {
                                 ProcessDescriptorList.add(descriptor);
                             }
                         } else {
-                            for (Process process : processFactory.getInclude().getProcess()) {
+                            for (final Process process : processFactory.getInclude().getProcess()) {
                                 try {
                                     final ProcessDescriptor desc = factory.getDescriptor(process.getId());
                                     if (desc != null) {
@@ -588,8 +594,15 @@ public class WPSWorker extends AbstractWorker {
 
         //check requested INPUT/OUTPUT. Throw an CstlException otherwise.
         WPSUtils.checkValidInputOuputRequest(processDesc, request);
+        try {
+            final GregorianCalendar c = new GregorianCalendar();
+            c.setTime(new Date());
+            status.setCreationTime(DatatypeFactory.newInstance().newXMLGregorianCalendar(c) );
+        } catch (DatatypeConfigurationException ex) {
+            throw new CstlServiceException(ex);
+        }
         status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" found.");
-
+        
         /*
          * Get the requested output form
          */
@@ -688,7 +701,7 @@ public class WPSWorker extends AbstractWorker {
             response.setService(WPS_SERVICE);
             response.setVersion(WPS_1_0_0);
             response.setLang(WPS_LANG);
-            response.setServiceInstance(getServiceUrl() + "SERVICE=WPS&amp;REQUEST=GetCapabilities");
+            response.setServiceInstance(getServiceUrl() + "SERVICE=WPS&REQUEST=GetCapabilities");
 
             //Give a bief process description into the execute response
             response.setProcess(WPSUtils.generateProcessBrief(processDesc));
@@ -1054,8 +1067,8 @@ public class WPSWorker extends AbstractWorker {
                 parameters.put(AbstractComplexOutputConverter.OUT_MIME, requestedOutput.getMimeType());
                 parameters.put(AbstractComplexOutputConverter.OUT_SCHEMA, requestedOutput.getSchema());
                     
-                final ObjectConverter converter = WPSIO.getConverter(outClass, WPSIO.IOType.OUTPUT, WPSIO.DataType.COMPLEX, requestedOutput.getMimeType());
-
+                final ObjectConverter converter = WPSIO.getConverter(outClass, WPSIO.IOType.OUTPUT, WPSIO.DataType.COMPLEX, 
+                        requestedOutput.getMimeType(), requestedOutput.getEncoding(), requestedOutput.getSchema());
                 if (converter == null) {
                     throw new CstlServiceException("Output complex not supported, no converter found.",
                             OPERATION_NOT_SUPPORTED, outputIdentifier);
@@ -1109,7 +1122,8 @@ public class WPSWorker extends AbstractWorker {
             parameters.put(AbstractReferenceOutputConverter.OUT_MIME, requestedOutput.getMimeType());
             parameters.put(AbstractReferenceOutputConverter.OUT_SCHEMA, requestedOutput.getSchema());
 
-            final ObjectConverter converter = WPSIO.getConverter(clazz, WPSIO.IOType.OUTPUT, WPSIO.DataType.REFERENCE, requestedOutput.getMimeType());
+            final ObjectConverter converter = WPSIO.getConverter(clazz, WPSIO.IOType.OUTPUT, WPSIO.DataType.REFERENCE, 
+                    requestedOutput.getMimeType(), requestedOutput.getEncoding(), requestedOutput.getSchema());
 
             if (converter == null) {
                 throw new CstlServiceException("Reference Output not supported, no converter found.", OPERATION_NOT_SUPPORTED, requestedOutput.getIdentifier().getValue());

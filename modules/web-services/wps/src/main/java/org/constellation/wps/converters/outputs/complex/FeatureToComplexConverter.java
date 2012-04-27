@@ -64,6 +64,9 @@ public final class FeatureToComplexConverter extends AbstractComplexOutputConver
         complex.setMimeType((String) source.get(OUT_MIME));
         complex.setEncoding((String) source.get(OUT_ENCODING));
         
+        if (!(source.get(OUT_DATA) instanceof Feature)) {
+            throw new NonconvertibleObjectException("The requested output data is not an instance of Feature.");
+        }
         final Feature feature = (Feature) source.get(OUT_DATA);
         final FeatureType ft = feature.getType();
         
