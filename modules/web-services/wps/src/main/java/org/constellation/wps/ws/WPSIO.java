@@ -35,9 +35,12 @@ import org.constellation.wps.converters.inputs.complex.ComplexToGeometryConverte
 import org.constellation.wps.converters.inputs.complex.ComplexToGeometryArrayConverter;
 import org.constellation.wps.converters.inputs.complex.ComplexToFeatureTypeConverter;
 import java.awt.geom.AffineTransform;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.util.*;
 import javax.measure.unit.Unit;
+import org.constellation.wps.converters.inputs.references.*;
+import org.constellation.wps.converters.outputs.references.RenderedImageToReference;
 import org.constellation.wps.utils.WPSMimeType;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.data.FeatureCollection;
@@ -161,10 +164,6 @@ public final class WPSIO {
                 new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, ReferenceToGeometryConverter.getInstance()), //GML
                 new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, ReferenceToGeometryConverter.getInstance()) //GML
                 ));
-        //Literal INPUT
-//        IOCLASSMAP.put(new KeyTuple(com.vividsolutions.jts.geom.Geometry.class, IOType.INPUT, DataType.LITERAL), UnmodifiableArrayList.wrap(
-//                    new DataInfo(false, WPSMimeType.NONE,  Encoding.NONE, Schema.NONE, StringToGeometryConverter.getInstance()) //WKT
-//                ));
         //Complex OUTPUT
         IOCLASSMAP.put(new KeyTuple(com.vividsolutions.jts.geom.Geometry.class, IOType.OUTPUT, DataType.COMPLEX), UnmodifiableArrayList.wrap(
                 new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToComplexConverter.getInstance()), //XML
@@ -333,6 +332,32 @@ public final class WPSIO {
         //output
         IOCLASSMAP.put(new KeyTuple(Envelope.class, IOType.OUTPUT, DataType.BBOX), UnmodifiableArrayList.wrap(
                 new DataInfo(true, WPSMimeType.NONE, Encoding.NONE, Schema.NONE, null)));
+        
+        /*
+         * RenderedImage
+         */
+       
+        //input
+        IOCLASSMAP.put(new KeyTuple(RenderedImage.class, IOType.INPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
+                new DataInfo(false, WPSMimeType.IMG_BMP,    null, null, ReferenceToRenderedImage.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, ReferenceToRenderedImage.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, ReferenceToRenderedImage.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, ReferenceToRenderedImage.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, ReferenceToRenderedImage.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, ReferenceToRenderedImage.getInstance()),
+                new DataInfo(true, WPSMimeType.IMG_PNG,     null, null, ReferenceToRenderedImage.getInstance())
+                ));
+        
+        // output
+        IOCLASSMAP.put(new KeyTuple(RenderedImage.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
+                new DataInfo(false, WPSMimeType.IMG_BMP,     null, null, RenderedImageToReference.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, RenderedImageToReference.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, RenderedImageToReference.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, RenderedImageToReference.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, RenderedImageToReference.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, RenderedImageToReference.getInstance()),
+                new DataInfo(true, WPSMimeType.IMG_PNG,      null, null, RenderedImageToReference.getInstance())
+                ));
 
     }
 

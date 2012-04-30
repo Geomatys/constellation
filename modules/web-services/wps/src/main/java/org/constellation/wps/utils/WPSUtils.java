@@ -557,26 +557,27 @@ public class WPSUtils {
      * @param attributeClass
      * @return SupportedComplexDataInputType
      */
-    public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType) {
+    public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.DataType type) {
 
         final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
-        final List<WPSIO.DataInfo> infos = WPSIO.IOCLASSMAP.get(new WPSIO.KeyTuple(attributeClass, ioType, WPSIO.DataType.COMPLEX));
+        final List<WPSIO.DataInfo> infos = WPSIO.IOCLASSMAP.get(new WPSIO.KeyTuple(attributeClass, ioType, type));
+        
+        if (infos != null) { 
+            for (WPSIO.DataInfo inputClass : infos) {
 
-        for (WPSIO.DataInfo inputClass : infos) {
+                final ComplexDataDescriptionType complexDesc = new ComplexDataDescriptionType();
+                complexDesc.setEncoding(inputClass.getEncoding() != null ? inputClass.getEncoding().getValue() : null); //Encoding
+                complexDesc.setMimeType(inputClass.getMime() != null ? inputClass.getMime().getValue() : null);                    //Mime
+                complexDesc.setSchema(inputClass.getSchema() != null ? inputClass.getSchema().getValue() : null);       //URL to xsd schema
 
-            final ComplexDataDescriptionType complexDesc = new ComplexDataDescriptionType();
-            complexDesc.setEncoding(inputClass.getEncoding().getValue());   //Encoding
-            complexDesc.setMimeType(inputClass.getMime().getValue());       //Mime
-            complexDesc.setSchema(inputClass.getSchema().getValue());       //URL to xsd schema
-
-            if (inputClass.isDefaultIO()) {
-                complexComb.setFormat(complexDesc);
+                if (inputClass.isDefaultIO()) {
+                    complexComb.setFormat(complexDesc);
+                }
+                complexCombs.getFormat().add(complexDesc);
             }
-            complexCombs.getFormat().add(complexDesc);
         }
-
         complex.setDefault(complexComb);
         complex.setSupported(complexCombs);
 

@@ -434,8 +434,12 @@ public class WPSWorker extends AbstractWorker {
 
                         //Complex type (XML, ...)     
                     } else if (WPSIO.isSupportedComplexInputClass(clazz)) {
-                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT));
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.DataType.COMPLEX));
 
+                        //Reference type (XML, ...)    
+                    } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.DataType.REFERENCE));
+                        
                         //Simple object (Integer, double, ...) and Object which need a conversion from String like affineTransform or WKT Geometry
                     } else if (WPSIO.isSupportedLiteralInputClass(clazz)) {
                         final LiteralInputType literal = new LiteralInputType();
@@ -497,7 +501,10 @@ public class WPSWorker extends AbstractWorker {
 
                         //Complex type (XML, raster, ...)
                     } else if (WPSIO.isSupportedComplexOutputClass(clazz)) {
-                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT));
+                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.DataType.COMPLEX));
+
+                    } else if (WPSIO.isSupportedReferenceOutputClass(clazz)) {
+                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.DataType.REFERENCE));
 
                         //Simple object (Integer, double) and Object which need a conversion from String like affineTransform or Geometry
                     } else if (WPSIO.isSupportedLiteralOutputClass(clazz)) {
@@ -582,6 +589,24 @@ public class WPSWorker extends AbstractWorker {
                     MISSING_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
         }
 
+        /*
+         * Get the requested output form
+         */
+        final ResponseFormType responseForm = request.getResponseForm();
+        final OutputDefinitionType rawData = responseForm.getRawDataOutput();
+        final ResponseDocumentType respDoc = responseForm.getResponseDocument();
+
+
+        boolean isOutputRaw = rawData != null ? true : false; // the default output is a ResponseDocument
+        boolean isOutputRespDoc = respDoc != null ? true : false;
+
+        if (!isOutputRaw && !isOutputRespDoc) {
+            throw new CstlServiceException("The response form should be defined.", MISSING_PARAMETER_VALUE, "responseForm");
+        }
+        if(isOutputRespDoc && respDoc.isStatus() && !respDoc.isStoreExecuteResponse()){
+             throw new CstlServiceException("Set the storeExecuteResponse to true if you want to see status in response documents.", INVALID_PARAMETER_VALUE, "storeExecuteResponse");
+        }
+        
         final StatusType status = new StatusType();
         LOGGER.log(Level.INFO, "Process Execute : {0}", request.getIdentifier().getValue());
         //Find the process
@@ -603,24 +628,6 @@ public class WPSWorker extends AbstractWorker {
         }
         status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" found.");
         
-        /*
-         * Get the requested output form
-         */
-        final ResponseFormType responseForm = request.getResponseForm();
-        final OutputDefinitionType rawData = responseForm.getRawDataOutput();
-        final ResponseDocumentType respDoc = responseForm.getResponseDocument();
-
-
-        boolean isOutputRaw = rawData != null ? true : false; // the default output is a ResponseDocument
-        boolean isOutputRespDoc = respDoc != null ? true : false;
-
-        if (!isOutputRaw && !isOutputRespDoc) {
-            throw new CstlServiceException("The response form should be defined.", MISSING_PARAMETER_VALUE, "responseForm");
-        }
-        if(isOutputRespDoc && respDoc.isStatus() && !respDoc.isStoreExecuteResponse()){
-             throw new CstlServiceException("Set the storeExecuteResponse to true if you want to see status in response documents.", INVALID_PARAMETER_VALUE, "storeExecuteResponse");
-        }
-
         String respDocFileName = UUID.randomUUID().toString();
         /*
          * ResponseDocument attributs
@@ -736,6 +743,7 @@ public class WPSWorker extends AbstractWorker {
                 } catch (InterruptedException ex) {
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 } catch (ExecutionException ex) {
+                    //process exception
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 } catch (TimeoutException ex) {
                     ((AbstractProcess) process).cancelProcess();

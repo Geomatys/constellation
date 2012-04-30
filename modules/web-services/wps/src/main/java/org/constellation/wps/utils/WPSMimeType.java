@@ -29,10 +29,12 @@ public enum WPSMimeType {
     NONE(""),
     
     IMG_JPEG("image/jpeg"),
+    IMG_JPEG2000("image/jpeg2000"),
+    IMG_PNG("image/png"),
     IMG_TIFF("image/tiff"),
     IMG_GEOTIFF("image/tiff;subtype=geotiff"),
     IMG_BMP("image/bmp"),
-    IMG_SVG("image/svg+xml"),
+    IMG_GIF("image/gif"),
     
     APP_OCTET("application/octet-stream"),
     APP_JSON("application/json"),
