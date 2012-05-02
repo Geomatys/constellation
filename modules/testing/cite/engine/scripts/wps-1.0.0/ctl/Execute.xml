@@ -97,6 +97,11 @@
                             xmlns:ows="http://www.opengis.net/ows/1.1"
                             xmlns="http://www.opengis.net/wps/1.0.0">
                             <ows:Identifier>invalidProcessIdentifier</ows:Identifier>
+                            <wps:ResponseForm>
+                                <wps:RawDataOutput>
+                                    <ows:Identifier>something</ows:Identifier>
+                                </wps:RawDataOutput>
+                            </wps:ResponseForm>
                         </Execute> 
                     </ctl:body>												 							
                     <ctl:call-function name="wpsFunctions:xmlValidatingParser">			

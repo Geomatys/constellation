@@ -161,10 +161,10 @@
          In Tomcat   : 1) Uncomment the WSServletContextListener listener.
                        2) Rename the file sun-jaxws.xml.backup  in sun-jaxws.xml and uncomment the endpoint you want to enable.
            
-     -->
+     >
     <listener>
         <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-    </listener>
+    </listener-->
 
     <session-config>
         <session-timeout>30</session-timeout>
