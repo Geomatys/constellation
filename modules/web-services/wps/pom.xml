@@ -27,10 +27,10 @@
     <developers>
         <developer>
             <name>Quentin Boileau</name>
-            <id>Kite</id>
-            <email>quentin.boileau@gmail.com</email>
+            <id>qboileau</id>
+            <email>quentin.boileau@geomatys.com</email>
             <organization>Geomatys</organization>
-            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <organizationUrl>http://www.geomatys.com/</organizationUrl>
             <timezone>+1</timezone>
             <roles>
                 <role>Developer</role>
