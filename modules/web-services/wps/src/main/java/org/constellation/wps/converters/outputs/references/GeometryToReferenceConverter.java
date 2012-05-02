@@ -32,16 +32,16 @@ import org.opengis.util.FactoryException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class GeometryToReference extends AbstractReferenceOutputConverter {
+public class GeometryToReferenceConverter extends AbstractReferenceOutputConverter {
 
-    private static GeometryToReference INSTANCE;
+    private static GeometryToReferenceConverter INSTANCE;
 
-    private GeometryToReference(){
+    private GeometryToReferenceConverter(){
     }
 
-    public static synchronized GeometryToReference getInstance(){
+    public static synchronized GeometryToReferenceConverter getInstance(){
         if(INSTANCE == null){
-            INSTANCE = new GeometryToReference();
+            INSTANCE = new GeometryToReferenceConverter();
         }
         return INSTANCE;
     }

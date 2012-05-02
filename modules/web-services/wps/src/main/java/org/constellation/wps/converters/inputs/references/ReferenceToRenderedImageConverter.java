@@ -29,15 +29,15 @@ import org.geotoolkit.util.converter.NonconvertibleObjectException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class ReferenceToRenderedImage extends AbstractInputConverter {
+public class ReferenceToRenderedImageConverter extends AbstractInputConverter {
     
-    private static ReferenceToRenderedImage INSTANCE;
+    private static ReferenceToRenderedImageConverter INSTANCE;
 
-    private ReferenceToRenderedImage(){}
+    private ReferenceToRenderedImageConverter(){}
 
-    public static synchronized ReferenceToRenderedImage getInstance(){
+    public static synchronized ReferenceToRenderedImageConverter getInstance(){
         if(INSTANCE == null){
-            INSTANCE = new ReferenceToRenderedImage();
+            INSTANCE = new ReferenceToRenderedImageConverter();
         }
         return INSTANCE;
     }

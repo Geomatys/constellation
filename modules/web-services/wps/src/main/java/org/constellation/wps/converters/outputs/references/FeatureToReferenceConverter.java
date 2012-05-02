@@ -39,16 +39,16 @@ import org.opengis.feature.type.FeatureType;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class FeatureToReference extends AbstractReferenceOutputConverter {
+public class FeatureToReferenceConverter extends AbstractReferenceOutputConverter {
 
-    private static FeatureToReference INSTANCE;
+    private static FeatureToReferenceConverter INSTANCE;
 
-    private FeatureToReference(){
+    private FeatureToReferenceConverter(){
     }
 
-    public static synchronized FeatureToReference getInstance(){
+    public static synchronized FeatureToReferenceConverter getInstance(){
         if(INSTANCE == null){
-            INSTANCE = new FeatureToReference();
+            INSTANCE = new FeatureToReferenceConverter();
         }
         return INSTANCE;
     }

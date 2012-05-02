@@ -18,37 +18,36 @@ package org.constellation.wps.converters.outputs.references;
 
 import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageWriter;
-import org.geotoolkit.image.io.XImageIO;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.io.CoverageIO;
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.GridCoverageWriter;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wps.xml.v100.OutputReferenceType;
+import org.opengis.coverage.Coverage;
 
 /**
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class RenderedImageToReference extends AbstractReferenceOutputConverter {
+public class CoverageToReferenceConverter extends AbstractReferenceOutputConverter {
 
-    private static RenderedImageToReference INSTANCE;
+    private static CoverageToReferenceConverter INSTANCE;
 
-    private RenderedImageToReference() {
+    private CoverageToReferenceConverter() {
     }
 
-    public static synchronized RenderedImageToReference getInstance() {
+    public static synchronized CoverageToReferenceConverter getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new RenderedImageToReference();
+            INSTANCE = new CoverageToReferenceConverter();
         }
         return INSTANCE;
     }
-
+    
     @Override
     public OutputReferenceType convert(final Map<String, Object> source) throws NonconvertibleObjectException {
-        
         final OutputReferenceType reference = new OutputReferenceType();
 
         reference.setMimeType((String) source.get(OUT_MIME));
@@ -57,28 +56,30 @@ public class RenderedImageToReference extends AbstractReferenceOutputConverter {
 
         final Object data = source.get(OUT_DATA);
 
-        if (!(data instanceof RenderedImage)) {
+        if (!(data instanceof Coverage)) {
             throw new NonconvertibleObjectException("The geometry is not an JTS geometry.");
         }
-
+        
         final String randomFileName = UUID.randomUUID().toString();
-        ImageWriter writer = null;
+        GridCoverageWriter writer = null;
+    
         try {
-            //create file
             final File imageFile = new File((String) source.get(OUT_TMP_DIR_PATH), randomFileName);
-            final RenderedImage image = (RenderedImage) data;
-            writer = XImageIO.getWriterByMIMEType((String) source.get(OUT_MIME), imageFile, image);
-            writer.write(image);
-            reference.setSchema((String) source.get(OUT_TMP_DIR_URL) + "/" + randomFileName);
-            
-        } catch (IOException ex) {
-            Logger.getLogger(RenderedImageToReference.class.getName()).log(Level.SEVERE, null, ex);
+            writer = CoverageIO.createSimpleWriter(imageFile);
+            writer.write((GridCoverage2D) data, null);
+        } catch (CoverageStoreException ex) {
+            throw new NonconvertibleObjectException("Error during wrtie the coverage in the output file.",ex);
         } finally {
             if (writer != null) {
-                writer.dispose();
+                try {
+                    writer.dispose();
+                } catch (CoverageStoreException ex) {
+                    throw new NonconvertibleObjectException("Error during release the coverage writer.",ex);
+                }
             }
         }
         
         return reference;
     }
+    
 }

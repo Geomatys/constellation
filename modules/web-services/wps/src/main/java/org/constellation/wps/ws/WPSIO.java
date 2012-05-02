@@ -16,8 +16,8 @@
  */
 package org.constellation.wps.ws;
 
-import org.constellation.wps.converters.outputs.references.GeometryToReference;
-import org.constellation.wps.converters.outputs.references.FeatureToReference;
+import org.constellation.wps.converters.outputs.references.GeometryToReferenceConverter;
+import org.constellation.wps.converters.outputs.references.FeatureToReferenceConverter;
 import org.constellation.wps.converters.outputs.complex.FeatureCollectionToComplexConverter;
 import org.constellation.wps.converters.outputs.complex.GeometryToComplexConverter;
 import org.constellation.wps.converters.outputs.complex.GeometryArrayToComplexConverter;
@@ -40,7 +40,8 @@ import java.io.File;
 import java.util.*;
 import javax.measure.unit.Unit;
 import org.constellation.wps.converters.inputs.references.*;
-import org.constellation.wps.converters.outputs.references.RenderedImageToReference;
+import org.constellation.wps.converters.outputs.references.CoverageToReferenceConverter;
+import org.constellation.wps.converters.outputs.references.RenderedImageToReferenceConverter;
 import org.constellation.wps.utils.WPSMimeType;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.data.FeatureCollection;
@@ -56,6 +57,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.opengis.coverage.Coverage;
 
 /**
  *
@@ -92,9 +94,9 @@ public final class WPSIO {
                 ));
          //Reference OUTPUT
         IOCLASSMAP.put(new KeyTuple(Feature.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()), //XML
-                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()), //GML
-                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()) //GML
+                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReferenceConverter.getInstance()), //XML
+                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReferenceConverter.getInstance()), //GML
+                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReferenceConverter.getInstance()) //GML
                 ));
 
         /*
@@ -122,9 +124,9 @@ public final class WPSIO {
                 ));
         //Reference OUTPUT
         IOCLASSMAP.put(new KeyTuple(FeatureCollection.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()), //XML
-                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()), //GML
-                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReference.getInstance()) //GML
+                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReferenceConverter.getInstance()), //XML
+                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReferenceConverter.getInstance()), //GML
+                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, FeatureToReferenceConverter.getInstance()) //GML
                 ));
 
         /*
@@ -172,9 +174,9 @@ public final class WPSIO {
                 ));
         //Reference OUTPUT
         IOCLASSMAP.put(new KeyTuple(com.vividsolutions.jts.geom.Geometry.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToReference.getInstance()), //XML
-                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToReference.getInstance()), //GML
-                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToReference.getInstance()) //GML
+                new DataInfo(false, WPSMimeType.TEXT_XML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToReferenceConverter.getInstance()), //XML
+                new DataInfo(false, WPSMimeType.TEXT_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToReferenceConverter.getInstance()), //GML
+                new DataInfo(true,  WPSMimeType.APP_GML, Encoding.UTF8, Schema.OGC_FEATURE_3_1_1, GeometryToReferenceConverter.getInstance()) //GML
                 ));
 
 
@@ -336,27 +338,49 @@ public final class WPSIO {
         /*
          * RenderedImage
          */
-       
         //input
         IOCLASSMAP.put(new KeyTuple(RenderedImage.class, IOType.INPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.IMG_BMP,    null, null, ReferenceToRenderedImage.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, ReferenceToRenderedImage.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, ReferenceToRenderedImage.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, ReferenceToRenderedImage.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, ReferenceToRenderedImage.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, ReferenceToRenderedImage.getInstance()),
-                new DataInfo(true, WPSMimeType.IMG_PNG,     null, null, ReferenceToRenderedImage.getInstance())
+                new DataInfo(false, WPSMimeType.IMG_BMP,    null, null, ReferenceToRenderedImageConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, ReferenceToRenderedImageConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, ReferenceToRenderedImageConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, ReferenceToRenderedImageConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, ReferenceToRenderedImageConverter.getInstance()),
+                new DataInfo(true, WPSMimeType.IMG_PNG,     null, null, ReferenceToRenderedImageConverter.getInstance())
                 ));
         
         // output
         IOCLASSMAP.put(new KeyTuple(RenderedImage.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.IMG_BMP,     null, null, RenderedImageToReference.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, RenderedImageToReference.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, RenderedImageToReference.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, RenderedImageToReference.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, RenderedImageToReference.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, RenderedImageToReference.getInstance()),
-                new DataInfo(true, WPSMimeType.IMG_PNG,      null, null, RenderedImageToReference.getInstance())
+                new DataInfo(false, WPSMimeType.IMG_BMP,     null, null, RenderedImageToReferenceConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, RenderedImageToReferenceConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, RenderedImageToReferenceConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, RenderedImageToReferenceConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, RenderedImageToReferenceConverter.getInstance()),
+                new DataInfo(true, WPSMimeType.IMG_PNG,      null, null, RenderedImageToReferenceConverter.getInstance())
+                ));
+        
+        /*
+         * Coverage
+         */
+        //input
+        IOCLASSMAP.put(new KeyTuple(Coverage.class, IOType.INPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
+                new DataInfo(false, WPSMimeType.IMG_BMP,    null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+                new DataInfo(true, WPSMimeType.IMG_PNG,     null, null, ReferenceToGridCoverage2DConverter.getInstance())
+                ));
+        
+        // output
+        IOCLASSMAP.put(new KeyTuple(Coverage.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
+                new DataInfo(false, WPSMimeType.IMG_BMP,     null, null, CoverageToReferenceConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, CoverageToReferenceConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, CoverageToReferenceConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, CoverageToReferenceConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, CoverageToReferenceConverter.getInstance()),
+                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, CoverageToReferenceConverter.getInstance()),
+                new DataInfo(true, WPSMimeType.IMG_PNG,      null, null, CoverageToReferenceConverter.getInstance())
                 ));
 
     }

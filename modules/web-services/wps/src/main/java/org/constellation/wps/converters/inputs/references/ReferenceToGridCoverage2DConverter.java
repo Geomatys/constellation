@@ -17,13 +17,15 @@
 package org.constellation.wps.converters.inputs.references;
 
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 import org.constellation.wps.converters.inputs.AbstractInputConverter;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.converter.SimpleConverter;
 
 /**
  * Implementation of ObjectConverter to convert a reference into a GridCoverage2D.
@@ -47,11 +49,26 @@ public final class ReferenceToGridCoverage2DConverter extends AbstractInputConve
     @Override
     public Object convert(final Map<String, Object> source) throws NonconvertibleObjectException {
                     
+        final String href = (String) source.get(IN_HREF);
+        GridCoverageReader reader = null;
         try{
-            final GridCoverageReader reader = (GridCoverageReader) ReferenceToGridCoverageReaderConverter.getInstance().convert(source);
+            
+            final URL url = new URL(href);
+            reader = CoverageIO.createSimpleReader(url);
             return (GridCoverage2D)reader.read(0, null);
+            
+        } catch (MalformedURLException ex) {
+            throw new NonconvertibleObjectException("Reference coverage invalid input : IO",ex);
         } catch (CoverageStoreException ex) {
-            throw new NonconvertibleObjectException("Reference grid coverage invalid input : Can't read coverage",ex);
+            throw new NonconvertibleObjectException("Reference coverage invalid input : Can't read coverage",ex);
+        } finally {
+            if( reader != null ) {
+                try {
+                    reader.dispose();
+                } catch (CoverageStoreException ex) {
+                    throw new NonconvertibleObjectException("Error during release the coverage reader.",ex);
+                }
+            }
         }
     }
 }

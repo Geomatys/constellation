@@ -593,6 +593,10 @@ public class WPSWorker extends AbstractWorker {
          * Get the requested output form
          */
         final ResponseFormType responseForm = request.getResponseForm();
+        if (responseForm == null) {
+            throw new CstlServiceException("The response form should be defined.", MISSING_PARAMETER_VALUE, "responseForm");
+        }
+        
         final OutputDefinitionType rawData = responseForm.getRawDataOutput();
         final ResponseDocumentType respDoc = responseForm.getResponseDocument();
 
