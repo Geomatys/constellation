@@ -359,29 +359,30 @@ public final class WPSIO {
                 ));
         
         /*
-         * Coverage
+         * Coverage 
+         * @TODO wait to URL support in GridCoverageReader
          */
         //input
-        IOCLASSMAP.put(new KeyTuple(Coverage.class, IOType.INPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.IMG_BMP,    null, null, ReferenceToGridCoverage2DConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, ReferenceToGridCoverage2DConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, ReferenceToGridCoverage2DConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, ReferenceToGridCoverage2DConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, ReferenceToGridCoverage2DConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, ReferenceToGridCoverage2DConverter.getInstance()),
-                new DataInfo(true, WPSMimeType.IMG_PNG,     null, null, ReferenceToGridCoverage2DConverter.getInstance())
-                ));
-        
-        // output
-        IOCLASSMAP.put(new KeyTuple(Coverage.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
-                new DataInfo(false, WPSMimeType.IMG_BMP,     null, null, CoverageToReferenceConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, CoverageToReferenceConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, CoverageToReferenceConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, CoverageToReferenceConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, CoverageToReferenceConverter.getInstance()),
-                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, CoverageToReferenceConverter.getInstance()),
-                new DataInfo(true, WPSMimeType.IMG_PNG,      null, null, CoverageToReferenceConverter.getInstance())
-                ));
+//        IOCLASSMAP.put(new KeyTuple(Coverage.class, IOType.INPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
+//                new DataInfo(false, WPSMimeType.IMG_BMP,    null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, ReferenceToGridCoverage2DConverter.getInstance()),
+//                new DataInfo(true, WPSMimeType.IMG_PNG,     null, null, ReferenceToGridCoverage2DConverter.getInstance())
+//                ));
+//        
+//        // output
+//        IOCLASSMAP.put(new KeyTuple(Coverage.class, IOType.OUTPUT, DataType.REFERENCE), UnmodifiableArrayList.wrap(
+//                new DataInfo(false, WPSMimeType.IMG_BMP,     null, null, CoverageToReferenceConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_GEOTIFF, null, null, CoverageToReferenceConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_GIF,     null, null, CoverageToReferenceConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_JPEG,    null, null, CoverageToReferenceConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_JPEG2000, null, null, CoverageToReferenceConverter.getInstance()),
+//                new DataInfo(false, WPSMimeType.IMG_TIFF,    null, null, CoverageToReferenceConverter.getInstance()),
+//                new DataInfo(true, WPSMimeType.IMG_PNG,      null, null, CoverageToReferenceConverter.getInstance())
+//                ));
 
     }
 

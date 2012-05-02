@@ -58,7 +58,7 @@ public class RenderedImageToReferenceConverter extends AbstractReferenceOutputCo
         final Object data = source.get(OUT_DATA);
 
         if (!(data instanceof RenderedImage)) {
-            throw new NonconvertibleObjectException("The geometry is not an JTS geometry.");
+            throw new NonconvertibleObjectException("The output data is not an instance of RenderedImage.");
         }
 
         final String randomFileName = UUID.randomUUID().toString();

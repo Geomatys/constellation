@@ -56,8 +56,8 @@ public class CoverageToReferenceConverter extends AbstractReferenceOutputConvert
 
         final Object data = source.get(OUT_DATA);
 
-        if (!(data instanceof Coverage)) {
-            throw new NonconvertibleObjectException("The geometry is not an JTS geometry.");
+        if (!(data instanceof GridCoverage2D)) {
+            throw new NonconvertibleObjectException("The output data is not an instance of GridCoverage2D.");
         }
         
         final String randomFileName = UUID.randomUUID().toString();
