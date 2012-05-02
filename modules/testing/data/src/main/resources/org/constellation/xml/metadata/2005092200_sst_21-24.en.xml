@@ -226,6 +226,9 @@
         <gmd:MD_CoverageDescription>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <gmd:descriptor>
+                        <gco:CharacterString>grid_number</gco:CharacterString>
+                    </gmd:descriptor>
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -245,8 +248,15 @@
                     </gmd:descriptor>
                 </gmd:MD_Band>
             </gmd:dimension>
+        </gmd:MD_CoverageDescription>
+    </gmd:contentInfo>
+    <gmd:contentInfo>
+        <gmd:MD_CoverageDescription>
             <gmd:dimension>
                 <gmd:MD_Band>
+                    <gmd:descriptor>
+                        <gco:CharacterString>SST</gco:CharacterString>
+                    </gmd:descriptor>
                     <gmd:sequenceIdentifier>
                         <gco:MemberName>
                             <gco:aName>
@@ -267,28 +277,6 @@
                 </gmd:MD_Band>
             </gmd:dimension>
         </gmd:MD_CoverageDescription>
-    </gmd:contentInfo>
-    <gmd:contentInfo>
-        <gmd:MD_ImageDescription>
-            <gmd:dimension>
-                <gmd:MD_RangeDimension>
-                    <gmd:descriptor>
-                        <gco:CharacterString>grid_number</gco:CharacterString>
-                    </gmd:descriptor>
-                </gmd:MD_RangeDimension>
-            </gmd:dimension>
-        </gmd:MD_ImageDescription>
-    </gmd:contentInfo>
-    <gmd:contentInfo>
-        <gmd:MD_ImageDescription>
-            <gmd:dimension>
-                <gmd:MD_RangeDimension>
-                    <gmd:descriptor>
-                        <gco:CharacterString>SST</gco:CharacterString>
-                    </gmd:descriptor>
-                </gmd:MD_RangeDimension>
-            </gmd:dimension>
-        </gmd:MD_ImageDescription>
     </gmd:contentInfo>
     <gmd:dataQualityInfo>
         <gmd:DQ_DataQuality>
