@@ -28,6 +28,7 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
+import javax.xml.ws.BindingType;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -47,11 +48,8 @@ import org.geotoolkit.wps.xml.v100.*;
  */
 @WebService(name = "WPSService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
+@BindingType(value="http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 @XmlSeeAlso({org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
-/*@XmlSeeAlso({org.geotoolkit.sml.xml.v100.ObjectFactory.class,
-             org.geotoolkit.sml.xml.v101.ObjectFactory.class,
-             org.geotoolkit.sampling.xml.v100.ObjectFactory.class,
-             org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})*/
 public class WPSService extends OGCWebService<WPSWorker> {
     
     /**
@@ -77,7 +75,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @throws WPSServiceException
      */
     @WebMethod(action="getCapabilities")
-    public WPSCapabilitiesType getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities) throws WPSServiceException  {
+    public WPSCapabilitiesType getCapabilities(@WebParam(name = "GetCapabilities", targetNamespace="http://www.opengis.net/wps/1.0.0") GetCapabilities requestCapabilities) throws WPSServiceException  {
         try {
             LOGGER.info("received SOAP getCapabilities request");
             final WPSWorker worker = getCurrentWorker();
@@ -97,7 +95,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @throws WPSServiceException
      */
     @WebMethod(action="describeProcess")
-    public ProcessDescriptions describeProcess(@WebParam(name = "DescribeProcess") DescribeProcess requestDescProcess) throws WPSServiceException  {
+    public ProcessDescriptions describeProcess(@WebParam(name = "DescribeProcess", targetNamespace="http://www.opengis.net/wps/1.0.0") DescribeProcess requestDescProcess) throws WPSServiceException  {
         try {
             LOGGER.info("received SOAP DescribeSensor request");
             final WPSWorker worker = getCurrentWorker();
@@ -117,7 +115,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @throws WPSServiceException
      */
     @WebMethod(action="Execute")
-    public Object Execute(@WebParam(name = "Execute") Execute requestExecute) throws WPSServiceException {
+    public Object Execute(@WebParam(name = "Execute", targetNamespace="http://www.opengis.net/wps/1.0.0") Execute requestExecute) throws WPSServiceException {
         try {
             LOGGER.info("received SOAP execute request");
             final WPSWorker worker = getCurrentWorker();

@@ -188,7 +188,7 @@ public class CstlEmbeddedService extends CommandLine {
 
         final String base = "http://" + host + "/";
         uri = UriBuilder.fromUri(base).port(port).build();
-        uriSoap = UriBuilder.fromUri(base + "ws-soap/").port(portsoap).build();
+        uriSoap = UriBuilder.fromUri(base).port(portsoap).build();
 
     }
 

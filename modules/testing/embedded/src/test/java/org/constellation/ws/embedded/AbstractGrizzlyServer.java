@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageReader;
 
@@ -62,6 +63,8 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.junit.Assume.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.wps.ws.soap.WPSService;
+import org.constellation.ws.CstlServiceException;
 import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 
 
@@ -313,7 +316,12 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         public void run() {
             final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{});
             cstlServer.duration = 5*60*1000;
-            cstlServer.runREST();
+            try {
+                cstlServer.serviceInstanceSOAP = new WPSService();
+            } catch (CstlServiceException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
+            cstlServer.runAll();
         }
     }
 

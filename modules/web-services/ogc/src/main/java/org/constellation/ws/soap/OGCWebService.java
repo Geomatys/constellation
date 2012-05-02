@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import javax.jws.WebService;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
@@ -152,9 +153,14 @@ public abstract class OGCWebService<W extends Worker> {
      */
     protected String getServiceURL() {
         final HttpServletRequest request =   (HttpServletRequest) context.getMessageContext().get(MessageContext.SERVLET_REQUEST);
-        String url = request.getRequestURL().toString();
-        url = url.substring(0, url.lastIndexOf('/'));
-        url = url.substring(0, url.lastIndexOf('/') + 1);
+        String url = "";
+        if (request != null) {
+            url = request.getRequestURL().toString();
+            url = url.substring(0, url.lastIndexOf('/'));
+            url = url.substring(0, url.lastIndexOf('/') + 1);
+        } else {
+            LOGGER.warning("uable to find the service URL");
+        }
         return url;
     }
 
@@ -164,9 +170,17 @@ public abstract class OGCWebService<W extends Worker> {
      * @return
      */
     private String extractWorkerID() {
+        final String pathInfo            = (String) context.getMessageContext().get(MessageContext.PATH_INFO);
         final HttpServletRequest request = (HttpServletRequest) context.getMessageContext().get(MessageContext.SERVLET_REQUEST);
-        final String url = request.getRequestURL().toString();
-        return url.substring(url.lastIndexOf('/') + 1);
+        if (request != null) {
+            final String url = request.getRequestURL().toString();
+            return url.substring(url.lastIndexOf('/') + 1);
+        } else if (pathInfo != null) {
+            return pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
+        } else {
+            LOGGER.severe("Unable to extract the servletRequest");
+            return null;
+        }
     }
 
     /**
