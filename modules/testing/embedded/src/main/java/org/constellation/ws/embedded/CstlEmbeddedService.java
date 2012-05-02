@@ -103,9 +103,12 @@ public class CstlEmbeddedService extends CommandLine {
     @Option
     protected Integer port = 9090;       //Default value
     @Option
+    protected Integer portsoap = 9191;      
+    @Option
     protected Integer duration = 20 * 60 * 1000; //minutes*seconds*millseconds; set to <=0 to last until <enter>
 
     final URI uri;
+    final URI uriSoap;
     final DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     /* ***********************************************************************
      *   CONCRETE CLASSES MUST: (see below)
@@ -185,6 +188,7 @@ public class CstlEmbeddedService extends CommandLine {
 
         final String base = "http://" + host + "/";
         uri = UriBuilder.fromUri(base).port(port).build();
+        uriSoap = UriBuilder.fromUri(base + "ws-soap/").port(portsoap).build();
 
     }
 
@@ -226,17 +230,17 @@ public class CstlEmbeddedService extends CommandLine {
     protected void runSOAP() {
 
         if (null == serviceInstanceSOAP) {
-            LOGGER.info("The Service Endpoint Instance was never defined.");
+            LOGGER.info("The SOAP Service Endpoint Instance was never defined.");
             System.exit(0);
         }
 
 
         LOGGER.log(Level.INFO, "Starting jax-ws server at: {0}", f.format(new Date()));
 
-        final String service = uri.toString() + "sos";
+        final String service = uriSoap.toString() + "wps";
         Endpoint ep =  Endpoint.create(serviceInstanceSOAP);
 
-        ep = Endpoint.publish(service, serviceInstanceSOAP);
+        ep.publish(service);
 
         LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
         LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
@@ -245,6 +249,48 @@ public class CstlEmbeddedService extends CommandLine {
 
         ep.stop();
         LOGGER.log(Level.INFO, "*Stopped jax-ws server at: {0}.", f.format(new Date()));
+    }
+
+    /**
+     * Should be called by the {@code main()} method for any web service wishing
+     * to implement a JAX-RS REST facade.
+     */
+    protected void runAll() {
+
+        grizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
+                "com.sun.jersey.api.core.PackagesResourceConfig");
+
+        LOGGER.log(Level.INFO, "Starting grizzly server at: {0}", f.format(new Date()));
+
+        HttpServer threadSelector = null;
+        try {
+            if (grizzlyWebContainerProperties.isEmpty()) {
+                threadSelector = GrizzlyWebContainerFactory.create(uri, CstlServletContainer.class);
+            } else {
+                threadSelector = GrizzlyWebContainerFactory.create(uri, CstlServletContainer.class, grizzlyWebContainerProperties);
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        LOGGER.log(Level.INFO, "Started Grizzly application server for: {0}", uri);
+        LOGGER.log(Level.INFO, "The service definition file can be found at: {0}application.wadl", uri);
+
+        final Endpoint ep;
+        if (serviceInstanceSOAP != null) {
+            final String service = uriSoap.toString() + "wps";
+            ep =  Endpoint.create(serviceInstanceSOAP);
+
+            ep.publish(service);
+
+            LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
+            LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
+        }
+        
+        stayAlive();
+
+        threadSelector.stop();
+        LOGGER.log(Level.INFO, "*Stopped grizzly server at: {0}.", f.format(new Date()));
     }
 
     /**
