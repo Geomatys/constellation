@@ -39,6 +39,7 @@ import org.constellation.wps.ws.WPSWorker;
 
 // Geotoolkit dependencies
 import org.constellation.ws.soap.OGCWebService;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.wps.xml.v100.*;
 
 
@@ -118,12 +119,17 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @throws WPSServiceException
      */
     @WebMethod(action="Execute")
-    public Object Execute(@WebParam(name = "Execute", targetNamespace="http://www.opengis.net/wps/1.0.0") Execute requestExecute) throws WPSServiceException {
+    @WebResult(name="ExecuteResponse", targetNamespace="http://www.opengis.net/wps/1.0.0")
+    public ExecuteResponse Execute(@WebParam(name = "Execute", targetNamespace="http://www.opengis.net/wps/1.0.0") Execute requestExecute) throws WPSServiceException {
         try {
             LOGGER.info("received SOAP execute request");
             final WPSWorker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.execute(requestExecute);
+            //if we receive a raw data output we throw an error
+            if (requestExecute.getResponseForm() != null && requestExecute.getResponseForm().getRawDataOutput() != null) {
+                throw new CstlServiceException("RawDataOutput is not allowed in SOAP protocol", OWSExceptionCode.INVALID_PARAMETER_VALUE, "responseForm");
+            }
+            return (ExecuteResponse) worker.execute(requestExecute);
         } catch (CstlServiceException ex) {
             throw new WPSServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.WPS_1_0_0.exceptionVersion.toString());

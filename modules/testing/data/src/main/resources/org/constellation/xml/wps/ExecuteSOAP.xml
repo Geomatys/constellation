@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <soap:Body>
+        <wps:Execute service="WPS" version="1.0.0" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <ows:Identifier>urn:ogc:geomatys:wps:math:add</ows:Identifier>
+            <wps:DataInputs>
+                <wps:Input>
+                    <ows:Identifier>urn:ogc:geomatys:wps:math:add:input:first</ows:Identifier>
+                    <ows:Title>First</ows:Title>
+                    <wps:Data>
+                        <wps:LiteralData>1</wps:LiteralData>
+                    </wps:Data>
+                </wps:Input>
+                <wps:Input>
+                    <ows:Identifier>urn:ogc:geomatys:wps:math:add:input:second</ows:Identifier>
+                    <ows:Title>Second</ows:Title>
+                    <wps:Data>
+                        <wps:LiteralData>1</wps:LiteralData>
+                    </wps:Data>
+                </wps:Input>
+            </wps:DataInputs>
+            <wps:ResponseForm>
+                <wps:ResponseDocument>
+                    <wps:Output>
+                        <ows:Identifier>urn:ogc:geomatys:wps:math:add:output:result</ows:Identifier>
+                        <ows:Title>Result</ows:Title>
+                        <ows:Abstract>Addition result</ows:Abstract>
+                    </wps:Output>
+                </wps:ResponseDocument>
+            </wps:ResponseForm>
+        </wps:Execute>
+    </soap:Body>
+</soap:Envelope>

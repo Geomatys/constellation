@@ -59,4 +59,28 @@ public class WPSSoapRequestTest extends AbstractTestSoapRequest {
         assertEquals(expResult, result);
 
     }
+    
+    /**
+     */
+    @Test
+    public void testWPSExecute() throws JAXBException, IOException {
+
+        // Creates a valid GetCapabilities url.
+        URL getCapsUrl;
+        try {
+            getCapsUrl = new URL(WPS_DEFAULT);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        
+        URLConnection conec = getCapsUrl.openConnection();
+        postRequestFile(conec, "org/constellation/xml/wps/ExecuteSOAP.xml");
+        
+        final String result    = getStringResponse(conec);
+        final String expResult = getStringFromFile("org/constellation/xml/wps/ExecuteResponseSOAP.xml");
+        
+        assertEquals(expResult, result);
+
+    }
 }

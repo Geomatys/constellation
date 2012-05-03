@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
+    <S:Body>
+        <ns4:ExecuteResponse xmlns:ns3="http://www.opengis.net/ows/1.1" xmlns:ns4="http://www.opengis.net/wps/1.0.0" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns6="http://www.opengis.net/gml" xmlns:ns7="http://soap.ws.wps.constellation.org/" serviceInstance="wps/default?SERVICE=WPS&amp;REQUEST=GetCapabilities" xml:lang="en-EN" version="1.0.0" service="WPS">
+            <ns4:Process ns4:processVersion="1.0.0">
+                <ns3:Identifier>urn:ogc:geomatys:wps:math:add</ns3:Identifier>
+                <ns3:Title>Math : Add</ns3:Title>
+                <ns3:Abstract>Adds two double.</ns3:Abstract>
+            </ns4:Process>
+            <ns4:ProcessOutputs>
+                <ns4:Output>
+                    <ns3:Identifier>urn:ogc:geomatys:wps:math:add:output:result</ns3:Identifier>
+                    <ns3:Title>Result</ns3:Title>
+                    <ns3:Abstract>Addition result</ns3:Abstract>
+                    <ns4:Data>
+                        <ns4:LiteralData dataType="java.lang.Double">2.0</ns4:LiteralData>
+                    </ns4:Data>
+                </ns4:Output>
+            </ns4:ProcessOutputs>
+        </ns4:ExecuteResponse>
+    </S:Body>
+</S:Envelope>
