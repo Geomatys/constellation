@@ -61,8 +61,7 @@ public class AbstractTestSoapRequest extends AbstractGrizzlyServer {
             sw.append(new String(buffer, 0, size));
         }
         String xmlResult = sw.toString();
-        //xmlResult = removeXmlns(xmlResult);
-        //xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
+        xmlResult = removeUpdateSequence(xmlResult);
         return xmlResult;
     }
     
@@ -92,7 +91,12 @@ public class AbstractTestSoapRequest extends AbstractGrizzlyServer {
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-
         return xmlExpResult;
+    }
+    
+    public String removeUpdateSequence(final String xml) {
+        String s = xml;
+        s = s.replaceAll("updateSequence=\"[^\"]*\" ", "");
+        return s;
     }
 }

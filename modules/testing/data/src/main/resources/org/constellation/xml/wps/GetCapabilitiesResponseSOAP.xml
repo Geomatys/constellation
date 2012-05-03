@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
+    <S:Body>
+        <ns4:Capabilities xmlns:ns3="http://www.opengis.net/ows/1.1" xmlns:ns4="http://www.opengis.net/wps/1.0.0" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns6="http://www.opengis.net/gml" xmlns:ns7="http://soap.ws.wps.constellation.org/" xml:lang="en-EN" service="WPS" version="1.0.0">
+            <ns3:ServiceIdentification>
+                <ns3:Title>WPS server</ns3:Title>
+                <ns3:Abstract>WPS server developed by Geomatys for Constallation SDI.</ns3:Abstract>
+                <ns3:Keywords>
+                    <ns3:Keyword>WPS</ns3:Keyword>
+                    <ns3:Keyword>Constallation</ns3:Keyword>
+                    <ns3:Keyword>geoprocessing</ns3:Keyword>
+                </ns3:Keywords>
+                <ns3:ServiceType>WPS</ns3:ServiceType>
+                <ns3:ServiceTypeVersion>1.0.0</ns3:ServiceTypeVersion>
+                <ns3:Fees>NONE</ns3:Fees>
+                <ns3:AccessConstraints>NONE</ns3:AccessConstraints>
+            </ns3:ServiceIdentification>
+            <ns3:ServiceProvider>
+                <ns3:ProviderName>Geomatys</ns3:ProviderName>
+                <ns3:ProviderSite ns5:href="http://www.geomatys.com/"/>
+                <ns3:ServiceContact>
+                    <ns3:IndividualName>Vincent Heurteaux</ns3:IndividualName>
+                    <ns3:PositionName>PDG</ns3:PositionName>
+                    <ns3:ContactInfo>
+                        <ns3:Phone>
+                            <ns3:Voice>04 67 54 87 30</ns3:Voice>
+                            <ns3:Facsimile></ns3:Facsimile>
+                        </ns3:Phone>
+                        <ns3:Address>
+                            <ns3:DeliveryPoint>24 rue Pierre Renaudel</ns3:DeliveryPoint>
+                            <ns3:City>ARLES</ns3:City>
+                            <ns3:AdministrativeArea>Bouches du rhone</ns3:AdministrativeArea>
+                            <ns3:PostalCode>13200</ns3:PostalCode>
+                            <ns3:Country>France</ns3:Country>
+                            <ns3:ElectronicMailAddress>vincent.heurteaux@geomatys.fr</ns3:ElectronicMailAddress>
+                        </ns3:Address>
+                    </ns3:ContactInfo>
+                </ns3:ServiceContact>
+            </ns3:ServiceProvider>
+            <ns3:OperationsMetadata>
+                <ns3:Operation name="GetCapabilities">
+                    <ns3:DCP>
+                        <ns3:HTTP>
+                            <ns3:Get ns5:href="wps/default?"/>
+                            <ns3:Post ns5:href="wps/default?"/>
+                        </ns3:HTTP>
+                    </ns3:DCP>
+                    <ns3:Parameter name="service">
+                        <ns3:AllowedValues>
+                            <ns3:Value>WPS</ns3:Value>
+                        </ns3:AllowedValues>
+                    </ns3:Parameter>
+                    <ns3:Parameter name="Acceptversions">
+                        <ns3:AllowedValues>
+                            <ns3:Value>1.0.0</ns3:Value>
+                        </ns3:AllowedValues>
+                    </ns3:Parameter>
+                    <ns3:Parameter name="AcceptFormats">
+                        <ns3:AllowedValues>
+                            <ns3:Value>text/xml</ns3:Value>
+                        </ns3:AllowedValues>
+                    </ns3:Parameter>
+                </ns3:Operation>
+                <ns3:Operation name="DescribeProcess">
+                    <ns3:DCP>
+                        <ns3:HTTP>
+                            <ns3:Get ns5:href="wps/default?"/>
+                            <ns3:Post ns5:href="wps/default?"/>
+                        </ns3:HTTP>
+                    </ns3:DCP>
+                    <ns3:Parameter name="service">
+                        <ns3:AllowedValues>
+                            <ns3:Value>WPS</ns3:Value>
+                        </ns3:AllowedValues>
+                    </ns3:Parameter>
+                    <ns3:Parameter name="version">
+                        <ns3:AllowedValues>
+                            <ns3:Value>1.0.0</ns3:Value>
+                        </ns3:AllowedValues>
+                    </ns3:Parameter>
+                </ns3:Operation>
+                <ns3:Operation name="Execute">
+                    <ns3:DCP>
+                        <ns3:HTTP>
+                            <ns3:Post ns5:href="wps/default?"/>
+                        </ns3:HTTP>
+                    </ns3:DCP>
+                    <ns3:Parameter name="service">
+                        <ns3:AllowedValues>
+                            <ns3:Value>WPS</ns3:Value>
+                        </ns3:AllowedValues>
+                    </ns3:Parameter>
+                    <ns3:Parameter name="version">
+                        <ns3:AllowedValues>
+                            <ns3:Value>1.0.0</ns3:Value>
+                        </ns3:AllowedValues>
+                    </ns3:Parameter>
+                </ns3:Operation>
+            </ns3:OperationsMetadata>
+            <ns4:ProcessOfferings>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:intersection</ns3:Identifier>
+                    <ns3:Title>Jts : Intersection</ns3:Title>
+                    <ns3:Abstract>Computes a intersection Geometry between the source geometry (geom1) and the other (geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:convexHull</ns3:Identifier>
+                    <ns3:Title>Jts : ConvexHull</ns3:Title>
+                    <ns3:Abstract>Return the convex hull geometry of the specified geometry.</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:touches</ns3:Identifier>
+                    <ns3:Title>Jts : Touches</ns3:Title>
+                    <ns3:Abstract>Returns true if this geometry(geom1) touches the specified geometry(geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:envelope</ns3:Identifier>
+                    <ns3:Title>Jts : Envelope</ns3:Title>
+                    <ns3:Abstract>Returns this Geometry bounding box.</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:crosses</ns3:Identifier>
+                    <ns3:Title>Jts : Crosses</ns3:Title>
+                    <ns3:Abstract> Returns true if this geometry source (geom1) crosses the specified geometry (geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:boundary</ns3:Identifier>
+                    <ns3:Title>Jts : Boundary</ns3:Title>
+                    <ns3:Abstract>Return boundarty geometry of an input JTS geometry</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:centroid</ns3:Identifier>
+                    <ns3:Title>Jts : Centroid</ns3:Title>
+                    <ns3:Abstract>Return the centroid point of an input JTS geometry</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:buffer</ns3:Identifier>
+                    <ns3:Title>Jts : Buffer</ns3:Title>
+                    <ns3:Abstract>Apply JTS buffer to a geometry.</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:difference</ns3:Identifier>
+                    <ns3:Title>Jts : Difference</ns3:Title>
+                    <ns3:Abstract>Computes a difference Geometry between the source geometry (geom1) and the other (geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:overlaps</ns3:Identifier>
+                    <ns3:Title>Jts : Overlaps</ns3:Title>
+                    <ns3:Abstract>Returns true if this geometry (geom1) overlaps the specified geometry (geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:isEmpty</ns3:Identifier>
+                    <ns3:Title>Jts : IsEmpty</ns3:Title>
+                    <ns3:Abstract>Returns true if this geometry source is an empty geometry.</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:area</ns3:Identifier>
+                    <ns3:Title>Jts : Area</ns3:Title>
+                    <ns3:Abstract>Return the area of a JTS geometry</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:equals2d</ns3:Identifier>
+                    <ns3:Title>Jts : Equals2d</ns3:Title>
+                    <ns3:Abstract>Return true if source geometry (geom1) is equals to the other geometry (geom2) .</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:covers</ns3:Identifier>
+                    <ns3:Title>Jts : Covers</ns3:Title>
+                    <ns3:Abstract>Returns true if this geometry source (geom1) covers the specified geometry (geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:union</ns3:Identifier>
+                    <ns3:Title>Jts : Union</ns3:Title>
+                    <ns3:Abstract>Computes a union Geometry between the source geometry (geom1) and the other (geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:intersects</ns3:Identifier>
+                    <ns3:Title>Jts : Intersects</ns3:Title>
+                    <ns3:Abstract>Returns true if this geometry source (geom1) intersects the specified geometry (geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:contain</ns3:Identifier>
+                    <ns3:Title>Jts : Contain</ns3:Title>
+                    <ns3:Abstract>Return true if source geometry (geom1) contains the specified geometry(geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:coveredBy</ns3:Identifier>
+                    <ns3:Title>Jts : CoveredBy</ns3:Title>
+                    <ns3:Abstract>Returns true if this geometry source (geom1) is covered by the specified geometry (geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:within</ns3:Identifier>
+                    <ns3:Title>Jts : Within</ns3:Title>
+                    <ns3:Abstract>Returns true if this geometry source (geom1) is within the specified geometry (geom2).</ns3:Abstract>
+                </ns4:Process>
+                <ns4:Process ns4:processVersion="1.0.0">
+                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:lenght</ns3:Identifier>
+                    <ns3:Title>Jts : Lenght</ns3:Title>
+                    <ns3:Abstract>Returns the length of this Geometry.</ns3:Abstract>
+                </ns4:Process>
+            </ns4:ProcessOfferings>
+            <ns4:Languages>
+                <ns4:Default>
+                    <ns3:Language>en-EN</ns3:Language>
+                </ns4:Default>
+                <ns4:Supported>
+                    <ns3:Language>en-EN</ns3:Language>
+                </ns4:Supported>
+            </ns4:Languages>
+            <ns4:WSDL ns5:href=""/>
+        </ns4:Capabilities>
+    </S:Body>
+</S:Envelope>
