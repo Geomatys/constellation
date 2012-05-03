@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 // JAX-WS dependencies
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
@@ -75,6 +76,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @throws WPSServiceException
      */
     @WebMethod(action="getCapabilities")
+    @WebResult(name="Capabilities", targetNamespace="http://www.opengis.net/wps/1.0.0")
     public WPSCapabilitiesType getCapabilities(@WebParam(name = "GetCapabilities", targetNamespace="http://www.opengis.net/wps/1.0.0") GetCapabilities requestCapabilities) throws WPSServiceException  {
         try {
             LOGGER.info("received SOAP getCapabilities request");
@@ -95,6 +97,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * @throws WPSServiceException
      */
     @WebMethod(action="describeProcess")
+    @WebResult(name="ProcessDescriptions", targetNamespace="http://www.opengis.net/wps/1.0.0")
     public ProcessDescriptions describeProcess(@WebParam(name = "DescribeProcess", targetNamespace="http://www.opengis.net/wps/1.0.0") DescribeProcess requestDescProcess) throws WPSServiceException  {
         try {
             LOGGER.info("received SOAP DescribeSensor request");

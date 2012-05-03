@@ -21,7 +21,7 @@ import static org.junit.Assume.*;
  *
  * @author guilhem
  */
-public class WPSSoapRequestTest extends AbstractGrizzlyServer {
+public class WPSSoapRequestTest extends AbstractTestSoapRequest {
     
     private static final String WPS_DEFAULT = "http://localhost:9191/wps/default?";
     
@@ -51,45 +51,12 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
         }
         
         URLConnection conec = getCapsUrl.openConnection();
-
         postRequestFile(conec, "org/constellation/xml/wps/DescribeProcessSOAP.xml");
         
+        final String result    = getStringResponse(conec);
+        final String expResult = getStringFromFile("org/constellation/xml/wps/DescribeProcessResponseSOAP.xml");
         
-        System.out.println(getStringResponse(conec));
-        
+        assertEquals(expResult, result);
 
-    }
-
-    public void postRequestFile(URLConnection conec, String filePath) throws IOException {
-
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "application/soap+xml");
-        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
-        final InputStream is = Util.getResourceAsStream(filePath);
-        final StringWriter sw = new StringWriter();
-        final BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        char[] buffer = new char[1024];
-        int size;
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-        wr.write(sw.toString());
-        wr.flush();
-        in.close();
-
-    }
-    
-    public String getStringResponse(URLConnection conec) throws UnsupportedEncodingException, IOException {
-        final StringWriter sw     = new StringWriter();
-        final BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
-        char [] buffer = new char[1024];
-        int size;
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-        String xmlResult = sw.toString();
-        //xmlResult = removeXmlns(xmlResult);
-        //xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
-        return xmlResult;
     }
 }
