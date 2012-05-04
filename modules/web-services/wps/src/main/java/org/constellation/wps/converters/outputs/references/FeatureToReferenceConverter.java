@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.UUID;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
-import org.constellation.wps.utils.WPSUtils;
 import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
@@ -36,7 +35,8 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 
 /**
- *
+ * Implementation of ObjectConverter to convert a {@link Feature feature} into a {@link OutputReferenceType reference}.
+ * 
  * @author Quentin Boileau (Geomatys).
  */
 public class FeatureToReferenceConverter extends AbstractReferenceOutputConverter {
@@ -53,6 +53,9 @@ public class FeatureToReferenceConverter extends AbstractReferenceOutputConverte
         return INSTANCE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public OutputReferenceType convert(final Map<String,Object> source) throws NonconvertibleObjectException {
         

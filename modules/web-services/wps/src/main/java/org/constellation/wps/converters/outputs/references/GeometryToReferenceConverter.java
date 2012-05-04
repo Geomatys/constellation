@@ -29,7 +29,8 @@ import org.geotoolkit.wps.xml.v100.OutputReferenceType;
 import org.opengis.util.FactoryException;
 
 /**
- *
+ * Implementation of ObjectConverter to convert a {@link Geometry geometry} into a {@link OutputReferenceType reference}.
+ * 
  * @author Quentin Boileau (Geomatys).
  */
 public class GeometryToReferenceConverter extends AbstractReferenceOutputConverter {
@@ -46,6 +47,9 @@ public class GeometryToReferenceConverter extends AbstractReferenceOutputConvert
         return INSTANCE;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public OutputReferenceType convert(final Map<String,Object> source) throws NonconvertibleObjectException {
         

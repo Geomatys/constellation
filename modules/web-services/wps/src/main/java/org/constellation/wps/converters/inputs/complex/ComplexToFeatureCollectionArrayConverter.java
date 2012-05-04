@@ -50,27 +50,38 @@ public final class ComplexToFeatureCollectionArrayConverter extends AbstractInpu
     }
 
     @Override
-    public Object convert(Map<String, Object> source) throws NonconvertibleObjectException {
+    public Class<? extends Object> getTargetClass() {
+        return FeatureCollection[].class;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return FeatureCollection array.
+     */
+    @Override
+    public FeatureCollection[] convert(final Map<String, Object> source) throws NonconvertibleObjectException {
 
         final List<Object> data = (List<Object>) source.get(IN_DATA);
 
         XmlFeatureReader fcollReader = null;
         try {
             fcollReader = getFeatureReader(source);
-            if(!data.isEmpty()){
-                
+            if (!data.isEmpty()) {
+
                 final List<FeatureCollection> features = new ArrayList<FeatureCollection>();
-                for(int i = 0; i<data.size(); i++){
+                for (int i = 0; i < data.size(); i++) {
                     final FeatureCollection f = (FeatureCollection) fcollReader.read(data.get(i));
                     features.add((FeatureCollection) WPSUtils.fixFeature(f));
                 }
                 return features.toArray(new FeatureCollection[features.size()]);
-            }else{
+            } else {
                 throw new NonconvertibleObjectException("Invalid data input : Empty Feature list.");
             }
 
         } catch (MalformedURLException ex) {
             throw new NonconvertibleObjectException("Unable to reach the schema url.", ex);
+        } catch (IllegalArgumentException ex) {
+            throw new NonconvertibleObjectException("Unable to read the feature with the specified schema.", ex);
         } catch (JAXBException ex) {
             throw new NonconvertibleObjectException("Unable to read the feature schema.", ex);
         } catch (CstlServiceException ex) {

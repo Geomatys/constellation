@@ -18,24 +18,19 @@ package org.constellation.wps.converters.outputs.complex;
 
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.converter.SimpleConverter;
 import org.geotoolkit.wps.xml.v100.ComplexDataType;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.util.FactoryException;
 
 
-
 /**
- * Implementation of ObjectConverter to convert a JTS Geometry array into a an object which can be supported
- * by JAXB.
+ * Implementation of ObjectConverter to convert a JTS Geometry array into a {@link ComplexDataType}.
  * 
- * @author Quentin Boileau
+ * @author Quentin Boileau (Geomatys).
  */
 public final class GeometryArrayToComplexConverter extends AbstractComplexOutputConverter {
 
@@ -51,6 +46,9 @@ public final class GeometryArrayToComplexConverter extends AbstractComplexOutput
         return INSTANCE;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ComplexDataType convert(final Map<String, Object> source) throws NonconvertibleObjectException {
         
@@ -61,10 +59,9 @@ public final class GeometryArrayToComplexConverter extends AbstractComplexOutput
         complex.setEncoding((String) source.get(OUT_ENCODING));
         
         final Geometry[] outGeom = (Geometry[]) source.get(OUT_DATA);
-        AbstractGeometryType gmlGeom = null;
         try {
             for(final Geometry jtsGeom : outGeom){
-                gmlGeom = JTStoGeometry.toGML(jtsGeom);
+                final AbstractGeometryType gmlGeom = JTStoGeometry.toGML(jtsGeom);
                 complex.getContent().add(gmlGeom);
             }
         } catch (NoSuchAuthorityCodeException ex) {

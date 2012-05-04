@@ -19,6 +19,8 @@ package org.constellation.wps.ws.rs;
 import java.util.logging.Level;
 import javax.ws.rs.Path;
 import com.sun.jersey.spi.resource.Singleton;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +46,7 @@ import org.constellation.wps.utils.WPSUtils;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.wps.ws.WPSConstant.*;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 
 import org.geotoolkit.wps.xml.v100.DataInputsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -219,14 +222,21 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 final Object executeResponse = worker.execute(exec);
 
                 boolean isTextPlain = false;
+                boolean isImage = false;
                 //if response is a literal
                 if (executeResponse instanceof String || executeResponse instanceof Double
                         || executeResponse instanceof Float || executeResponse instanceof Integer
                         || executeResponse instanceof Boolean || executeResponse instanceof Long) {
                     isTextPlain = true;
                 }
-                if (isTextPlain) {
+                if (executeResponse instanceof RenderedImage || executeResponse instanceof BufferedImage 
+                        || executeResponse instanceof GridCoverage2D) {
+                    isImage = true;
+                }
+                if (isTextPlain)  {
                     return Response.ok(executeResponse.toString(), MimeType.TEXT_PLAIN).build();
+                } else if (isImage) {
+                    return Response.ok(executeResponse.toString(), MimeType.IMAGE_PNG).build();
                 } else {
                     return Response.ok(executeResponse, MimeType.TEXT_XML).build();
                 }

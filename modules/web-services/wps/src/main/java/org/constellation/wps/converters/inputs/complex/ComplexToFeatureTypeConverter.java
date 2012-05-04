@@ -47,24 +47,30 @@ public final class ComplexToFeatureTypeConverter extends AbstractInputConverter 
     }
 
     @Override
-    public Object convert(Map<String,Object> source) throws NonconvertibleObjectException {
+    public Class<? extends Object> getTargetClass() {
+        return FeatureType.class;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return FeatureType
+     */
+    @Override
+    public FeatureType convert(final Map<String,Object> source) throws NonconvertibleObjectException {
         
         final List<Object> data = (List<Object>) source.get(IN_DATA);
         if(data.size() > 1){
            throw new NonconvertibleObjectException("Invalid data input : Only one FeatureType expected.");
         }
 
-        //Get FeatureType
-        List<FeatureType> ft = null;
         try {
             final JAXBFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
-            ft = xsdReader.read((Node)data.get(0));
+            final List<FeatureType> ft = xsdReader.read((Node)data.get(0));
             return ft.get(0);
 
         } catch (JAXBException ex) {
             throw new NonconvertibleObjectException("Unable to read feature type from xsd.", ex); 
         }
-      
     }
 }
 

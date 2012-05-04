@@ -64,5 +64,5 @@ public final class WPSConstant {
     /**
      * Temprary directory name used for store responses.
      */
-    public static final String TEMP_FOLDER = "/tmpDoc" ;
+    public static final String TEMP_FOLDER = "/wps/output" ;
 }

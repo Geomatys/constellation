@@ -16,20 +16,20 @@
  */
 package org.constellation.wps.converters.outputs.references;
 
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageWriter;
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wps.xml.v100.OutputReferenceType;
 
 /**
- *
+ * Implementation of ObjectConverter to convert a {@link RenderedImage image} into a {@link OutputReferenceType reference}.
+ * 
  * @author Quentin Boileau (Geomatys).
  */
 public class RenderedImageToReferenceConverter extends AbstractReferenceOutputConverter {
@@ -46,18 +46,23 @@ public class RenderedImageToReferenceConverter extends AbstractReferenceOutputCo
         return INSTANCE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public OutputReferenceType convert(final Map<String, Object> source) throws NonconvertibleObjectException {
         
         final OutputReferenceType reference = new OutputReferenceType();
 
-        reference.setMimeType((String) source.get(OUT_MIME));
+        final String mime = (String) source.get(OUT_MIME) != null ? (String) source.get(OUT_MIME) : "image/png";
+        
+        reference.setMimeType(mime);
         reference.setEncoding((String) source.get(OUT_ENCODING));
         reference.setSchema((String) source.get(OUT_SCHEMA));
 
         final Object data = source.get(OUT_DATA);
 
-        if (!(data instanceof RenderedImage)) {
+        if (!(data instanceof BufferedImage) && !(data instanceof RenderedImage)) {
             throw new NonconvertibleObjectException("The output data is not an instance of RenderedImage.");
         }
 
@@ -67,12 +72,12 @@ public class RenderedImageToReferenceConverter extends AbstractReferenceOutputCo
             //create file
             final File imageFile = new File((String) source.get(OUT_TMP_DIR_PATH), randomFileName);
             final RenderedImage image = (RenderedImage) data;
-            writer = XImageIO.getWriterByMIMEType((String) source.get(OUT_MIME), imageFile, image);
+            writer = XImageIO.getWriterByMIMEType(mime, imageFile, image);
             writer.write(image);
-            reference.setSchema((String) source.get(OUT_TMP_DIR_URL) + "/" + randomFileName);
+            reference.setHref((String) source.get(OUT_TMP_DIR_URL) + "/" + randomFileName);
             
         } catch (IOException ex) {
-            Logger.getLogger(RenderedImageToReferenceConverter.class.getName()).log(Level.SEVERE, null, ex);
+            throw new NonconvertibleObjectException("Error occure during image writing.", ex);
         } finally {
             if (writer != null) {
                 writer.dispose();

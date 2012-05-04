@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.UUID;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.wps.utils.WPSUtils;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
@@ -33,13 +32,12 @@ import org.geotoolkit.feature.xml.jaxp.ElementFeatureWriter;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wps.xml.v100.ComplexDataType;
-import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 
 /**
- * Implementation of ObjectConverter to convert a FeatureCollection into a an object which can be supported by JAXB.
+ * Implementation of ObjectConverter to convert a FeatureCollection into a {@link ComplexDataType}.
  *
- * @author Quentin Boileau
+ * @author Quentin Boileau (Geomatys).
  */
 public final class FeatureCollectionToComplexConverter extends AbstractComplexOutputConverter {
 
@@ -55,6 +53,9 @@ public final class FeatureCollectionToComplexConverter extends AbstractComplexOu
         return INSTANCE;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ComplexDataType convert(final Map<String, Object> source) throws NonconvertibleObjectException {
 

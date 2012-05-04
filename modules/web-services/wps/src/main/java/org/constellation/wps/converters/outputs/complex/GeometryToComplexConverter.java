@@ -27,8 +27,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.util.FactoryException;
 
 /**
- * Implementation of ObjectConverter to convert a JTS Geometry into a an object which can be supported
- * by JAXB.
+ * Implementation of ObjectConverter to convert a JTS Geometry into a {@link ComplexDataType}.
  * 
  * @author Quentin Boileau
  */
@@ -46,6 +45,9 @@ public final class GeometryToComplexConverter extends AbstractComplexOutputConve
         return INSTANCE;
     }
  
+    /**
+     * {@inheritDoc}
+     */
      @Override
     public ComplexDataType convert(final Map<String, Object> source) throws NonconvertibleObjectException {
         
@@ -55,10 +57,9 @@ public final class GeometryToComplexConverter extends AbstractComplexOutputConve
         complex.setSchema((String) source.get(OUT_SCHEMA));
         complex.setEncoding((String) source.get(OUT_ENCODING));
         
-        AbstractGeometryType gmlGeom = null;
         try {
             
-            gmlGeom = JTStoGeometry.toGML((Geometry) source.get(OUT_DATA));
+            final AbstractGeometryType gmlGeom = JTStoGeometry.toGML((Geometry) source.get(OUT_DATA));
             complex.getContent().add(gmlGeom);
             
         } catch (NoSuchAuthorityCodeException ex) {

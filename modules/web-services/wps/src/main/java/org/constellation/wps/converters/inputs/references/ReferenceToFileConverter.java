@@ -25,8 +25,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.constellation.wps.converters.inputs.AbstractInputConverter;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 
@@ -50,7 +48,17 @@ public final class ReferenceToFileConverter extends AbstractInputConverter {
     }
 
     @Override
-    public Object convert(Map<String, Object> source) throws NonconvertibleObjectException {
+    public Class<? extends Object> getTargetClass() {
+        return File.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return File.
+     */
+    @Override
+    public File convert(final Map<String, Object> source) throws NonconvertibleObjectException {
 
         File file;
         InputStream in = null;
@@ -102,7 +110,7 @@ public final class ReferenceToFileConverter extends AbstractInputConverter {
                     out.close();
                 }
             } catch (IOException ex) {
-                Logger.getLogger(ReferenceToFileConverter.class.getName()).log(Level.SEVERE, null, ex);
+                throw new NonconvertibleObjectException("Reference file invalid input : IO", ex);
             }
         }
         return file;

@@ -25,10 +25,7 @@ import org.constellation.wps.converters.inputs.AbstractInputConverter;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.converter.SimpleConverter;
 import org.opengis.util.FactoryException;
-
-
 
 /**
  * Implementation of ObjectConverter to convert a complex input into a JTS Geometry array.
@@ -50,7 +47,16 @@ public final class ComplexToGeometryArrayConverter extends AbstractInputConverte
     }
 
     @Override
-    public Object convert(Map<String,Object> source) throws NonconvertibleObjectException {
+    public Class<? extends Object> getTargetClass() {
+        return Geometry[].class;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return Geometry array.
+     */
+    @Override
+    public Geometry[] convert(final Map<String,Object> source) throws NonconvertibleObjectException {
 
         try {                
             final List<Object> data = (List<Object>) source.get(IN_DATA);

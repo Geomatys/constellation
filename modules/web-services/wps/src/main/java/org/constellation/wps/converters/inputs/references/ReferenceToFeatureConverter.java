@@ -16,7 +16,6 @@
  */
 package org.constellation.wps.converters.inputs.references;
 
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,41 +30,44 @@ import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.opengis.feature.Feature;
 
-
-
 /**
  * Implementation of ObjectConverter to convert a reference into a Feature.
- * 
+ *
  * @author Quentin Boileau (Geomatys).
  */
 public final class ReferenceToFeatureConverter extends AbstractInputConverter {
 
     private static ReferenceToFeatureConverter INSTANCE;
 
-    private ReferenceToFeatureConverter(){
+    private ReferenceToFeatureConverter() {
     }
 
-    public static synchronized ReferenceToFeatureConverter getInstance(){
-        if(INSTANCE == null){
+    public static synchronized ReferenceToFeatureConverter getInstance() {
+        if (INSTANCE == null) {
             INSTANCE = new ReferenceToFeatureConverter();
         }
         return INSTANCE;
     }
 
     @Override
-    public Object convert(final Map<String, Object> source) throws NonconvertibleObjectException {
-            
-        final String mime = (String) source.get(IN_MIME);
+    public Class<? extends Object> getTargetClass() {
+        return Feature.class;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return Feature.
+     */
+    @Override
+    public Feature convert(final Map<String, Object> source) throws NonconvertibleObjectException {
+
+        final String mime = (String) source.get(IN_MIME) != null ? (String) source.get(IN_MIME) : WPSMimeType.TEXT_XML.getValue();
         final String href = (String) source.get(IN_HREF);
-        
-        if (source.get(IN_MIME) == null) {
-            throw new NonconvertibleObjectException("Invalid reference input : typeMime can't be null.");
-        }
-        
+
         //XML
-        if (mime.equalsIgnoreCase(WPSMimeType.TEXT_XML.getValue()) || mime.equalsIgnoreCase(WPSMimeType.APP_GML.getValue()) ||
-                mime.equalsIgnoreCase(WPSMimeType.TEXT_GML.getValue())) {
-            
+        if (mime.equalsIgnoreCase(WPSMimeType.TEXT_XML.getValue()) || mime.equalsIgnoreCase(WPSMimeType.APP_GML.getValue())
+                || mime.equalsIgnoreCase(WPSMimeType.TEXT_GML.getValue())) {
+
             XmlFeatureReader fcollReader = null;
             try {
                 fcollReader = getFeatureReader(source);
@@ -74,6 +76,8 @@ public final class ReferenceToFeatureConverter extends AbstractInputConverter {
 
             } catch (CstlServiceException ex) {
                 throw new NonconvertibleObjectException("Invalid reference input : can't spread CRS.", ex);
+            } catch (IllegalArgumentException ex) {
+                throw new NonconvertibleObjectException("Unable to read the feature with the specified schema.", ex);
             } catch (JAXBException ex) {
                 throw new NonconvertibleObjectException("Invalid reference input : can't read reference schema.", ex);
             } catch (MalformedURLException ex) {

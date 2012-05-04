@@ -31,7 +31,6 @@ import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.opengis.feature.type.FeatureType;
 
 
-
 /**
  * Implementation of ObjectConverter to convert a reference into a FeatureType.
  *
@@ -52,14 +51,20 @@ public final class ReferenceToFeatureTypeConverter extends AbstractInputConverte
     }
  
     @Override
-    public Object convert(Map<String, Object> source) throws NonconvertibleObjectException {
+    public Class<? extends Object> getTargetClass() {
+        return FeatureType.class;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return FeatureType.
+     */
+    @Override
+    public FeatureType convert(final Map<String, Object> source) throws NonconvertibleObjectException {
 
-        final String mime = (String) source.get(IN_MIME);
+        final String mime = (String) source.get(IN_MIME) != null ? (String) source.get(IN_MIME) : WPSMimeType.TEXT_XML.getValue();
         final String href = (String) source.get(IN_HREF);
         
-        if (source.get(IN_MIME) == null) {
-            throw new NonconvertibleObjectException("Invalid reference input : typeMime can't be null.");
-        }
         //XML
         if (mime.equalsIgnoreCase(WPSMimeType.TEXT_XML.getValue()) || mime.equalsIgnoreCase(WPSMimeType.APP_GML.getValue()) ||
                 mime.equalsIgnoreCase(WPSMimeType.TEXT_GML.getValue())) {

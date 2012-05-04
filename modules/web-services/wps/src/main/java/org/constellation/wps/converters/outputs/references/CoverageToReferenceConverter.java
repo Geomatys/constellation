@@ -16,7 +16,6 @@
  */
 package org.constellation.wps.converters.outputs.references;
 
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.util.Map;
 import java.util.UUID;
@@ -29,7 +28,8 @@ import org.geotoolkit.wps.xml.v100.OutputReferenceType;
 import org.opengis.coverage.Coverage;
 
 /**
- *
+ * Implementation of ObjectConverter to convert a {@link GridCoverage2D coverage} into a {@link OutputReferenceType reference}.
+ * 
  * @author Quentin Boileau (Geomatys).
  */
 public class CoverageToReferenceConverter extends AbstractReferenceOutputConverter {
@@ -46,6 +46,9 @@ public class CoverageToReferenceConverter extends AbstractReferenceOutputConvert
         return INSTANCE;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public OutputReferenceType convert(final Map<String, Object> source) throws NonconvertibleObjectException {
         final OutputReferenceType reference = new OutputReferenceType();
@@ -56,7 +59,7 @@ public class CoverageToReferenceConverter extends AbstractReferenceOutputConvert
 
         final Object data = source.get(OUT_DATA);
 
-        if (!(data instanceof GridCoverage2D)) {
+        if (!(data instanceof GridCoverage2D) && !(data instanceof Coverage)) {
             throw new NonconvertibleObjectException("The output data is not an instance of GridCoverage2D.");
         }
         
@@ -81,5 +84,4 @@ public class CoverageToReferenceConverter extends AbstractReferenceOutputConvert
         
         return reference;
     }
-    
 }

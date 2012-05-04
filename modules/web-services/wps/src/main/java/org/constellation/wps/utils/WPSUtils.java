@@ -18,7 +18,6 @@ package org.constellation.wps.utils;
 
 import com.vividsolutions.jts.geom.Geometry;
 import java.io.File;
-import java.io.IOException;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -33,7 +32,6 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.constellation.wps.converters.inputs.AbstractInputConverter;
 
@@ -562,14 +560,14 @@ public class WPSUtils {
         final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
-        final List<WPSIO.DataInfo> infos = WPSIO.IOCLASSMAP.get(new WPSIO.KeyTuple(attributeClass, ioType, type));
+        final List<WPSIO.WPSSupport> infos = WPSIO.getSupports(attributeClass, ioType, type);
         
         if (infos != null) { 
-            for (WPSIO.DataInfo inputClass : infos) {
+            for (WPSIO.WPSSupport inputClass : infos) {
 
                 final ComplexDataDescriptionType complexDesc = new ComplexDataDescriptionType();
                 complexDesc.setEncoding(inputClass.getEncoding() != null ? inputClass.getEncoding().getValue() : null); //Encoding
-                complexDesc.setMimeType(inputClass.getMime() != null ? inputClass.getMime().getValue() : null);                    //Mime
+                complexDesc.setMimeType(inputClass.getMime() != null ? inputClass.getMime() : null);                    //Mime
                 complexDesc.setSchema(inputClass.getSchema() != null ? inputClass.getSchema().getValue() : null);       //URL to xsd schema
 
                 if (inputClass.isDefaultIO()) {

@@ -16,6 +16,7 @@
  */
 package org.constellation.wps.converters.inputs.references;
 
+import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,33 +31,43 @@ import org.geotoolkit.util.converter.NonconvertibleObjectException;
  * @author Quentin Boileau (Geomatys).
  */
 public class ReferenceToRenderedImageConverter extends AbstractInputConverter {
-    
+
     private static ReferenceToRenderedImageConverter INSTANCE;
 
-    private ReferenceToRenderedImageConverter(){}
+    private ReferenceToRenderedImageConverter() {
+    }
 
-    public static synchronized ReferenceToRenderedImageConverter getInstance(){
-        if(INSTANCE == null){
+    public static synchronized ReferenceToRenderedImageConverter getInstance() {
+        if (INSTANCE == null) {
             INSTANCE = new ReferenceToRenderedImageConverter();
         }
         return INSTANCE;
     }
 
     @Override
-    public Object convert(final Map<String, Object> source) throws NonconvertibleObjectException {
+    public Class<? extends Object> getTargetClass() {
+        return RenderedImage.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return RenderedImage.
+     */
+    @Override
+    public RenderedImage convert(final Map<String, Object> source) throws NonconvertibleObjectException {
 
         final String href = (String) source.get(IN_HREF);
-        
+
         try {
             final URL url = new URL(href);
-            final ImageReader imageReader =  XImageIO.getReader(url, true, true);
+            final ImageReader imageReader = XImageIO.getReader(url, true, true);
             //read the first image.
             return imageReader.read(0);
         } catch (MalformedURLException ex) {
-            throw new NonconvertibleObjectException("Reference image invalid URL : Malformed url",ex);
+            throw new NonconvertibleObjectException("Reference image invalid URL : Malformed url", ex);
         } catch (IOException ex) {
-            throw new NonconvertibleObjectException("Reference image invalid input : IO",ex);
+            throw new NonconvertibleObjectException("Reference image invalid input : IO", ex);
         }
     }
-    
 }

@@ -49,25 +49,35 @@ public final class ComplexToFeatureCollectionConverter extends AbstractInputConv
     }
 
     @Override
-    public FeatureCollection convert(Map<String, Object> source) throws NonconvertibleObjectException {
+    public Class<? extends Object> getTargetClass() {
+        return FeatureCollection.class;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return FeatureCollection
+     */
+    @Override
+    public FeatureCollection convert(final Map<String, Object> source) throws NonconvertibleObjectException {
 
         final List<Object> data = (List<Object>) source.get(IN_DATA);
 
         if (data.size() > 1) {
-            throw new NonconvertibleObjectException("Invalid data input : Only one Feature/FeatureCollection expected.");
+            throw new NonconvertibleObjectException("Invalid data input : Only one FeatureCollection expected.");
         }
-        FeatureCollection extractData = null;
 
         //Read featureCollection
         XmlFeatureReader fcollReader = null;
         try {
             
             fcollReader = getFeatureReader(source);
-            extractData = (FeatureCollection) fcollReader.read(data.get(0));
+            FeatureCollection extractData = (FeatureCollection) fcollReader.read(data.get(0));
             return (FeatureCollection) WPSUtils.fixFeature( extractData);
 
         } catch (MalformedURLException ex) {
             throw new NonconvertibleObjectException("Unable to reach the schema url.", ex);
+        } catch (IllegalArgumentException ex) {
+            throw new NonconvertibleObjectException("Unable to read the feature with the specified schema.", ex);
         } catch (JAXBException ex) {
             throw new NonconvertibleObjectException("Unable to read the feature schema.", ex);
         } catch (CstlServiceException ex) {

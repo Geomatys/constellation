@@ -31,7 +31,7 @@ import org.opengis.feature.Feature;
 
 /**
  * Implementation of ObjectConverter to convert a complex input into a Feature.
- * 
+ *
  * @author Quentin Boileau (Geomatys).
  */
 public final class ComplexToFeatureConverter extends AbstractInputConverter {
@@ -49,27 +49,36 @@ public final class ComplexToFeatureConverter extends AbstractInputConverter {
     }
 
     @Override
-    public Object convert(Map<String, Object> source) throws NonconvertibleObjectException {
+    public Class<? extends Object> getTargetClass() {
+        return Feature.class;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return Feature
+     */
+    @Override
+    public Feature convert(final Map<String, Object> source) throws NonconvertibleObjectException {
 
 
         final List<Object> data = (List<Object>) source.get(IN_DATA);
 
         if (data.size() > 1) {
-            throw new NonconvertibleObjectException("Invalid data input : Only one Feature/FeatureCollection expected.");
+            throw new NonconvertibleObjectException("Invalid data input : Only one Feature expected.");
         }
-        
-        Feature extractData = null;
 
         //Read featureCollection
         XmlFeatureReader fcollReader = null;
         try {
-            
+
             fcollReader = getFeatureReader(source);
-            extractData = (Feature) fcollReader.read(data.get(0));
+            final Feature extractData = (Feature) fcollReader.read(data.get(0));
             return (Feature) WPSUtils.fixFeature(extractData);
 
         } catch (MalformedURLException ex) {
             throw new NonconvertibleObjectException("Unable to reach the schema url.", ex);
+        } catch (IllegalArgumentException ex) {
+            throw new NonconvertibleObjectException("Unable to read the feature with the specified schema.", ex);
         } catch (JAXBException ex) {
             throw new NonconvertibleObjectException("Unable to read the feature schema.", ex);
         } catch (CstlServiceException ex) {

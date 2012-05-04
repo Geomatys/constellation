@@ -26,20 +26,13 @@ import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
+import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.converter.SimpleConverter;
 import org.opengis.feature.type.FeatureType;
 
 /**
  * An abstract class to define the source and target class used by all input converter.
  * 
- * <ul> 
- * <li>inData : data object from complex input.</li> 
- * <li>inHref : the url to the data in reference case.</li> 
- * <li>inMime : mime type of the data like text/xml, ...</li> 
- * <li>inEncoding : is the data requires a schema</li> 
- * <li>encoding : the data encoding like UTF8, ...</li> 
- * </ul>
- *
  * @author Quentin Boileau (Geomatys).
  */
 public abstract class AbstractInputConverter extends SimpleConverter<Map<String, Object>, Object> {
@@ -61,6 +54,23 @@ public abstract class AbstractInputConverter extends SimpleConverter<Map<String,
     }
 
     /**
+     * Convert the data from source Map into the requested {@code Object}. 
+     * The {@code source} Map contain : 
+     * <ul>
+     *      <li>inData : data object from complex input.</li>
+     *      <li>inHref : the url to the data in reference case.</li>
+     *      <li>inMime : mime type of the data like text/xml, ...</li>
+     *      <li>inEncoding : is the data requires a schema</li>
+     *      <li>encoding : the data encoding like UTF8, ...</li>
+     * </ul>
+     * @param source
+     * @return the converted inData into the specialized converter output object.
+     * @throws NonconvertibleObjectException if an error occurs durring the convertion processing.
+     */
+    @Override
+    public abstract Object convert(Map<String, Object> source) throws NonconvertibleObjectException;
+    
+    /**
      * Get the JAXPStreamFeatureReader to read feature. If there is a schema defined, the JAXPStreamFeatureReader will
      * use it overwise it will use the embedded.
      *
@@ -71,20 +81,24 @@ public abstract class AbstractInputConverter extends SimpleConverter<Map<String,
      * @throws IOException
      */
     protected XmlFeatureReader getFeatureReader(final Map<String, Object> source) throws MalformedURLException, JAXBException, IOException {
+        
+        JAXPStreamFeatureReader featureReader = new JAXPStreamFeatureReader();
+        try {
+            final XmlFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
+            final String schema = (String) source.get(IN_SCHEMA);
 
-        final JAXPStreamFeatureReader featureReader;
-        final XmlFeatureTypeReader xsdReader = new JAXBFeatureTypeReader();
-        final String schema = (String) source.get(IN_SCHEMA);
-
-        if (schema != null) {
-            final URL schemaURL = new URL(schema);
-            final List<FeatureType> featureTypes = xsdReader.read(schemaURL.openStream());
-            if (featureTypes != null) {
-                return new JAXPStreamFeatureReader(featureTypes);
+            if (schema != null) {
+                final URL schemaURL = new URL(schema);
+                final List<FeatureType> featureTypes = xsdReader.read(schemaURL.openStream());
+                if (featureTypes != null) {
+                    featureReader = new JAXPStreamFeatureReader(featureTypes);
+                }
+            } else {
+                featureReader.setReadEmbeddedFeatureType(true);
             }
+        } catch(JAXBException ex) {
+            featureReader.setReadEmbeddedFeatureType(true);
         }
-        featureReader = new JAXPStreamFeatureReader();
-        featureReader.setReadEmbeddedFeatureType(true);
         return featureReader;
     }
 }

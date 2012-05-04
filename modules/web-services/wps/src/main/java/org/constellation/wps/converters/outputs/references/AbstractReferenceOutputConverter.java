@@ -17,6 +17,7 @@
 package org.constellation.wps.converters.outputs.references;
 
 import java.util.Map;
+import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.util.converter.SimpleConverter;
 import org.geotoolkit.wps.xml.v100.ComplexDataType;
 import org.geotoolkit.wps.xml.v100.OutputReferenceType;
@@ -45,4 +46,21 @@ public abstract class AbstractReferenceOutputConverter extends SimpleConverter<M
     }
 
 
+    /**
+     * Convert the data from source Map into {@link ComplexDataType}. 
+     * The {@code source} Map contain : 
+     * <ul>
+     *      <li>outData : the object to convert into {@link ComplexDataType}.</li>
+     *      <li>outMime : the requested mime type for the output.</li>
+     *      <li>outEncoding : the requested encoding for the output</li>
+     *      <li>outSchema : the schema of the complex output</li>
+     *      <li>outTempDirectoryPath : the absolute path to the output storage like schemas.</li>
+     *      <li>outTempDirectoryUrl : the URL path to the web accessible storage folder.</li>
+     * </ul>
+     * @param source
+     * @return the converted outData into {@link ComplexDataType}.
+     * @throws NonconvertibleObjectException if an error occurs durring the convertion processing.
+     */
+    @Override
+    public abstract OutputReferenceType convert(final Map<String, Object> source) throws NonconvertibleObjectException;
 }

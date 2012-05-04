@@ -16,7 +16,6 @@
  */
 package org.constellation.wps.converters.inputs.complex;
 
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -33,46 +32,57 @@ import org.opengis.feature.Feature;
 
 /**
  * Implementation of ObjectConverter to convert a complex input into a Feature array.
- * 
+ *
  * @author Quentin Boileau (Geomatys).
  */
 public final class ComplexToFeatureArrayConverter extends AbstractInputConverter {
 
     private static ComplexToFeatureArrayConverter INSTANCE;
 
-    private ComplexToFeatureArrayConverter(){
+    private ComplexToFeatureArrayConverter() {
     }
 
     public static synchronized ComplexToFeatureArrayConverter getInstance() {
-        if(INSTANCE == null){
+        if (INSTANCE == null) {
             INSTANCE = new ComplexToFeatureArrayConverter();
         }
         return INSTANCE;
     }
-   
+
     @Override
-    public Object convert(Map<String,Object> source) throws NonconvertibleObjectException {
-        
+    public Class<? extends Object> getTargetClass() {
+        return Feature[].class;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @return Feature array.
+     */
+    @Override
+    public Feature[] convert(final Map<String, Object> source) throws NonconvertibleObjectException {
+
         final List<Object> data = (List<Object>) source.get(IN_DATA);
-            
-        
+
+
         XmlFeatureReader fcollReader = null;
         try {
             fcollReader = getFeatureReader(source);
-            if(!data.isEmpty()){
-                
+            if (!data.isEmpty()) {
+
                 final List<Feature> features = new ArrayList<Feature>();
-                for(int i = 0; i<data.size(); i++){
+                for (int i = 0; i < data.size(); i++) {
                     final Feature f = (Feature) fcollReader.read(data.get(i));
                     features.add((Feature) WPSUtils.fixFeature(f));
                 }
                 return features.toArray(new Feature[features.size()]);
-            }else{
+            } else {
                 throw new NonconvertibleObjectException("Invalid data input : Empty Feature list.");
             }
 
         } catch (MalformedURLException ex) {
             throw new NonconvertibleObjectException("Unable to reach the schema url.", ex);
+        } catch (IllegalArgumentException ex) {
+            throw new NonconvertibleObjectException("Unable to read the feature with the specified schema.", ex);
         } catch (JAXBException ex) {
             throw new NonconvertibleObjectException("Unable to read the feature schema.", ex);
         } catch (CstlServiceException ex) {
@@ -86,7 +96,5 @@ public final class ComplexToFeatureArrayConverter extends AbstractInputConverter
                 fcollReader.dispose();
             }
         }
-      
     }
 }
-

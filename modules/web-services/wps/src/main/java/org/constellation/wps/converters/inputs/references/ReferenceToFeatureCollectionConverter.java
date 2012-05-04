@@ -38,12 +38,9 @@ import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 
 /**
- * Implementation of ObjectConverter to convert a reference into a FeatureCollection. Reference is define by a
- * <code>Map<String,String></code> with entries keys : <ul> <li>href : Url to the data GML or shapefile</li> <li>mime :
- * mime type of the data like text/xml, ...</li> <li>schema : is the data requires a schema</li> <li>encoding : the data
- * encoding like UTF8, ...</li> <li>method : GET or POST</li> </ul>
+ * Implementation of ObjectConverter to convert a reference into a FeatureCollection.
  *
- * @author Quentin Boileau
+ * @author Quentin Boileau (Geomatys).
  */
 public final class ReferenceToFeatureCollectionConverter extends AbstractInputConverter {
 
@@ -60,20 +57,27 @@ public final class ReferenceToFeatureCollectionConverter extends AbstractInputCo
     }
 
     @Override
-    public Object convert(Map<String, Object> source) throws NonconvertibleObjectException {
+    public Class<? extends Object> getTargetClass() {
+        return FeatureCollection.class;
+    }
 
-        
-        final String mime = (String) source.get(IN_MIME);
+    /**
+     * {@inheritDoc}
+     *
+     * @return FeatureCollection.
+     */
+    @Override
+    public FeatureCollection convert(final Map<String, Object> source) throws NonconvertibleObjectException {
+
+
+        final String mime = (String) source.get(IN_MIME) != null ? (String) source.get(IN_MIME) : WPSMimeType.TEXT_XML.getValue();
         final String href = (String) source.get(IN_HREF);
-        
-        if (source.get(IN_MIME) == null) {
-            throw new NonconvertibleObjectException("Invalid reference input : typeMime can't be null.");
-        }
-        
+
         //XML
-        if (mime.equalsIgnoreCase(WPSMimeType.TEXT_XML.getValue()) || mime.equalsIgnoreCase(WPSMimeType.APP_GML.getValue()) ||
-                mime.equalsIgnoreCase(WPSMimeType.TEXT_GML.getValue())) {
-            
+        if (mime.equalsIgnoreCase(WPSMimeType.TEXT_XML.getValue())
+                || mime.equalsIgnoreCase(WPSMimeType.APP_GML.getValue())
+                || mime.equalsIgnoreCase(WPSMimeType.TEXT_GML.getValue())) {
+
             XmlFeatureReader fcollReader = null;
             try {
                 fcollReader = getFeatureReader(source);
@@ -82,6 +86,8 @@ public final class ReferenceToFeatureCollectionConverter extends AbstractInputCo
 
             } catch (CstlServiceException ex) {
                 throw new NonconvertibleObjectException("Invalid reference input : can't spread CRS.", ex);
+            } catch (IllegalArgumentException ex) {
+                throw new NonconvertibleObjectException("Unable to read the feature with the specified schema.", ex);
             } catch (JAXBException ex) {
                 throw new NonconvertibleObjectException("Invalid reference input : can't read reference schema.", ex);
             } catch (MalformedURLException ex) {
@@ -96,7 +102,8 @@ public final class ReferenceToFeatureCollectionConverter extends AbstractInputCo
                 }
             }
             // SHP
-        } else if (mime.equalsIgnoreCase(WPSMimeType.APP_SHP.getValue()) || mime.equalsIgnoreCase(WPSMimeType.APP_OCTET.getValue())) {
+        } else if (mime.equalsIgnoreCase(WPSMimeType.APP_SHP.getValue())
+                || mime.equalsIgnoreCase(WPSMimeType.APP_OCTET.getValue())) {
 
             try {
                 Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);

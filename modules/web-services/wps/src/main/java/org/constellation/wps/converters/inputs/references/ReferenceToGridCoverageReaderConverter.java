@@ -16,7 +16,6 @@
  */
 package org.constellation.wps.converters.inputs.references;
 
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,40 +25,49 @@ import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.converter.SimpleConverter;
 
 /**
  * Implementation of ObjectConverter to convert a reference into a GridCoverageReader.
- * 
+ *
  * @author Quentin Boileau (Geomatys).
  */
 public final class ReferenceToGridCoverageReaderConverter extends AbstractInputConverter {
 
     private static ReferenceToGridCoverageReaderConverter INSTANCE;
 
-    private ReferenceToGridCoverageReaderConverter(){
+    private ReferenceToGridCoverageReaderConverter() {
     }
 
-    public static synchronized ReferenceToGridCoverageReaderConverter getInstance(){
-        if(INSTANCE == null){
+    public static synchronized ReferenceToGridCoverageReaderConverter getInstance() {
+        if (INSTANCE == null) {
             INSTANCE = new ReferenceToGridCoverageReaderConverter();
         }
         return INSTANCE;
     }
- 
+
     @Override
-    public Object convert(final Map<String, Object> source) throws NonconvertibleObjectException {
-                    
+    public Class<? extends Object> getTargetClass() {
+        return GridCoverageReader.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return GridCoverageReader.
+     */
+    @Override
+    public GridCoverageReader convert(final Map<String, Object> source) throws NonconvertibleObjectException {
+
         final String href = (String) source.get(IN_HREF);
         try {
             final URL url = new URL(href);
             return CoverageIO.createSimpleReader(url);
         } catch (MalformedURLException ex) {
-            throw new NonconvertibleObjectException("Reference grid coverage invalid input : Malformed url",ex);
+            throw new NonconvertibleObjectException("Reference grid coverage invalid input : Malformed url", ex);
         } catch (CoverageStoreException ex) {
-            throw new NonconvertibleObjectException("Reference grid coverage invalid input : Can't read coverage",ex);
+            throw new NonconvertibleObjectException("Reference grid coverage invalid input : Can't read coverage", ex);
         } catch (IOException ex) {
-            throw new NonconvertibleObjectException("Reference grid coverage invalid input : IO",ex);
+            throw new NonconvertibleObjectException("Reference grid coverage invalid input : IO", ex);
         }
     }
 }

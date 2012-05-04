@@ -16,7 +16,6 @@
  */
 package org.constellation.wps.converters.inputs.references;
 
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -29,44 +28,54 @@ import org.geotoolkit.util.converter.NonconvertibleObjectException;
 
 /**
  * Implementation of ObjectConverter to convert a reference into a GridCoverage2D.
- * 
+ *
  * @author Quentin Boileau (Geomatys).
  */
 public final class ReferenceToGridCoverage2DConverter extends AbstractInputConverter {
 
     private static ReferenceToGridCoverage2DConverter INSTANCE;
 
-    private ReferenceToGridCoverage2DConverter(){
+    private ReferenceToGridCoverage2DConverter() {
     }
 
-    public static synchronized ReferenceToGridCoverage2DConverter getInstance(){
-        if(INSTANCE == null){
+    public static synchronized ReferenceToGridCoverage2DConverter getInstance() {
+        if (INSTANCE == null) {
             INSTANCE = new ReferenceToGridCoverage2DConverter();
         }
         return INSTANCE;
     }
 
     @Override
-    public Object convert(final Map<String, Object> source) throws NonconvertibleObjectException {
-                    
+    public Class<? extends Object> getTargetClass() {
+        return GridCoverage2D.class;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return GridCoverage2D.
+     */
+    @Override
+    public GridCoverage2D convert(final Map<String, Object> source) throws NonconvertibleObjectException {
+
         final String href = (String) source.get(IN_HREF);
         GridCoverageReader reader = null;
-        try{
-            
+        try {
+
             final URL url = new URL(href);
             reader = CoverageIO.createSimpleReader(url);
-            return (GridCoverage2D)reader.read(0, null);
-            
+            return (GridCoverage2D) reader.read(0, null);
+
         } catch (MalformedURLException ex) {
-            throw new NonconvertibleObjectException("Reference coverage invalid input : IO",ex);
+            throw new NonconvertibleObjectException("Reference coverage invalid input : IO", ex);
         } catch (CoverageStoreException ex) {
-            throw new NonconvertibleObjectException("Reference coverage invalid input : Can't read coverage",ex);
+            throw new NonconvertibleObjectException("Reference coverage invalid input : Can't read coverage", ex);
         } finally {
-            if( reader != null ) {
+            if (reader != null) {
                 try {
                     reader.dispose();
                 } catch (CoverageStoreException ex) {
-                    throw new NonconvertibleObjectException("Error during release the coverage reader.",ex);
+                    throw new NonconvertibleObjectException("Error during release the coverage reader.", ex);
                 }
             }
         }

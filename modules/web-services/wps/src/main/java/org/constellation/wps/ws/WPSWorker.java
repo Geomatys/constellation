@@ -23,12 +23,12 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.measure.converter.UnitConverter;
+import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.geotoolkit.ows.xml.v110.AnyValue;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
@@ -67,7 +67,6 @@ import org.geotoolkit.wps.xml.v100.ResponseDocumentType;
 import org.geotoolkit.wps.xml.v100.ResponseFormType;
 import org.geotoolkit.wps.xml.v100.StatusType;
 import org.geotoolkit.geometry.isoonjts.GeometryUtils;
-import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.process.ProcessingRegistry;
@@ -394,12 +393,12 @@ public class WPSWorker extends AbstractWorker {
             }
 
             final ProcessDescriptionType descriptionType = new ProcessDescriptionType();
-            descriptionType.setIdentifier(identifier);          //Process Identifier
-            descriptionType.setTitle(WPSUtils.buildProcessTitle(processDesc));                //Process Title
+            descriptionType.setIdentifier(identifier);                                                                      //Process Identifier
+            descriptionType.setTitle(WPSUtils.buildProcessTitle(processDesc));                                              //Process Title
             descriptionType.setAbstract(WPSUtils.capitalizeFirstLetter(processDesc.getProcedureDescription().toString()));  //Process abstract
-            descriptionType.setProcessVersion(WPS_1_0_0);
-            descriptionType.setWSDL(null);                      //TODO WSDL
-            descriptionType.setStatusSupported(false);          //TODO support process status
+            descriptionType.setProcessVersion(WPS_1_0_0);                                                                   //Process verstion 
+            descriptionType.setWSDL(null);                                                                                  //TODO WSDL
+            descriptionType.setStatusSupported(true);         
             descriptionType.setStoreSupported(WPSService.SUPPORT_STORAGE);
 
             // Get process input and output descriptors
@@ -429,7 +428,7 @@ public class WPSWorker extends AbstractWorker {
                     final Class clazz = paramDesc.getValueClass();
 
                     // BoundingBox type
-                    if (clazz.equals(Envelope.class)) {
+                    if (WPSIO.isSupportedBBoxInputClass(clazz)) {
                         in.setBoundingBoxData(WPS_SUPPORTED_CRS);
 
                         //Complex type (XML, ...)     
@@ -496,7 +495,7 @@ public class WPSWorker extends AbstractWorker {
                     final Class clazz = paramDesc.getValueClass();
 
                     //BoundingBox type
-                    if (clazz.equals(JTSEnvelope2D.class)) {
+                    if (WPSIO.isSupportedBBoxOutputClass(clazz)) {
                         out.setBoundingBoxOutput(WPS_SUPPORTED_CRS);
 
                         //Complex type (XML, raster, ...)
@@ -641,7 +640,7 @@ public class WPSWorker extends AbstractWorker {
         boolean useStorage = isOutputRespDoc ? respDoc.isStoreExecuteResponse() : false;
         final List<DocumentOutputDefinitionType> wantedOutputs = isOutputRespDoc ? respDoc.getOutput() : null;
 
-        LOGGER.log(Level.INFO, "Request : [Lineage=" + isLineage + ", Storage=" + useStatus + ", Status=" + useStorage + "]");
+        //LOGGER.log(Level.INFO, "Request : [Lineage=" + isLineage + ", Storage=" + useStatus + ", Status=" + useStorage + "]");
 
 
         //Input temporary files used by the process. In order to delete them at the end of the process.
@@ -845,7 +844,7 @@ public class WPSWorker extends AbstractWorker {
             final Class expectedClass = inputDescriptor.getValueClass();
 
             Object dataValue = null;
-            LOGGER.log(Level.INFO, "Input : " + inputIdentifier + " : expected Class " + expectedClass.getCanonicalName());
+            //LOGGER.log(Level.INFO, "Input : " + inputIdentifier + " : expected Class " + expectedClass.getCanonicalName());
 
 
             /**
@@ -858,7 +857,6 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("The input" + inputIdentifier + " can't handle reference.", INVALID_PARAMETER_VALUE, inputIdentifier);
                 }
                 final InputReferenceType requestedRef = inputRequest.getReference();
-                LOGGER.log(Level.INFO, "LOG -> Input -> Reference");
                 final String href = requestedRef.getHref();
                 final String method = requestedRef.getMethod();
                 final String mime = requestedRef.getMimeType();
@@ -882,7 +880,6 @@ public class WPSWorker extends AbstractWorker {
              * Handle Bbox input data.
              */
             if (isBBox) {
-                LOGGER.log(Level.INFO, "LOG -> Input -> Boundingbox");
                 final BoundingBoxType bBox = inputRequest.getData().getBoundingBoxData();
                 final List<Double> lower = bBox.getLowerCorner();
                 final List<Double> upper = bBox.getUpperCorner();
@@ -915,7 +912,6 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Complex value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
                 }
 
-                LOGGER.log(Level.INFO, "LOG -> Input -> Complex");
 
                 final ComplexDataType complex = inputRequest.getData().getComplexData();
                 final String mime = complex.getMimeType();
@@ -957,14 +953,20 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Literal value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
                 }
 
-                LOGGER.log(Level.INFO, "LOG -> Input -> Literal");
-
                 final LiteralDataType literal = inputRequest.getData().getLiteralData();
                 final String data = literal.getValue();
-
-                //convert String into expected type
-                dataValue = WPSUtils.convertFromString(data, expectedClass);
-                LOGGER.log(Level.INFO, "DEBUG -> Input -> Literal -> Value={0}", dataValue);
+                
+                if (inputDescriptor.getUnit() != null) {
+                    final Unit paramUnit = inputDescriptor.getUnit();
+                    final Unit requestedUnit = Unit.valueOf(literal.getUom());
+                    final UnitConverter converter = requestedUnit.getConverterTo(paramUnit);
+                    dataValue = Double.valueOf(converter.convert(Double.valueOf(data)));
+                    
+                } else {
+                    //convert String into expected type
+                    dataValue = WPSUtils.convertFromString(data, expectedClass);
+                }
+                
             }
 
             try {
@@ -1064,12 +1066,10 @@ public class WPSWorker extends AbstractWorker {
             final DataType data = new DataType();
 
             if (WPSIO.isSupportedBBoxOutputClass(outClass)) {
-                LOGGER.log(Level.INFO, "LOG -> Output -> BoundingBox");
                 org.opengis.geometry.Envelope envelop = (org.opengis.geometry.Envelope) outputValue;
                 data.setBoundingBoxData(new BoundingBoxType(envelop));
 
             } else if (WPSIO.isSupportedComplexOutputClass(outClass)) {
-                LOGGER.log(Level.INFO, "LOG -> Output -> Complex");
                 
                 final Map<String, Object> parameters = new HashMap<String, Object>();
                 parameters.put(AbstractComplexOutputConverter.OUT_DATA, outputValue);
@@ -1093,7 +1093,6 @@ public class WPSWorker extends AbstractWorker {
                 }
 
             } else if (WPSIO.isSupportedLiteralOutputClass(outClass)) {
-                LOGGER.log(Level.INFO, "LOG -> Output -> Literal");
                 final LiteralDataType literal = new LiteralDataType();
                 literal.setDataType(outClass.getCanonicalName());
                 if (outputValue == null) {
@@ -1179,7 +1178,7 @@ public class WPSWorker extends AbstractWorker {
 
         if (outputValue instanceof Geometry) {
             try {
-
+                
                 final Geometry jtsGeom = (Geometry) outputValue;
                 final AbstractGeometryType gmlGeom = JTStoGeometry.toGML(jtsGeom);
                 return gmlGeom;

@@ -21,11 +21,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.wps.utils.WPSUtils;
 import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.ElementFeatureWriter;
@@ -37,10 +37,9 @@ import org.opengis.feature.type.FeatureType;
 
 
 /**
- * Implementation of ObjectConverter to convert a Feature into a an object which can be supported
- * by JAXB.
+ * Implementation of ObjectConverter to convert a Feature into a {@link ComplexDataType}.
  * 
- * @author Quentin Boileau
+ * @author Quentin Boileau (Geoamtys).
  */
 public final class FeatureToComplexConverter extends AbstractComplexOutputConverter {
 
@@ -56,6 +55,9 @@ public final class FeatureToComplexConverter extends AbstractComplexOutputConver
         return INSTANCE;
     } 
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ComplexDataType convert(final Map<String, Object> source) throws NonconvertibleObjectException {
         
@@ -69,6 +71,8 @@ public final class FeatureToComplexConverter extends AbstractComplexOutputConver
         }
         final Feature feature = (Feature) source.get(OUT_DATA);
         final FeatureType ft = feature.getType();
+        final String namespace = ft.getName().getURI();
+        final Map<String, String> schemaLocation = new HashMap<String, String>();
         
         try {
             
@@ -81,7 +85,7 @@ public final class FeatureToComplexConverter extends AbstractComplexOutputConver
             xmlFTWriter.write(ft, stream);
             
             complex.setSchema((String) source.get(OUT_TMP_DIR_URL) + "/" +schemaFileName);
-        
+            schemaLocation.put(namespace, complex.getSchema());
         } catch (JAXBException ex) {
             throw new NonconvertibleObjectException("Can't write FeatureType into xsd schema.",ex);
         } catch (FileNotFoundException ex) {
@@ -90,7 +94,7 @@ public final class FeatureToComplexConverter extends AbstractComplexOutputConver
         
         try {
             
-            final ElementFeatureWriter efw = new ElementFeatureWriter();
+            final ElementFeatureWriter efw = new ElementFeatureWriter(schemaLocation);
             complex.getContent().add(efw.writeFeature(feature, null, true));
             
         } catch (ParserConfigurationException ex) {
