@@ -29,6 +29,8 @@ import java.util.logging.Level;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.ws.Endpoint;
 import com.sun.jersey.api.container.grizzly2.servlet.GrizzlyWebContainerFactory;
+import java.util.*;
+import java.util.Map.Entry;
 import org.constellation.ws.rs.CstlServletContainer;
 import org.glassfish.grizzly.http.server.HttpServer;
 
@@ -123,7 +125,7 @@ public class CstlEmbeddedService extends CommandLine {
     //  below we add in one of the properties needed by all services.
     protected Map<String, String> grizzlyWebContainerProperties = new HashMap<String, String>();
     //FOR SOAP, DEFINE THIS REFERENCE:
-    protected Object serviceInstanceSOAP = null;
+    protected final Map<String, Object> serviceInstanceSOAP = new HashMap<String, Object>();
 
     //INCLUDE THIS MAIN.
 //	public static void main(String[] args) {
@@ -229,7 +231,7 @@ public class CstlEmbeddedService extends CommandLine {
      */
     protected void runSOAP() {
 
-        if (null == serviceInstanceSOAP) {
+        if (serviceInstanceSOAP.isEmpty()) {
             LOGGER.info("The SOAP Service Endpoint Instance was never defined.");
             System.exit(0);
         }
@@ -237,17 +239,21 @@ public class CstlEmbeddedService extends CommandLine {
 
         LOGGER.log(Level.INFO, "Starting jax-ws server at: {0}", f.format(new Date()));
 
-        final String service = uriSoap.toString() + "wps";
-        Endpoint ep =  Endpoint.create(serviceInstanceSOAP);
-
-        ep.publish(service);
-
-        LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
-        LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
+        final List<Endpoint> eps = new ArrayList<Endpoint>();
+        for (Entry<String, Object> instance : serviceInstanceSOAP.entrySet()) {
+            final String service = uriSoap.toString() + instance.getKey();
+            Endpoint ep =  Endpoint.create(instance.getValue());
+            ep.publish(service);
+            eps.add(ep);
+            LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
+            LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
+        }
+        
 
         stayAlive();
-
-        ep.stop();
+        for (Endpoint ep : eps) {
+            ep.stop();
+        }
         LOGGER.log(Level.INFO, "*Stopped jax-ws server at: {0}.", f.format(new Date()));
     }
 
@@ -276,12 +282,12 @@ public class CstlEmbeddedService extends CommandLine {
         LOGGER.log(Level.INFO, "Started Grizzly application server for: {0}", uri);
         LOGGER.log(Level.INFO, "The service definition file can be found at: {0}application.wadl", uri);
 
-        final Endpoint ep;
-        if (serviceInstanceSOAP != null) {
-            final String service = uriSoap.toString() + "wps";
-            ep =  Endpoint.create(serviceInstanceSOAP);
-
+        final List<Endpoint> eps = new ArrayList<Endpoint>();
+        for (Entry<String, Object> instance : serviceInstanceSOAP.entrySet()) {
+            final String service = uriSoap.toString() + instance.getKey();
+            final Endpoint ep =  Endpoint.create(instance.getValue());
             ep.publish(service);
+            eps.add(ep);
 
             LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
             LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
@@ -290,6 +296,9 @@ public class CstlEmbeddedService extends CommandLine {
         stayAlive();
 
         threadSelector.stop();
+        for (Endpoint ep : eps) {
+            ep.stop();
+        }
         LOGGER.log(Level.INFO, "*Stopped grizzly server at: {0}.", f.format(new Date()));
     }
 

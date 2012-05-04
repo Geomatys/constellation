@@ -25,9 +25,12 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 // JAX-WS dependencies
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
+import javax.xml.ws.BindingType;
+import javax.xml.ws.ResponseWrapper;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -61,6 +64,7 @@ import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
  */
 @WebService(name = "SOService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
+@BindingType(value="http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 @XmlSeeAlso({org.geotoolkit.sml.xml.v100.ObjectFactory.class,
              org.geotoolkit.sml.xml.v101.ObjectFactory.class,
              org.geotoolkit.sampling.xml.v100.ObjectFactory.class,
@@ -91,7 +95,8 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="getCapabilities")
-    public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities) throws SOServiceException  {
+    @WebResult(name="Capabilities", targetNamespace="http://www.opengis.net/sos/1.0")
+    public Capabilities getCapabilities(@WebParam(name = "GetCapabilities", targetNamespace="http://www.opengis.net/sos/1.0") GetCapabilities requestCapabilities) throws SOServiceException  {
         try {
             LOGGER.info("received SOAP getCapabilities request");
             final SOSworker worker = getCurrentWorker();
@@ -111,7 +116,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="describeSensor")
-    public AbstractSensorML describeSensor(@WebParam(name = "DescribeSensor") DescribeSensor requestDescSensor) throws SOServiceException  {
+    public AbstractSensorML describeSensor(@WebParam(name = "DescribeSensor", targetNamespace="http://www.opengis.net/sos/1.0") DescribeSensor requestDescSensor) throws SOServiceException  {
         try {
             LOGGER.info("received SOAP DescribeSensor request");
             final SOSworker worker = getCurrentWorker();
@@ -132,7 +137,8 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="getObservation")
-    public ObservationCollectionType getObservation(@WebParam(name = "GetObservation") GetObservation requestObservation) throws SOServiceException {
+    @WebResult(name="ObservationCollection", targetNamespace="http://www.opengis.net/om/1.0")
+    public ObservationCollectionType getObservation(@WebParam(name = "GetObservation", targetNamespace="http://www.opengis.net/sos/1.0") GetObservation requestObservation) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getObservation request");
             final SOSworker worker = getCurrentWorker();
@@ -152,7 +158,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="getFeatureOfInterest")
-    public AbstractFeatureType getFeatureOfInterest(@WebParam(name = "GetFeatureOfInterest") GetFeatureOfInterest requestfeatureOfInterest) throws SOServiceException {
+    public AbstractFeatureType getFeatureOfInterest(@WebParam(name = "GetFeatureOfInterest", targetNamespace="http://www.opengis.net/sos/1.0") GetFeatureOfInterest requestfeatureOfInterest) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getfeatureOfInterest request");
             final SOSworker worker = getCurrentWorker();
@@ -172,7 +178,7 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="getFeatureOfInterestTime")
-    public AbstractTimePrimitiveType getFeatureOfInterestTime(@WebParam(name = "GetFeatureOfInterestTime") GetFeatureOfInterestTime requestfeatureOfInterestTime) throws SOServiceException {
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(@WebParam(name = "GetFeatureOfInterestTime", targetNamespace="http://www.opengis.net/sos/1.0") GetFeatureOfInterestTime requestfeatureOfInterestTime) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getfeatureOfInterest request");
             final SOSworker worker = getCurrentWorker();
@@ -190,7 +196,8 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="getResult")
-    public GetResultResponse getResult(@WebParam(name = "GetResult") GetResult requestResult) throws SOServiceException {
+    @WebResult(name="GetResultResponse", targetNamespace="http://www.opengis.net/sos/1.0")
+    public GetResultResponse getResult(@WebParam(name = "GetResult", targetNamespace="http://www.opengis.net/sos/1.0") GetResult requestResult) throws SOServiceException {
         try {
             LOGGER.info("received SOAP getResult request");
             final SOSworker worker = getCurrentWorker();
@@ -211,7 +218,8 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="registerSensor")
-    public RegisterSensorResponse registerSensor(@WebParam(name = "RegisterSensor") RegisterSensor requestRegSensor) throws SOServiceException {
+    @WebResult(name="RegisterSensorResponse", targetNamespace="http://www.opengis.net/sos/1.0")
+    public RegisterSensorResponse registerSensor(@WebParam(name = "RegisterSensor", targetNamespace="http://www.opengis.net/sos/1.0") RegisterSensor requestRegSensor) throws SOServiceException {
         try {
             LOGGER.info("received SOAP registerSensor request");
             final SOSworker worker = getCurrentWorker();
@@ -231,7 +239,8 @@ public class SOService extends OGCWebService<SOSworker> {
      * @throws SOServiceException
      */
     @WebMethod(action="InsertObservation")
-    public InsertObservationResponse insertObservation(@WebParam(name = "InsertObservation") InsertObservation requestInsObs) throws SOServiceException {
+    @WebResult(name="InsertObservationResponse", targetNamespace="http://www.opengis.net/sos/1.0")
+    public InsertObservationResponse insertObservation(@WebParam(name = "InsertObservation", targetNamespace="http://www.opengis.net/sos/1.0") InsertObservation requestInsObs) throws SOServiceException {
         try {
             LOGGER.info("received SOAP insertObservation request");
             final SOSworker worker = getCurrentWorker();

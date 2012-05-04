@@ -63,6 +63,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.junit.Assume.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.sos.ws.soap.SOService;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.CstlServiceException;
 import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
@@ -317,7 +318,8 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{});
             cstlServer.duration = 5*60*1000;
             try {
-                cstlServer.serviceInstanceSOAP = new WPSService();
+                cstlServer.serviceInstanceSOAP.put("wps", new WPSService());
+                cstlServer.serviceInstanceSOAP.put("sos", new SOService());
             } catch (CstlServiceException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
             }

@@ -1,0 +1,345 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
+    <S:Body>
+        <ns11:Capabilities xmlns:ns3="http://www.opengis.net/gml" xmlns:ns4="http://www.w3.org/1999/xlink" xmlns:ns5="http://www.opengis.net/sensorML/1.0" xmlns:ns6="urn:us:gov:ic:ism:v2" xmlns:ns7="http://www.opengis.net/swe/1.0" xmlns:ns8="http://www.opengis.net/om/1.0" xmlns:ns9="http://www.opengis.net/swe/1.0.1" xmlns:ns10="http://www.opengis.net/sampling/1.0" xmlns:ns11="http://www.opengis.net/sos/1.0" xmlns:ns12="http://www.opengis.net/gml/" xmlns:ns13="http://www.opengis.net/sensorML/1.0.1" xmlns:ns14="http://www.opengis.net/ows/1.1" xmlns:ns15="http://www.opengis.net/ogc" xmlns:ns16="http://soap.ws.sos.constellation.org/" version="1.0.0">
+            <ns14:ServiceIdentification>
+                <ns14:Title xml:lang="fr">Constellation SOS</ns14:Title>
+                <ns14:Abstract xml:lang="fr">Constellation SOS Server</ns14:Abstract>
+                <ns14:Keywords>
+                    <ns14:Keyword>SOS</ns14:Keyword>
+                    <ns14:Keyword>Geomatys</ns14:Keyword>
+                </ns14:Keywords>
+                <ns14:ServiceType codeSpace="http://www.opengeospatial.net">OGC:SOS</ns14:ServiceType>
+                <ns14:ServiceTypeVersion>1.0.0</ns14:ServiceTypeVersion>
+                <ns14:Fees>NONE</ns14:Fees>
+                <ns14:AccessConstraints>NONE</ns14:AccessConstraints>
+            </ns14:ServiceIdentification>
+            <ns14:ServiceProvider>
+                <ns14:ProviderName>Geomatys</ns14:ProviderName>
+                <ns14:ProviderSite ns4:href="http://www.geomatys.fr/"/>
+                <ns14:ServiceContact>
+                    <ns14:IndividualName>Vincent Heurteaux</ns14:IndividualName>
+                    <ns14:PositionName>PDG</ns14:PositionName>
+                    <ns14:ContactInfo>
+                        <ns14:Phone>
+                            <ns14:Voice>04 67 54 87 30</ns14:Voice>
+                        </ns14:Phone>
+                        <ns14:Address>
+                            <ns14:DeliveryPoint>Geomatys</ns14:DeliveryPoint>
+                            <ns14:City>Arles</ns14:City>
+                            <ns14:PostalCode>13200</ns14:PostalCode>
+                            <ns14:Country>FRANCE</ns14:Country>
+                        </ns14:Address>
+                    </ns14:ContactInfo>
+                </ns14:ServiceContact>
+            </ns14:ServiceProvider>
+            <ns14:OperationsMetadata>
+                <ns14:Operation name="GetCapabilities">
+                    <ns14:DCP>
+                        <ns14:HTTP>
+                            <ns14:Get ns4:href="sos/default?"/>
+                            <ns14:Post ns4:href="sos/default?"/>
+                        </ns14:HTTP>
+                    </ns14:DCP>
+                    <ns14:Parameter name="service">
+                        <ns14:AllowedValues>
+                            <ns14:Value>SOS</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="Acceptversions">
+                        <ns14:AllowedValues>
+                            <ns14:Value>1.0.0</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="Sections">
+                        <ns14:AllowedValues>
+                            <ns14:Value>ServiceIdentification</ns14:Value>
+                            <ns14:Value>ServiceProvider</ns14:Value>
+                            <ns14:Value>OperationsMetadata</ns14:Value>
+                            <ns14:Value>Contents</ns14:Value>
+                            <ns14:Value>Filter_Capabilities</ns14:Value>
+                            <ns14:Value>All</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="AcceptFormats">
+                        <ns14:AllowedValues>
+                            <ns14:Value>text/xml</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                </ns14:Operation>
+                <ns14:Operation name="RegisterSensor">
+                    <ns14:DCP>
+                        <ns14:HTTP>
+                            <ns14:Post ns4:href="sos/default?"/>
+                        </ns14:HTTP>
+                    </ns14:DCP>
+                    <ns14:Parameter name="version">
+                        <ns14:AllowedValues>
+                            <ns14:Value>1.0.0</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="service">
+                        <ns14:AllowedValues>
+                            <ns14:Value>SOS</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                </ns14:Operation>
+                <ns14:Operation name="GetResult">
+                    <ns14:DCP>
+                        <ns14:HTTP>
+                            <ns14:Post ns4:href="sos/default?"/>
+                        </ns14:HTTP>
+                    </ns14:DCP>
+                    <ns14:Parameter name="version">
+                        <ns14:AllowedValues>
+                            <ns14:Value>1.0.0</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="service">
+                        <ns14:AllowedValues>
+                            <ns14:Value>SOS</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                </ns14:Operation>
+                <ns14:Operation name="GetObservation">
+                    <ns14:DCP>
+                        <ns14:HTTP>
+                            <ns14:Post ns4:href="sos/default?"/>
+                        </ns14:HTTP>
+                    </ns14:DCP>
+                    <ns14:Parameter name="version">
+                        <ns14:AllowedValues>
+                            <ns14:Value>1.0.0</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="service">
+                        <ns14:AllowedValues>
+                            <ns14:Value>SOS</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="srsName">
+                        <ns14:AnyValue/>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="offering">
+                        <ns14:AllowedValues>
+                            <ns14:Value>offering-allSensor</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="eventTime">
+                        <ns14:AllowedValues>
+                            <ns14:Range>
+                                <ns14:MinimumValue>2009-07-31 16:09:12.046</ns14:MinimumValue>
+                                <ns14:MaximumValue>now</ns14:MaximumValue>
+                            </ns14:Range>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="procedure">
+                        <ns14:AllowedValues>
+                            <ns14:Value>urn:ogc:object:sensor:SunSpot:0014.4F01.0000.261A</ns14:Value>
+                            <ns14:Value>urn:ogc:object:sensor:SunSpot:0014.4F01.0000.2626</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="observedProperty">
+                        <ns14:AllowedValues>
+                            <ns14:Value>light</ns14:Value>
+                            <ns14:Value>temperature</ns14:Value>
+                            <ns14:Value>acceleration</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="featureOfInterest">
+                        <ns14:AllowedValues>
+                            <ns14:Value>sampling-point-001</ns14:Value>
+                            <ns14:Value>station-003</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="result">
+                        <ns14:AnyValue/>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="responseFormat">
+                        <ns14:AllowedValues>
+                            <ns14:Value>text/xml; subtype=&quot;om/1.0.0&quot;</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="resultModel">
+                        <ns14:AllowedValues>
+                            <ns14:Value>om:Observation</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="responseMode">
+                        <ns14:AllowedValues>
+                            <ns14:Value>inline</ns14:Value>
+                            <ns14:Value>resultTemplate</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                </ns14:Operation>
+                <ns14:Operation name="InsertObservation">
+                    <ns14:DCP>
+                        <ns14:HTTP>
+                            <ns14:Post ns4:href="sos/default?"/>
+                        </ns14:HTTP>
+                    </ns14:DCP>
+                    <ns14:Parameter name="version">
+                        <ns14:AllowedValues>
+                            <ns14:Value>1.0.0</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="service">
+                        <ns14:AllowedValues>
+                            <ns14:Value>SOS</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                </ns14:Operation>
+                <ns14:Operation name="GetFeatureOfInterest">
+                    <ns14:DCP>
+                        <ns14:HTTP>
+                            <ns14:Post ns4:href="sos/default?"/>
+                        </ns14:HTTP>
+                    </ns14:DCP>
+                    <ns14:Parameter name="featureOfInterestId">
+                        <ns14:AllowedValues>
+                            <ns14:Value>sampling-point-001</ns14:Value>
+                            <ns14:Value>station-003</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="version">
+                        <ns14:AllowedValues>
+                            <ns14:Value>1.0.0</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="service">
+                        <ns14:AllowedValues>
+                            <ns14:Value>SOS</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                </ns14:Operation>
+                <ns14:Operation name="GetFeatureOfInterestTime">
+                    <ns14:DCP>
+                        <ns14:HTTP>
+                            <ns14:Post ns4:href="sos/default?"/>
+                        </ns14:HTTP>
+                    </ns14:DCP>
+                    <ns14:Parameter name="featureOfInterestId">
+                        <ns14:AllowedValues>
+                            <ns14:Value>sampling-point-001</ns14:Value>
+                            <ns14:Value>station-003</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="version">
+                        <ns14:AllowedValues>
+                            <ns14:Value>1.0.0</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="service">
+                        <ns14:AllowedValues>
+                            <ns14:Value>SOS</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                </ns14:Operation>
+                <ns14:Operation name="DescribeSensor">
+                    <ns14:DCP>
+                        <ns14:HTTP>
+                            <ns14:Post ns4:href="sos/default?"/>
+                        </ns14:HTTP>
+                    </ns14:DCP>
+                    <ns14:Parameter name="version">
+                        <ns14:AllowedValues>
+                            <ns14:Value>1.0.0</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="service">
+                        <ns14:AllowedValues>
+                            <ns14:Value>SOS</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="outputFormat">
+                        <ns14:AllowedValues>
+                            <ns14:Value>text/xml;subtype=&quot;sensorML/1.0.0&quot;</ns14:Value>
+                            <ns14:Value>text/xml;subtype=&quot;sensorML/1.0.1&quot;</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                    <ns14:Parameter name="procedure">
+                        <ns14:AllowedValues>
+                            <ns14:Value>urn-ogc-object-sensor-SunSpot-2</ns14:Value>
+                            <ns14:Value>urn-ogc-object-sensor-SunSpot-0014.4F01.0000.261A</ns14:Value>
+                            <ns14:Value>urn-ogc-object-sensor-SunSpot-0014.4F01.0000.2626</ns14:Value>
+                        </ns14:AllowedValues>
+                    </ns14:Parameter>
+                </ns14:Operation>
+                <ns14:Constraint name="PostEncoding">
+                    <ns14:AllowedValues>
+                        <ns14:Value>XML</ns14:Value>
+                    </ns14:AllowedValues>
+                </ns14:Constraint>
+            </ns14:OperationsMetadata>
+            <ns11:Filter_Capabilities>
+                <ns15:Spatial_Capabilities>
+                    <ns15:GeometryOperands>
+                        <ns15:GeometryOperand>ns3:Envelope</ns15:GeometryOperand>
+                    </ns15:GeometryOperands>
+                    <ns15:SpatialOperators>
+                        <ns15:SpatialOperator name="BBOX"/>
+                    </ns15:SpatialOperators>
+                </ns15:Spatial_Capabilities>
+                <ns15:Temporal_Capabilities>
+                    <ns15:TemporalOperands>
+                        <ns15:TemporalOperand>ns3:TimeInstant</ns15:TemporalOperand>
+                        <ns15:TemporalOperand>ns3:TimePeriod</ns15:TemporalOperand>
+                    </ns15:TemporalOperands>
+                    <ns15:TemporalOperators>
+                        <ns15:TemporalOperator name="TM_During"/>
+                        <ns15:TemporalOperator name="TM_Equals"/>
+                        <ns15:TemporalOperator name="TM_After"/>
+                        <ns15:TemporalOperator name="TM_Before"/>
+                    </ns15:TemporalOperators>
+                </ns15:Temporal_Capabilities>
+                <ns15:Scalar_Capabilities>
+                    <ns15:ComparisonOperators>
+                        <ns15:ComparisonOperator>Between</ns15:ComparisonOperator>
+                        <ns15:ComparisonOperator>EqualTo</ns15:ComparisonOperator>
+                        <ns15:ComparisonOperator>NotEqualTo</ns15:ComparisonOperator>
+                        <ns15:ComparisonOperator>LessThan</ns15:ComparisonOperator>
+                        <ns15:ComparisonOperator>LessThanEqualTo</ns15:ComparisonOperator>
+                        <ns15:ComparisonOperator>GreaterThan</ns15:ComparisonOperator>
+                        <ns15:ComparisonOperator>GreaterThanEqualTo</ns15:ComparisonOperator>
+                        <ns15:ComparisonOperator>Like</ns15:ComparisonOperator>
+                    </ns15:ComparisonOperators>
+                </ns15:Scalar_Capabilities>
+                <ns15:Id_Capabilities>
+                    <ns15:EID/>
+                    <ns15:FID/>
+                </ns15:Id_Capabilities>
+            </ns11:Filter_Capabilities>
+            <ns11:Contents>
+                <ns11:ObservationOfferingList>
+                    <ns11:ObservationOffering ns3:id="offering-allSensor">
+                        <ns3:description>Base offering containing all the sensors.</ns3:description>
+                        <ns3:name>offering-allSensor</ns3:name>
+                        <ns3:srsName>EPSG:4326</ns3:srsName>
+                        <ns3:boundedBy>
+                            <ns3:Null>not_bounded</ns3:Null>
+                        </ns3:boundedBy>
+                        <ns11:time>
+                            <ns3:TimePeriod ns3:id="time-offering-allSensor">
+                                <ns3:beginPosition>2009-07-31T16:09:12.046</ns3:beginPosition>
+                                <ns3:endPosition indeterminatePosition="now"></ns3:endPosition>
+                            </ns3:TimePeriod>
+                        </ns11:time>
+                        <ns11:procedure ns4:href="urn:ogc:object:sensor:SunSpot:0014.4F01.0000.261A"/>
+                        <ns11:procedure ns4:href="urn:ogc:object:sensor:SunSpot:0014.4F01.0000.2626"/>
+                        <ns11:observedProperty>
+                            <ns9:Phenomenon ns3:id="acceleration">
+                                <ns3:name>urn:phenomenon:acceleration</ns3:name>
+                            </ns9:Phenomenon>
+                        </ns11:observedProperty>
+                        <ns11:featureOfInterest ns4:href="sampling-point-001"/>
+                        <ns11:responseFormat>text/xml; subtype=&quot;om/1.0.0&quot;</ns11:responseFormat>
+                        <ns11:resultModel>ns8:Observation</ns11:resultModel>
+                        <ns11:resultModel>ns8:Measurement</ns11:resultModel>
+                        <ns11:responseMode>resultTemplate</ns11:responseMode>
+                        <ns11:responseMode>inline</ns11:responseMode>
+                    </ns11:ObservationOffering>
+                </ns11:ObservationOfferingList>
+            </ns11:Contents>
+        </ns11:Capabilities>
+    </S:Body>
+</S:Envelope>

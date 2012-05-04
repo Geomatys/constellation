@@ -30,8 +30,6 @@ import static org.junit.Assert.*;
  */
 public class ConstellationServerTest extends AbstractTestRequest {
     
-    private static final ConstellationServer administrator = ConstellationServer.login("http://localhost:9090/", "", "");
-            
     @BeforeClass
     public static void initPool() throws JAXBException {
         // Get the list of layers
@@ -53,6 +51,7 @@ public class ConstellationServerTest extends AbstractTestRequest {
     
     @Test
     public void testgetDescriptor() throws Exception {
+        final ConstellationServer administrator = ConstellationServer.login("http://localhost:9090/", "", "");
         assertNotNull(administrator);
         GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("shapefile");
         assertNotNull(desc);

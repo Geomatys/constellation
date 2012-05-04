@@ -187,7 +187,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             getClientSecurity().secure(cnx);
             stream = AbstractRequest.openRichException(cnx, getClientSecurity());            
         } catch (Exception ex) {
-            LOGGER.log(Level.INFO, ex.getLocalizedMessage());
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             return false;
         }finally{
             if(stream != null){

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
+    <S:Body>
+        <ns16:getFeatureOfInterestResponse xmlns:ns3="http://www.opengis.net/gml" xmlns:ns4="http://www.w3.org/1999/xlink" xmlns:ns5="http://www.opengis.net/sensorML/1.0" xmlns:ns6="urn:us:gov:ic:ism:v2" xmlns:ns7="http://www.opengis.net/swe/1.0" xmlns:ns8="http://www.opengis.net/om/1.0" xmlns:ns9="http://www.opengis.net/swe/1.0.1" xmlns:ns10="http://www.opengis.net/sampling/1.0" xmlns:ns11="http://www.opengis.net/sos/1.0" xmlns:ns12="http://www.opengis.net/gml/" xmlns:ns13="http://www.opengis.net/sensorML/1.0.1" xmlns:ns14="http://www.opengis.net/ows/1.1" xmlns:ns15="http://www.opengis.net/ogc" xmlns:ns16="http://soap.ws.sos.constellation.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns10:SamplingPointType" ns3:id="sampling-point-001">
+            <ns3:name>sampling-point-001</ns3:name>
+            <ns3:boundedBy>
+                <ns3:Null>not_bounded</ns3:Null>
+            </ns3:boundedBy>
+            <ns10:sampledFeature ns4:href="sampling-point-001"/>
+            <ns10:position>
+                <ns3:Point ns3:id="pt-1">
+                    <ns3:pos srsName="EPSG:4326" srsDimension="2">0.0 0.0</ns3:pos>
+                </ns3:Point>
+            </ns10:position>
+        </ns16:getFeatureOfInterestResponse>
+    </S:Body>
+</S:Envelope>

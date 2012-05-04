@@ -101,7 +101,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
     @WebResult(name="ProcessDescriptions", targetNamespace="http://www.opengis.net/wps/1.0.0")
     public ProcessDescriptions describeProcess(@WebParam(name = "DescribeProcess", targetNamespace="http://www.opengis.net/wps/1.0.0") DescribeProcess requestDescProcess) throws WPSServiceException  {
         try {
-            LOGGER.info("received SOAP DescribeSensor request");
+            LOGGER.info("received SOAP DescribeProcess request");
             final WPSWorker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
             return worker.describeProcess(requestDescProcess);
@@ -122,7 +122,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
     @WebResult(name="ExecuteResponse", targetNamespace="http://www.opengis.net/wps/1.0.0")
     public ExecuteResponse Execute(@WebParam(name = "Execute", targetNamespace="http://www.opengis.net/wps/1.0.0") Execute requestExecute) throws WPSServiceException {
         try {
-            LOGGER.info("received SOAP execute request");
+            LOGGER.info("received SOAP Execute request");
             final WPSWorker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
             //if we receive a raw data output we throw an error
