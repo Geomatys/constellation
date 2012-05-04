@@ -23,10 +23,12 @@ import java.io.IOException;
 import java.util.logging.Level;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
 import org.constellation.wmts.ws.WMTSWorker;
@@ -54,6 +56,7 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
 @WebService(name = "WMTSService")
 @XmlSeeAlso({org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
+@BindingType(value="http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 public class WMTSService extends OGCWebService<WMTSWorker>{
 
     /**
@@ -81,6 +84,7 @@ public class WMTSService extends OGCWebService<WMTSWorker>{
      * @throws SOAPServiceException
      */
     @WebMethod(action="getCapabilities")
+    @WebResult(name="Capabilities", targetNamespace="http://www.opengis.net/wmts/1.0.0")
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities)
                                                                                      throws SOAPServiceException
     {
