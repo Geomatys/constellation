@@ -24,12 +24,14 @@ import java.util.logging.Level;
 // JAX-WS dependencies
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 
 // constellation dependencies
 import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
@@ -56,6 +58,7 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
  */
 @WebService(name = "CSWService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
+@BindingType(value="http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 @XmlSeeAlso({org.geotoolkit.metadata.iso.DefaultMetadata.class,
              org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class,
              org.geotoolkit.metadata.fra.FRA_Constraints.class,
@@ -107,6 +110,7 @@ public class CSWService extends OGCWebService<CSWworker>{
      * @throws SOAPServiceException
      */
     @WebMethod(action="getCapabilities")
+    @WebResult(name="Capabilities", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilitiesType requestCapabilities) throws SOAPServiceException  {
         try {
             LOGGER.info("received SOAP getCapabilities request");
@@ -123,6 +127,7 @@ public class CSWService extends OGCWebService<CSWworker>{
      * Web service operation 
      */
     @WebMethod(action="getDomain")
+    @WebResult(name="GetDomainResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
     public GetDomainResponseType getDomain(@WebParam(name = "GetDomain") GetDomainType requestGetDomain) throws SOAPServiceException  {
         try {
             LOGGER.info("received SOAP GetDomain request");
@@ -140,6 +145,7 @@ public class CSWService extends OGCWebService<CSWworker>{
      * Web service operation 
      */
     @WebMethod(action="getRecordById")
+    @WebResult(name="GetRecordByIdResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
     public GetRecordByIdResponseType getRecordById(@WebParam(name = "GetRecordById") GetRecordByIdType requestRecordById) throws SOAPServiceException {
         try {
             LOGGER.info("received SOAP getRecordById request");
@@ -172,6 +178,7 @@ public class CSWService extends OGCWebService<CSWworker>{
      * Web service operation 
      */
     @WebMethod(action="describeRecord")
+    @WebResult(name="DescribeRecordResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
     public DescribeRecordResponseType describeRecord(@WebParam(name = "DescribeRecord") DescribeRecordType requestDescribeRecord) throws SOAPServiceException {
         try {
             LOGGER.info("received SOAP describeRecord request");
@@ -188,6 +195,7 @@ public class CSWService extends OGCWebService<CSWworker>{
      * Web service operation 
      */
     @WebMethod(action="harvest")
+    @WebResult(name="HarvestResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
     public HarvestResponseType harvest(@WebParam(name = "Harvest") HarvestType requestHarvest) throws SOAPServiceException {
         try {
             LOGGER.info("received SOAP harvest request");
@@ -204,6 +212,7 @@ public class CSWService extends OGCWebService<CSWworker>{
      * Web service operation 
      */
     @WebMethod(action="transaction")
+    @WebResult(name="TransactionResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
     public TransactionResponseType transaction(@WebParam(name = "Transaction") TransactionType requestTransaction) throws SOAPServiceException {
         try {
             LOGGER.info("received SOAP transaction request");
