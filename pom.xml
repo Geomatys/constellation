@@ -240,7 +240,7 @@
         <profile>
             <id>wps</id>
             <properties>
-                <constellation.services.packages>${constellation.config};${constellation.wps}</constellation.services.packages>
+                <constellation.services.packages>${constellation.config};${constellation.wps};${constellation.provider}</constellation.services.packages>
             </properties>
         </profile>
     </profiles>
