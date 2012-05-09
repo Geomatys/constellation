@@ -764,10 +764,13 @@ public class SOSworker extends AbstractWorker {
                 */
                final Operation ds = om.getOperation("DescribeSensor");
                if (smlReader != null) {
-                   ds.updateParameter(PROCEDURE, smlReader.getSensorNames());
+                   final List<String> sensorNames = new ArrayList<String>(smlReader.getSensorNames());
+                   Collections.sort(sensorNames);
+                   ds.updateParameter(PROCEDURE, sensorNames);
                } else {
                    ds.updateParameter(PROCEDURE, procNames);
                }
+               
                ds.updateParameter("outputFormat", ACCEPTED_SENSORML_FORMATS);
 
                final Operation gfoi = om.getOperation("GetFeatureOfInterest");

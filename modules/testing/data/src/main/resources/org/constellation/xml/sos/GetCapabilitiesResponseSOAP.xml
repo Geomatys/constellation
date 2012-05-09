@@ -259,9 +259,9 @@
                     </ns14:Parameter>
                     <ns14:Parameter name="procedure">
                         <ns14:AllowedValues>
-                            <ns14:Value>urn-ogc-object-sensor-SunSpot-2</ns14:Value>
                             <ns14:Value>urn-ogc-object-sensor-SunSpot-0014.4F01.0000.261A</ns14:Value>
                             <ns14:Value>urn-ogc-object-sensor-SunSpot-0014.4F01.0000.2626</ns14:Value>
+                            <ns14:Value>urn-ogc-object-sensor-SunSpot-2</ns14:Value>
                         </ns14:AllowedValues>
                     </ns14:Parameter>
                 </ns14:Operation>
