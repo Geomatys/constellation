@@ -195,9 +195,9 @@
             ${constellation.wps}
         </constellation.services.packages>
         <constellation.services.soap.packages>
-            ${constellation.metadata.soap};
-            ${constellation.sensor.soap};
-            ${constellation.tile.soap};
+            ${constellation.metadata.soap}
+            ${constellation.sensor.soap}
+            ${constellation.tile.soap}
             ${constellation.wps.soap}
         </constellation.services.soap.packages>
         <!-- Defines the source encoding -->
