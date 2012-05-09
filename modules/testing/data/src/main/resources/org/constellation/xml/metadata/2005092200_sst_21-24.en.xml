@@ -222,7 +222,7 @@
             </gmd:extent>
         </gmd:MD_DataIdentification>
     </gmd:identificationInfo>
-    <gmd:contentInfo>
+    <!--gmd:contentInfo>
         <gmd:MD_CoverageDescription>
             <gmd:dimension>
                 <gmd:MD_Band>
@@ -249,7 +249,7 @@
                 </gmd:MD_Band>
             </gmd:dimension>
         </gmd:MD_CoverageDescription>
-    </gmd:contentInfo>
+    </gmd:contentInfo-->
     <gmd:contentInfo>
         <gmd:MD_CoverageDescription>
             <gmd:dimension>
