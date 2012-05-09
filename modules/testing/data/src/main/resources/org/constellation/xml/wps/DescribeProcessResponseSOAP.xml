@@ -2,7 +2,7 @@
 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
     <S:Body>
         <ns4:ProcessDescriptions xmlns:ns3="http://www.opengis.net/ows/1.1" xmlns:ns4="http://www.opengis.net/wps/1.0.0" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns6="http://www.opengis.net/gml" xmlns:ns7="http://soap.ws.wps.constellation.org/" xml:lang="en-EN" version="1.0.0" service="WPS">
-            <ProcessDescription statusSupported="false" storeSupported="true" ns4:processVersion="1.0.0">
+            <ProcessDescription statusSupported="true" storeSupported="true" ns4:processVersion="1.0.0">
                 <ns3:Identifier>urn:ogc:geomatys:wps:jts:intersection</ns3:Identifier>
                 <ns3:Title>Jts : Intersection</ns3:Title>
                 <ns3:Abstract>Computes a intersection Geometry between the source geometry (geom1) and the other (geom2).</ns3:Abstract>
@@ -16,24 +16,24 @@
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Default>
                             <Supported>
                                 <Format>
                                     <MimeType>text/xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>text/gml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Supported>
                         </ComplexData>
@@ -47,24 +47,24 @@
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Default>
                             <Supported>
                                 <Format>
                                     <MimeType>text/xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>text/gml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Supported>
                         </ComplexData>
@@ -80,31 +80,31 @@
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Default>
                             <Supported>
                                 <Format>
                                     <MimeType>text/xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>text/gml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Supported>
                         </ComplexOutput>
                     </Output>
                 </ProcessOutputs>
             </ProcessDescription>
-            <ProcessDescription statusSupported="false" storeSupported="true" ns4:processVersion="1.0.0">
+            <ProcessDescription statusSupported="true" storeSupported="true" ns4:processVersion="1.0.0">
                 <ns3:Identifier>urn:ogc:geomatys:wps:jts:convexHull</ns3:Identifier>
                 <ns3:Title>Jts : ConvexHull</ns3:Title>
                 <ns3:Abstract>Return the convex hull geometry of the specified geometry.</ns3:Abstract>
@@ -118,24 +118,24 @@
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Default>
                             <Supported>
                                 <Format>
                                     <MimeType>text/xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>text/gml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Supported>
                         </ComplexData>
@@ -151,24 +151,24 @@
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Default>
                             <Supported>
                                 <Format>
                                     <MimeType>text/xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>text/gml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                                 <Format>
                                     <MimeType>application/gml+xml</MimeType>
                                     <Encoding>utf-8</Encoding>
-                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/feature.xsd</Schema>
+                                    <Schema>http://schemas.opengis.net/gml/3.1.1/base/gml.xsd</Schema>
                                 </Format>
                             </Supported>
                         </ComplexOutput>
