@@ -171,20 +171,25 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
             final Name name = new DefaultName(namespace, layerName);
             final Query query = QueryBuilder.language(language, statement, name);
             store.addQuery(query);
+            index.add(name);
         }
 
-
-        try {
-            for (final Name name : store.getNames()) {
-                if (isLoadAll(getSource()) || containLayer(getSource(), name.getLocalPart())) {
-                    index.add(name);
+        final boolean loadAll = isLoadAll(getSource());
+        // if we have only queryLayer we skip this part
+        if (loadAll || !getLayers(source).isEmpty()) {
+            
+            try {
+                for (final Name name : store.getNames()) {
+                    if (loadAll || containLayer(getSource(), name.getLocalPart())) {
+                        index.add(name);
+                    }
                 }
+            } catch (DataStoreException ex) {
+                //Looks like we failed to retrieve the list of featuretypes,
+                //the layers won't be indexed and the getCapability
+                //won't be able to find thoses layers.
+                getLogger().log(Level.SEVERE, "Failed to retrive list of available feature types.", ex);
             }
-        } catch (DataStoreException ex) {
-            //Looks like we failed to retrieve the list of featuretypes,
-            //the layers won't be indexed and the getCapability
-            //won't be able to find thoses layers.
-            getLogger().log(Level.SEVERE, "Failed to retrive list of available feature types.", ex);
         }
         super.visit();
     }

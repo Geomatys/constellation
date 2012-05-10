@@ -96,13 +96,13 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
         if(store == null){
             throw new IllegalArgumentException("FeatureSource can not be null.");
         }
-        try {
+        /*try {
             if (!store.getNames().contains(name)) {
                 throw new IllegalArgumentException("Provided name " + name + " is not in the datastore known names");
             }
         } catch (DataStoreException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-        }
+        }*/
 
         this.store = store;
        
