@@ -180,7 +180,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
             
             try {
                 for (final Name name : store.getNames()) {
-                    if (loadAll || containLayer(getSource(), name.getLocalPart())) {
+                    if ((loadAll || containLayer(getSource(), name.getLocalPart())) && !index.contains(name)) {
                         index.add(name);
                     }
                 }
