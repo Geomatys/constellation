@@ -16,14 +16,10 @@
  */
 package org.constellation.wps.utils;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.io.File;
-
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,53 +28,29 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.constellation.util.Util;
-import org.constellation.wps.converters.inputs.AbstractInputConverter;
 
+import org.constellation.util.Util;
+import static org.constellation.wps.ws.WPSConstant.*;
+import org.constellation.ws.CstlServiceException;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import org.geotoolkit.ows.xml.v110.CodeType;
+import org.geotoolkit.ows.xml.v110.DomainMetadataType;
+import org.geotoolkit.ows.xml.v110.LanguageStringType;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.ows.xml.v110.CodeType;
-import org.geotoolkit.ows.xml.v110.LanguageStringType;
-import org.geotoolkit.wps.xml.v100.ProcessBriefType;
 import org.geotoolkit.util.ArgumentChecks;
-import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.data.FeatureIterator;
-import org.geotoolkit.feature.FeatureTypeBuilder;
-import org.geotoolkit.feature.type.DefaultFeatureType;
-import org.geotoolkit.feature.type.DefaultGeometryType;
-import org.geotoolkit.feature.type.DefaultPropertyDescriptor;
-import org.geotoolkit.geometry.jts.JTS;
-import org.geotoolkit.ows.xml.v110.DomainMetadataType;
-import org.geotoolkit.util.converter.ConverterRegistry;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.converter.ObjectConverter;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.wps.xml.v100.SupportedUOMsType;
-import org.geotoolkit.wps.xml.v100.UOMsType;
-import org.geotoolkit.wps.xml.v100.SupportedComplexDataInputType;
-import org.geotoolkit.wps.xml.v100.ComplexDataCombinationsType;
-import org.geotoolkit.wps.xml.v100.ComplexDataCombinationType;
-import org.geotoolkit.wps.xml.v100.ComplexDataDescriptionType;
-import org.opengis.feature.Feature;
-import org.opengis.feature.Property;
-import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.type.PropertyDescriptor;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.NoSuchIdentifierException;
-
-import org.opengis.util.FactoryException;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.wps.ws.WPSIO;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.wps.ws.WPSConstant.*;
+import org.geotoolkit.wps.io.WPSIO;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
 import org.geotoolkit.wps.xml.v100.*;
 import org.geotoolkit.xml.MarshallerPool;
+
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * Set of utilities method used by WPS worker.
@@ -100,7 +72,7 @@ public class WPSUtils {
      * @throws CstlServiceException in case of an unknown process identifier.
      */
     public static ProcessDescriptor getProcessDescriptor(final String identifier) throws CstlServiceException {
-      
+
         final String processFactory = extractFactoryFromIdentifier(identifier);
         final String processName = extractProcessNameFromIdentifier(identifier);
 
@@ -358,195 +330,15 @@ public class WPSUtils {
             throw new CstlServiceException("No supported literal type");
         }
     }
-
-    /**
-     * Convert a string to a binding class. If the binding class isn't a primitive like Integer, Double, .. we search
-     * into the converter list if found a match.
-     *
-     * @param data string to convert
-     * @param binding wanted class
-     * @return converted object
-     * @throws CstlServiceException if there is no match found
-     */
-    public static <T> Object convertFromString(final String data, final Class binding) throws CstlServiceException {
-
-        Object convertedData = null; //resulting Object
+    
+    public static String getDataTypeString(final Class clazz) {
+        String ref = null;
         try {
-
-            ObjectConverter<String, T> converter;//converter
-            try {
-                //try to convert into a primitive type
-                converter = ConverterRegistry.system().converter(String.class, binding);
-            } catch (NonconvertibleObjectException ex) {
-                //try to convert with some specified converter
-                converter = WPSIO.getConverter(binding, WPSIO.IOType.INPUT, WPSIO.DataType.LITERAL, null, null, null);
-
-                if (converter == null) {
-                    throw new CstlServiceException(ex);
-                }
-            }
-            convertedData = converter.convert(data);
-        } catch (NonconvertibleObjectException ex) {
-            throw new CstlServiceException(ex);
+            ref = createDataType(clazz).getReference();
+        } catch (CstlServiceException ex) {
+            ref = "http://www.w3.org/TR/xmlschema-2/#string";
         }
-        return convertedData;
-    }
-
-    /**
-     * Get an convert data from a reference for an expected binding
-     *
-     * @param expectedClass
-     * @param inputObject
-     * @param schema
-     * @param mime
-     * @param encoding
-     * @param inputID
-     * @return
-     * @throws CstlServiceException
-     */
-    public static Object extractComplexInput(final Class expectedClass, final List<Object> inputObject,
-            final String schema, final String mime, final String encoding, final String inputID) throws CstlServiceException {
-
-        final Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put(AbstractInputConverter.IN_DATA, inputObject);
-        parameters.put(AbstractInputConverter.IN_MIME, mime);
-        parameters.put(AbstractInputConverter.IN_SCHEMA, schema);
-        parameters.put(AbstractInputConverter.IN_ENCODING, encoding);
-
-        final ObjectConverter converter = WPSIO.getConverter(expectedClass, WPSIO.IOType.INPUT, WPSIO.DataType.COMPLEX, mime, encoding, schema);
-
-        if (converter == null) {
-            throw new CstlServiceException("Input complex not supported, no converter found.", OPERATION_NOT_SUPPORTED, inputID);
-        }
-
-        try {
-            return converter.convert(parameters);
-
-        } catch (NonconvertibleObjectException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, inputID);
-        }
-
-    }
-
-    /**
-     * Get an convert data from a reference for an expected binding
-     *
-     * @param href
-     * @param method
-     * @param mime
-     * @param encoding
-     * @param schema
-     * @param expectedClass
-     * @return an object
-     * @throws CstlServiceException if something went wrong
-     */
-    public static Object reachReferencedData(String href, final String method, final String mime,
-            final String encoding, final String schema, final Class expectedClass, final String inputID) throws CstlServiceException {
-
-
-        if (href == null) {
-            throw new CstlServiceException("Invalid reference input : href can't be null.", INVALID_PARAMETER_VALUE, inputID);
-        }
-
-        try {
-            href = URLDecoder.decode(href, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new CstlServiceException("Invalid reference href.", ex, INVALID_PARAMETER_VALUE, inputID);
-        }
-
-        final Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put(AbstractInputConverter.IN_HREF, href);
-        parameters.put(AbstractInputConverter.IN_MIME, mime);
-        parameters.put(AbstractInputConverter.IN_SCHEMA, schema);
-        parameters.put(AbstractInputConverter.IN_ENCODING, encoding);
-
-        final ObjectConverter converter = WPSIO.getConverter(expectedClass, WPSIO.IOType.INPUT, WPSIO.DataType.REFERENCE, mime, encoding, schema);
-
-        if (converter == null) {
-            throw new CstlServiceException("Input reference not supported, no converter found.", OPERATION_NOT_SUPPORTED, inputID);
-        }
-
-        try {
-            return converter.convert(parameters);
-
-        } catch (NonconvertibleObjectException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, inputID);
-        }
-
-    }
-
-    /**
-     * Fix the CRS problem for a Feature or a FeatureCollection
-     *
-     * @param dataValue a Feature or a FeatureCollection
-     * @return the sale Feature/FeatureCollection fixed
-     * @throws CstlServiceException
-     */
-    public static Object fixFeature(final Object dataValue) throws CstlServiceException {
-
-        if (dataValue instanceof Feature) {
-
-            final Feature featureIN = (Feature) dataValue;
-            DefaultFeatureType ft = (DefaultFeatureType) featureIN.getType();
-            fixFeatureType(featureIN, ft);
-
-            return featureIN;
-        }
-
-        if (dataValue instanceof FeatureCollection) {
-            final FeatureCollection featureColl = (FeatureCollection) dataValue;
-
-            DefaultFeatureType ft = (DefaultFeatureType) featureColl.getFeatureType();
-            final FeatureIterator featureIter = featureColl.iterator();
-            if (featureIter.hasNext()) {
-                final Feature feature = featureIter.next();
-                fixFeatureType(feature, ft);
-            }
-            featureIter.close();
-            return featureColl;
-        }
-
-        throw new CstlServiceException("Invalid Feature");
-    }
-
-    /**
-     * Fix a FeatureType in spread the geometry CRS from a feature to the geometry descriptor CRS
-     *
-     * @param featureIN feature with geometry used to fix the geometry descriptor
-     * @param type the featureType to fix
-     * @throws CstlServiceException
-     */
-    public static void fixFeatureType(final Feature featureIN, DefaultFeatureType type) throws CstlServiceException {
-
-        final FeatureTypeBuilder ftb = new FeatureTypeBuilder();
-        ftb.copy(type);
-
-        //Fetch each geometry, get his CRS and 
-        for (Property property : featureIN.getProperties()) {
-            if (property.getDescriptor() instanceof GeometryDescriptor) {
-                try {
-                    final String propertyName = property.getName().getLocalPart();
-                    final Geometry propertyGeom = (Geometry) property.getValue();
-                    final CoordinateReferenceSystem extractCRS = JTS.findCoordinateReferenceSystem(propertyGeom);
-
-                    final Iterator<PropertyDescriptor> ite = type.getDescriptors().iterator();
-
-                    while (ite.hasNext()) {
-                        final DefaultPropertyDescriptor propertyDesc = (DefaultPropertyDescriptor) ite.next();
-
-                        if (propertyDesc.getName().getLocalPart().equals(propertyName)) {
-                            final DefaultGeometryType geomType = (DefaultGeometryType) propertyDesc.getType();
-                            geomType.setCoordinateReferenceSystem(extractCRS);
-                            break;
-                        }
-                    }
-                } catch (NoSuchAuthorityCodeException ex) {
-                    throw new CstlServiceException("Can't find feature geometry CRS", ex, NO_APPLICABLE_CODE);
-                } catch (FactoryException ex) {
-                    throw new CstlServiceException("Can't find feature geometry CRS", ex, NO_APPLICABLE_CODE);
-                }
-            }
-        }
+        return ref;
     }
 
     /**
@@ -555,14 +347,14 @@ public class WPSUtils {
      * @param attributeClass
      * @return SupportedComplexDataInputType
      */
-    public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.DataType type) {
+    public static SupportedComplexDataInputType describeComplex(final Class attributeClass, final WPSIO.IOType ioType, final WPSIO.FormChoice type) {
 
         final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
         final List<WPSIO.WPSSupport> infos = WPSIO.getSupports(attributeClass, ioType, type);
-        
-        if (infos != null) { 
+
+        if (infos != null) {
             for (WPSIO.WPSSupport inputClass : infos) {
 
                 final ComplexDataDescriptionType complexDesc = new ComplexDataDescriptionType();
@@ -764,17 +556,17 @@ public class WPSUtils {
     }
 
     /**
-     * Store the given object into a temorary file specified by the given fileName into the temporary folder.
-     * The object to store is marshalled by the {@link WPSMarshallerPool}. If the temporary file already exist
-     * he will be overwrited.
-     * 
+     * Store the given object into a temorary file specified by the given fileName into the temporary folder. The object
+     * to store is marshalled by the {@link WPSMarshallerPool}. If the temporary file already exist he will be
+     * overwrited.
+     *
      * @param obj object to marshalle and store to a temporary file.
      * @param fileName temporary file name.
-     * @return 
+     * @return
      */
     public static boolean storeResponse(final Object obj, final String fileName) {
         ArgumentChecks.ensureNonNull("obj", obj);
-        
+
         final MarshallerPool marshallerPool = WPSMarshallerPool.getInstance();
         boolean success = false;
 
@@ -806,7 +598,7 @@ public class WPSUtils {
 
     /**
      * Return the temporary folder URL. e.g : http://server:port/domain/tempDoc/
-     * 
+     *
      * @param workerURL
      * @return temporary folder path URL.
      */
@@ -823,8 +615,8 @@ public class WPSUtils {
 
     /**
      * Clean temporary file used as process inputs.
-     * 
-     * @param files 
+     *
+     * @param files
      */
     public static void cleanTempFiles(List<File> files) {
         if (files != null) {
@@ -832,5 +624,28 @@ public class WPSUtils {
                 f.delete();
             }
         }
+    }
+
+    public static String outputDefinitionToString(final DocumentOutputDefinitionType requestedOuptut) {
+        final StringBuilder builder = new StringBuilder();
+        final String begin = "[";
+        final String end = "]";
+        final String separator = ", ";
+
+        builder.append(begin);
+        
+        builder.append("mimeType=");
+        builder.append(requestedOuptut.getMimeType());
+        builder.append(separator);
+        
+        builder.append("encoding=");
+        builder.append(requestedOuptut.getEncoding());
+        builder.append(separator);
+        
+        builder.append("schema=");
+        builder.append(requestedOuptut.getSchema());
+       
+        builder.append(end);
+        return builder.toString();
     }
 }

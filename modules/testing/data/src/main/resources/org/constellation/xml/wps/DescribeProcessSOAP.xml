@@ -8,8 +8,8 @@
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 ../wpsDescribeProcess_request.xsd"
 			service="WPS" version="1.0.0" language="en-En">
-			<ows:Identifier>urn:ogc:geomatys:wps:jts:intersection</ows:Identifier>
-			<ows:Identifier>urn:ogc:geomatys:wps:jts:convexHull</ows:Identifier>
+			<ows:Identifier>urn:ogc:cstl:wps:jts:intersection</ows:Identifier>
+			<ows:Identifier>urn:ogc:cstl:wps:jts:convexHull</ows:Identifier>
 		</DescribeProcess>
 	</soap:Body>
 </soap:Envelope>

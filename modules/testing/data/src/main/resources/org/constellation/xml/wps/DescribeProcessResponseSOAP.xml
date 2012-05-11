@@ -3,12 +3,12 @@
     <S:Body>
         <ns4:ProcessDescriptions xmlns:ns3="http://www.opengis.net/ows/1.1" xmlns:ns4="http://www.opengis.net/wps/1.0.0" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns6="http://www.opengis.net/gml" xmlns:ns7="http://soap.ws.wps.constellation.org/" xml:lang="en-EN" version="1.0.0" service="WPS">
             <ProcessDescription statusSupported="true" storeSupported="true" ns4:processVersion="1.0.0">
-                <ns3:Identifier>urn:ogc:geomatys:wps:jts:intersection</ns3:Identifier>
+                <ns3:Identifier>urn:ogc:cstl:wps:jts:intersection</ns3:Identifier>
                 <ns3:Title>Jts : Intersection</ns3:Title>
                 <ns3:Abstract>Computes a intersection Geometry between the source geometry (geom1) and the other (geom2).</ns3:Abstract>
                 <DataInputs>
                     <Input maxOccurs="1" minOccurs="1">
-                        <ns3:Identifier>urn:ogc:geomatys:wps:jts:intersection:input:geom1</ns3:Identifier>
+                        <ns3:Identifier>urn:ogc:cstl:wps:jts:intersection:input:geom1</ns3:Identifier>
                         <ns3:Title>Geom1</ns3:Title>
                         <ns3:Abstract>Geometry JTS source</ns3:Abstract>
                         <ComplexData maximumMegabytes="100">
@@ -39,7 +39,7 @@
                         </ComplexData>
                     </Input>
                     <Input maxOccurs="1" minOccurs="1">
-                        <ns3:Identifier>urn:ogc:geomatys:wps:jts:intersection:input:geom2</ns3:Identifier>
+                        <ns3:Identifier>urn:ogc:cstl:wps:jts:intersection:input:geom2</ns3:Identifier>
                         <ns3:Title>Geom2</ns3:Title>
                         <ns3:Abstract>Geometry JTS</ns3:Abstract>
                         <ComplexData maximumMegabytes="100">
@@ -72,7 +72,7 @@
                 </DataInputs>
                 <ProcessOutputs>
                     <Output>
-                        <ns3:Identifier>urn:ogc:geomatys:wps:jts:intersection:output:result_geom</ns3:Identifier>
+                        <ns3:Identifier>urn:ogc:cstl:wps:jts:intersection:output:result_geom</ns3:Identifier>
                         <ns3:Title>Result_geom</ns3:Title>
                         <ns3:Abstract>The intersection geometry result</ns3:Abstract>
                         <ComplexOutput>
@@ -105,12 +105,12 @@
                 </ProcessOutputs>
             </ProcessDescription>
             <ProcessDescription statusSupported="true" storeSupported="true" ns4:processVersion="1.0.0">
-                <ns3:Identifier>urn:ogc:geomatys:wps:jts:convexHull</ns3:Identifier>
+                <ns3:Identifier>urn:ogc:cstl:wps:jts:convexHull</ns3:Identifier>
                 <ns3:Title>Jts : ConvexHull</ns3:Title>
                 <ns3:Abstract>Return the convex hull geometry of the specified geometry.</ns3:Abstract>
                 <DataInputs>
                     <Input maxOccurs="1" minOccurs="1">
-                        <ns3:Identifier>urn:ogc:geomatys:wps:jts:convexHull:input:geom</ns3:Identifier>
+                        <ns3:Identifier>urn:ogc:cstl:wps:jts:convexHull:input:geom</ns3:Identifier>
                         <ns3:Title>Geom</ns3:Title>
                         <ns3:Abstract>Geometry JTS</ns3:Abstract>
                         <ComplexData maximumMegabytes="100">
@@ -143,7 +143,7 @@
                 </DataInputs>
                 <ProcessOutputs>
                     <Output>
-                        <ns3:Identifier>urn:ogc:geomatys:wps:jts:convexHull:output:result_geom</ns3:Identifier>
+                        <ns3:Identifier>urn:ogc:cstl:wps:jts:convexHull:output:result_geom</ns3:Identifier>
                         <ns3:Title>Result_geom</ns3:Title>
                         <ns3:Abstract>ConvexHull geometry result</ns3:Abstract>
                         <ComplexOutput>

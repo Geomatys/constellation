@@ -18,10 +18,13 @@ package org.constellation.wps.ws;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import java.io.*;
+import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
@@ -30,79 +33,46 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
-import org.geotoolkit.ows.xml.v110.AnyValue;
-import org.geotoolkit.ows.xml.v110.BoundingBoxType;
-import org.geotoolkit.ows.xml.v110.CodeType;
-import org.geotoolkit.ows.xml.v110.AllowedValues;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.util.converter.ObjectConverter;
-import org.geotoolkit.wps.xml.v100.ComplexDataType;
-import org.geotoolkit.wps.xml.v100.DescribeProcess;
-import org.geotoolkit.wps.xml.v100.Execute;
-import org.geotoolkit.wps.xml.v100.ExecuteResponse;
-import org.geotoolkit.wps.xml.v100.GetCapabilities;
-import org.geotoolkit.wps.xml.v100.InputDescriptionType;
-import org.geotoolkit.wps.xml.v100.InputType;
-import org.geotoolkit.wps.xml.v100.LiteralDataType;
-import org.geotoolkit.wps.xml.v100.LiteralInputType;
-import org.geotoolkit.wps.xml.v100.OutputDescriptionType;
-import org.geotoolkit.wps.xml.v100.ProcessDescriptionType;
-import org.geotoolkit.wps.xml.v100.ProcessDescriptions;
-import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
-import org.geotoolkit.wps.xml.v100.ProcessOfferings;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.wps.xml.v100.DataType;
-import org.geotoolkit.wps.xml.v100.OutputDataType;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.wps.xml.v100.CRSsType;
-import org.geotoolkit.wps.xml.v100.SupportedCRSsType;
-import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
-import org.geotoolkit.wps.xml.v100.DocumentOutputDefinitionType;
-import org.geotoolkit.wps.xml.v100.OutputDefinitionType;
-import org.geotoolkit.wps.xml.v100.OutputDefinitionsType;
-import org.geotoolkit.wps.xml.v100.ResponseDocumentType;
-import org.geotoolkit.wps.xml.v100.ResponseFormType;
-import org.geotoolkit.wps.xml.v100.StatusType;
-import org.geotoolkit.geometry.isoonjts.GeometryUtils;
-import org.geotoolkit.gml.JTStoGeometry;
-import org.geotoolkit.wps.xml.WPSMarshallerPool;
-import org.geotoolkit.process.ProcessingRegistry;
-import org.geotoolkit.wps.xml.v100.LiteralOutputType;
-import org.geotoolkit.wps.xml.v100.*;
-import org.geotoolkit.process.*;
-import org.geotoolkit.util.ArgumentChecks;
-import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.InvalidParameterValueException;
-import org.opengis.util.FactoryException;
-import org.opengis.geometry.Envelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.NoSuchIdentifierException;
-import org.constellation.wps.utils.WPSUtils;
 import org.constellation.ServiceDef;
+import static org.constellation.api.CommonConstants.DEFAULT_CRS;
+import static org.constellation.api.QueryConstants.*;
+import org.constellation.configuration.Process;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.ProcessFactory;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.wps.utils.WPSUtils;
+import static org.constellation.wps.ws.WPSConstant.*;
+import org.constellation.wps.ws.rs.WPSService;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.configuration.ProcessContext;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.configuration.ProcessFactory;
-import org.constellation.configuration.Process;
-import org.constellation.wps.ws.rs.WPSService;
 
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.api.CommonConstants.*;
-import org.constellation.wps.converters.outputs.complex.AbstractComplexOutputConverter;
-import org.constellation.wps.converters.outputs.references.AbstractReferenceOutputConverter;
-import static org.constellation.wps.ws.WPSConstant.*;
+import org.geotoolkit.geometry.isoonjts.GeometryUtils;
+import org.geotoolkit.gml.JTStoGeometry;
+import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.*;
+import org.geotoolkit.process.AbstractProcess;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.process.ProcessingRegistry;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.util.ArgumentChecks;
+import org.geotoolkit.util.converter.NonconvertibleObjectException;
+import org.geotoolkit.util.converter.ObjectConverter;
+import org.geotoolkit.wps.converters.WPSConvertersUtils;
+import org.geotoolkit.wps.converters.outputs.complex.AbstractComplexOutputConverter;
+import org.geotoolkit.wps.converters.outputs.references.AbstractReferenceOutputConverter;
+import org.geotoolkit.wps.io.WPSIO;
+import org.geotoolkit.wps.xml.WPSMarshallerPool;
+import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
+import org.geotoolkit.wps.xml.v100.*;
+import org.geotoolkit.xml.MarshallerPool;
+
+import org.opengis.geometry.Envelope;
+import org.opengis.parameter.*;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.FactoryException;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -430,16 +400,8 @@ public class WPSWorker extends AbstractWorker {
                     // BoundingBox type
                     if (WPSIO.isSupportedBBoxInputClass(clazz)) {
                         in.setBoundingBoxData(WPS_SUPPORTED_CRS);
-
-                        //Complex type (XML, ...)     
-                    } else if (WPSIO.isSupportedComplexInputClass(clazz)) {
-                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.DataType.COMPLEX));
-
-                        //Reference type (XML, ...)    
-                    } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
-                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.DataType.REFERENCE));
                         
-                        //Simple object (Integer, double, ...) and Object which need a conversion from String like affineTransform or WKT Geometry
+                         //Simple object (Integer, double, ...) and Object which need a conversion from String like affineTransform or WKT Geometry
                     } else if (WPSIO.isSupportedLiteralInputClass(clazz)) {
                         final LiteralInputType literal = new LiteralInputType();
 
@@ -461,6 +423,16 @@ public class WPSWorker extends AbstractWorker {
 
 
                         in.setLiteralData(literal);
+                        
+                        //Complex type (XML, ...)     
+                    } else if (WPSIO.isSupportedComplexInputClass(clazz)) {
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX));
+
+                        //Reference type (XML, ...)    
+                    } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
+                        in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.REFERENCE));
+                        
+                       
 
                     } else {
                         throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
@@ -497,14 +469,7 @@ public class WPSWorker extends AbstractWorker {
                     //BoundingBox type
                     if (WPSIO.isSupportedBBoxOutputClass(clazz)) {
                         out.setBoundingBoxOutput(WPS_SUPPORTED_CRS);
-
-                        //Complex type (XML, raster, ...)
-                    } else if (WPSIO.isSupportedComplexOutputClass(clazz)) {
-                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.DataType.COMPLEX));
-
-                    } else if (WPSIO.isSupportedReferenceOutputClass(clazz)) {
-                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.DataType.REFERENCE));
-
+                        
                         //Simple object (Integer, double) and Object which need a conversion from String like affineTransform or Geometry
                     } else if (WPSIO.isSupportedLiteralOutputClass(clazz)) {
 
@@ -515,6 +480,14 @@ public class WPSWorker extends AbstractWorker {
                         }
 
                         out.setLiteralOutput(literal);
+                        
+                        //Complex type (XML, raster, ...)
+                    } else if (WPSIO.isSupportedComplexOutputClass(clazz)) {
+                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX));
+
+                    } else if (WPSIO.isSupportedReferenceOutputClass(clazz)) {
+                        out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.REFERENCE));
+
                     } else {
                         throw new CstlServiceException("Process output not supported.", NO_APPLICABLE_CODE);
                     }
@@ -857,16 +830,15 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("The input" + inputIdentifier + " can't handle reference.", INVALID_PARAMETER_VALUE, inputIdentifier);
                 }
                 final InputReferenceType requestedRef = inputRequest.getReference();
-                final String href = requestedRef.getHref();
-                final String method = requestedRef.getMethod();
-                final String mime = requestedRef.getMimeType();
-                final String encoding = requestedRef.getEncoding();
-                final String schema = requestedRef.getSchema();
-
-                dataValue = WPSUtils.reachReferencedData(href, method, mime, encoding, schema, expectedClass, inputIdentifier);
-                if (dataValue instanceof FeatureCollection) {
-                    dataValue = (FeatureCollection) dataValue;
+                if (requestedRef.getHref() == null) {
+                    throw new CstlServiceException("Invalid reference input : href can't be null.", INVALID_PARAMETER_VALUE, inputIdentifier);
                 }
+                try {
+                    dataValue = WPSConvertersUtils.convertFromReference(requestedRef, expectedClass);
+                } catch (NonconvertibleObjectException ex) {
+                    throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+                }
+                
                 if (dataValue instanceof File) {
                     if (files == null) {
                         files = new ArrayList<File>();
@@ -912,35 +884,18 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Complex value expected", INVALID_PARAMETER_VALUE, inputIdentifier);
                 }
 
-
                 final ComplexDataType complex = inputRequest.getData().getComplexData();
-                final String mime = complex.getMimeType();
-                final String encoding = complex.getEncoding();
-                final List<Object> content = complex.getContent();
-                final String schema = complex.getSchema();
 
-                if (content.size() <= 0) {
+                if (complex.getContent() == null || complex.getContent().size() <= 0) {
                     throw new CstlServiceException("Missing data input value.", INVALID_PARAMETER_VALUE, inputIdentifier);
 
                 } else {
 
-                    final List<Object> inputObject = new ArrayList<Object>();
-                    for (final Object obj : content) {
-                        if (obj != null) {
-                            if (!(obj instanceof String)) {
-                                inputObject.add(obj);
-                            }
-                        }
+                    try {
+                        dataValue = WPSConvertersUtils.convertFromComplex(expectedClass, complex);
+                    } catch (NonconvertibleObjectException ex) {
+                        throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                     }
-
-                    if (inputObject == null) {
-                        throw new CstlServiceException("Invalid data input value : Empty value.", INVALID_PARAMETER_VALUE, inputIdentifier);
-                    }
-
-                    /*
-                     * Extract Data from inputObject array
-                     */
-                    dataValue = WPSUtils.extractComplexInput(expectedClass, inputObject, schema, mime, encoding, inputIdentifier);
                 }
             }
 
@@ -963,10 +918,13 @@ public class WPSWorker extends AbstractWorker {
                     dataValue = Double.valueOf(converter.convert(Double.valueOf(data)));
                     
                 } else {
-                    //convert String into expected type
-                    dataValue = WPSUtils.convertFromString(data, expectedClass);
+                    
+                    try {
+                        dataValue = WPSConvertersUtils.convertFromString(data, expectedClass);
+                    } catch (NonconvertibleObjectException ex) {
+                        throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+                    }
                 }
-                
             }
 
             try {
@@ -1047,7 +1005,7 @@ public class WPSWorker extends AbstractWorker {
         //set Ouput informations
         outData.setIdentifier(new CodeType(outputIdentifier));
         
-        //support custom title.
+        //support custom title/abstract.
         final LanguageStringType titleOut = requestedOutput.getTitle() != null ? 
                 requestedOutput.getTitle() : WPSUtils.capitalizeFirstLetter(outputIdentifierCode);
         final LanguageStringType abstractOut = requestedOutput.getAbstract() != null ? 
@@ -1078,30 +1036,26 @@ public class WPSWorker extends AbstractWorker {
                 parameters.put(AbstractComplexOutputConverter.OUT_ENCODING, requestedOutput.getEncoding());
                 parameters.put(AbstractComplexOutputConverter.OUT_MIME, requestedOutput.getMimeType());
                 parameters.put(AbstractComplexOutputConverter.OUT_SCHEMA, requestedOutput.getSchema());
-                    
-                final ObjectConverter converter = WPSIO.getConverter(outClass, WPSIO.IOType.OUTPUT, WPSIO.DataType.COMPLEX, 
+                try {    
+                
+                    final ObjectConverter converter = WPSIO.getConverter(outClass, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX, 
                         requestedOutput.getMimeType(), requestedOutput.getEncoding(), requestedOutput.getSchema());
-                if (converter == null) {
-                    throw new CstlServiceException("Output complex not supported, no converter found.",
-                            OPERATION_NOT_SUPPORTED, outputIdentifier);
-                }
-
-                try {
+                     
                     data.setComplexData((ComplexDataType) converter.convert(parameters));
                 } catch (NonconvertibleObjectException ex) {
-                    throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, outputIdentifier);
+                    throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
 
             } else if (WPSIO.isSupportedLiteralOutputClass(outClass)) {
+                
                 final LiteralDataType literal = new LiteralDataType();
-                literal.setDataType(outClass.getCanonicalName());
-                if (outputValue == null) {
-                    literal.setValue(null);
-                } else {
-                    literal.setValue(String.valueOf(outputValue));
+                literal.setDataType(WPSUtils.getDataTypeString(outClass));
+                literal.setValue(WPSConvertersUtils.convertToString(outputValue));
+                if (outputDescriptor.getUnit() != null) {
+                    literal.setUom(outputDescriptor.getUnit().toString());
                 }
                 data.setLiteralData(literal);
-
+                
             } else {
                 throw new CstlServiceException("Process output parameter invalid", MISSING_PARAMETER_VALUE, outputIdentifier);
             }
@@ -1127,29 +1081,30 @@ public class WPSWorker extends AbstractWorker {
         try {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put(AbstractReferenceOutputConverter.OUT_DATA, outputValue);
-            parameters.put(AbstractComplexOutputConverter.OUT_TMP_DIR_PATH, WPSUtils.getTempDirectoryPath());
+            parameters.put(AbstractReferenceOutputConverter.OUT_TMP_DIR_PATH, WPSUtils.getTempDirectoryPath());
             parameters.put(AbstractReferenceOutputConverter.OUT_TMP_DIR_URL, WPSUtils.getTempDirectoryURL(serviceURL));
             parameters.put(AbstractReferenceOutputConverter.OUT_ENCODING, requestedOutput.getEncoding());
             parameters.put(AbstractReferenceOutputConverter.OUT_MIME, requestedOutput.getMimeType());
             parameters.put(AbstractReferenceOutputConverter.OUT_SCHEMA, requestedOutput.getSchema());
 
-            final ObjectConverter converter = WPSIO.getConverter(clazz, WPSIO.IOType.OUTPUT, WPSIO.DataType.REFERENCE, 
+            final ObjectConverter converter = WPSIO.getConverter(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.REFERENCE, 
                     requestedOutput.getMimeType(), requestedOutput.getEncoding(), requestedOutput.getSchema());
 
             if (converter == null) {
-                throw new CstlServiceException("Reference Output not supported, no converter found.", OPERATION_NOT_SUPPORTED, requestedOutput.getIdentifier().getValue());
+                throw new CstlServiceException("Reference Output not supported, no converter found with " + WPSUtils.outputDefinitionToString(requestedOutput), 
+                        OPERATION_NOT_SUPPORTED, requestedOutput.getIdentifier().getValue());
             }
 
             return (OutputReferenceType) converter.convert(parameters);
 
         } catch (NonconvertibleObjectException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
         }
     }
 
 
     /**
-     * Handle Raw output. //TODO create raw output converters
+     * Handle Raw output. 
      *
      * @param outputValue
      * @return

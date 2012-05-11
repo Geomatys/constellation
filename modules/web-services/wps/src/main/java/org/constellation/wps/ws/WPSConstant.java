@@ -59,7 +59,7 @@ public final class WPSConstant {
     /** 
      * Process identifier prefix to uniquely identifies process using OGC URN code.
      */
-    public static final String PROCESS_PREFIX = "urn:ogc:geomatys:wps:";
+    public static final String PROCESS_PREFIX = "urn:ogc:cstl:wps:";
     
     /**
      * Temprary directory name used for store responses.

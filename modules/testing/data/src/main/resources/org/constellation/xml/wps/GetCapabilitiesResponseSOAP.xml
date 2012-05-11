@@ -99,102 +99,102 @@
             </ns3:OperationsMetadata>
             <ns4:ProcessOfferings>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:intersection</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:intersection</ns3:Identifier>
                     <ns3:Title>Jts : Intersection</ns3:Title>
                     <ns3:Abstract>Computes a intersection Geometry between the source geometry (geom1) and the other (geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:convexHull</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:convexHull</ns3:Identifier>
                     <ns3:Title>Jts : ConvexHull</ns3:Title>
                     <ns3:Abstract>Return the convex hull geometry of the specified geometry.</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:touches</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:touches</ns3:Identifier>
                     <ns3:Title>Jts : Touches</ns3:Title>
                     <ns3:Abstract>Returns true if this geometry(geom1) touches the specified geometry(geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:envelope</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:envelope</ns3:Identifier>
                     <ns3:Title>Jts : Envelope</ns3:Title>
                     <ns3:Abstract>Returns this Geometry bounding box.</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:crosses</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:crosses</ns3:Identifier>
                     <ns3:Title>Jts : Crosses</ns3:Title>
                     <ns3:Abstract> Returns true if this geometry source (geom1) crosses the specified geometry (geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:boundary</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:boundary</ns3:Identifier>
                     <ns3:Title>Jts : Boundary</ns3:Title>
                     <ns3:Abstract>Return boundarty geometry of an input JTS geometry</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:centroid</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:centroid</ns3:Identifier>
                     <ns3:Title>Jts : Centroid</ns3:Title>
                     <ns3:Abstract>Return the centroid point of an input JTS geometry</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:buffer</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:buffer</ns3:Identifier>
                     <ns3:Title>Jts : Buffer</ns3:Title>
                     <ns3:Abstract>Apply JTS buffer to a geometry.</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:difference</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:difference</ns3:Identifier>
                     <ns3:Title>Jts : Difference</ns3:Title>
                     <ns3:Abstract>Computes a difference Geometry between the source geometry (geom1) and the other (geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:overlaps</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:overlaps</ns3:Identifier>
                     <ns3:Title>Jts : Overlaps</ns3:Title>
                     <ns3:Abstract>Returns true if this geometry (geom1) overlaps the specified geometry (geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:isEmpty</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:isEmpty</ns3:Identifier>
                     <ns3:Title>Jts : IsEmpty</ns3:Title>
                     <ns3:Abstract>Returns true if this geometry source is an empty geometry.</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:area</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:area</ns3:Identifier>
                     <ns3:Title>Jts : Area</ns3:Title>
                     <ns3:Abstract>Return the area of a JTS geometry</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:equals2d</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:equals2d</ns3:Identifier>
                     <ns3:Title>Jts : Equals2d</ns3:Title>
                     <ns3:Abstract>Return true if source geometry (geom1) is equals to the other geometry (geom2) .</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:covers</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:covers</ns3:Identifier>
                     <ns3:Title>Jts : Covers</ns3:Title>
                     <ns3:Abstract>Returns true if this geometry source (geom1) covers the specified geometry (geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:union</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:union</ns3:Identifier>
                     <ns3:Title>Jts : Union</ns3:Title>
                     <ns3:Abstract>Computes a union Geometry between the source geometry (geom1) and the other (geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:intersects</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:intersects</ns3:Identifier>
                     <ns3:Title>Jts : Intersects</ns3:Title>
                     <ns3:Abstract>Returns true if this geometry source (geom1) intersects the specified geometry (geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:contain</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:contain</ns3:Identifier>
                     <ns3:Title>Jts : Contain</ns3:Title>
                     <ns3:Abstract>Return true if source geometry (geom1) contains the specified geometry(geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:coveredBy</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:coveredBy</ns3:Identifier>
                     <ns3:Title>Jts : CoveredBy</ns3:Title>
                     <ns3:Abstract>Returns true if this geometry source (geom1) is covered by the specified geometry (geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:within</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:within</ns3:Identifier>
                     <ns3:Title>Jts : Within</ns3:Title>
                     <ns3:Abstract>Returns true if this geometry source (geom1) is within the specified geometry (geom2).</ns3:Abstract>
                 </ns4:Process>
                 <ns4:Process ns4:processVersion="1.0.0">
-                    <ns3:Identifier>urn:ogc:geomatys:wps:jts:lenght</ns3:Identifier>
+                    <ns3:Identifier>urn:ogc:cstl:wps:jts:lenght</ns3:Identifier>
                     <ns3:Title>Jts : Lenght</ns3:Title>
                     <ns3:Abstract>Returns the length of this Geometry.</ns3:Abstract>
                 </ns4:Process>
