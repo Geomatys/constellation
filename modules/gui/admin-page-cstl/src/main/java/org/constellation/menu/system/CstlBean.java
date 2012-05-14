@@ -17,6 +17,7 @@
 
 package org.constellation.menu.system;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.context.FacesContext;
 import org.constellation.admin.service.ConstellationServer;
@@ -114,7 +115,7 @@ public class CstlBean extends I18NBean {
         if (userName != null && !userName.isEmpty() && password != null && !password.isEmpty()) {
             final ConstellationServer server = getServer();
             if (server != null) {
-                LOGGER.info("updating User");
+                LOGGER.log(Level.INFO, "updating User: oldLogin={0}", server.currentUser);
                 server.updateUser(userName, password, server.currentUser);
                 /*
                  * we must disconnect the user

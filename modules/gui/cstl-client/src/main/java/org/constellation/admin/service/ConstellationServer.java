@@ -99,9 +99,10 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         this.providers   = createProviderManager();
         this.csws        = createCswManager();
         this.tasks       = createTaskManager();
+        Parameters.getOrCreate(ConstellationServerFactory.USER, parameters).setValue(user);
+        Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, parameters).setValue(password);
+        Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters).setValue(new BasicAuthenticationSecurity(user, password));
         this.currentUser = Parameters.value(ConstellationServerFactory.USER, parameters);
-        Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters)
-                .setValue(new BasicAuthenticationSecurity(user, password));
     }
     
     public ConstellationServer(ParameterValueGroup params){
@@ -279,6 +280,10 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     }
     
     public boolean updateUser(final String userName, final String password, final String oldLogin){
+        if (oldLogin == null) {
+            LOGGER.warning("you must specify the old login to change it");
+            return false;
+        }
         try {
             final String url = getURL() + "configuration?request=updateUser&username=" + userName + "&password=" + password + "&oldLogin=" + oldLogin;
             final Object response = sendRequest(url, null);
