@@ -20,6 +20,7 @@ import java.io.File;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -40,6 +41,9 @@ public class WebdavContext {
     private boolean hideDotFile = true;
     
     private String contextPath = "webdav";
+    
+    @XmlTransient
+    private String id;
     
     private String defaultPage;
 
@@ -154,5 +158,19 @@ public class WebdavContext {
      */
     public void setDefaultPage(String defaultPage) {
         this.defaultPage = defaultPage;
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 }

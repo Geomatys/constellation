@@ -29,12 +29,16 @@ public class FsDirectoryResource extends FsResource implements MakeCollectionabl
     private final String contextPath;
     
     private final boolean hideDotFile;
+    
+    private final String id;
+    
     public FsDirectoryResource(final String host, final File dir, final WebdavContext context) {
         super(host, dir, context);
         this.defaultPage = context.getDefaultPage();
         this.root        = context.getRootFile();
         this.contextPath = context.getContextPath();
         this.hideDotFile = context.isHideDotFile();
+        this.id          = context.getId();
         if (!dir.exists()) {
             throw new IllegalArgumentException("Directory does not exist: " + dir.getAbsolutePath());
         }
@@ -273,7 +277,7 @@ public class FsDirectoryResource extends FsResource implements MakeCollectionabl
     
     private String buildHref(final String subPath, final String name) {
         
-        final String abUrl = getURL() + contextPath + subPath;
+        final String abUrl = getURL() + contextPath + '/'+ id + subPath;
 
         if (ssoPrefix == null) {
             if (name == null) {

@@ -64,6 +64,11 @@
        <artifactId>cstl-xml-configuration</artifactId>
        <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 

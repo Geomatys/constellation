@@ -401,6 +401,29 @@ public class ConfigurationXmlBindingTest {
     }
     
     /**
+     * Test processContext Marshalling.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void webdavContextMarshalingTest() throws Exception {
+        WebdavContext context = new WebdavContext("/home/guilhem");
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(context, sw);
+
+        String expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:WebdavContext >" + '\n'
+                + "    <ns2:rootFile>/home/guilhem</ns2:rootFile>" + '\n'
+                + "    <ns2:digestAllowed>true</ns2:digestAllowed>" + '\n'
+                + "    <ns2:hideDotFile>true</ns2:hideDotFile>" + '\n'
+                + "    <ns2:contextPath>webdav</ns2:contextPath>" + '\n'
+                + "</ns2:WebdavContext>\n";
+
+        String result = removeXmlns(sw.toString());
+        assertEquals(expresult, result);
+    }
+    
+    /**
      * Test layerContext Marshalling.
      *
      * @throws java.lang.Exception

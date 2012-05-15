@@ -139,6 +139,11 @@ public class ObjectFactory {
         return new StringTreeNode();
     }
     
+    public WebdavContext createWebdavContext(){
+        return new WebdavContext();
+    }
+    
+    
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")
     public JAXBElement<Object> createSource(Object value) {
         return new JAXBElement<Object>(SOURCE_QNAME, Object.class, null, value);
