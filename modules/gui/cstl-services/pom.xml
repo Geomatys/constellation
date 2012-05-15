@@ -200,6 +200,12 @@
                 <dependency>
                     <groupId>org.geotoolkit</groupId>
                     <artifactId>geotk-coverageio-netcdf</artifactId>
+		    <exclusions>
+		       <exclusion>
+		          <groupId>org.slf4j</groupId>
+		          <artifactId>slf4j-jdk14</artifactId>
+		       </exclusion>
+		    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
@@ -521,6 +527,11 @@
             <artifactId>cstl-web-configuration</artifactId>
             <version>${project.version}</version>
         </dependency>
+	<dependency>
+            <groupId>org.constellation.web-services</groupId>
+            <artifactId>cstl-web-webdav</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.constellation.engine</groupId>
             <artifactId>cstl-engine-auth</artifactId>
@@ -557,7 +568,10 @@
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+	    <groupId>com.ettrema</groupId>
+            <artifactId>milton-servlet</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

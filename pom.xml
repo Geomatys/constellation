@@ -402,6 +402,17 @@
                <artifactId>shiro-web</artifactId>
                <version>1.2.0</version>
             </dependency>
+            <!-- milton webdav -->
+            <dependency>
+               <groupId>com.ettrema</groupId>
+               <artifactId>milton-api</artifactId>
+               <version>1.7.2</version>
+            </dependency>
+            <dependency>
+               <groupId>com.ettrema</groupId>
+               <artifactId>milton-servlet</artifactId>
+               <version>1.7.2</version>
+            </dependency>
             <!-- MapFaces -->
             <dependency>
                 <groupId>org.mapfaces</groupId>
@@ -997,6 +1008,13 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>ettrema-repo</id>
+            <url>http://www.ettrema.com/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>    
     </repositories>
     <pluginRepositories>
         <pluginRepository>

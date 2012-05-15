@@ -153,6 +153,7 @@
     <module>base</module>
     <module>ogc</module>
     <module>configuration</module>
+    <module>webdav</module>
   </modules>
 
 </project>
