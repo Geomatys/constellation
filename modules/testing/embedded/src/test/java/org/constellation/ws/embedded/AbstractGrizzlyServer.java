@@ -233,12 +233,6 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         // Starting the grizzly server
         grizzly.start();
 
-        // Waiting for grizzly server to be completely started
-        try {
-            Thread.sleep(3 * 1000);
-        } catch (InterruptedException ex) {
-            assumeNoException(ex);
-        }
     }
 
     /**

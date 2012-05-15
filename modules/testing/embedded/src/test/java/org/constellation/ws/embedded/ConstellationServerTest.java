@@ -20,6 +20,9 @@ import org.constellation.admin.service.ConstellationServer;
 import org.geotoolkit.xml.MarshallerPool;
 import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.net.ConnectException;
+import java.net.URL;
+import java.net.URLConnection;
 import org.junit.*;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import static org.junit.Assert.*;
@@ -51,6 +54,9 @@ public class ConstellationServerTest extends AbstractTestRequest {
     
     @Test
     public void testgetDescriptor() throws Exception {
+        
+        waitForStart();
+        
         final ConstellationServer administrator = ConstellationServer.login("http://localhost:9090/", "", "");
         assertNotNull(administrator);
         GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("shapefile");

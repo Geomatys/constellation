@@ -63,6 +63,8 @@ public class AdminRequestTest extends AbstractTestRequest {
     @Test
     public void testNewInstance() throws Exception {
 
+        waitForStart();
+        
         /*
          * we build a new instance
          */
