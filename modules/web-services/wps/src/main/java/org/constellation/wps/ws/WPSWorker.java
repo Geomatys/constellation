@@ -419,7 +419,7 @@ public class WPSWorker extends AbstractWorker {
                             literal.setAnyValue(new AnyValue());
                         }
                         literal.setValuesReference(null);
-                        literal.setDataType(WPSUtils.createDataType(clazz));
+                        literal.setDataType(WPSConvertersUtils.createDataType(clazz));
 
 
                         in.setLiteralData(literal);
@@ -474,7 +474,7 @@ public class WPSWorker extends AbstractWorker {
                     } else if (WPSIO.isSupportedLiteralOutputClass(clazz)) {
 
                         final LiteralOutputType literal = new LiteralOutputType();
-                        literal.setDataType(WPSUtils.createDataType(clazz));
+                        literal.setDataType(WPSConvertersUtils.createDataType(clazz));
                         if (paramDesc.getUnit() != null) {
                             literal.setUOMs(WPSUtils.generateUOMs(paramDesc));
                         }
@@ -892,7 +892,7 @@ public class WPSWorker extends AbstractWorker {
                 } else {
 
                     try {
-                        dataValue = WPSConvertersUtils.convertFromComplex(expectedClass, complex);
+                        dataValue = WPSConvertersUtils.convertFromComplex(complex, expectedClass);
                     } catch (NonconvertibleObjectException ex) {
                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                     }
@@ -1029,19 +1029,18 @@ public class WPSWorker extends AbstractWorker {
 
             } else if (WPSIO.isSupportedComplexOutputClass(outClass)) {
                 
-                final Map<String, Object> parameters = new HashMap<String, Object>();
-                parameters.put(AbstractComplexOutputConverter.OUT_DATA, outputValue);
-                parameters.put(AbstractComplexOutputConverter.OUT_TMP_DIR_PATH, WPSUtils.getTempDirectoryPath());
-                parameters.put(AbstractComplexOutputConverter.OUT_TMP_DIR_URL, WPSUtils.getTempDirectoryURL(serviceURL));
-                parameters.put(AbstractComplexOutputConverter.OUT_ENCODING, requestedOutput.getEncoding());
-                parameters.put(AbstractComplexOutputConverter.OUT_MIME, requestedOutput.getMimeType());
-                parameters.put(AbstractComplexOutputConverter.OUT_SCHEMA, requestedOutput.getSchema());
-                try {    
+                try {  
+                    final ComplexDataType complex = WPSConvertersUtils.convertToComplex(
+                            outputValue, 
+                            requestedOutput.getMimeType(), 
+                            requestedOutput.getEncoding(), 
+                            requestedOutput.getSchema(), 
+                            WPSUtils.getTempDirectoryPath(), 
+                            WPSUtils.getTempDirectoryURL(serviceURL)
+                            );
                 
-                    final ObjectConverter converter = WPSIO.getConverter(outClass, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX, 
-                        requestedOutput.getMimeType(), requestedOutput.getEncoding(), requestedOutput.getSchema());
-                     
-                    data.setComplexData((ComplexDataType) converter.convert(parameters));
+                    data.setComplexData(complex);
+                    
                 } catch (NonconvertibleObjectException ex) {
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
@@ -1049,7 +1048,7 @@ public class WPSWorker extends AbstractWorker {
             } else if (WPSIO.isSupportedLiteralOutputClass(outClass)) {
                 
                 final LiteralDataType literal = new LiteralDataType();
-                literal.setDataType(WPSUtils.getDataTypeString(outClass));
+                literal.setDataType(WPSConvertersUtils.getDataTypeString(outClass));
                 literal.setValue(WPSConvertersUtils.convertToString(outputValue));
                 if (outputDescriptor.getUnit() != null) {
                     literal.setUom(outputDescriptor.getUnit().toString());
@@ -1079,24 +1078,16 @@ public class WPSWorker extends AbstractWorker {
             final Object outputValue, final String serviceURL) throws CstlServiceException {
         
         try {
-            final Map<String, Object> parameters = new HashMap<String, Object>();
-            parameters.put(AbstractReferenceOutputConverter.OUT_DATA, outputValue);
-            parameters.put(AbstractReferenceOutputConverter.OUT_TMP_DIR_PATH, WPSUtils.getTempDirectoryPath());
-            parameters.put(AbstractReferenceOutputConverter.OUT_TMP_DIR_URL, WPSUtils.getTempDirectoryURL(serviceURL));
-            parameters.put(AbstractReferenceOutputConverter.OUT_ENCODING, requestedOutput.getEncoding());
-            parameters.put(AbstractReferenceOutputConverter.OUT_MIME, requestedOutput.getMimeType());
-            parameters.put(AbstractReferenceOutputConverter.OUT_SCHEMA, requestedOutput.getSchema());
-
-            final ObjectConverter converter = WPSIO.getConverter(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.REFERENCE, 
-                    requestedOutput.getMimeType(), requestedOutput.getEncoding(), requestedOutput.getSchema());
-
-            if (converter == null) {
-                throw new CstlServiceException("Reference Output not supported, no converter found with " + WPSUtils.outputDefinitionToString(requestedOutput), 
-                        OPERATION_NOT_SUPPORTED, requestedOutput.getIdentifier().getValue());
-            }
-
-            return (OutputReferenceType) converter.convert(parameters);
-
+           final OutputReferenceType reference = (OutputReferenceType) WPSConvertersUtils.convertToReference(
+                    outputValue, 
+                    requestedOutput.getMimeType(), 
+                    requestedOutput.getEncoding(), 
+                    requestedOutput.getSchema(),
+                    WPSUtils.getTempDirectoryPath(),  
+                    WPSUtils.getTempDirectoryURL(serviceURL), 
+                    WPSIO.IOType.OUTPUT);
+            
+           return reference;
         } catch (NonconvertibleObjectException ex) {
             throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
         }

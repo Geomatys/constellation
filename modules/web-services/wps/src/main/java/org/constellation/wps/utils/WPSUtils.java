@@ -299,49 +299,6 @@ public class WPSUtils {
     }
 
     /**
-     * Create the DomaineMetaData object for a literal
-     *
-     * @param clazz
-     * @return
-     * @throws CstlServiceException
-     */
-    public static DomainMetadataType createDataType(final Class clazz) throws CstlServiceException {
-
-
-        if (clazz.equals(Double.class)) {
-            return new DomainMetadataType("Double", "http://www.w3.org/TR/xmlschema-2/#double");
-
-        } else if (clazz.equals(Float.class)) {
-            return new DomainMetadataType("Float", "http://www.w3.org/TR/xmlschema-2/#float");
-
-        } else if (clazz.equals(Boolean.class)) {
-            return new DomainMetadataType("Boolean", "http://www.w3.org/TR/xmlschema-2/#boolean");
-
-        } else if (clazz.equals(Integer.class)) {
-            return new DomainMetadataType("Integer", "http://www.w3.org/TR/xmlschema-2/#integer");
-
-        } else if (clazz.equals(Long.class)) {
-            return new DomainMetadataType("Long", "http://www.w3.org/TR/xmlschema-2/#long");
-
-        } else if (clazz.equals(String.class) || WPSIO.isSupportedInputClass(clazz) || WPSIO.isSupportedOutputClass(clazz)) {
-            return new DomainMetadataType("String", "http://www.w3.org/TR/xmlschema-2/#string");
-
-        } else {
-            throw new CstlServiceException("No supported literal type");
-        }
-    }
-    
-    public static String getDataTypeString(final Class clazz) {
-        String ref = null;
-        try {
-            ref = createDataType(clazz).getReference();
-        } catch (CstlServiceException ex) {
-            ref = "http://www.w3.org/TR/xmlschema-2/#string";
-        }
-        return ref;
-    }
-
-    /**
      * Return the SupportedComplexDataInputType for the given class.
      *
      * @param attributeClass
