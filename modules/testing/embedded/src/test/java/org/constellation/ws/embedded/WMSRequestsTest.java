@@ -19,19 +19,27 @@ package org.constellation.ws.embedded;
 // J2SE dependencies
 import java.util.Arrays;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import javax.imageio.ImageIO;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBException;
+import org.constellation.map.ws.WMSMapDecoration;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.configuration.Configurator;
+import org.constellation.provider.shapefile.ShapeFileProviderService;
+
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 // Geotoolkit dependencies
+import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
@@ -44,12 +52,18 @@ import org.geotoolkit.inspire.xml.vs.LanguagesType;
 import org.geotoolkit.inspire.xml.vs.LanguageType;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.image.io.plugin.WorldFileImageReader;
+import org.geotoolkit.image.jai.Registry;
+import org.geotoolkit.internal.io.IOUtilities;
 
 // JUnit dependencies
-import org.geotoolkit.wms.xml.WMSMarshallerPool;
+
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
+
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
@@ -132,6 +146,106 @@ public class WMSRequestsTest extends AbstractTestRequest {
     @BeforeClass
     public static void initLayerList() throws JAXBException {
         pool = WMSMarshallerPool.getInstance();
+        
+        final Configurator config = new Configurator() {
+            @Override
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+
+                final ParameterValueGroup config = desc.createValue();
+                
+                if("coverage-sql".equals(serviceName)){
+                    // Defines a PostGrid data provider
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://db.geomatys.com/coverages-test");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+
+                }else if("shapefile".equals(serviceName)){
+                    try{
+                        final File outputDir = initDataDirectory();
+                        
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
+                        srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
+                                .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
+                        srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
+                                .setValue("http://www.opengis.net/gml");
+                        
+                        ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                        layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
+                        layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
+
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                    }
+                }
+                //empty configuration for others
+                return config;
+            }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
+
+        LayerProviderProxy.getInstance().setConfigurator(config);
+        
+        WorldFileImageReader.Spi.registerDefaults(null);
+        WMSMapDecoration.setEmptyExtension(true);
+        
+        //reset values, only allow pure java readers
+        for(String jn : ImageIO.getReaderFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+        }
+
+        //reset values, only allow pure java writers
+        for(String jn : ImageIO.getWriterFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+        }
+    }
+    
+    /**
+     * Initializes the data directory in unzipping the jar containing the resources
+     * into a temporary directory.
+     *
+     * @return The root output directory where the data are unzipped.
+     * @throws IOException
+     */
+    private static File initDataDirectory() throws IOException {
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
+        if (styleResource.indexOf('!') != -1) {
+            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        }
+        if (styleResource.startsWith("file:")) {
+            styleResource = styleResource.substring(5);
+        }
+        final File styleJar = new File(styleResource);
+        if (styleJar == null || !styleJar.exists()) {
+            throw new IOException("Unable to find the style folder: "+ styleJar);
+        }
+        if (styleJar.isDirectory()) {
+            return styleJar;
+        }
+        final InputStream in = new FileInputStream(styleJar);
+        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        final File outputDir = new File(tmpDir, "Constellation");
+        if (!outputDir.exists()) {
+            outputDir.mkdir();
+        }
+        IOUtilities.unzip(in, outputDir);
+        in.close();
+        return outputDir;
     }
 
     /**

@@ -17,18 +17,32 @@
 
 package org.constellation.ws.embedded;
 
-// JUnit dependencies
-import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.geotoolkit.xml.MarshallerPool;
+
 import java.net.MalformedURLException;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
 import javax.xml.bind.JAXBException;
+
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.configuration.Configurator;
+
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+
+import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.test.xml.DomComparator;
+
+import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
+
+// JUnit dependencies
 import org.junit.*;
 import static org.junit.Assume.*;
 import static org.junit.Assert.*;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Ensure extended datastores properly work.
@@ -57,6 +71,51 @@ public class WFSCustomSQLTest extends AbstractTestRequest {
                           ":org.geotoolkit.xsd.xml.v2001" +
                           ":org.geotoolkit.sampling.xml.v100" +
                          ":org.geotoolkit.internal.jaxb.geometry");
+        
+        final Configurator config = new Configurator() {
+            @Override
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+
+                final ParameterValueGroup config = desc.createValue();
+                
+                if("postgis".equals(serviceName)){
+                    // Defines a PostGis data provider
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(PostgisNGDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                    
+                    srcconfig.parameter(HOST.getName().getCode()).setValue("db.geomatys.com");
+                    srcconfig.parameter(PORT.getName().getCode()).setValue(5432);
+                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                    srcconfig.parameter(USER.getName().getCode()).setValue("test");
+                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");                    
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+                    
+                    //add a custom sql query layer                    
+                    ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("CustomSQLQuery");
+                    layer.parameter(LAYER_QUERY_LANGUAGE.getName().getCode()).setValue("CUSTOM-SQL");
+                    layer.parameter(LAYER_QUERY_STATEMENT.getName().getCode()).setValue(
+                            "SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+                }
+
+                //empty configuration for others
+                return config;
+            }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
+
+        LayerProviderProxy.getInstance().setConfigurator(config);
+
+
+
     }
 
     @AfterClass

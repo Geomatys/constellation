@@ -17,20 +17,31 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import javax.imageio.ImageIO;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import org.constellation.map.ws.WMSMapDecoration;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
-import org.geotoolkit.feature.DefaultName;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.configuration.Configurator;
+
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 // Geotoolkit dependencies
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.image.io.plugin.WorldFileImageReader;
+import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.wcs.xml.WCSMarshallerPool;
 import org.geotoolkit.wcs.xml.v100.CoverageDescription;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
@@ -45,6 +56,8 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * A set of methods that request a Grizzly server which embeds a WCS service.
@@ -109,6 +122,53 @@ public class WCSRequestsTest extends AbstractTestRequest {
     @BeforeClass
     public static void initLayerList() throws JAXBException {
         pool = WCSMarshallerPool.getInstance();
+        
+        final Configurator config = new Configurator() {
+            @Override
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+
+                final ParameterValueGroup config = desc.createValue();
+                
+                if("coverage-sql".equals(serviceName)){
+                    // Defines a PostGrid data provider
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://db.geomatys.com/coverages-test");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+
+                }
+
+                //empty configuration for others
+                return config;
+            }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
+
+        LayerProviderProxy.getInstance().setConfigurator(config);
+        
+        WorldFileImageReader.Spi.registerDefaults(null);
+        WMSMapDecoration.setEmptyExtension(true);
+        
+        //reset values, only allow pure java readers
+        for(String jn : ImageIO.getReaderFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+        }
+
+        //reset values, only allow pure java writers
+        for(String jn : ImageIO.getWriterFormatNames()){
+            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+        }
     }
 
     /**

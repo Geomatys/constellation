@@ -17,27 +17,52 @@
 
 package org.constellation.ws.embedded;
 
-// JUnit dependencies
-import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.xml.MarshallerPool;
 import java.net.MalformedURLException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+
+// Constellation dependencies
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.configuration.Configurator;
+import org.constellation.provider.shapefile.ShapeFileProviderService;
+import org.constellation.util.Util;
+
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+
+// Geotoolkit dependencies
+import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.data.om.OMDataStoreFactory;
+import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.wfs.xml.v110.*;
+
+import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
+
+// JUnit dependencies
 import org.junit.*;
 import static org.junit.Assume.*;
 import static org.junit.Assert.*;
+
+// GeoAPI dependencies
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -45,6 +70,8 @@ import static org.junit.Assert.*;
  */
 public class WFSRequestTest extends AbstractTestRequest {
 
+    private static boolean datasourceCreated = false;
+    
     private static final String WFS_POST_URL = "http://localhost:9090/wfs/default?";
     private static final String WFS_POST_URL2 = "http://localhost:9090/wfs/test?";
     
@@ -76,6 +103,126 @@ public class WFSRequestTest extends AbstractTestRequest {
                           ":org.geotoolkit.xsd.xml.v2001" +
                           ":org.geotoolkit.sampling.xml.v100" +
                          ":org.geotoolkit.internal.jaxb.geometry");
+        
+        
+                final Configurator config = new Configurator() {
+            @Override
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+
+                final ParameterValueGroup config = desc.createValue();
+                
+                if("observation".equals(serviceName)){
+                    try{
+                        final String url = "jdbc:derby:memory:TestWFSWorker";
+                        final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+                        if (!datasourceCreated) {
+                            Connection con = ds.getConnection();
+                            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+                            sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
+                            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                            con.close();
+                            datasourceCreated = true;
+                        }
+                        ds.shutdown();
+
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(OMDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                        srcconfig.parameter(OMDataStoreFactory.SGBDTYPE.getName().getCode()).setValue("derby");
+                        srcconfig.parameter(OMDataStoreFactory.DERBYURL.getName().getCode()).setValue(url);
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("omSrc");
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                    }
+                }else if("shapefile".equals(serviceName)){
+                    try{
+                        final File outputDir = initDataDirectory();
+                        
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
+                        srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
+                                .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
+                        srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
+                                .setValue("http://www.opengis.net/gml");
+                        
+                        ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                        layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
+                        layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
+
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                    }
+                }else if("postgis".equals(serviceName)){
+                    // Defines a PostGis data provider
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(PostgisNGDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                    
+                    srcconfig.parameter(HOST.getName().getCode()).setValue("db.geomatys.com");
+                    srcconfig.parameter(PORT.getName().getCode()).setValue(5432);
+                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                    srcconfig.parameter(USER.getName().getCode()).setValue("test");
+                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");                    
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+                    
+                    //add a custom sql query layer                    
+                    ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                    layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("CustomSQLQuery");
+                    layer.parameter(LAYER_QUERY_LANGUAGE.getName().getCode()).setValue("CUSTOM-SQL");
+                    layer.parameter(LAYER_QUERY_STATEMENT.getName().getCode()).setValue(
+                            "SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+                }
+
+                //empty configuration for others
+                return config;
+            }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
+
+        LayerProviderProxy.getInstance().setConfigurator(config);
+    }
+    
+    /**
+     * Initializes the data directory in unzipping the jar containing the resources
+     * into a temporary directory.
+     *
+     * @return The root output directory where the data are unzipped.
+     * @throws IOException
+     */
+    private static File initDataDirectory() throws IOException {
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
+        if (styleResource.indexOf('!') != -1) {
+            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        }
+        if (styleResource.startsWith("file:")) {
+            styleResource = styleResource.substring(5);
+        }
+        final File styleJar = new File(styleResource);
+        if (styleJar == null || !styleJar.exists()) {
+            throw new IOException("Unable to find the style folder: "+ styleJar);
+        }
+        if (styleJar.isDirectory()) {
+            return styleJar;
+        }
+        final InputStream in = new FileInputStream(styleJar);
+        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        final File outputDir = new File(tmpDir, "Constellation");
+        if (!outputDir.exists()) {
+            outputDir.mkdir();
+        }
+        IOUtilities.unzip(in, outputDir);
+        in.close();
+        return outputDir;
     }
 
     @AfterClass

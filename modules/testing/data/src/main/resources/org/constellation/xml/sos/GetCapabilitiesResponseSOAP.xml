@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
     <S:Body>
-        <ns11:Capabilities xmlns:ns3="http://www.opengis.net/gml" xmlns:ns4="http://www.w3.org/1999/xlink" xmlns:ns5="http://www.opengis.net/sensorML/1.0" xmlns:ns6="urn:us:gov:ic:ism:v2" xmlns:ns7="http://www.opengis.net/swe/1.0" xmlns:ns8="http://www.opengis.net/om/1.0" xmlns:ns9="http://www.opengis.net/swe/1.0.1" xmlns:ns10="http://www.opengis.net/sampling/1.0" xmlns:ns11="http://www.opengis.net/sos/1.0" xmlns:ns12="http://www.opengis.net/gml/" xmlns:ns13="http://www.opengis.net/sensorML/1.0.1" xmlns:ns14="http://www.opengis.net/ows/1.1" xmlns:ns15="http://www.opengis.net/ogc" xmlns:ns16="http://soap.ws.sos.constellation.org/" version="1.0.0">
+        <ns8:Capabilities xmlns:ns3="http://www.opengis.net/sensorML/1.0" xmlns:ns4="http://www.opengis.net/gml" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns6="urn:us:gov:ic:ism:v2" xmlns:ns7="http://www.opengis.net/swe/1.0" xmlns:ns8="http://www.opengis.net/sos/1.0" xmlns:ns9="http://www.opengis.net/om/1.0" xmlns:ns10="http://www.opengis.net/swe/1.0.1" xmlns:ns11="http://www.opengis.net/sampling/1.0" xmlns:ns12="http://www.opengis.net/gml/" xmlns:ns13="http://www.opengis.net/sensorML/1.0.1" xmlns:ns14="http://www.opengis.net/ows/1.1" xmlns:ns15="http://www.opengis.net/ogc" xmlns:ns16="http://soap.ws.sos.constellation.org/" version="1.0.0">
             <ns14:ServiceIdentification>
                 <ns14:Title xml:lang="fr">Constellation SOS</ns14:Title>
                 <ns14:Abstract xml:lang="fr">Constellation SOS Server</ns14:Abstract>
@@ -16,7 +16,7 @@
             </ns14:ServiceIdentification>
             <ns14:ServiceProvider>
                 <ns14:ProviderName>Geomatys</ns14:ProviderName>
-                <ns14:ProviderSite ns4:href="http://www.geomatys.fr/"/>
+                <ns14:ProviderSite ns5:href="http://www.geomatys.fr/"/>
                 <ns14:ServiceContact>
                     <ns14:IndividualName>Vincent Heurteaux</ns14:IndividualName>
                     <ns14:PositionName>PDG</ns14:PositionName>
@@ -37,8 +37,8 @@
                 <ns14:Operation name="GetCapabilities">
                     <ns14:DCP>
                         <ns14:HTTP>
-                            <ns14:Get ns4:href="sos/default?"/>
-                            <ns14:Post ns4:href="sos/default?"/>
+                            <ns14:Get ns5:href="sos/default?"/>
+                            <ns14:Post ns5:href="sos/default?"/>
                         </ns14:HTTP>
                     </ns14:DCP>
                     <ns14:Parameter name="service">
@@ -70,7 +70,7 @@
                 <ns14:Operation name="RegisterSensor">
                     <ns14:DCP>
                         <ns14:HTTP>
-                            <ns14:Post ns4:href="sos/default?"/>
+                            <ns14:Post ns5:href="sos/default?"/>
                         </ns14:HTTP>
                     </ns14:DCP>
                     <ns14:Parameter name="version">
@@ -87,7 +87,7 @@
                 <ns14:Operation name="GetResult">
                     <ns14:DCP>
                         <ns14:HTTP>
-                            <ns14:Post ns4:href="sos/default?"/>
+                            <ns14:Post ns5:href="sos/default?"/>
                         </ns14:HTTP>
                     </ns14:DCP>
                     <ns14:Parameter name="version">
@@ -104,7 +104,7 @@
                 <ns14:Operation name="GetObservation">
                     <ns14:DCP>
                         <ns14:HTTP>
-                            <ns14:Post ns4:href="sos/default?"/>
+                            <ns14:Post ns5:href="sos/default?"/>
                         </ns14:HTTP>
                     </ns14:DCP>
                     <ns14:Parameter name="version">
@@ -175,7 +175,7 @@
                 <ns14:Operation name="InsertObservation">
                     <ns14:DCP>
                         <ns14:HTTP>
-                            <ns14:Post ns4:href="sos/default?"/>
+                            <ns14:Post ns5:href="sos/default?"/>
                         </ns14:HTTP>
                     </ns14:DCP>
                     <ns14:Parameter name="version">
@@ -192,7 +192,7 @@
                 <ns14:Operation name="GetFeatureOfInterest">
                     <ns14:DCP>
                         <ns14:HTTP>
-                            <ns14:Post ns4:href="sos/default?"/>
+                            <ns14:Post ns5:href="sos/default?"/>
                         </ns14:HTTP>
                     </ns14:DCP>
                     <ns14:Parameter name="featureOfInterestId">
@@ -215,7 +215,7 @@
                 <ns14:Operation name="GetFeatureOfInterestTime">
                     <ns14:DCP>
                         <ns14:HTTP>
-                            <ns14:Post ns4:href="sos/default?"/>
+                            <ns14:Post ns5:href="sos/default?"/>
                         </ns14:HTTP>
                     </ns14:DCP>
                     <ns14:Parameter name="featureOfInterestId">
@@ -238,7 +238,7 @@
                 <ns14:Operation name="DescribeSensor">
                     <ns14:DCP>
                         <ns14:HTTP>
-                            <ns14:Post ns4:href="sos/default?"/>
+                            <ns14:Post ns5:href="sos/default?"/>
                         </ns14:HTTP>
                     </ns14:DCP>
                     <ns14:Parameter name="version">
@@ -271,10 +271,10 @@
                     </ns14:AllowedValues>
                 </ns14:Constraint>
             </ns14:OperationsMetadata>
-            <ns11:Filter_Capabilities>
+            <ns8:Filter_Capabilities>
                 <ns15:Spatial_Capabilities>
                     <ns15:GeometryOperands>
-                        <ns15:GeometryOperand>ns3:Envelope</ns15:GeometryOperand>
+                        <ns15:GeometryOperand>ns4:Envelope</ns15:GeometryOperand>
                     </ns15:GeometryOperands>
                     <ns15:SpatialOperators>
                         <ns15:SpatialOperator name="BBOX"/>
@@ -282,8 +282,8 @@
                 </ns15:Spatial_Capabilities>
                 <ns15:Temporal_Capabilities>
                     <ns15:TemporalOperands>
-                        <ns15:TemporalOperand>ns3:TimeInstant</ns15:TemporalOperand>
-                        <ns15:TemporalOperand>ns3:TimePeriod</ns15:TemporalOperand>
+                        <ns15:TemporalOperand>ns4:TimeInstant</ns15:TemporalOperand>
+                        <ns15:TemporalOperand>ns4:TimePeriod</ns15:TemporalOperand>
                     </ns15:TemporalOperands>
                     <ns15:TemporalOperators>
                         <ns15:TemporalOperator name="TM_During"/>
@@ -308,38 +308,38 @@
                     <ns15:EID/>
                     <ns15:FID/>
                 </ns15:Id_Capabilities>
-            </ns11:Filter_Capabilities>
-            <ns11:Contents>
-                <ns11:ObservationOfferingList>
-                    <ns11:ObservationOffering ns3:id="offering-allSensor">
-                        <ns3:description>Base offering containing all the sensors.</ns3:description>
-                        <ns3:name>offering-allSensor</ns3:name>
-                        <ns3:srsName>EPSG:4326</ns3:srsName>
-                        <ns3:boundedBy>
-                            <ns3:Null>not_bounded</ns3:Null>
-                        </ns3:boundedBy>
-                        <ns11:time>
-                            <ns3:TimePeriod ns3:id="time-offering-allSensor">
-                                <ns3:beginPosition>2009-07-31T16:09:12.046</ns3:beginPosition>
-                                <ns3:endPosition indeterminatePosition="now"></ns3:endPosition>
-                            </ns3:TimePeriod>
-                        </ns11:time>
-                        <ns11:procedure ns4:href="urn:ogc:object:sensor:SunSpot:0014.4F01.0000.261A"/>
-                        <ns11:procedure ns4:href="urn:ogc:object:sensor:SunSpot:0014.4F01.0000.2626"/>
-                        <ns11:observedProperty>
-                            <ns9:Phenomenon ns3:id="acceleration">
-                                <ns3:name>urn:phenomenon:acceleration</ns3:name>
-                            </ns9:Phenomenon>
-                        </ns11:observedProperty>
-                        <ns11:featureOfInterest ns4:href="sampling-point-001"/>
-                        <ns11:responseFormat>text/xml; subtype=&quot;om/1.0.0&quot;</ns11:responseFormat>
-                        <ns11:resultModel>ns8:Observation</ns11:resultModel>
-                        <ns11:resultModel>ns8:Measurement</ns11:resultModel>
-                        <ns11:responseMode>resultTemplate</ns11:responseMode>
-                        <ns11:responseMode>inline</ns11:responseMode>
-                    </ns11:ObservationOffering>
-                </ns11:ObservationOfferingList>
-            </ns11:Contents>
-        </ns11:Capabilities>
+            </ns8:Filter_Capabilities>
+            <ns8:Contents>
+                <ns8:ObservationOfferingList>
+                    <ns8:ObservationOffering ns4:id="offering-allSensor">
+                        <ns4:description>Base offering containing all the sensors.</ns4:description>
+                        <ns4:name>offering-allSensor</ns4:name>
+                        <ns4:srsName>EPSG:4326</ns4:srsName>
+                        <ns4:boundedBy>
+                            <ns4:Null>not_bounded</ns4:Null>
+                        </ns4:boundedBy>
+                        <ns8:time>
+                            <ns4:TimePeriod ns4:id="time-offering-allSensor">
+                                <ns4:beginPosition>2009-07-31T16:09:12.046</ns4:beginPosition>
+                                <ns4:endPosition indeterminatePosition="now"></ns4:endPosition>
+                            </ns4:TimePeriod>
+                        </ns8:time>
+                        <ns8:procedure ns5:href="urn:ogc:object:sensor:SunSpot:0014.4F01.0000.261A"/>
+                        <ns8:procedure ns5:href="urn:ogc:object:sensor:SunSpot:0014.4F01.0000.2626"/>
+                        <ns8:observedProperty>
+                            <ns10:Phenomenon ns4:id="acceleration">
+                                <ns4:name>urn:phenomenon:acceleration</ns4:name>
+                            </ns10:Phenomenon>
+                        </ns8:observedProperty>
+                        <ns8:featureOfInterest ns5:href="sampling-point-001"/>
+                        <ns8:responseFormat>text/xml; subtype=&quot;om/1.0.0&quot;</ns8:responseFormat>
+                        <ns8:resultModel>ns9:Observation</ns8:resultModel>
+                        <ns8:resultModel>ns9:Measurement</ns8:resultModel>
+                        <ns8:responseMode>resultTemplate</ns8:responseMode>
+                        <ns8:responseMode>inline</ns8:responseMode>
+                    </ns8:ObservationOffering>
+                </ns8:ObservationOfferingList>
+            </ns8:Contents>
+        </ns8:Capabilities>
     </S:Body>
 </S:Envelope>
