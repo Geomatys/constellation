@@ -51,7 +51,6 @@ public class WPSRequestTest  extends AbstractTestRequest {
       
     @AfterClass
     public static void finish() {
-        layers = null;
     }
     
     /**

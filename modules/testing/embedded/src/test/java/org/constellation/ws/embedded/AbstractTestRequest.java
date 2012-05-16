@@ -17,6 +17,7 @@
 
 package org.constellation.ws.embedded;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,14 +26,15 @@ import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import javax.imageio.ImageReader;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
+import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
@@ -164,5 +166,37 @@ public class AbstractTestRequest extends AbstractGrizzlyServer {
             obj = ((JAXBElement) obj).getValue();
         }
         return obj;
+    }
+    
+    /**
+     * Returned the {@link BufferedImage} from an URL requesting an image.
+     *
+     * @param url  The url of a request of an image.
+     * @param mime The mime type of the image to return.
+     *
+     * @return The {@link BufferedImage} or {@code null} if an error occurs.
+     * @throws IOException
+     */
+    protected static BufferedImage getImageFromURL(final URL url, final String mime) throws IOException {
+        // Try to get the image from the url.
+        final InputStream in = url.openStream();
+        final ImageReader reader = XImageIO.getReaderByMIMEType(mime, in, true, true);
+        final BufferedImage image = reader.read(0);
+        XImageIO.close(reader);
+        reader.dispose();
+        // For debugging, uncomment the JFrame creation and the Thread.sleep further,
+        // in order to see the image in a popup.
+//        javax.swing.JFrame frame = new javax.swing.JFrame();
+//        frame.setContentPane(new javax.swing.JLabel(new javax.swing.ImageIcon(image)));
+//        frame.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+//        frame.pack();
+//        frame.setVisible(true);
+//        try {
+//            Thread.sleep(5 * 1000);
+//            frame.dispose();
+//        } catch (InterruptedException ex) {
+//            assumeNoException(ex);
+//        }
+        return image;
     }
 }

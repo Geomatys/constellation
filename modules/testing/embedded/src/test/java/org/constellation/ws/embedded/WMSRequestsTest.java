@@ -63,6 +63,11 @@ import static org.junit.Assume.*;
 public class WMSRequestsTest extends AbstractTestRequest {
 
     /**
+     * The layer to test.
+     */
+    private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
+    
+    /**
      * URLs which will be tested on the server.
      */
     private static final String WMS_DEFAULT = "http://localhost:9090/wms/default?";
@@ -513,6 +518,5 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @AfterClass
     public static void finish() {
-        layers = null;
     }
 }

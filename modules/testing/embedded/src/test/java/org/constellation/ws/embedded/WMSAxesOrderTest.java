@@ -22,12 +22,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 // Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
+import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.test.ImageTesting;
+import org.geotoolkit.feature.DefaultName;
 
 // Geotoolkit.org dependencies
 import org.geotoolkit.test.Commons;
@@ -48,7 +51,18 @@ import static org.junit.Assume.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WMSAxesOrderTest extends AbstractGrizzlyServer {
+public class WMSAxesOrderTest extends AbstractTestRequest {
+    
+    /**
+     * The layer to test.
+     */
+    private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
+    
+    /**
+     * A list of available layers to be requested in WMS.
+     */
+    private static List<LayerDetails> layers;
+    
     /**
      * Checksum value on the returned image expressed in a geographic CRS for the SST_tests layer.
      */
@@ -106,7 +120,22 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
             assumeNoException(ex);
         }
     }
-
+    
+    /**
+     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
+     * available layers. It means the postgrid database, pointed by the postgrid.xml
+     * file in the configuration directory, contains this layer and can then be requested
+     * in WMS.
+     */
+    private static boolean containsTestLayer() {
+        for (LayerDetails layer : layers) {
+            if (layer.getName().equals(LAYER_TEST)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * Free some resources.
      */

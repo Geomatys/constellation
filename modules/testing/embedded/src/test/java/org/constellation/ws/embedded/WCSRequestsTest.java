@@ -28,6 +28,7 @@ import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
+import org.geotoolkit.feature.DefaultName;
 
 // Geotoolkit dependencies
 import org.geotoolkit.wcs.xml.WCSMarshallerPool;
@@ -55,6 +56,11 @@ import static org.junit.Assume.*;
  */
 public class WCSRequestsTest extends AbstractTestRequest {
 
+    /**
+     * The layer to test.
+     */
+    private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
+    
     /**
      * URLs which will be tested on the server.
      */
@@ -315,6 +321,5 @@ public class WCSRequestsTest extends AbstractTestRequest {
      */
     @AfterClass
     public static void finish() {
-        layers = null;
     }
 }

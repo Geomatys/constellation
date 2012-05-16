@@ -16,58 +16,52 @@
  */
 package org.constellation.ws.embedded;
 
-// J2SE dependencies
+// JAI dependencies
 import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.spi.ImageReaderSpi;
-import org.geotoolkit.image.jai.Registry;
 import javax.imageio.ImageIO;
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
-import org.geotoolkit.data.om.OMDataStoreFactory;
-import java.awt.image.BufferedImage;
+
+// J2SE dependencies
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.sql.Connection;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageReader;
 
 // Constellation dependencies
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.map.ws.WMSMapDecoration;
-import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.postgis.PostGisProviderService;
+import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.util.Util;
-
-// Geotoolkit dependencies
-import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
-import org.geotoolkit.image.io.XImageIO;
-import org.geotoolkit.image.io.plugin.WorldFileImageReader;
-import org.geotoolkit.internal.io.IOUtilities;
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.internal.sql.ScriptRunner;
-import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.feature.DefaultName;
-
-// JUnit dependencies
-import org.junit.*;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-
-import static org.junit.Assume.*;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
-import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.CstlServiceException;
+
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+
+// Geotoolkit dependencies
+import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
+import org.geotoolkit.data.om.OMDataStoreFactory;
+import org.geotoolkit.image.jai.Registry;
+import org.geotoolkit.image.io.plugin.WorldFileImageReader;
+import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+
 import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 
+// JUnit dependencies
+import org.junit.*;
+
+// GeoAPI dependencies
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Launches a Grizzly server in a thread at the beginning of the testing process
@@ -80,22 +74,10 @@ import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
  */
 public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     /**
-     * A list of available layers to be requested in WMS.
-     */
-    protected static List<LayerDetails> layers;
-
-    /**
      * The grizzly server that will received some HTTP requests.
      */
     protected static GrizzlyThread grizzly = null;
 
-    /**
-     * The layer to test.
-     */
-    protected static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
-
-    private static DefaultDataSource ds;
-    
     private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
 
     private static boolean datasourceCreated = false;
@@ -141,7 +123,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
                 }else if("observation".equals(serviceName)){
                     try{
                         final String url = "jdbc:derby:memory:TestWFSWorker";
-                        ds = new DefaultDataSource(url + ";create=true");
+                        final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                         if (!datasourceCreated) {
                             Connection con = ds.getConnection();
                             DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
@@ -150,6 +132,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
                             con.close();
                             datasourceCreated = true;
                         }
+                        ds.shutdown();
 
                         final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                         final ParameterValueGroup srcconfig = getOrCreate(OMDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
@@ -243,60 +226,10 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         if (grizzly.isAlive()) {
             grizzly.interrupt();
         }
-        if (ds != null) {
-            ds.shutdown();
-        }
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
-    }
-
-    /**
-     * Returned the {@link BufferedImage} from an URL requesting an image.
-     *
-     * @param url  The url of a request of an image.
-     * @param mime The mime type of the image to return.
-     *
-     * @return The {@link BufferedImage} or {@code null} if an error occurs.
-     * @throws IOException
-     */
-    protected static BufferedImage getImageFromURL(final URL url, final String mime) throws IOException {
-        // Try to get the image from the url.
-        final InputStream in = url.openStream();
-        final ImageReader reader = XImageIO.getReaderByMIMEType(mime, in, true, true);
-        final BufferedImage image = reader.read(0);
-        XImageIO.close(reader);
-        reader.dispose();
-        // For debugging, uncomment the JFrame creation and the Thread.sleep further,
-        // in order to see the image in a popup.
-//        javax.swing.JFrame frame = new javax.swing.JFrame();
-//        frame.setContentPane(new javax.swing.JLabel(new javax.swing.ImageIcon(image)));
-//        frame.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
-//        frame.pack();
-//        frame.setVisible(true);
-//        try {
-//            Thread.sleep(5 * 1000);
-//            frame.dispose();
-//        } catch (InterruptedException ex) {
-//            assumeNoException(ex);
-//        }
-        return image;
-    }
-
-    /**
-     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
-     * available layers. It means the postgrid database, pointed by the postgrid.xml
-     * file in the configuration directory, contains this layer and can then be requested
-     * in WMS.
-     */
-    protected static boolean containsTestLayer() {
-        for (LayerDetails layer : layers) {
-            if (layer.getName().equals(LAYER_TEST)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

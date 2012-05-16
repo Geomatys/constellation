@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
     <S:Body>
-        <ns4:ProcessDescriptions xmlns:ns3="http://www.opengis.net/ows/1.1" xmlns:ns4="http://www.opengis.net/wps/1.0.0" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns6="http://www.opengis.net/gml" xmlns:ns7="http://soap.ws.wps.constellation.org/" xml:lang="en-EN" version="1.0.0" service="WPS">
+        <ns4:ProcessDescriptions xmlns:ns3="http://www.opengis.net/ows/1.1" xmlns:ns4="http://www.opengis.net/wps/1.0.0" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns6="http://www.opengis.net/gml" xmlns:ns7="http://www.w3.org/1998/Math/MathML" xmlns:ns8="http://soap.ws.wps.constellation.org/" xml:lang="en-EN" version="1.0.0" service="WPS">
             <ProcessDescription statusSupported="true" storeSupported="true" ns4:processVersion="1.0.0">
                 <ns3:Identifier>urn:ogc:cstl:wps:jts:intersection</ns3:Identifier>
                 <ns3:Title>Jts : Intersection</ns3:Title>
