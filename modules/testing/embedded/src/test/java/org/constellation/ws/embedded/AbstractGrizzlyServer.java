@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 // Constellation dependencies
 import org.constellation.sos.ws.soap.SOService;
-import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.CstlServiceException;
 
 // geotoolkit dependencies
@@ -102,7 +101,6 @@ public abstract class AbstractGrizzlyServer { // extends CoverageSQLTestCase {
             final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{});
             cstlServer.duration = 5*60*1000;
             try {
-                cstlServer.serviceInstanceSOAP.put("wps", new WPSService());
                 cstlServer.serviceInstanceSOAP.put("sos", new SOService());
             } catch (CstlServiceException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);

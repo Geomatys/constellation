@@ -105,7 +105,7 @@ public class WFSRequestTest extends AbstractTestRequest {
                          ":org.geotoolkit.internal.jaxb.geometry");
         
         
-                final Configurator config = new Configurator() {
+       final Configurator config = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
 

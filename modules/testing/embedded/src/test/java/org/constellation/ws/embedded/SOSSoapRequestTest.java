@@ -23,6 +23,7 @@ import java.net.URLConnection;
 import javax.xml.bind.JAXBException;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
+import org.geotoolkit.util.StringUtilities;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -61,9 +62,11 @@ public class SOSSoapRequestTest extends AbstractTestSoapRequest {
         URLConnection conec = getCapsUrl.openConnection();
         postRequestFile(conec, "org/constellation/xml/sos/GetCapabilitiesSOAP.xml");
         
-        final String result    = getStringResponse(conec);
-        final String expResult = getStringFromFile("org/constellation/xml/sos/GetCapabilitiesResponseSOAP.xml");
+        String result    = getStringResponse(conec);
+        String expResult = getStringFromFile("org/constellation/xml/sos/GetCapabilitiesResponseSOAP.xml");
         
+        result = cleanXMlString(result);
+        expResult = cleanXMlString(expResult);
         assertEquals(expResult, result);
     }
     
@@ -79,6 +82,10 @@ public class SOSSoapRequestTest extends AbstractTestSoapRequest {
         
         String result    = getStringResponse(conec);
         String expResult = getStringFromFile("org/constellation/xml/sos/GetFeatureOfInterestResponseSOAP.xml");
+        
+        result = cleanXMlString(result);
+        expResult = cleanXMlString(expResult);
+        
         System.out.println("result:\n" + result);
         
         assertEquals(expResult, result);
@@ -89,8 +96,23 @@ public class SOSSoapRequestTest extends AbstractTestSoapRequest {
         
         result    = getStringResponse(conec);
         expResult = getStringFromFile("org/constellation/xml/sos/GetFeatureOfInterestResponseSOAP2.xml");
+        
+        
+        result = cleanXMlString(result);
+        expResult = cleanXMlString(expResult);
+        
         System.out.println("result:\n" + result);
         
         assertEquals(expResult, result);
+    }
+    
+    private static String cleanXMlString(String s) {
+        s = s.substring(s.indexOf('>') + 1);
+        s = StringUtilities.removeXmlns(s);
+        for (int i = 0; i< 17; i++) {
+            s = StringUtilities.removePrefix("ns" + i);
+        }
+        
+        return s;
     }
 }
