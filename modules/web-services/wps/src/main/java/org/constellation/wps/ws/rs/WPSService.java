@@ -79,11 +79,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 public class WPSService extends OGCWebService<WPSWorker> {
 
     /**
-     * Try to create temporary directory.
-     */
-    public static final boolean SUPPORT_STORAGE = WPSUtils.createTempDirectory();
-    
-    /**
      * Executor thread pool.
      */
     public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
@@ -109,8 +104,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
     @Override
     public void destroy() {
         super.destroy();
-        //Delete recursuvly temporary directory.
-        WPSUtils.deleteTempFileOrDirectory(new File(WPSUtils.getTempDirectoryPath()));
+        
         //Shutdown the WPS scheduler.
         EXECUTOR.shutdown();
     }

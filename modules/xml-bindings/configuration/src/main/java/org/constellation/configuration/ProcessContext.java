@@ -37,6 +37,8 @@ public class ProcessContext {
     private String security;
 
     private Languages supportedLanguages;
+    
+    private String tmpDirectory;
 
     public ProcessContext() {
 
@@ -103,6 +105,20 @@ public class ProcessContext {
      */
     public void setSupportedLanguages(Languages supportedLanguages) {
         this.supportedLanguages = supportedLanguages;
+    }
+    
+    /**
+     * @return the tmpDirectory
+     */
+    public String getTmpDirectory() {
+        return tmpDirectory;
+    }
+
+    /**
+     * @param tmpDirectory the tmpDirectory to set
+     */
+    public void setTmpDirectory(String tmpDirectory) {
+        this.tmpDirectory = tmpDirectory;
     }
     
     @Override

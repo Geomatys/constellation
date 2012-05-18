@@ -57,8 +57,9 @@ public class WPSRequestTest  extends AbstractTestRequest {
      * Ensures that a valid GetCapabilities request returns indeed a valid GetCapabilities
      */
     @Test
-    public void testWPSGetCapabilities() throws JAXBException, IOException {
+    public void testWPSGetCapabilities() throws Exception {
 
+        waitForStart();
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {

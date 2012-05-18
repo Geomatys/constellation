@@ -81,6 +81,13 @@ import org.opengis.util.NoSuchIdentifierException;
  */
 public class WPSWorker extends AbstractWorker {
 
+    /**
+     * Try to create temporary directory.
+     */
+    private final boolean supportStorage;
+    
+    private final String temporaryFolderPath;
+    
     private final ProcessContext context;
     /**
      * Supported CRS.
@@ -152,7 +159,18 @@ public class WPSWorker extends AbstractWorker {
         }
         this.context = candidate;
         fillProcessList();
-
+        if (context.getTmpDirectory() != null) {
+            final File tmpDir = new File(context.getTmpDirectory());
+            if (!tmpDir.isDirectory()) {
+                supportStorage = tmpDir.mkdirs();
+            } else {
+                supportStorage = true;
+            }
+            temporaryFolderPath = context.getTmpDirectory();
+        } else {
+            supportStorage      = WPSUtils.createTempDirectory();
+            temporaryFolderPath = WPSUtils.getTempDirectoryPath();
+        }
         if (isStarted) {
             LOGGER.log(Level.INFO, "WPS worker {0} running", id);
         }
@@ -209,6 +227,8 @@ public class WPSWorker extends AbstractWorker {
 
     @Override
     public void destroy() {
+        //Delete recursuvly temporary directory.
+        WPSUtils.deleteTempFileOrDirectory(new File(temporaryFolderPath));
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -369,7 +389,7 @@ public class WPSWorker extends AbstractWorker {
             descriptionType.setProcessVersion(WPS_1_0_0);                                                                   //Process verstion 
             descriptionType.setWSDL(null);                                                                                  //TODO WSDL
             descriptionType.setStatusSupported(true);         
-            descriptionType.setStoreSupported(WPSService.SUPPORT_STORAGE);
+            descriptionType.setStoreSupported(supportStorage);
 
             // Get process input and output descriptors
             final ParameterDescriptorGroup input = processDesc.getInputDescriptor();
@@ -704,7 +724,7 @@ public class WPSWorker extends AbstractWorker {
                 // DOC Async
                 ////////
                 response.setStatus(status);
-                process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0, getServiceUrl()));
+                process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0, getServiceUrl(), temporaryFolderPath));
                 WPSService.EXECUTOR.submit(process);
                 
             } else {
@@ -729,17 +749,17 @@ public class WPSWorker extends AbstractWorker {
                 }
                 
                 final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-                fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, getServiceUrl());
+                fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, getServiceUrl(), temporaryFolderPath);
                 response.setProcessOutputs(outputs);
                 
             }
 
             if (respDoc.isStoreExecuteResponse()) {
-                if (!WPSService.SUPPORT_STORAGE) {
+                if (!supportStorage) {
                     throw new CstlServiceException("Storage not supported.", STORAGE_NOT_SUPPORTED, "storeExecuteResponse");
                 }
                 response.setStatusLocation(WPSUtils.getTempDirectoryURL(getServiceUrl()) + "/" + respDocFileName); //Output data URL
-                WPSUtils.storeResponse(response, respDocFileName);
+                WPSUtils.storeResponse(response, temporaryFolderPath, respDocFileName);
             }
 
             //Delete input temporary files 
@@ -947,7 +967,7 @@ public class WPSWorker extends AbstractWorker {
      * @throws CstlServiceException
      */
     public static void fillOutputsFromProcessResult(final ProcessOutputs outputs, final List<DocumentOutputDefinitionType> wantedOutputs,
-            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final String serviceURL) 
+            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final String serviceURL, final String folderPath) 
             throws CstlServiceException {
         if(result == null){
             throw new CstlServiceException("Empty process result.", NO_APPLICABLE_CODE);
@@ -977,7 +997,7 @@ public class WPSWorker extends AbstractWorker {
             //output value object.
             final Object outputValue = result.parameter(outputIdentifierCode).getValue();
             
-            outputs.getOutput().add(createDocumentResponseOutput(outputDescriptor, outputsRequest, outputValue, serviceURL));
+            outputs.getOutput().add(createDocumentResponseOutput(outputDescriptor, outputsRequest, outputValue, serviceURL, folderPath));
 
         }//end foreach wanted outputs
 
@@ -995,7 +1015,7 @@ public class WPSWorker extends AbstractWorker {
      * @throws CstlServiceException
      */
     public static OutputDataType createDocumentResponseOutput(final ParameterDescriptor outputDescriptor, final DocumentOutputDefinitionType requestedOutput,
-            final Object outputValue, final String serviceURL) throws CstlServiceException {
+            final Object outputValue, final String serviceURL, final String folderPath) throws CstlServiceException {
 
         final OutputDataType outData = new OutputDataType();
 
@@ -1016,7 +1036,7 @@ public class WPSWorker extends AbstractWorker {
         final Class outClass = outputDescriptor.getValueClass(); // output class
         
         if (requestedOutput.isAsReference()) {
-            final OutputReferenceType ref = createReferenceOutput(outClass, requestedOutput, outputValue, serviceURL);
+            final OutputReferenceType ref = createReferenceOutput(outClass, requestedOutput, outputValue, serviceURL, folderPath);
             
             outData.setReference(ref);
         } else {
@@ -1035,9 +1055,8 @@ public class WPSWorker extends AbstractWorker {
                             requestedOutput.getMimeType(), 
                             requestedOutput.getEncoding(), 
                             requestedOutput.getSchema(), 
-                            WPSUtils.getTempDirectoryPath(), 
-                            WPSUtils.getTempDirectoryURL(serviceURL)
-                            );
+                            folderPath, 
+                            WPSUtils.getTempDirectoryURL(serviceURL));
                 
                     data.setComplexData(complex);
                     
@@ -1075,7 +1094,7 @@ public class WPSWorker extends AbstractWorker {
      * @throws CstlServiceException 
      */
     private static OutputReferenceType createReferenceOutput(final Class clazz, final DocumentOutputDefinitionType requestedOutput, 
-            final Object outputValue, final String serviceURL) throws CstlServiceException {
+            final Object outputValue, final String serviceURL, final String folderPath) throws CstlServiceException {
         
         try {
            final OutputReferenceType reference = (OutputReferenceType) WPSConvertersUtils.convertToReference(
@@ -1083,7 +1102,7 @@ public class WPSWorker extends AbstractWorker {
                     requestedOutput.getMimeType(), 
                     requestedOutput.getEncoding(), 
                     requestedOutput.getSchema(),
-                    WPSUtils.getTempDirectoryPath(),  
+                    folderPath,  
                     WPSUtils.getTempDirectoryURL(serviceURL), 
                     WPSIO.IOType.OUTPUT);
             

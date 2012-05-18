@@ -475,8 +475,14 @@ public class WPSUtils {
      * @return {@code true} if success, {@code false} if failed.
      */
     public static boolean createTempDirectory() {
-        final String tmpDir = getTempDirectoryPath();
-        boolean success = (new File(tmpDir)).mkdirs();
+        final String tmpDirPath = getTempDirectoryPath();
+        final File tmpDir       = new File(tmpDirPath);
+        if (tmpDir.isDirectory()) {
+            LOGGER.log(Level.INFO, "Temporary storage directory already created at : " + tmpDir);
+            return true;
+        }
+        
+        boolean success = tmpDir.mkdirs();
         if (success) {
             LOGGER.log(Level.INFO, "Temporary storage directory created at : " + tmpDir);
         } else {
@@ -488,9 +494,12 @@ public class WPSUtils {
     /**
      * Delete a file. If the file is a directory, the method will recursivly delete all files before.
      *
+     * @deprecated use the methods from geotk FileUtilities
+     * 
      * @param file
      * @return {@code true} if success, {@code false} if failed.
      */
+    @Deprecated
     public static boolean deleteTempFileOrDirectory(final File file) {
         //directory case.
         if (file.isDirectory()) {
@@ -521,7 +530,7 @@ public class WPSUtils {
      * @param fileName temporary file name.
      * @return
      */
-    public static boolean storeResponse(final Object obj, final String fileName) {
+    public static boolean storeResponse(final Object obj, final String folderPath, final String fileName) {
         ArgumentChecks.ensureNonNull("obj", obj);
 
         final MarshallerPool marshallerPool = WPSMarshallerPool.getInstance();
@@ -530,7 +539,7 @@ public class WPSUtils {
         Marshaller marshaller = null;
         try {
 
-            final File outputFile = new File(getTempDirectoryPath(), fileName);
+            final File outputFile = new File(folderPath, fileName);
             marshaller = marshallerPool.acquireMarshaller();
             marshaller.marshal(obj, outputFile);
 

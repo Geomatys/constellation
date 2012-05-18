@@ -47,6 +47,7 @@ public class WPSProcessListener implements ProcessListener{
     
     private Execute request;
     private ExecuteResponse responseDoc;
+    private final String folderPath;
     private String fileName;
     private ServiceDef def;
     private String serviceURL;
@@ -54,13 +55,14 @@ public class WPSProcessListener implements ProcessListener{
     private static final int TIMEOUT = 20000;
     
     public WPSProcessListener(final Execute request, final ExecuteResponse responseDoc, final String fileName, final ServiceDef def,
-            final String serviceURL) {
+            final String serviceURL, final String folderPath) {
         this.request = request;
         this.responseDoc = responseDoc;
         this.fileName = fileName;
         this.def = def;
         this.serviceURL = serviceURL;
         this.nextTimestamp = System.currentTimeMillis() + TIMEOUT;
+        this.folderPath = folderPath;
     }
     
     @Override
@@ -73,7 +75,7 @@ public class WPSProcessListener implements ProcessListener{
         started.setPercentCompleted(0);
         status.setProcessStarted(started);
         responseDoc.setStatus(status);
-        WPSUtils.storeResponse(responseDoc, fileName);
+        WPSUtils.storeResponse(responseDoc, folderPath, fileName);
     }
 
     @Override
@@ -89,7 +91,7 @@ public class WPSProcessListener implements ProcessListener{
             started.setPercentCompleted((int) event.getProgress());
             status.setProcessStarted(started);
             responseDoc.setStatus(status);
-            WPSUtils.storeResponse(responseDoc, fileName);
+            WPSUtils.storeResponse(responseDoc, folderPath, fileName);
         }
     }
 
@@ -99,14 +101,14 @@ public class WPSProcessListener implements ProcessListener{
         try {
             final List<GeneralParameterDescriptor> processOutputDesc = event.getSource().getDescriptor().getOutputDescriptor().descriptors();
             final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
-            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput(), serviceURL);
+            WPSWorker.fillOutputsFromProcessResult(outputs, request.getResponseForm().getResponseDocument().getOutput(), processOutputDesc, event.getOutput(), serviceURL, folderPath);
             final StatusType status = new StatusType();
             status.setCreationTime(getCurrentXMLGregorianCalendar());
             status.setProcessSucceeded("Process complet.");
             
             responseDoc.setStatus(status);
             responseDoc.setProcessOutputs(outputs);
-            WPSUtils.storeResponse(responseDoc, fileName);
+            WPSUtils.storeResponse(responseDoc, folderPath, fileName);
         } catch (CstlServiceException ex) {
             writeException(ex);
         }
@@ -122,7 +124,7 @@ public class WPSProcessListener implements ProcessListener{
         processFT.setExceptionReport(new ExceptionReport(event.getException().getMessage(), null, null, null));
         status.setProcessFailed(processFT);
         responseDoc.setStatus(status);
-        WPSUtils.storeResponse(responseDoc, fileName);
+        WPSUtils.storeResponse(responseDoc, folderPath, fileName);
     }
     
     /**
@@ -142,7 +144,7 @@ public class WPSProcessListener implements ProcessListener{
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), codeRepresentation, ex.getLocator(),
                                                      def.exceptionVersion.toString());
         
-        WPSUtils.storeResponse(report, fileName);
+        WPSUtils.storeResponse(report, folderPath, fileName);
     }
     
     /**

@@ -90,12 +90,12 @@
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-wfs</artifactId>
       <version>${project.version}</version>
-    </dependency-->
+    </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-wps</artifactId>
       <version>${project.version}</version>
-    </dependency>
+    </dependency-->
     
     <dependency>
       <groupId>org.constellation.web-services</groupId>
