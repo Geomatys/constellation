@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="BDD" type="bdd"/>
+
+  <xs:element name="automatic" type="automatic"/>
+
+  <xs:element name="from">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="alias" type="xs:string"/>
+          <xs:attribute name="group" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="groupby">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="group" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="orderBy">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="sens" type="xs:string"/>
+          <xs:attribute name="group" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="query" type="query"/>
+
+  <xs:element name="where">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="operator" type="xs:string"/>
+          <xs:attribute name="group" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="automatic">
+    <xs:sequence>
+      <xs:element name="bdd" type="bdd" minOccurs="0"/>
+      <xs:element name="thesaurus" type="bdd" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="profile" type="xs:string" minOccurs="0"/>
+      <xs:element name="enableThread" type="xs:string" minOccurs="0"/>
+      <xs:element name="enableCache" type="xs:string" minOccurs="0"/>
+      <xs:element name="indexOnlyPublishedMetadata" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="indexExternalRecordset" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="indexInternalRecordset" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="defaultRecordSet" type="xs:string" minOccurs="0"/>
+      <xs:element name="storeMapping" type="xs:string" minOccurs="0"/>
+      <xs:element name="noIndexation" type="xs:string" minOccurs="0"/>
+      <xs:element name="dataDirectory" type="xs:string" minOccurs="0"/>
+      <xs:element name="harvester" type="xs:string" minOccurs="0"/>
+      <xs:element name="identifierDirectory" type="xs:string" minOccurs="0"/>
+      <xs:element name="logLevel" type="xs:string" minOccurs="0"/>
+      <xs:element name="customparameters">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="key" minOccurs="0" type="xs:string"/>
+                  <xs:element name="value" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="queries" type="queries" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="format" type="xs:string"/>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="bdd">
+    <xs:sequence>
+      <xs:element name="className" type="xs:string" minOccurs="0"/>
+      <xs:element name="connectURL" type="xs:string" minOccurs="0"/>
+      <xs:element name="user" type="xs:string" minOccurs="0"/>
+      <xs:element name="password" type="xs:string" minOccurs="0"/>
+      <xs:element name="schema" type="xs:string" minOccurs="0"/>
+      <xs:element name="sharedConnection" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="queries">
+    <xs:sequence>
+      <xs:element name="parameters">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="key" minOccurs="0" type="xs:string"/>
+                  <xs:element name="value" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="main" type="query" minOccurs="0"/>
+      <xs:element name="statique" type="queryList" minOccurs="0"/>
+      <xs:element name="queryList" type="queryList" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="query">
+    <xs:sequence>
+      <xs:element name="parameters">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="key" minOccurs="0" type="xs:string"/>
+                  <xs:element name="value" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="statique" type="queryList" minOccurs="0"/>
+      <xs:element name="select" type="select" maxOccurs="unbounded"/>
+      <xs:element name="leftJoin" nillable="true" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="operator" type="xs:string"/>
+              <xs:attribute name="group" type="xs:string"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element ref="from" maxOccurs="unbounded"/>
+      <xs:element name="where" nillable="true" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="operator" type="xs:string"/>
+              <xs:attribute name="group" type="xs:string"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="orderBy" nillable="true" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="sens" type="xs:string"/>
+              <xs:attribute name="group" type="xs:string"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="groupby" nillable="true" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="group" type="xs:string"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="limit" type="xs:string" minOccurs="0"/>
+      <xs:element name="union" type="union" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="option" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="queryList">
+    <xs:sequence>
+      <xs:element name="query" type="query" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="select">
+    <xs:sequence>
+      <xs:element name="col" type="column" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="group" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="column">
+    <xs:sequence>
+      <xs:element name="var" type="xs:string" minOccurs="0"/>
+      <xs:element name="sql" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="union">
+    <xs:sequence>
+      <xs:element ref="query" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

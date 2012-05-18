@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0" targetNamespace="http://www.constellation.org/config" xmlns:ns1="http://www.w3.org/1999/xlink" xmlns:tns="http://www.constellation.org/config" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="http://schemas.opengis.net/xlink/1.0.0/xlinks.xsd"/>
+
+  <xs:import schemaLocation="schema4.xsd"/>
+
+  <xs:element name="Acknowlegement">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="message" type="xs:string" minOccurs="0"/>
+        <xs:element name="status" type="xs:string" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ExceptionReport" type="tns:exceptionReport"/>
+
+  <xs:element name="HarvestTasks" type="tns:harvestTasks"/>
+
+  <xs:element name="Instance" type="tns:instance"/>
+
+  <xs:element name="InstanceReport" type="tns:instanceReport"/>
+
+  <xs:element name="LayerContext" type="tns:layerContext"/>
+
+  <xs:element name="ProcessContext" type="tns:processContext"/>
+
+  <xs:element name="ProviderReport" type="tns:providerReport"/>
+
+  <xs:element name="ProvidersReport" type="tns:providersReport"/>
+
+  <xs:element name="SOSConfiguration" type="tns:sosConfiguration"/>
+
+  <xs:element name="ServiceReport" type="tns:serviceReport"/>
+
+  <xs:element name="StringList" type="tns:stringList"/>
+
+  <xs:element name="StringMap" type="tns:stringMap"/>
+
+  <xs:element name="StringTreeNode" type="tns:stringTreeNode"/>
+
+  <xs:element name="WebdavContext" type="tns:webdavContext"/>
+
+  <xs:complexType name="attributionType">
+    <xs:sequence>
+      <xs:element name="Title" type="xs:string" minOccurs="0"/>
+      <xs:element name="OnlineResource" type="tns:reference" minOccurs="0"/>
+      <xs:element name="LogoURL" type="tns:formatURL" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="reference">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute ref="ns1:href"/>
+        <xs:attribute name="authority" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="formatURL">
+    <xs:sequence>
+      <xs:element name="Format" type="xs:string" minOccurs="0"/>
+      <xs:element name="OnlineResource" type="tns:reference" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="width" type="xs:int"/>
+    <xs:attribute name="height" type="xs:int"/>
+  </xs:complexType>
+
+  <xs:simpleType name="dataSourceType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:complexType name="exceptionReport">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="code" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="harvestTask">
+    <xs:sequence>
+      <xs:element name="sourceURL" type="xs:string" minOccurs="0"/>
+      <xs:element name="resourceType" type="xs:string" minOccurs="0"/>
+      <xs:element name="mode" type="xs:int"/>
+      <xs:element name="emails" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="period" type="xs:long"/>
+      <xs:element name="lastHarvest" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="harvestTasks">
+    <xs:sequence>
+      <xs:element name="task" type="tns:harvestTask" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="instance">
+    <xs:sequence/>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="status" type="tns:serviceStatus"/>
+  </xs:complexType>
+
+  <xs:complexType name="instanceReport">
+    <xs:sequence>
+      <xs:element name="instance" type="tns:instance" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="language">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="default" type="xs:boolean"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="languages">
+    <xs:sequence>
+      <xs:element name="language" type="tns:language" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="layer">
+    <xs:sequence>
+      <xs:element name="Title" type="xs:string" minOccurs="0"/>
+      <xs:element name="Abstract" type="xs:string" minOccurs="0"/>
+      <xs:element name="Keyword" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="MetadataURL" type="tns:formatURL" minOccurs="0"/>
+      <xs:element name="DataURL" type="tns:formatURL" minOccurs="0"/>
+      <xs:element name="AuthorityURL" type="tns:formatURL" minOccurs="0"/>
+      <xs:element name="Identifier" type="tns:reference" minOccurs="0"/>
+      <xs:element name="Attribution" type="tns:attributionType" minOccurs="0"/>
+      <xs:element name="Opaque" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="CRS" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:QName"/>
+  </xs:complexType>
+
+  <xs:complexType name="layerContext">
+    <xs:sequence>
+      <xs:element name="layers" type="tns:layers" minOccurs="0"/>
+      <xs:element name="security" type="xs:string" minOccurs="0"/>
+      <xs:element name="supportedLanguages" type="tns:languages" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="layers">
+    <xs:sequence>
+      <xs:element name="MainLayer" type="tns:layer" minOccurs="0"/>
+      <xs:element name="Source" type="tns:source" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="source">
+    <xs:sequence>
+      <xs:element name="include" type="tns:layerList" minOccurs="0"/>
+      <xs:element name="exclude" type="tns:layerList" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string"/>
+    <xs:attribute name="load_all" type="xs:boolean"/>
+  </xs:complexType>
+
+  <xs:complexType name="layerList">
+    <xs:sequence>
+      <xs:element name="Layer" type="tns:layer" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sosConfiguration">
+    <xs:sequence>
+      <xs:element name="SMLConfiguration" type="automatic" minOccurs="0"/>
+      <xs:element name="observationFilterType" type="tns:dataSourceType" minOccurs="0"/>
+      <xs:element name="observationReaderType" type="tns:dataSourceType" minOccurs="0"/>
+      <xs:element name="observationWriterType" type="tns:dataSourceType" minOccurs="0"/>
+      <xs:element name="SMLType" type="tns:dataSourceType" minOccurs="0"/>
+      <xs:element name="OMConfiguration" type="automatic" minOccurs="0"/>
+      <xs:element name="extensions" type="automatic" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="parameters">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="key" minOccurs="0" type="xs:string"/>
+                  <xs:element name="value" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="observationIdBase" type="xs:string" minOccurs="0"/>
+      <xs:element name="phenomenonIdBase" type="xs:string" minOccurs="0"/>
+      <xs:element name="observationTemplateIdBase" type="xs:string" minOccurs="0"/>
+      <xs:element name="sensorIdBase" type="xs:string" minOccurs="0"/>
+      <xs:element name="maxObservationByRequest" type="xs:int"/>
+      <xs:element name="templateValidTime" type="xs:string" minOccurs="0"/>
+      <xs:element name="profile" type="xs:string" minOccurs="0"/>
+      <xs:element name="logFolder" type="xs:string" minOccurs="0"/>
+      <xs:element name="debugMode" type="xs:boolean"/>
+      <xs:element name="verifySynchronization" type="xs:boolean"/>
+      <xs:element name="keepCapabilities" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processContext">
+    <xs:sequence>
+      <xs:element name="processes" type="tns:processes" minOccurs="0"/>
+      <xs:element name="security" type="xs:string" minOccurs="0"/>
+      <xs:element name="supportedLanguages" type="tns:languages" minOccurs="0"/>
+      <xs:element name="tmpDirectory" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processes">
+    <xs:sequence>
+      <xs:element name="ProcessFactory" type="tns:processFactory" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="load_all" type="xs:boolean"/>
+  </xs:complexType>
+
+  <xs:complexType name="processFactory">
+    <xs:sequence>
+      <xs:element name="include" type="tns:processList" minOccurs="0"/>
+      <xs:element name="exclude" type="tns:processList" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="autorityCode" type="xs:string"/>
+    <xs:attribute name="load_all" type="xs:boolean"/>
+  </xs:complexType>
+
+  <xs:complexType name="processList">
+    <xs:sequence>
+      <xs:element name="Process" type="tns:process" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="process">
+    <xs:sequence/>
+    <xs:attribute name="id" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="serviceReport">
+    <xs:sequence>
+      <xs:element name="availableServices" type="tns:serviceProtocol" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="serviceProtocol">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="protocol" type="xs:string" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="providerReport">
+    <xs:sequence>
+      <xs:element name="item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="providersReport">
+    <xs:sequence>
+      <xs:element name="service" type="tns:providerServiceReport" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="providerServiceReport">
+    <xs:sequence>
+      <xs:element name="provider" type="tns:providerReport" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="xs:string"/>
+    <xs:attribute name="styleService" type="xs:boolean" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="stringList">
+    <xs:sequence>
+      <xs:element name="Entry" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="stringMap">
+    <xs:sequence>
+      <xs:element name="map">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="key" minOccurs="0" type="xs:string"/>
+                  <xs:element name="value" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="stringTreeNode">
+    <xs:sequence>
+      <xs:element name="properties">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="key" minOccurs="0" type="xs:string"/>
+                  <xs:element name="value" minOccurs="0" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Child" type="tns:stringTreeNode" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="webdavContext">
+    <xs:sequence>
+      <xs:element name="rootFile" type="xs:string" minOccurs="0"/>
+      <xs:element name="maxAgeSeconds" type="xs:long" minOccurs="0"/>
+      <xs:element name="digestAllowed" type="xs:boolean"/>
+      <xs:element name="ssoPrefix" type="xs:string" minOccurs="0"/>
+      <xs:element name="hideDotFile" type="xs:boolean"/>
+      <xs:element name="contextPath" type="xs:string" minOccurs="0"/>
+      <xs:element name="defaultPage" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="serviceStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="WORKING"/>
+      <xs:enumeration value="ERROR"/>
+      <xs:enumeration value="NOT_STARTED"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+
