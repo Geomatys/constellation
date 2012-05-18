@@ -107,7 +107,7 @@ public class CstlEmbeddedService extends CommandLine {
     @Option
     protected Integer portsoap = 9191;      
     @Option
-    protected Integer duration = 20 * 60 * 1000; //minutes*seconds*millseconds; set to <=0 to last until <enter>
+    public Integer duration = 20 * 60 * 1000; //minutes*seconds*millseconds; set to <=0 to last until <enter>
 
     final URI uri;
     final URI uriSoap;
@@ -125,7 +125,7 @@ public class CstlEmbeddedService extends CommandLine {
     //  below we add in one of the properties needed by all services.
     protected Map<String, String> grizzlyWebContainerProperties = new HashMap<String, String>();
     //FOR SOAP, DEFINE THIS REFERENCE:
-    protected final Map<String, Object> serviceInstanceSOAP = new HashMap<String, Object>();
+    public final Map<String, Object> serviceInstanceSOAP = new HashMap<String, Object>();
 
     //INCLUDE THIS MAIN.
 //	public static void main(String[] args) {
@@ -151,7 +151,7 @@ public class CstlEmbeddedService extends CommandLine {
      * <p>
      * Extending classes using the REST facade should
      */
-    protected CstlEmbeddedService(final String[] args) {
+    public CstlEmbeddedService(final String[] args) {
         this(args, new String[] {
             "org.constellation.map.ws.rs",
             "org.constellation.coverage.ws.rs",
@@ -174,7 +174,7 @@ public class CstlEmbeddedService extends CommandLine {
      * @param args The command line arguments.
      * @param providerPackages The packages for providers to start.
      */
-    protected CstlEmbeddedService(final String[] args, final String[] providerPackages) {
+    public CstlEmbeddedService(final String[] args, final String[] providerPackages) {
         super(null, args);
 
         final StringBuilder sb = new StringBuilder();
@@ -198,7 +198,7 @@ public class CstlEmbeddedService extends CommandLine {
      * Should be called by the {@code main()} method for any web service wishing
      * to implement a JAX-RS REST facade.
      */
-    protected void runREST() {
+    public void runREST() {
 
         grizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
                 "com.sun.jersey.api.core.PackagesResourceConfig");
@@ -229,7 +229,7 @@ public class CstlEmbeddedService extends CommandLine {
      * Should be called by the {@code main()} method for any web service wishing
      * to implement a JAX-WS SOAP facade.
      */
-    protected void runSOAP() {
+    public void runSOAP() {
 
         if (serviceInstanceSOAP.isEmpty()) {
             LOGGER.info("The SOAP Service Endpoint Instance was never defined.");
@@ -261,7 +261,7 @@ public class CstlEmbeddedService extends CommandLine {
      * Should be called by the {@code main()} method for any web service wishing
      * to implement a JAX-RS REST facade.
      */
-    protected void runAll() {
+    public void runAll() {
 
         grizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
                 "com.sun.jersey.api.core.PackagesResourceConfig");
@@ -310,7 +310,7 @@ public class CstlEmbeddedService extends CommandLine {
      * the duration time is greater than zero.
      *
      */
-    protected void stayAlive() {
+    public void stayAlive() {
 
         if (duration > 0) {
             //Survive 'duration' milliseconds

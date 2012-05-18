@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.ws.embedded;
+package org.constellation.ws.embedded.wps;
 
 // JUnit dependencies
 import java.io.IOException;

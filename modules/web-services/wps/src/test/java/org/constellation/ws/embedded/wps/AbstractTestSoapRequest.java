@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.ws.embedded;
+package org.constellation.ws.embedded.wps;
 
 import java.io.*;
 import java.net.URLConnection;

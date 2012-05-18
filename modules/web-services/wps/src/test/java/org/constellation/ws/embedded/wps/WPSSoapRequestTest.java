@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.ws.embedded;
+package org.constellation.ws.embedded.wps;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -49,8 +49,9 @@ public class WPSSoapRequestTest extends AbstractTestSoapRequest {
     /**
      */
     @Test
-    public void testWPSGetCapabilities() throws JAXBException, IOException {
+    public void testWPSGetCapabilities() throws Exception {
 
+        waitForStart();
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {

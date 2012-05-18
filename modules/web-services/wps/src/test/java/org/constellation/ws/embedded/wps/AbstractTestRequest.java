@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.ws.embedded;
+package org.constellation.ws.embedded.wps;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -25,7 +25,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
 import javax.imageio.ImageReader;
@@ -54,22 +53,6 @@ public class AbstractTestRequest extends AbstractGrizzlyServer {
         return s;
     }
 
-    public void waitForStart() throws Exception {
-        final URL u = new URL("http://localhost:9090/configuration?request=access");
-        boolean ex = true;
-        
-        while (ex) {
-            Thread.sleep(1 * 1000);
-            ex = false;
-            URLConnection conec = u.openConnection();
-            try {
-                conec.getInputStream();
-            } catch (ConnectException e) {
-                ex = true;
-            }
-        }
-    }
-    
     public void postRequestFile(URLConnection conec, String filePath) throws IOException {
 
         conec.setDoOutput(true);

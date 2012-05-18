@@ -14,19 +14,22 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.ws.embedded;
+package org.constellation.ws.embedded.wps;
 
 // JAI dependencies
 
 // J2SE dependencies
 import java.io.File;
+import java.net.ConnectException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Constellation dependencies
-import org.constellation.sos.ws.soap.SOService;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.embedded.CstlEmbeddedService;
 
 // geotoolkit dependencies
 import org.geotoolkit.util.logging.Logging;
@@ -111,6 +114,22 @@ public abstract class AbstractGrizzlyServer { // extends CoverageSQLTestCase {
                 LOGGER.log(Level.SEVERE, null, ex);
             }
             cstlServer.runAll();
+        }
+    }
+    
+    public void waitForStart() throws Exception {
+        final URL u = new URL("http://localhost:9090/configuration?request=access");
+        boolean ex = true;
+        
+        while (ex) {
+            Thread.sleep(1 * 1000);
+            ex = false;
+            URLConnection conec = u.openConnection();
+            try {
+                conec.getInputStream();
+            } catch (ConnectException e) {
+                ex = true;
+            }
         }
     }
 }
