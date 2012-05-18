@@ -116,20 +116,4 @@ public abstract class AbstractGrizzlyServer { // extends CoverageSQLTestCase {
             cstlServer.runAll();
         }
     }
-    
-    public void waitForStart() throws Exception {
-        final URL u = new URL("http://localhost:9090/configuration?request=access");
-        boolean ex = true;
-        
-        while (ex) {
-            Thread.sleep(1 * 1000);
-            ex = false;
-            URLConnection conec = u.openConnection();
-            try {
-                conec.getInputStream();
-            } catch (ConnectException e) {
-                ex = true;
-            }
-        }
-    }
 }
