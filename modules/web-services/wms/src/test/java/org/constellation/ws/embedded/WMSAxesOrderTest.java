@@ -216,7 +216,9 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
      * in version 1.3.0 on the same CRS.
      */
     @Test
-    public void testGetMap111And130Projected() throws IOException {
+    public void testGetMap111And130Projected() throws Exception {
+        waitForStart();
+        
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());

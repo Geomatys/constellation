@@ -22,10 +22,9 @@ package org.constellation.ws.embedded;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.data.CoverageSQLTestCase;
 
 // Constellation dependencies
-import org.constellation.sos.ws.soap.SOService;
-import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.CstlServiceException;
 
 // geotoolkit dependencies
@@ -44,7 +43,7 @@ import org.junit.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public abstract class AbstractGrizzlyServer { // extends CoverageSQLTestCase {
+public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     /**
      * The grizzly server that will received some HTTP requests.
      */
@@ -101,12 +100,6 @@ public abstract class AbstractGrizzlyServer { // extends CoverageSQLTestCase {
         public void run() {
             final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{});
             cstlServer.duration = 5*60*1000;
-            try {
-                cstlServer.serviceInstanceSOAP.put("wps", new WPSService());
-                cstlServer.serviceInstanceSOAP.put("sos", new SOService());
-            } catch (CstlServiceException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            }
             cstlServer.runAll();
         }
     }

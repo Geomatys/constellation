@@ -27,7 +27,6 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import org.constellation.map.ws.WMSMapDecoration;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
@@ -158,7 +157,6 @@ public class WCSRequestsTest extends AbstractTestRequest {
         LayerProviderProxy.getInstance().setConfigurator(config);
         
         WorldFileImageReader.Spi.registerDefaults(null);
-        WMSMapDecoration.setEmptyExtension(true);
         
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){

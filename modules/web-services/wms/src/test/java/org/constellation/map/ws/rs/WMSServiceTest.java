@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import javax.xml.bind.JAXBException;
 
 import org.constellation.map.ws.QueryContext;
 import org.constellation.ws.rs.WebService;
@@ -36,6 +37,7 @@ import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
+import org.junit.AfterClass;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -45,6 +47,7 @@ import org.opengis.util.FactoryException;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.BeforeClass;
 
 /**
  * Testing wms service value parsing.
@@ -54,11 +57,21 @@ import static org.junit.Assert.*;
 public class WMSServiceTest {
 
     private static final double DELTA = 0.00000001;
-    private final WMSService service = new WMSService();
+    private static WMSService service;
     private final BasicUriInfo info = new BasicUriInfo(null, null);
     private final MultivaluedMap<String,String> queryParameters = new BasicMultiValueMap<String, String>();
     private final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<String, String>();
 
+    @BeforeClass
+    public static void init() throws JAXBException {
+        service = new WMSService();
+    }
+    
+    @AfterClass
+    public static void finish() {
+        service.destroy();
+    }
+    
     public WMSServiceTest() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
         //do not use this in real code, just for testing
         Field privateStringField = WebService.class.getDeclaredField("uriContext");
