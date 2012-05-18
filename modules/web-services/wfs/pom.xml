@@ -130,6 +130,12 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-coveragesql</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-postgis</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
@@ -152,7 +158,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.constellation.testing</groupId>
+      <artifactId>cstl-test-embedded</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-epsg-javadb</artifactId>

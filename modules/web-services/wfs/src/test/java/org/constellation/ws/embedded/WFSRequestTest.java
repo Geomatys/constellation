@@ -113,7 +113,7 @@ public class WFSRequestTest extends AbstractTestRequest {
                 
                 if("observation".equals(serviceName)){
                     try{
-                        final String url = "jdbc:derby:memory:TestWFSWorker";
+                        final String url = "jdbc:derby:memory:TestEmbeddedWFSWorker";
                         final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                         if (!datasourceCreated) {
                             Connection con = ds.getConnection();
