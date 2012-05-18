@@ -174,7 +174,9 @@ public class WCSRequestsTest extends AbstractTestRequest {
      * returned an error report for the user.
      */
     @Test
-    public void testWCSWrongRequest() throws JAXBException, IOException {
+    public void testWCSWrongRequest() throws Exception {
+        waitForStart();
+        
         // Creates an intentional wrong url, regarding the WCS version 1.0.0 standard
         URL wrongUrl;
         try {

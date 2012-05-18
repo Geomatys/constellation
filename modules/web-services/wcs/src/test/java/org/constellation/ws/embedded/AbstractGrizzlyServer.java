@@ -21,9 +21,6 @@ package org.constellation.ws.embedded;
 // J2SE dependencies
 import java.io.File;
 import java.util.logging.Logger;
-import org.constellation.data.CoverageSQLTestCase;
-
-// Constellation dependencies
 
 // geotoolkit dependencies
 import org.geotoolkit.util.logging.Logging;
@@ -41,7 +38,7 @@ import org.junit.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
+public abstract class AbstractGrizzlyServer { // extends CoverageSQLTestCase {
     /**
      * The grizzly server that will received some HTTP requests.
      */
@@ -97,7 +94,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         @Override
         public void run() {
             final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{}, new String[] {
-            "org.constellation.map.ws.rs",
+            "org.constellation.coverage.ws.rs",
             "org.constellation.configuration.ws.rs",
             "org.constellation.ws.rs.provider"
         });
