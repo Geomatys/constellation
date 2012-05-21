@@ -147,6 +147,13 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             return importRecords(id, (File)objectRequest, fileName);
         }
         
+        if ("deleteRecords".equalsIgnoreCase(request)) {
+
+            final String id       = getParameter("ID", true, parameters);
+            final String metadata = getParameter("metadata", true, parameters);
+            return deleteMetadata(id, metadata);
+        }
+        
         if ("metadataExist".equalsIgnoreCase(request)) {
 
             final String id       = getParameter("ID", true, parameters);
@@ -557,8 +564,12 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         try {
             u = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
             for (File importedFile: files) {
-                final Object unmarshalled = u.unmarshal(importedFile);
-                writer.storeMetadata(unmarshalled);
+                if (importedFile != null) {
+                    final Object unmarshalled = u.unmarshal(importedFile);
+                    writer.storeMetadata(unmarshalled);
+                } else {
+                    throw new CstlServiceException("An imported file is null");
+                }
             }
             final String msg = "The specified record have been imported in the CSW";
             return new AcknowlegementType("Success", msg);
@@ -584,6 +595,22 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             } else {
                 final String msg = "The specified record does not exist in the CSW";
                 return new AcknowlegementType("Not Exist", msg);
+            }
+        } catch (MetadataIoException ex) {
+            throw new CstlServiceException(ex);
+        }
+    }
+    
+    private AcknowlegementType deleteMetadata(final String id, final String metadataName) throws CstlServiceException {
+        final CSWMetadataWriter writer = initWriter(id);
+        try {
+            final boolean deleted = writer.deleteMetadata(metadataName);
+            if (deleted) {
+                final String msg = "The specified record has been deleted from the CSW";
+                return new AcknowlegementType("Success", msg);
+            } else {
+                final String msg = "The specified record has not been deleted from the CSW";
+                return new AcknowlegementType("Failure", msg);
             }
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);

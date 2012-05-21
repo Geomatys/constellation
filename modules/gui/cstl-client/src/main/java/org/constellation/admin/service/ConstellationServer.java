@@ -1395,6 +1395,26 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return false;
         }
         
+        public boolean deleteMetadata(final String id, final String metadataName) {
+            try {
+                final String url = getURL() + "configuration?request=" + REQUEST_DELETE_RECORDS + "&id=" + id + "&metadata=" + metadataName;
+                Object response = sendRequest(url, null);
+                if (response instanceof AcknowlegementType) {
+                    final AcknowlegementType ack = (AcknowlegementType) response;
+                    if ("Success".equalsIgnoreCase(ack.getStatus())) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else if (response instanceof ExceptionReport) {
+                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+                }
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            return false;
+        }
+        
         public Collection<String> getAvailableDataSourceType() {
             try {
                 final String url = getURL() + "configuration?request=" + REQUEST_AVAILABLE_SOURCE_TYPE;

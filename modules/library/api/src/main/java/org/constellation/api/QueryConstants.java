@@ -71,6 +71,7 @@ public final class QueryConstants {
     //CSW operations
     public static final String REQUEST_REFRESH_INDEX         = "refreshIndex"; 
     public static final String REQUEST_IMPORT_RECORDS        = "importRecords"; 
+    public static final String REQUEST_DELETE_RECORDS        = "deleteRecords";
     public static final String REQUEST_METADATA_EXIST        = "metadataExist"; 
     public static final String REQUEST_AVAILABLE_SOURCE_TYPE = "getCSWDatasourceType"; 
     
