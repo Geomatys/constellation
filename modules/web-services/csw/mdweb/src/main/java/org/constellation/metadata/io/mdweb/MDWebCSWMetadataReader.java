@@ -71,7 +71,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     /**
      * A map of binding term-path for each standard.
      */
-    private static final Map<Standard, Map<String, String>> DUBLINCORE_PATH_MAP;
+    protected static final Map<Standard, Map<String, String>> DUBLINCORE_PATH_MAP;
     static {
         DUBLINCORE_PATH_MAP          = new HashMap<Standard, Map<String, String>>();
 
@@ -447,7 +447,12 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
             litType = new SimpleLiteral(null, dataType);
         } catch (NumberFormatException ex) {
-            LOGGER.warning("Number format exception while trying to get the DC type");
+            LOGGER.finer("Number format exception while trying to get the DC type using the value as it is in the database");
+            final TextValue value = (TextValue)typeValues.get(0);
+            final String stringValue = value.getValue();
+            if (stringValue != null && !stringValue.isEmpty()) {
+                litType = new SimpleLiteral(null, stringValue);
+            }
         }
 
 
