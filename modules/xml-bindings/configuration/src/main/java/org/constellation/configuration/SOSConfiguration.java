@@ -21,11 +21,14 @@ package org.constellation.configuration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.constellation.generic.database.Automatic;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  * A XML binding object for SOS configuration.
@@ -36,6 +39,8 @@ import org.constellation.generic.database.Automatic;
 @XmlRootElement(name = "SOSConfiguration")
 public class SOSConfiguration {
 
+    private static final Logger LOGGER = Logging.getLogger(SOSConfiguration.class);
+    
     /**
      * Informations about SensorML Datasource.
      */
@@ -155,6 +160,8 @@ public class SOSConfiguration {
      */
     @Deprecated
     private boolean keepCapabilities = false;
+    
+    private String logLevel;
 
     /**
      * Empty constructor used by JAXB.
@@ -249,6 +256,28 @@ public class SOSConfiguration {
         this.smlType = smlType;
     }
 
+     /**
+     * @return the logLevel
+     */
+    public Level getLogLevel() {
+        if (logLevel != null) {
+            try {
+                final Level l = Level.parse(logLevel);
+                return l;
+            } catch (IllegalArgumentException ex) {
+                LOGGER.log(Level.WARNING, "Unexpected value for Log level:{0}", logLevel);
+            }
+        }
+        return Level.INFO;
+    }
+
+    /**
+     * @param logLevel the logLevel to set
+     */
+    public void setLogLevel(String logLevel) {
+        this.logLevel = logLevel;
+    }
+    
     /**
      * @return the observationIdBase
      */

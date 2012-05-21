@@ -20,9 +20,7 @@ import org.constellation.admin.service.ConstellationServer;
 import org.geotoolkit.xml.MarshallerPool;
 import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.net.ConnectException;
-import java.net.URL;
-import java.net.URLConnection;
+import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import static org.junit.Assert.*;
@@ -61,6 +59,27 @@ public class ConstellationServerTest extends AbstractTestRequest {
         assertNotNull(administrator);
         GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("shapefile");
         assertNotNull(desc);
+    }
+    
+    @Test
+    public void testImportFile() throws Exception {
+        
+        final ConstellationServer administrator = ConstellationServer.login("http://localhost:9090/", "", "");
+        assertNotNull(administrator);
+        final File f = FileUtilities.getFileFromResource("constellation.CSW.csw2.data.urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58.xml");
+        
+        final boolean inserted = administrator.csws.importFile("default", f, "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58.xml");
+        assertTrue(inserted);
+        
+        boolean exist = administrator.csws.metadataExist("default", "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        assertTrue(exist);
+        
+        final boolean deleted = administrator.csws.deleteMetadata("default", "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        assertTrue(deleted);
+        
+        exist = administrator.csws.metadataExist("default", "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        assertFalse(exist);
+        
     }
     
 }

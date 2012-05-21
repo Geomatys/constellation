@@ -438,6 +438,7 @@ public class SOSworker extends AbstractWorker {
                 omFilter  = omFactory.getObservationFilter(omFilterType, omConfiguration, properties);
             }
 
+            setLogLevel(configuration.getLogLevel());
             // we log some implementation informations
             logInfos();
 
