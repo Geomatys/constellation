@@ -1527,6 +1527,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 unmarshallerPool = POOL;
             }
             
+            readSessionId(conec);
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = unmarshallerPool.acquireUnmarshaller();
@@ -1603,6 +1604,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 
             }
             try {
+                readSessionId(conec);
                 final ParameterDescriptorReader reader = new ParameterDescriptorReader();
                 final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());  
                 reader.setInput(responseStream);

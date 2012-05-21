@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.bind.JAXBElement;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBException;
@@ -565,7 +566,10 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             u = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
             for (File importedFile: files) {
                 if (importedFile != null) {
-                    final Object unmarshalled = u.unmarshal(importedFile);
+                    Object unmarshalled = u.unmarshal(importedFile);
+                    if (unmarshalled instanceof JAXBElement) {
+                        unmarshalled = ((JAXBElement)unmarshalled).getValue();
+                    }
                     writer.storeMetadata(unmarshalled);
                 } else {
                     throw new CstlServiceException("An imported file is null");

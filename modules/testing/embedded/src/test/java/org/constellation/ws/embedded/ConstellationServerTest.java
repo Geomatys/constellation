@@ -71,13 +71,13 @@ public class ConstellationServerTest extends AbstractTestRequest {
         final boolean inserted = administrator.csws.importFile("default", f, "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58.xml");
         assertTrue(inserted);
         
-        boolean exist = administrator.csws.metadataExist("default", "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        boolean exist = administrator.csws.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
         assertTrue(exist);
         
-        final boolean deleted = administrator.csws.deleteMetadata("default", "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        final boolean deleted = administrator.csws.deleteMetadata("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
         assertTrue(deleted);
         
-        exist = administrator.csws.metadataExist("default", "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        exist = administrator.csws.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
         assertFalse(exist);
         
     }
