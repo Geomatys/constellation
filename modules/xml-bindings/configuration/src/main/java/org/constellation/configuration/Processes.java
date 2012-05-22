@@ -39,7 +39,10 @@ public class Processes {
     public Processes() {
         
     }
-    
+    public Processes(final Boolean loadAll) {
+        this.loadAll = loadAll;
+    }
+            
     public Processes(final List<ProcessFactory> factory) {
         this.factory = factory;
     }

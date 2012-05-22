@@ -159,7 +159,7 @@ public class WPSWorker extends AbstractWorker {
         }
         this.context = candidate;
         fillProcessList();
-        if (context.getTmpDirectory() != null) {
+        if (context != null && context.getTmpDirectory() != null) {
             final File tmpDir = new File(context.getTmpDirectory());
             if (!tmpDir.isDirectory()) {
                 supportStorage = tmpDir.mkdirs();
@@ -180,7 +180,7 @@ public class WPSWorker extends AbstractWorker {
      * Create process list from context file. 
      */
     private void fillProcessList() {
-        if (context != null) {
+        if (context != null && context.getProcesses() != null) {
             // Load all process from all factory
             if (Boolean.TRUE == context.getProcesses().getLoadAll()) {
                 LOGGER.info("Loading all process");

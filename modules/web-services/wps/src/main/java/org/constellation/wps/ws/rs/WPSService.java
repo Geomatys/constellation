@@ -36,15 +36,15 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.constellation.ServiceDef;
-import org.constellation.configuration.LayerContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.wps.utils.WPSUtils;
 
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.Processes;
 import static org.constellation.wps.ws.WPSConstant.*;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 
@@ -112,8 +112,8 @@ public class WPSService extends OGCWebService<WPSWorker> {
     
     @Override
     protected void configureInstance(File instanceDirectory, Object configuration) throws CstlServiceException {
-        if (configuration instanceof LayerContext) {
-            final File configurationFile = new File(instanceDirectory, "layerContext.xml");
+        if (configuration instanceof ProcessContext) {
+            final File configurationFile = new File(instanceDirectory, "processContext.xml");
             Marshaller marshaller = null;
             try {
                 marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
@@ -127,22 +127,22 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 }
             }
         } else {
-            throw new CstlServiceException("The configuration Object is not a layer context", INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException("The configuration Object is not a process context", INVALID_PARAMETER_VALUE);
         }
     }
 
     @Override
     protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
-        final File configurationFile = new File(instanceDirectory, "layerContext.xml");
+        final File configurationFile = new File(instanceDirectory, "processContext.xml");
         if (configurationFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 Object obj = unmarshaller.unmarshal(configurationFile);
-                if (obj instanceof LayerContext) {
+                if (obj instanceof ProcessContext) {
                     return obj;
                 } else {
-                    throw new CstlServiceException("The layerContext.xml file does not contain a LayerContext object");
+                    throw new CstlServiceException("The processContext.xml file does not contain a ProcessContext object");
                 }
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex);
@@ -152,13 +152,13 @@ public class WPSService extends OGCWebService<WPSWorker> {
                 }
             }
         } else {
-            throw new CstlServiceException("Unable to find a file layerContext.xml");
+            throw new CstlServiceException("Unable to find a file processContext.xml");
         }
     }
 
     @Override
     protected void basicConfigure(File instanceDirectory) throws CstlServiceException {
-        configureInstance(instanceDirectory, new LayerContext());
+        configureInstance(instanceDirectory, new ProcessContext(new Processes(true)));
     }
 
     @Override
