@@ -139,16 +139,11 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final List<BDD> thesaurusDBs = configuration.getThesaurus();
         final List<Thesaurus> thesaurusList = new ArrayList<Thesaurus>();
         for (BDD thesaurusDB : thesaurusDBs) {
-            try {
-                final DataSource source    =    thesaurusDB.getPooledDataSource();
-                final String schema        = thesaurusDB.getSchema();
-                final boolean derby        = !thesaurusDB.isPostgres();
-                final ThesaurusDatabase th = new ThesaurusDatabase(source, schema, derby);
-                thesaurusList.add(th);
-
-            } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, "SQLException while initializing the Thesaurus reader: {0}", thesaurusDB.getConnectURL());
-            }
+            final DataSource source    =    thesaurusDB.getPooledDataSource();
+            final String schema        = thesaurusDB.getSchema();
+            final boolean derby        = !thesaurusDB.isPostgres();
+            final ThesaurusDatabase th = new ThesaurusDatabase(source, schema, derby);
+            thesaurusList.add(th);
         }
         if (thesaurusList.size() > 0) {
             final LocalThesaurusHandler tReader = new LocalThesaurusHandler(thesaurusList);

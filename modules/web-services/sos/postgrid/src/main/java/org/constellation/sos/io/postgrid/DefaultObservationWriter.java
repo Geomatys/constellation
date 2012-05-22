@@ -19,6 +19,7 @@ package org.constellation.sos.io.postgrid;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -210,7 +211,8 @@ public class DefaultObservationWriter implements ObservationWriter {
         if (position == null || position.getValue().size() < 2 || !isPostgres)
             return;
         try {
-            final Statement stmt2    = omDatabase.getDataSource(true).getConnection().createStatement();
+            final Connection c       = omDatabase.getDataSource(true).getConnection();
+            final Statement stmt2    = c.createStatement();
             final ResultSet result2;
             String request = "SELECT * FROM ";
             boolean insert = true;
@@ -251,6 +253,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             }
             result2.close();
             stmt2.close();
+            c.close();
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);

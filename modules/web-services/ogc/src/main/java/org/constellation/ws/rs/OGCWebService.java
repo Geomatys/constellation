@@ -469,7 +469,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
              * Return a report about the instances in the service.
              */
             } else if ("listInstance".equalsIgnoreCase(request)) {
-                LOGGER.info("listing instances");
+                LOGGER.finer("listing instances");
                 final List<Instance> instances = new ArrayList<Instance>();
                 // 1- First we list the instance in the map
                 for (Entry<String, Boolean> entry : WSEngine.getEntriesStatus(serviceName)) {

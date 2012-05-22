@@ -335,7 +335,7 @@ public class BDD {
      *
      * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
      */
-    public DataSource getPooledDataSource() throws SQLException {
+    public DataSource getPooledDataSource() {
         final DataSource source;
         // by Default  we use the postgres driver.
         if (className == null) {
@@ -394,11 +394,16 @@ public class BDD {
                 return null;
             }
         } else if (className.equals(ORACLE_DRIVER_CLASS)) {
-            final OracleConnectionPoolDataSource oraSource = new OracleConnectionPoolDataSource();
-            oraSource.setURL(connectURL);
-            oraSource.setUser(user);
-            oraSource.setPassword(password);
-            source = new WrappedDataSource(oraSource);
+            try {
+                final OracleConnectionPoolDataSource oraSource = new OracleConnectionPoolDataSource();
+                oraSource.setURL(connectURL);
+                oraSource.setUser(user);
+                oraSource.setPassword(password);
+                source = new WrappedDataSource(oraSource);
+            } catch (SQLException ex) {
+                LOGGER.log(Level.SEVERE, "SQLException while creating oracle datasource", ex);
+                return null;
+            }
         } else {
             source = new DefaultDataSource(connectURL);
         }
