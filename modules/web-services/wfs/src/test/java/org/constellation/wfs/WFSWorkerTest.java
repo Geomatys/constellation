@@ -81,7 +81,7 @@ import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.ValueType;
-import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.xml.DomCompare;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
@@ -188,7 +188,7 @@ public class WFSWorkerTest {
         final Marshaller marshaller = pool.acquireMarshaller();
 
         GetCapabilitiesType request = new GetCapabilitiesType("WFS");
-        WFSCapabilitiesType result = worker.getCapabilities(request);
+        WFSCapabilities result = worker.getCapabilities(request);
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(result, sw);

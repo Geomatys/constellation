@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
@@ -46,6 +45,7 @@ import static org.constellation.wfs.ws.WFSConstants.*;
 
 // Geotoolkit dependencies
 import org.constellation.ws.LayerWorker;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.data.DataUtilities;
@@ -66,11 +66,8 @@ import org.geotoolkit.ows.xml.v100.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.XMLUtilities;
-import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.FeatureTypeListType;
-import org.geotoolkit.wfs.xml.v110.FeatureTypeType;
-import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.GetGmlObjectType;
 import org.geotoolkit.wfs.xml.v110.LockFeatureResponseType;
@@ -90,9 +87,14 @@ import org.geotoolkit.gml.xml.v311.AbstractGMLType;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
-import org.geotoolkit.ows.xml.v100.KeywordsType;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.v100.OperationsMetadata;
-import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.ows.xml.v100.ServiceIdentification;
+import org.geotoolkit.ows.xml.v100.ServiceProvider;
+import org.geotoolkit.wfs.xml.GetCapabilities;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.IdentifierGenerationOptionType;
@@ -104,12 +106,11 @@ import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
-import org.geotoolkit.wfs.xml.v110.MetadataURLType;
+import org.geotoolkit.wfs.xml.WFSXmlFactory;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.wfs.xml.FeatureTypeList;
 
 // GeoAPI dependencies
-import org.geotoolkit.ows.xml.v100.ServiceIdentification;
-import org.geotoolkit.ows.xml.v100.ServiceProvider;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
@@ -155,6 +156,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * Current map with namespace - xsd location. << ISSUE multiThread
      */
     private Map<String, String> schemaLocations;
+    
+    private static final WFSXmlFactory xmlFactory = new WFSXmlFactory();
 
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WFS);
@@ -180,30 +183,31 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public WFSCapabilitiesType getCapabilities(final GetCapabilitiesType request) throws CstlServiceException {
+    public WFSCapabilities getCapabilities(final GetCapabilities request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetCapabilities request proccesing");
         final long start = System.currentTimeMillis();
-
+        final String currentVersion = actingVersion.version.toString();
         // we verify the base attribute
         isWorking();
         verifyBaseRequest(request, false, true);
 
-        final WFSCapabilitiesType inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(actingVersion.version.toString(), "WFS");
+        
+        final WFSCapabilities inCapabilities = (WFSCapabilities) getStaticCapabilitiesObject(currentVersion, "WFS");
         
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
         if (returnUS) {
-            return new WFSCapabilitiesType("1.1.0", getCurrentUpdateSequence());
+            return xmlFactory.buildWFSCapabilities(currentVersion, getCurrentUpdateSequence());
         }
 
-        FeatureTypeListType ftl  = null;
-        OperationsMetadata om    = null;
-        ServiceProvider sp       = null;
-        ServiceIdentification si = null;
+        FeatureTypeList ftl              = null;
+        AbstractOperationsMetadata om    = null;
+        AbstractServiceProvider sp       = null;
+        AbstractServiceIdentification si = null;
 
         if (request.getSections() == null || request.containsSection("featureTypeList")) {
-            final List<FeatureTypeType> types = new ArrayList<FeatureTypeType>();
-
+            ftl = xmlFactory.buildFeatureTypeList(currentVersion);
+            
             /*
              *  layer providers
              */
@@ -223,7 +227,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                 "\ncause:" + ex.getMessage());
                         continue;
                     }
-                    final FeatureTypeType ftt;
+                    final org.geotoolkit.wfs.xml.FeatureType ftt;
                     try {
 
                         final String defaultCRS;
@@ -251,32 +255,33 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         } else {
                             title = fld.getName().getLocalPart();
                         }
-                        ftt = new FeatureTypeType(
+                        ftt = xmlFactory.buildFeatureType(
+                                currentVersion,
                                 Utils.getQnameFromName(layerName),
                                 title,
                                 defaultCRS,
                                 DEFAULT_CRS,
-                                UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getStore(), fld.getName())}));
+                                toBBox(fld.getStore(), fld.getName()));
 
                         /*
                          * we apply the layer customization
                          */
                         ftt.setAbstract(configLayer.getAbstrac());
                         if (!configLayer.getKeywords().isEmpty()) {
-                            ftt.getKeywords().add(new KeywordsType(configLayer.getKeywords(), null));
+                            ftt.addKeywords(configLayer.getKeywords());
                         }
                         FormatURL metadataURL = configLayer.getMetadataURL();
                         if (metadataURL != null) {
-                            ftt.getMetadataURL().add(new MetadataURLType(metadataURL.getOnlineResource().getValue(),
-                                                                         metadataURL.getType(),
-                                                                         metadataURL.getFormat()));
+                            ftt.addMetadataURL(metadataURL.getOnlineResource().getValue(),
+                                               metadataURL.getType(),
+                                               metadataURL.getFormat());
                         }
                         if (!configLayer.getCrs().isEmpty()) {
-                            ftt.setOtherSRS(configLayer.getCrs());
+                            ftt.setOtherCRS(configLayer.getCrs());
                         }
 
                         // we add the feature type description to the list
-                        types.add(ftt);
+                        ftl.addFeatureType(ftt);
                     } catch (FactoryException ex) {
                         Logging.unexpectedException(LOGGER, ex);
                     }
@@ -285,17 +290,19 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     LOGGER.log(Level.WARNING, "The layer:{0} is not a feature layer", layerName);
                 }
             }
-
-            ftl = new FeatureTypeListType(null, types);
         }
         //todo ...etc...--------------------------------------------------------
 
         if (request.getSections() == null || request.containsSection("operationsMetadata")) {
+            if (currentVersion.equals("2.0.0")) {
+                om =  OPERATIONS_METADATA_V200;
+            } else {
+                om = OPERATIONS_METADATA_V110;
+            }
             final String url = getServiceUrl();
             if (url != null) {
-                OPERATIONS_METADATA.updateURL(url);
+                om.updateURL(url);
             }
-            om = OPERATIONS_METADATA;
         }
         if (request.getSections() == null || request.containsSection("serviceProvider")) {
             sp = inCapabilities.getServiceProvider();
@@ -304,9 +311,19 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             si = inCapabilities.getServiceIdentification();
         }
 
-        final WFSCapabilitiesType result = new WFSCapabilitiesType("1.1.0", si, sp, om, ftl, WFSConstants.FILTER_CAPABILITIES);
-        result.setServesGMLObjectTypeList(null);
-        result.setSupportsGMLObjectTypeList(null);
+        final WFSCapabilities result;
+        if (currentVersion.equals("1.1.0")) {
+            result = new WFSCapabilitiesType("1.1.0", (ServiceIdentification)si, (ServiceProvider)sp, (OperationsMetadata)om, (FeatureTypeListType)ftl, WFSConstants.FILTER_CAPABILITIES_V110);
+            /*result.setServesGMLObjectTypeList(null);
+            result.setSupportsGMLObjectTypeList(null);*/
+        } else {
+            result = new org.geotoolkit.wfs.xml.v200.WFSCapabilitiesType("2.0.0", 
+                                                                        (org.geotoolkit.ows.xml.v110.ServiceIdentification)si, 
+                                                                        (org.geotoolkit.ows.xml.v110.ServiceProvider)sp, 
+                                                                        (org.geotoolkit.ows.xml.v110.OperationsMetadata)om, 
+                                                                        (org.geotoolkit.wfs.xml.v200.FeatureTypeListType)ftl, 
+                                                                        WFSConstants.FILTER_CAPABILITIES_V200);
+        }
 
         LOGGER.log(logLevel, "GetCapabilities treated in {0}ms", (System.currentTimeMillis() - start));
         return result;

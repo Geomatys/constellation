@@ -28,6 +28,8 @@ import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.AbstractGMLType;
+import org.geotoolkit.wfs.xml.GetCapabilities;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
@@ -56,7 +58,7 @@ public interface WFSWorker extends Worker {
      *
      * @throws CstlServiceException
      */
-    WFSCapabilitiesType getCapabilities(final GetCapabilitiesType getCapab) throws CstlServiceException;
+    WFSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException;
 
     /**
      * describe the structure of any feature type it can service.

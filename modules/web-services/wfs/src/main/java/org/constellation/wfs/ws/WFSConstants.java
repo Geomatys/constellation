@@ -33,12 +33,14 @@ import org.geotoolkit.ogc.xml.v110.ScalarCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.SpatialCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.SpatialOperatorType;
 import org.geotoolkit.ogc.xml.v110.SpatialOperatorsType;
+import org.geotoolkit.ogc.xml.v200.ResourceIdentifierType;
 import org.geotoolkit.ows.xml.v100.DCP;
 import org.geotoolkit.ows.xml.v100.DomainType;
 import org.geotoolkit.ows.xml.v100.HTTP;
 import org.geotoolkit.ows.xml.v100.Operation;
 import org.geotoolkit.ows.xml.v100.OperationsMetadata;
 import org.geotoolkit.ows.xml.v100.RequestMethodType;
+import org.geotoolkit.ows.xml.v110.AllowedValues;
 import org.opengis.filter.capability.Operator;
 import org.opengis.filter.capability.SpatialOperator;
 
@@ -70,7 +72,7 @@ public final class WFSConstants {
      */
     public final static MediaType GML_3_1_1 = new MediaType("text", "xml; subtype=gml/3.1.1");
 
-    public static final FilterCapabilities FILTER_CAPABILITIES;
+    public static final FilterCapabilities FILTER_CAPABILITIES_V110;
     static {
         final List<QName> operandList = new ArrayList<QName>();
         operandList.add(new QName("http://www.opengis.net/gml", "Envelope"));
@@ -110,11 +112,54 @@ public final class WFSConstants {
 
 
         final IdCapabilitiesType idCapabilities = new IdCapabilitiesType(true, true);
-        FILTER_CAPABILITIES = new FilterCapabilities(scalarCapabilities, spatialCapabilties, idCapabilities);
+        FILTER_CAPABILITIES_V110 = new FilterCapabilities(scalarCapabilities, spatialCapabilties, idCapabilities);
+
+    }
+    
+    public static final org.geotoolkit.ogc.xml.v200.FilterCapabilities FILTER_CAPABILITIES_V200;
+    static {
+        final List<QName> operandList = new ArrayList<QName>();
+        operandList.add(new QName("http://www.opengis.net/gml/3.2.1", "Envelope"));
+        operandList.add(new QName("http://www.opengis.net/gml/3.2.1", "Point"));
+        operandList.add(new QName("http://www.opengis.net/gml/3.2.1", "LineString"));
+        operandList.add(new QName("http://www.opengis.net/gml/3.2.1", "Polygon"));
+        final org.geotoolkit.ogc.xml.v200.GeometryOperandsType operands = new org.geotoolkit.ogc.xml.v200.GeometryOperandsType(operandList);
+        final SpatialOperator[] operatorList = new SpatialOperator[10];
+        operatorList[0] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("DISJOINT", null);
+        operatorList[1] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("EQUALS", null);
+        operatorList[2] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("D_WITHIN", null);
+        operatorList[3] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("BEYOND", null);
+        operatorList[4] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("INTERSECTS", null);
+        operatorList[5] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("TOUCHES", null);
+        operatorList[6] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("CROSSES", null);
+        operatorList[7] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("CONTAINS", null);
+        operatorList[8] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("OVERLAPS", null);
+        operatorList[9] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("BBOX", null);
+
+        final org.geotoolkit.ogc.xml.v200.SpatialOperatorsType spatialOperators = new org.geotoolkit.ogc.xml.v200.SpatialOperatorsType(operatorList);
+        final org.geotoolkit.ogc.xml.v200.SpatialCapabilitiesType spatialCapabilties = new org.geotoolkit.ogc.xml.v200.SpatialCapabilitiesType(operands, spatialOperators);
+
+        final Operator[] compaOperatorList = new Operator[9];
+        compaOperatorList[0] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsBetween");
+        compaOperatorList[1] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsEqualTo");
+        compaOperatorList[2] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsGreaterThan");
+        compaOperatorList[3] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsGReaterThanEqualTo");
+        compaOperatorList[4] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLessThan");
+        compaOperatorList[5] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLessThanEqualTo");
+        compaOperatorList[6] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsLike");
+        compaOperatorList[7] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsNotEqualTo");
+        compaOperatorList[8] = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorType("PropertyIsNull");
+
+        final org.geotoolkit.ogc.xml.v200.ComparisonOperatorsType comparisons = new org.geotoolkit.ogc.xml.v200.ComparisonOperatorsType(compaOperatorList);
+        final org.geotoolkit.ogc.xml.v200.ScalarCapabilitiesType scalarCapabilities = new org.geotoolkit.ogc.xml.v200.ScalarCapabilitiesType(comparisons, true);
+
+        final ResourceIdentifierType iden = new ResourceIdentifierType(new QName("http://www.opengis.net/fes/2.0", "ResourceId"));
+        final org.geotoolkit.ogc.xml.v200.IdCapabilitiesType idCapabilities = new org.geotoolkit.ogc.xml.v200.IdCapabilitiesType(iden);
+        FILTER_CAPABILITIES_V200 = new org.geotoolkit.ogc.xml.v200.FilterCapabilities(scalarCapabilities, spatialCapabilties, idCapabilities);
 
     }
 
-    public static final OperationsMetadata OPERATIONS_METADATA;
+    public static final OperationsMetadata OPERATIONS_METADATA_V110;
     static {
         final List<DCP> dcps = new ArrayList<DCP>();
         dcps.add(new DCP(new HTTP(new RequestMethodType("somURL"), new RequestMethodType("someURL"))));
@@ -159,6 +204,55 @@ public final class WFSConstants {
         operations.add(Transaction);
 
 
-        OPERATIONS_METADATA = new OperationsMetadata(operations, null, null, null);
+        OPERATIONS_METADATA_V110 = new OperationsMetadata(operations, null, null, null);
+    }
+    
+    public static final org.geotoolkit.ows.xml.v110.OperationsMetadata OPERATIONS_METADATA_V200;
+    static {
+        final List<org.geotoolkit.ows.xml.v110.DCP> dcps = new ArrayList<org.geotoolkit.ows.xml.v110.DCP>();
+        dcps.add(new org.geotoolkit.ows.xml.v110.DCP(new org.geotoolkit.ows.xml.v110.HTTP(new org.geotoolkit.ows.xml.v110.RequestMethodType("somURL"), 
+                                                                                          new org.geotoolkit.ows.xml.v110.RequestMethodType("someURL"))));
+
+        final List<org.geotoolkit.ows.xml.v110.DCP> dcps2 = new ArrayList<org.geotoolkit.ows.xml.v110.DCP>();
+        dcps2.add(new org.geotoolkit.ows.xml.v110.DCP(new org.geotoolkit.ows.xml.v110.HTTP(null, new org.geotoolkit.ows.xml.v110.RequestMethodType("someURL"))));
+
+        final List<org.geotoolkit.ows.xml.v110.Operation> operations = new ArrayList<org.geotoolkit.ows.xml.v110.Operation>();
+
+        final List<org.geotoolkit.ows.xml.v110.DomainType> gcParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        gcParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("AcceptVersions", new AllowedValues(Arrays.asList("2.0.0"))));
+        gcParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("AcceptFormats", new AllowedValues(Arrays.asList("text/xml"))));
+        gcParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("Service", new AllowedValues(Arrays.asList("WFS"))));
+        org.geotoolkit.ows.xml.v110.Operation getCapabilities = new org.geotoolkit.ows.xml.v110.Operation(dcps, gcParameters, null, null, "GetCapabilities");
+        operations.add(getCapabilities);
+
+        final List<org.geotoolkit.ows.xml.v110.DomainType> dfParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        dfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("outputFormat", new AllowedValues(Arrays.asList("text/xml; subtype=gml/3.1.1"))));
+        dfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("Service", new AllowedValues(Arrays.asList("WFS"))));
+        dfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("Version", new AllowedValues(Arrays.asList("2.0.0"))));
+        org.geotoolkit.ows.xml.v110.Operation describeFeatureType = new org.geotoolkit.ows.xml.v110.Operation(dcps, dfParameters, null, null, "DescribeFeatureType");
+        operations.add(describeFeatureType);
+
+        final List<org.geotoolkit.ows.xml.v110.DomainType> gfParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        gfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("resultType", new AllowedValues(Arrays.asList("results","hits"))));
+        gfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("outputFormat", new AllowedValues(Arrays.asList("text/xml; subtype=gml/3.1.1"))));
+        gfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("Service", new AllowedValues(Arrays.asList("WFS"))));
+        gfParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("Version", new AllowedValues(Arrays.asList("2.0.0"))));
+
+        final List<org.geotoolkit.ows.xml.v110.DomainType> gfConstraints = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        gfConstraints.add(new org.geotoolkit.ows.xml.v110.DomainType("LocalTraverseXLinkScope", new AllowedValues(Arrays.asList("2")))); // ???
+        org.geotoolkit.ows.xml.v110.Operation getFeature = new org.geotoolkit.ows.xml.v110.Operation(dcps, gfParameters, gfConstraints, null, "GetFeature");
+        operations.add(getFeature);
+
+        final List<org.geotoolkit.ows.xml.v110.DomainType> tParameters = new ArrayList<org.geotoolkit.ows.xml.v110.DomainType>();
+        tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("inputFormat", new AllowedValues(Arrays.asList("text/xml; subtype=gml/3.1.1"))));
+        tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("idgen", new AllowedValues(Arrays.asList("GenerateNew","UseExisting","ReplaceDuplicate"))));
+        tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("releaseAction", new AllowedValues(Arrays.asList("ALL", "SOME"))));
+        tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("Service", new AllowedValues(Arrays.asList("WFS"))));
+        tParameters.add(new org.geotoolkit.ows.xml.v110.DomainType("Version", new AllowedValues(Arrays.asList("2.0.0"))));
+        org.geotoolkit.ows.xml.v110.Operation Transaction = new org.geotoolkit.ows.xml.v110.Operation(dcps2, tParameters, null, null, "Transaction");
+        operations.add(Transaction);
+
+
+        OPERATIONS_METADATA_V200 = new org.geotoolkit.ows.xml.v110.OperationsMetadata(operations, null, null, null);
     }
 }
