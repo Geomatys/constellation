@@ -67,7 +67,7 @@ public class WPSUtils {
     /**
      * Return the process descriptor from a process identifier
      *
-     * @param identifier like "urn:ogc:geomatys:wps:math:add"
+     * @param identifier like "urn:ogc:cstl:wps:math:add"
      * @return ProcessDescriptor
      * @throws CstlServiceException in case of an unknown process identifier.
      */
@@ -178,7 +178,7 @@ public class WPSUtils {
 
     /**
      * Generate process INPUT/OUPTUT identifiers based on process identifier. e.g :
-     * urn:ogc:geomatys:wps:math:add:input:number1, urn:ogc:geomatys:wps:math:add:ouput:result
+     * urn:ogc:cstl:wps:math:add:input:number1, urn:ogc:cstl:wps:math:add:ouput:result
      *
      * @param procDesc
      * @param input
@@ -266,7 +266,7 @@ public class WPSUtils {
      * @param descriptor
      * @return true if process is supported, false if is not.
      */
-    public static boolean isSupportedProcess(ProcessDescriptor descriptor) {
+    public static boolean isSupportedProcess(final ProcessDescriptor descriptor) {
 
         //Inputs
         final List<GeneralParameterDescriptor> inputDesc = descriptor.getInputDescriptor().descriptors();
@@ -309,17 +309,17 @@ public class WPSUtils {
         final SupportedComplexDataInputType complex = new SupportedComplexDataInputType();
         final ComplexDataCombinationsType complexCombs = new ComplexDataCombinationsType();
         final ComplexDataCombinationType complexComb = new ComplexDataCombinationType();
-        final List<WPSIO.WPSSupport> infos = WPSIO.getSupports(attributeClass, ioType, type);
+        final List<WPSIO.FormatSupport> infos = WPSIO.getFormats(attributeClass, ioType);
 
         if (infos != null) {
-            for (WPSIO.WPSSupport inputClass : infos) {
+            for (WPSIO.FormatSupport inputClass : infos) {
 
                 final ComplexDataDescriptionType complexDesc = new ComplexDataDescriptionType();
-                complexDesc.setEncoding(inputClass.getEncoding() != null ? inputClass.getEncoding().getValue() : null); //Encoding
-                complexDesc.setMimeType(inputClass.getMime() != null ? inputClass.getMime() : null);                    //Mime
-                complexDesc.setSchema(inputClass.getSchema() != null ? inputClass.getSchema().getValue() : null);       //URL to xsd schema
+                complexDesc.setEncoding(inputClass.getEncoding() != null ? inputClass.getEncoding() : null); //Encoding
+                complexDesc.setMimeType(inputClass.getMimeType() != null ? inputClass.getMimeType() : null);                    //Mime
+                complexDesc.setSchema(inputClass.getSchema() != null ? inputClass.getSchema() : null);       //URL to xsd schema
 
-                if (inputClass.isDefaultIO()) {
+                if (inputClass.isDefaultFormat()) {
                     complexComb.setFormat(complexDesc);
                 }
                 complexCombs.getFormat().add(complexDesc);
