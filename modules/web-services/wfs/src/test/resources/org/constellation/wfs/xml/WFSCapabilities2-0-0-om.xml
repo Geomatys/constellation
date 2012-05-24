@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns8:WFS_Capabilities version="2.0.0" xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:wfs="http://www.opengis.net/wfs" xmlns:ins="http://www.inspire.org" xmlns:ows="http://www.opengis.net/ows" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml" xmlns:ns7="http://www.opengis.net/ows/1.1" xmlns:ns8="http://www.opengis.net/wfs/2.0">
+    <ns7:OperationsMetadata>
+        <ns7:Operation name="GetCapabilities">
+            <ns7:DCP>
+                <ns7:HTTP>
+                    <ns7:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns7:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                </ns7:HTTP>
+            </ns7:DCP>
+            <ns7:Parameter name="AcceptVersions">
+                <ns7:AllowedValues>
+                    <ns7:Value>2.0.0</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="AcceptFormats">
+                <ns7:AllowedValues>
+                    <ns7:Value>text/xml</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="Service">
+                <ns7:AllowedValues>
+                    <ns7:Value>WFS</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+        </ns7:Operation>
+        <ns7:Operation name="DescribeFeatureType">
+            <ns7:DCP>
+                <ns7:HTTP>
+                    <ns7:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns7:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                </ns7:HTTP>
+            </ns7:DCP>
+            <ns7:Parameter name="outputFormat">
+                <ns7:AllowedValues>
+                    <ns7:Value>text/xml; subtype=gml/3.1.1</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="Service">
+                <ns7:AllowedValues>
+                    <ns7:Value>WFS</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="Version">
+                <ns7:AllowedValues>
+                    <ns7:Value>2.0.0</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+        </ns7:Operation>
+        <ns7:Operation name="GetFeature">
+            <ns7:DCP>
+                <ns7:HTTP>
+                    <ns7:Get xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                    <ns7:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                </ns7:HTTP>
+            </ns7:DCP>
+            <ns7:Parameter name="resultType">
+                <ns7:AllowedValues>
+                    <ns7:Value>results</ns7:Value>
+                    <ns7:Value>hits</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="outputFormat">
+                <ns7:AllowedValues>
+                    <ns7:Value>text/xml; subtype=gml/3.1.1</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="Service">
+                <ns7:AllowedValues>
+                    <ns7:Value>WFS</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="Version">
+                <ns7:AllowedValues>
+                    <ns7:Value>2.0.0</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Constraint name="LocalTraverseXLinkScope">
+                <ns7:AllowedValues>
+                    <ns7:Value>2</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Constraint>
+        </ns7:Operation>
+        <ns7:Operation name="Transaction">
+            <ns7:DCP>
+                <ns7:HTTP>
+                    <ns7:Post xlink:href="http://geomatys.com/constellation/WS/wfs/default?"/>
+                </ns7:HTTP>
+            </ns7:DCP>
+            <ns7:Parameter name="inputFormat">
+                <ns7:AllowedValues>
+                    <ns7:Value>text/xml; subtype=gml/3.1.1</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="idgen">
+                <ns7:AllowedValues>
+                    <ns7:Value>GenerateNew</ns7:Value>
+                    <ns7:Value>UseExisting</ns7:Value>
+                    <ns7:Value>ReplaceDuplicate</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="releaseAction">
+                <ns7:AllowedValues>
+                    <ns7:Value>ALL</ns7:Value>
+                    <ns7:Value>SOME</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="Service">
+                <ns7:AllowedValues>
+                    <ns7:Value>WFS</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+            <ns7:Parameter name="Version">
+                <ns7:AllowedValues>
+                    <ns7:Value>2.0.0</ns7:Value>
+                </ns7:AllowedValues>
+            </ns7:Parameter>
+        </ns7:Operation>
+    </ns7:OperationsMetadata>
+    <fes:Filter_Capabilities>
+        <fes:Id_Capabilities>
+            <fes:ResourceIdentifier name="fes:ResourceId"/>
+        </fes:Id_Capabilities>
+        <fes:Scalar_Capabilities>
+            <fes:LogicalOperators/>
+            <fes:ComparisonOperators>
+                <fes:ComparisonOperator name="PropertyIsBetween"/>
+                <fes:ComparisonOperator name="PropertyIsEqualTo"/>
+                <fes:ComparisonOperator name="PropertyIsGreaterThan"/>
+                <fes:ComparisonOperator name="PropertyIsGReaterThanEqualTo"/>
+                <fes:ComparisonOperator name="PropertyIsLessThan"/>
+                <fes:ComparisonOperator name="PropertyIsLessThanEqualTo"/>
+                <fes:ComparisonOperator name="PropertyIsLike"/>
+                <fes:ComparisonOperator name="PropertyIsNotEqualTo"/>
+                <fes:ComparisonOperator name="PropertyIsNull"/>
+            </fes:ComparisonOperators>
+        </fes:Scalar_Capabilities>
+        <fes:Spatial_Capabilities>
+            <fes:GeometryOperands>
+                <fes:GeometryOperand name="ns10:Envelope" xmlns:ns10="http://www.opengis.net/gml/3.2.1"/>
+                <fes:GeometryOperand name="ns10:Point" xmlns:ns10="http://www.opengis.net/gml/3.2.1"/>
+                <fes:GeometryOperand name="ns10:LineString" xmlns:ns10="http://www.opengis.net/gml/3.2.1"/>
+                <fes:GeometryOperand name="ns10:Polygon" xmlns:ns10="http://www.opengis.net/gml/3.2.1"/>
+            </fes:GeometryOperands>
+            <fes:SpatialOperators>
+                <fes:SpatialOperator name="DISJOINT"/>
+                <fes:SpatialOperator name="EQUALS"/>
+                <fes:SpatialOperator name="D_WITHIN"/>
+                <fes:SpatialOperator name="BEYOND"/>
+                <fes:SpatialOperator name="INTERSECTS"/>
+                <fes:SpatialOperator name="TOUCHES"/>
+                <fes:SpatialOperator name="CROSSES"/>
+                <fes:SpatialOperator name="CONTAINS"/>
+                <fes:SpatialOperator name="OVERLAPS"/>
+                <fes:SpatialOperator name="BBOX"/>
+            </fes:SpatialOperators>
+        </fes:Spatial_Capabilities>
+    </fes:Filter_Capabilities>
+</ns8:WFS_Capabilities>

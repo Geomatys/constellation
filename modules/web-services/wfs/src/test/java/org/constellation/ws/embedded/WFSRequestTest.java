@@ -88,6 +88,7 @@ public class WFSRequestTest extends AbstractTestRequest {
             + "%3C/ogc:Filter%3E";
 
      private static final String WFS_DESCRIBE_FEATURE_TYPE_URL = "http://localhost:9090/wfs/default?request=DescribeFeatureType&service=WFS&version=1.1.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.1.1";
+     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL_V2 = "http://localhost:9090/wfs/default?request=DescribeFeatureType&service=WFS&version=2.0.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.2";
 
     private static String EPSG_VERSION;
     
@@ -343,7 +344,7 @@ public class WFSRequestTest extends AbstractTestRequest {
      */
     @Test
     public void testWFSDescribeFeatureGET() throws Exception {
-        final URL getfeatsUrl;
+        URL getfeatsUrl;
         try {
             getfeatsUrl = new URL(WFS_DESCRIBE_FEATURE_TYPE_URL);
         } catch (MalformedURLException ex) {
@@ -356,6 +357,20 @@ public class WFSRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof Schema);
 
         Schema schema = (Schema) obj;
+        assertEquals(17, schema.getElements().size());
+        
+        try {
+            getfeatsUrl = new URL(WFS_DESCRIBE_FEATURE_TYPE_URL_V2);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue(obj instanceof Schema);
+
+        schema = (Schema) obj;
         assertEquals(17, schema.getElements().size());
 
     }

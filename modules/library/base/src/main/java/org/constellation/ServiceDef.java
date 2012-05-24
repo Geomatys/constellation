@@ -45,6 +45,7 @@ public enum ServiceDef {
     // WFS service definitions
     WFS_1_0_0(Specification.WFS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true),
     WFS_1_1_0(Specification.WFS, Organization.OGC, "1.1.0", Profile.NONE, "1.1.0", true),
+    WFS_2_0_0(Specification.WFS, Organization.OGC, "2.0.0", Profile.NONE, "1.1.0", true),
     // CSW service definition
     CSW_2_0_0(Specification.CSW, Organization.OGC, "2.0.0", Profile.CSW_ISO, "1.2.0", true),
     CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.CSW_ISO, "1.2.0", true),

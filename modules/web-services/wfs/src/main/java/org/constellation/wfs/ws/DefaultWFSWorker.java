@@ -62,20 +62,16 @@ import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
-import org.geotoolkit.ows.xml.v100.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.XMLUtilities;
-import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
-import org.geotoolkit.wfs.xml.v110.FeatureTypeListType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
-import org.geotoolkit.wfs.xml.v110.GetGmlObjectType;
-import org.geotoolkit.wfs.xml.v110.LockFeatureResponseType;
-import org.geotoolkit.wfs.xml.v110.LockFeatureType;
+import org.geotoolkit.wfs.xml.GetGmlObject;
+import org.geotoolkit.wfs.xml.LockFeatureResponse;
+import org.geotoolkit.wfs.xml.LockFeature;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
-import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.accessor.Accessors;
@@ -90,9 +86,6 @@ import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
-import org.geotoolkit.ows.xml.v100.OperationsMetadata;
-import org.geotoolkit.ows.xml.v100.ServiceIdentification;
-import org.geotoolkit.ows.xml.v100.ServiceProvider;
 import org.geotoolkit.wfs.xml.GetCapabilities;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
@@ -108,7 +101,7 @@ import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.WFSXmlFactory;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.wfs.xml.FeatureTypeList;
+import org.geotoolkit.wfs.xml.*;
 
 // GeoAPI dependencies
 import org.opengis.feature.Feature;
@@ -116,6 +109,7 @@ import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.capability.FilterCapabilities;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.geometry.Envelope;
@@ -186,10 +180,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public WFSCapabilities getCapabilities(final GetCapabilities request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetCapabilities request proccesing");
         final long start = System.currentTimeMillis();
-        final String currentVersion = actingVersion.version.toString();
         // we verify the base attribute
         isWorking();
         verifyBaseRequest(request, false, true);
+        final String currentVersion = actingVersion.version.toString();
 
         
         final WFSCapabilities inCapabilities = (WFSCapabilities) getStaticCapabilitiesObject(currentVersion, "WFS");
@@ -204,6 +198,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         AbstractOperationsMetadata om    = null;
         AbstractServiceProvider sp       = null;
         AbstractServiceIdentification si = null;
+        FilterCapabilities fc            = null;
 
         if (request.getSections() == null || request.containsSection("featureTypeList")) {
             ftl = xmlFactory.buildFeatureTypeList(currentVersion);
@@ -261,7 +256,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                 title,
                                 defaultCRS,
                                 DEFAULT_CRS,
-                                toBBox(fld.getStore(), fld.getName()));
+                                toBBox(fld.getStore(), fld.getName(), currentVersion));
 
                         /*
                          * we apply the layer customization
@@ -311,19 +306,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             si = inCapabilities.getServiceIdentification();
         }
 
-        final WFSCapabilities result;
-        if (currentVersion.equals("1.1.0")) {
-            result = new WFSCapabilitiesType("1.1.0", (ServiceIdentification)si, (ServiceProvider)sp, (OperationsMetadata)om, (FeatureTypeListType)ftl, WFSConstants.FILTER_CAPABILITIES_V110);
-            /*result.setServesGMLObjectTypeList(null);
-            result.setSupportsGMLObjectTypeList(null);*/
+        if (currentVersion.equals("2.0.0")) {
+            fc = WFSConstants.FILTER_CAPABILITIES_V200;
         } else {
-            result = new org.geotoolkit.wfs.xml.v200.WFSCapabilitiesType("2.0.0", 
-                                                                        (org.geotoolkit.ows.xml.v110.ServiceIdentification)si, 
-                                                                        (org.geotoolkit.ows.xml.v110.ServiceProvider)sp, 
-                                                                        (org.geotoolkit.ows.xml.v110.OperationsMetadata)om, 
-                                                                        (org.geotoolkit.wfs.xml.v200.FeatureTypeListType)ftl, 
-                                                                        WFSConstants.FILTER_CAPABILITIES_V200);
-        }
+            fc = WFSConstants.FILTER_CAPABILITIES_V110;
+        }    
+        final WFSCapabilities result = xmlFactory.buildWFSCapabilities(currentVersion, si, sp, om, ftl, fc);
 
         LOGGER.log(logLevel, "GetCapabilities treated in {0}ms", (System.currentTimeMillis() - start));
         return result;
@@ -333,15 +321,22 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public Schema describeFeatureType(final DescribeFeatureTypeType request) throws CstlServiceException {
+    public Schema describeFeatureType(final DescribeFeatureType request) throws CstlServiceException {
         LOGGER.log(logLevel, "DecribeFeatureType request proccesing");
         final long start = System.currentTimeMillis();
-
+        
         // we verify the base attribute
         isWorking();
         verifyBaseRequest(request, false, false);
+        final String currentVersion = actingVersion.version.toString();
 
-        final JAXBFeatureTypeWriter writer  = new JAXBFeatureTypeWriter();
+        final String gmlVersion;
+        if ("2.0.0".equals(currentVersion)) {
+            gmlVersion = "3.2.1";
+        } else {
+            gmlVersion = "3.1.1";
+        }
+        final JAXBFeatureTypeWriter writer  = new JAXBFeatureTypeWriter(gmlVersion);
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
         final List<QName> names             = request.getTypeName();
         final List<FeatureType> types       = new ArrayList<FeatureType>();
@@ -592,7 +587,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public AbstractGMLType getGMLObject(final GetGmlObjectType grbi) throws CstlServiceException {
+    public AbstractGMLType getGMLObject(final GetGmlObject grbi) throws CstlServiceException {
         throw new CstlServiceException("WFS get GML Object is not supported on this Constellation version.");
     }
 
@@ -600,7 +595,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public LockFeatureResponseType lockFeature(final LockFeatureType gr) throws CstlServiceException {
+    public LockFeatureResponse lockFeature(final LockFeature gr) throws CstlServiceException {
         throw new CstlServiceException("WFS Lock is not supported on this Constellation version.");
     }
 
@@ -990,7 +985,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * Extract the WGS84 BBOx from a featureSource.
      * what ? may not be wgs84 exactly ? why is there a CRS attribute on a wgs84 bbox ?
      */
-    private static WGS84BoundingBoxType toBBox(final DataStore source, final Name groupName) throws CstlServiceException{
+    private static Object toBBox(final DataStore source, final Name groupName, final String version) throws CstlServiceException{
         try {
             Envelope env = source.getEnvelope(QueryBuilder.all(groupName));
             final CoordinateReferenceSystem epsg4326 = CRS.decode("urn:ogc:def:crs:OGC:2:84");
@@ -998,14 +993,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (!CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), epsg4326)) {
                     env = CRS.transform(env, epsg4326);
                 }
-                return new WGS84BoundingBoxType(
+                return xmlFactory.buildBBOX(version,
                        "urn:ogc:def:crs:OGC:2:84",
                        env.getMinimum(0),
                        env.getMinimum(1),
                        env.getMaximum(0),
                        env.getMaximum(1));
             } else {
-                return new WGS84BoundingBoxType("urn:ogc:def:crs:OGC:2:84", -180, -90, 180, 90);
+                return xmlFactory.buildBBOX(version,"urn:ogc:def:crs:OGC:2:84", -180, -90, 180, 90);
             }
 
         } catch (DataStoreException ex) {
@@ -1039,6 +1034,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") ||
                         request.getVersion().toString().isEmpty()  || request.getVersion().toString().equals("1.0.0") ) { // hack for openScale accept 1.0.0
                     this.actingVersion = ServiceDef.WFS_1_1_0;
+                } else if (request.getVersion().toString().equals("2.0.0") || request.getVersion().toString().equals("2.0")) { // hack for openScale accept 1.0.0
+                    this.actingVersion = ServiceDef.WFS_2_0_0;
 
                 } else {
                     CodeList code;

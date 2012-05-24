@@ -71,6 +71,8 @@ public final class WFSConstants {
      * The Mime type for describe feature GML 3.1.1
      */
     public final static MediaType GML_3_1_1 = new MediaType("text", "xml; subtype=gml/3.1.1");
+    
+    public final static MediaType GML_3_2_1 = new MediaType("text", "xml; subtype=gml/3.2.1");
 
     public static final FilterCapabilities FILTER_CAPABILITIES_V110;
     static {

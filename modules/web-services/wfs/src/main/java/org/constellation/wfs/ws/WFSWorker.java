@@ -28,17 +28,16 @@ import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.AbstractGMLType;
+import org.geotoolkit.wfs.xml.DescribeFeatureType;
 import org.geotoolkit.wfs.xml.GetCapabilities;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
-import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
+import org.geotoolkit.wfs.xml.GetGmlObject;
+import org.geotoolkit.wfs.xml.LockFeatureResponse;
+import org.geotoolkit.wfs.xml.LockFeature;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
-import org.geotoolkit.wfs.xml.v110.GetGmlObjectType;
-import org.geotoolkit.wfs.xml.v110.LockFeatureResponseType;
-import org.geotoolkit.wfs.xml.v110.LockFeatureType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
-import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 
 // GeoAPI dependencies
@@ -68,7 +67,7 @@ public interface WFSWorker extends Worker {
      * @return A marshallable object representing a xsd.
      * @throws CstlServiceException
      */
-    Schema describeFeatureType(final DescribeFeatureTypeType model) throws CstlServiceException;
+    Schema describeFeatureType(final DescribeFeatureType model) throws CstlServiceException;
 
     /**
      * Allows retrieval of features from a web feature service.
@@ -87,7 +86,7 @@ public interface WFSWorker extends Worker {
      * @return A GML representation of a feature instance or element.
      * @throws CstlServiceException
      */
-    AbstractGMLType getGMLObject(GetGmlObjectType grbi) throws CstlServiceException;
+    AbstractGMLType getGMLObject(GetGmlObject grbi) throws CstlServiceException;
 
     /**
      * lock request on one or more instances of a feature type for the duration of a transaction
@@ -97,7 +96,7 @@ public interface WFSWorker extends Worker {
      * @return An acknowledgment
      * @throws CstlServiceException
      */
-    LockFeatureResponseType lockFeature(LockFeatureType gr) throws CstlServiceException;
+    LockFeatureResponse lockFeature(LockFeature gr) throws CstlServiceException;
 
     /**
      * Allow to insert, update, or remove feature instances.

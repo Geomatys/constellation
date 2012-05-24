@@ -283,6 +283,112 @@ public class WFSWorkerTest {
         pool.release(marshaller);
     }
 
+    /**
+     * test the feature marshall
+     *
+     */
+    @Test
+    public void getCapabilitiesV2Test() throws Exception {
+        final Marshaller marshaller = pool.acquireMarshaller();
+
+        org.geotoolkit.wfs.xml.v200.GetCapabilitiesType request = new org.geotoolkit.wfs.xml.v200.GetCapabilitiesType();
+        request.setAcceptVersions(new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0"));
+        WFSCapabilities result = worker.getCapabilities(request);
+
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0.xml"),
+                sw.toString());
+
+        org.geotoolkit.ows.xml.v110.AcceptVersionsType acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.3.0");
+        request = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
+
+        try {
+            result = worker.getCapabilities(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
+            assertEquals(ex.getLocator(), "version");
+        }
+
+        request = new org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, null, null, null, "WPS");
+
+        try {
+            result = worker.getCapabilities(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "service");
+        }
+
+        request = new org.geotoolkit.wfs.xml.v200.GetCapabilitiesType();
+        request.setService(null);
+
+        try {
+            result = worker.getCapabilities(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "service");
+        }
+
+
+        acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0");
+        org.geotoolkit.ows.xml.v110.SectionsType sections = new org.geotoolkit.ows.xml.v110.SectionsType("featureTypeList");
+        request       = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
+        result = worker.getCapabilities(request);
+
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-ftl.xml"),
+                sw.toString());
+
+        acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0");
+        sections      = new org.geotoolkit.ows.xml.v110.SectionsType("operationsMetadata");
+        request       = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
+        result = worker.getCapabilities(request);
+
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-om.xml"),
+                sw.toString());
+
+        acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0");
+        sections      = new org.geotoolkit.ows.xml.v110.SectionsType("serviceIdentification");
+        request       = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
+        result = worker.getCapabilities(request);
+
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-si.xml"),
+                sw.toString());
+
+        acceptVersion = new org.geotoolkit.ows.xml.v110.AcceptVersionsType("2.0.0");
+        sections      = new org.geotoolkit.ows.xml.v110.SectionsType("serviceProvider");
+        request       = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
+        result = worker.getCapabilities(request);
+
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-sp.xml"),
+                sw.toString());
+
+        pool.release(marshaller);
+    }
+
      /**
      * test the Getfeature operations with bad parameter causing exception return
      *

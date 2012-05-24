@@ -179,7 +179,9 @@ public class WFSService extends GridWebService<WFSWorker> {
                 String requestOutputFormat = model.getOutputFormat();
                 final MediaType outputFormat;
                 if (requestOutputFormat == null || requestOutputFormat.equals("text/xml; subtype=gml/3.1.1")) {
-                    outputFormat = GML_3_1_1;
+                    outputFormat = GML_3_1_1;                                                                       
+                } else if (requestOutputFormat.equals("text/xml; subtype=gml/3.2.1") || requestOutputFormat.equals("text/xml; subtype=gml/3.2")) {
+                    outputFormat = GML_3_2_1;
                 } else {
                     outputFormat = MediaType.valueOf(requestOutputFormat);
                 }
@@ -192,7 +194,9 @@ public class WFSService extends GridWebService<WFSWorker> {
                 String requestOutputFormat = model.getOutputFormat();
                 final MediaType outputFormat;
                 if (requestOutputFormat == null || requestOutputFormat.equals("text/xml; subtype=gml/3.1.1")) {
-                    outputFormat = GML_3_1_1;
+                    outputFormat = GML_3_1_1;                                                                       
+                } else if (requestOutputFormat.equals("text/xml; subtype=gml/3.2.1") || requestOutputFormat.equals("text/xml; subtype=gml/3.2")) {
+                    outputFormat = GML_3_2_1;
                 } else {
                     outputFormat = MediaType.valueOf(requestOutputFormat);
                 }
