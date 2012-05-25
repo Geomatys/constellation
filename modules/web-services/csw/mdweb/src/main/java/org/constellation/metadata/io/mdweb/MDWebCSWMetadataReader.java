@@ -147,7 +147,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
         if (thesaurusList.size() > 0) {
             final LocalThesaurusHandler tReader = new LocalThesaurusHandler(thesaurusList);
-            final List<Word> words = tReader.getWords(null);
+            final List<Word> words = tReader.getWords(null, true);
             tReader.close();
             for (final Word word : words) {
                 try {

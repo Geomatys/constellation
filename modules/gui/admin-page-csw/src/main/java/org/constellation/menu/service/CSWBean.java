@@ -34,11 +34,12 @@ import org.constellation.generic.database.BDD;
 import org.geotoolkit.util.FileUtilities;
 import org.mdweb.sql.DatabaseCreator;
 import org.mapfaces.model.UploadedFile;
+import org.mdweb.sql.DatabaseUpdater;
+import org.mdweb.sql.DefaultDatabaseUpdater;
 
 // portlet upload
 import javax.portlet.ActionRequest;
 import org.apache.commons.fileupload.FileItem;
-import org.mdweb.sql.DatabaseUpdater;
 
 /**
  *
@@ -89,7 +90,7 @@ public class CSWBean extends AbstractServiceBean {
                 final Automatic config = (Automatic) configurationObject;
                 final String currentConfigType = config.getFormat();
                 if (!sources.contains(currentConfigType)) {
-                    LOGGER.info("unsupported config type:" + currentConfigType);
+                    LOGGER.log(Level.INFO, "unsupported config type:{0}", currentConfigType);
                     selectItems.add(new SelectItem(currentConfigType));
                 }
             }
@@ -404,7 +405,7 @@ public class CSWBean extends AbstractServiceBean {
                 if (config.getBdd() != null) {
                     final DataSource ds    = config.getBdd().getDataSource();
                     if (ds != null) {
-                        final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                        final DatabaseUpdater dbUpdater = new DefaultDatabaseUpdater(ds, true);
                         if (dbUpdater.isToUpgradeDatabase()) {
                             dbUpdater.upgradeDatabase();          
                         }
@@ -424,7 +425,7 @@ public class CSWBean extends AbstractServiceBean {
                 if (config.getBdd() != null) {
                     final DataSource ds    = config.getBdd().getDataSource();
                     if (ds != null) {
-                        final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                        final DefaultDatabaseUpdater dbUpdater = new DefaultDatabaseUpdater(ds, true);
                         if (dbUpdater.validConnection() && dbUpdater.structurePresent()) {
                             return dbUpdater.isToUpgradeDatabase();
                         }

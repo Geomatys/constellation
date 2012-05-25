@@ -32,6 +32,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.observation.sql.ObservationDatabaseCreator;
 import org.mdweb.sql.DatabaseCreator;
 import org.mdweb.sql.DatabaseUpdater;
+import org.mdweb.sql.DefaultDatabaseUpdater;
 
 /**
  *
@@ -661,7 +662,7 @@ public class SOSBean extends AbstractServiceBean{
                     try {
                         final DataSource ds = smlConfig.getBdd().getDataSource();
                         if (ds != null) {
-                            final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                            final DatabaseUpdater dbUpdater = new DefaultDatabaseUpdater(ds, true);
                             if (dbUpdater.isToUpgradeDatabase()) {
                                 dbUpdater.upgradeDatabase();
                             }
@@ -685,7 +686,7 @@ public class SOSBean extends AbstractServiceBean{
                     try {
                         final DataSource ds = smlConfig.getBdd().getDataSource();
                         if (ds != null) {
-                            final DatabaseUpdater dbUpdater = new DatabaseUpdater(ds, true);
+                            final DefaultDatabaseUpdater dbUpdater = new DefaultDatabaseUpdater(ds, true);
                             if (dbUpdater.validConnection() && dbUpdater.structurePresent()) {
                                 return dbUpdater.isToUpgradeDatabase();
                             }
