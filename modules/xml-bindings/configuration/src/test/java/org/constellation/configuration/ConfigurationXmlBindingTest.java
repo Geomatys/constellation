@@ -143,6 +143,8 @@ public class ConfigurationXmlBindingTest {
         sources.add(s1);
         sources.add(s2);
         LayerContext context = new LayerContext(new Layers(sources));
+        
+        context.getCustomParameters().put("multipleVersion", "false");
         StringWriter sw = new StringWriter();
         marshaller.marshal(context, sw);
 
@@ -152,6 +154,12 @@ public class ConfigurationXmlBindingTest {
                 + "        <ns2:Source load_all=\"true\" id=\"source1\"/>" + '\n'
                 + "        <ns2:Source load_all=\"true\" id=\"source2\"/>" + '\n'
                 + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters>" + '\n'
+                + "        <entry>" + '\n'
+                + "            <key>multipleVersion</key>" + '\n'
+                + "            <value>false</value>" + '\n'
+                + "        </entry>" + '\n'
+                + "    </ns2:customParameters>" + '\n'
                 + "</ns2:LayerContext>\n";
 
         String result = removeXmlns(sw.toString());
@@ -182,6 +190,7 @@ public class ConfigurationXmlBindingTest {
                 + "        </ns2:Source>" + '\n'
                 + "        <ns2:Source load_all=\"true\" id=\"source2\"/>" + '\n'
                 + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
         result =  removeXmlns(sw.toString());
@@ -212,6 +221,7 @@ public class ConfigurationXmlBindingTest {
                 + "        </ns2:Source>" + '\n'
                 + "        <ns2:Source load_all=\"true\" id=\"source2\"/>" + '\n'
                 + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
         result =  removeXmlns(sw.toString());
@@ -288,6 +298,7 @@ public class ConfigurationXmlBindingTest {
                 + "        </ns2:Source>" + '\n'
                 + "        <ns2:Source load_all=\"true\" id=\"source2\"/>" + '\n'
                 + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
         result =  removeXmlns(sw.toString());

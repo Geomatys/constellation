@@ -152,6 +152,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      */
     private Map<String, String> schemaLocations;
     
+    private boolean multipleVersionActivated = true;
+    
     private static final WFSXmlFactory xmlFactory = new WFSXmlFactory();
 
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
@@ -167,6 +169,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 refreshUpdateSequence();
             }
         });
+        
+        final String multiVersProp = getProperty("multipleVersion");
+        if (multiVersProp != null) {
+            multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
+            LOGGER.info("Multiple version activated:" + multipleVersionActivated);
+        }
     }
 
     @Override
@@ -1036,7 +1044,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") ||
                         request.getVersion().toString().isEmpty()  || request.getVersion().toString().equals("1.0.0") ) { // hack for openScale accept 1.0.0
                     this.actingVersion = ServiceDef.WFS_1_1_0;
-                } else if (request.getVersion().toString().equals("2.0.0") || request.getVersion().toString().equals("2.0")) { // hack for openScale accept 1.0.0
+                } else if (multipleVersionActivated && (request.getVersion().toString().equals("2.0.0") || request.getVersion().toString().equals("2.0"))) { 
                     this.actingVersion = ServiceDef.WFS_2_0_0;
 
                 } else {

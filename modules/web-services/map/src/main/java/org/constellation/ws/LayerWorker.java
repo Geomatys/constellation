@@ -226,4 +226,11 @@ public abstract class LayerWorker extends AbstractWorker {
     public boolean isSecured() {
         return (pdp != null);
     }
+    
+    protected String getProperty(final String key) {
+        if (layerContext != null && layerContext.getCustomParameters() != null) {
+            return layerContext.getCustomParameters().get(key);
+        }
+        return null;
+    }
 }

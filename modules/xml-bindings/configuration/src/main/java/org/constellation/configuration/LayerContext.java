@@ -17,7 +17,10 @@
 
 package org.constellation.configuration;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -38,6 +41,8 @@ public class LayerContext {
     private String security;
 
     private Languages supportedLanguages;
+    
+    private final Map<String, String> customParameters = new HashMap<String, String>();
 
     public LayerContext() {
 
@@ -114,6 +119,13 @@ public class LayerContext {
         this.supportedLanguages = supportedLanguages;
     }
     
+    /**
+     * @return the customParameters
+     */
+    public Map<String, String> getCustomParameters() {
+        return customParameters;
+    }
+    
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
@@ -124,6 +136,12 @@ public class LayerContext {
         if (supportedLanguages != null) {
             sb.append("Supported languages:\n").append(supportedLanguages);
         }
+        if (customParameters != null && !customParameters.isEmpty()) {
+            sb.append("Custom parameters:\n");
+            for (Entry<String, String> entry : customParameters.entrySet()) {
+                sb.append("key:").append(entry.getKey()).append(" value:").append(entry.getValue()).append('\n');
+            }
+        }
         return sb.toString();
     }
 
@@ -133,6 +151,7 @@ public class LayerContext {
             final LayerContext that = (LayerContext) obj;
             return Utilities.equals(this.layers, that.layers) &&
                    Utilities.equals(this.security, that.security) &&
+                   Utilities.equals(this.customParameters, that.customParameters) &&
                    Utilities.equals(this.supportedLanguages, that.supportedLanguages);
         }
         return false;
@@ -143,6 +162,7 @@ public class LayerContext {
         int hash = 3;
         hash = 97 * hash + (this.layers != null ? this.layers.hashCode() : 0);
         hash = 97 * hash + (this.security != null ? this.security.hashCode() : 0);
+        hash = 97 * hash + (this.customParameters != null ? this.customParameters.hashCode() : 0);
         hash = 97 * hash + (this.supportedLanguages != null ? this.supportedLanguages.hashCode() : 0);
         return hash;
     }

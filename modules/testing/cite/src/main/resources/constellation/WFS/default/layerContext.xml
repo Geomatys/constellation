@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LayerContext xmlns="http://www.constellation.org/config">
-    <layers>
-        <Source id="postgisSrc" load_all="true"/>
-    </layers>
-</LayerContext>
+<cstl:LayerContext xmlns:cstl="http://www.constellation.org/config">
+    <cstl:layers>
+        <cstl:Source id="postgisSrc" load_all="true"/>
+    </cstl:layers>
+    <cstl:customParameters>
+        <entry>
+            <key>multipleVersion</key>
+            <value>false</value>
+        </entry>
+    </cstl:customParameters>
+</cstl:LayerContext>
 
