@@ -75,7 +75,7 @@ import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.InsertElementType;
 import org.geotoolkit.wfs.xml.v110.PropertyType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
-import org.geotoolkit.wfs.xml.v110.ResultTypeType;
+import org.geotoolkit.wfs.xml.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;

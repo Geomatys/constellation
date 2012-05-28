@@ -35,7 +35,7 @@ import org.geotoolkit.wfs.xml.GetGmlObject;
 import org.geotoolkit.wfs.xml.LockFeatureResponse;
 import org.geotoolkit.wfs.xml.LockFeature;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
-import org.geotoolkit.wfs.xml.v110.GetFeatureType;
+import org.geotoolkit.wfs.xml.GetFeature;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.xsd.xml.v2001.Schema;
@@ -76,7 +76,7 @@ public interface WFSWorker extends Worker {
      * @return features instances.
      * @throws CstlServiceException
      */
-    Object getFeature(final GetFeatureType request) throws CstlServiceException;
+    Object getFeature(final GetFeature request) throws CstlServiceException;
 
     /**
      * Allows retrieval of features and elements by ID from a web feature service.

@@ -52,6 +52,7 @@ import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.wfs.xml.v110.*;
+import org.geotoolkit.wfs.xml.*;
 
 import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 

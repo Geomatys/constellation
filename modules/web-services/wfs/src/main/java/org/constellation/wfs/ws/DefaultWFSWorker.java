@@ -65,7 +65,7 @@ import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.XMLUtilities;
-import org.geotoolkit.wfs.xml.v110.GetFeatureType;
+import org.geotoolkit.wfs.xml.GetFeature;
 import org.geotoolkit.wfs.xml.GetGmlObject;
 import org.geotoolkit.wfs.xml.LockFeatureResponse;
 import org.geotoolkit.wfs.xml.LockFeature;
@@ -88,6 +88,8 @@ import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.wfs.xml.GetCapabilities;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
+import org.geotoolkit.wfs.xml.ResultTypeType;
+import org.geotoolkit.wfs.xml.Query;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.IdentifierGenerationOptionType;
@@ -95,7 +97,6 @@ import org.geotoolkit.wfs.xml.v110.InsertElementType;
 import org.geotoolkit.wfs.xml.v110.InsertResultsType;
 import org.geotoolkit.wfs.xml.v110.InsertedFeatureType;
 import org.geotoolkit.wfs.xml.v110.PropertyType;
-import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
@@ -406,7 +407,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public Object getFeature(final GetFeatureType request) throws CstlServiceException {
+    public Object getFeature(final GetFeature request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetFeature request proccesing");
         final long start = System.currentTimeMillis();
 
@@ -417,7 +418,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final LayerProviderProxy namedProxy        = LayerProviderProxy.getInstance();
         final String featureId                     = request.getFeatureId();
         final XMLUtilities util                    = new XMLUtilities();
-        final Integer maxFeatures                  = request.getMaxFeatures();
+        final Integer maxFeatures                  = request.getCount();
         final List<FeatureCollection> collections  = new ArrayList<FeatureCollection>();
         schemaLocations                            = new HashMap<String, String>();
         final Map<Name,Layer> layers               = getLayers();
@@ -426,7 +427,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             throw new CstlServiceException("You must specify a query!", MISSING_PARAMETER_VALUE);
         }
 
-        for (final QueryType query : request.getQuery()) {
+        for (final Query queryI : request.getQuery()) {
+            final QueryType query         = (QueryType) queryI;
             final FilterType jaxbFilter   = query.getFilter();
             final SortByType jaxbSortBy   = query.getSortBy();
             final String srs              = query.getSrsName();
@@ -481,7 +483,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             if (!sortBys.isEmpty()) {
                 queryBuilder.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
             }
-            if (maxFeatures != null){
+            if (maxFeatures != null && maxFeatures != 0){
                 queryBuilder.setMaxFeatures(maxFeatures);
             }
 

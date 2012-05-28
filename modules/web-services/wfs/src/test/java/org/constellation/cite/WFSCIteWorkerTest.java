@@ -46,7 +46,7 @@ import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
-import org.geotoolkit.wfs.xml.v110.ResultTypeType;
+import org.geotoolkit.wfs.xml.ResultTypeType;
 
 import org.junit.*;
 import org.opengis.parameter.ParameterDescriptorGroup;

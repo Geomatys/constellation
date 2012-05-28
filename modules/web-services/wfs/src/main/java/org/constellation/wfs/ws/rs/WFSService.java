@@ -86,7 +86,7 @@ import org.geotoolkit.wfs.xml.v110.GetGmlObjectType;
 import org.geotoolkit.wfs.xml.v110.LockFeatureType;
 import org.geotoolkit.wfs.xml.v110.LockType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
-import org.geotoolkit.wfs.xml.v110.ResultTypeType;
+import org.geotoolkit.wfs.xml.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.BaseRequestType;
 import org.geotoolkit.xml.MarshallerPool;
@@ -94,6 +94,7 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.filter.sort.SortOrder;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.wfs.xml.*;
 
 /**
  *
@@ -127,8 +128,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             LOGGER.log(Level.INFO, "WFS REST service running ({0} instances)\n", getWorkerMapSize());
 
         } catch (JAXBException ex){
-            LOGGER.warning("The WFS REST service is not running.\ncause  : Error creating XML context.\n" +
-                           " error  : " + ex.getMessage()  + 
+            LOGGER.warning("The WFS REST service is not running.\ncause  : Error creating XML context.\n error  : " + ex.getMessage()  + 
                            "\n details: " + ex.toString());
         } 
 
@@ -166,16 +166,16 @@ public class WFSService extends GridWebService<WFSWorker> {
             }
             version = getVersionFromNumber(request.getVersion());
 
-            if (request instanceof GetCapabilitiesType) {
-                final GetCapabilitiesType model = (GetCapabilitiesType) request;
+            if (request instanceof GetCapabilities) {
+                final GetCapabilities model = (GetCapabilities) request;
                 String outputFormat = model.getFirstAcceptFormat();
                 if (outputFormat == null) {
                     outputFormat = "application/xml";
                 }
                 return Response.ok(worker.getCapabilities(model), outputFormat).build();
 
-            } else if (request instanceof DescribeFeatureTypeType) {
-                final DescribeFeatureTypeType model = (DescribeFeatureTypeType) request;
+            } else if (request instanceof DescribeFeatureType) {
+                final DescribeFeatureType model = (DescribeFeatureType) request;
                 String requestOutputFormat = model.getOutputFormat();
                 final MediaType outputFormat;
                 if (requestOutputFormat == null || requestOutputFormat.equals("text/xml; subtype=gml/3.1.1")) {
@@ -189,8 +189,8 @@ public class WFSService extends GridWebService<WFSWorker> {
                 
                 return Response.ok(worker.describeFeatureType(model), outputFormat).build();
 
-            } else if (request instanceof GetFeatureType) {
-                final GetFeatureType model = (GetFeatureType) request;
+            } else if (request instanceof GetFeature) {
+                final GetFeature model = (GetFeature) request;
                 String requestOutputFormat = model.getOutputFormat();
                 final MediaType outputFormat;
                 if (requestOutputFormat == null || requestOutputFormat.equals("text/xml; subtype=gml/3.1.1")) {
@@ -204,8 +204,8 @@ public class WFSService extends GridWebService<WFSWorker> {
                 schemaLocations = worker.getSchemaLocations();
                 return Response.ok(response, outputFormat).build();
                 
-            } else if (request instanceof GetGmlObjectType) {
-                final GetGmlObjectType model = (GetGmlObjectType) request;
+            } else if (request instanceof GetGmlObject) {
+                final GetGmlObject model = (GetGmlObject) request;
                 final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model));
                 return Response.ok(response, MediaType.TEXT_XML).build();
 
