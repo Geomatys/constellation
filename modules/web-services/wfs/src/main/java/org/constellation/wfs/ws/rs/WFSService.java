@@ -659,7 +659,13 @@ public class WFSService extends GridWebService<WFSWorker> {
             final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
             List<String> list = parameters.get(parameterName);
             if (list == null) {
-                list = parameters.get(parameterName.toLowerCase());
+                for(final String key : parameters.keySet()){
+                    if(parameterName.equalsIgnoreCase(key)){
+                        list = parameters.get(key);
+                        break;
+                    }                    
+                }
+                
                 if (list == null) {
                     if (!mandatory) {
                         return null;
