@@ -61,7 +61,6 @@ import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.XMLUtilities;
@@ -69,7 +68,6 @@ import org.geotoolkit.wfs.xml.GetFeature;
 import org.geotoolkit.wfs.xml.GetGmlObject;
 import org.geotoolkit.wfs.xml.LockFeatureResponse;
 import org.geotoolkit.wfs.xml.LockFeature;
-import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.xml.MarshallerPool;
@@ -115,10 +113,10 @@ import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.geometry.Envelope;
 import org.opengis.util.FactoryException;
+import org.opengis.util.CodeList;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.util.CodeList;
 
 // W3c dependencies
 import org.w3c.dom.Element;
@@ -173,7 +171,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final String multiVersProp = getProperty("multipleVersion");
         if (multiVersProp != null) {
             multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
-            LOGGER.info("Multiple version activated:" + multipleVersionActivated);
+            LOGGER.log(Level.INFO, "Multiple version activated:{0}", multipleVersionActivated);
         }
     }
 
@@ -207,7 +205,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         AbstractOperationsMetadata om    = null;
         AbstractServiceProvider sp       = null;
         AbstractServiceIdentification si = null;
-        FilterCapabilities fc            = null;
+        final FilterCapabilities fc;
 
         if (request.getSections() == null || request.containsSection("featureTypeList")) {
             ftl = xmlFactory.buildFeatureTypeList(currentVersion);
@@ -423,9 +421,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, false, false);
 
+        final String currentVersion                = actingVersion.version.toString();
         final LayerProviderProxy namedProxy        = LayerProviderProxy.getInstance();
         final String featureId                     = request.getFeatureId();
-        final XMLUtilities util                    = new XMLUtilities();
         final Integer maxFeatures                  = request.getCount();
         final List<FeatureCollection> collections  = new ArrayList<FeatureCollection>();
         schemaLocations                            = new HashMap<String, String>();
@@ -435,18 +433,17 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             throw new CstlServiceException("You must specify a query!", MISSING_PARAMETER_VALUE);
         }
 
-        for (final Query queryI : request.getQuery()) {
-            final QueryType query         = (QueryType) queryI;
-            final FilterType jaxbFilter   = query.getFilter();
-            final SortByType jaxbSortBy   = query.getSortBy();
+        for (final Query query : request.getQuery()) {
+            final org.geotoolkit.ogc.xml.SortBy jaxbSortBy = query.getSortBy();
+            final Filter jaxbFilter       = query.getFilter();
             final String srs              = query.getSrsName();
-            final List<Object> properties = query.getPropertyNameOrXlinkPropertyNameOrFunction();
+            final List<Object> properties = query.getPropertyNames();
 
             final List<QName> typeNames;
-            if (featureId != null && query.getTypeName().isEmpty()) {
+            if (featureId != null && query.getTypeNames().isEmpty()) {
                 typeNames = Utils.getQNameListFromNameSet(layers.keySet());
             } else {
-                typeNames = query.getTypeName();
+                typeNames = query.getTypeNames();
             }
 
             final List<String> requestPropNames = new ArrayList<String>();
@@ -455,9 +452,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             //decode filter-----------------------------------------------------
             final Filter filter;
             if (featureId == null) {
-                filter = extractJAXBFilter(jaxbFilter, Filter.INCLUDE, namespaceMapping);
+                filter = extractJAXBFilter(jaxbFilter, Filter.INCLUDE, namespaceMapping, currentVersion);
             } else {
-                filter = extractJAXBFilter(new FilterType(new FeatureIdType(featureId)), Filter.INCLUDE, namespaceMapping);
+                filter = extractJAXBFilter(new FilterType(new FeatureIdType(featureId)), Filter.INCLUDE, namespaceMapping, currentVersion);
             }
 
             //decode crs--------------------------------------------------------
@@ -481,7 +478,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             //decode sort by----------------------------------------------------
             if (jaxbSortBy != null) {
-                sortBys.addAll(util.getTransformer110(namespaceMapping).visitSortBy(jaxbSortBy));
+                sortBys.addAll(visitJaxbSortBy(jaxbSortBy, namespaceMapping, currentVersion));
             }
 
             final QueryBuilder queryBuilder = new QueryBuilder();
@@ -592,6 +589,15 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
         return response;
     }
+    
+    private List<SortBy> visitJaxbSortBy(final org.geotoolkit.ogc.xml.SortBy jaxbSortby,final Map<String, String> namespaceMapping, final String version) {
+        final XMLUtilities util = new XMLUtilities();
+        if ("2.0.0".equals(version)) {
+            return util.getTransformer200(namespaceMapping).visitSortBy((org.geotoolkit.ogc.xml.v200.SortByType)jaxbSortby);
+        } else {
+            return util.getTransformer110(namespaceMapping).visitSortBy((org.geotoolkit.ogc.xml.v110.SortByType)jaxbSortby);
+        }
+    }
 
     /**
      * {@inheritDoc }
@@ -620,6 +626,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, true, false);
 
         // we prepare the report
+        final String currentVersion                = actingVersion.version.toString();
         int totalInserted                          = 0;
         int totalUpdated                           = 0;
         int totalDeleted                           = 0;
@@ -738,7 +745,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (deleteRequest.getFilter() == null) {
                     throw new CstlServiceException("The filter must be specified.", MISSING_PARAMETER_VALUE, "filter");
                 }
-                final Filter filter = extractJAXBFilter(deleteRequest.getFilter(), Filter.EXCLUDE, namespaceMapping);
+                final Filter filter = extractJAXBFilter(deleteRequest.getFilter(), Filter.EXCLUDE, namespaceMapping, currentVersion);
 
                 final Name typeName = Utils.getNameFromQname(deleteRequest.getTypeName());
                 if (layersContainsKey(typeName) == null) {
@@ -778,7 +785,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
 
                 //decode filter-----------------------------------------------------
-                final Filter filter = extractJAXBFilter(updateRequest.getFilter(),Filter.EXCLUDE, namespaceMapping);
+                final Filter filter = extractJAXBFilter(updateRequest.getFilter(),Filter.EXCLUDE, namespaceMapping, currentVersion);
 
                 //decode crs--------------------------------------------------------
                 final CoordinateReferenceSystem crs = extractCRS(updateRequest.getSrsName());
@@ -922,12 +929,16 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * @return An OGC filter
      * @throws CstlServiceException
      */
-    private Filter extractJAXBFilter(final FilterType jaxbFilter, final Filter defaultFilter, final Map<String, String> namespaceMapping) throws CstlServiceException {
+    private Filter extractJAXBFilter(final Filter jaxbFilter, final Filter defaultFilter, final Map<String, String> namespaceMapping, final String currentVersion) throws CstlServiceException {
         final XMLUtilities util = new XMLUtilities();
         final Filter filter;
         try {
             if (jaxbFilter != null) {
-                filter = util.getTransformer110(namespaceMapping).visitFilter(jaxbFilter);
+                if ("2.0.0".equals(currentVersion)) {
+                    filter = util.getTransformer200(namespaceMapping).visitFilter((org.geotoolkit.ogc.xml.v200.FilterType)jaxbFilter);
+                } else {
+                    filter = util.getTransformer110(namespaceMapping).visitFilter((org.geotoolkit.ogc.xml.v110.FilterType)jaxbFilter);
+                }
             } else {
                 filter = defaultFilter;
             }
