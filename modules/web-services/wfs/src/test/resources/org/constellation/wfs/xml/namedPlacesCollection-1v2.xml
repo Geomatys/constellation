@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml32="http://www.opengis.net/gml/3.2.1">
+    <gml:boundedBy>
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:4326">
+            <gml:lowerCorner>0.0014 -0.0011</gml:lowerCorner>
+            <gml:upperCorner>0.0042 0.0024</gml:upperCorner>
+        </gml:Envelope>
+    </gml:boundedBy>
+    <gml:featureMember>
+        <gml32:NamedPlaces gml:id="NamedPlaces.1">
+            <gml32:the_geom>
+                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
+                    <gml:surfaceMember>
+                        <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
+                            <gml:exterior>
+                                <gml:LinearRing>
+                                    <gml:posList>0.0020 0.0024 0.0042 0.0024 0.0042 6.0E-4 0.0014 6.0E-4 0.0014 0.0010 0.0020 0.0024</gml:posList>
+                                </gml:LinearRing>
+                            </gml:exterior>
+                        </gml:Polygon>
+                    </gml:surfaceMember>
+                </gml:MultiSurface>
+            </gml32:the_geom>
+            <gml32:FID>117</gml32:FID>
+            <gml32:NAME>Ashton</gml32:NAME>
+        </gml32:NamedPlaces>
+    </gml:featureMember>
+    <gml:featureMember>
+        <gml32:NamedPlaces gml:id="NamedPlaces.2">
+            <gml32:the_geom>
+                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
+                    <gml:surfaceMember>
+                        <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
+                            <gml:exterior>
+                                <gml:LinearRing>
+                                    <gml:posList>0.0017 -0.0011 0.0017 -6.0E-4 0.0025 -6.0E-4 0.0025 -0.0011 0.0017 -0.0011</gml:posList>
+                                </gml:LinearRing>
+                            </gml:exterior>
+                        </gml:Polygon>
+                    </gml:surfaceMember>
+                </gml:MultiSurface>
+            </gml32:the_geom>
+            <gml32:FID>118</gml32:FID>
+            <gml32:NAME>Goose Island</gml32:NAME>
+        </gml32:NamedPlaces>
+    </gml:featureMember>
+</wfs:FeatureCollection>

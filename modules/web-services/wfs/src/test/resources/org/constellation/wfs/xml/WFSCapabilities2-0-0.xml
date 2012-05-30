@@ -158,40 +158,7 @@
     </ns7:OperationsMetadata>
     <ns8:FeatureTypeList>
         <ns8:FeatureType>
-            <ns8:Name>gml:NamedPlaces</ns8:Name>
-            <ns8:Title>NamedPlaces</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns7:LowerCorner>-0.0011 0.0014</ns7:LowerCorner>
-                <ns7:UpperCorner>0.0024 0.0042</ns7:UpperCorner>
-            </ns7:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
-            <ns8:Name>gml:Streams</ns8:Name>
-            <ns8:Title>Streams</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns7:LowerCorner>-0.0024 -4.0E-4</ns7:LowerCorner>
-                <ns7:UpperCorner>0.0024 0.0036</ns7:UpperCorner>
-            </ns7:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
-            <ns8:Name>gml:Lakes</ns8:Name>
-            <ns8:Title>Lakes</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns7:LowerCorner>-0.0018 6.0E-4</ns7:LowerCorner>
-                <ns7:UpperCorner>-1.0E-4 0.0031</ns7:UpperCorner>
-            </ns7:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
-            <ns8:Name>gml:RoadSegments</ns8:Name>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:RoadSegments</ns8:Name>
             <ns8:Title>RoadSegments</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -199,6 +166,28 @@
             <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
                 <ns7:LowerCorner>-0.0024 -0.0042</ns7:LowerCorner>
                 <ns7:UpperCorner>0.0024 0.0042</ns7:UpperCorner>
+            </ns7:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:Bridges</ns8:Name>
+            <ns8:Title>Bridges</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns7:LowerCorner>7.0E-4 2.0E-4</ns7:LowerCorner>
+                <ns7:UpperCorner>7.0E-4 2.0E-4</ns7:UpperCorner>
+            </ns7:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:Ponds</ns8:Name>
+            <ns8:Title>Ponds</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns7:LowerCorner>0.0016 -0.0020</ns7:LowerCorner>
+                <ns7:UpperCorner>0.0020 -0.0014</ns7:UpperCorner>
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
@@ -213,18 +202,7 @@
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name>gml:BasicPolygons</ns8:Name>
-            <ns8:Title>BasicPolygons</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns7:LowerCorner>-1.0 -2.0</ns7:LowerCorner>
-                <ns7:UpperCorner>6.0 2.0</ns7:UpperCorner>
-            </ns7:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
-            <ns8:Name>gml:Forests</ns8:Name>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:Forests</ns8:Name>
             <ns8:Title>Forests</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -235,14 +213,14 @@
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name>gml:Bridges</ns8:Name>
-            <ns8:Title>Bridges</ns8:Title>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:Lakes</ns8:Name>
+            <ns8:Title>Lakes</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
             <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns7:LowerCorner>7.0E-4 2.0E-4</ns7:LowerCorner>
-                <ns7:UpperCorner>7.0E-4 2.0E-4</ns7:UpperCorner>
+                <ns7:LowerCorner>-0.0018 6.0E-4</ns7:LowerCorner>
+                <ns7:UpperCorner>-1.0E-4 0.0031</ns7:UpperCorner>
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
@@ -268,9 +246,20 @@
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:Streams</ns8:Name>
+            <ns8:Title>Streams</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns7:LowerCorner>-0.0024 -4.0E-4</ns7:LowerCorner>
+                <ns7:UpperCorner>0.0024 0.0036</ns7:UpperCorner>
+            </ns7:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
             <ns8:Name xmlns:sampling="http://www.opengis.net/sampling/1.0">sampling:SamplingPoint</ns8:Name>
             <ns8:Title>SamplingPoint</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:27582</ns8:DefaultCRS>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
             <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
@@ -279,29 +268,7 @@
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name>gml:DividedRoutes</ns8:Name>
-            <ns8:Title>DividedRoutes</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns7:LowerCorner>-0.0024 -0.0032</ns7:LowerCorner>
-                <ns7:UpperCorner>0.0024 -0.0026</ns7:UpperCorner>
-            </ns7:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
-            <ns8:Name>gml:BuildingCenters</ns8:Name>
-            <ns8:Title>BuildingCenters</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns7:LowerCorner>6.0E-4 0.0010</ns7:LowerCorner>
-                <ns7:UpperCorner>9.0E-4 0.0022</ns7:UpperCorner>
-            </ns7:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
-            <ns8:Name>gml:Buildings</ns8:Name>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:Buildings</ns8:Name>
             <ns8:Title>Buildings</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -312,14 +279,47 @@
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name>gml:Ponds</ns8:Name>
-            <ns8:Title>Ponds</ns8:Title>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:NamedPlaces</ns8:Name>
+            <ns8:Title>NamedPlaces</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
             <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns7:LowerCorner>0.0016 -0.0020</ns7:LowerCorner>
-                <ns7:UpperCorner>0.0020 -0.0014</ns7:UpperCorner>
+                <ns7:LowerCorner>-0.0011 0.0014</ns7:LowerCorner>
+                <ns7:UpperCorner>0.0024 0.0042</ns7:UpperCorner>
+            </ns7:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:BuildingCenters</ns8:Name>
+            <ns8:Title>BuildingCenters</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns7:LowerCorner>6.0E-4 0.0010</ns7:LowerCorner>
+                <ns7:UpperCorner>9.0E-4 0.0022</ns7:UpperCorner>
+            </ns7:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:BasicPolygons</ns8:Name>
+            <ns8:Title>BasicPolygons</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns7:LowerCorner>-1.0 -2.0</ns7:LowerCorner>
+                <ns7:UpperCorner>6.0 2.0</ns7:UpperCorner>
+            </ns7:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:MapNeatline</ns8:Name>
+            <ns8:Title>MapNeatline</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns7:LowerCorner>-0.0024 -0.0042</ns7:LowerCorner>
+                <ns7:UpperCorner>0.0024 0.0042</ns7:UpperCorner>
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
@@ -334,14 +334,14 @@
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name>gml:MapNeatline</ns8:Name>
-            <ns8:Title>MapNeatline</ns8:Title>
+            <ns8:Name xmlns:ns10="http://www.opengis.net/gml/3.2.1">ns10:DividedRoutes</ns8:Name>
+            <ns8:Title>DividedRoutes</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
             <ns7:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns7:LowerCorner>-0.0024 -0.0042</ns7:LowerCorner>
-                <ns7:UpperCorner>0.0024 0.0042</ns7:UpperCorner>
+                <ns7:LowerCorner>-0.0024 -0.0032</ns7:LowerCorner>
+                <ns7:UpperCorner>0.0024 -0.0026</ns7:UpperCorner>
             </ns7:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>

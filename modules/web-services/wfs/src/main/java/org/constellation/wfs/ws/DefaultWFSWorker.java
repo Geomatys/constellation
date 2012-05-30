@@ -60,16 +60,9 @@ import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
-import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.XMLUtilities;
-import org.geotoolkit.wfs.xml.GetFeature;
-import org.geotoolkit.wfs.xml.GetGmlObject;
-import org.geotoolkit.wfs.xml.LockFeatureResponse;
-import org.geotoolkit.wfs.xml.LockFeature;
-import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
-import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.accessor.Accessors;
@@ -77,30 +70,34 @@ import org.geotoolkit.filter.accessor.PropertyAccessor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
 import org.geotoolkit.filter.visitor.IsValidSpatialFilterVisitor;
 import org.geotoolkit.gml.GeometrytoJTS;
-import org.geotoolkit.gml.xml.v311.AbstractGMLType;
+import org.geotoolkit.gml.xml.AbstractGML;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
-import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.wfs.xml.GetCapabilities;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.ResultTypeType;
-import org.geotoolkit.wfs.xml.Query;
-import org.geotoolkit.wfs.xml.v110.DeleteElementType;
-import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
-import org.geotoolkit.wfs.xml.v110.IdentifierGenerationOptionType;
-import org.geotoolkit.wfs.xml.v110.InsertElementType;
-import org.geotoolkit.wfs.xml.v110.InsertResultsType;
-import org.geotoolkit.wfs.xml.v110.InsertedFeatureType;
-import org.geotoolkit.wfs.xml.v110.PropertyType;
-import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
-import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.WFSXmlFactory;
+import org.geotoolkit.wfs.xml.TransactionResponse;
+import org.geotoolkit.wfs.xml.Transaction;
+import org.geotoolkit.wfs.xml.Query;
+import org.geotoolkit.wfs.xml.GetFeature;
+import org.geotoolkit.wfs.xml.GetGmlObject;
+import org.geotoolkit.wfs.xml.LockFeatureResponse;
+import org.geotoolkit.wfs.xml.LockFeature;
+import org.geotoolkit.wfs.xml.DeleteElement;
+import org.geotoolkit.wfs.xml.InsertElement;
+import org.geotoolkit.wfs.xml.IdentifierGenerationOptionType;
+import org.geotoolkit.wfs.xml.Property;
+import org.geotoolkit.wfs.xml.UpdateElement;
+import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.wfs.xml.*;
+import org.geotoolkit.wfs.xml.v200.PropertyName;
 
 // GeoAPI dependencies
 import org.opengis.feature.Feature;
@@ -454,7 +451,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             if (featureId == null) {
                 filter = extractJAXBFilter(jaxbFilter, Filter.INCLUDE, namespaceMapping, currentVersion);
             } else {
-                filter = extractJAXBFilter(new FilterType(new FeatureIdType(featureId)), Filter.INCLUDE, namespaceMapping, currentVersion);
+                filter = extractJAXBFilter(featureId, namespaceMapping, currentVersion);
             }
 
             //decode crs--------------------------------------------------------
@@ -473,6 +470,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         pName = pName.substring(pos + 1);
                     }
                     requestPropNames.add(pName);
+                } else if (obj instanceof PropertyName) {
+                    final PropertyName pName = (PropertyName) obj;
+                    if (pName.getValue() != null) {
+                        requestPropNames.add(pName.getValue().getLocalPart());
+                    }
                 }
             }
 
@@ -581,10 +583,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             response = DataUtilities.collection("collection-1", null);
         }
         if (request.getResultType() == ResultTypeType.HITS) {
-            final FeatureCollectionType collection = new FeatureCollectionType(response.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
-            collection.setId("collection-1");
-            return collection;
-
+            return xmlFactory.buildFeatureCollection(currentVersion, "collection-1", response.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
         }
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
         return response;
@@ -603,7 +602,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public AbstractGMLType getGMLObject(final GetGmlObject grbi) throws CstlServiceException {
+    public AbstractGML getGMLObject(final GetGmlObject grbi) throws CstlServiceException {
         throw new CstlServiceException("WFS get GML Object is not supported on this Constellation version.");
     }
 
@@ -619,7 +618,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public TransactionResponseType transaction(final TransactionType request) throws CstlServiceException {
+    public TransactionResponse transaction(final Transaction request) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
         final long startTime = System.currentTimeMillis();
         isWorking();
@@ -631,9 +630,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         int totalUpdated                           = 0;
         int totalDeleted                           = 0;
         final LayerProviderProxy namedProxy        = LayerProviderProxy.getInstance();
-        InsertResultsType insertResults            = null;
-        final List<Object> transactions            = request.getInsertOrUpdateOrDelete();
-        final List<InsertedFeatureType> inserted   = new ArrayList<InsertedFeatureType>();
+        final List<Object> transactions            = request.getTransactionAction();
+        final Map<String, String> inserted        = new HashMap<String, String>();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
         final XmlFeatureReader featureReader       = new JAXPStreamFeatureReader(getFeatureTypes());
 
@@ -642,14 +640,15 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             /**
              * Features insertion.
              */
-            if (transaction instanceof InsertElementType) {
-                final InsertElementType insertRequest = (InsertElementType)transaction;
+            if (transaction instanceof InsertElement) {
+                final InsertElement insertRequest = (InsertElement)transaction;
 
                 final String handle = insertRequest.getHandle();
 
                 // we verify the input format
-                if (insertRequest.getInputFormat() != null && !insertRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")) {
-                    throw new CstlServiceException("This only input format supported is: text/xml; subtype=gml/3.1.1",
+                if (insertRequest.getInputFormat() != null && !(insertRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1") 
+                                                           ||   insertRequest.getInputFormat().equals("application/gml+xml; version=3.2"))) {
+                    throw new CstlServiceException("This only input format supported are: text/xml; subtype=gml/3.1.1 and application/gml+xml; version=3.2",
                             INVALID_PARAMETER_VALUE, "inputFormat");
                 }
 
@@ -721,8 +720,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         final List<FeatureId> features = layer.getStore().addFeatures(typeName, featureCollection);
 
                         for (FeatureId fid : features) {
-                            final String id = fid.getID(); // get the id of the inserted feature
-                            inserted.add(new InsertedFeatureType(new FeatureIdType(id), handle));
+                            inserted.put(fid.getID(), handle);// get the id of the inserted feature
                             totalInserted++;
                             LOGGER.finer("fid inserted: " + fid + " total:" + totalInserted);
                         }
@@ -737,9 +735,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             /**
              * Features remove.
              */
-            } else if (transaction instanceof DeleteElementType) {
+            } else if (transaction instanceof DeleteElement) {
 
-                final DeleteElementType deleteRequest = (DeleteElementType) transaction;
+                final DeleteElement deleteRequest = (DeleteElement) transaction;
 
                 //decode filter-----------------------------------------------------
                 if (deleteRequest.getFilter() == null) {
@@ -774,13 +772,14 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             /**
              * Features updates.
              */
-            } else if (transaction instanceof UpdateElementType) {
+            } else if (transaction instanceof UpdateElement) {
 
-                final UpdateElementType updateRequest = (UpdateElementType) transaction;
+                final UpdateElement updateRequest = (UpdateElement) transaction;
 
                 // we verify the input format
-                if (updateRequest.getInputFormat() != null && !updateRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")) {
-                    throw new CstlServiceException("The only input format supported is: text/xml; subtype=gml/3.1.1",
+                if (updateRequest.getInputFormat() != null && !(updateRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1") 
+                                                           ||   updateRequest.getInputFormat().equals("application/gml+xml; version=3.2"))) {
+                    throw new CstlServiceException("This only input format supported are: text/xml; subtype=gml/3.1.1 and application/gml+xml; version=3.2",
                             INVALID_PARAMETER_VALUE, "inputFormat");
                 }
 
@@ -804,8 +803,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     final Map<PropertyDescriptor,Object> values = new HashMap<PropertyDescriptor, Object>();
 
                     // we verify that the update property are contained in the feature type
-                    for (final PropertyType updateProperty : updateRequest.getProperty()) {
-                        final String updatePropertyValue = updateProperty.getName().getLocalPart();
+                    for (final Property updateProperty : updateRequest.getProperty()) {
+                        final String updatePropertyValue = updateProperty.getLocalName();
                         final PropertyAccessor pa        = Accessors.getAccessor(Feature.class, updatePropertyValue, null);
                         if (pa == null || pa.get(ft, updatePropertyValue, null) == null) {
                             throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyValue, INVALID_PARAMETER_VALUE);
@@ -861,14 +860,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
 
         }
-        if (inserted.size() > 0) {
-            insertResults = new InsertResultsType(inserted);
-        }
-        final TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
-                                                                          totalUpdated,
-                                                                          totalDeleted);
-
-        final TransactionResponseType response = new TransactionResponseType(summary, null, insertResults, actingVersion.version.toString());
+        
+        final TransactionResponse response = xmlFactory.buildTransactionResponse(currentVersion,
+                                                                                 totalInserted,
+                                                                                 totalUpdated,
+                                                                                 totalDeleted, 
+                                                                                 inserted);
         LOGGER.log(logLevel, "Transaction request processed in {0} ms", (System.currentTimeMillis() - startTime));
 
         return response;
@@ -921,6 +918,21 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         return temp;
     }
 
+    /**
+     * Extract an OGC filter usable by the dataStore from the request filter
+     * unmarshalled by JAXB.
+     *
+     * @param jaxbFilter an OGC JAXB filter.
+     * @return An OGC filter
+     * @throws CstlServiceException
+     */
+    private Filter extractJAXBFilter(final String featureId, final Map<String, String> namespaceMapping, final String currentVersion) throws CstlServiceException {
+        if ("2.0.0".equals(currentVersion)) {
+            return extractJAXBFilter(new org.geotoolkit.ogc.xml.v200.FilterType(new org.geotoolkit.ogc.xml.v200.ResourceIdType(featureId)), Filter.INCLUDE, namespaceMapping, currentVersion);
+        } else {
+            return extractJAXBFilter(new org.geotoolkit.ogc.xml.v110.FilterType(new org.geotoolkit.ogc.xml.v110.FeatureIdType(featureId)), Filter.INCLUDE, namespaceMapping, currentVersion);
+        }
+    }
     /**
      * Extract an OGC filter usable by the dataStore from the request filter
      * unmarshalled by JAXB.

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.opengis.net/gml/3.2.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2.1">
+    <xsd:import schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd" namespace="http://www.opengis.net/gml/3.2.1"/>
+    <xsd:element name="Bridges" type="gml:BridgesType" />
+    <xsd:complexType name="BridgesType">
+        <xsd:complexContent>
+            <xsd:extension base="gml:_Feature" >
+                <xsd:sequence>
+                    <xsd:element name="FID" maxOccurs="1" minOccurs="1" type="xsd:string"/>
+                    <xsd:element name="NAME" maxOccurs="1" minOccurs="1" type="xsd:string"/>
+                    <xsd:element name="the_geom" maxOccurs="1" minOccurs="1" type="gml:Point"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+</xsd:schema>

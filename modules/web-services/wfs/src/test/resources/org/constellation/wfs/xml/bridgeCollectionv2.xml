@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+<wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml32="http://www.opengis.net/gml/3.2.1">
+    <gml:boundedBy>
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:4326">
+            <gml:lowerCorner>2.0E-4 7.0E-4</gml:lowerCorner>
+            <gml:upperCorner>2.0E-4 7.0E-4</gml:upperCorner>
+        </gml:Envelope>
+    </gml:boundedBy>
+    <gml:featureMember>
+        <gml32:Bridges gml:id="Bridges.1">
+            <gml32:the_geom>
+                <gml:Point srsName="urn:ogc:def:crs:epsg:4326">
+                    <gml:pos>2.0E-4 7.0E-4</gml:pos>
+                </gml:Point>
+            </gml32:the_geom>
+            <gml32:FID>110</gml32:FID>
+            <gml32:NAME>Cam Bridge</gml32:NAME>
+        </gml32:Bridges>
+    </gml:featureMember>
+</wfs:FeatureCollection>

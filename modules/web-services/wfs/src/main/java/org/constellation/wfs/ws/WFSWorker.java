@@ -22,22 +22,20 @@ import java.util.List;
 import java.util.Map;
 
 // Constellation dependencies
-import javax.ws.rs.core.MediaType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
-import org.geotoolkit.gml.xml.v311.AbstractGMLType;
+import org.geotoolkit.gml.xml.AbstractGML;
 import org.geotoolkit.wfs.xml.DescribeFeatureType;
 import org.geotoolkit.wfs.xml.GetCapabilities;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.GetGmlObject;
 import org.geotoolkit.wfs.xml.LockFeatureResponse;
 import org.geotoolkit.wfs.xml.LockFeature;
-import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.GetFeature;
-import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
-import org.geotoolkit.wfs.xml.v110.TransactionType;
+import org.geotoolkit.wfs.xml.TransactionResponse;
+import org.geotoolkit.wfs.xml.Transaction;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 
 // GeoAPI dependencies
@@ -52,7 +50,7 @@ public interface WFSWorker extends Worker {
     /**
      * Describe the capabilities and the layers available of this service.
      *
-     * @param getCapab       The {@linkplain GetCapabilitiesType get capabilities} request.
+     * @param getCapab       The {@linkplain GetCapabilities get capabilities} request.
      * @return a WFSCapabilities XML document describing the capabilities of the service.
      *
      * @throws CstlServiceException
@@ -86,7 +84,7 @@ public interface WFSWorker extends Worker {
      * @return A GML representation of a feature instance or element.
      * @throws CstlServiceException
      */
-    AbstractGMLType getGMLObject(GetGmlObject grbi) throws CstlServiceException;
+    AbstractGML getGMLObject(GetGmlObject grbi) throws CstlServiceException;
 
     /**
      * lock request on one or more instances of a feature type for the duration of a transaction
@@ -105,7 +103,7 @@ public interface WFSWorker extends Worker {
      * @return
      * @throws CstlServiceException
      */
-    TransactionResponseType transaction(TransactionType t) throws CstlServiceException;
+    TransactionResponse transaction(Transaction t) throws CstlServiceException;
 
     /**
      * Return a map with namespace - xsd location.
