@@ -68,32 +68,25 @@ import static org.constellation.wfs.ws.WFSConstants.*;
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.client.util.RequestsUtilities;
+import org.geotoolkit.ogc.xml.XMLFilter;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.ogc.xml.v110.GmlObjectIdType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
-import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.geotoolkit.wfs.xml.v110.AllSomeType;
-import org.geotoolkit.wfs.xml.v110.DeleteElementType;
-import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
-import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
-import org.geotoolkit.wfs.xml.v110.GetFeatureType;
-import org.geotoolkit.wfs.xml.v110.GetGmlObjectType;
-import org.geotoolkit.wfs.xml.v110.LockFeatureType;
-import org.geotoolkit.wfs.xml.v110.LockType;
-import org.geotoolkit.wfs.xml.v110.QueryType;
+import org.geotoolkit.wfs.xml.AllSomeType;
 import org.geotoolkit.wfs.xml.ResultTypeType;
-import org.geotoolkit.wfs.xml.v110.TransactionType;
-import org.geotoolkit.wfs.xml.v110.BaseRequestType;
+import org.geotoolkit.wfs.xml.v110.GetFeatureType;
+import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.xml.MarshallerPool;
 
 import org.opengis.filter.sort.SortOrder;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.wfs.xml.*;
 
 /**
@@ -111,6 +104,8 @@ public class WFSService extends GridWebService<WFSWorker> {
         System.setProperty("javax.xml.stream.XmlOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
     }
 
+    private static final WFSXmlFactory xmlFactory = new WFSXmlFactory();
+    
     /**
      * Build a new Restful WFS service.
      */
@@ -209,12 +204,12 @@ public class WFSService extends GridWebService<WFSWorker> {
                 final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model));
                 return Response.ok(response, MediaType.TEXT_XML).build();
 
-            } else if (request instanceof LockFeatureType) {
-                final LockFeatureType model = (LockFeatureType) request;
+            } else if (request instanceof LockFeature) {
+                final LockFeature model = (LockFeature) request;
                 return Response.ok(worker.lockFeature(model), MediaType.TEXT_XML).build();
 
-            } else if (request instanceof TransactionType) {
-                final TransactionType model = (TransactionType) request;
+            } else if (request instanceof Transaction) {
+                final Transaction model = (Transaction) request;
                 return Response.ok(worker.transaction(model), MediaType.TEXT_XML).build();
             }
 
@@ -287,8 +282,8 @@ public class WFSService extends GridWebService<WFSWorker> {
             if (request instanceof JAXBElement) {
                 request = ((JAXBElement)request).getValue();
             }
-            if (request instanceof BaseRequestType) {
-                ((BaseRequestType)request).setPrefixMapping(prefixMapping);
+            if (request instanceof BaseRequest) {
+                ((BaseRequest)request).setPrefixMapping(prefixMapping);
             }
             return request;
         } catch (XMLStreamException ex) {
@@ -314,43 +309,46 @@ public class WFSService extends GridWebService<WFSWorker> {
                         INVALID_PARAMETER_VALUE, "request");
     }
 
-    private DescribeFeatureTypeType createNewDescribeFeatureTypeRequest() throws CstlServiceException {
+    private DescribeFeatureType createNewDescribeFeatureTypeRequest() throws CstlServiceException {
         String outputFormat   = getParameter("outputFormat", false);
         final String handle   = getParameter(HANDLE, false);
         final String service  = getParameter(SERVICE_PARAMETER, true);
         final String version  = getParameter(VERSION_PARAMETER, true);
 
-        if (outputFormat == null) {
-            outputFormat = "text/xml; subtype=gml/3.1.1";
-        }
         final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 
         final String typeName = getParameter("typeName", false);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
 
-        return new DescribeFeatureTypeType(service, version, handle, typeNames, outputFormat);
+        return xmlFactory.buildDecribeFeatureType(version, service, handle, typeNames, outputFormat);
     }
 
-    private GetCapabilitiesType createNewGetCapabilitiesRequest() throws CstlServiceException {
+    private GetCapabilities createNewGetCapabilitiesRequest() throws CstlServiceException {
         String version = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
-        AcceptVersionsType versions;
+        
+        // TODO determine the best version
+        String currentVersion = "1.1.0";
+        
+        
+        final List<String> versions = new ArrayList<String>();
         if (version != null) {
             if (version.indexOf(',') != -1) {
                 version = version.substring(0, version.indexOf(','));
             }
-            versions = new AcceptVersionsType(version);
+            versions.add(version);
         } else {
-             versions = new AcceptVersionsType("1.1.0");
+            versions.add("1.1.0");
         }
+        final AcceptVersions acceptVersions = xmlFactory.buildAcceptVersion(currentVersion, versions);
         
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
-        final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
+        final AcceptFormats formats = xmlFactory.buildAcceptFormat(currentVersion, Arrays.asList(getParameter(ACCEPT_FORMATS_PARAMETER, false)));
 
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
-        final SectionsType sections;
+        final Sections sections;
         final String section = getParameter(SECTIONS_PARAMETER, false);
         if (section != null && !section.equalsIgnoreCase("All")) {
             final List<String> requestedSections = new ArrayList<String>();
@@ -364,13 +362,14 @@ public class WFSService extends GridWebService<WFSWorker> {
                                                   INVALID_PARAMETER_VALUE, "Sections");
                 }
             }
-            sections = new SectionsType(requestedSections);
+            sections = xmlFactory.buildSections(currentVersion, requestedSections);
         } else {
             sections = null;
             
         }
         
-        return new GetCapabilitiesType(versions,
+        return xmlFactory.buildGetCapabilities(currentVersion,
+                                       acceptVersions,
                                        sections,
                                        formats,
                                        updateSequence,
@@ -512,18 +511,17 @@ public class WFSService extends GridWebService<WFSWorker> {
         return gf;
     }
 
-    private GetGmlObjectType createNewGetGmlObjectRequest() throws CstlServiceException {
+    private GetGmlObject createNewGetGmlObjectRequest() throws CstlServiceException {
         final String service      = getParameter(SERVICE_PARAMETER, true);
         final String version      = getParameter(VERSION_PARAMETER, true);
         final String handle       = getParameter(HANDLE,  false);
         final String outputFormat = getParameter("outputFormat", false);
         final String id           = getParameter("gmlobjectid", true);
 
-        final GmlObjectIdType gmlObjectId = new GmlObjectIdType(id);
-        return new GetGmlObjectType(service, version, handle, gmlObjectId, outputFormat);
+        return xmlFactory.buildGetGmlObject(version, id, service, handle, outputFormat);
     }
 
-    private LockFeatureType createNewLockFeatureRequest() throws CstlServiceException {
+    private LockFeature createNewLockFeatureRequest() throws CstlServiceException {
         final String service  = getParameter(SERVICE_PARAMETER, true);
         final String version  = getParameter(VERSION_PARAMETER, true);
         final String handle   = getParameter(HANDLE,  false);
@@ -551,10 +549,10 @@ public class WFSService extends GridWebService<WFSWorker> {
         final List<QName> typeNames = extractTypeName(typeName, mapping);
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
-        final FilterType filter;
+        final XMLFilter filter;
         final Map<String, String> prefixMapping;
-        if (xmlFilter instanceof FilterType) {
-            filter = (FilterType) xmlFilter;
+        if (xmlFilter instanceof XMLFilter) {
+            filter = (XMLFilter) xmlFilter;
             prefixMapping = filter.getPrefixMapping();
         } else {
             filter = null;
@@ -563,14 +561,13 @@ public class WFSService extends GridWebService<WFSWorker> {
         
         // TODO
         final QName typeNamee = typeNames.get(0);
-        final LockType lock = new LockType(filter, handle, typeNamee);
 
-        final LockFeatureType lf = new LockFeatureType(service, version, handle, Arrays.asList(lock), expiry, lockAction);
+        final LockFeature lf = xmlFactory.buildLockFeature(version, service, handle, lockAction, filter, typeNamee, expiry);
         lf.setPrefixMapping(prefixMapping);
         return lf;
     }
 
-    private TransactionType createNewTransactionRequest() throws CstlServiceException {
+    private Transaction createNewTransactionRequest() throws CstlServiceException {
         final String service      = getParameter(SERVICE_PARAMETER, true);
         final String version      = getParameter(VERSION_PARAMETER, true);
         final String handle       = getParameter(HANDLE,  false);
@@ -587,10 +584,10 @@ public class WFSService extends GridWebService<WFSWorker> {
         final List<QName> typeNames = extractTypeName(typeName, mapping);
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
-        final FilterType filter;
+        final XMLFilter filter;
         final Map<String, String> prefixMapping;
-        if (xmlFilter instanceof FilterType) {
-            filter = (FilterType) xmlFilter;
+        if (xmlFilter instanceof XMLFilter) {
+            filter = (XMLFilter) xmlFilter;
             prefixMapping = filter.getPrefixMapping();
         } else {
             filter = null;
@@ -599,8 +596,8 @@ public class WFSService extends GridWebService<WFSWorker> {
 
         // TODO
         final QName typeNamee = typeNames.get(0);
-        final DeleteElementType delete = new DeleteElementType(filter, handle, typeNamee);
-        final TransactionType t = new TransactionType(service, version, handle, releaseAction, delete);
+        final DeleteElement delete = xmlFactory.buildDeleteElement(version, filter, handle, typeNamee);
+        final Transaction t = xmlFactory.buildTransaction(version, service, handle, releaseAction, delete);
         t.setPrefixMapping(prefixMapping);
         return t;
      }

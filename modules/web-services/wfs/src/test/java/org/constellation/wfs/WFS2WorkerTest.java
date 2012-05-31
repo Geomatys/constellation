@@ -63,7 +63,7 @@ import org.geotoolkit.ogc.xml.v200.SortPropertyType;
 import org.geotoolkit.ogc.xml.v200.SpatialOpsType;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
-import org.geotoolkit.wfs.xml.v200.AllSomeType;
+import org.geotoolkit.wfs.xml.AllSomeType;
 import org.geotoolkit.wfs.xml.v200.DeleteType;
 import org.geotoolkit.wfs.xml.v200.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v200.FeatureCollectionType;

@@ -71,6 +71,7 @@ import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.wfs.xml.DescribeFeatureType;
 import org.geotoolkit.wfs.xml.GetCapabilities;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.ResultTypeType;
@@ -87,12 +88,12 @@ import org.geotoolkit.wfs.xml.DeleteElement;
 import org.geotoolkit.wfs.xml.InsertElement;
 import org.geotoolkit.wfs.xml.IdentifierGenerationOptionType;
 import org.geotoolkit.wfs.xml.Property;
+import org.geotoolkit.wfs.xml.FeatureTypeList;
 import org.geotoolkit.wfs.xml.UpdateElement;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
+import org.geotoolkit.wfs.xml.v200.PropertyName;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.wfs.xml.*;
-import org.geotoolkit.wfs.xml.v200.PropertyName;
 
 // GeoAPI dependencies
 import org.opengis.feature.Feature;
