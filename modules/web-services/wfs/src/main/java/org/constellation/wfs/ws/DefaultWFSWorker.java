@@ -21,13 +21,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -40,6 +34,7 @@ import org.constellation.configuration.Layer;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.util.NameComparator;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.wfs.ws.WFSConstants.*;
 
@@ -210,9 +205,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             /*
              *  layer providers
              */
-            final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
-            final Map<Name,Layer> layers = getLayers();
-            for (final Name layerName : layers.keySet()) {
+            final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+            final Map<Name,Layer> layers        = getLayers();
+            final List<Name> layerNames         = new ArrayList<Name>(layers.keySet());
+            Collections.sort(layerNames, new NameComparator());
+            for (final Name layerName : layerNames) {
                 final LayerDetails layer = namedProxy.get(layerName);
                 final Layer configLayer  = layers.get(layerName);
 
