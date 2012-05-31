@@ -68,26 +68,22 @@ import static org.constellation.wfs.ws.WFSConstants.*;
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.client.util.RequestsUtilities;
+import org.geotoolkit.ogc.xml.SortBy;
 import org.geotoolkit.ogc.xml.XMLFilter;
-import org.geotoolkit.ogc.xml.v110.BBOXType;
-import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.ogc.xml.v110.SortByType;
-import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
+import org.geotoolkit.ows.xml.Sections;
+import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.AllSomeType;
 import org.geotoolkit.wfs.xml.ResultTypeType;
-import org.geotoolkit.wfs.xml.v110.GetFeatureType;
-import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.xml.MarshallerPool;
 
 import org.opengis.filter.sort.SortOrder;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.wfs.xml.*;
+
 
 /**
  *
@@ -377,7 +373,7 @@ public class WFSService extends GridWebService<WFSWorker> {
 
     }
 
-    private GetFeatureType createNewGetFeatureRequest() throws CstlServiceException {
+    private GetFeature createNewGetFeatureRequest() throws CstlServiceException {
         Integer maxFeature = null;
         final String max = getParameter("maxfeatures", false);
         if (max != null) {
@@ -421,18 +417,54 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String typeName = getParameter("typeName", mandatory);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
 
+        final String srsName = getParameter("srsName", false);
+        
+        // TODO handle multiple properties and handle prefixed properties
+        String sortByParam = getParameter("sortBy", false);
+        final SortBy sortBy;
+        if (sortByParam != null) {
+            if (sortByParam.indexOf(':') != -1) {
+                sortByParam = sortByParam.substring(sortByParam.indexOf(':') + 1);
+            }
+            //we get the order
+            final SortOrder order;
+            if (sortByParam.indexOf(' ') != -1) {
+                final char cOrder = sortByParam.charAt(sortByParam.length() -1);
+                sortByParam = sortByParam.substring(0, sortByParam.indexOf(' '));
+                if (cOrder == 'D') {
+                    order = SortOrder.DESCENDING;
+                } else {
+                    order = SortOrder.ASCENDING;
+                }
+            } else {
+                order = SortOrder.ASCENDING;
+            }
+            sortBy =  xmlFactory.buildSortBy(version, sortByParam, order);
+        } else {
+            sortBy = null;
+        }
+        
+        final String propertyNameParam = getParameter("propertyName", false);
+        final List<String> propertyNames = new ArrayList<String>();
+        if (propertyNameParam != null) {
+            final StringTokenizer tokens = new StringTokenizer(propertyNameParam, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                propertyNames.add(token);
+            }
+        }
+        
         if (featureId != null) {
-            final QueryType query = new QueryType(null, typeNames, featureVersion);
-            return new GetFeatureType(service, version, handle, maxFeature, featureId, Arrays.asList(query), resultType, outputFormat);
-
+            final Query query = xmlFactory.buildQuery(version, null, typeNames, featureVersion, srsName, sortBy, propertyNames);
+            return xmlFactory.buildGetFeature(version, service, handle, maxFeature, featureId, query, resultType, outputFormat);
         }
 
         final Object xmlFilter  = getComplexParameter(FILTER, false);
 
-        FilterType filter;
+        XMLFilter filter;
         final Map<String, String> prefixMapping;
-        if (xmlFilter instanceof FilterType) {
-            filter = (FilterType) xmlFilter;
+        if (xmlFilter instanceof XMLFilter) {
+            filter = (XMLFilter) xmlFilter;
             prefixMapping = filter.getPrefixMapping();
         } else {
             filter = null;
@@ -456,57 +488,16 @@ public class WFSService extends GridWebService<WFSWorker> {
             }
             
             if (coodinates != null) {
-                final BBOXType bboxFilter = new BBOXType("", coodinates[0], coodinates[1], coodinates[2], coodinates[3], crs);
                 if (filter == null) {
-                    filter = new FilterType(bboxFilter);
+                    filter = xmlFactory.buildBBOXFilter(version, "", coodinates[0], coodinates[1], coodinates[2], coodinates[3], crs);
                 } else {
                     LOGGER.info("unexpected case --> filter + bbox TODO");
                 }
             }
         }
         
-        final QueryType query = new QueryType(filter, typeNames, featureVersion);
-
-        final String srsName = getParameter("srsName", false);
-        query.setSrsName(srsName);
-
-        // TODO handle multiple properties and handle prefixed properties
-        String sortByParam = getParameter("sortBy", false);
-        if (sortByParam != null) {
-            if (sortByParam.indexOf(':') != -1) {
-                sortByParam = sortByParam.substring(sortByParam.indexOf(':') + 1);
-            }
-            //we get the order
-            final SortOrder order;
-            if (sortByParam.indexOf(' ') != -1) {
-                final char cOrder = sortByParam.charAt(sortByParam.length() -1);
-                sortByParam = sortByParam.substring(0, sortByParam.indexOf(' '));
-                if (cOrder == 'D') {
-                    order = SortOrder.DESCENDING;
-                } else {
-                    order = SortOrder.ASCENDING;
-                }
-            } else {
-                order = SortOrder.ASCENDING;
-            }
-            final List<SortPropertyType> sortProperties = new ArrayList<SortPropertyType>();
-            sortProperties.add(new SortPropertyType(sortByParam, order));
-            final SortByType sortBy = new SortByType(sortProperties);
-            query.setSortBy(sortBy);
-        }
-
-        final String propertyNameParam = getParameter("propertyName", false);
-        if (propertyNameParam != null) {
-            final List<String> propertyNames = new ArrayList<String>();
-            final StringTokenizer tokens = new StringTokenizer(propertyNameParam, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                propertyNames.add(token);
-            }
-            query.getPropertyNameOrXlinkPropertyNameOrFunction().addAll(propertyNames);
-        }
-        
-        final GetFeatureType gf = new GetFeatureType(service, version, handle, maxFeature, Arrays.asList(query), resultType, outputFormat);
+        final Query query   = xmlFactory.buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
+        final GetFeature gf = xmlFactory.buildGetFeature(version, service, handle, maxFeature, null, query, resultType, outputFormat);
         gf.setPrefixMapping(prefixMapping);
         return gf;
     }
@@ -699,8 +690,8 @@ public class WFSService extends GridWebService<WFSWorker> {
             if (result instanceof JAXBElement) {
                 result = ((JAXBElement)result).getValue();
             }
-            if (result instanceof FilterType) {
-                ((FilterType)result).setPrefixMapping(prefixMapping);
+            if (result instanceof XMLFilter) {
+                ((XMLFilter)result).setPrefixMapping(prefixMapping);
             }
             return result;
         } catch (JAXBException ex) {
