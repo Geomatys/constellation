@@ -48,7 +48,7 @@ import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.gml.JTStoGeometry;
-import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.*;
 import org.geotoolkit.process.AbstractProcess;
@@ -1145,7 +1145,7 @@ public class WPSWorker extends AbstractWorker {
             try {
                 
                 final Geometry jtsGeom = (Geometry) outputValue;
-                final AbstractGeometryType gmlGeom = JTStoGeometry.toGML(jtsGeom);
+                final AbstractGeometry gmlGeom = JTStoGeometry.toGML("3.1.1", jtsGeom); // TODO determine gml version
                 return gmlGeom;
 
             } catch (FactoryException ex) {
