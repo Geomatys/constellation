@@ -93,7 +93,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 @Singleton
 public class WFSService extends GridWebService<WFSWorker> {
 
-    private static Map<String, String> schemaLocations;
     static {
         System.setProperty("javax.xml.stream.XmlInputFactory", "com.ctc.wstx.stax.WstxInputFactory");
         System.setProperty("javax.xml.stream.XmlEventFactory", "com.ctc.wstx.stax.WstxEventFactory");
@@ -186,13 +185,13 @@ public class WFSService extends GridWebService<WFSWorker> {
                 final MediaType outputFormat;
                 if (requestOutputFormat == null || requestOutputFormat.equals("text/xml; subtype=gml/3.1.1")) {
                     outputFormat = GML_3_1_1;                                                                       
-                } else if (requestOutputFormat.equals("text/xml; subtype=gml/3.2.1") || requestOutputFormat.equals("text/xml; subtype=gml/3.2")) {
+                } else if (requestOutputFormat.equals("text/xml; subtype=gml/3.2.1") || requestOutputFormat.equals("text/xml; subtype=gml/3.2") ||
+                           requestOutputFormat.equals("application/gml+xml; version=3.2")) {
                     outputFormat = GML_3_2_1;
                 } else {
                     outputFormat = MediaType.valueOf(requestOutputFormat);
                 }
                 final Object response = worker.getFeature(model);
-                schemaLocations = worker.getSchemaLocations();
                 return Response.ok(response, outputFormat).build();
                 
             } else if (request instanceof GetGmlObject) {
@@ -390,6 +389,11 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String handle  = getParameter(HANDLE,  false);
         String outputFormat  = getParameter("outputFormat", false);
 
+        if (!(version.equals("1.1.0") ||version.equals("2.0.0"))) {
+            throw new CstlServiceException("unsupported service version" + version,
+                                                  INVALID_PARAMETER_VALUE, "version");
+        }
+        
         if (outputFormat == null) {
             outputFormat = "text/xml; subtype=gml/3.1.1";
         }
@@ -629,10 +633,6 @@ public class WFSService extends GridWebService<WFSWorker> {
         return typeNames;
     }
 
-    public static Map<String, String> getSchemaLocations() {
-        return schemaLocations;
-    }
-    
     /**
      * {@inheritDoc}
      * overriden for extract namespace mapping.

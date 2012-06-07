@@ -42,13 +42,13 @@ import org.geotoolkit.util.logging.Logging;
  * @author Guilhem Legal (Geomatys)
  */
 @Provider
-public class FeatureCollectionWriter<T extends FeatureCollection> implements MessageBodyWriter<T> {
+public class FeatureCollectionWriter<T extends FeatureCollectionWrapper> implements MessageBodyWriter<T> {
 
     private static final Logger LOGGER = Logging.getLogger("org.constellation.wfs.ws.rs");
 
     @Override
     public boolean isWriteable(final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt) {
-        return FeatureCollection.class.isAssignableFrom(type);
+        return FeatureCollectionWrapper.class.isAssignableFrom(type);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
     public void writeTo(final T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt,
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         try {
-            final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(WFSService.getSchemaLocations());
-            featureWriter.write(t, out);
+            final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(t.getGmlVersion(), t.getSchemaLocations());
+            featureWriter.write(t.getFeatureCollection(), out);
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);
         } catch (DataStoreException ex) {

@@ -48,6 +48,7 @@ import org.constellation.provider.configuration.Configurator;
 import org.geotoolkit.data.FeatureCollection;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.om.OMDataStoreFactory;
@@ -157,8 +158,8 @@ public class WFSServiceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
 
-        assertTrue(result.getEntity() instanceof FeatureCollection);
-        FeatureCollection collection = (FeatureCollection) result.getEntity();
+        assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
+        FeatureCollection collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
         assertEquals(2, collection.size());
         
         /*
@@ -177,8 +178,8 @@ public class WFSServiceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
 
-        assertTrue(result.getEntity() instanceof FeatureCollection);
-        collection = (FeatureCollection) result.getEntity();
+        assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
+        collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
         assertEquals(4, collection.size());
         
         /*
@@ -197,8 +198,8 @@ public class WFSServiceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
 
-        assertTrue(result.getEntity() instanceof FeatureCollection);
-        collection = (FeatureCollection) result.getEntity();
+        assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
+        collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
         assertEquals(2, collection.size());
         
         /*
@@ -217,8 +218,8 @@ public class WFSServiceTest {
 
         assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
 
-        assertTrue(result.getEntity() instanceof FeatureCollection);
-        collection = (FeatureCollection) result.getEntity();
+        assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
+        collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
         assertEquals(4, collection.size());
         
     }

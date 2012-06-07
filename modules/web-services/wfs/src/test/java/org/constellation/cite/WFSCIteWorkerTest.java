@@ -55,6 +55,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.junit.Assert.*;
 import static org.constellation.provider.postgis.PostGisProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import static org.geotoolkit.data.postgis.PostgisNGDataStoreFactory.*;
 
 
@@ -138,9 +139,9 @@ public class WFSCIteWorkerTest {
 
         Object result = worker.getFeature(request);
 
-        assertTrue(result instanceof FeatureCollection);
+        assertTrue(result instanceof FeatureCollectionWrapper);
 
-        FeatureCollection collection = (FeatureCollection)result;
+        FeatureCollection collection = ((FeatureCollectionWrapper)result).getFeatureCollection();
 
         StringWriter writer = new StringWriter();
         featureWriter.write(collection,writer);

@@ -304,14 +304,14 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         final List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        final GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, 2, queries, ResultTypeType.RESULTS, "text/xml");
+        final GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, 2, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.1.1");
         
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
         postRequestObject(conec, request);
         Object obj = unmarshallResponse(conec);
 
-        assertTrue(obj instanceof FeatureCollectionType);
+        assertTrue("unexpected type: " + obj.getClass().getName() + "\n" + obj, obj instanceof FeatureCollectionType);
 
     }
 

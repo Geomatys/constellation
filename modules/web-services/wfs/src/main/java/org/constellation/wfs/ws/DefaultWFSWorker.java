@@ -37,6 +37,7 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.util.NameComparator;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.wfs.ws.WFSConstants.*;
+import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 
 // Geotoolkit dependencies
 import org.constellation.ws.LayerWorker;
@@ -138,11 +139,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      */
     private ServiceDef actingVersion = ServiceDef.WFS_1_1_0;
 
-    /**
-     * Current map with namespace - xsd location. << ISSUE multiThread
-     */
-    private Map<String, String> schemaLocations;
-    
     private boolean multipleVersionActivated = true;
     
     private static final WFSXmlFactory xmlFactory = new WFSXmlFactory();
@@ -421,7 +417,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final String featureId                     = request.getFeatureId();
         final Integer maxFeatures                  = request.getCount();
         final List<FeatureCollection> collections  = new ArrayList<FeatureCollection>();
-        schemaLocations                            = new HashMap<String, String>();
+        final Map<String, String> schemaLocations  = new HashMap<String, String>();
         final Map<Name,Layer> layers               = getLayers();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
         if (request.getQuery() == null || request.getQuery().isEmpty()) {
@@ -563,6 +559,18 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
 
         }
+        final String gmlVersion;
+        if ("text/xml; subtype=gml/3.1.1".equals(request.getOutputFormat()) ||
+            "text/gml; subtype=gml/3.1.1".equals(request.getOutputFormat())) {
+            gmlVersion = "3.1.1";
+        } else if ("text/xml; subtype=gml/3.2.1".equals(request.getOutputFormat()) ||
+                   "text/xml; subtype=gml/3.2".equals(request.getOutputFormat())   ||
+                   "application/gml+xml; version=3.2".equals(request.getOutputFormat())) {
+            gmlVersion = "3.2.1";
+        } else {
+            throw new CstlServiceException("invalid outputFormat:" + request.getOutputFormat(), INVALID_PARAMETER_VALUE, "outputFormat");
+        }
+        
 
         /**
          * 3 possibility here :
@@ -572,19 +580,19 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          *
          * result TODO find an id and a member type
          */
-        final FeatureCollection response;
+        final FeatureCollection FeatureCollection;
 	if (collections.size() > 1) {
-            response = DataUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
+            FeatureCollection = DataUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
         } else if (collections.size() == 1) {
-            response = collections.get(0);
+            FeatureCollection = collections.get(0);
         } else {
-            response = DataUtilities.collection("collection-1", null);
+            FeatureCollection = DataUtilities.collection("collection-1", null);
         }
         if (request.getResultType() == ResultTypeType.HITS) {
-            return xmlFactory.buildFeatureCollection(currentVersion, "collection-1", response.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+            return xmlFactory.buildFeatureCollection(currentVersion, "collection-1", FeatureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
         }
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
-        return response;
+        return new FeatureCollectionWrapper(FeatureCollection, schemaLocations, gmlVersion);
     }
     
     private List<SortBy> visitJaxbSortBy(final org.geotoolkit.ogc.xml.SortBy jaxbSortby,final Map<String, String> namespaceMapping, final String version) {
@@ -1088,15 +1096,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             throw new CstlServiceException("The request is null!", NO_APPLICABLE_CODE);
          }
     }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Map<String, String> getSchemaLocations() {
-        return schemaLocations;
-    }
-
 
     /**
      * {@inheritDoc }

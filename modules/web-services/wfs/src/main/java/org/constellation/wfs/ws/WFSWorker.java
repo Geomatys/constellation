@@ -106,17 +106,6 @@ public interface WFSWorker extends Worker {
     TransactionResponse transaction(Transaction t) throws CstlServiceException;
 
     /**
-     * Return a map with namespace - xsd location.
-     * this map is added to the XML output.
-     *
-     * @return a map with namespace - xsd location.
-     *
-     * @deprecated Thread unsafe must be replaced.
-     */
-    @Deprecated
-    Map<String, String> getSchemaLocations();
-
-    /**
      * Return all the feature type that the service support.
      * @return all the feature type that the service support.
      */

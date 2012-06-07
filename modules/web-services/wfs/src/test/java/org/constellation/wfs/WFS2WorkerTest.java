@@ -43,6 +43,7 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 
 import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
@@ -337,6 +338,10 @@ public class WFS2WorkerTest {
 
         Object result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -369,6 +374,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -389,6 +398,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -408,6 +421,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -427,6 +444,10 @@ public class WFS2WorkerTest {
 
        result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -446,6 +467,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -467,6 +492,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -487,6 +516,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -560,6 +593,10 @@ public class WFS2WorkerTest {
 
         Object result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -580,6 +617,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -601,6 +642,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -627,6 +672,10 @@ public class WFS2WorkerTest {
 
         Object result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -645,6 +694,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -662,6 +715,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -695,6 +752,10 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -714,6 +775,10 @@ public class WFS2WorkerTest {
 
         try {
             result = worker.getFeature(request);
+            assertTrue(result instanceof FeatureCollectionWrapper);
+            wrapper = (FeatureCollectionWrapper) result;
+            result = wrapper.getFeatureCollection();
+        
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
             String xmlResult = writer.toString();
@@ -733,6 +798,11 @@ public class WFS2WorkerTest {
 
         try {
             result = worker.getFeature(request);
+            
+            assertTrue(result instanceof FeatureCollectionWrapper);
+            wrapper = (FeatureCollectionWrapper) result;
+            result = wrapper.getFeatureCollection();
+        
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
             String xmlResult = writer.toString();
@@ -887,6 +957,10 @@ public class WFS2WorkerTest {
 
         Object resultGF = worker.getFeature(requestGF);
 
+        assertTrue(resultGF instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
+        resultGF = wrapper.getFeatureCollection();
+        
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
@@ -942,6 +1016,10 @@ public class WFS2WorkerTest {
 
         Object resultGF = worker.getFeature(requestGF);
 
+        assertTrue(resultGF instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
+        resultGF = wrapper.getFeatureCollection();
+        
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
