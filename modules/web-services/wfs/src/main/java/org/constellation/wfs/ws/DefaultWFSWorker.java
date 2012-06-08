@@ -592,7 +592,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             return xmlFactory.buildFeatureCollection(currentVersion, "collection-1", FeatureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
         }
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
-        return new FeatureCollectionWrapper(FeatureCollection, schemaLocations, gmlVersion);
+        return new FeatureCollectionWrapper(FeatureCollection, schemaLocations, gmlVersion, currentVersion);
     }
     
     private List<SortBy> visitJaxbSortBy(final org.geotoolkit.ogc.xml.SortBy jaxbSortby,final Map<String, String> namespaceMapping, final String version) {

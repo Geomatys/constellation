@@ -30,9 +30,12 @@ public class FeatureCollectionWrapper {
     
     private final String gmlVersion;
     
-    public FeatureCollectionWrapper(final FeatureCollection featureCollection, final Map<String, String> schemaLocations, final String gmlVersion) {
+    private final String wfsVersion;
+    
+    public FeatureCollectionWrapper(final FeatureCollection featureCollection, final Map<String, String> schemaLocations, final String gmlVersion, final String wfsVersion) {
         this.featureCollection = featureCollection;
         this.gmlVersion = gmlVersion;
+        this.wfsVersion = wfsVersion;
         this.schemaLocations = schemaLocations;
     }
 
@@ -55,6 +58,13 @@ public class FeatureCollectionWrapper {
      */
     public String getGmlVersion() {
         return gmlVersion;
+    }
+
+    /**
+     * @return the wfsVersion
+     */
+    public String getWfsVersion() {
+        return wfsVersion;
     }
     
     

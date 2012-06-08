@@ -60,7 +60,7 @@ public class FeatureCollectionWriter<T extends FeatureCollectionWrapper> impleme
     public void writeTo(final T t, final Class<?> type, final Type type1, final Annotation[] antns, final MediaType mt,
             final MultivaluedMap<String, Object> mm, final OutputStream out) throws IOException, WebApplicationException {
         try {
-            final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(t.getGmlVersion(), t.getSchemaLocations());
+            final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(t.getGmlVersion(), t.getWfsVersion(), t.getSchemaLocations());
             featureWriter.write(t.getFeatureCollection(), out);
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);

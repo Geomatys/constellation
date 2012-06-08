@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
@@ -173,7 +174,7 @@ public class WFS2WorkerTest {
 
     @Before
     public void setUp() throws Exception {
-        featureWriter = new JAXPStreamFeatureWriter();
+        featureWriter = new JAXPStreamFeatureWriter("3.2.1", "2.0.0", new HashMap<String, String>());
     }
 
     @After
@@ -204,7 +205,7 @@ public class WFS2WorkerTest {
         request = new  org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
 
         try {
-            result = worker.getCapabilities(request);
+            worker.getCapabilities(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
@@ -214,7 +215,7 @@ public class WFS2WorkerTest {
         request = new org.geotoolkit.wfs.xml.v200.GetCapabilitiesType(acceptVersion, null, null, null, "WPS");
 
         try {
-            result = worker.getCapabilities(request);
+            worker.getCapabilities(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
@@ -225,7 +226,7 @@ public class WFS2WorkerTest {
         request.setService(null);
 
         try {
-            result = worker.getCapabilities(request);
+            worker.getCapabilities(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
@@ -298,7 +299,7 @@ public class WFS2WorkerTest {
         /**
          * Test 1 : empty query => error
          */
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = null;
         try {
@@ -311,7 +312,7 @@ public class WFS2WorkerTest {
         /**
          * Test 2 : bad version => error
          */
-        request = new GetFeatureType("WFS", "1.2.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "1.2.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
             result = worker.getFeature(request);
@@ -334,18 +335,19 @@ public class WFS2WorkerTest {
          */
         List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
         DomCompare.compare(expectedResult, writer.toString());
 
@@ -355,7 +357,7 @@ public class WFS2WorkerTest {
         queries = new ArrayList<QueryType>();
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
 
         FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
 
@@ -370,18 +372,19 @@ public class WFS2WorkerTest {
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("http://www.opengis.net/gml/3.2.1", "name"))));
         
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -394,18 +397,19 @@ public class WFS2WorkerTest {
         ComparisonOpsType pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "name", Boolean.TRUE);
         FilterType filter = new FilterType(pe);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -417,18 +421,19 @@ public class WFS2WorkerTest {
         pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), "//{http://www.opengis.net/gml}name", Boolean.TRUE);
         filter = new FilterType(pe);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -440,18 +445,19 @@ public class WFS2WorkerTest {
         SpatialOpsType bbox = new BBOXType("{http://www.opengis.net/sampling/1.0}position", 65300.0, 1731360.0, 65500.0, 1731400.0, "urn:ogc:def:crs:epsg:7.6:27582");
         filter = new FilterType(bbox);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
        result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -463,18 +469,19 @@ public class WFS2WorkerTest {
         bbox = new BBOXType("position", 65300.0, 1731360.0, 65500.0, 1731400.0, "urn:ogc:def:crs:epsg:7.6:27582");
         filter = new FilterType(bbox);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -488,18 +495,19 @@ public class WFS2WorkerTest {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.ASC)))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"));
+         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -512,18 +520,19 @@ public class WFS2WorkerTest {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC)))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"));
+         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -534,7 +543,7 @@ public class WFS2WorkerTest {
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
 
         resultHits = (FeatureCollectionType) worker.getFeature(request);
 
@@ -549,7 +558,7 @@ public class WFS2WorkerTest {
         pe = new PropertyIsEqualToType(new LiteralType("whatever"), "wrongProperty", Boolean.TRUE);
         filter = new FilterType(pe);
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
             result = worker.getFeature(request);
@@ -566,7 +575,7 @@ public class WFS2WorkerTest {
         query = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("wrongProperty"))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
             result = worker.getFeature(request);
@@ -589,18 +598,19 @@ public class WFS2WorkerTest {
 
         List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null));
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -613,18 +623,19 @@ public class WFS2WorkerTest {
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
         query.setSrsName("EPSG:4326");
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -645,11 +656,12 @@ public class WFS2WorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
@@ -668,13 +680,14 @@ public class WFS2WorkerTest {
 
         List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "Bridges")), null));
-        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
@@ -690,13 +703,14 @@ public class WFS2WorkerTest {
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "Bridges")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("FID"))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
@@ -711,13 +725,14 @@ public class WFS2WorkerTest {
 
         queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "NamedPlaces")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
@@ -732,7 +747,7 @@ public class WFS2WorkerTest {
 
         queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "NamedPlaces")), null));
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
@@ -748,13 +763,14 @@ public class WFS2WorkerTest {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "NamedPlaces")), null);
         query.setSrsName("EPSG:27582");
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         result = worker.getFeature(request);
 
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
@@ -771,13 +787,14 @@ public class WFS2WorkerTest {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "NamedPlaces")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.DESC)))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
             result = worker.getFeature(request);
             assertTrue(result instanceof FeatureCollectionWrapper);
             wrapper = (FeatureCollectionWrapper) result;
             result = wrapper.getFeatureCollection();
+            assertEquals("3.2.1", wrapper.getGmlVersion());
         
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
@@ -794,7 +811,7 @@ public class WFS2WorkerTest {
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "NamedPlaces")), null);
         query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.ASC)))));
         queries.add(query);
-        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
             result = worker.getFeature(request);
@@ -802,6 +819,7 @@ public class WFS2WorkerTest {
             assertTrue(result instanceof FeatureCollectionWrapper);
             wrapper = (FeatureCollectionWrapper) result;
             result = wrapper.getFeatureCollection();
+            assertEquals("3.2.1", wrapper.getGmlVersion());
         
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
@@ -826,7 +844,7 @@ public class WFS2WorkerTest {
          */
         List<QName> typeNames = new ArrayList<QName>();
         typeNames.add(new QName("http://www.opengis.net/gml/3.2.1", "Bridges"));
-        DescribeFeatureTypeType request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+        DescribeFeatureTypeType request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/xml; subtype=gml/3.2.1");
 
         Schema result = worker.describeFeatureType(request);
 
@@ -839,7 +857,7 @@ public class WFS2WorkerTest {
          */
         typeNames = new ArrayList<QName>();
         typeNames.add(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-        request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+        request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/xml; subtype=gml/3.2.1");
 
         result = worker.describeFeatureType(request);
 
@@ -852,7 +870,7 @@ public class WFS2WorkerTest {
          */
         typeNames = new ArrayList<QName>();
         typeNames.add(new QName("http://www.opengis.net/sml/1.0", "System"));
-        request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+        request = new DescribeFeatureTypeType("WFS", "2.0.0", null, typeNames, "text/xml; subtype=gml/3.2.1");
 
         result = worker.describeFeatureType(request);
 
@@ -953,13 +971,14 @@ public class WFS2WorkerTest {
          */
          List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "NamedPlaces")), null));
-        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object resultGF = worker.getFeature(requestGF);
 
         assertTrue(resultGF instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
         resultGF = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
         
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
@@ -1012,7 +1031,7 @@ public class WFS2WorkerTest {
          */
         List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "NamedPlaces")), null));
-        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+        GetFeatureType requestGF = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         Object resultGF = worker.getFeature(requestGF);
 
