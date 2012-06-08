@@ -637,7 +637,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         int totalDeleted                           = 0;
         final LayerProviderProxy namedProxy        = LayerProviderProxy.getInstance();
         final List<Object> transactions            = request.getTransactionAction();
-        final Map<String, String> inserted        = new HashMap<String, String>();
+        final Map<String, String> inserted         = new LinkedHashMap<String, String>();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
         final XmlFeatureReader featureReader       = new JAXPStreamFeatureReader(getFeatureTypes());
 
