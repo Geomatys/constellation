@@ -58,12 +58,14 @@ public final class WFSConstants {
     public static final String NAMESPACE = "namespace";
     public static final String FILTER    = "filter";
 
-    public static final String STR_GETCAPABILITIES      = "GetCapabilities";
-    public static final String STR_DESCRIBEFEATURETYPE  = "DescribeFeatureType";
-    public static final String STR_GETFEATURE           = "GetFeature";
-    public static final String STR_GETGMLOBJECT         = "getGMLObject";
-    public static final String STR_LOCKFEATURE          = "lockFeature";
-    public static final String STR_TRANSACTION          = "Transaction";
+    public static final String STR_GETCAPABILITIES         = "GetCapabilities";
+    public static final String STR_DESCRIBEFEATURETYPE     = "DescribeFeatureType";
+    public static final String STR_GETFEATURE              = "GetFeature";
+    public static final String STR_GETGMLOBJECT            = "getGMLObject";
+    public static final String STR_LOCKFEATURE             = "lockFeature";
+    public static final String STR_TRANSACTION             = "Transaction";
+    public static final String STR_DESCRIBE_STORED_QUERIES = "DescribeStoredQueries";
+    public static final String STR_LIST_STORED_QUERIES     = "ListStoredQueries";
 
     public static final String UNKNOW_TYPENAME= "The specified TypeNames does not exist:";
 

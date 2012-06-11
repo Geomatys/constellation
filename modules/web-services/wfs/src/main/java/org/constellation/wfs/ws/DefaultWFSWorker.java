@@ -73,6 +73,10 @@ import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.wfs.xml.DescribeFeatureType;
+import org.geotoolkit.wfs.xml.DescribeStoredQueries;
+import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.ListStoredQueries;
+import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
 import org.geotoolkit.wfs.xml.GetCapabilities;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.ResultTypeType;
@@ -1125,6 +1129,16 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      */
     @Override
     public void destroy() {
+    }
+
+    @Override
+    public ListStoredQueriesResponse listStoredQueries(ListStoredQueries request) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public DescribeStoredQueriesResponse describeStoredQueries(DescribeStoredQueries request) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

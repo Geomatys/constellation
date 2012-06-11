@@ -194,6 +194,16 @@ public class WFSService extends GridWebService<WFSWorker> {
                 final Object response = worker.getFeature(model);
                 return Response.ok(response, outputFormat).build();
                 
+            } else if (request instanceof ListStoredQueries) {
+                final ListStoredQueries model = (ListStoredQueries) request;
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.listStoredQueries(model));
+                return Response.ok(response, MediaType.TEXT_XML).build();
+                
+            } else if (request instanceof DescribeStoredQueries) {
+                final DescribeStoredQueries model = (DescribeStoredQueries) request;
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.describeStoredQueries(model));
+                return Response.ok(response, MediaType.TEXT_XML).build();
+
             } else if (request instanceof GetGmlObject) {
                 final GetGmlObject model = (GetGmlObject) request;
                 final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model));
@@ -299,6 +309,10 @@ public class WFSService extends GridWebService<WFSWorker> {
             return createNewLockFeatureRequest();
         } else if (STR_TRANSACTION.equalsIgnoreCase(request)) {
             return createNewTransactionRequest();
+        } else if (STR_DESCRIBE_STORED_QUERIES.equalsIgnoreCase(request)) {
+            return createNewDescribeStoredQueriesRequest();
+        } else if (STR_LIST_STORED_QUERIES.equalsIgnoreCase(request)) {
+            return createNewListStoredQueriesRequest();
         }
         throw new CstlServiceException("The operation " + request + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
@@ -705,5 +719,30 @@ public class WFSService extends GridWebService<WFSWorker> {
                 getMarshallerPool().release(unmarshaller);
             }
         }
+    }
+
+    private DescribeStoredQueries createNewDescribeStoredQueriesRequest() throws CstlServiceException {
+        final String service      = getParameter(SERVICE_PARAMETER, true);
+        final String version      = getParameter(VERSION_PARAMETER, true);
+        final String handle       = getParameter(HANDLE,  false);
+        
+        final String storedQueryIdParam = getParameter("StoredQueryId", false);
+        final List<String> storedQueryId = new ArrayList<String>();
+        if (storedQueryIdParam != null) {
+            final StringTokenizer tokens = new StringTokenizer(storedQueryIdParam, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                storedQueryId.add(token);
+            }
+        }
+        return xmlFactory.buildDescribeStoredQueries(version, service, handle, storedQueryId);
+    }
+
+    private ListStoredQueries createNewListStoredQueriesRequest() throws CstlServiceException {
+        final String service      = getParameter(SERVICE_PARAMETER, true);
+        final String version      = getParameter(VERSION_PARAMETER, true);
+        final String handle       = getParameter(HANDLE,  false);
+        
+        return xmlFactory.buildListStoredQueries(version, service, handle);
     }
 }

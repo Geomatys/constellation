@@ -36,6 +36,10 @@ import org.geotoolkit.wfs.xml.LockFeature;
 import org.geotoolkit.wfs.xml.GetFeature;
 import org.geotoolkit.wfs.xml.TransactionResponse;
 import org.geotoolkit.wfs.xml.Transaction;
+import org.geotoolkit.wfs.xml.DescribeStoredQueries;
+import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.ListStoredQueries;
+import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 
 // GeoAPI dependencies
@@ -84,8 +88,12 @@ public interface WFSWorker extends Worker {
      * @return A GML representation of a feature instance or element.
      * @throws CstlServiceException
      */
-    AbstractGML getGMLObject(GetGmlObject grbi) throws CstlServiceException;
+    AbstractGML getGMLObject(final GetGmlObject grbi) throws CstlServiceException;
 
+    ListStoredQueriesResponse listStoredQueries(ListStoredQueries request)  throws CstlServiceException;
+    
+    DescribeStoredQueriesResponse describeStoredQueries(DescribeStoredQueries request) throws CstlServiceException;
+    
     /**
      * lock request on one or more instances of a feature type for the duration of a transaction
      *
