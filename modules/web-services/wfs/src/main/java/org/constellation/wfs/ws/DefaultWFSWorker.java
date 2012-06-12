@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
@@ -79,6 +81,8 @@ import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
 import org.geotoolkit.wfs.xml.ListStoredQueries;
 import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
 import org.geotoolkit.wfs.xml.GetCapabilities;
+import org.geotoolkit.wfs.xml.StoredQueryDescription;
+import org.geotoolkit.wfs.xml.StoredQueries;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.ResultTypeType;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
@@ -149,6 +153,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     private boolean multipleVersionActivated = true;
     
     private static final WFSXmlFactory xmlFactory = new WFSXmlFactory();
+    
+    private List<StoredQueryDescription> storedQueries = new ArrayList<StoredQueryDescription>();
 
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WFS);
@@ -168,6 +174,30 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (multiVersProp != null) {
             multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
             LOGGER.log(Level.INFO, "Multiple version activated:{0}", multipleVersionActivated);
+        }
+        
+        // loading stored queries
+        if (configurationDirectory != null) {
+            final File sqFile = new File(configurationDirectory, "StoredQueries.xml");
+            if (sqFile.exists()) {
+                Unmarshaller unmarshaller = null;
+                try {
+                    unmarshaller = getMarshallerPool().acquireUnmarshaller();
+                    Object obj   = unmarshaller.unmarshal(sqFile);
+                    if (obj instanceof StoredQueries) {
+                        StoredQueries candidate = (StoredQueries) obj;
+                        this.storedQueries = candidate.getStoredQuery();
+                    } else {
+                        LOGGER.log(Level.WARNING, "The storedQueries FIle does not contains proper object");
+                    }
+                } catch (JAXBException ex) {
+                    LOGGER.log(Level.WARNING, "JAXBExeception while unmarshalling the stored queries File", ex);
+                } finally {
+                    if (unmarshaller != null) {
+                        getMarshallerPool().release(unmarshaller);
+                    }
+                }
+            }
         }
     }
 
@@ -1135,13 +1165,39 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     @Override
-    public ListStoredQueriesResponse listStoredQueries(final ListStoredQueries request) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public ListStoredQueriesResponse listStoredQueries(final ListStoredQueries request) throws CstlServiceException {
+        LOGGER.log(logLevel, "ListStoredQueries request processing\n");
+        final long startTime = System.currentTimeMillis();
+        isWorking();
+        verifyBaseRequest(request, true, false);
+
+        final String currentVersion              = actingVersion.version.toString();
+        
+        final ListStoredQueriesResponse response = xmlFactory.buildListStoredQueriesResponse(currentVersion, storedQueries);
+        LOGGER.log(logLevel, "ListStoredQueries request processed in {0} ms", (System.currentTimeMillis() - startTime));
+        return response;
+        
     }
 
     @Override
-    public DescribeStoredQueriesResponse describeStoredQueries(final DescribeStoredQueries request) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public DescribeStoredQueriesResponse describeStoredQueries(final DescribeStoredQueries request) throws CstlServiceException {
+        LOGGER.log(logLevel, "DescribeStoredQueries request processing\n");
+        final long startTime = System.currentTimeMillis();
+        isWorking();
+        verifyBaseRequest(request, true, false);
+
+        final List<StoredQueryDescription> storedQueryList = new ArrayList<StoredQueryDescription>();
+        final String currentVersion              = actingVersion.version.toString();
+        for (String id : request.getStoredQueryId()) {
+            for (StoredQueryDescription description : storedQueries) {
+                if (description.getId().equals(id)) {
+                    storedQueryList.add(description);
+                }
+            }
+        }
+        final DescribeStoredQueriesResponse response = xmlFactory.buildDescribeStoredQueriesResponse(currentVersion, storedQueryList);
+        LOGGER.log(logLevel, "DescribeStoredQueries request processed in {0} ms", (System.currentTimeMillis() - startTime));
+        return response;
     }
 
     @Override

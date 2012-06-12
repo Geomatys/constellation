@@ -53,7 +53,7 @@ public abstract class LayerWorker extends AbstractWorker {
     protected final String defaultLanguage;
 
 
-    public LayerWorker(String id, File configurationDirectory, Specification specification) {
+    public LayerWorker(final String id, final File configurationDirectory, final Specification specification) {
         super(id, configurationDirectory, specification);
         isStarted = true;
 
