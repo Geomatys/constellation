@@ -72,6 +72,7 @@ import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.wfs.xml.GetPropertyValue;
 import org.geotoolkit.wfs.xml.DescribeFeatureType;
 import org.geotoolkit.wfs.xml.DescribeStoredQueries;
 import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
@@ -97,8 +98,10 @@ import org.geotoolkit.wfs.xml.FeatureTypeList;
 import org.geotoolkit.wfs.xml.UpdateElement;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v200.PropertyName;
+import org.geotoolkit.wfs.xml.ValueCollection;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.wfs.xml.*;
 
 // GeoAPI dependencies
 import org.opengis.feature.Feature;
@@ -1132,13 +1135,27 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     @Override
-    public ListStoredQueriesResponse listStoredQueries(ListStoredQueries request) {
+    public ListStoredQueriesResponse listStoredQueries(final ListStoredQueries request) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public DescribeStoredQueriesResponse describeStoredQueries(DescribeStoredQueries request) {
+    public DescribeStoredQueriesResponse describeStoredQueries(final DescribeStoredQueries request) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public ValueCollection getPropertyValue(final GetPropertyValue request) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public CreateStoredQueryResponse createStoredQuery(CreateStoredQuery model) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public DropStoredQueryResponse dropStoredQuery(DropStoredQuery model) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

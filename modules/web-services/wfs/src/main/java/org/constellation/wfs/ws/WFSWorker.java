@@ -19,7 +19,6 @@ package org.constellation.wfs.ws;
 
 
 import java.util.List;
-import java.util.Map;
 
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
@@ -27,19 +26,7 @@ import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.AbstractGML;
-import org.geotoolkit.wfs.xml.DescribeFeatureType;
-import org.geotoolkit.wfs.xml.GetCapabilities;
-import org.geotoolkit.wfs.xml.WFSCapabilities;
-import org.geotoolkit.wfs.xml.GetGmlObject;
-import org.geotoolkit.wfs.xml.LockFeatureResponse;
-import org.geotoolkit.wfs.xml.LockFeature;
-import org.geotoolkit.wfs.xml.GetFeature;
-import org.geotoolkit.wfs.xml.TransactionResponse;
-import org.geotoolkit.wfs.xml.Transaction;
-import org.geotoolkit.wfs.xml.DescribeStoredQueries;
-import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
-import org.geotoolkit.wfs.xml.ListStoredQueries;
-import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 
 // GeoAPI dependencies
@@ -90,9 +77,9 @@ public interface WFSWorker extends Worker {
      */
     AbstractGML getGMLObject(final GetGmlObject grbi) throws CstlServiceException;
 
-    ListStoredQueriesResponse listStoredQueries(ListStoredQueries request)  throws CstlServiceException;
+    ListStoredQueriesResponse listStoredQueries(final ListStoredQueries request)  throws CstlServiceException;
     
-    DescribeStoredQueriesResponse describeStoredQueries(DescribeStoredQueries request) throws CstlServiceException;
+    DescribeStoredQueriesResponse describeStoredQueries(final DescribeStoredQueries request) throws CstlServiceException;
     
     /**
      * lock request on one or more instances of a feature type for the duration of a transaction
@@ -102,7 +89,7 @@ public interface WFSWorker extends Worker {
      * @return An acknowledgment
      * @throws CstlServiceException
      */
-    LockFeatureResponse lockFeature(LockFeature gr) throws CstlServiceException;
+    LockFeatureResponse lockFeature(final LockFeature gr) throws CstlServiceException;
 
     /**
      * Allow to insert, update, or remove feature instances.
@@ -111,7 +98,7 @@ public interface WFSWorker extends Worker {
      * @return
      * @throws CstlServiceException
      */
-    TransactionResponse transaction(Transaction t) throws CstlServiceException;
+    TransactionResponse transaction(final Transaction t) throws CstlServiceException;
 
     /**
      * Return all the feature type that the service support.
@@ -119,4 +106,9 @@ public interface WFSWorker extends Worker {
      */
     List<FeatureType> getFeatureTypes();
 
+    ValueCollection getPropertyValue(final GetPropertyValue request);
+
+    public CreateStoredQueryResponse createStoredQuery(final CreateStoredQuery model);
+
+    public DropStoredQueryResponse dropStoredQuery(final DropStoredQuery model);
 }

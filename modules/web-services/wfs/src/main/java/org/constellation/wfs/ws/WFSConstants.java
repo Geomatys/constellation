@@ -66,6 +66,9 @@ public final class WFSConstants {
     public static final String STR_TRANSACTION             = "Transaction";
     public static final String STR_DESCRIBE_STORED_QUERIES = "DescribeStoredQueries";
     public static final String STR_LIST_STORED_QUERIES     = "ListStoredQueries";
+    public static final String STR_GET_PROPERTY_VALUE      = "GetPropertyValue";
+    public static final String STR_CREATE_STORED_QUERY     = "CreateStoredQuery";
+    public static final String STR_DROP_STORED_QUERY       = "DropStoredQuery";
 
     public static final String UNKNOW_TYPENAME= "The specified TypeNames does not exist:";
 

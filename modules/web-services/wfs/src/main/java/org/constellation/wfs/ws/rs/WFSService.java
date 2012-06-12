@@ -194,6 +194,31 @@ public class WFSService extends GridWebService<WFSWorker> {
                 final Object response = worker.getFeature(model);
                 return Response.ok(response, outputFormat).build();
                 
+            } else if (request instanceof GetPropertyValue) {
+                final GetPropertyValue model = (GetPropertyValue) request;
+                String requestOutputFormat = model.getOutputFormat();
+                final MediaType outputFormat;
+                if (requestOutputFormat == null || requestOutputFormat.equals("text/xml; subtype=gml/3.1.1")) {
+                    outputFormat = GML_3_1_1;                                                                       
+                } else if (requestOutputFormat.equals("text/xml; subtype=gml/3.2.1") || requestOutputFormat.equals("text/xml; subtype=gml/3.2") ||
+                           requestOutputFormat.equals("application/gml+xml; version=3.2")) {
+                    outputFormat = GML_3_2_1;
+                } else {
+                    outputFormat = MediaType.valueOf(requestOutputFormat);
+                }
+                final ValueCollection response = worker.getPropertyValue(model);
+                return Response.ok(response, outputFormat).build();
+                
+            } else if (request instanceof CreateStoredQuery) {
+                final CreateStoredQuery model = (CreateStoredQuery) request;
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.createStoredQuery(model));
+                return Response.ok(response, MediaType.TEXT_XML).build();
+                
+            } else if (request instanceof DropStoredQuery) {
+                final DropStoredQuery model = (DropStoredQuery) request;
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.dropStoredQuery(model));
+                return Response.ok(response, MediaType.TEXT_XML).build();
+                
             } else if (request instanceof ListStoredQueries) {
                 final ListStoredQueries model = (ListStoredQueries) request;
                 final WFSResponseWrapper response = new WFSResponseWrapper(worker.listStoredQueries(model));
@@ -313,6 +338,12 @@ public class WFSService extends GridWebService<WFSWorker> {
             return createNewDescribeStoredQueriesRequest();
         } else if (STR_LIST_STORED_QUERIES.equalsIgnoreCase(request)) {
             return createNewListStoredQueriesRequest();
+        } else if (STR_GET_PROPERTY_VALUE.equalsIgnoreCase(request)) {
+            return createNewGetPropertyValueRequest();
+        } else if (STR_CREATE_STORED_QUERY.equalsIgnoreCase(request)) {
+            return createNewCreateStoredQueryRequest();
+        } else if (STR_DROP_STORED_QUERY.equalsIgnoreCase(request)) {
+            return createNewDropStoredQueryRequest();
         }
         throw new CstlServiceException("The operation " + request + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
@@ -516,6 +547,140 @@ public class WFSService extends GridWebService<WFSWorker> {
         
         final Query query   = xmlFactory.buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
         final GetFeature gf = xmlFactory.buildGetFeature(version, service, handle, maxFeature, null, query, resultType, outputFormat);
+        gf.setPrefixMapping(prefixMapping);
+        return gf;
+    }
+    
+    private GetPropertyValue createNewGetPropertyValueRequest() throws CstlServiceException {
+        Integer maxFeature = null;
+        final String max = getParameter("maxfeatures", false);
+        if (max != null) {
+            try {
+                maxFeature = Integer.parseInt(max);
+            } catch (NumberFormatException ex) {
+                throw new CstlServiceException("Unable to parse the integer maxfeatures parameter" + max,
+                                                  INVALID_PARAMETER_VALUE, "MaxFeatures");
+            }
+
+        }
+        final String service = getParameter(SERVICE_PARAMETER, true);
+        final String version = getParameter(VERSION_PARAMETER, true);
+        final String handle  = getParameter(HANDLE,  false);
+        String outputFormat  = getParameter("outputFormat", false);
+
+        if (!(version.equals("1.1.0") ||version.equals("2.0.0"))) {
+            throw new CstlServiceException("unsupported service version" + version,
+                                                  INVALID_PARAMETER_VALUE, "version");
+        }
+        
+        if (outputFormat == null) {
+            outputFormat = "text/xml; subtype=gml/3.1.1";
+        }
+        final String namespace = getParameter(NAMESPACE, false);
+        final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
+
+        final String result = getParameter("resultType", false);
+        ResultTypeType resultType = null;
+        if (result != null) {
+            resultType = ResultTypeType.fromValue(result.toLowerCase());
+        }
+        
+        final String featureVersion = getParameter("featureVersion", false);
+
+        String featureId = getParameter("featureid", false);
+        boolean mandatory = true;
+        if (featureId != null) {
+            //cite test fix
+            if (featureId.endsWith(",")) {
+                featureId = featureId.substring(0, featureId.length() - 1);
+            }
+            mandatory = false;
+        }
+
+        final String typeName = getParameter("typeName", mandatory);
+        final List<QName> typeNames = extractTypeName(typeName, mapping);
+
+        final String srsName = getParameter("srsName", false);
+        
+        // TODO handle multiple properties and handle prefixed properties
+        String sortByParam = getParameter("sortBy", false);
+        final SortBy sortBy;
+        if (sortByParam != null) {
+            if (sortByParam.indexOf(':') != -1) {
+                sortByParam = sortByParam.substring(sortByParam.indexOf(':') + 1);
+            }
+            //we get the order
+            final SortOrder order;
+            if (sortByParam.indexOf(' ') != -1) {
+                final char cOrder = sortByParam.charAt(sortByParam.length() -1);
+                sortByParam = sortByParam.substring(0, sortByParam.indexOf(' '));
+                if (cOrder == 'D') {
+                    order = SortOrder.DESCENDING;
+                } else {
+                    order = SortOrder.ASCENDING;
+                }
+            } else {
+                order = SortOrder.ASCENDING;
+            }
+            sortBy =  xmlFactory.buildSortBy(version, sortByParam, order);
+        } else {
+            sortBy = null;
+        }
+        
+        final String propertyNameParam = getParameter("propertyName", false);
+        final List<String> propertyNames = new ArrayList<String>();
+        if (propertyNameParam != null) {
+            final StringTokenizer tokens = new StringTokenizer(propertyNameParam, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                propertyNames.add(token);
+            }
+        }
+        
+        if (featureId != null) {
+            final Query query = xmlFactory.buildQuery(version, null, typeNames, featureVersion, srsName, sortBy, propertyNames);
+            return xmlFactory.buildGetPropertyValue(version, service, handle, maxFeature, featureId, query, resultType, outputFormat);
+        }
+
+        final Object xmlFilter  = getComplexParameter(FILTER, false);
+
+        XMLFilter filter;
+        final Map<String, String> prefixMapping;
+        if (xmlFilter instanceof XMLFilter) {
+            filter = (XMLFilter) xmlFilter;
+            prefixMapping = filter.getPrefixMapping();
+        } else {
+            filter = null;
+            prefixMapping = new HashMap<String, String>();
+        }
+
+        final String bbox = getParameter("bbox", false);
+        if (bbox != null) {
+            final double[] coodinates = new double[4];
+
+            final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
+            int index = 0;
+            while (tokens.hasMoreTokens() && index < 4) {
+                final double value = RequestsUtilities.toDouble(tokens.nextToken());
+                coodinates[index] = value;
+                index++;
+            }
+            String crs = null;
+            if (tokens.hasMoreTokens()) {
+                crs = tokens.nextToken();
+            }
+            
+            if (coodinates != null) {
+                if (filter == null) {
+                    filter = xmlFactory.buildBBOXFilter(version, "", coodinates[0], coodinates[1], coodinates[2], coodinates[3], crs);
+                } else {
+                    LOGGER.info("unexpected case --> filter + bbox TODO");
+                }
+            }
+        }
+        
+        final Query query   = xmlFactory.buildQuery(version, filter, typeNames, featureVersion, srsName, sortBy, propertyNames);
+        final GetPropertyValue gf = xmlFactory.buildGetPropertyValue(version, service, handle, maxFeature, null, query, resultType, outputFormat);
         gf.setPrefixMapping(prefixMapping);
         return gf;
     }
@@ -744,5 +909,18 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String handle       = getParameter(HANDLE,  false);
         
         return xmlFactory.buildListStoredQueries(version, service, handle);
+    }
+
+    private CreateStoredQuery createNewCreateStoredQueryRequest() throws CstlServiceException {
+        throw new CstlServiceException("KVP encoding is not allowed for CreateStoredQuery request");
+    }
+
+    private DropStoredQuery createNewDropStoredQueryRequest() throws CstlServiceException {
+        final String service      = getParameter(SERVICE_PARAMETER, true);
+        final String version      = getParameter(VERSION_PARAMETER, true);
+        final String handle       = getParameter(HANDLE,  false);
+        final String id           = getParameter("id",  true);
+        
+        return xmlFactory.buildDropStoredQuery(version, service, handle, id);
     }
 }
