@@ -66,6 +66,19 @@ import org.geotoolkit.ogc.xml.v200.SpatialOpsType;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.AllSomeType;
+import org.geotoolkit.wfs.xml.StoredQueryDescription;
+import org.geotoolkit.wfs.xml.StoredQueries;
+import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.v200.Title;
+import org.geotoolkit.wfs.xml.v200.StoredQueryListItemType;
+import org.geotoolkit.wfs.xml.v200.ListStoredQueriesResponseType;
+import org.geotoolkit.wfs.xml.v200.ListStoredQueriesType;
+import org.geotoolkit.wfs.xml.v200.UpdateActionType;
+import org.geotoolkit.wfs.xml.v200.ValueReference;
+import org.geotoolkit.wfs.xml.v200.PropertyName;
+import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
+import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
+import org.geotoolkit.wfs.xml.v200.ParameterExpressionType;
 import org.geotoolkit.wfs.xml.v200.DeleteType;
 import org.geotoolkit.wfs.xml.v200.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v200.FeatureCollectionType;
@@ -88,7 +101,9 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.v200.*;
+import org.geotoolkit.wfs.xml.v200.Title;
 
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -131,17 +146,38 @@ public class WFS2WorkerTest {
             pool = WFSMarshallerPool.getInstance();
 
             if (!configDir.exists()) {
+                
                 configDir.mkdir();
+                
                 Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
                 Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
                 Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
                 LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
 
                 //we write the configuration file
+                Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 File configFile = new File(configDir, "layerContext.xml");
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 marshaller.marshal(lc, configFile);
+                
                 GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                
+                final List<StoredQueryDescription> descriptions = new ArrayList<StoredQueryDescription>();
+                final ParameterExpressionType param = new ParameterExpressionType("nameParam", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+                final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+                final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "NAME", true);
+                final FilterType filter = new FilterType(pis);
+                final QueryType query = new QueryType(filter, types, "2.0.0");
+                final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", query, types);
+                final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
+                descriptions.add(des1);
+                final StoredQueries storesQueries = new StoredQueries(descriptions);
+                
+                //we write the configuration file
+                marshaller = WFSMarshallerPool.getInstance().acquireMarshaller();
+                configFile = new File(configDir, "StoredQueries.xml");
+                marshaller.marshal(storesQueries, configFile);
+                WFSMarshallerPool.getInstance().release(marshaller);
+                
             }
 
         } catch (Exception ex) {
@@ -196,7 +232,7 @@ public class WFS2WorkerTest {
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(result, sw);
-        
+
         DomCompare.compare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0.xml"),
                 sw.toString());
@@ -243,7 +279,7 @@ public class WFS2WorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-
+        
         DomCompare.compare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-ftl.xml"),
                 sw.toString());
@@ -1069,6 +1105,61 @@ public class WFS2WorkerTest {
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "inputFormat");
         }
+    }
+    
+    /**
+     *
+     *
+     */
+    @Test
+    public void listStoredQueriesTest() throws Exception {
+
+        final ListStoredQueriesType request = new ListStoredQueriesType("WFS", "2.0.0", null);
+
+        final ListStoredQueriesResponse resultI = worker.listStoredQueries(request);
+        
+        assertTrue(resultI instanceof ListStoredQueriesResponseType);
+        final ListStoredQueriesResponseType result = (ListStoredQueriesResponseType) resultI;
+
+        final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
+        items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
+        final ListStoredQueriesResponseType expResult = new ListStoredQueriesResponseType(items);
+        
+        assertEquals(1, result.getStoredQuery().size());
+        assertEquals(expResult, result);
+        
+    }
+    
+    /**
+     *
+     *
+     */
+    @Test
+    public void describeStoredQueriesTest() throws Exception {
+        final DescribeStoredQueriesType request = new DescribeStoredQueriesType("WFS", "2.0.0", null, Arrays.asList("nameQuery"));
+        final DescribeStoredQueriesResponse resultI = worker.describeStoredQueries(request);
+        
+        assertTrue(resultI instanceof DescribeStoredQueriesResponseType);
+        final DescribeStoredQueriesResponseType result = (DescribeStoredQueriesResponseType) resultI;
+        
+        final List<StoredQueryDescriptionType> descriptions = new ArrayList<StoredQueryDescriptionType>();
+        final ParameterExpressionType param = new ParameterExpressionType("nameParam", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+        final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "NAME", true);
+        final FilterType filter = new FilterType(pis);
+        final QueryType query = new QueryType(filter, types, "2.0.0");
+        final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
+        final ObjectFactory factory = new ObjectFactory();
+        queryEx.getContent().add(factory.createQuery(query));
+        final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
+        descriptions.add(des1);
+        final DescribeStoredQueriesResponseType expResult = new DescribeStoredQueriesResponseType(descriptions);
+        
+        assertEquals(1, result.getStoredQueryDescription().size());
+        assertEquals(expResult.getStoredQueryDescription().get(0).getQueryExpressionText(), result.getStoredQueryDescription().get(0).getQueryExpressionText());
+        assertEquals(expResult.getStoredQueryDescription().get(0), result.getStoredQueryDescription().get(0));
+        assertEquals(expResult.getStoredQueryDescription(), result.getStoredQueryDescription());
+        assertEquals(expResult, result);
     }
 
     private static void initFeatureSource() throws Exception {
