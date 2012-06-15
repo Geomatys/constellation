@@ -67,7 +67,7 @@ public class ResultsDatabase {
      */
     private static final String DB_NAME  = "cite_resultsV2";
     private static final String PROTOCOL = "jdbc:postgresql";
-    private static final String HOST     = "db.geomatys.com";
+    private static final String HOST     = "flupke.geomatys.com";
     private static final String USER     = "cite";
     private static final String PASS     = "cite";
 

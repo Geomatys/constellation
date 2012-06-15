@@ -83,7 +83,7 @@ public class WFSCustomSQLTest extends AbstractTestRequest {
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(PostgisNGDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
                     
-                    srcconfig.parameter(HOST.getName().getCode()).setValue("db.geomatys.com");
+                    srcconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
                     srcconfig.parameter(PORT.getName().getCode()).setValue(5432);
                     srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
                     srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");

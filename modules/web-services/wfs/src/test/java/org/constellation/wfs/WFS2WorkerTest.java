@@ -130,6 +130,8 @@ public class WFS2WorkerTest {
 
     private static String EPSG_VERSION;
     
+    private static File configDir;
+    
     private static final ObjectFactory wfsFactory = new ObjectFactory();
     private static final org.geotoolkit.ogc.xml.v200.ObjectFactory ogcFactory = new org.geotoolkit.ogc.xml.v200.ObjectFactory();
 
@@ -137,7 +139,7 @@ public class WFS2WorkerTest {
     public static void setUpClass() throws Exception {
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
         initFeatureSource();
-        File configDir = new File("WFSWorker2Test");
+        configDir = new File("WFSWorker2Test");
         if (configDir.exists()) {
             FileUtilities.deleteDirectory(new File("WFSWorker2Test"));
         }
@@ -1160,6 +1162,115 @@ public class WFS2WorkerTest {
         assertEquals(expResult.getStoredQueryDescription().get(0), result.getStoredQueryDescription().get(0));
         assertEquals(expResult.getStoredQueryDescription(), result.getStoredQueryDescription());
         assertEquals(expResult, result);
+    }
+    
+    /**
+     *
+     *
+     */
+    @Test
+    public void createStoredQueriesTest() throws Exception {
+        final List<StoredQueryDescriptionType> desc = new ArrayList<StoredQueryDescriptionType>();
+        
+        final ParameterExpressionType param = new ParameterExpressionType("nameParam2", "name Parameter 2 ", "A parameter on the geometry \"the_geom\" of the feature", new QName("http://www.opengis.net/gml/3.2.1", "AbstractGeometryType", "gml"));
+        final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "Bridges"));
+        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$geom"), "the_geom", true);
+        final FilterType filter = new FilterType(pis);
+        final QueryType query = new QueryType(filter, types, "2.0.0");
+        final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
+        final ObjectFactory factory = new ObjectFactory();
+        queryEx.getContent().add(factory.createQuery(query));
+        final StoredQueryDescriptionType desc1 = new StoredQueryDescriptionType("geomQuery", "Geom query" , "filter on geom for Bridge", param, queryEx);
+        desc.add(desc1);
+        final CreateStoredQueryType request = new CreateStoredQueryType("WFS", "2.0.0", null, desc);
+        final CreateStoredQueryResponse resultI = worker.createStoredQuery(request);
+        
+        assertTrue(resultI instanceof CreateStoredQueryResponseType);
+        final CreateStoredQueryResponseType result = (CreateStoredQueryResponseType) resultI;
+        
+        final CreateStoredQueryResponseType expResult =  new CreateStoredQueryResponseType("OK");
+        assertEquals(expResult, result);
+        
+        final ListStoredQueriesType requestlsq = new ListStoredQueriesType("WFS", "2.0.0", null);
+
+        ListStoredQueriesResponse resultlsqI = worker.listStoredQueries(requestlsq);
+        
+        assertTrue(resultlsqI instanceof ListStoredQueriesResponseType);
+        ListStoredQueriesResponseType resultlsq = (ListStoredQueriesResponseType) resultlsqI;
+
+        final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
+        items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
+        items.add(new StoredQueryListItemType("geomQuery", Arrays.asList(new Title("Geom query")), Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "Bridges"))));
+        final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
+        
+        assertEquals(2, resultlsq.getStoredQuery().size());
+        assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
+        assertEquals(expResultlsq, resultlsq);
+        
+        
+        // verify the persistance by restarting the WFS
+        worker.destroy();
+        worker = new DefaultWFSWorker("default", configDir);
+        worker.setLogLevel(Level.FINER);
+        worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+        
+        resultlsqI = worker.listStoredQueries(requestlsq);
+        
+        assertTrue(resultlsqI instanceof ListStoredQueriesResponseType);
+        resultlsq = (ListStoredQueriesResponseType) resultlsqI;
+
+        
+        assertEquals(2, resultlsq.getStoredQuery().size());
+        assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
+        assertEquals(expResultlsq, resultlsq);
+        
+        
+    }
+    
+    @Test
+    public void dropStoredQueriesTest() throws Exception {
+        final DropStoredQueryType request = new DropStoredQueryType("WFS", "2.0.0", null, "geomQuery");
+        final DropStoredQueryResponse resultI = worker.dropStoredQuery(request);
+
+        assertTrue(resultI instanceof DropStoredQueryResponseType);
+        final DropStoredQueryResponseType result = (DropStoredQueryResponseType) resultI;
+        final DropStoredQueryResponseType expResult = new DropStoredQueryResponseType("OK");
+
+        assertEquals(expResult, result);
+
+
+        final ListStoredQueriesType requestlsq = new ListStoredQueriesType("WFS", "2.0.0", null);
+
+        ListStoredQueriesResponse resultlsqI = worker.listStoredQueries(requestlsq);
+
+        assertTrue(resultlsqI instanceof ListStoredQueriesResponseType);
+        ListStoredQueriesResponseType resultlsq = (ListStoredQueriesResponseType) resultlsqI;
+
+        final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
+        items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
+        final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
+
+        assertEquals(1, resultlsq.getStoredQuery().size());
+        assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
+        assertEquals(expResultlsq, resultlsq);
+
+
+        // verify the persistance by restarting the WFS
+        worker.destroy();
+        worker = new DefaultWFSWorker("default", configDir);
+        worker.setLogLevel(Level.FINER);
+        worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+
+        resultlsqI = worker.listStoredQueries(requestlsq);
+
+        assertTrue(resultlsqI instanceof ListStoredQueriesResponseType);
+        resultlsq = (ListStoredQueriesResponseType) resultlsqI;
+
+
+        assertEquals(1, resultlsq.getStoredQuery().size());
+        assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
+        assertEquals(expResultlsq, resultlsq);
+
     }
 
     private static void initFeatureSource() throws Exception {

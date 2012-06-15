@@ -106,9 +106,9 @@ public interface WFSWorker extends Worker {
      */
     List<FeatureType> getFeatureTypes();
 
-    ValueCollection getPropertyValue(final GetPropertyValue request);
+    ValueCollection getPropertyValue(final GetPropertyValue request) throws CstlServiceException;
 
-    public CreateStoredQueryResponse createStoredQuery(final CreateStoredQuery model);
+    CreateStoredQueryResponse createStoredQuery(final CreateStoredQuery request) throws CstlServiceException;
 
-    public DropStoredQueryResponse dropStoredQuery(final DropStoredQuery model);
+    DropStoredQueryResponse dropStoredQuery(final DropStoredQuery request) throws CstlServiceException;
 }

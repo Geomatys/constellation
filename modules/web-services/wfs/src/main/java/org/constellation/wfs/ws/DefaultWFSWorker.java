@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
@@ -177,6 +178,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         }
         
         // loading stored queries
+       loadStoredQueries();
+    }
+    
+    private void loadStoredQueries() {
+        // loading stored queries
         if (configurationDirectory != null) {
             final File sqFile = new File(configurationDirectory, "StoredQueries.xml");
             if (sqFile.exists()) {
@@ -198,6 +204,26 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     }
                 }
             }
+        }
+    }
+    
+    private void storedQueries() {
+        // loading stored queries
+        if (configurationDirectory != null) {
+            final File sqFile = new File(configurationDirectory, "StoredQueries.xml");
+            Marshaller marshaller = null;
+            try {
+                marshaller = getMarshallerPool().acquireMarshaller();
+                marshaller.marshal(new StoredQueries(storedQueries), sqFile);
+                
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, "JAXBExeception while marshalling the stored queries File", ex);
+            } finally {
+                if (marshaller != null) {
+                    getMarshallerPool().release(marshaller);
+                }
+            }
+            
         }
     }
 
@@ -1206,12 +1232,44 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     @Override
-    public CreateStoredQueryResponse createStoredQuery(CreateStoredQuery model) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public CreateStoredQueryResponse createStoredQuery(final CreateStoredQuery request) throws CstlServiceException {
+        LOGGER.log(logLevel, "CreateStoredQuery request processing\n");
+        final long startTime = System.currentTimeMillis();
+        isWorking();
+        verifyBaseRequest(request, true, false);
+        final String currentVersion  = actingVersion.version.toString();
+        
+        storedQueries.addAll(request.getStoredQueryDefinition());
+        storedQueries();
+        
+        final CreateStoredQueryResponse response = xmlFactory.buildCreateStoredQueryResponse(currentVersion, "OK");
+        LOGGER.log(logLevel, "CreateStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
+        return response;
     }
 
     @Override
-    public DropStoredQueryResponse dropStoredQuery(DropStoredQuery model) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public DropStoredQueryResponse dropStoredQuery(final DropStoredQuery request) throws CstlServiceException {
+        LOGGER.log(logLevel, "dropStoredQuery request processing\n");
+        final long startTime = System.currentTimeMillis();
+        isWorking();
+        verifyBaseRequest(request, true, false);
+        final String currentVersion  = actingVersion.version.toString();
+        
+        StoredQueryDescription candidate = null;
+        for (StoredQueryDescription sq : storedQueries) {
+            if (sq.getId().equals(request.getId())) {
+                candidate = sq;
+            }
+        }
+        if (candidate == null) {
+            throw new CstlServiceException("Unexisting Stored query: " + request.getId(), INVALID_PARAMETER_VALUE);
+        } else  {
+            storedQueries.remove(candidate);
+        }
+        storedQueries();
+        
+        final DropStoredQueryResponse response = xmlFactory.buildDropStoredQueryResponse(currentVersion, "OK");
+        LOGGER.log(logLevel, "dropStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
+        return response;
     }
 }

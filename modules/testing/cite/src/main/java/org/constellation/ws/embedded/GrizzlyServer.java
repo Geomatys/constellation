@@ -109,7 +109,7 @@ public final class GrizzlyServer {
                 if("coverage-sql".equals(serviceName)){
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://db.geomatys.com/coverages-test");
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
                     srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
                     final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
                     srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
