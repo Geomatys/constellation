@@ -164,7 +164,7 @@ public class WFS2WorkerTest {
                 GenericDatabaseMarshallerPool.getInstance().release(marshaller);
                 
                 final List<StoredQueryDescription> descriptions = new ArrayList<StoredQueryDescription>();
-                final ParameterExpressionType param = new ParameterExpressionType("nameParam", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+                final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
                 final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
                 final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "NAME", true);
                 final FilterType filter = new FilterType(pis);
@@ -1145,7 +1145,7 @@ public class WFS2WorkerTest {
         final DescribeStoredQueriesResponseType result = (DescribeStoredQueriesResponseType) resultI;
         
         final List<StoredQueryDescriptionType> descriptions = new ArrayList<StoredQueryDescriptionType>();
-        final ParameterExpressionType param = new ParameterExpressionType("nameParam", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+        final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
         final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
         final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "NAME", true);
         final FilterType filter = new FilterType(pis);
@@ -1172,7 +1172,7 @@ public class WFS2WorkerTest {
     public void createStoredQueriesTest() throws Exception {
         final List<StoredQueryDescriptionType> desc = new ArrayList<StoredQueryDescriptionType>();
         
-        final ParameterExpressionType param = new ParameterExpressionType("nameParam2", "name Parameter 2 ", "A parameter on the geometry \"the_geom\" of the feature", new QName("http://www.opengis.net/gml/3.2.1", "AbstractGeometryType", "gml"));
+        final ParameterExpressionType param = new ParameterExpressionType("name2", "name Parameter 2 ", "A parameter on the geometry \"the_geom\" of the feature", new QName("http://www.opengis.net/gml/3.2.1", "AbstractGeometryType", "gml"));
         final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "Bridges"));
         final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$geom"), "the_geom", true);
         final FilterType filter = new FilterType(pis);
@@ -1271,6 +1271,38 @@ public class WFS2WorkerTest {
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
+    }
+    
+    /**
+     * test the feature marshall
+     *
+     */
+    @Test
+    public void getFeatureOMStoredQueriesTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName samplingPoint
+         */
+        GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        ObjectFactory factory = new ObjectFactory();
+        final List<ParameterType> params = new ArrayList<ParameterType>();
+        params.add(new ParameterType("name", "//10972X0137-PONT"));
+        StoredQueryType query = new StoredQueryType("nameQuery", null, params);
+        request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
+
+        Object result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+        
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPoint-1v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+        DomCompare.compare(expectedResult, writer.toString());
     }
 
     private static void initFeatureSource() throws Exception {
