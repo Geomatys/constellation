@@ -17,6 +17,8 @@
 
 package org.constellation.process;
 
+import org.constellation.process.refreshindex.RefreshIndexDescriptor;
+import org.constellation.process.restart.RestartDescriptor;
 import java.util.Collections;
 import org.geotoolkit.metadata.iso.DefaultIdentifier;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;

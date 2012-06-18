@@ -14,21 +14,23 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process;
+package org.constellation.process.refreshindex;
 
 
+import org.constellation.process.restart.RestartDescriptor;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.process.AbstractCstlProcess;
 
 
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.io.X364.*;
-import static org.constellation.process.RefreshIndexDescriptor.*;
+import static org.constellation.process.refreshindex.RefreshIndexDescriptor.*;
 
 /**
  * @author Guilhem Legal (Geomatys)

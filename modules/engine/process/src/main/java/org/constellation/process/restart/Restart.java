@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process;
+package org.constellation.process.restart;
 
 
 import java.io.IOException;
@@ -23,11 +23,12 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.process.AbstractCstlProcess;
 
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.io.X364.*;
-import static org.constellation.process.RestartDescriptor.*;
+import static org.constellation.process.restart.RestartDescriptor.*;
 
 /**
  * @author Guilhem Legal (Geomatys)

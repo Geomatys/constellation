@@ -14,9 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process;
+package org.constellation.process.restart;
 
 import org.constellation.admin.service.ConstellationServerFactory;
+import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.Process;
@@ -28,26 +29,28 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
+
 /**
- *
- * @author Guilhem Legal (Geomatys)
+ * restart a constellation WebService instance.
+ * 
+ * @author Guilhem Legal (Geomatys) 
  */
-public class RefreshIndexDescriptor extends AbstractProcessDescriptor {
- 
-    public static final String NAME = "refreshIndex";
+public final class RestartDescriptor extends AbstractProcessDescriptor {
+
+    public static final String NAME = "restart";
     
     // Constellation
-    public static final GeneralParameterDescriptor CSTL_CSW_INSTANCE = new DefaultParameterDescriptor("CSWInstance",
-            "Name of the CSW instance.",String.class,"default", true);
-    public static final GeneralParameterDescriptor CSTL_ASYNCHRONOUS = new DefaultParameterDescriptor("Asynchronous",
-            "Falg for asynchrone refresh index mode.", Boolean.class, Boolean.TRUE, true);
+    public static final GeneralParameterDescriptor CSTL_WS_INSTANCE = new DefaultParameterDescriptor("WSInstance",
+            "Name of the WebService instance.",String.class,"default", true);
+    public static final GeneralParameterDescriptor CSTL_WS_TYPE = new DefaultParameterDescriptor("WSType",
+            "Type of the WebService.",String.class,null, true);
     public static final ParameterDescriptorGroup CSTL_DESCRIPTOR_GROUP =
             new DefaultParameterDescriptorGroup("Constellation",
                                                  ConstellationServerFactory.URL,
                                                  ConstellationServerFactory.USER,
                                                  ConstellationServerFactory.PASSWORD,
-                                                 CSTL_CSW_INSTANCE,
-                                                 CSTL_ASYNCHRONOUS);
+                                                 CSTL_WS_INSTANCE,
+                                                 CSTL_WS_TYPE);
     
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters", CSTL_DESCRIPTOR_GROUP);
@@ -56,11 +59,11 @@ public class RefreshIndexDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
 
     /** Instance */
-    public static final ProcessDescriptor INSTANCE = new RefreshIndexDescriptor();
+    public static final ProcessDescriptor INSTANCE = new RestartDescriptor();
 
-    private RefreshIndexDescriptor() {
+    private RestartDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION,
-                new SimpleInternationalString("Refresh CSW lucene Index"), 
+                new SimpleInternationalString("Restart constellation web service instance"), 
                 INPUT_DESC, OUTPUT_DESC);
     }
 
@@ -69,6 +72,6 @@ public class RefreshIndexDescriptor extends AbstractProcessDescriptor {
      */
     @Override
     public Process createProcess(ParameterValueGroup pvg) {
-        return new RefreshIndex(pvg);
+        return new Restart(pvg);
     }
 }
