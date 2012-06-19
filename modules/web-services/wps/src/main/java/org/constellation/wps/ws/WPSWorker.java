@@ -856,6 +856,7 @@ public class WPSWorker extends AbstractWorker {
                 try {
                     dataValue = WPSConvertersUtils.convertFromReference(requestedRef, expectedClass);
                 } catch (NonconvertibleObjectException ex) {
+                    LOGGER.log(Level.WARNING, "Error during conversion of reference input {0}.",inputIdentifier);
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
                 
@@ -914,6 +915,7 @@ public class WPSWorker extends AbstractWorker {
                     try {
                         dataValue = WPSConvertersUtils.convertFromComplex(complex, expectedClass);
                     } catch (NonconvertibleObjectException ex) {
+                        LOGGER.log(Level.WARNING, "Error during conversion of complex input {0}.",inputIdentifier);
                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                     }
                 }
@@ -942,6 +944,7 @@ public class WPSWorker extends AbstractWorker {
                     try {
                         dataValue = WPSConvertersUtils.convertFromString(data, expectedClass);
                     } catch (NonconvertibleObjectException ex) {
+                        LOGGER.log(Level.WARNING, "Error during conversion of literal input {0}.",inputIdentifier);
                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                     }
                 }
@@ -1036,7 +1039,7 @@ public class WPSWorker extends AbstractWorker {
         final Class outClass = outputDescriptor.getValueClass(); // output class
         
         if (requestedOutput.isAsReference()) {
-            final OutputReferenceType ref = createReferenceOutput(outClass, requestedOutput, outputValue, serviceURL, folderPath);
+            final OutputReferenceType ref = createReferenceOutput(outputIdentifier, outClass, requestedOutput, outputValue, serviceURL, folderPath);
             
             outData.setReference(ref);
         } else {
@@ -1061,6 +1064,7 @@ public class WPSWorker extends AbstractWorker {
                     data.setComplexData(complex);
                     
                 } catch (NonconvertibleObjectException ex) {
+                    LOGGER.log(Level.WARNING, "Error during conversion of complex output {0}.", outputIdentifier);
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
 
@@ -1093,7 +1097,7 @@ public class WPSWorker extends AbstractWorker {
      * @return
      * @throws CstlServiceException 
      */
-    private static OutputReferenceType createReferenceOutput(final Class clazz, final DocumentOutputDefinitionType requestedOutput, 
+    private static OutputReferenceType createReferenceOutput(final String outputIdentifier, final Class clazz, final DocumentOutputDefinitionType requestedOutput, 
             final Object outputValue, final String serviceURL, final String folderPath) throws CstlServiceException {
         
         try {
@@ -1108,6 +1112,7 @@ public class WPSWorker extends AbstractWorker {
             
            return reference;
         } catch (NonconvertibleObjectException ex) {
+            LOGGER.log(Level.WARNING, "Error during conversion of reference output {0}.", outputIdentifier);
             throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
         }
     }
