@@ -166,7 +166,7 @@ public class WFS2WorkerTest {
                 final List<StoredQueryDescription> descriptions = new ArrayList<StoredQueryDescription>();
                 final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
                 final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-                final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "NAME", true);
+                final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
                 final FilterType filter = new FilterType(pis);
                 final QueryType query = new QueryType(filter, types, "2.0.0");
                 final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", query, types);
@@ -1147,7 +1147,7 @@ public class WFS2WorkerTest {
         final List<StoredQueryDescriptionType> descriptions = new ArrayList<StoredQueryDescriptionType>();
         final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
         final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "NAME", true);
+        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
         final FilterType filter = new FilterType(pis);
         final QueryType query = new QueryType(filter, types, "2.0.0");
         final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
@@ -1286,7 +1286,7 @@ public class WFS2WorkerTest {
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         ObjectFactory factory = new ObjectFactory();
         final List<ParameterType> params = new ArrayList<ParameterType>();
-        params.add(new ParameterType("name", "//10972X0137-PONT"));
+        params.add(new ParameterType("name", "10972X0137-PONT"));
         StoredQueryType query = new StoredQueryType("nameQuery", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
 
@@ -1300,8 +1300,9 @@ public class WFS2WorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPoint-1v2.xml"));
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+        
         DomCompare.compare(expectedResult, writer.toString());
     }
 

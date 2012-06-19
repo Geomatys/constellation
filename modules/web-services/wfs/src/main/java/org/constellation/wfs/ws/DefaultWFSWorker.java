@@ -72,6 +72,8 @@ import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGML;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
+import org.geotoolkit.ogc.xml.XMLFilter;
+import org.geotoolkit.ogc.xml.XMLLiteral;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
@@ -113,10 +115,14 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.filter.BinaryComparisonOperator;
+import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.filter.expression.Literal;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.opengis.geometry.Envelope;
 import org.opengis.util.FactoryException;
 import org.opengis.util.CodeList;
@@ -483,11 +489,41 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final Map<String, String> schemaLocations  = new HashMap<String, String>();
         final Map<Name,Layer> layers               = getLayers();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
-        if (request.getQuery() == null || request.getQuery().isEmpty()) {
+        if ((request.getQuery() == null || request.getQuery().isEmpty()) && (request.getStoredQuery() == null || request.getStoredQuery().isEmpty())) {
             throw new CstlServiceException("You must specify a query!", MISSING_PARAMETER_VALUE);
         }
-
-        for (final Query query : request.getQuery()) {
+        final List<? extends Query> queries = request.getQuery();
+        
+        for (StoredQuery storedQuery : request.getStoredQuery()) {
+            StoredQueryDescription description = null;
+            final List<? extends Parameter> parameters = storedQuery.getParameter();
+            for (StoredQueryDescription desc : storedQueries) {
+                if (desc.getId().equals(storedQuery.getId())) {
+                    description = desc;
+                    break;
+                }
+            }
+            if (description == null) {
+                throw new CstlServiceException("Unknow stored query: " + storedQuery.getId(), INVALID_PARAMETER_VALUE, "storedQuery");
+            } else {
+                for (QueryExpressionText queryEx : description.getQueryExpressionText()) {
+                    for (Object content : queryEx.getContent()) {
+                        if (content instanceof JAXBElement) {
+                            content = ((JAXBElement)content).getValue();
+                        }
+                        if (content instanceof Query) {
+                            final Query query = (Query)content;
+                            applyParameterOnQuery(query.getFilter(), parameters);
+                            ((List)queries).add(query);
+                        } else {
+                            throw new CstlServiceException("unexpected query object: " + content, INVALID_PARAMETER_VALUE, "storedQuery");
+                        }
+                    }
+                }
+            }
+        }
+        
+        for (final Query query : queries) {
             final org.geotoolkit.ogc.xml.SortBy jaxbSortBy = query.getSortBy();
             final Filter jaxbFilter       = query.getFilter();
             final String srs              = query.getSrsName();
@@ -1112,6 +1148,56 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         } catch (FactoryException ex) {
             throw new CstlServiceException(ex);
         }
+    }
+    
+    private static void applyParameterOnQuery(final Filter filter, final List<? extends Parameter> parameters) throws CstlServiceException {
+        if (filter instanceof XMLFilter) {
+            final Object filterObject = ((XMLFilter)filter).getFilterObject();
+
+            if (filterObject instanceof BinarySpatialOperator) {
+                final BinarySpatialOperator binary = (BinarySpatialOperator) filterObject;
+                if (binary.getExpression2() != null && binary.getExpression2() instanceof XMLLiteral) {
+                    final XMLLiteral lit = (XMLLiteral) binary.getExpression2();
+                    if (lit.getValue() instanceof String) {
+                        String s = (String)lit.getValue();
+                        for (Parameter param : parameters) {
+                            if (s.indexOf('$' + param.getName()) != -1) {
+                                s = s.replace('$' + param.getName(), (String)param.getContent().get(0));
+                            }
+                        }
+                        lit.getContent().clear();
+                        lit.setContent(s);
+                    }
+                    
+                }
+
+            } else if (filterObject instanceof BinaryComparisonOperator) {
+                final BinaryComparisonOperator binary = (BinaryComparisonOperator) filterObject;
+                if (binary.getExpression2() != null && binary.getExpression2() instanceof XMLLiteral) {
+                    final XMLLiteral lit = (XMLLiteral) binary.getExpression2();
+                    if (lit.getValue() instanceof String) {
+                        String s = (String)lit.getValue();
+                        for (Parameter param : parameters) {
+                            if (s.indexOf('$' + param.getName()) != -1) {
+                                s = s.replace('$' + param.getName(), (String)param.getContent().get(0));
+                            }
+                        }
+                        lit.getContent().clear();
+                        lit.setContent(s);
+                    }
+                }
+
+            } else if (filterObject instanceof BinaryLogicOperator) {
+                final BinaryLogicOperator binary = (BinaryLogicOperator) filterObject;
+                for (Filter child : binary.getChildren()) {
+                    applyParameterOnQuery(child, parameters);
+                }
+            } else {
+                throw new CstlServiceException("Unimplemented filter implementation:" + filterObject.getClass().getName(), NO_APPLICABLE_CODE);
+            }
+        } else {
+            throw new CstlServiceException("Expected filter implementation", NO_APPLICABLE_CODE);
+        }        
     }
 
     /**
