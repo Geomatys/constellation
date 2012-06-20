@@ -21,27 +21,23 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import org.consellation.process.AbstractProcessTest;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.feature.FeatureUtilities;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.AfterClass;
-import static org.junit.Assert.assertNotNull;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.util.NoSuchIdentifierException;
 /**
  *
  * @author Quentin Boileau (Geomatys).
  */
-public abstract class ProviderTest {
+public abstract class ProviderTest extends AbstractProcessTest {
     
     private static File configDirectory;
     
@@ -56,22 +52,9 @@ public abstract class ProviderTest {
         }
     }
     
-    private static final String factory = "constellation";
-    private String process;
-
-
-    protected ProviderTest(final String process){
-        this.process = process;
-        
-        
+    protected ProviderTest(final String processName) {
+        super(processName);
     }
-
-    @Test
-    public void findProcessTest() throws NoSuchIdentifierException{
-        ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(factory, process);
-        assertNotNull(desc);
-    }
-    
     
     @BeforeClass
     public static void initFolder() throws MalformedURLException {

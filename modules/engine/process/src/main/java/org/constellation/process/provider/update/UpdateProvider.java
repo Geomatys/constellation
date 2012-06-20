@@ -14,57 +14,51 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.provider.remove;
+package org.constellation.process.provider.update;
 
 import java.util.Collection;
 import org.constellation.process.AbstractCstlProcess;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.process.provider.remove.RemoveProviderDescriptor.*;
+import static org.constellation.process.provider.update.UpdateProviderDescriptor.*;
 import org.constellation.provider.*;
 import static org.geotoolkit.parameter.Parameters.*;
 
 /**
- * Remove a provider from constellation. Throw an ProcessException if Provider is not found.
- * 
+ * Upadte a provider from constellation.
  * @author Quentin Boileau (Geomatys).
  */
-public final class RemoveProvider extends AbstractCstlProcess{
+public class UpdateProvider extends AbstractCstlProcess{
 
-    public RemoveProvider( final ParameterValueGroup parameter) {
+    public UpdateProvider( final ParameterValueGroup parameter) {
         super(INSTANCE, parameter);
     }
 
-    
-    @Override
+       @Override
     protected void execute() throws ProcessException {
         final String providerID = value(PROVIDER_ID, inputParameters);
-        
-        boolean found = false;
+        final ParameterValueGroup source = (ParameterValueGroup) value(SOURCE, inputParameters);
+
+        boolean updated = false;
         
         Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
         for (final Provider p : providers) {
-            if (p.getId().equals(providerID)) {
-                LayerProviderProxy.getInstance().removeProvider((LayerProvider) p);
-                found = true;
-                break;
+            if (providerID.equals(p.getId())) {
+                p.updateSource(source);
             }
         }
-       
-        if (!found) {
+        if (!updated) {
             providers = StyleProviderProxy.getInstance().getProviders();
             for (final Provider p : providers) {
-                if (p.getId().equals(providerID)) {
-                    StyleProviderProxy.getInstance().removeProvider((StyleProvider) p);
-                    found = true;
-                    break;
+                if (providerID.equals(p.getId())) {
+                    p.updateSource(source);
                 }
             }
         }
-        
-        if (!found) {
-            throw new ProcessException("Provider to remove not found.", this, null);
+
+        if (!updated) {
+            throw new ProcessException("Service name not found.", this, null);
         }
     }
 

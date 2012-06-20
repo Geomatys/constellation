@@ -56,7 +56,8 @@ public class ConstellationProcessFactory extends AbstractProcessingRegistry {
                 RestartDescriptor.INSTANCE, 
                 RefreshIndexDescriptor.INSTANCE, 
                 CreateProviderDescriptor.INSTANCE,
-                RemoveProviderDescriptor.INSTANCE
+                RemoveProviderDescriptor.INSTANCE,
+                UpdateProviderDescriptor.INSTANCE
                 );
     }
     

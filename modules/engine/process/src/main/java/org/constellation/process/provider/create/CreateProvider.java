@@ -18,7 +18,6 @@ package org.constellation.process.provider.create;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.constellation.process.AbstractCstlProcess;
 import org.geotoolkit.process.ProcessException;
@@ -32,13 +31,11 @@ import static org.geotoolkit.parameter.Parameters.*;
  * Create a new provider in constellation.
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateProvider extends AbstractCstlProcess{
+public final class CreateProvider extends AbstractCstlProcess{
 
     public CreateProvider( final ParameterValueGroup parameter) {
         super(INSTANCE, parameter);
     }
-
-    
     
     @Override
     protected void execute() throws ProcessException {
@@ -61,21 +58,28 @@ public class CreateProvider extends AbstractCstlProcess{
 
             //check no other provider with this id exist            
             final String id = (String) source.parameter("id").getValue();
-
-            for (final Provider p : LayerProviderProxy.getInstance().getProviders()) {
-                if (id.equals(p.getId())) {
-                    throw new ProcessException("Provider ID is already used : " + id, this, null);
+            
+            //LayerProvider case
+            if (service instanceof LayerProviderService) {
+                
+                final Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
+                for (final LayerProvider lp : layerProviders) {
+                    if (id.equals(lp.getId())) {
+                        throw new ProcessException("Provider ID is already used : " + id, this, null);
+                    }
                 }
-            }
-            for (final Provider p : StyleProviderProxy.getInstance().getProviders()) {
-                if (id.equals(p.getId())) {
-                    throw new ProcessException("Provider ID is already used : " + id, this, null);
-                }
+                LayerProviderProxy.getInstance().createProvider((LayerProviderService) service, source);
             }
            
-            if (service instanceof LayerProviderService) {
-                LayerProviderProxy.getInstance().createProvider((LayerProviderService) service, source);
-            } else if (service instanceof StyleProviderService) {
+            //StyleProvider case
+            if (service instanceof StyleProviderService) {
+                
+                final Collection<StyleProvider> styleProviders = StyleProviderProxy.getInstance().getProviders();
+                for (final Provider sp : styleProviders) {
+                    if (id.equals(sp.getId())) {
+                        throw new ProcessException("Provider ID is already used : " + id, this, null);
+                    }
+                }
                 StyleProviderProxy.getInstance().createProvider((StyleProviderService) service, source);
             }
             
