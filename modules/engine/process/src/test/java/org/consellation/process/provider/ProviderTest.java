@@ -40,7 +40,7 @@ import org.opengis.parameter.ParameterValueGroup;
 public abstract class ProviderTest extends AbstractProcessTest {
     
     private static File configDirectory;
-    
+    protected static URL EMPTY_CSV;
     // dataStore service
     protected static ProviderService DATASTORE_SERVICE;
     static {
@@ -71,11 +71,13 @@ public abstract class ProviderTest extends AbstractProcessTest {
         File datastore = new File(providerDirectory, "data-store.xml");
         ConfigDirectory.setConfigDirectory(configDirectory);    
         
+        File csv = new File(configDirectory, "file.csv");
+        EMPTY_CSV = csv.toURI().toURL();
         
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider1", true, new URL("http://dataurl.csv"), "csv1"));
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider2", true, new URL("http://dataurl.csv"), "csv2"));
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider3", true, new URL("http://dataurl.csv"), "csv3"));
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider4", true, new URL("http://dataurl.csv"), "csv4"));
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider1", true, EMPTY_CSV));
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider2", true, EMPTY_CSV));
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider3", true, EMPTY_CSV));
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider4", true, EMPTY_CSV));
         
     }
     
@@ -92,7 +94,7 @@ public abstract class ProviderTest extends AbstractProcessTest {
      * @throws MalformedURLException 
      */
     protected static ParameterValueGroup buildCSVProvider(final ProviderService sercice, final String providerID, final boolean loadAll, 
-            final URL url, final String identifier) throws MalformedURLException {
+            final URL url) throws MalformedURLException {
         
         ParameterDescriptorGroup desc = sercice.getServiceDescriptor();
        
@@ -105,7 +107,7 @@ public abstract class ProviderTest extends AbstractProcessTest {
             
             ComplexAttribute choice = (ComplexAttribute) source.getProperty("choice");
             ComplexAttribute csv = (ComplexAttribute) FeatureUtilities.defaultProperty(choice.getType().getDescriptor("CSVParameters"));
-            csv.getProperty("identifier").setValue(identifier);
+            csv.getProperty("identifier").setValue("csv");
             csv.getProperty("url").setValue(url);
             
             choice.getProperties().add(csv);

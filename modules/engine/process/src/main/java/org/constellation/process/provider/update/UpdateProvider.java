@@ -46,6 +46,8 @@ public class UpdateProvider extends AbstractCstlProcess{
         for (final Provider p : providers) {
             if (providerID.equals(p.getId())) {
                 p.updateSource(source);
+                updated = true;
+                break;
             }
         }
         if (!updated) {
@@ -53,12 +55,14 @@ public class UpdateProvider extends AbstractCstlProcess{
             for (final Provider p : providers) {
                 if (providerID.equals(p.getId())) {
                     p.updateSource(source);
+                    updated = true;
+                    break;
                 }
             }
         }
 
         if (!updated) {
-            throw new ProcessException("Service name not found.", this, null);
+            throw new ProcessException("Provider ID not found.", this, null);
         }
     }
 

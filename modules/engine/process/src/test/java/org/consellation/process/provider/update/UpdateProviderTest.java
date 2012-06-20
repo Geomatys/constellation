@@ -14,14 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.consellation.process.provider.create;
+package org.consellation.process.provider.update;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.consellation.process.provider.ProviderTest;
 
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.provider.create.CreateProviderDescriptor;
+import org.constellation.process.provider.update.UpdateProviderDescriptor;
 import org.constellation.provider.*;
 
 import org.geotoolkit.process.Process;
@@ -39,34 +39,38 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateProviderTest extends ProviderTest {
+public class UpdateProviderTest extends ProviderTest {
 
-    public CreateProviderTest () {
-        super(CreateProviderDescriptor.NAME);
+    public UpdateProviderTest () {
+        super(UpdateProviderDescriptor.NAME);
     }
     
     @Test
-    public void testCreateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+    public void testUpdateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
         
-        final int nbProvider = LayerProviderProxy.getInstance().getProviders().size();
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
+        
+        LayerProviderProxy.getInstance().createProvider((LayerProviderService) DATASTORE_SERVICE, buildCSVProvider(DATASTORE_SERVICE, "providerToUpdate", true, EMPTY_CSV));
+        
+        
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderDescriptor.NAME);
 
-        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "newProvider", false, EMPTY_CSV);
+        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "providerToUpdate", false, EMPTY_CSV);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("service_Name").setValue(DATASTORE_SERVICE.getName());
-        in.parameter("parameters").setValue(parameters);
+        in.parameter("provider_id").setValue("providerToUpdate");
+        in.parameter("source").setValue(parameters);
 
         final Process proc = desc.createProcess(in);
         proc.call();
 
         Provider provider = null;
         for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
-            if ("newProvider".equals(p.getId())){
+            if ("providerToUpdate".equals(p.getId())){
                 provider = p;
             }
-        }
-        assertTrue(nbProvider+1 == LayerProviderProxy.getInstance().getProviders().size());
+        } 
+            
         assertNotNull(provider);
+        assertTrue(parameters.equals(provider.getSource()));
             
     }
 }

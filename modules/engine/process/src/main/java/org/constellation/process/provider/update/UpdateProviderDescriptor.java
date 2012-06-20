@@ -39,14 +39,6 @@ public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Update a provider from constellation.");
     
     /*
-     * Service Name
-     */
-    private static final String SERVICE_NAME_NAME = "service_Name";
-    private static final String SERVICE_NAME_REMARKS = "The name of the service.";
-    public static final ParameterDescriptor<String> SERVICE_NAME = 
-            new DefaultParameterDescriptor(SERVICE_NAME_NAME, SERVICE_NAME_REMARKS, String.class, null, true);
-    
-    /*
      * Provider to update identifier
      */
     private static final String PROVIDER_ID_NAME = "provider_id";
@@ -65,7 +57,7 @@ public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{PROVIDER_ID});
+            new GeneralParameterDescriptor[]{PROVIDER_ID, SOURCE});
 
     
     /**Output parameters */
