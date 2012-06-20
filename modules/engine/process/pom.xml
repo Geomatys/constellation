@@ -57,11 +57,37 @@
        <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-provider</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-serverstore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-datastore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-coveragestore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-style-sld</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-
+    
   </dependencies>
 
 </project>

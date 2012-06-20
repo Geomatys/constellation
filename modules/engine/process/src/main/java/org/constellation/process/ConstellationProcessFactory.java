@@ -20,6 +20,9 @@ package org.constellation.process;
 import org.constellation.process.refreshindex.RefreshIndexDescriptor;
 import org.constellation.process.restart.RestartDescriptor;
 import java.util.Collections;
+import org.constellation.process.provider.create.CreateProviderDescriptor;
+import org.constellation.process.provider.remove.RemoveProviderDescriptor;
+import org.constellation.process.provider.update.UpdateProviderDescriptor;
 import org.geotoolkit.metadata.iso.DefaultIdentifier;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.identification.DefaultServiceIdentification;
@@ -49,7 +52,11 @@ public class ConstellationProcessFactory extends AbstractProcessingRegistry {
      * Default constructor 
      */
     public ConstellationProcessFactory() {
-        super(RestartDescriptor.INSTANCE, RefreshIndexDescriptor.INSTANCE);
+        super(
+                RestartDescriptor.INSTANCE, 
+                RefreshIndexDescriptor.INSTANCE, 
+                CreateProviderDescriptor.INSTANCE
+                );
     }
     
     @Override
