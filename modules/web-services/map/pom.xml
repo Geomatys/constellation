@@ -73,6 +73,11 @@
       <artifactId>cstl-engine-scheduler</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.engine</groupId>
+      <artifactId>cstl-engine-process-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Geotoolkit pending -->
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
@@ -85,6 +90,15 @@
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-clients-core</artifactId>
+    </dependency>
+    
+    <!-- Tests dependencies -->
+    <dependency>
+       <groupId>org.constellation.engine</groupId>
+       <artifactId>cstl-engine-process-core</artifactId>
+       <version>${project.version}</version>
+       <type>test-jar</type>
+       <scope>test</scope>
     </dependency>
   </dependencies>
 
