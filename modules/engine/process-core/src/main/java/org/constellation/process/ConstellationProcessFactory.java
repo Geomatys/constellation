@@ -17,16 +17,16 @@
 
 package org.constellation.process;
 
-import org.constellation.process.refreshindex.RefreshIndexDescriptor;
-import org.constellation.process.restart.RestartDescriptor;
+import java.util.ArrayList;
 import java.util.Collections;
-import org.constellation.process.provider.create.CreateProviderDescriptor;
-import org.constellation.process.provider.remove.RemoveProviderDescriptor;
-import org.constellation.process.provider.update.UpdateProviderDescriptor;
+import java.util.Iterator;
+import java.util.List;
+import javax.imageio.spi.ServiceRegistry;
 import org.geotoolkit.metadata.iso.DefaultIdentifier;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.identification.DefaultServiceIdentification;
 import org.geotoolkit.process.AbstractProcessingRegistry;
+import org.geotoolkit.process.ProcessDescriptor;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
 
@@ -52,18 +52,25 @@ public class ConstellationProcessFactory extends AbstractProcessingRegistry {
      * Default constructor 
      */
     public ConstellationProcessFactory() {
-        super(
-                RestartDescriptor.INSTANCE, 
-                RefreshIndexDescriptor.INSTANCE, 
-                CreateProviderDescriptor.INSTANCE,
-                RemoveProviderDescriptor.INSTANCE,
-                UpdateProviderDescriptor.INSTANCE
-                );
+        super( findDescriptors() );
     }
     
     @Override
     public Identification getIdentification() {
         return IDENTIFICATION;
     }
-    
+        
+    /**
+     * Find all processDescriptor defined in META-INF/service files.
+     * @return 
+     */
+    private static ProcessDescriptor[] findDescriptors() {
+        final Iterator<ProcessDescriptor> ite = ServiceRegistry.lookupProviders(ProcessDescriptor.class);
+        final List<ProcessDescriptor> descriptors = new ArrayList<ProcessDescriptor>();
+        while (ite.hasNext()) {
+            descriptors.add(ite.next());
+        }
+        
+        return descriptors.toArray(new ProcessDescriptor[descriptors.size()]);
+    }
 }

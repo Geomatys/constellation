@@ -63,15 +63,16 @@ public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
     
-    public static final ProcessDescriptor INSTANCE = new UpdateProviderDescriptor();
-    
-    private UpdateProviderDescriptor() {
+    /**
+     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     */
+    public UpdateProviderDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
     
     @Override
     public Process createProcess(ParameterValueGroup input) {
-        return new UpdateProvider(input);
+        return new UpdateProvider(this, input);
     }
     
 }

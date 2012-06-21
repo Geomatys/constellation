@@ -24,6 +24,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.constellation.process.provider.remove.RemoveProviderDescriptor.*;
 import org.constellation.provider.*;
 import static org.geotoolkit.parameter.Parameters.*;
+import org.geotoolkit.process.ProcessDescriptor;
 
 /**
  * Remove a provider from constellation. Throw an ProcessException if Provider is not found.
@@ -32,8 +33,8 @@ import static org.geotoolkit.parameter.Parameters.*;
  */
 public final class RemoveProvider extends AbstractCstlProcess{
 
-    public RemoveProvider( final ParameterValueGroup parameter) {
-        super(INSTANCE, parameter);
+    public RemoveProvider( final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+        super(desc, parameter);
     }
 
     

@@ -56,10 +56,10 @@ public class RefreshIndexDescriptor extends AbstractProcessDescriptor {
     /** Output parameters : nothing */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
 
-    /** Instance */
-    public static final ProcessDescriptor INSTANCE = new RefreshIndexDescriptor();
-
-    private RefreshIndexDescriptor() {
+    /**
+     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     */
+    public RefreshIndexDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION,
                 new SimpleInternationalString("Refresh CSW lucene Index"), 
                 INPUT_DESC, OUTPUT_DESC);
@@ -70,6 +70,6 @@ public class RefreshIndexDescriptor extends AbstractProcessDescriptor {
      */
     @Override
     public Process createProcess(ParameterValueGroup pvg) {
-        return new RefreshIndex(pvg);
+        return new RefreshIndex(this, pvg);
     }
 }

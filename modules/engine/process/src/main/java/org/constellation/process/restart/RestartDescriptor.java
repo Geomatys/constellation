@@ -58,10 +58,11 @@ public final class RestartDescriptor extends AbstractProcessDescriptor {
     /** Output parameters : nothing */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
 
-    /** Instance */
-    public static final ProcessDescriptor INSTANCE = new RestartDescriptor();
-
-    private RestartDescriptor() {
+    
+    /**
+     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     */
+    public RestartDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION,
                 new SimpleInternationalString("Restart constellation web service instance"), 
                 INPUT_DESC, OUTPUT_DESC);
@@ -72,6 +73,6 @@ public final class RestartDescriptor extends AbstractProcessDescriptor {
      */
     @Override
     public Process createProcess(ParameterValueGroup pvg) {
-        return new Restart(pvg);
+        return new Restart(this, pvg);
     }
 }

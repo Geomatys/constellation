@@ -24,6 +24,7 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.constellation.process.provider.update.UpdateProviderDescriptor.*;
 import org.constellation.provider.*;
 import static org.geotoolkit.parameter.Parameters.*;
+import org.geotoolkit.process.ProcessDescriptor;
 
 /**
  * Upadte a provider from constellation.
@@ -31,8 +32,8 @@ import static org.geotoolkit.parameter.Parameters.*;
  */
 public class UpdateProvider extends AbstractCstlProcess{
 
-    public UpdateProvider( final ParameterValueGroup parameter) {
-        super(INSTANCE, parameter);
+    public UpdateProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+        super(desc, parameter);
     }
 
        @Override

@@ -53,15 +53,16 @@ public class RemoveProviderDescriptor extends AbstractProcessDescriptor {
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
     
-    public static final ProcessDescriptor INSTANCE = new RemoveProviderDescriptor();
-    
-    private RemoveProviderDescriptor() {
+    /**
+     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     */
+    public RemoveProviderDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
     
     @Override
     public Process createProcess(ParameterValueGroup input) {
-        return new RemoveProvider(input);
+        return new RemoveProvider(this, input);
     }
     
 }

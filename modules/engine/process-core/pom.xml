@@ -18,11 +18,11 @@
 
   <!--  Module description.  -->
   <groupId>org.constellation.engine</groupId>
-  <artifactId>cstl-engine-process</artifactId>
+  <artifactId>cstl-engine-process-core</artifactId>
   <packaging>jar</packaging>
-  <name>Constellation Process Engine</name>
+  <name>Constellation Process core Engine</name>
   <description>
-    Provide the various constellation tasks.
+    Provide core base used by all process in Consellation.
   </description>
 
 
@@ -59,39 +59,8 @@
   -->
   <dependencies>
     <dependency>
-       <groupId>org.constellation.engine</groupId>
-       <artifactId>cstl-engine-process-core</artifactId>
-       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-       <groupId>org.constellation.gui</groupId>
-       <artifactId>cstl-client</artifactId>
-       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-provider</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-serverstore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-datastore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-coveragestore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-style-sld</artifactId>
-      <version>${project.version}</version>
+       <groupId>org.geotoolkit.pending</groupId>
+       <artifactId>geotk-processing-core</artifactId>
     </dependency>
     
     <dependency>

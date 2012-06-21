@@ -31,6 +31,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.io.X364.*;
 import static org.constellation.process.refreshindex.RefreshIndexDescriptor.*;
+import org.geotoolkit.process.ProcessDescriptor;
 
 /**
  * @author Guilhem Legal (Geomatys)
@@ -47,8 +48,8 @@ public class RefreshIndex extends AbstractCstlProcess {
     /**
      * Default Constructor
      */
-    public RefreshIndex(ParameterValueGroup parameter) {
-        super(RestartDescriptor.INSTANCE,parameter);
+    public RefreshIndex(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+        super(desc, parameter);
         
         CSTL_CONFIG   = inputParameters.groups(CSTL_DESCRIPTOR_GROUP.getName().getCode()).get(0);
         CSW_INSTANCE  = CSTL_CONFIG.parameter(CSTL_CSW_INSTANCE.getName().getCode()).stringValue();

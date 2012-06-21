@@ -26,15 +26,16 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.constellation.process.provider.create.CreateProviderDescriptor.*;
 import org.constellation.provider.*;
 import static org.geotoolkit.parameter.Parameters.*;
+import org.geotoolkit.process.ProcessDescriptor;
 
 /**
  * Create a new provider in constellation.
  * @author Quentin Boileau (Geomatys).
  */
-public final class CreateProvider extends AbstractCstlProcess{
+public final class CreateProvider extends AbstractCstlProcess {
 
-    public CreateProvider( final ParameterValueGroup parameter) {
-        super(INSTANCE, parameter);
+    public CreateProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+        super(desc, parameter);
     }
     
     @Override
