@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.consellation.process;
+package org.constellation.process;
 
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
@@ -28,7 +28,7 @@ import org.opengis.util.NoSuchIdentifierException;
  */
 public abstract class AbstractProcessTest {
     
-    private static final String factory = "constellation";
+    private static final String factory = ConstellationProcessFactory.NAME;
     private String process;
 
 

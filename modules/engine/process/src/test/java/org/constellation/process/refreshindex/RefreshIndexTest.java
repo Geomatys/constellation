@@ -14,9 +14,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.consellation.process.refreshindex;
+package org.constellation.process.refreshindex;
 
-import org.consellation.process.AbstractProcessTest;
+import org.constellation.process.AbstractProcessTest;
 import org.constellation.process.refreshindex.RefreshIndexDescriptor;
 
 /**

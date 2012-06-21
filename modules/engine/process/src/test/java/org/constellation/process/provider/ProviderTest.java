@@ -14,14 +14,14 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.consellation.process.provider;
+package org.constellation.process.provider;
 
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
-import org.consellation.process.AbstractProcessTest;
+import org.constellation.process.AbstractProcessTest;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;

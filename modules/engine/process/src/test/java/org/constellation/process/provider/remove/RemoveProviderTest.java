@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.consellation.process.provider.remove;
+package org.constellation.process.provider.remove;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.consellation.process.provider.ProviderTest;
+import org.constellation.process.provider.ProviderTest;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.remove.RemoveProviderDescriptor;
 import org.constellation.provider.*;
