@@ -1,1 +1,2 @@
 org.constellation.process.map.create.CreateMapServiceDesciptor
+org.constellation.process.map.configure.ConfigureMapServiceDescriptor
