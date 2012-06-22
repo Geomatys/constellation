@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.provider.update;
+package org.constellation.process.wms.start;
 
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
@@ -32,46 +32,36 @@ import org.opengis.util.InternationalString;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
-
-    public static final String NAME = "updateProvider";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Update a provider from constellation.");
+public final class StartWMSServiceDescriptor extends AbstractProcessDescriptor {
     
-    /*
-     * Provider to update identifier
-     */
-    private static final String PROVIDER_ID_NAME = "provider_id";
-    private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to remove.";
-    public static final ParameterDescriptor<String> PROVIDER_ID = 
-            new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
+    public static final String NAME = "startWMSService";
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Start a new instance for the specified WMS identifier.");
     
-    /*
-     * Source use to update.
-     */
-    private static final String SOURCE_NAME = "source";
-    private static final String SOURCE_REMARKS = "ParameterValueGroup use to update provider source.";
-    public static final ParameterDescriptor<ParameterValueGroup> SOURCE =
-            new DefaultParameterDescriptor(SOURCE_NAME, SOURCE_REMARKS, ParameterValueGroup.class, null, true);
+  
+    public static final String IDENTIFIER_NAME = "identifier";
+    private static final String IDENTIFIER_REMARKS = "Identifier of the new service instance.";
+    public static final ParameterDescriptor<String> IDENTIFIER =
+            new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, null, true);
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{PROVIDER_ID, SOURCE});
+            new GeneralParameterDescriptor[]{IDENTIFIER});
 
-    
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    
     
     /**
      * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
      */
-    public UpdateProviderDescriptor() {
+    public StartWMSServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
     
     @Override
     public Process createProcess(ParameterValueGroup input) {
-        return new UpdateProvider(this, input);
+        return new StartWMSService(this, input);
     }
     
 }

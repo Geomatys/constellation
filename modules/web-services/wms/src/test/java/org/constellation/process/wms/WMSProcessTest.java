@@ -23,6 +23,7 @@ import javax.xml.bind.Marshaller;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.util.FileUtilities;
@@ -57,9 +58,10 @@ public abstract class WMSProcessTest extends AbstractProcessTest {
         deleteInstance("instance1");
         deleteInstance("instance2");
         deleteInstance("instance3");
+        WSEngine.destroyInstances("WMS");
     }
 
-    private static void createInstance(String identifier) {
+    protected static void createInstance(String identifier) {
         final File wms = new File(configDirectory, "WMS");
         final File instance = new File(wms, identifier);
         instance.mkdir();
@@ -80,9 +82,18 @@ public abstract class WMSProcessTest extends AbstractProcessTest {
         }
     }
     
-    private static void deleteInstance(String identifier) {
+    protected static void deleteInstance(String identifier) {
         final File wms = new File(configDirectory, "WMS");
         final File instance = new File(wms, identifier);
         FileUtilities.deleteDirectory(instance);
+    }
+    
+    protected static void startInstance(String identifier) {
+        final File wms = new File(configDirectory, "WMS");
+        final File instance = new File(wms, identifier);
+        final DefaultWMSWorker worker = new DefaultWMSWorker(identifier, instance);
+        if (worker != null) {
+            WSEngine.addServiceInstance("WMS", identifier, worker);
+        }
     }
 }

@@ -21,13 +21,13 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.process.AbstractCstlProcess;
-import static org.constellation.process.wms.start.StartWMSServiceDesciptor.IDENTIFIER;
 import org.constellation.ws.WSEngine;
-import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
+import static org.geotoolkit.parameter.Parameters.value;
+import static org.constellation.process.wms.start.StartWMSServiceDescriptor.*;
 /**
  * 
  * @author Quentin Boileau (Geomatys).

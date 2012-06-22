@@ -14,13 +14,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.wms.start;
+package org.constellation.process.wms.stop;
 
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
-import org.geotoolkit.process.Process;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -32,10 +31,10 @@ import org.opengis.util.InternationalString;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public final class StartWMSServiceDesciptor extends AbstractProcessDescriptor {
+public class StopWMSServiceDescriptor extends AbstractProcessDescriptor {
     
-    public static final String NAME = "startWMSService";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new provider in constellation.");
+    public static final String NAME = "stopWMSService";
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Stop the instance for the specified WMS identifier.");
     
   
     public static final String IDENTIFIER_NAME = "identifier";
@@ -55,15 +54,12 @@ public final class StartWMSServiceDesciptor extends AbstractProcessDescriptor {
     /**
      * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
      */
-    public StartWMSServiceDesciptor() {
+    public StopWMSServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
     
     @Override
-    public Process createProcess(ParameterValueGroup input) {
-        return new StartWMSService(this, input);
+    public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
+        return new StopWMSService(this, input);
     }
-    
-    
-    
 }

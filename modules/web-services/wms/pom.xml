@@ -54,6 +54,17 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
+    <developer>
+      <id>qboileau</id>
+      <name>Quentin Boileau</name>
+      <email>quentin.boileau@geomatys.com</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
 
 
