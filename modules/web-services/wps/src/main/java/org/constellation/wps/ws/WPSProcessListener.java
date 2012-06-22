@@ -117,7 +117,7 @@ public class WPSProcessListener implements ProcessListener{
 
     @Override
     public void failed(final ProcessEvent event) {
-        LOGGER.log(Level.INFO, "Process {0} has failed.", WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor()));
+        LOGGER.log(Level.WARNING, "Process "+WPSUtils.buildProcessIdentifier(event.getSource().getDescriptor())+" has failed.", event.getException());
         final StatusType status = new StatusType();
         status.setCreationTime(getCurrentXMLGregorianCalendar());
         final ProcessFailedType processFT = new ProcessFailedType();
