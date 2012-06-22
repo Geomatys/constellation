@@ -43,8 +43,8 @@ public class CreateMapServiceTest extends ServiceTest {
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("service_Name").setValue("wms");
-        in.parameter("identifier").setValue("instance1");
+        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("wms");
+        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance1");
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -60,8 +60,8 @@ public class CreateMapServiceTest extends ServiceTest {
 
         //WMTS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("service_Name").setValue("wmTs");
-        in.parameter("identifier").setValue("instance2");
+        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("wmTs");
+        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance2");
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -79,8 +79,8 @@ public class CreateMapServiceTest extends ServiceTest {
         instance3Dir.mkdir();
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("service_Name").setValue("WMS");
-        in.parameter("identifier").setValue("instance3");
+        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("WMS");
+        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance3");
 
         final org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -94,8 +94,8 @@ public class CreateMapServiceTest extends ServiceTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("service_Name").setValue("foo");
-        in.parameter("identifier").setValue("instance2");
+        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("foo");
+        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance2");
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -112,8 +112,8 @@ public class CreateMapServiceTest extends ServiceTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("service_Name").setValue("SOS");
-        in.parameter("identifier").setValue("instance1");
+        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("SOS");
+        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance1");
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -130,8 +130,8 @@ public class CreateMapServiceTest extends ServiceTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("service_Name").setValue("WMS");
-        in.parameter("identifier").setValue("");
+        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("WMS");
+        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("");
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -148,8 +148,8 @@ public class CreateMapServiceTest extends ServiceTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("service_Name").setValue("WMS");
-        in.parameter("identifier").setValue("instance3");
+        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("WMS");
+        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance3");
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);

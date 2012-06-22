@@ -39,14 +39,14 @@ public class CreateMapServiceDesciptor extends AbstractProcessDescriptor {
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new map service (WMS, WMTS, WFS) in constellation.");
     
   
-    private static final String SERVICE_NAME_NAME = "service_Name";
+    public static final String SERVICE_NAME_NAME = "service_Name";
     private static final String SERVICE_NAME_REMARKS = "The name of the service.";
     public static final ParameterDescriptor<String> SERVICE_NAME = 
             new DefaultParameterDescriptor(SERVICE_NAME_NAME, SERVICE_NAME_REMARKS, String.class, null, true);
 
     
     
-    private static final String IDENTIFIER_NAME = "identifier";
+    public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the new service instance.";
     public static final ParameterDescriptor<String> IDENTIFIER =
             new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, null, true);
