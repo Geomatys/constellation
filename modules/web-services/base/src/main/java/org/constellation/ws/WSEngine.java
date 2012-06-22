@@ -117,6 +117,7 @@ public final class WSEngine {
         Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap == null) {
             workersMap = new HashMap<String, Worker>();
+            WORKERS_MAP.put(specification, workersMap);
         }
         final Worker oldWorker = workersMap.put(serviceID, instance);
         if (oldWorker != null) {
