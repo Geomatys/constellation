@@ -30,7 +30,10 @@ import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.process.map.create.CreateMapServiceDesciptor.*;
 
 /**
- *
+ * Process that create a new instance configuration from the service name (WMS, WMTS or WFS) for a specified instance name.
+ * If the instance directory is created but no configuration file exist, the process will create one.
+ * Execution will throw ProcessExeption if the service name is different from WMS, WMTS of WFS (no mather of case) or if 
+ * a configuration file already exist fo this instance name.
  * @author Quentin Boileau (Geomatys).
  */
 public class CreateMapService extends AbstractProcess {
@@ -39,13 +42,20 @@ public class CreateMapService extends AbstractProcess {
         super(desc, parameter);
     }
 
+    /**
+     * Create a new instance and configuration for a specified service and instance name.
+     * @throws ProcessException in cases : 
+     * - if the service name is different from WMS, WMTS of WFS (no mather of case)
+     * - if a configuration file already exist fo this instance name.
+     * - if error during file creation or marshalling phase.
+     */
     @Override
     protected void execute() throws ProcessException {
 
         String serviceName = value(SERVICE_NAME, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
 
-        if (serviceName != null && !serviceName.isEmpty()) {
+        if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) || "WFS".equalsIgnoreCase(serviceName))) {
             serviceName = serviceName.toUpperCase();
         } else {
             throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\").", this, null);
@@ -65,26 +75,35 @@ public class CreateMapService extends AbstractProcess {
                 
                 //create service instance directory
                 final File instanceDirectory = new File(serviceDir, identifier);
-                if (instanceDirectory.mkdir()) {
+                
+                File configurationFile = null;
+                if (instanceDirectory.exists()) {
+                     configurationFile = new File(instanceDirectory, "layerContext.xml");
+                     if (configurationFile.exists()) {
+                         throw new ProcessException("Instance identifier already exist.", this, null);
+                     }
                     
-                    //create layerContext.xml file for the default configuration.
-                    final LayerContext configuration = new LayerContext();
-                    final File configurationFile = new File(instanceDirectory, "layerContext.xml");
-                    Marshaller marshaller = null;
-                    try {
-                        marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                        marshaller.marshal(configuration, configurationFile);
-
-                    } catch (JAXBException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } finally {
-                        if (marshaller != null) {
-                            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                        }
-                    }
+                } else if (instanceDirectory.mkdir()) {
+                    configurationFile = new File(instanceDirectory, "layerContext.xml");
                 } else {
                     throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
                 }
+                
+                //create layerContext.xml file for the default configuration.
+                final LayerContext configuration = new LayerContext();
+                Marshaller marshaller = null;
+                try {
+                    marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                    marshaller.marshal(configuration, configurationFile);
+
+                } catch (JAXBException ex) {
+                    throw new ProcessException(null, this, ex);
+                } finally {
+                    if (marshaller != null) {
+                        GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                    }
+                }
+                
             } else {
                 throw new ProcessException("Service directory can' be found for service name : "+serviceName, this, null);
             } 

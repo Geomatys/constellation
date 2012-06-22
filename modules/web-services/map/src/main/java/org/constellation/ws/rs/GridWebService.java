@@ -21,16 +21,24 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import javax.xml.bind.Marshaller;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import org.constellation.ServiceDef;
 import org.constellation.configuration.LayerContext;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.map.create.CreateMapServiceDesciptor;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessFinder;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * A Super class for WMS, WMTS, WFS and WCS web-service.
@@ -62,6 +70,8 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
      */
     @Override
     protected void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException {
+        
+        //@TODO use CreateMapService process instead.
         if (configuration instanceof LayerContext) {
             final File configurationFile = new File(instanceDirectory, "layerContext.xml");
             Marshaller marshaller = null;

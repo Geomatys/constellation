@@ -48,10 +48,12 @@ public abstract class ServiceTest extends AbstractProcessTest {
         final File wms = new File(configDirectory, "WMS");
         final File wmts = new File(configDirectory, "WMTS");
         final File wfs = new File(configDirectory, "WFS");
+        final File sos = new File(configDirectory, "SOS");
         
         wms.mkdir();
         wmts.mkdir();
         wfs.mkdir();
+        sos.mkdir();
         
         ConfigDirectory.setConfigDirectory(configDirectory);
     }
