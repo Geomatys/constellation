@@ -253,7 +253,10 @@ public class WMSRequestsTest extends AbstractTestRequest {
      * returned an error report for the user.
      */
     @Test
-    public void testWMSWrongRequest() throws JAXBException, IOException {
+    public void testWMSWrongRequest() throws Exception {
+        
+        waitForStart();
+        
         // Creates an intentional wrong url, regarding the WMS version 1.1.1 standard
         final URL wrongUrl;
         try {
