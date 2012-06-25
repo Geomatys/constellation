@@ -50,6 +50,7 @@ public abstract class WMSProcessTest extends AbstractProcessTest {
         createInstance("instance1");
         createInstance("instance2");
         createInstance("instance3");
+        createInstance("instance4");
 
     }
 
@@ -58,6 +59,7 @@ public abstract class WMSProcessTest extends AbstractProcessTest {
         deleteInstance("instance1");
         deleteInstance("instance2");
         deleteInstance("instance3");
+        deleteInstance("instance4");
         WSEngine.destroyInstances("WMS");
     }
 

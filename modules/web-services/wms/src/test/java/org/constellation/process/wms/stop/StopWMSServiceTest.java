@@ -63,7 +63,7 @@ public class StopWMSServiceTest extends WMSProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopWMSServiceDescriptor.NAME);
         
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StopWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance4");
+        in.parameter(StopWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance5");
         
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);
