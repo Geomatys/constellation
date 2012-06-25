@@ -105,10 +105,10 @@ public class CreateMapService extends AbstractProcess {
                 }
                 
             } else {
-                throw new ProcessException("Service directory can' be found for service name : "+serviceName, this, null);
+                throw new ProcessException("Service directory can't be found for service name : "+serviceName, this, null);
             } 
         } else {
-            throw new ProcessException("Configuration directory can' be found.", this, null);
+            throw new ProcessException("Configuration directory can't be found.", this, null);
         }
     }
 }

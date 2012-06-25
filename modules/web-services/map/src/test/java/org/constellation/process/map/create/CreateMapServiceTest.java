@@ -17,7 +17,8 @@
 package org.constellation.process.map.create;
 
 import java.io.File;
-import org.constellation.process.map.ServiceTest;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.map.MapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -30,7 +31,7 @@ import static org.junit.Assert.*;
  *
  * @author Quentin Boileau (Geometys).
  */
-public class CreateMapServiceTest extends ServiceTest {
+public class CreateMapServiceTest extends MapServiceTest {
 
     public CreateMapServiceTest() {
         super(CreateMapServiceDesciptor.NAME);
@@ -39,7 +40,7 @@ public class CreateMapServiceTest extends ServiceTest {
     @Test
     public void testCreateWMS() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
@@ -49,14 +50,14 @@ public class CreateMapServiceTest extends ServiceTest {
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
 
-        assertTrue(checkInsanceCreated("WMS", "instance1"));
-
+        assertTrue(checkInsanceExist("WMS", "instance1"));
+        deleteInstance("WMS", "instance1");
     }
 
     @Test
     public void testCreateWMTS() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
 
         //WMTS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
@@ -66,13 +67,14 @@ public class CreateMapServiceTest extends ServiceTest {
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
 
-        assertTrue(checkInsanceCreated("WMTS", "instance2"));
+        assertTrue(checkInsanceExist("WMTS", "instance2"));
+        deleteInstance("WMTS", "instance2");
     }
 
     @Test
     public void testCreateNoConfiguration() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
 
         // instance directory created but no configuration file
         final File instance3Dir = new File(configDirectory.getAbsolutePath() + "/WMS/instance3");
@@ -85,13 +87,14 @@ public class CreateMapServiceTest extends ServiceTest {
         final org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
 
-        assertTrue(checkInsanceCreated("WMS", "instance3"));
+        assertTrue(checkInsanceExist("WMS", "instance3"));
+        deleteInstance("WMS", "instance3");
     }
 
     @Test
     public void testCreateUnknowService() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("foo");
@@ -109,7 +112,7 @@ public class CreateMapServiceTest extends ServiceTest {
     @Test
     public void testCreateOtherService() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("SOS");
@@ -127,7 +130,7 @@ public class CreateMapServiceTest extends ServiceTest {
     @Test
     public void testCreateEmptyIdentifier() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("WMS");
@@ -145,7 +148,7 @@ public class CreateMapServiceTest extends ServiceTest {
     @Test
     public void testCreateAleardyExist() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("WMS");
@@ -157,17 +160,6 @@ public class CreateMapServiceTest extends ServiceTest {
             fail();
         } catch (ProcessException ex) {
             //do nothing
-        }
-    }
-
-    private boolean checkInsanceCreated(final String serviceName, final String identifier) {
-
-        final File instanceDir = new File(configDirectory.getAbsolutePath() + "/" + serviceName, identifier);
-        if (instanceDir.exists() && instanceDir.isDirectory()) {
-            final File configFile = new File(instanceDir, "layerContext.xml");
-            return configFile.exists();
-        } else {
-            return false;
         }
     }
 }

@@ -16,20 +16,13 @@
  */
 package org.constellation.process.map.configure;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.process.map.ServiceTest;
-import org.constellation.process.map.create.CreateMapServiceDesciptor;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.map.MapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -41,7 +34,7 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class ConfigureMapServiceTest  extends ServiceTest {
+public class ConfigureMapServiceTest  extends MapServiceTest {
     
     public ConfigureMapServiceTest () {
         super(ConfigureMapServiceDescriptor.NAME);
@@ -50,9 +43,9 @@ public class ConfigureMapServiceTest  extends ServiceTest {
     @Test
     public void testUpdateWMS() throws ProcessException, NoSuchIdentifierException {
 
-        createDefaultInstance("instance4");
+        createDefaultInstance("WMS","instance4");
         
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", ConfigureMapServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, ConfigureMapServiceDescriptor.NAME);
 
         final List<Source> sources = new ArrayList<Source>();
         sources.add(new Source("source1", Boolean.TRUE, null, null));
@@ -70,13 +63,14 @@ public class ConfigureMapServiceTest  extends ServiceTest {
 
         assertEquals(conf, getConfig("instance4"));
 
+        deleteInstance("WMS", "instance4");
     }
     
     @Test
     public void testUpdateNoInstanceWMS() throws ProcessException, NoSuchIdentifierException {
 
         
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("constellation", ConfigureMapServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, ConfigureMapServiceDescriptor.NAME);
 
         final List<Source> sources = new ArrayList<Source>();
         sources.add(new Source("source1", Boolean.TRUE, null, null));
@@ -97,46 +91,5 @@ public class ConfigureMapServiceTest  extends ServiceTest {
             //do nohing
         }
 
-    }
-    
-    private void createDefaultInstance(final String identifier) {
-        final File wms = new File(configDirectory, "WMS");
-        final File instance = new File(wms, identifier);
-        instance.mkdir();
-        
-        final File configFile = new File(instance, "layerContext.xml");
-        final LayerContext configuration = new LayerContext();
-        Marshaller marshaller = null;
-        try {
-            marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-
-        } catch (JAXBException ex) {
-            //
-        } finally {
-            if (marshaller != null) {
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-            }
-        }
-    }
-    
-    private  LayerContext getConfig(final String identifier) {
-        final File wms = new File(configDirectory, "WMS");
-        final File instance = new File(wms, identifier);
-        final File configFile = new File(instance, "layerContext.xml");
-        
-        Unmarshaller unmarshaller = null;
-        LayerContext  context = null;
-        try {
-            unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-            context = (LayerContext) unmarshaller.unmarshal(configFile);
-        } catch (JAXBException ex) {
-            //
-        } finally {
-            if (unmarshaller != null) {
-                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-            }
-        }
-        return context;
     }
 }
