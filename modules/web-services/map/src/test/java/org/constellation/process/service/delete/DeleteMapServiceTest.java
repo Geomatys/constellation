@@ -14,10 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.map.delete;
+package org.constellation.process.service.delete;
 
+import org.constellation.process.service.delete.DeleteMapServiceDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.map.MapServiceTest;
+import org.constellation.process.service.MapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;

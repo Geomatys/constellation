@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.map;
+package org.constellation.process.service;
 
 import java.io.File;
 import java.net.MalformedURLException;

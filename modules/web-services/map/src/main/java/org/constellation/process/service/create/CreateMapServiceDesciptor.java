@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.map.create;
+package org.constellation.process.service.create;
 
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;

@@ -28,7 +28,7 @@ import javax.xml.bind.JAXBException;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.map.create.CreateMapServiceDesciptor;
+import org.constellation.process.service.create.CreateMapServiceDesciptor;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;

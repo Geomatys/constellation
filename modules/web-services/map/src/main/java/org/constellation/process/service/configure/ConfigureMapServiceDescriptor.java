@@ -14,11 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.map.delete;
+package org.constellation.process.service.configure;
 
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.map.create.CreateMapService;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
@@ -31,47 +30,49 @@ import org.opengis.util.InternationalString;
 
 /**
  *
- * @author Quentin Boileau (Geomatys)
+ * @author Quentin Boileau (Geomatys).
  */
-public class DeleteMapServiceDescriptor extends AbstractProcessDescriptor {
+public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
+
     
-    
-     public static final String NAME = "deleteMapService";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Delete a map service (WMS, WMTS, WFS) in constellation.");
+    public static final String NAME = "configureMapService";
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Update configuration of an existing map service (WMS, WMTS, WFS) in constellation.");
     
   
     public static final String SERVICE_NAME_NAME = "service_Name";
-    private static final String SERVICE_NAME_REMARKS = "The name of the service. (WMS, WMTS, WFS)";
+    private static final String SERVICE_NAME_REMARKS = "The name of the service (WMS, WMTS, WFS).";
     public static final ParameterDescriptor<String> SERVICE_NAME = 
             new DefaultParameterDescriptor(SERVICE_NAME_NAME, SERVICE_NAME_REMARKS, String.class, null, true);
 
     
     public static final String IDENTIFIER_NAME = "identifier";
-    private static final String IDENTIFIER_REMARKS = "Identifier of the service instance o delete.";
+    private static final String IDENTIFIER_REMARKS = "Identifier of the service instance.";
     public static final ParameterDescriptor<String> IDENTIFIER =
-            new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, null, true);
+            new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, "default", true);
 
+    
+    public static final String CONFIG_NAME = "configuration";
+    private static final String CONFIG_REMARKS = "LayerContext object use to update instance configuration. If not specified the instance will be configured from default LayerContext.";
+    public static final ParameterDescriptor<LayerContext> CONFIGURATION =
+            new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, LayerContext.class, new LayerContext(), true);
+    
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_NAME, IDENTIFIER});
+            new GeneralParameterDescriptor[]{SERVICE_NAME, IDENTIFIER, CONFIGURATION});
 
-    
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
     
     /**
      * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
      */
-    public DeleteMapServiceDescriptor() {
+    public ConfigureMapServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
     
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
-        return new DeleteMapService(this, input);
+        return new ConfigureMapService(this, input);
     }
-    
-    
 }

@@ -14,15 +14,16 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.map.configure;
+package org.constellation.process.service.configure;
 
+import org.constellation.process.service.configure.ConfigureMapServiceDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.map.MapServiceTest;
+import org.constellation.process.service.MapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
