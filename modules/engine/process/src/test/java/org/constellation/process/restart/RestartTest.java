@@ -17,7 +17,6 @@
 package org.constellation.process.restart;
 
 import org.constellation.process.AbstractProcessTest;
-import org.constellation.process.restart.RestartDescriptor;
 
 /**
  *
@@ -28,5 +27,5 @@ public class RestartTest extends AbstractProcessTest {
    public RestartTest() {
        super(RestartDescriptor.NAME);
    }
-  
+
 }

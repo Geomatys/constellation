@@ -26,7 +26,7 @@ import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.process.wms.stop.StopWMSServiceDescriptor.*;
 
 /**
- * Stop service specified instance. If instance already stoped or didn't exist, a ProcessException will be throwed.
+ * Stop service specified instance. If instance already stopped or didn't exist, a ProcessException will be throws.
  * 
  * @author Quentin Boileau (Geomatys).
  */
@@ -43,7 +43,7 @@ public class StopWMSService extends AbstractCstlProcess {
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
         }
-        
+
         final String serviceName = ServiceDef.WMS_1_3_0.specification.name();
         if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
             WSEngine.shutdownInstance(serviceName, identifier);
@@ -51,5 +51,5 @@ public class StopWMSService extends AbstractCstlProcess {
             throw new ProcessException("Instance "+identifier+" doesn't exist.", this, null);
         }
     }
-    
+
 }

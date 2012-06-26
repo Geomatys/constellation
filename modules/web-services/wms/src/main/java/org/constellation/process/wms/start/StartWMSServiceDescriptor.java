@@ -33,11 +33,11 @@ import org.opengis.util.InternationalString;
  * @author Quentin Boileau (Geomatys).
  */
 public final class StartWMSServiceDescriptor extends AbstractProcessDescriptor {
-    
+
     public static final String NAME = "startWMSService";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Start a new instance for the specified WMS identifier.");
-    
-  
+
+
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the new service instance.";
     public static final ParameterDescriptor<String> IDENTIFIER =
@@ -50,18 +50,18 @@ public final class StartWMSServiceDescriptor extends AbstractProcessDescriptor {
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
-    
+
+
     /**
-     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public StartWMSServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
     @Override
     public Process createProcess(ParameterValueGroup input) {
         return new StartWMSService(this, input);
     }
-    
+
 }

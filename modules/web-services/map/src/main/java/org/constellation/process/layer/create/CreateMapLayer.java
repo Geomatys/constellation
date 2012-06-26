@@ -28,19 +28,19 @@ import org.constellation.provider.LayerProviderProxy;
 
 /**
  * Add a layer to an existing provider.
- * 
+ *
  * @author Quentin Boileau (Geomatys).
  */
 public class CreateMapLayer extends AbstractCstlProcess {
-    
+
     public CreateMapLayer(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
     /**
      * Add a layer to an existing provider.
-     * @throws ProcessException if : 
-     * - process idenifier is null/empty or not found in LayerProvider list.
+     * @throws ProcessException if :
+     * - Provider identifier is null/empty or not found in LayerProvider list.
      * - layer is null.
      */
     @Override
@@ -50,12 +50,12 @@ public class CreateMapLayer extends AbstractCstlProcess {
         final ParameterValueGroup layer = value(LAYER, inputParameters);
 
         if (providerId == null || "".equals(providerId.trim())) {
-            throw new ProcessException("Provier identifier can't be null or empty.", this, null);
+            throw new ProcessException("Provider identifier can't be null or empty.", this, null);
         }
-        
+
         if (layer != null) {
             final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-            
+
             boolean found = false;
             for (final LayerProvider p : providers) {
                 if (p.getId().equals(providerId)) {
@@ -65,11 +65,11 @@ public class CreateMapLayer extends AbstractCstlProcess {
                     break;
                 }
             }
-            
+
             if (!found) {
                 throw new ProcessException("Provider with id "+providerId+" not found.", this, null);
             }
-            
+
         } else {
             throw new ProcessException("Layer can't be null.", this, null);
         }

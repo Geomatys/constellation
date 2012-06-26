@@ -32,17 +32,17 @@ import org.opengis.util.InternationalString;
  * @author Quentin Boileau (Geomatys).
  */
 public class RestartWMSServiceDescriptor  extends AbstractProcessDescriptor {
-    
+
     public static final String NAME = "restartWMSService";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Restart an instance for the specified WMS identifier. "
             + "Or all WMS instances if identifier is not specified.");
-    
-  
+
+
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the service instance to restart. If empty, all WMS service instance will be restarted.";
     public static final ParameterDescriptor<String> IDENTIFIER =
             new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, null, false);
-    
+
     public static final String CLOSE_NAME = "close";
     private static final String CLOSE_REMARKS = "Close instance(s) before restart.";
     public static final ParameterDescriptor<Boolean> CLOSE =
@@ -55,15 +55,15 @@ public class RestartWMSServiceDescriptor  extends AbstractProcessDescriptor {
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
-    
+
+
     /**
-     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public RestartWMSServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
         return new RestartWMSService(this, input);

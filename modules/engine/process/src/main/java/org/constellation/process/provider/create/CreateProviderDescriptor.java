@@ -21,7 +21,6 @@ import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
 import org.geotoolkit.process.Process;
-import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -37,15 +36,15 @@ public class CreateProviderDescriptor extends AbstractProcessDescriptor {
 
     public static final String NAME = "createProvider";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new provider in constellation.");
-    
-  
+
+
     private static final String SERVICE_NAME_NAME = "service_Name";
     private static final String SERVICE_NAME_REMARKS = "The name of the service.";
-    public static final ParameterDescriptor<String> SERVICE_NAME = 
+    public static final ParameterDescriptor<String> SERVICE_NAME =
             new DefaultParameterDescriptor(SERVICE_NAME_NAME, SERVICE_NAME_REMARKS, String.class, null, true);
 
-    
-    
+
+
     private static final String SOURCE_NAME = "parameters";
     private static final String SOURCE_REMARKS = "ParameterValueGroup use to create provider.";
     public static final ParameterDescriptor<ParameterValueGroup> SOURCE =
@@ -56,20 +55,20 @@ public class CreateProviderDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptorGroup("InputParameters",
             new GeneralParameterDescriptor[]{SERVICE_NAME, SOURCE});
 
-    
+
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
+
     /**
-     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public CreateProviderDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
     @Override
     public Process createProcess(ParameterValueGroup input) {
         return new CreateProvider(this, input);
     }
-    
+
 }

@@ -35,48 +35,48 @@ import org.opengis.util.InternationalString;
  */
 public class CreateMapServiceDesciptor extends AbstractProcessDescriptor {
 
-    
+
     public static final String NAME = "createMapService";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new map service (WMS, WMTS, WFS) in constellation.");
-    
-  
+
+
     public static final String SERVICE_NAME_NAME = "service_Name";
     private static final String SERVICE_NAME_REMARKS = "The name of the service.";
-    public static final ParameterDescriptor<String> SERVICE_NAME = 
+    public static final ParameterDescriptor<String> SERVICE_NAME =
             new DefaultParameterDescriptor(SERVICE_NAME_NAME, SERVICE_NAME_REMARKS, String.class, null, true);
 
-    
+
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the new service instance.";
     public static final ParameterDescriptor<String> IDENTIFIER =
             new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, "default", true);
 
-    
+
     public static final String CONFIG_NAME = "configuration";
     private static final String CONFIG_REMARKS = "LayerContext object use to configure the instance. If not specified the instance will be configured from default LayerContext.";
     public static final ParameterDescriptor<LayerContext> CONFIGURATION =
             new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, LayerContext.class, new LayerContext(), true);
-    
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
             new GeneralParameterDescriptor[]{SERVICE_NAME, IDENTIFIER, CONFIGURATION});
 
-    
+
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
-    
+
+
     /**
-     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public CreateMapServiceDesciptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
     @Override
     public Process createProcess(ParameterValueGroup input) {
         return new CreateMapService(this, input);
     }
-    
+
 }

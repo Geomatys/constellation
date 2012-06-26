@@ -122,8 +122,8 @@ public abstract class AbstractMapLayerTest extends AbstractProcessTest {
     }
 
     /**
-     * Regiser a provider.
-     * @param providerSource 
+     * Register a provider.
+     * @param providerSource
      */
     protected static void addProvider(ParameterValueGroup providerSource) {
         LayerProviderProxy.getInstance().createProvider((LayerProviderService) DATASTORE_SERVICE, providerSource);
@@ -131,7 +131,7 @@ public abstract class AbstractMapLayerTest extends AbstractProcessTest {
 
     /**
      * Un-register a provider
-     * @param id 
+     * @param id
      */
     protected static void removeProvider(String id) {
 
@@ -147,7 +147,7 @@ public abstract class AbstractMapLayerTest extends AbstractProcessTest {
      * Build only a ParameterValueGroup for one layer.
      * @param sercice
      * @param name
-     * @return 
+     * @return
      */
     protected ParameterValueGroup buildLayer(final ProviderService sercice, final String name) {
 

@@ -35,16 +35,16 @@ import static org.constellation.process.layer.update.UpdateMapLayerDescriptor.*;
  * @author Quentin Boileau (Geomatys).
  */
 public class UpdateMapLayer extends AbstractCstlProcess {
-    
+
      public UpdateMapLayer(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
     /**
      * Update a layer from an existing provider.
-     * 
-     * @throws ProcessException if : 
-     * - process idenifier is null/empty or not found in LayerProvider list.
+     *
+     * @throws ProcessException if :
+     * - Provider identifier is null/empty or not found in LayerProvider list.
      * - layer name is null/empty or not found in LayerProvider list.
      */
     @Override
@@ -55,17 +55,17 @@ public class UpdateMapLayer extends AbstractCstlProcess {
         final ParameterValueGroup updateLayer = value(UPDATE_LAYER, inputParameters);
 
         if (providerId == null || "".equals(providerId.trim())) {
-            throw new ProcessException("Provier identifier can't be null or empty.", this, null);
+            throw new ProcessException("Provider identifier can't be null or empty.", this, null);
         }
-        
+
         if (layerName == null || "".equals(layerName.trim())) {
             throw new ProcessException("Layer name can't be null or empty.", this, null);
         }
-        
+
         if (updateLayer == null) {
             throw new ProcessException("Layer can't be null.", this, null);
         }
-        
+
         final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
 
         boolean providerFound = false;
@@ -97,9 +97,9 @@ public class UpdateMapLayer extends AbstractCstlProcess {
         } else {
             if (!updated) {
                 throw new ProcessException("Layer with name "+layerName+" can't be found in provider "+providerId+" layers.", this, null);
-            } 
+            }
         }
-            
+
     }
-    
+
 }

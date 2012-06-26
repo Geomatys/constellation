@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
+
 /**
  *
  * @author Quentin Boileau (Geomatys)
@@ -36,32 +37,32 @@ public class StartWMSServiceTest extends WMSProcessTest {
     public StartWMSServiceTest() {
         super(StartWMSServiceDescriptor.NAME);
     }
-    
-    
+
+
     @Test
     public void testStartWMS() throws NoSuchIdentifierException, ProcessException {
-        
+
         final int initSize = WSEngine.getInstanceSize("WMS");
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartWMSServiceDescriptor.NAME);
-        
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(StartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance1");
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
-        
+
         assertTrue(WSEngine.getInstanceSize("WMS") == initSize+1);
         assertTrue(WSEngine.serviceInstanceExist("WMS", "instance1"));
-        
+
         WSEngine.destroyInstances("WMS");
     }
-    
+
     @Test
     public void testFailStartWMS() throws NoSuchIdentifierException, ProcessException {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartWMSServiceDescriptor.NAME);
-        
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(StartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance5");
-        
+
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);
             proc.call();

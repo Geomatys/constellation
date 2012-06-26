@@ -32,11 +32,11 @@ import org.opengis.util.InternationalString;
  * @author Quentin Boileau (Geomatys).
  */
 public class StopWMSServiceDescriptor extends AbstractProcessDescriptor {
-    
+
     public static final String NAME = "stopWMSService";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Stop the instance for the specified WMS identifier.");
-    
-  
+
+
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the new service instance.";
     public static final ParameterDescriptor<String> IDENTIFIER =
@@ -49,15 +49,15 @@ public class StopWMSServiceDescriptor extends AbstractProcessDescriptor {
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
-    
+
+
     /**
-     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public StopWMSServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
         return new StopWMSService(this, input);

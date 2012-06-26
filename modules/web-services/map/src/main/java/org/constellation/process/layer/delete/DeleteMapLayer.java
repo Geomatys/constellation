@@ -34,15 +34,15 @@ import static org.constellation.process.layer.delete.DeleteMapLayerDescriptor.*;
  * @author Quentin Boileau (Geomatys).
  */
 public class DeleteMapLayer extends AbstractCstlProcess {
-    
+
      public DeleteMapLayer(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
     /**
      * Remove a layer from an existing provider.
-     * @throws ProcessException if : 
-     * - process idenifier is null/empty or not found in LayerProvider list.
+     * @throws ProcessException if :
+     * - Provider identifier is null/empty or not found in LayerProvider list.
      * - layer name is null/empty or not found in LayerProvider list.
      */
     @Override
@@ -52,13 +52,13 @@ public class DeleteMapLayer extends AbstractCstlProcess {
         final String layerName = value(LAYER_NAME, inputParameters);
 
         if (providerId == null || "".equals(providerId.trim())) {
-            throw new ProcessException("Provier identifier can't be null or empty.", this, null);
+            throw new ProcessException("Provider identifier can't be null or empty.", this, null);
         }
-        
+
         if (layerName == null || "".equals(layerName.trim())) {
             throw new ProcessException("Layer name can't be null or empty.", this, null);
         }
-        
+
         final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
 
         boolean providerFound = false;
@@ -89,9 +89,9 @@ public class DeleteMapLayer extends AbstractCstlProcess {
         } else {
             if (!removed) {
                 throw new ProcessException("Layer with name "+layerName+" can't be found in provider "+providerId+" layers.", this, null);
-            } 
+            }
         }
-            
+
     }
-    
+
 }

@@ -37,7 +37,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Quentin Boileau (Geomatys).
  */
 public abstract class AbstractProviderTest extends AbstractProcessTest {
-    
+
     private static File configDirectory;
     protected static URL EMPTY_CSV;
     // dataStore service
@@ -50,48 +50,48 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
             }
         }
     }
-    
+
     protected AbstractProviderTest(final String processName) {
         super(processName);
     }
-    
+
     @BeforeClass
     public static void initFolder() throws MalformedURLException {
-        
+
         configDirectory = new File("ProcessProviderTest");
 
         if (configDirectory.exists()) {
             FileUtilities.deleteDirectory(configDirectory);
         }
-        
+
         configDirectory.mkdir();
         File providerDirectory = new File(configDirectory, "provider");
         providerDirectory.mkdir();
         File datastore = new File(providerDirectory, "data-store.xml");
-        ConfigDirectory.setConfigDirectory(configDirectory);    
-        
+        ConfigDirectory.setConfigDirectory(configDirectory);
+
         File csv = new File(configDirectory, "file.csv");
         EMPTY_CSV = csv.toURI().toURL();
-        
+
     }
-    
+
     @AfterClass
     public static void destroyFolder() {
         FileUtilities.deleteDirectory(configDirectory);
     }
-    
+
     /**
      * Create a CSV provider for test purpose.
      * @param sercice
      * @param providerID
      * @return
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
-    protected static ParameterValueGroup buildCSVProvider(final ProviderService sercice, final String providerID, final boolean loadAll, 
+    protected static ParameterValueGroup buildCSVProvider(final ProviderService sercice, final String providerID, final boolean loadAll,
             final URL url) throws MalformedURLException {
-        
+
         ParameterDescriptorGroup desc = sercice.getServiceDescriptor();
-       
+
         if (desc != null) {
             final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) desc.descriptor("source");
             final ParameterValueGroup sourceValue = sourceDesc.createValue();
@@ -111,25 +111,25 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
             return null;
         }
     }
-    
+
     /**
-     * Regiser a provider.
-     * @param providerSource 
+     * Register a provider.
+     * @param providerSource
      */
     protected static void addProvider(ParameterValueGroup providerSource) {
         LayerProviderProxy.getInstance().createProvider((LayerProviderService) DATASTORE_SERVICE, providerSource);
     }
-    
+
     /**
      * Un-register a provider
-     * @param id 
+     * @param id
      */
     protected static void removeProvider(String id) {
-        
+
         LayerProvider provider = null;
         for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
             if (p.getId().equals(id)) {
-                
+
             }
         }
         LayerProviderProxy.getInstance().removeProvider(provider);

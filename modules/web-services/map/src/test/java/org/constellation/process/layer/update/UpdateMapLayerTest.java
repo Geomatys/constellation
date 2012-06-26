@@ -35,18 +35,18 @@ import org.opengis.util.NoSuchIdentifierException;
  * @author Quentin Boileau (Geomatys).
  */
 public class UpdateMapLayerTest extends AbstractMapLayerTest {
-    
+
     public UpdateMapLayerTest() {
         super(UpdateMapLayerDescriptor.NAME);
     }
-    
+
     @Test
     public void testUpdateLayer() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
-        
+
         addProvider(buildCSVProvider(DATASTORE_SERVICE, "updateProvider1", true, EMPTY_CSV, "provider2Layer"));
-        
+
         final ParameterValueGroup expectedProvider = buildCSVProvider(DATASTORE_SERVICE, "updateProvider1", true, EMPTY_CSV, "newLayer");
-        
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapLayerDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
@@ -66,19 +66,19 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
         assertNotNull(provider);
         assertEquals(expectedProvider, provider.getSource());
         assertTrue(provider.getSource().groups("Layer").size() == 1);
-        
+
         removeProvider("updateProvider1");
     }
-    
-    
+
+
     /**
-     * Layer does'nt exist.
+     * Layer doesn't exist.
      */
     @Test
     public void testFailUpdateLayer1() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
-        
+
         addProvider(buildCSVProvider(DATASTORE_SERVICE, "updateProvider2", true, EMPTY_CSV, "provider2Layer"));
-        
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapLayerDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
@@ -96,14 +96,14 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
 
         removeProvider("updateProvider2");
     }
-    
-    
+
+
     /**
-     * Provider does'nt exist.
+     * Provider doesn't exist.
      */
     @Test
     public void testFailUpdateLayer2() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
-        
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapLayerDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
@@ -111,7 +111,7 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
         in.parameter(UpdateMapLayerDescriptor.PROVIDER_ID_NAME).setValue("updateProvider3");
         in.parameter(UpdateMapLayerDescriptor.LAYER_NAME_NAME).setValue("layer2");
         in.parameter(UpdateMapLayerDescriptor.UPDATE_LAYER_NAME).setValue(layer);
-        
+
         try {
             desc.createProcess(in).call();
             fail();
@@ -119,14 +119,14 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
             //do nothing
         }
     }
-    
-    
+
+
     /**
      * Empty provider identifier.
      */
     @Test
     public void testFailUpdateLayer3() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
-        
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapLayerDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
@@ -142,13 +142,13 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
             //do nothing
         }
     }
-    
+
      /**
      * Empty layer name.
      */
     @Test
     public void testFailUpdateLayer4() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
-        
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapLayerDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
@@ -164,5 +164,5 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
             //do nothing
         }
     }
-    
+
 }

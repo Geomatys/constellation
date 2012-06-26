@@ -16,9 +16,7 @@
  */
 package org.constellation.process.service.delete;
 
-import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.create.CreateMapService;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
@@ -34,18 +32,18 @@ import org.opengis.util.InternationalString;
  * @author Quentin Boileau (Geomatys)
  */
 public class DeleteMapServiceDescriptor extends AbstractProcessDescriptor {
-    
-    
+
+
      public static final String NAME = "deleteMapService";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Delete a map service (WMS, WMTS, WFS) in constellation.");
-    
-  
+
+
     public static final String SERVICE_NAME_NAME = "service_Name";
     private static final String SERVICE_NAME_REMARKS = "The name of the service. (WMS, WMTS, WFS)";
-    public static final ParameterDescriptor<String> SERVICE_NAME = 
+    public static final ParameterDescriptor<String> SERVICE_NAME =
             new DefaultParameterDescriptor(SERVICE_NAME_NAME, SERVICE_NAME_REMARKS, String.class, null, true);
 
-    
+
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the service instance o delete.";
     public static final ParameterDescriptor<String> IDENTIFIER =
@@ -56,22 +54,22 @@ public class DeleteMapServiceDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptorGroup("InputParameters",
             new GeneralParameterDescriptor[]{SERVICE_NAME, IDENTIFIER});
 
-    
+
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
-    
+
+
     /**
-     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public DeleteMapServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
         return new DeleteMapService(this, input);
     }
-    
-    
+
+
 }

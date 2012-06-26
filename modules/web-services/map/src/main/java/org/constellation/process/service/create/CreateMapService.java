@@ -32,7 +32,7 @@ import static org.constellation.process.service.create.CreateMapServiceDesciptor
 /**
  * Process that create a new instance configuration from the service name (WMS, WMTS or WFS) for a specified instance name.
  * If the instance directory is created but no configuration file exist, the process will create one.
- * Execution will throw ProcessExeption if the service name is different from WMS, WMTS of WFS (no mather of case) or if 
+ * Execution will throw ProcessExeption if the service name is different from WMS, WMTS of WFS (no matter of case) or if
  * a configuration file already exist fo this instance name.
  * @author Quentin Boileau (Geomatys).
  */
@@ -44,9 +44,9 @@ public class CreateMapService extends AbstractProcess {
 
     /**
      * Create a new instance and configuration for a specified service and instance name.
-     * @throws ProcessException in cases : 
-     * - if the service name is different from WMS, WMTS of WFS (no mather of case)
-     * - if a configuration file already exist fo this instance name.
+     * @throws ProcessException in cases :
+     * - if the service name is different from WMS, WMTS of WFS (no matter of case)
+     * - if a configuration file already exist for this instance name.
      * - if error during file creation or marshalling phase.
      */
     @Override
@@ -61,7 +61,7 @@ public class CreateMapService extends AbstractProcess {
         } else {
             throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\").", this, null);
         }
-        
+
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
         }
@@ -69,27 +69,27 @@ public class CreateMapService extends AbstractProcess {
         //get config directory .constellation
         final File configDirectory = ConfigDirectory.getConfigDirectory();
         if (configDirectory != null && configDirectory.isDirectory()) {
-            
+
             //get service directory ("WMS", "WMTS", "WFS")
             final File serviceDir = new File(configDirectory, serviceName);
             if (serviceDir.exists() && serviceDir.isDirectory()) {
-                
+
                 //create service instance directory
                 final File instanceDirectory = new File(serviceDir, identifier);
-                
+
                 File configurationFile = null;
                 if (instanceDirectory.exists()) {
                      configurationFile = new File(instanceDirectory, "layerContext.xml");
                      if (configurationFile.exists()) {
                          throw new ProcessException("Instance identifier already exist.", this, null);
                      }
-                    
+
                 } else if (instanceDirectory.mkdir()) {
                     configurationFile = new File(instanceDirectory, "layerContext.xml");
                 } else {
                     throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
                 }
-                
+
                 //create layerContext.xml file for the default configuration.
                 Marshaller marshaller = null;
                 try {
@@ -103,10 +103,10 @@ public class CreateMapService extends AbstractProcess {
                         GenericDatabaseMarshallerPool.getInstance().release(marshaller);
                     }
                 }
-                
+
             } else {
                 throw new ProcessException("Service directory can't be found for service name : "+serviceName, this, null);
-            } 
+            }
         } else {
             throw new ProcessException("Configuration directory can't be found.", this, null);
         }

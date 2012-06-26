@@ -17,7 +17,6 @@
 package org.constellation.process.refreshindex;
 
 import org.constellation.process.AbstractProcessTest;
-import org.constellation.process.refreshindex.RefreshIndexDescriptor;
 
 /**
  *
@@ -28,5 +27,5 @@ public class RefreshIndexTest extends AbstractProcessTest {
    public RefreshIndexTest() {
        super(RefreshIndexDescriptor.NAME);
    }
-  
+
 }

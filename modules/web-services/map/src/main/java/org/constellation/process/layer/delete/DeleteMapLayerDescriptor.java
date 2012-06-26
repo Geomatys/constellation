@@ -32,19 +32,19 @@ import org.opengis.util.InternationalString;
  * @author Quentin Boileau (Geomatys).
  */
 public class DeleteMapLayerDescriptor extends AbstractProcessDescriptor {
-    
-      
+
+
     public static final String NAME = "deleteMapLayer";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Delete a map layer from a specified provider.");
-    
+
     /*
      * Provider idenifier
      */
     public static final String PROVIDER_ID_NAME = "provider_id";
     private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to remove layer.";
-    public static final ParameterDescriptor<String> PROVIDER_ID = 
+    public static final ParameterDescriptor<String> PROVIDER_ID =
             new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
-    
+
     /*
      * Layer name to delete
      */
@@ -53,26 +53,26 @@ public class DeleteMapLayerDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<String> LAYER_NAME =
             new DefaultParameterDescriptor(LAYER_NAME_NAME, LAYER_NAME_REMARKS, String.class, null, true);
 
-    
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, LAYER_NAME});
 
-    
+
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
-    
+
+
     /**
-     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public DeleteMapLayerDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
         return new DeleteMapLayer(this, input);
     }
-    
+
 }

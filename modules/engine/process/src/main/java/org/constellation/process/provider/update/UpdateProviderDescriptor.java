@@ -36,15 +36,15 @@ public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
 
     public static final String NAME = "updateProvider";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Update a provider from constellation.");
-    
+
     /*
      * Provider to update identifier
      */
     private static final String PROVIDER_ID_NAME = "provider_id";
     private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to remove.";
-    public static final ParameterDescriptor<String> PROVIDER_ID = 
+    public static final ParameterDescriptor<String> PROVIDER_ID =
             new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
-    
+
     /*
      * Source use to update.
      */
@@ -58,20 +58,20 @@ public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptorGroup("InputParameters",
             new GeneralParameterDescriptor[]{PROVIDER_ID, SOURCE});
 
-    
+
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
+
     /**
-     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public UpdateProviderDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
     @Override
     public Process createProcess(ParameterValueGroup input) {
         return new UpdateProvider(this, input);
     }
-    
+
 }

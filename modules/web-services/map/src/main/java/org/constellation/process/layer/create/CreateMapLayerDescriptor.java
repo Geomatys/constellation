@@ -32,19 +32,19 @@ import org.opengis.util.InternationalString;
  * @author Quentin Boileau (Geomatys).
  */
 public class CreateMapLayerDescriptor extends AbstractProcessDescriptor {
-    
-     
+
+
     public static final String NAME = "createMapLayer";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Attach a new layer to a specified provider.");
-    
+
     /*
      * Provider identifier
      */
     public static final String PROVIDER_ID_NAME = "provider_id";
     private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to add layer.";
-    public static final ParameterDescriptor<String> PROVIDER_ID = 
+    public static final ParameterDescriptor<String> PROVIDER_ID =
             new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
-    
+
     /*
      * Layer to attach.
      */
@@ -53,27 +53,27 @@ public class CreateMapLayerDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<ParameterValueGroup> LAYER =
             new DefaultParameterDescriptor(LAYER_NAME, LAYER_REMARKS, ParameterValueGroup.class, null, true);
 
-    
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, LAYER});
 
-    
+
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-    
-    
+
+
     /**
-     * Public constructor use by the ServiceRegistry to find and intanciate all ProcessDescriptor.
+     * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
     public CreateMapLayerDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
-    
+
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
         return new CreateMapLayer(this, input);
     }
-    
-    
+
+
 }

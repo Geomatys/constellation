@@ -35,18 +35,18 @@ import org.opengis.util.NoSuchIdentifierException;
  * @author Quentin Boileau (Geomatys).
  */
 public class CreateMapLayerTest extends AbstractMapLayerTest {
-    
+
     public CreateMapLayerTest() {
         super(CreateMapLayerDescriptor.NAME);
     }
-    
+
     @Test
     public void testCreateLayer() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
-        
+
         addProvider(buildCSVProvider(DATASTORE_SERVICE, "createProvider1", true, EMPTY_CSV, null));
-        
+
         ParameterValueGroup expectedProvider = buildCSVProvider(DATASTORE_SERVICE, "createProvider1", true, EMPTY_CSV, "layer1");
-        
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapLayerDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "layer1");
@@ -65,16 +65,16 @@ public class CreateMapLayerTest extends AbstractMapLayerTest {
         assertNotNull(provider);
         assertEquals(expectedProvider, provider.getSource());
         assertFalse(provider.getSource().groups("Layer").isEmpty());
-        
+
         removeProvider("createProvider1");
     }
-    
+
     /**
-     * Provider does'nt exist.
+     * Provider doesn't exist.
      */
     @Test
     public void testFailCreateLayer() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
-        
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapLayerDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "layer2");

@@ -27,7 +27,7 @@ import static org.geotoolkit.parameter.Parameters.*;
 import org.geotoolkit.process.ProcessDescriptor;
 
 /**
- * Upadte a provider from constellation.
+ * Update a provider from constellation.
  * @author Quentin Boileau (Geomatys).
  */
 public class UpdateProvider extends AbstractCstlProcess{
@@ -42,7 +42,7 @@ public class UpdateProvider extends AbstractCstlProcess{
         final ParameterValueGroup source = (ParameterValueGroup) value(SOURCE, inputParameters);
 
         boolean updated = false;
-        
+
         Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
         for (final Provider p : providers) {
             if (providerID.equals(p.getId())) {

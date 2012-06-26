@@ -26,6 +26,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
+
 /**
  *
  * @author Quentin Boileau (Geomatys).
@@ -35,104 +36,104 @@ public class RestartWMSServiceTest extends WMSProcessTest {
     public RestartWMSServiceTest() {
         super(RestartWMSServiceDescriptor.NAME);
     }
-    
-     
+
+
     @Test
     public void testRestartOneWMSNoClose() throws NoSuchIdentifierException, ProcessException {
-        
+
         startInstance("instance1");
-        
+
         final int initSize = WSEngine.getInstanceSize("WMS");
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
-        
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance1");
         in.parameter(RestartWMSServiceDescriptor.CLOSE_NAME).setValue(false);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
-        
+
         assertTrue(WSEngine.getInstanceSize("WMS") == initSize);
         assertTrue(WSEngine.serviceInstanceExist("WMS", "instance1"));
-        
+
         WSEngine.destroyInstances("WMS");
     }
-    
+
     @Test
     public void testRestartOneWMSClose() throws NoSuchIdentifierException, ProcessException {
-        
+
         startInstance("instance2");
-        
+
         final int initSize = WSEngine.getInstanceSize("WMS");
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
-        
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance2");
         in.parameter(RestartWMSServiceDescriptor.CLOSE_NAME).setValue(true);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
-        
+
         assertTrue(WSEngine.getInstanceSize("WMS") == initSize);
         assertTrue(WSEngine.serviceInstanceExist("WMS", "instance2"));
-        
+
         WSEngine.destroyInstances("WMS");
     }
-    
+
     @Test
     public void testRestartAllWMSNoClose() throws NoSuchIdentifierException, ProcessException {
-        
+
         startInstance("instance1");
         startInstance("instance2");
-        
+
         final int initSize = WSEngine.getInstanceSize("WMS");
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
-        
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue(null);
         in.parameter(RestartWMSServiceDescriptor.CLOSE_NAME).setValue(false);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
-        
+
         assertTrue(WSEngine.getInstanceSize("WMS") == initSize);
         assertTrue(WSEngine.serviceInstanceExist("WMS", "instance1"));
         assertTrue(WSEngine.serviceInstanceExist("WMS", "instance2"));
-        
+
         WSEngine.destroyInstances("WMS");
     }
-    
+
     @Test
     public void testRestartAllWMSClose() throws NoSuchIdentifierException, ProcessException {
-        
+
         startInstance("instance1");
         startInstance("instance2");
-        
+
         final int initSize = WSEngine.getInstanceSize("WMS");
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
-        
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue(null);        
+        in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue(null);
         in.parameter(RestartWMSServiceDescriptor.CLOSE_NAME).setValue(true);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
-        
+
         assertTrue(WSEngine.getInstanceSize("WMS") == initSize);
         assertTrue(WSEngine.serviceInstanceExist("WMS", "instance1"));
         assertTrue(WSEngine.serviceInstanceExist("WMS", "instance2"));
-        
+
         WSEngine.destroyInstances("WMS");
     }
-    
+
     /**
      * Try to restart an instance that exist but no started.
      * @throws NoSuchIdentifierException
-     * @throws ProcessException 
+     * @throws ProcessException
      */
     @Test
     public void testFailRestartWMS1() throws NoSuchIdentifierException, ProcessException {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
-        
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance4");
-        
+
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);
             proc.call();
@@ -141,19 +142,19 @@ public class RestartWMSServiceTest extends WMSProcessTest {
             //do nothing
         }
     }
-    
+
     /**
      * Try to restart an instance that doesn't exist.
      * @throws NoSuchIdentifierException
-     * @throws ProcessException 
+     * @throws ProcessException
      */
     @Test
     public void testFailRestartWMS2() throws NoSuchIdentifierException, ProcessException {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
-        
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance5");
-        
+
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);
             proc.call();
@@ -162,5 +163,5 @@ public class RestartWMSServiceTest extends WMSProcessTest {
             //do nothing
         }
     }
-    
+
 }
