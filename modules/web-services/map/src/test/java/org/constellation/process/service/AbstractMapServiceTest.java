@@ -34,10 +34,10 @@ import org.junit.BeforeClass;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public abstract class MapServiceTest extends AbstractProcessTest {
+public abstract class AbstractMapServiceTest extends AbstractProcessTest {
     
     protected static File configDirectory;
-    public MapServiceTest (final String str) {
+    public AbstractMapServiceTest (final String str) {
         super(str);
     }
     

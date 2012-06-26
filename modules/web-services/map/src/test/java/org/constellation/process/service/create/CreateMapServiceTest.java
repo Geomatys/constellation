@@ -19,7 +19,7 @@ package org.constellation.process.service.create;
 import org.constellation.process.service.create.CreateMapServiceDesciptor;
 import java.io.File;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.MapServiceTest;
+import org.constellation.process.service.AbstractMapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  *
  * @author Quentin Boileau (Geometys).
  */
-public class CreateMapServiceTest extends MapServiceTest {
+public class CreateMapServiceTest extends AbstractMapServiceTest {
 
     public CreateMapServiceTest() {
         super(CreateMapServiceDesciptor.NAME);

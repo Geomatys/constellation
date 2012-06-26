@@ -117,7 +117,7 @@ public final class RestartWMSService extends AbstractCstlProcess {
                     /*
                     * For each sub-directory we build a new Worker only if his already have an instance.
                     */
-                    if (instanceDir.isDirectory() && !instanceDir.getName().startsWith(".")) {
+                    if (instanceDir.isDirectory()) {
                         
                         if (oldWorkersMap.containsKey(instanceDir.getName())) {
                             final DefaultWMSWorker worker = new DefaultWMSWorker(identifier, instanceDir);

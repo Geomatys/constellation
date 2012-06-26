@@ -18,7 +18,7 @@ package org.constellation.process.service.delete;
 
 import org.constellation.process.service.delete.DeleteMapServiceDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.MapServiceTest;
+import org.constellation.process.service.AbstractMapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
  *
  * @author Quentin Boileau (Geometys).
  */
-public class DeleteMapServiceTest extends MapServiceTest {
+public class DeleteMapServiceTest extends AbstractMapServiceTest {
 
     public DeleteMapServiceTest() {
         super(DeleteMapServiceDescriptor.NAME);

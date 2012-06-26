@@ -23,7 +23,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.MapServiceTest;
+import org.constellation.process.service.AbstractMapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -35,7 +35,7 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class ConfigureMapServiceTest  extends MapServiceTest {
+public class ConfigureMapServiceTest  extends AbstractMapServiceTest {
     
     public ConfigureMapServiceTest () {
         super(ConfigureMapServiceDescriptor.NAME);
