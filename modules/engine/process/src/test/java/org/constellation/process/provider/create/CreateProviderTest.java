@@ -17,7 +17,7 @@
 package org.constellation.process.provider.create;
 
 import java.net.MalformedURLException;
-import org.constellation.process.provider.ProviderTest;
+import org.constellation.process.provider.AbstractProviderTest;
 
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.provider.*;
@@ -37,7 +37,7 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateProviderTest extends ProviderTest {
+public class CreateProviderTest extends AbstractProviderTest {
 
     public CreateProviderTest () {
         super(CreateProviderDescriptor.NAME);

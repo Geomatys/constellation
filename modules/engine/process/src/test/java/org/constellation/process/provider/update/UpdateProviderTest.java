@@ -18,7 +18,7 @@ package org.constellation.process.provider.update;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.constellation.process.provider.ProviderTest;
+import org.constellation.process.provider.AbstractProviderTest;
 
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.update.UpdateProviderDescriptor;
@@ -39,7 +39,7 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class UpdateProviderTest extends ProviderTest {
+public class UpdateProviderTest extends AbstractProviderTest {
 
     public UpdateProviderTest () {
         super(UpdateProviderDescriptor.NAME);

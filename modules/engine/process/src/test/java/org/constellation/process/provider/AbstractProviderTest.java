@@ -37,7 +37,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public abstract class ProviderTest extends AbstractProcessTest {
+public abstract class AbstractProviderTest extends AbstractProcessTest {
     
     private static File configDirectory;
     protected static URL EMPTY_CSV;
@@ -52,7 +52,7 @@ public abstract class ProviderTest extends AbstractProcessTest {
         }
     }
     
-    protected ProviderTest(final String processName) {
+    protected AbstractProviderTest(final String processName) {
         super(processName);
     }
     

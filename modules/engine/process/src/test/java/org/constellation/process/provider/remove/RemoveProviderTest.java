@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.process.provider.ProviderTest;
+import org.constellation.process.provider.AbstractProviderTest;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.remove.RemoveProviderDescriptor;
 import org.constellation.provider.*;
@@ -42,7 +42,7 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class RemoveProviderTest extends ProviderTest {
+public class RemoveProviderTest extends AbstractProviderTest {
 
     public RemoveProviderTest() {
         super(RemoveProviderDescriptor.NAME);
