@@ -102,7 +102,7 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-clients-core</artifactId>
     </dependency>
-    
+
     <!-- Tests dependencies -->
     <dependency>
        <groupId>org.constellation.engine</groupId>
@@ -117,8 +117,13 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    
-    
+     <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-style-sld</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 </project>
