@@ -76,13 +76,10 @@ public abstract class AbstractMapLayerTest extends AbstractProcessTest {
         File csv = new File(configDirectory, "file.csv");
         EMPTY_CSV = csv.toURI().toURL();
 
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider1", true, EMPTY_CSV, null));
-
     }
 
     @AfterClass
     public static void destroyFolder() {
-        removeProvider("provider1");
         FileUtilities.deleteDirectory(configDirectory);
     }
 

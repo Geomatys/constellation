@@ -43,21 +43,21 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testDeleteLayer() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
         
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider2", true, EMPTY_CSV, "provider2Layer"));
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "deleteProvider1", true, EMPTY_CSV, "provider2Layer"));
         
-        ParameterValueGroup emptyProvider = buildCSVProvider(DATASTORE_SERVICE, "provider2", true, EMPTY_CSV, null);
+        ParameterValueGroup emptyProvider = buildCSVProvider(DATASTORE_SERVICE, "deleteProvider1", true, EMPTY_CSV, null);
         
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteMapLayerDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue("provider2");
+        in.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider1");
         in.parameter(DeleteMapLayerDescriptor.LAYER_NAME_NAME).setValue( "provider2Layer");
 
         desc.createProcess(in).call();
 
         Provider provider = null;
         for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
-            if ("provider2".equals(p.getId())){
+            if ("deleteProvider1".equals(p.getId())){
                 provider = p;
             }
         }
@@ -65,7 +65,7 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
         assertEquals(emptyProvider, provider.getSource());
         assertTrue(provider.getSource().groups("Layer").isEmpty());
         
-        removeProvider("provider2");
+        removeProvider("deleteProvider1");
     }
     
     
@@ -75,12 +75,12 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testFailDeleteLayer1() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
         
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider2", true, EMPTY_CSV, "provider2Layer"));
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "deleteProvider2", true, EMPTY_CSV, "provider2Layer"));
         
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteMapLayerDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue("provider2");
+        in.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider2");
         in.parameter(DeleteMapLayerDescriptor.LAYER_NAME_NAME).setValue("layer22");
 
         try {
@@ -90,7 +90,7 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
             //do nothing
         }
 
-        removeProvider("provider2");
+        removeProvider("deleteProvider2");
     }
     
     
@@ -103,7 +103,7 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteMapLayerDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue("provider22");
+        in.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider3");
         in.parameter(DeleteMapLayerDescriptor.LAYER_NAME_NAME).setValue("layer2");
 
         try {
@@ -144,7 +144,7 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteMapLayerDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue("provider2");
+        in.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider4");
         in.parameter(DeleteMapLayerDescriptor.LAYER_NAME_NAME).setValue("");
 
         try {

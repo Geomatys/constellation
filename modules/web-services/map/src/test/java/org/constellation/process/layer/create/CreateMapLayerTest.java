@@ -43,23 +43,30 @@ public class CreateMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testCreateLayer() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
         
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "createProvider1", true, EMPTY_CSV, null));
+        
+        ParameterValueGroup expectedProvider = buildCSVProvider(DATASTORE_SERVICE, "createProvider1", true, EMPTY_CSV, "layer1");
+        
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapLayerDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "layer1");
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapLayerDescriptor.PROVIDER_ID_NAME).setValue("provider1");
+        in.parameter(CreateMapLayerDescriptor.PROVIDER_ID_NAME).setValue("createProvider1");
         in.parameter(CreateMapLayerDescriptor.LAYER_NAME).setValue(layer);
 
         desc.createProcess(in).call();
 
         Provider provider = null;
         for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
-            if ("provider1".equals(p.getId())){
+            if ("createProvider1".equals(p.getId())){
                 provider = p;
             }
         }
         assertNotNull(provider);
-        assertEquals("layer1", provider.getSource().groups("Layer").get(0).parameter("name").getValue());
+        assertEquals(expectedProvider, provider.getSource());
+        assertFalse(provider.getSource().groups("Layer").isEmpty());
+        
+        removeProvider("createProvider1");
     }
     
     /**
@@ -72,7 +79,7 @@ public class CreateMapLayerTest extends AbstractMapLayerTest {
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "layer2");
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapLayerDescriptor.PROVIDER_ID_NAME).setValue("provider2");
+        in.parameter(CreateMapLayerDescriptor.PROVIDER_ID_NAME).setValue("createProvider2");
         in.parameter(CreateMapLayerDescriptor.LAYER_NAME).setValue(layer);
 
         try {
