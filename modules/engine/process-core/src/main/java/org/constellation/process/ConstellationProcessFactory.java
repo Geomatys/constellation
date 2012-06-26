@@ -64,7 +64,7 @@ public class ConstellationProcessFactory extends AbstractProcessingRegistry {
      * Find all processDescriptor defined in META-INF/service files.
      * @return 
      */
-    private static ProcessDescriptor[] findDescriptors() {
+    private static synchronized ProcessDescriptor[] findDescriptors() {
         final Iterator<ProcessDescriptor> ite = ServiceRegistry.lookupProviders(ProcessDescriptor.class);
         final List<ProcessDescriptor> descriptors = new ArrayList<ProcessDescriptor>();
         while (ite.hasNext()) {

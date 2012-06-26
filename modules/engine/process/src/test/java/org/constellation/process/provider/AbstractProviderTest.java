@@ -73,20 +73,11 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
         File csv = new File(configDirectory, "file.csv");
         EMPTY_CSV = csv.toURI().toURL();
         
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider1", true, EMPTY_CSV));
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider2", true, EMPTY_CSV));
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider3", true, EMPTY_CSV));
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider4", true, EMPTY_CSV));
-        
     }
     
     @AfterClass
     public static void destroyFolder() {
         FileUtilities.deleteDirectory(configDirectory);
-        removeProvider("provider1");
-        removeProvider("provider2");
-        removeProvider("provider3");
-        removeProvider("provider4");
     }
     
     /**

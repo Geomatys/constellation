@@ -17,11 +17,9 @@
 package org.constellation.process.provider.update;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import org.constellation.process.provider.AbstractProviderTest;
 
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.provider.update.UpdateProviderDescriptor;
 import org.constellation.provider.*;
 
 import org.geotoolkit.process.Process;
@@ -48,15 +46,13 @@ public class UpdateProviderTest extends AbstractProviderTest {
     @Test
     public void testUpdateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
         
-        
-        LayerProviderProxy.getInstance().createProvider((LayerProviderService) DATASTORE_SERVICE, buildCSVProvider(DATASTORE_SERVICE, "providerToUpdate", true, EMPTY_CSV));
-        
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "updateProvider1", true, EMPTY_CSV));
         
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderDescriptor.NAME);
 
-        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "providerToUpdate", false, EMPTY_CSV);
+        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "updateProvider1", false, EMPTY_CSV);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("provider_id").setValue("providerToUpdate");
+        in.parameter("provider_id").setValue("updateProvider1");
         in.parameter("source").setValue(parameters);
 
         final Process proc = desc.createProcess(in);
@@ -64,13 +60,34 @@ public class UpdateProviderTest extends AbstractProviderTest {
 
         Provider provider = null;
         for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
-            if ("providerToUpdate".equals(p.getId())){
+            if ("updateProvider1".equals(p.getId())){
                 provider = p;
             }
         } 
             
         assertNotNull(provider);
         assertTrue(parameters.equals(provider.getSource()));
+            
+        removeProvider("updateProvider1");
+    }
+    
+    @Test
+    public void testFailUpdateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+        
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderDescriptor.NAME);
+
+        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "updateProvider2", false, EMPTY_CSV);
+        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
+        in.parameter("provider_id").setValue("updateProvider2");
+        in.parameter("source").setValue(parameters);
+        
+        try {
+            final Process proc = desc.createProcess(in);
+            proc.call();
+            fail();
+        } catch (ProcessException ex) {
+            
+        }
             
     }
 }
