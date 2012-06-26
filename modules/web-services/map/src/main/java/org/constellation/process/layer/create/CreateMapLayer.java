@@ -27,7 +27,7 @@ import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 
 /**
- * Add a layer to an existinf provider.
+ * Add a layer to an existing provider.
  * 
  * @author Quentin Boileau (Geomatys).
  */
@@ -38,7 +38,7 @@ public class CreateMapLayer extends AbstractCstlProcess {
     }
 
     /**
-     * Add a layer to an existinf provider.
+     * Add a layer to an existing provider.
      * @throws ProcessException if : 
      * - process idenifier is null/empty or not found in LayerProvider list.
      * - layer is null.
@@ -50,7 +50,7 @@ public class CreateMapLayer extends AbstractCstlProcess {
         final ParameterValueGroup layer = value(LAYER, inputParameters);
 
         if (providerId == null || "".equals(providerId.trim())) {
-            throw new ProcessException("Provier idenifier can't be null or empty.", this, null);
+            throw new ProcessException("Provier identifier can't be null or empty.", this, null);
         }
         
         if (layer != null) {

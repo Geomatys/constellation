@@ -23,14 +23,13 @@ import java.net.URL;
 import java.util.Collection;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.ProviderService;
-import org.geotoolkit.feature.FeatureUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.opengis.feature.ComplexAttribute;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 /**
@@ -84,10 +83,14 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
     @AfterClass
     public static void destroyFolder() {
         FileUtilities.deleteDirectory(configDirectory);
+        removeProvider("provider1");
+        removeProvider("provider2");
+        removeProvider("provider3");
+        removeProvider("provider4");
     }
     
     /**
-     * Create a CSV provider for test using.
+     * Create a CSV provider for test purpose.
      * @param sercice
      * @param providerID
      * @return
@@ -99,26 +102,45 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
         ParameterDescriptorGroup desc = sercice.getServiceDescriptor();
        
         if (desc != null) {
-            ComplexAttribute root = FeatureUtilities.toFeature(desc.createValue());
-            final ParameterDescriptorGroup sourceDescriptor = (ParameterDescriptorGroup)desc.descriptor("source");
-            ComplexAttribute source = (ComplexAttribute) FeatureUtilities.defaultProperty(root.getType().getDescriptor("source"));
-            source.getProperty("id").setValue(providerID);
-            source.getProperty("load_all").setValue(loadAll);
-            
-            ComplexAttribute choice = (ComplexAttribute) source.getProperty("choice");
-            ComplexAttribute csv = (ComplexAttribute) FeatureUtilities.defaultProperty(choice.getType().getDescriptor("CSVParameters"));
-            csv.getProperty("identifier").setValue("csv");
-            csv.getProperty("url").setValue(url);
-            
-            choice.getProperties().add(csv);
-            return FeatureUtilities.toParameter(source, sourceDescriptor);
+            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) desc.descriptor("source");
+            final ParameterValueGroup sourceValue = sourceDesc.createValue();
+            sourceValue.parameter("id").setValue(providerID);
+            sourceValue.parameter("load_all").setValue(loadAll);
+
+            final ParameterValueGroup choiceValue = sourceValue.groups("choice").get(0);
+            final ParameterValueGroup csvValue = (ParameterValueGroup) choiceValue.addGroup("CSVParameters");
+            csvValue.parameter("identifier").setValue("csv");
+            csvValue.parameter("url").setValue(url);
+            csvValue.parameter("namespace").setValue(null);
+            csvValue.parameter("separator").setValue(new Character(';'));
+
+            return sourceValue;
         } else {
             //error
             return null;
         }
     }
     
-    private static void addProvider(ParameterValueGroup providerSource) {
+    /**
+     * Regiser a provider.
+     * @param providerSource 
+     */
+    protected static void addProvider(ParameterValueGroup providerSource) {
         LayerProviderProxy.getInstance().createProvider((LayerProviderService) DATASTORE_SERVICE, providerSource);
+    }
+    
+    /**
+     * Un-register a provider
+     * @param id 
+     */
+    protected static void removeProvider(String id) {
+        
+        LayerProvider provider = null;
+        for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
+            if (p.getId().equals(id)) {
+                
+            }
+        }
+        LayerProviderProxy.getInstance().removeProvider(provider);
     }
 }

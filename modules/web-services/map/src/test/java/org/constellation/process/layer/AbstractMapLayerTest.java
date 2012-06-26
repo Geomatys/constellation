@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.Collection;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.process.AbstractProcessTest;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.ProviderService;
@@ -75,17 +76,18 @@ public abstract class AbstractMapLayerTest extends AbstractProcessTest {
         File csv = new File(configDirectory, "file.csv");
         EMPTY_CSV = csv.toURI().toURL();
 
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider1", true, EMPTY_CSV));
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "provider1", true, EMPTY_CSV, null));
 
     }
 
     @AfterClass
     public static void destroyFolder() {
+        removeProvider("provider1");
         FileUtilities.deleteDirectory(configDirectory);
     }
 
     /**
-     * Create a CSV provider for test using.
+     * Create a CSV provider for test purpose.
      *
      * @param sercice
      * @param providerID
@@ -93,34 +95,63 @@ public abstract class AbstractMapLayerTest extends AbstractProcessTest {
      * @throws MalformedURLException
      */
     protected static ParameterValueGroup buildCSVProvider(final ProviderService sercice, final String providerID, final boolean loadAll,
-            final URL url) throws MalformedURLException {
+            final URL url, final String layerName) throws MalformedURLException {
 
         ParameterDescriptorGroup desc = sercice.getServiceDescriptor();
 
         if (desc != null) {
-            ComplexAttribute root = FeatureUtilities.toFeature(desc.createValue());
-            final ParameterDescriptorGroup sourceDescriptor = (ParameterDescriptorGroup) desc.descriptor("source");
-            ComplexAttribute source = (ComplexAttribute) FeatureUtilities.defaultProperty(root.getType().getDescriptor("source"));
-            source.getProperty("id").setValue(providerID);
-            source.getProperty("load_all").setValue(loadAll);
+            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) desc.descriptor("source");
+            final ParameterValueGroup sourceValue = sourceDesc.createValue();
+            sourceValue.parameter("id").setValue(providerID);
+            sourceValue.parameter("load_all").setValue(loadAll);
 
-            ComplexAttribute choice = (ComplexAttribute) source.getProperty("choice");
-            ComplexAttribute csv = (ComplexAttribute) FeatureUtilities.defaultProperty(choice.getType().getDescriptor("CSVParameters"));
-            csv.getProperty("identifier").setValue("csv");
-            csv.getProperty("url").setValue(url);
+            final ParameterValueGroup choiceValue = sourceValue.groups("choice").get(0);
+            final ParameterValueGroup csvValue = (ParameterValueGroup) choiceValue.addGroup("CSVParameters");
+            csvValue.parameter("identifier").setValue("csv");
+            csvValue.parameter("url").setValue(url);
+            csvValue.parameter("namespace").setValue(null);
+            csvValue.parameter("separator").setValue(new Character(';'));
 
-            choice.getProperties().add(csv);
-            return FeatureUtilities.toParameter(source, sourceDescriptor);
+            if (layerName != null) {
+                final ParameterValueGroup layerValue = sourceValue.addGroup("Layer");
+                layerValue.parameter("name").setValue(layerName);
+            }
+
+            return sourceValue;
         } else {
             //error
             return null;
         }
     }
 
-    private static void addProvider(ParameterValueGroup providerSource) {
+    /**
+     * Regiser a provider.
+     * @param providerSource 
+     */
+    protected static void addProvider(ParameterValueGroup providerSource) {
         LayerProviderProxy.getInstance().createProvider((LayerProviderService) DATASTORE_SERVICE, providerSource);
     }
 
+    /**
+     * Un-register a provider
+     * @param id 
+     */
+    protected static void removeProvider(String id) {
+
+        LayerProvider provider = null;
+        for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
+            if (p.getId().equals(id)) {
+            }
+        }
+        LayerProviderProxy.getInstance().removeProvider(provider);
+    }
+
+    /**
+     * Build only a ParameterValueGroup for one layer.
+     * @param sercice
+     * @param name
+     * @return 
+     */
     protected ParameterValueGroup buildLayer(final ProviderService sercice, final String name) {
 
         ParameterDescriptorGroup desc = sercice.getServiceDescriptor();
@@ -139,4 +170,5 @@ public abstract class AbstractMapLayerTest extends AbstractProcessTest {
             return null;
         }
     }
+
 }
