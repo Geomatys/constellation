@@ -71,6 +71,7 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
         assertNotNull(provider);
         final File styleFile = new File(configDirectory.getAbsolutePath()+"/sldDir/");
         assertTrue(styleFile.list().length == 0);
+        assertFalse(provider.contains("styleToDelete"));
 
         removeProvider("deleteStyleProvider1");
     }

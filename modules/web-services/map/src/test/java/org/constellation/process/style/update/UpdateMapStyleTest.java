@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.style.create;
+package org.constellation.process.style.update;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -25,6 +25,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.style.*;
+import org.geotoolkit.util.FileUtilities;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.opengis.parameter.ParameterValueGroup;
@@ -34,41 +35,49 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateMapStyleTest extends AbstractMapStyleTest {
+public class UpdateMapStyleTest extends AbstractMapStyleTest {
 
-    public CreateMapStyleTest() {
-        super(CreateMapStyleDescriptor.NAME);
+    public UpdateMapStyleTest() {
+        super(UpdateMapStyleDescriptor.NAME);
     }
 
     @Test
     public void testCreateStyle() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        addProvider(buildProvider("createStyleProvider1", true));
+        addProvider(buildProvider("updateStyleProvider1", true));
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapStyleDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapStyleDescriptor.NAME);
 
         final MutableStyleFactory msf = new DefaultStyleFactory();
-        final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
+        final MutableStyle style1 = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
+
+         for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
+            if (p.getId().equals("updateStyleProvider1")) {
+                p.set("styleToUpdate", style1);
+            }
+        }
+
+        final MutableStyle newStyle = msf.style(StyleConstants.DEFAULT_POLYGON_SYMBOLIZER);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapStyleDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider1");
-        in.parameter(CreateMapStyleDescriptor.STYLE_ID_NAME).setValue("myStyle");
-        in.parameter(CreateMapStyleDescriptor.STYLE_NAME).setValue(style);
+        in.parameter(UpdateMapStyleDescriptor.PROVIDER_ID_NAME).setValue("updateStyleProvider1");
+        in.parameter(UpdateMapStyleDescriptor.STYLE_ID_NAME).setValue("styleToUpdate");
+        in.parameter(UpdateMapStyleDescriptor.STYLE_NAME).setValue(newStyle);
 
         desc.createProcess(in).call();
 
         Provider provider = null;
         for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
-            if ("createStyleProvider1".equals(p.getId())){
+            if ("updateStyleProvider1".equals(p.getId())){
                 provider = p;
             }
         }
         assertNotNull(provider);
-        final File styleFile = new File(configDirectory.getAbsolutePath()+"/sldDir/", "myStyle.xml");
-        assertTrue(styleFile.exists());
-        assertTrue(provider.contains("myStyle"));
+        final File newFile = new File(configDirectory.getAbsolutePath()+"/sldDir/", "styleToUpdate.xml");
+        assertTrue(newFile.exists());
+        assertTrue(provider.contains("styleToUpdate"));
 
-        removeProvider("createStyleProvider1");
+        removeProvider("updateStyleProvider1");
     }
 
     /**
@@ -77,15 +86,15 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
     @Test
     public void testFailCreateStyle1() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapStyleDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapStyleDescriptor.NAME);
 
         final MutableStyleFactory msf = new DefaultStyleFactory();
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapStyleDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider2");
-        in.parameter(CreateMapStyleDescriptor.STYLE_ID_NAME).setValue("myStyle");
-        in.parameter(CreateMapStyleDescriptor.STYLE_NAME).setValue(style);
+        in.parameter(UpdateMapStyleDescriptor.PROVIDER_ID_NAME).setValue("updateStyleProvider2");
+        in.parameter(UpdateMapStyleDescriptor.STYLE_ID_NAME).setValue("myStyle");
+        in.parameter(UpdateMapStyleDescriptor.STYLE_NAME).setValue(style);
 
         try {
             desc.createProcess(in).call();
@@ -101,15 +110,15 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
     @Test
     public void testFailCreateStyle2() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapStyleDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapStyleDescriptor.NAME);
 
         final MutableStyleFactory msf = new DefaultStyleFactory();
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapStyleDescriptor.PROVIDER_ID_NAME).setValue("");
-        in.parameter(CreateMapStyleDescriptor.STYLE_ID_NAME).setValue("myStyle");
-        in.parameter(CreateMapStyleDescriptor.STYLE_NAME).setValue(style);
+        in.parameter(UpdateMapStyleDescriptor.PROVIDER_ID_NAME).setValue("");
+        in.parameter(UpdateMapStyleDescriptor.STYLE_ID_NAME).setValue("myStyle");
+        in.parameter(UpdateMapStyleDescriptor.STYLE_NAME).setValue(style);
 
         try {
             desc.createProcess(in).call();
@@ -125,17 +134,17 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
     @Test
     public void testFailCreateStyle3() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        addProvider(buildProvider("createStyleProvider3", true));
+        addProvider(buildProvider("updateStyleProvider3", true));
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapStyleDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapStyleDescriptor.NAME);
 
         final MutableStyleFactory msf = new DefaultStyleFactory();
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapStyleDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider3");
-        in.parameter(CreateMapStyleDescriptor.STYLE_ID_NAME).setValue("");
-        in.parameter(CreateMapStyleDescriptor.STYLE_NAME).setValue(style);
+        in.parameter(UpdateMapStyleDescriptor.PROVIDER_ID_NAME).setValue("updateStyleProvider3");
+        in.parameter(UpdateMapStyleDescriptor.STYLE_ID_NAME).setValue("");
+        in.parameter(UpdateMapStyleDescriptor.STYLE_NAME).setValue(style);
 
         try {
             desc.createProcess(in).call();
@@ -144,6 +153,6 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
             //do nothing
         }
 
-        removeProvider("createStyleProvider3");
+        removeProvider("updateStyleProvider3");
     }
 }

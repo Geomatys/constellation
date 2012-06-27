@@ -6,3 +6,4 @@ org.constellation.process.layer.delete.DeleteMapLayerDescriptor
 org.constellation.process.layer.update.UpdateMapLayerDescriptor
 org.constellation.process.style.create.CreateMapStyleDescriptor
 org.constellation.process.style.delete.DeleteMapStyleDescriptor
+org.constellation.process.style.update.UpdateMapStyleDescriptor
