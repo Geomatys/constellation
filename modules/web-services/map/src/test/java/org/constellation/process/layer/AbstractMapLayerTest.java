@@ -61,7 +61,7 @@ public abstract class AbstractMapLayerTest extends AbstractProcessTest {
     @BeforeClass
     public static void initFolder() throws MalformedURLException {
 
-        configDirectory = new File("ProcessProviderTest");
+        configDirectory = new File("AbstractMapLayerTest");
 
         if (configDirectory.exists()) {
             FileUtilities.deleteDirectory(configDirectory);
@@ -81,6 +81,7 @@ public abstract class AbstractMapLayerTest extends AbstractProcessTest {
     @AfterClass
     public static void destroyFolder() {
         FileUtilities.deleteDirectory(configDirectory);
+        ConfigDirectory.setConfigDirectory(null);
     }
 
     /**

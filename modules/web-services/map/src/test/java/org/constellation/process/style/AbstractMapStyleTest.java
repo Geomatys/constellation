@@ -56,7 +56,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
     @BeforeClass
     public static void initFolder() throws MalformedURLException {
 
-        configDirectory = new File("ProcessProviderTest");
+        configDirectory = new File("AbstractMapStyleTest");
 
         if (configDirectory.exists()) {
             FileUtilities.deleteDirectory(configDirectory);
@@ -76,6 +76,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
     @AfterClass
     public static void destroyFolder() {
         FileUtilities.deleteDirectory(configDirectory);
+        ConfigDirectory.setConfigDirectory(null);
     }
 
     /**
