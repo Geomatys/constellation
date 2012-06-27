@@ -8,6 +8,10 @@
             <key>multipleVersion</key>
             <value>false</value>
         </entry>
+        <entry>
+            <key>transactionSecurized</key>
+            <value>false</value>
+        </entry>
     </cstl:customParameters>
 </cstl:LayerContext>
 
