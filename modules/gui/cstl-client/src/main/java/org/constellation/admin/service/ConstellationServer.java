@@ -179,7 +179,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      * @return true if login/password are valid
      */
     protected boolean authenticate() {
-        final String str = this.serverURL.toString() + "configuration?request=access";
+        final String str = this.getURLWithEndSlash() + "configuration?request="+REQUEST_ACCESS;
         InputStream stream = null;
         HttpURLConnection cnx = null;
         try {
@@ -210,7 +210,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      */
     public String getConfigurationPath(){
         try {
-            final String url = getURL() + "configuration?request=" + REQUEST_GET_CONFIG_PATH;
+            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_CONFIG_PATH;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ak = (AcknowlegementType) response;
@@ -240,7 +240,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     public boolean setConfigurationPath(final String path){
         try {
             
-            final String url = getURL() + "configuration?request=" + REQUEST_SET_CONFIG_PATH + "&path=" + URLEncoder.encode(path);
+            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_SET_CONFIG_PATH + "&path=" + URLEncoder.encode(path);
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -259,7 +259,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     
     public boolean deleteUser(final String userName){
         try {
-            final String url = getURL() + "configuration?request=deleteUser&username=" + userName;
+            final String url = getURLWithEndSlash() + "configuration?request=deleteUser&username=" + userName;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ak = (AcknowlegementType) response;
@@ -285,7 +285,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return false;
         }
         try {
-            final String url = getURL() + "configuration?request=updateUser&username=" + userName + "&password=" + password + "&oldLogin=" + oldLogin;
+            final String url = getURLWithEndSlash() + "configuration?request=updateUser&username=" + userName + "&password=" + password + "&oldLogin=" + oldLogin;
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ak = (AcknowlegementType) response;
@@ -307,7 +307,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     
     public String getUserName(){
         try {
-            final String url = getURL() + "configuration?request=getUserName";
+            final String url = getURLWithEndSlash() + "configuration?request=getUserName";
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
                 final AcknowlegementType ak = (AcknowlegementType) response;
@@ -334,7 +334,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         
         public Map<String, List<String>> getAvailableService() {
             try {
-                final String url = getURL() + "configuration?request=" + REQUEST_LIST_SERVICE;
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_SERVICE;
                 final Object response = sendRequest(url, null);
                 if (response instanceof ServiceReport) {
                     return ((ServiceReport)response).getAvailableServices();
@@ -358,7 +358,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean restartAll() {
             try {
-                final String url = getURL() + "configuration?request=" + REQUEST_FULL_RESTART;
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_FULL_RESTART;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -384,7 +384,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean restartAllInstance(final String service) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=restart";
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=restart";
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -410,7 +410,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean renameInstance(final String service, final String instanceId, final String newName) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=renameInstance&id=" + instanceId + "&newName=" + newName;
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=renameInstance&id=" + instanceId + "&newName=" + newName;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -437,7 +437,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean restartInstance(final String service, final String instanceId) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -464,7 +464,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean newInstance(String service, String instanceId) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -491,7 +491,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean startInstance(final String service, final String instanceId) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -518,7 +518,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean stopInstance(final String service, final String instanceId) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -545,7 +545,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean deleteInstance(final String service, final String instanceId) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -571,7 +571,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public InstanceReport listInstance(final String service) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=listInstance";
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=listInstance";
                 final Object response = sendRequest(url, null);
                 if (response instanceof InstanceReport) {
                     return (InstanceReport) response;
@@ -599,7 +599,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean configureInstance(final String service, final String instanceId, final Object configuration) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
                 final Object response = sendRequest(url, configuration);
                 if (response instanceof AcknowlegementType) {
                     return "Success".equals(((AcknowlegementType)response).getStatus());
@@ -626,7 +626,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public Object getInstanceconfiguration(final String service, final String instanceId) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=getConfiguration&id=" + instanceId;
                 final Object response = sendRequest(url, null);
                 if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
@@ -645,7 +645,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         public boolean updateCapabilities(final String service, final String instanceId, final File importFile, final String fileName) {
             try {
-                final String url = getURL() + service.toLowerCase() + "/admin?request=" + REQUEST_UPDATE_CAPABILITIES + "&id=" + instanceId + "&filename=" + fileName;
+                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=" + REQUEST_UPDATE_CAPABILITIES + "&id=" + instanceId + "&filename=" + fileName;
                 Object response = sendRequest(url, importFile, null, null, true);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -672,7 +672,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * @return A complete URL for the specified service.
          */
         public String getInstanceURL(final String service, final String instanceId) {
-            return getURL() + service.toLowerCase() + '/' + instanceId;
+            return getURLWithEndSlash() + service.toLowerCase() + '/' + instanceId;
         }
         
     }
@@ -687,7 +687,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean restartAllLayerProviders() {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_RESTART_ALL_LAYER_PROVIDERS;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_RESTART_ALL_LAYER_PROVIDERS;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -710,7 +710,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean restartAllStyleProviders() {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_RESTART_ALL_STYLE_PROVIDERS;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_RESTART_ALL_STYLE_PROVIDERS;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -739,7 +739,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("service name", serviceName);
             ArgumentChecks.ensureNonNull("config", config);
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_CREATE_PROVIDER+"&serviceName=" + serviceName;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_CREATE_PROVIDER+"&serviceName=" + serviceName;
                 Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -766,7 +766,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_GET_PROVIDER_CONFIG+"&id=" + id;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_GET_PROVIDER_CONFIG+"&id=" + id;
                 Object response = sendRequest(url, null, descriptor, null, false);
                 if (response instanceof GeneralParameterValue) {
                     return (GeneralParameterValue) response;
@@ -787,7 +787,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean deleteProvider(final String id) {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_DELETE_PROVIDER+"&id=" + id;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_DELETE_PROVIDER+"&id=" + id;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -815,7 +815,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean updateProvider(final String serviceName, final String id, final ParameterValueGroup config) {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_UPDATE_PROVIDER+"&serviceName=" + serviceName + "&id=" + id;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_UPDATE_PROVIDER+"&serviceName=" + serviceName + "&id=" + id;
                 final Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -841,7 +841,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean restartProvider(final String id){
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_RESTART_PROVIDER+"&id=" + id;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_RESTART_PROVIDER+"&id=" + id;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -872,7 +872,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("id", id);
             ArgumentChecks.ensureNonNull("config", config);
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_CREATE_LAYER+"&id=" + id;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_CREATE_LAYER+"&id=" + id;
                 Object response = sendRequest(url, config);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -898,7 +898,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean deleteLayer(final String id, final String layerName) {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_DELETE_LAYER+"&id=" + id + "&layerName=" + layerName;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_DELETE_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -924,7 +924,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public boolean updateLayer(final String id, final String layerName, final ParameterValueGroup layer) {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_UPDATE_LAYER+"&id=" + id + "&layerName=" + layerName;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_UPDATE_LAYER+"&id=" + id + "&layerName=" + layerName;
                 Object response = sendRequest(url, layer);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -949,7 +949,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("styleName", styleName);
             
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_DOWNLOAD_STYLE+"&id=" + id + "&styleName=" + styleName;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_DOWNLOAD_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, null, null, XMLUtilities.getJaxbContext110(), false);
                 
                 if (response instanceof ExceptionReport) {
@@ -979,7 +979,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("styleName", styleName);
             ArgumentChecks.ensureNonNull("style", style);
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_CREATE_STYLE+"&id=" + id + "&styleName=" + styleName;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_CREATE_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, style);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1008,7 +1008,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("styleName", styleName);
             
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_DELETE_STYLE+"&id=" + id + "&styleName=" + styleName;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_DELETE_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1039,7 +1039,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("styleName", styleName);
             ArgumentChecks.ensureNonNull("style", style);
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_UPDATE_STYLE+"&id=" + id + "&styleName=" + styleName;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_UPDATE_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, style);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1065,7 +1065,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_GET_SERVICE_DESCRIPTOR+"&serviceName=" + serviceName;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_GET_SERVICE_DESCRIPTOR+"&serviceName=" + serviceName;
                 Object response = sendDescriptorRequest(url, null);
                 if (response instanceof GeneralParameterDescriptor) {
                     return (GeneralParameterDescriptor) response;
@@ -1088,7 +1088,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public GeneralParameterDescriptor getSourceDescriptor(final String serviceName) {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_GET_SOURCE_DESCRIPTOR+"&serviceName=" + serviceName;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_GET_SOURCE_DESCRIPTOR+"&serviceName=" + serviceName;
                 Object response = sendDescriptorRequest(url, null);
                 if (response instanceof GeneralParameterDescriptor) {
                     return (GeneralParameterDescriptor) response;
@@ -1105,7 +1105,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         public ProvidersReport listProviders() {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_LIST_SERVICES;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_LIST_SERVICES;
                 final Object response = sendRequest(url, null);
                 if (response instanceof ProvidersReport) {
                     return (ProvidersReport) response;
@@ -1134,7 +1134,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public StringList listProcess() {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_LIST_PROCESS;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_LIST_PROCESS;
                 final Object response = sendRequest(url, null);
                 if (response instanceof StringList) {
                     return (StringList) response;
@@ -1156,7 +1156,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public StringTreeNode listTasks(){
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_LIST_TASKS;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_LIST_TASKS;
                 final Object response = sendRequest(url, null);
                 if (response instanceof StringTreeNode) {
                     return (StringTreeNode) response;
@@ -1178,7 +1178,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public GeneralParameterDescriptor getProcessDescriptor(final String authority, final String code) {
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_GET_PROCESS_DESC+"&authority="+authority+"&code="+code;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_GET_PROCESS_DESC+"&authority="+authority+"&code="+code;
                 Object response = sendDescriptorRequest(url, null);
                 if (response instanceof GeneralParameterDescriptor) {
                     return (GeneralParameterDescriptor) response;
@@ -1200,7 +1200,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          */
         public GeneralParameterValue getTaskParameters(final String id, ParameterDescriptorGroup desc){
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_GET_TASK_PARAMS+"&id="+id;
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_GET_TASK_PARAMS+"&id="+id;
                 Object response = sendRequest(url, null, desc, null, false);
                 if (response instanceof GeneralParameterValue) {
                     return (GeneralParameterValue) response;
@@ -1234,7 +1234,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("step", step);
             ArgumentChecks.ensureNonNull("parameters", parameters);
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_CREATE_TASK
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_CREATE_TASK
                         +"&authority=" + authority 
                         +"&code=" + code
                         +"&id=" + id
@@ -1277,7 +1277,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("step", step);
             ArgumentChecks.ensureNonNull("parameters", parameters);
             try {
-                final String url = getURL() + "configuration?request="+REQUEST_UPDATE_TASK
+                final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_UPDATE_TASK
                         +"&authority=" + authority 
                         +"&code=" + code
                         +"&id=" + id
@@ -1308,7 +1308,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean deleteTask(final String id){
             ArgumentChecks.ensureNonNull("id", id);
             try {
-                final String url = getURL().toString() + "configuration?request="+REQUEST_DELETE_TASK+"&id="+id;
+                final String url = getURLWithEndSlash().toString() + "configuration?request="+REQUEST_DELETE_TASK+"&id="+id;
                 Object response = sendRequest(url,null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1335,7 +1335,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         
         public boolean refreshIndex(final String id, final boolean asynchrone) {
             try {
-                final String url = getURL() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1355,7 +1355,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     
         public boolean importFile(final String id, final File importFile, final String fileName) {
             try {
-                final String url = getURL() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id + "&filename=" + fileName;
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id + "&filename=" + fileName;
                 Object response = sendRequest(url, importFile, null, null, true);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1375,7 +1375,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         
         public boolean metadataExist(final String id, final String metadataName) {
             try {
-                final String url = getURL() + "configuration?request=" + REQUEST_METADATA_EXIST + "&id=" + id + "&metadata=" + metadataName;
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_METADATA_EXIST + "&id=" + id + "&metadata=" + metadataName;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1397,7 +1397,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         
         public boolean deleteMetadata(final String id, final String metadataName) {
             try {
-                final String url = getURL() + "configuration?request=" + REQUEST_DELETE_RECORDS + "&id=" + id + "&metadata=" + metadataName;
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_RECORDS + "&id=" + id + "&metadata=" + metadataName;
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
@@ -1417,7 +1417,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         
         public Collection<String> getAvailableDataSourceType() {
             try {
-                final String url = getURL() + "configuration?request=" + REQUEST_AVAILABLE_SOURCE_TYPE;
+                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_AVAILABLE_SOURCE_TYPE;
                 Object response = sendRequest(url, null);
                 if (response instanceof StringList) {
                     final StringList sl = (StringList) response;
@@ -1625,5 +1625,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         return response;
     }
 
-    
+    protected String getURLWithEndSlash(){
+        return (serverURL.toString().endsWith("/")? serverURL.toString() : serverURL.toString() + '/');
+    }
 }
