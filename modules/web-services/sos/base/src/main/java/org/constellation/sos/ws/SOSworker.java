@@ -59,6 +59,7 @@ import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.Normalizer.*;
+import org.constellation.ws.UnauthorizedException;
 
 
 // GeoAPI dependencies
@@ -153,37 +154,37 @@ public class SOSworker extends AbstractWorker {
 
     public static final int DISCOVERY     = 0;
     public static final int TRANSACTIONAL = 1;
-    
+
     /**
      * A list of temporary ObservationTemplate
      */
     private final Map<String, ObservationType> templates = new HashMap<String, ObservationType>();
-    
+
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
-     */ 
+     */
     private final Properties map = new Properties();
-    
+
     /**
      * The base for sensor id.
-     */ 
+     */
     private String sensorIdBase;
-    
+
     /**
      * The base for observation id.
-     */ 
+     */
     private String observationTemplateIdBase;
-    
+
     /**
      * The base for offering id.
-     */ 
+     */
     private static final String OFFERING_ID_BASE = "offering-";
-    
+
     /**
      * The base for phenomenon id.
-     */ 
+     */
     private String phenomenonIdBase;
-    
+
     /**
      * The valid time for a getObservation template (in ms).
      */
@@ -193,14 +194,14 @@ public class SOSworker extends AbstractWorker {
      * The current MIME type of return
      */
     private String outputFormat;
-    
+
     /**
      * A list of schreduled Task (used in close method).
      */
     private final List<Timer> schreduledTask = new ArrayList<Timer>();
-    
+
     /**
-     * A list of supported MIME type 
+     * A list of supported MIME type
      */
     private static final List<String> ACCEPTED_OUTPUT_FORMATS;
     static {
@@ -217,17 +218,17 @@ public class SOSworker extends AbstractWorker {
         ACCEPTED_SENSORML_FORMATS = Arrays.asList(SENSORML_100_FORMAT,
                                                   SENSORML_101_FORMAT);
     }
-    
+
     /**
-     * The profile of the SOS service (transational/discovery). 
+     * The profile of the SOS service (transational/discovery).
      */
     private int profile;
-    
+
     /**
      * The Observation database reader
      */
     private ObservationReader omReader;
-    
+
     /**
      * The Observation database writer
      */
@@ -237,12 +238,12 @@ public class SOSworker extends AbstractWorker {
      * The observation filter
      */
     private ObservationFilter omFilter;
-    
+
     /**
      * The sensorML database reader
      */
     private SensorReader smlReader;
-    
+
     /**
      * The sensorML database writer
      */
@@ -252,9 +253,9 @@ public class SOSworker extends AbstractWorker {
      * The factory to instanciate the O&M Readers / Writers / Filters
      */
     private OMFactory omFactory;
-    
+
     /**
-     * The factory to instanciate the SensorML Readers / Writers 
+     * The factory to instanciate the SensorML Readers / Writers
      */
     private SMLFactory smlFactory;
 
@@ -285,13 +286,13 @@ public class SOSworker extends AbstractWorker {
     private static Capabilities cachedCapabilities;
 
     private boolean alwaysFeatureCollection;
-            
+
     /**
      * Initialize the database connection.
      */
     public SOSworker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.SOS);
-        
+
         isStarted                      = true;
         final SOSConfiguration configuration;
 
@@ -362,8 +363,8 @@ public class SOSworker extends AbstractWorker {
             }
             omConfiguration.setConfigurationDirectory(configurationDirectory);
 
-            
-        
+
+
             //we initialize the properties attribute
             final String observationIdBase  = configuration.getObservationIdBase() != null ?
             configuration.getObservationIdBase() : "urn:ogc:object:observation:unknow:";
@@ -380,7 +381,7 @@ public class SOSworker extends AbstractWorker {
             alwaysFeatureCollection   = configuration.getParameters().containsKey(OMFactory.ALWAYS_FEATURE_COLLECTION) ?
             Boolean.parseBoolean(configuration.getParameters().get(OMFactory.ALWAYS_FEATURE_COLLECTION)) : false;
 
-             
+
             // we fill a map of properties to sent to the reader/writer/filter
             final Map<String, Object> properties = new HashMap<String, Object>();
             properties.put(OMFactory.OBSERVATION_ID_BASE, observationIdBase);
@@ -391,11 +392,11 @@ public class SOSworker extends AbstractWorker {
 
             // we add the general parameters to the properties
             properties.putAll(configuration.getParameters());
-            
+
             // we add the custom parameters to the properties
             properties.putAll(omConfiguration.getCustomparameters());
             properties.putAll(smlConfiguration.getCustomparameters());
-            
+
             // look for template life limit
             int h, m;
             try {
@@ -419,12 +420,12 @@ public class SOSworker extends AbstractWorker {
                 smlReader  = smlFactory.getSensorReader(smlType, smlConfiguration, properties);
                 smlWriter  = smlFactory.getSensorWriter(smlType, smlConfiguration, properties);
             }
-            
+
             // we initialize the O&M reader/writer/filter
             if (!DataSourceType.NONE.equals(omReaderType)) {
                 omFactory = getOMFactory(omReaderType);
                 omReader  = omFactory.getObservationReader(omReaderType, omConfiguration, properties);
-                
+
                 //we initialize the variables depending on the Reader capabilities
                 this.acceptedResponseMode   = omReader.getResponseModes();
                 this.acceptedResponseFormat = omReader.getResponseFormats();
@@ -439,6 +440,13 @@ public class SOSworker extends AbstractWorker {
             }
 
             setLogLevel(configuration.getLogLevel());
+
+            // look for transaction security
+            final String ts = configuration.getParameters().get("transactionSecurized");
+            if (ts != null && !ts.isEmpty()) {
+                transactionSecurized = Boolean.parseBoolean(ts);
+            }
+
             // we log some implementation informations
             logInfos();
 
@@ -476,12 +484,12 @@ public class SOSworker extends AbstractWorker {
             }
         }
     }
-    
+
     /**
      * Select the good O&M factory in the available ones in function of the dataSource type.
-     * 
+     *
      * @param type
-     * @return 
+     * @return
      */
     private OMFactory getOMFactory(DataSourceType type) {
         final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
@@ -493,12 +501,12 @@ public class SOSworker extends AbstractWorker {
         }
         throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
     }
-    
+
     /**
      * Select the good O&M factory in the available ones in function of the dataSource type.
-     * 
+     *
      * @param type
-     * @return 
+     * @return
      */
     private SMLFactory getSMLFactory(DataSourceType type) {
         final Iterator<SMLFactory> ite = ServiceRegistry.lookupProviders(SMLFactory.class);
@@ -558,14 +566,14 @@ public class SOSworker extends AbstractWorker {
 
     /**
      * Load the Capabilites document from a configuration file if its present.
-     * 
+     *
      * @param configurationDirectory
      * @throws JAXBException
      */
     private void cacheCapabilities(final File configurationDirectory) throws JAXBException {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
-        Unmarshaller capaUM = null; 
+        Unmarshaller capaUM = null;
         try {
             capaUM = SOSMarshallerPool.getInstance().acquireUnmarshaller();
             final File configFile = new File(configurationDirectory, "cached-offerings.xml");
@@ -586,10 +594,10 @@ public class SOSworker extends AbstractWorker {
             }
         }
     }
-    
+
     /**
      * Load the Mapping between database identifier/real Identifier
-     * 
+     *
      * @param configDirectory
      */
     private void loadMapping(final File configDirectory) {
@@ -614,10 +622,10 @@ public class SOSworker extends AbstractWorker {
             LOGGER.log(Level.WARNING, "IO Exception while loading the mapping file:{0}", e.getMessage());
         }
     }
-    
+
     /**
      * Web service operation describing the service and its capabilities.
-     * 
+     *
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      */
@@ -625,7 +633,7 @@ public class SOSworker extends AbstractWorker {
         isWorking();
         LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long start = System.currentTimeMillis();
-        
+
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals(SOS)) {
@@ -656,17 +664,17 @@ public class SOSworker extends AbstractWorker {
                 throw new CstlServiceException("accepted format : text/xml, application/xml",
                                                  INVALID_PARAMETER_VALUE, "acceptFormats");
             }
-            
+
         } else {
             this.outputFormat = MimeType.APPLICATION_XML;
         }
-        
+
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
         if (returnUS) {
             return new Capabilities("1.0.0", getCurrentUpdateSequence());
         }
-        
+
         //we prepare the different parts response document
         ServiceIdentification si = null;
         ServiceProvider       sp = null;
@@ -681,7 +689,7 @@ public class SOSworker extends AbstractWorker {
 
         // we load the skeleton capabilities
         final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "SOS");
-        
+
         final Capabilities localCapabilities;
         if (keepCapabilities) {
             localCapabilities = cachedCapabilities;
@@ -771,7 +779,7 @@ public class SOSworker extends AbstractWorker {
                } else {
                    ds.updateParameter(PROCEDURE, procNames);
                }
-               
+
                ds.updateParameter("outputFormat", ACCEPTED_SENSORML_FORMATS);
 
                final Operation gfoi = om.getOperation("GetFeatureOfInterest");
@@ -809,10 +817,10 @@ public class SOSworker extends AbstractWorker {
         LOGGER.log(logLevel, "getCapabilities processed in {0} ms.\n", (System.currentTimeMillis() - start));
         return c;
     }
-    
+
     /**
      * Web service operation which return an sml description of the specified sensor.
-     * 
+     *
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
     public AbstractSensorML describeSensor(final DescribeSensor requestDescSensor) throws CstlServiceException  {
@@ -846,27 +854,27 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("You must specify the sensor ID!",
                                          MISSING_PARAMETER_VALUE, PROCEDURE);
         }
-       
+
 
         AbstractSensorML result = smlReader.getSensor(sensorId);
         if (result instanceof SensorML && out.equalsIgnoreCase(SENSORML_101_FORMAT)) {
             result = SmlFactory.convertTo101((SensorML)result);
         }
-        
+
         LOGGER.log(logLevel, "describeSensor processed in {0} ms.\n", (System.currentTimeMillis() - start));
         return result;
     }
-    
+
     /**
      * Web service operation which respond a collection of observation satisfying
      * the restriction specified in the query.
-     * 
+     *
      * @param requestObservation a document specifying the parameter of the request.
      */
     public Object getObservation(final GetObservation requestObservation) throws CstlServiceException {
         LOGGER.log(logLevel, "getObservation request processing\n");
         final long start = System.currentTimeMillis();
-        
+
         //we verify the base request attribute
         verifyBaseRequest(requestObservation);
 
@@ -900,7 +908,7 @@ public class SOSworker extends AbstractWorker {
         if (localOmFilter instanceof ObservationFilterReader) {
             ((ObservationFilterReader)localOmFilter).setResponseFormat(responseFormat);
         }
-        
+
         QName resultModel = requestObservation.getResultModel();
         if (resultModel == null) {
             resultModel = OBSERVATION_QNAME;
@@ -940,7 +948,7 @@ public class SOSworker extends AbstractWorker {
             for (ResponseModeType s : acceptedResponseMode) {
                 arm.append(s.value()).append('\n');
             }
-            throw new CstlServiceException("This response Mode is not supported by the service" + 
+            throw new CstlServiceException("This response Mode is not supported by the service" +
                                            "Supported Values are:\n" + arm.toString(),
                                              OPERATION_NOT_SUPPORTED, RESPONSE_MODE);
         }
@@ -958,7 +966,7 @@ public class SOSworker extends AbstractWorker {
             }
         }
         localOmFilter.setOffering(off);
-        
+
         //we verify that the srsName (if there is one) is advertised in the offering
         if (requestObservation.getSrsName() != null) {
             if (!off.getSrsName().contains(requestObservation.getSrsName())) {
@@ -1020,9 +1028,9 @@ public class SOSworker extends AbstractWorker {
             final List<String> singlePhenomenons    = new ArrayList<String>();
             final List<String> compositePhenomenons = new ArrayList<String>();
             for (String phenomenonName : observedProperties) {
-                
+
                 if (!phenomenonName.equals(phenomenonIdBase + "ALL")) {
-                    
+
                     // we remove the phenomenon id base
                     if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
                         phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
@@ -1093,7 +1101,7 @@ public class SOSworker extends AbstractWorker {
                                     } else {
                                         LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", sp.getId());
                                     }
-                                    
+
                                 } else if (station instanceof SamplingCurveType) {
                                     final SamplingCurveType sc = (SamplingCurveType) station;
                                     if (sc.getBoundedBy() != null && sc.getBoundedBy().getEnvelope() != null &&
@@ -1132,7 +1140,7 @@ public class SOSworker extends AbstractWorker {
                                 return new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");
                             }
                         }
-                        
+
                     } else {
                         throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
                     }
@@ -1188,7 +1196,7 @@ public class SOSworker extends AbstractWorker {
                     throw new CstlServiceException("To use the operation Between you must specify the propertyName and the litteral",
                                                   MISSING_PARAMETER_VALUE, "propertyIsBetween");
                 }
-                
+
                 final String propertyName       = result.getPropertyIsBetween().getPropertyName();
                 final LiteralType lowerLiteral  = result.getPropertyIsBetween().getLowerBoundary().getLiteral();
                 final LiteralType upperLiteral  = result.getPropertyIsBetween().getUpperBoundary().getLiteral();
@@ -1207,7 +1215,7 @@ public class SOSworker extends AbstractWorker {
         if (!outOfBand) {
 
             ObservationCollectionType ocResponse = new ObservationCollectionType();
-            
+
             /*
              * here we can have 2 different behaviour :
              *
@@ -1221,7 +1229,7 @@ public class SOSworker extends AbstractWorker {
              */
             final List<Observation> matchingResult;
             final EnvelopeType computedBounds;
-            
+
             // case (1)
             if (!(localOmFilter instanceof ObservationFilterReader)) {
                 matchingResult = new ArrayList<Observation>();
@@ -1317,20 +1325,20 @@ public class SOSworker extends AbstractWorker {
         LOGGER.log(Level.WARNING, " the feature of interest {0} does not have proper position", sp.getId());
         return false;
     }
-    
+
     /**
      * Web service operation
      */
     public GetResultResponse getResult(final GetResult requestResult) throws CstlServiceException {
         LOGGER.log(logLevel, "getResult request processing\n");
         final long start = System.currentTimeMillis();
-        
+
         //we verify the base request attribute
         verifyBaseRequest(requestResult);
 
         // we clone the filter for this request
         final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
-        
+
         ObservationType template = null;
         if (requestResult.getObservationTemplateId() != null) {
             final String id = requestResult.getObservationTemplateId();
@@ -1343,67 +1351,67 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("ObservationTemplateID must be specified",
                                           MISSING_PARAMETER_VALUE, "ObservationTemplateId");
         }
-        
+
         final QName resultModel;
         if (template instanceof MeasurementType) {
             resultModel = MEASUREMENT_QNAME;
         } else {
             resultModel = OBSERVATION_QNAME;
         }
-        
+
         //we begin to create the sql request
         localOmFilter.initFilterGetResult(template, resultModel);
-        
+
         //we treat the time constraint
         final List<EventTime> times = requestResult.getEventTime();
 
         /**
          * The template time :
-         */ 
-        
+         */
+
         // case TEquals with time instant
         if (template.getSamplingTime() instanceof TimeInstantType) {
            final TimeInstantType ti           = (TimeInstantType) template.getSamplingTime();
            final BinaryTemporalOpType equals  = new BinaryTemporalOpType(ti);
            final EventTime e                  = new EventTime(equals);
            times.add(e);
-        
+
         } else if (template.getSamplingTime() instanceof TimePeriodType) {
             final TimePeriodType tp = (TimePeriodType) template.getSamplingTime();
-            
+
             //case TBefore
             if (tp.getBeginPosition().equals(new TimePositionType(TimeIndeterminateValueType.BEFORE))) {
                 final BinaryTemporalOpType before  = new BinaryTemporalOpType(new TimeInstantType(tp.getEndPosition()));
                 final EventTime e                  = new EventTime(null, before, null);
                 times.add(e);
-            
-            //case TAfter    
+
+            //case TAfter
             } else if (tp.getEndPosition().equals(new TimePositionType(TimeIndeterminateValueType.NOW))) {
                 final BinaryTemporalOpType after  = new BinaryTemporalOpType(new TimeInstantType(tp.getBeginPosition()));
                 final EventTime e                  = new EventTime(after, null, null);
                 times.add(e);
-            
-            //case TDuring/TEquals  (here the sense of T_Equals with timePeriod is lost but not very usefull) 
+
+            //case TDuring/TEquals  (here the sense of T_Equals with timePeriod is lost but not very usefull)
             } else {
                 final BinaryTemporalOpType during  = new BinaryTemporalOpType(tp);
                 final EventTime e                  = new EventTime(null, null, during);
                 times.add(e);
             }
         }
-        
+
         //we treat the time constraint
         treatEventTimeRequest(times, false, localOmFilter);
-        
+
         //we prepare the response document
-        
+
         String values;
         if (localOmFilter instanceof ObservationFilterReader) {
             values = ((ObservationFilterReader)localOmFilter).getResults();
-            
+
         } else {
             final List<ObservationResult> results = localOmFilter.filterResult();
             final StringBuilder datablock         = new StringBuilder();
-            
+
             for (ObservationResult result: results) {
                 final Timestamp tBegin = result.beginTime;
                 final Timestamp tEnd   = result.endTime;
@@ -1430,62 +1438,62 @@ public class SOSworker extends AbstractWorker {
         LOGGER.log(logLevel, "GetResult processed in {0} ms", (System.currentTimeMillis() - start));
         return response;
     }
-    
+
     private String getResultValues(final Timestamp tBegin, final Timestamp tEnd, final DataArray array, final List<EventTime> eventTimes) throws CstlServiceException {
         String values;
-        
+
         //for multiple observations we parse the brut values (if we got a time constraint)
         if (tBegin != null && tEnd != null) {
 
             values = array.getValues();
-            
+
             for (EventTime bound: eventTimes) {
                 LOGGER.log(Level.FINER, " Values: {0}", values);
                 if (bound.getTEquals() != null) {
                     if (bound.getTEquals().getRest().get(0) instanceof TimeInstantType) {
                         final TimeInstantType ti    = (TimeInstantType) bound.getTEquals().getRest().get(0);
                         final Timestamp boundEquals = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
-                        
+
                         LOGGER.finer("TE case 1");
                         //case 1 the periods contains a matching values
                         values = parseDataBlock(values, array.getEncoding(), null, null, boundEquals);
-                        
+
                     }
-                    
+
                 } else if (bound.getTAfter()  != null) {
                     final TimeInstantType ti   = (TimeInstantType) bound.getTAfter().getRest().get(0);
                     final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
-                    
-                    // case 1 the period overlaps the bound 
+
+                    // case 1 the period overlaps the bound
                     if (tBegin.before(boundBegin) && tEnd.after(boundBegin)) {
                         LOGGER.finer("TA case 1");
                         values = parseDataBlock(values, array.getEncoding(), boundBegin, null, null);
-                    
+
                     }
-                        
+
                 } else if (bound.getTBefore() != null) {
                     final TimeInstantType ti = (TimeInstantType) bound.getTBefore().getRest().get(0);
                     final Timestamp boundEnd = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
-                    
-                    // case 1 the period overlaps the bound 
+
+                    // case 1 the period overlaps the bound
                     if (tBegin.before(boundEnd) && tEnd.after(boundEnd)) {
                         LOGGER.finer("TB case 1");
                         values = parseDataBlock(values, array.getEncoding(), null, boundEnd, null);
-                    
+
                     }
-                    
+
                 } else if (bound.getTDuring() != null) {
-                    
+
                     final TimePeriodType tp = (TimePeriodType) bound.getTDuring().getRest().get(0);
                     final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(tp.getBeginPosition()));
                     final Timestamp boundEnd   = Timestamp.valueOf(getTimeValue(tp.getEndPosition()));
-                    
-                    // case 1 the period overlaps the first bound 
+
+                    // case 1 the period overlaps the first bound
                     if (tBegin.before(boundBegin) && tEnd.before(boundEnd) && tEnd.after(boundBegin)) {
                         LOGGER.finer("TD case 1");
                         values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
 
-                    // case 2 the period overlaps the second bound    
+                    // case 2 the period overlaps the second bound
                     } else if (tBegin.after(boundBegin) && tEnd.after(boundEnd) && tBegin.before(boundEnd)) {
                         LOGGER.finer("TD case 2");
                         values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
@@ -1494,19 +1502,19 @@ public class SOSworker extends AbstractWorker {
                     } else if (tBegin.before(boundBegin) && tEnd.after(boundEnd)) {
                         LOGGER.finer("TD case 3");
                         values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
-                    } 
-                    
-                } 
+                    }
+
+                }
             }
-            
-                    
-        //if this is a simple observation, or if there is no time bound    
+
+
+        //if this is a simple observation, or if there is no time bound
         } else {
             values = array.getValues();
         }
         return values;
     }
-    
+
     /**
      * Parse a data block and return only the values matching the time filter.
      *
@@ -1538,26 +1546,26 @@ public class SOSworker extends AbstractWorker {
                         continue;
                     }
                     final Timestamp t = new Timestamp(d.getTime());
-                    
+
                     // time during case
                     if (boundBegin != null && boundEnd != null) {
                         if (t.after(boundBegin) && t.before(boundEnd)) {
                             values += block + encoding.getBlockSeparator();
                         }
-                        
-                    //time after case    
+
+                    //time after case
                     } else if (boundBegin != null && boundEnd == null) {
                         if (t.after(boundBegin)) {
                             values += block + encoding.getBlockSeparator();
                         }
-                    
-                    //time before case    
+
+                    //time before case
                     } else if (boundBegin == null && boundEnd != null) {
                         if (t.before(boundEnd)) {
                             values += block + encoding.getBlockSeparator();
                         }
-                        
-                    //time equals case    
+
+                    //time equals case
                     } else if (boundEquals != null) {
                         if (t.equals(boundEquals)) {
                             values += block + encoding.getBlockSeparator();
@@ -1587,7 +1595,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         AbstractFeatureType result = null;
-        
+
         // we return a single result
         if (request.getFeatureOfInterestId().size() == 1) {
             final SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0));
@@ -1625,7 +1633,7 @@ public class SOSworker extends AbstractWorker {
             final SpatialOpsType spatialFilter = request.getLocation().getSpatialOps().getValue();
             if (spatialFilter instanceof BBOXType) {
                 final List<SamplingFeature> results = spatialFiltering((BBOXType) spatialFilter);
-                
+
                 // we return a single result
                 if (results.size() == 1) {
                     result = (AbstractFeatureType) results.get(0);
@@ -1657,7 +1665,7 @@ public class SOSworker extends AbstractWorker {
         LOGGER.log(logLevel, "GetFeatureOfInterestTime request processing\n");
         final long start = System.currentTimeMillis();
         verifyBaseRequest(request);
-        
+
         final AbstractTimePrimitiveType result;
         final String fid = request.getFeatureOfInterestId();
 
@@ -1677,7 +1685,7 @@ public class SOSworker extends AbstractWorker {
 
     /**
      * Build the correct featurePropertyType from a sampling feature
-     * 
+     *
      * @param feature
      * @return
      */
@@ -1740,18 +1748,21 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The operation registerSensor is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
+        if (transactionSecurized && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
+            throw new UnauthorizedException("You must be authentified to perform an registerSensor request.");
+        }
         LOGGER.log(logLevel, "registerSensor request processing\n");
         final long start = System.currentTimeMillis();
-        
+
         //we verify the base request attribute
         verifyBaseRequest(requestRegSensor);
-        
+
         boolean success = false;
         String id = "";
         try {
             //we begin a transaction
             smlWriter.startTransaction();
-            
+
             //we get the SensorML file who describe the Sensor to insert.
             final RegisterSensor.SensorDescription d = requestRegSensor.getSensorDescription();
             AbstractSensorML process;
@@ -1763,7 +1774,7 @@ public class SOSworker extends AbstractWorker {
                     type = d.getAny().getClass().getName();
                 throw new CstlServiceException("unexpected type for process: " + type , INVALID_PARAMETER_VALUE, "sensorDescription");
             }
-            
+
             //we get the observation template provided with the sensor description.
             final ObservationTemplate temp = requestRegSensor.getObservationTemplate();
             ObservationType obs           = null;
@@ -1779,7 +1790,7 @@ public class SOSworker extends AbstractWorker {
                                               INVALID_PARAMETER_VALUE,
                                               OBSERVATION_TEMPLATE);
             }
-            
+
             //we create a new Identifier from the SensorML database
             String num = "";
             if (obs.getProcedure() instanceof ProcessType) {
@@ -1787,18 +1798,18 @@ public class SOSworker extends AbstractWorker {
                 if (pentry.getHref() != null && pentry.getHref().startsWith(sensorIdBase)) {
                     id  = pentry.getHref();
                     num = id.substring(sensorIdBase.length());
-                    LOGGER.log(logLevel, "using specified sensor ID:" + id + " num =" + num);
+                    LOGGER.log(logLevel, "using specified sensor ID:{0} num ={1}", new Object[]{id, num});
                 }
-            } 
+            }
 
             if (id.isEmpty()) {
                 num = Integer.toString(smlWriter.getNewSensorId());
                 id  = sensorIdBase + num;
             }
 
-            /* 
+            /*
              * @TODO
-             * 
+             *
              * here we affect the new Sensor id to the metatadata
              * does we have to keep the one of the metadata instead of generating one?
              */
@@ -1814,7 +1825,7 @@ public class SOSworker extends AbstractWorker {
 
             // we record the mapping between physical id and database id
             recordMapping(id, phyId);
-            
+
             // and we record the position of the piezometer
             final DirectPositionType position = getSensorPosition(process);
             if (omWriter != null) {
@@ -1831,10 +1842,10 @@ public class SOSworker extends AbstractWorker {
             } else {
                 LOGGER.warning("unable to record Sensor template and location in O&M datasource: no O&M writer");
             }
-                   
-            
-            
-           success = true; 
+
+
+
+           success = true;
 
         } finally {
             if (!success) {
@@ -1844,15 +1855,15 @@ public class SOSworker extends AbstractWorker {
                 smlWriter.endTransaction();
             }
         }
-        
+
         LOGGER.log(logLevel, "registerSensor processed in {0}ms", (System.currentTimeMillis() - start));
         return new RegisterSensorResponse(id);
     }
-    
+
     /**
      * Web service operation which insert a new Observation for the specified sensor
      * in the O&M database.
-     * 
+     *
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
      */
     public InsertObservationResponse insertObservation(final InsertObservation requestInsObs) throws CstlServiceException {
@@ -1860,12 +1871,16 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("The operation insertObservation is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
+        if (transactionSecurized && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
+            throw new UnauthorizedException("You must be authentified to perform an insertObservation request.");
+        }
+
         LOGGER.log(logLevel, "InsertObservation request processing\n");
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
         verifyBaseRequest(requestInsObs);
-        
+
         String id = "";
         //we get the id of the sensor and we create a sensor object
         final String sensorId = requestInsObs.getAssignedSensorId();
@@ -1932,27 +1947,27 @@ public class SOSworker extends AbstractWorker {
         omFilter.refresh();
         return new InsertObservationResponse(id);
     }
-    
+
     /**
      *
-     * 
+     *
      * @param times A list of time constraint.
      * @param SQLrequest A stringBuilder building the SQL request.
-     * 
+     *
      * @return true if there is no errors in the time constraint else return false.
      */
     private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(final List<EventTime> times, final boolean template, final ObservationFilter localOmFilter) throws CstlServiceException {
-        
+
         //In template mode  his method return a temporal Object.
         AbstractTimeGeometricPrimitiveType templateTime = null;
-        
+
         if (!times.isEmpty()) {
-            
+
             for (EventTime time: times) {
 
                 // The operation Time Equals
                 if (time.getTEquals() != null) {
-                    
+
                     if (!time.getTEquals().getRest().isEmpty()) {
                         // we get the property name (not used for now)
                         //String propertyName = time.getTEquals().getPropertyName();
@@ -1993,8 +2008,8 @@ public class SOSworker extends AbstractWorker {
                         throw new CstlServiceException("TM_Equals filter content is empty!",
                                                           INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
-                
-                // The operation Time before    
+
+                // The operation Time before
                 } else if (time.getTBefore() != null) {
 
                     if (!time.getTBefore().getRest().isEmpty()) {
@@ -2015,10 +2030,10 @@ public class SOSworker extends AbstractWorker {
                         throw new CstlServiceException("TM_Before filter content is empty!",
                                                           INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
-                    
-                // The operation Time after    
+
+                // The operation Time after
                 } else if (time.getTAfter() != null) {
-                    
+
                     if (!time.getTAfter().getRest().isEmpty()) {
                         // we get the property name (not used for now)
                         //String propertyName = time.getTAfter().getPropertyName();
@@ -2038,8 +2053,8 @@ public class SOSworker extends AbstractWorker {
                         throw new CstlServiceException("TM_After filter content is empty!",
                                                           INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
-                    
-                // The time during operation    
+
+                // The time during operation
                 } else if (time.getTDuring() != null) {
                     if (!time.getTDuring().getRest().isEmpty()) {
                         // we get the property name (not used for now)
@@ -2074,10 +2089,10 @@ public class SOSworker extends AbstractWorker {
         }
         return templateTime;
     }
-    
+
     /**
      *  Verify that the bases request attributes are correct.
-     */ 
+     */
     private void verifyBaseRequest(final RequestBaseType request) throws CstlServiceException {
         isWorking();
         if (request != null) {
@@ -2095,16 +2110,16 @@ public class SOSworker extends AbstractWorker {
             } else {
                 throw new CstlServiceException("version must be specified!", MISSING_PARAMETER_VALUE, "version");
             }
-         } else { 
+         } else {
             throw new CstlServiceException("The request is null!", NO_APPLICABLE_CODE);
-         }  
+         }
     }
-    
+
     /**
-     * Find a new suffix to obtain a unic temporary template id. 
-     * 
+     * Find a new suffix to obtain a unic temporary template id.
+     *
      * @param templateName the full name of the sensor template.
-     * 
+     *
      * @return an integer to paste after the template name;
      */
     private int getTemplateSuffix(final String templateName) {
@@ -2117,18 +2132,18 @@ public class SOSworker extends AbstractWorker {
         }
         return i;
     }
-    
+
     /**
      * Add the new Sensor to an offering specified in the network attribute of sensorML file.
      * if the offering doesn't yet exist in the database, it will be create.
-     * 
+     *
      * @param sensor A sensorML object describing the sensor.
      * @param template The observation template for this sensor.
      *
      * @throws CstlServiceException If an error occurs during the the storage of offering in the datasource.
      */
     private void addSensorToOffering(final AbstractSensorML sensor, final Observation template) throws CstlServiceException {
-     
+
         //we search which are the networks binded to this sensor
         final List<String> networkNames = getNetworkNames(sensor);
 
@@ -2141,7 +2156,7 @@ public class SOSworker extends AbstractWorker {
         for (String networkName : networkNames) {
             final String offeringName               = "offering-" + networkName;
             final ObservationOfferingType offering = omReader.getObservationOffering(offeringName);
-            
+
             if (offering != null) {
                 updateOffering(offering, template);
             } else {
@@ -2165,7 +2180,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @param offering The offering to update
      * @param template An Observation template.
-     * 
+     *
      * @throws CstlServiceException If the service does not succeed to update the offering in the datasource.
      */
     private void updateOffering(final ObservationOfferingType offering, final Observation template) throws CstlServiceException {
@@ -2200,10 +2215,10 @@ public class SOSworker extends AbstractWorker {
         omWriter.updateOffering(offProc, offPheno, offSF);
     }
 
-    
+
     /**
      * Create a new Offering with the specified observation template
-     * 
+     *
      * @param offeringName the name of the new offering (not including offering base name).
      * @param template An observation template used as a base for the offering.
      *
@@ -2256,10 +2271,10 @@ public class SOSworker extends AbstractWorker {
                                             resultModel,
                                             responses));
     }
-    
+
     /**
      * Return the current output format MIME type (default: application/xml).
-     * 
+     *
      * @return The current output format MIME type (default: application/xml).
      *
      * @deprecated thread unsafe todo replace
@@ -2271,7 +2286,7 @@ public class SOSworker extends AbstractWorker {
         }
         return outputFormat;
     }
-    
+
     /**
      * Record the mapping between physical ID and database ID.
      *
@@ -2344,7 +2359,7 @@ public class SOSworker extends AbstractWorker {
     }
 
     @Override
-    public void setLogLevel(final Level logLevel) {
+    public final void setLogLevel(final Level logLevel) {
         this.logLevel = logLevel;
         if (omFilter != null) {
             omFilter.setLoglevel(logLevel);
@@ -2358,26 +2373,26 @@ public class SOSworker extends AbstractWorker {
     protected MarshallerPool getMarshallerPool() {
         return SOSMarshallerPool.getInstance();
     }
-    
+
     /**
      * A task destroying a observation template when the template validity period pass.
-     */ 
+     */
     class DestroyTemplateTask extends TimerTask {
 
         /**
          * The identifier of the temporary template.
          */
         private final String templateId;
-        
+
         /**
          * Build a new Timer which will destroy the temporaryTemplate
-         * 
+         *
          * @param templateId The identifier of the temporary template.
          */
         public DestroyTemplateTask(final String templateId) {
             this.templateId  = templateId;
         }
-        
+
         /**
          * This method is launch when the timer expire.
          */

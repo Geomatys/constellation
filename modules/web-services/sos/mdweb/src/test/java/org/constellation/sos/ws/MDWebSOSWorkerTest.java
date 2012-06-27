@@ -42,7 +42,7 @@ import org.junit.*;
 public class MDWebSOSWorkerTest extends SOSWorkerTest {
 
     private static DefaultDataSource ds2 = null;
-    
+
     private static final File configDir = new File("MDSOSWorkerTest");
 
     @BeforeClass
@@ -66,7 +66,7 @@ public class MDWebSOSWorkerTest extends SOSWorkerTest {
 
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
-        
+
         if (configDir.exists()) {
             FileUtilities.deleteDirectory(configDir);
         }
@@ -80,20 +80,21 @@ public class MDWebSOSWorkerTest extends SOSWorkerTest {
             BDD smBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url2, "", "");
             SMLConfiguration.setBdd(smBdd);
             SMLConfiguration.setFormat("mdweb");
-            
+
             Automatic OMConfiguration  = new Automatic();
-            
+
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(DataSourceType.NONE);
             configuration.setObservationWriterType(DataSourceType.NONE);
             configuration.setObservationFilterType(DataSourceType.NONE);
-            
+
             configuration.setSMLType(DataSourceType.MDWEB);
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
             configuration.setProfile("transactional");
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+            configuration.getParameters().put("transactionSecurized", "false");
             marshaller.marshal(configuration, configFile);
 
         }
@@ -123,7 +124,7 @@ public class MDWebSOSWorkerTest extends SOSWorkerTest {
         }
     }
 
-    
+
 
     @Before
     public void setUp() throws Exception {

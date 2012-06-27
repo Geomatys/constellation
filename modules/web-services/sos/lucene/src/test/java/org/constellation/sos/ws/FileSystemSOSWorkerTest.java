@@ -91,7 +91,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic SMLConfiguration = new Automatic();
-            
+
             Automatic OMConfiguration  = new Automatic();
             OMConfiguration.setDataDirectory(configDir.getName());
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
@@ -104,6 +104,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+            configuration.getParameters().put("transactionSecurized", "false");
             marshaller.marshal(configuration, configFile);
 
         }
@@ -129,7 +130,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
     @After
     public void tearDown() throws Exception {
-        
+
     }
 
     public static void writeCommonDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {
@@ -163,7 +164,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         in.close();
         fw.close();
     }
-    
+
     /**
      * Tests the getcapabilities method
      *
@@ -231,7 +232,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
     public void GetResultErrorTest() throws Exception {
         super.GetResultErrorTest();
     }
-    
+
     /**
      * Tests the GetResult method
      *

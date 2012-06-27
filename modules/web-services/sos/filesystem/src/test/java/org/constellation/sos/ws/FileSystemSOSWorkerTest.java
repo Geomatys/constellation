@@ -43,7 +43,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
 
     private static final File configDir = new File("FSSOSWorkerTest");
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
@@ -55,7 +55,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         if (!configDir.exists()) {
             configDir.mkdir();
 
-            
+
 
             File sensorDirectory = new File(configDir, "sensors");
             sensorDirectory.mkdir();
@@ -66,20 +66,22 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             File configFile = new File(configDir, "config.xml");
             Automatic SMLConfiguration = new Automatic();
             SMLConfiguration.setDataDirectory(configDir.getName() + "/sensors");
-            
+
             Automatic OMConfiguration  = new Automatic();
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(DataSourceType.NONE);
             configuration.setObservationWriterType(DataSourceType.NONE);
             configuration.setObservationFilterType(DataSourceType.NONE);
-            
+
             configuration.setSMLType(DataSourceType.FILESYSTEM);
-            
+
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
             configuration.setProfile("transactional");
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+            configuration.getParameters().put("transactionSecurized", "false");
+            
             marshaller.marshal(configuration, configFile);
 
         }
@@ -105,7 +107,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
     @After
     public void tearDown() throws Exception {
-        
+
     }
 
     public static void writeCommonDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {
@@ -147,7 +149,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
        super.DescribeSensorTest();
     }
 
-    
+
     /**
      * Tests the RegisterSensor method
      *

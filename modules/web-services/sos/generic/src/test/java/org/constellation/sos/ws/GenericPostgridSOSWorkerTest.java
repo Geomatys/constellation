@@ -99,6 +99,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+            configuration.getParameters().put("transactionSecurized", "false");
             marshaller.marshal(configuration, configFile);
 
         }

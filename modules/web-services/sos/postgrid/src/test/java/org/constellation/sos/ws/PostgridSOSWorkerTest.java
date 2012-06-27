@@ -54,7 +54,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
         sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
-       
+
 
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
@@ -70,7 +70,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic SMLConfiguration = new Automatic();
-            
+
             Automatic OMConfiguration  = new Automatic();
             BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
             OMConfiguration.setBdd(bdd);
@@ -84,6 +84,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+            configuration.getParameters().put("transactionSecurized", "false");
             marshaller.marshal(configuration, configFile);
 
         }
@@ -113,7 +114,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         }
     }
 
-    
+
 
     @Before
     public void setUp() throws Exception {
@@ -136,7 +137,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
     }
 
-    
+
     /**
      * Tests the getcapabilities method
      *
@@ -192,7 +193,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
     public void GetResultErrorTest() throws Exception {
         super.GetResultErrorTest();
     }
-    
+
     /**
      * Tests the GetResult method
      *
@@ -237,7 +238,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         super.GetFeatureOfInterestTest();
     }
 
-    
+
     /**
      * Tests the destroy method
      *
