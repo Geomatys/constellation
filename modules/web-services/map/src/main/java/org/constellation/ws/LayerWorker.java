@@ -41,7 +41,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * A super class for all the web service worker dealing with layers (WMS, WCS, WMTS, WFS, ...)
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
 public abstract class LayerWorker extends AbstractWorker {
@@ -82,6 +82,12 @@ public abstract class LayerWorker extends AbstractWorker {
                                 }
                             }
                         }
+                        // look for transaction security
+                        final String ts = candidate.getCustomParameters().get("transactionSecurized");
+                        if (ts != null && !ts.isEmpty()) {
+                            LOGGER.log(Level.INFO, "transaction securized:{0}", ts);
+                            transactionSecurized = Boolean.parseBoolean(ts);
+                        }
                     } else {
                         startError = "The layer context File does not contain a layerContext object";
                         isStarted  = false;
@@ -112,7 +118,7 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     /**
-     * 
+     *
      * @return map of additional informations for each layer declared in the layer context.
      */
     protected Map<Name, Layer> getLayers(){
@@ -226,7 +232,7 @@ public abstract class LayerWorker extends AbstractWorker {
     public boolean isSecured() {
         return (pdp != null);
     }
-    
+
     protected String getProperty(final String key) {
         if (layerContext != null && layerContext.getCustomParameters() != null) {
             return layerContext.getCustomParameters().get(key);

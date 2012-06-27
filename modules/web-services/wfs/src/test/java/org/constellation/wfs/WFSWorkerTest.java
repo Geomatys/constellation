@@ -109,11 +109,11 @@ public class WFSWorkerTest {
 
     private static MarshallerPool pool;
     private static WFSWorker worker ;
-    
+
     private static DefaultDataSource ds = null;
 
     private static DefaultDataSource ds2 = null;
-    
+
     private XmlFeatureWriter featureWriter;
 
     private static String EPSG_VERSION;
@@ -136,7 +136,8 @@ public class WFSWorkerTest {
                 Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
                 Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
                 LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
-
+                lc.getCustomParameters().put("transactionSecurized", "false");
+                
                 //we write the configuration file
                 File configFile = new File(configDir, "layerContext.xml");
                 final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
@@ -337,7 +338,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -372,7 +373,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -396,7 +397,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -419,7 +420,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -442,7 +443,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -465,7 +466,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -490,7 +491,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -498,7 +499,7 @@ public class WFSWorkerTest {
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
-        
+
 
         /**
          * Test 9 : query on typeName samplingPoint with sort on gml:name
@@ -510,7 +511,7 @@ public class WFSWorkerTest {
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
         result = worker.getFeature(request);
-        
+
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
@@ -570,7 +571,7 @@ public class WFSWorkerTest {
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
     }
-    
+
     /**
      * test the feature marshall
      *
@@ -591,7 +592,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -615,7 +616,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -640,7 +641,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -670,7 +671,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -692,7 +693,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -713,7 +714,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -748,7 +749,7 @@ public class WFSWorkerTest {
         assertTrue(result instanceof FeatureCollectionWrapper);
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -771,7 +772,7 @@ public class WFSWorkerTest {
             assertTrue(result instanceof FeatureCollectionWrapper);
             wrapper = (FeatureCollectionWrapper) result;
             result = wrapper.getFeatureCollection();
-        
+
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
             String xmlResult = writer.toString();
@@ -794,7 +795,7 @@ public class WFSWorkerTest {
             assertTrue(result instanceof FeatureCollectionWrapper);
             wrapper = (FeatureCollectionWrapper) result;
             result = wrapper.getFeatureCollection();
-        
+
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
             String xmlResult = writer.toString();
@@ -871,7 +872,7 @@ public class WFSWorkerTest {
         UpdateElementType update = new UpdateElementType(properties, null, typeName, null);
         update.setInputFormat("bad inputFormat");
         TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, update);
-        
+
 
         try {
             worker.transaction(request);
@@ -891,7 +892,7 @@ public class WFSWorkerTest {
         properties.add(new PropertyType(new QName("whatever"), new ValueType("someValue")));
         request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(properties, null, typeName, null));
 
-        
+
         try {
             worker.transaction(request);
             fail("Should have raised an error.");
@@ -912,7 +913,7 @@ public class WFSWorkerTest {
         FilterType filter        = new FilterType(pe);
         request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(properties, filter, typeName, null));
 
-        
+
         try {
             worker.transaction(request);
             fail("Should have raised an error.");
@@ -932,7 +933,7 @@ public class WFSWorkerTest {
         filter = new FilterType(pe);
         request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, new UpdateElementType(properties, filter, typeName, null));
 
-        
+
         TransactionResponse result = worker.transaction(request);
 
         TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0);
@@ -952,7 +953,7 @@ public class WFSWorkerTest {
         assertTrue(resultGF instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
         resultGF = wrapper.getFeatureCollection();
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
@@ -1011,7 +1012,7 @@ public class WFSWorkerTest {
         assertTrue(resultGF instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
         resultGF = wrapper.getFeatureCollection();
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
@@ -1112,7 +1113,7 @@ public class WFSWorkerTest {
                     layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
                     layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Streams");
                     layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Streams");
-                    
+
                 }else if("observation".equals(serviceName)){
                     try{
                         final String url = "jdbc:derby:memory:TestWFSWorker";

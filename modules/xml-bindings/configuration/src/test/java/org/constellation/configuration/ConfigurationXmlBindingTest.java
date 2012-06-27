@@ -80,10 +80,10 @@ public class ConfigurationXmlBindingTest {
                 "</ns2:ServiceReport>\n";
 
         String result =  removeXmlns(sw.toString());
-        
+
         assertEquals(expresult, result);
     }
-    
+
     /**
      * Test InstanceReport Marshalling.
      *
@@ -143,7 +143,7 @@ public class ConfigurationXmlBindingTest {
         sources.add(s1);
         sources.add(s2);
         LayerContext context = new LayerContext(new Layers(sources));
-        
+
         context.getCustomParameters().put("multipleVersion", "false");
         StringWriter sw = new StringWriter();
         marshaller.marshal(context, sw);
@@ -229,7 +229,7 @@ public class ConfigurationXmlBindingTest {
 
         sources = new ArrayList<Source>();
         include = new ArrayList<Layer>();
-        l1 = new Layer(new QName("layer1"), 
+        l1 = new Layer(new QName("layer1"),
                        "some title human readeable",
                        " a resume about the layer",
                        Arrays.asList("key1", "key2"),
@@ -305,7 +305,7 @@ public class ConfigurationXmlBindingTest {
         assertEquals(expresult, result);
 
     }
-    
+
     /**
      * Test processContext Marshalling.
      *
@@ -410,7 +410,7 @@ public class ConfigurationXmlBindingTest {
         result =  removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
-    
+
     /**
      * Test processContext Marshalling.
      *
@@ -433,7 +433,7 @@ public class ConfigurationXmlBindingTest {
         String result = removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
-    
+
     /**
      * Test layerContext Marshalling.
      *
@@ -448,16 +448,16 @@ public class ConfigurationXmlBindingTest {
                 + "        <ns2:Source load_all=\"true\" id=\"source2\"/>" + '\n'
                 + "    </ns2:layers>" + '\n'
                 + "</ns2:LayerContext>\n";
-        
+
         List<Source> sources = new ArrayList<Source>();
         Source s1 = new Source("source1", true, null, null);
         Source s2 = new Source("source2", true, null, null);
         sources.add(s1);
         sources.add(s2);
         LayerContext expresult = new LayerContext(new Layers(sources));
-        
+
         LayerContext result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
-        
+
         assertEquals(expresult.getLayers(), result.getLayers());
         assertEquals(expresult, result);
 
@@ -474,7 +474,7 @@ public class ConfigurationXmlBindingTest {
                 + "    </ns2:layers>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        
+
         sources = new ArrayList<Source>();
         List<Layer> exclude = new ArrayList<Layer>();
         Layer l1 = new Layer(new QName("layer1"));
@@ -486,9 +486,9 @@ public class ConfigurationXmlBindingTest {
         sources.add(s1);
         sources.add(s2);
         expresult = new LayerContext(new Layers(sources));
-        
+
         result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
-        
+
         assertEquals(expresult, result);
 
         xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
@@ -515,9 +515,9 @@ public class ConfigurationXmlBindingTest {
         sources.add(s1);
         sources.add(s2);
         expresult = new LayerContext(new Layers(sources));
-        
+
         result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
-        
+
         assertEquals(expresult, result);
 
         xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
@@ -568,7 +568,7 @@ public class ConfigurationXmlBindingTest {
 
          sources = new ArrayList<Source>();
         include = new ArrayList<Layer>();
-        l1 = new Layer(new QName("layer1"), 
+        l1 = new Layer(new QName("layer1"),
                        "some title human readeable",
                        " a resume about the layer",
                        Arrays.asList("key1", "key2"),
@@ -590,9 +590,9 @@ public class ConfigurationXmlBindingTest {
         sources.add(s2);
         Layer mainLayer = new Layer(null, "mainTitle", null, null, null, null, null, null, null, null, Arrays.asList("CRS-custo1", "CRS-custo2"));
         expresult = new LayerContext(new Layers(mainLayer, sources));
-        
+
         result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
-        
+
         assertEquals(expresult.getLayers().size(), result.getLayers().size());
         assertEquals(expresult.getLayers().get(0).getInclude().get(0).getAttribution().getOnlineResource(), result.getLayers().get(0).getInclude().get(0).getAttribution().getOnlineResource());
         assertEquals(expresult.getLayers().get(0).getInclude().get(0).getAttribution().getLogoURL(), result.getLayers().get(0).getInclude().get(0).getAttribution().getLogoURL());
@@ -608,6 +608,23 @@ public class ConfigurationXmlBindingTest {
         assertEquals(expresult.getMainLayer(), result.getMainLayer());
         assertEquals(expresult, result);
 
+        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<c:LayerContext xmlns:c=\"http://www.constellation.org/config\">" + '\n'
+                + "    <c:layers/>" + '\n'
+                + "    <c:customParameters>" + '\n'
+                + "        <entry>" + '\n'
+                + "            <key>transactionSecurized</key>" + '\n'
+                + "            <value>false</value>" + '\n'
+                + "        </entry>" + '\n'
+                + "    </c:customParameters>" + '\n'
+                + " </c:LayerContext>\n";
+
+        result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
+
+        expresult = new LayerContext();
+        expresult.getCustomParameters().put("transactionSecurized", "false");
+        assertEquals(expresult.getLayers(), result.getLayers());
+        assertEquals(expresult, result);
     }
 
     public static String removeXmlns(String xml) {
@@ -618,7 +635,7 @@ public class ConfigurationXmlBindingTest {
         s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
         return s;
     }
-    
+
     @Test
     public void stringListMarshalingTest() throws Exception {
         final List<String> list = new ArrayList<String>();
@@ -636,18 +653,18 @@ public class ConfigurationXmlBindingTest {
 
         String result = removeXmlns(sw.toString());
         assertEquals(expresult, result);
-        
+
         final Set<String> set = new HashSet<String>();
         set.add("value1");
         set.add("value2");
         final StringList slSet = new StringList(set);
         sw = new StringWriter();
         marshaller.marshal(slSet, sw);
-        
+
         result = removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
-    
+
     @Test
     public void stringListUnMarshalingTest() throws Exception {
         final List<String> list = new ArrayList<String>();
@@ -656,7 +673,7 @@ public class ConfigurationXmlBindingTest {
         final StringList expResult = new StringList(list);
 
 
-        String xml = 
+        String xml =
                   "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:StringList xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:Entry>value1</ns2:Entry>" + '\n'

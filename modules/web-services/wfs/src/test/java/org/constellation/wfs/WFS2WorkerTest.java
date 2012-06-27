@@ -69,7 +69,6 @@ import org.geotoolkit.wfs.xml.AllSomeType;
 import org.geotoolkit.wfs.xml.StoredQueryDescription;
 import org.geotoolkit.wfs.xml.StoredQueries;
 import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
-import org.geotoolkit.wfs.xml.v200.Title;
 import org.geotoolkit.wfs.xml.v200.StoredQueryListItemType;
 import org.geotoolkit.wfs.xml.v200.ListStoredQueriesResponseType;
 import org.geotoolkit.wfs.xml.v200.ListStoredQueriesType;
@@ -121,17 +120,17 @@ public class WFS2WorkerTest {
 
     private static MarshallerPool pool;
     private static WFSWorker worker ;
-    
+
     private static DefaultDataSource ds = null;
 
     private static DefaultDataSource ds2 = null;
-    
+
     private XmlFeatureWriter featureWriter;
 
     private static String EPSG_VERSION;
-    
+
     private static File configDir;
-    
+
     private static final ObjectFactory wfsFactory = new ObjectFactory();
     private static final org.geotoolkit.ogc.xml.v200.ObjectFactory ogcFactory = new org.geotoolkit.ogc.xml.v200.ObjectFactory();
 
@@ -148,21 +147,22 @@ public class WFS2WorkerTest {
             pool = WFSMarshallerPool.getInstance();
 
             if (!configDir.exists()) {
-                
+
                 configDir.mkdir();
-                
+
                 Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
                 Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
                 Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
                 LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
+                lc.getCustomParameters().put("transactionSecurized", "false");
 
                 //we write the configuration file
                 Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
                 File configFile = new File(configDir, "layerContext.xml");
                 marshaller.marshal(lc, configFile);
-                
+
                 GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                
+
                 final List<StoredQueryDescription> descriptions = new ArrayList<StoredQueryDescription>();
                 final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
                 final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
@@ -173,13 +173,13 @@ public class WFS2WorkerTest {
                 final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
                 descriptions.add(des1);
                 final StoredQueries storesQueries = new StoredQueries(descriptions);
-                
+
                 //we write the configuration file
                 marshaller = WFSMarshallerPool.getInstance().acquireMarshaller();
                 configFile = new File(configDir, "StoredQueries.xml");
                 marshaller.marshal(storesQueries, configFile);
                 WFSMarshallerPool.getInstance().release(marshaller);
-                
+
             }
 
         } catch (Exception ex) {
@@ -219,7 +219,7 @@ public class WFS2WorkerTest {
     public void tearDown() throws Exception {
     }
 
-    
+
     /**
      * test the feature marshall
      *
@@ -281,7 +281,7 @@ public class WFS2WorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        
+
         DomCompare.compare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities2-0-0-ftl.xml"),
                 sw.toString());
@@ -381,7 +381,7 @@ public class WFS2WorkerTest {
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -408,7 +408,7 @@ public class WFS2WorkerTest {
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.getAbstractProjectionClause().add(wfsFactory.createPropertyName(new PropertyName(new QName("http://www.opengis.net/gml/3.2.1", "name"))));
-        
+
         queries.add(query);
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
@@ -418,7 +418,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -443,7 +443,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -467,7 +467,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -491,7 +491,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -515,7 +515,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -541,7 +541,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -549,7 +549,7 @@ public class WFS2WorkerTest {
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         DomCompare.compare(expectedResult, writer.toString());
-        
+
 
         /**
          * Test 9 : query on typeName samplingPoint with sort on gml:name
@@ -566,7 +566,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -599,7 +599,7 @@ public class WFS2WorkerTest {
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
-            result = worker.getFeature(request);
+            worker.getFeature(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             //ok
@@ -616,13 +616,13 @@ public class WFS2WorkerTest {
         request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
 
         try {
-            result = worker.getFeature(request);
+            worker.getFeature(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
     }
-    
+
     /**
      * test the feature marshall
      *
@@ -644,7 +644,7 @@ public class WFS2WorkerTest {
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -669,7 +669,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -695,7 +695,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -726,7 +726,7 @@ public class WFS2WorkerTest {
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -749,7 +749,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -771,7 +771,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -809,7 +809,7 @@ public class WFS2WorkerTest {
         wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
@@ -833,7 +833,7 @@ public class WFS2WorkerTest {
             wrapper = (FeatureCollectionWrapper) result;
             result = wrapper.getFeatureCollection();
             assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
             String xmlResult = writer.toString();
@@ -853,12 +853,12 @@ public class WFS2WorkerTest {
 
         try {
             result = worker.getFeature(request);
-            
+
             assertTrue(result instanceof FeatureCollectionWrapper);
             wrapper = (FeatureCollectionWrapper) result;
             result = wrapper.getFeatureCollection();
             assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
             String xmlResult = writer.toString();
@@ -935,7 +935,7 @@ public class WFS2WorkerTest {
         UpdateType update = new UpdateType(properties, null, typeName, null);
         update.setInputFormat("bad inputFormat");
         TransactionType request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, update);
-        
+
 
         try {
             worker.transaction(request);
@@ -955,7 +955,7 @@ public class WFS2WorkerTest {
         properties.add(new PropertyType(new ValueReference("whatever", UpdateActionType.REPLACE), "someValue"));
         request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(properties, null, typeName, null));
 
-        
+
         try {
             worker.transaction(request);
             fail("Should have raised an error.");
@@ -976,7 +976,7 @@ public class WFS2WorkerTest {
         FilterType filter        = new FilterType(pe);
         request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(properties, filter, typeName, null));
 
-        
+
         try {
             worker.transaction(request);
             fail("Should have raised an error.");
@@ -996,7 +996,7 @@ public class WFS2WorkerTest {
         filter = new FilterType(pe);
         request = new TransactionType("WFS", "2.0.0", null, AllSomeType.ALL, new UpdateType(properties, filter, typeName, null));
 
-        
+
         TransactionResponse result = worker.transaction(request);
 
         TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0);
@@ -1017,7 +1017,7 @@ public class WFS2WorkerTest {
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
         resultGF = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
@@ -1076,7 +1076,7 @@ public class WFS2WorkerTest {
         assertTrue(resultGF instanceof FeatureCollectionWrapper);
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) resultGF;
         resultGF = wrapper.getFeatureCollection();
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
@@ -1108,7 +1108,7 @@ public class WFS2WorkerTest {
             assertEquals(ex.getLocator(), "inputFormat");
         }
     }
-    
+
     /**
      *
      *
@@ -1119,19 +1119,19 @@ public class WFS2WorkerTest {
         final ListStoredQueriesType request = new ListStoredQueriesType("WFS", "2.0.0", null);
 
         final ListStoredQueriesResponse resultI = worker.listStoredQueries(request);
-        
+
         assertTrue(resultI instanceof ListStoredQueriesResponseType);
         final ListStoredQueriesResponseType result = (ListStoredQueriesResponseType) resultI;
 
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResult = new ListStoredQueriesResponseType(items);
-        
+
         assertEquals(1, result.getStoredQuery().size());
         assertEquals(expResult, result);
-        
+
     }
-    
+
     /**
      *
      *
@@ -1140,10 +1140,10 @@ public class WFS2WorkerTest {
     public void describeStoredQueriesTest() throws Exception {
         final DescribeStoredQueriesType request = new DescribeStoredQueriesType("WFS", "2.0.0", null, Arrays.asList("nameQuery"));
         final DescribeStoredQueriesResponse resultI = worker.describeStoredQueries(request);
-        
+
         assertTrue(resultI instanceof DescribeStoredQueriesResponseType);
         final DescribeStoredQueriesResponseType result = (DescribeStoredQueriesResponseType) resultI;
-        
+
         final List<StoredQueryDescriptionType> descriptions = new ArrayList<StoredQueryDescriptionType>();
         final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
         final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
@@ -1156,14 +1156,14 @@ public class WFS2WorkerTest {
         final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
         descriptions.add(des1);
         final DescribeStoredQueriesResponseType expResult = new DescribeStoredQueriesResponseType(descriptions);
-        
+
         assertEquals(1, result.getStoredQueryDescription().size());
         assertEquals(expResult.getStoredQueryDescription().get(0).getQueryExpressionText(), result.getStoredQueryDescription().get(0).getQueryExpressionText());
         assertEquals(expResult.getStoredQueryDescription().get(0), result.getStoredQueryDescription().get(0));
         assertEquals(expResult.getStoredQueryDescription(), result.getStoredQueryDescription());
         assertEquals(expResult, result);
     }
-    
+
     /**
      *
      *
@@ -1171,7 +1171,7 @@ public class WFS2WorkerTest {
     @Test
     public void createStoredQueriesTest() throws Exception {
         final List<StoredQueryDescriptionType> desc = new ArrayList<StoredQueryDescriptionType>();
-        
+
         final ParameterExpressionType param = new ParameterExpressionType("name2", "name Parameter 2 ", "A parameter on the geometry \"the_geom\" of the feature", new QName("http://www.opengis.net/gml/3.2.1", "AbstractGeometryType", "gml"));
         final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "Bridges"));
         final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$geom"), "the_geom", true);
@@ -1184,17 +1184,17 @@ public class WFS2WorkerTest {
         desc.add(desc1);
         final CreateStoredQueryType request = new CreateStoredQueryType("WFS", "2.0.0", null, desc);
         final CreateStoredQueryResponse resultI = worker.createStoredQuery(request);
-        
+
         assertTrue(resultI instanceof CreateStoredQueryResponseType);
         final CreateStoredQueryResponseType result = (CreateStoredQueryResponseType) resultI;
-        
+
         final CreateStoredQueryResponseType expResult =  new CreateStoredQueryResponseType("OK");
         assertEquals(expResult, result);
-        
+
         final ListStoredQueriesType requestlsq = new ListStoredQueriesType("WFS", "2.0.0", null);
 
         ListStoredQueriesResponse resultlsqI = worker.listStoredQueries(requestlsq);
-        
+
         assertTrue(resultlsqI instanceof ListStoredQueriesResponseType);
         ListStoredQueriesResponseType resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
@@ -1202,31 +1202,31 @@ public class WFS2WorkerTest {
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         items.add(new StoredQueryListItemType("geomQuery", Arrays.asList(new Title("Geom query")), Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "Bridges"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
-        
+
         assertEquals(2, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
-        
-        
+
+
         // verify the persistance by restarting the WFS
         worker.destroy();
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
-        
+
         resultlsqI = worker.listStoredQueries(requestlsq);
-        
+
         assertTrue(resultlsqI instanceof ListStoredQueriesResponseType);
         resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
-        
+
         assertEquals(2, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
-        
-        
+
+
     }
-    
+
     @Test
     public void dropStoredQueriesTest() throws Exception {
         final DropStoredQueryType request = new DropStoredQueryType("WFS", "2.0.0", null, "geomQuery");
@@ -1272,7 +1272,7 @@ public class WFS2WorkerTest {
         assertEquals(expResultlsq, resultlsq);
 
     }
-    
+
     /**
      * test the feature marshall
      *
@@ -1296,13 +1296,13 @@ public class WFS2WorkerTest {
         FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
-        
+
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
-        
+
         DomCompare.compare(expectedResult, writer.toString());
     }
 
@@ -1374,7 +1374,7 @@ public class WFS2WorkerTest {
                     layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
                     layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Streams");
                     layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Streams");
-                    
+
                 }else if("observation".equals(serviceName)){
                     try{
                         final String url = "jdbc:derby:memory:TestWFSWorker2";

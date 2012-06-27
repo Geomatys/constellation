@@ -50,12 +50,10 @@ import org.geotoolkit.data.FeatureCollection;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 
-import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.om.OMDataStoreFactory;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.util.FileUtilities;
 
-import org.opengis.feature.Feature;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptorGroup;
 
@@ -90,7 +88,7 @@ public class WFSServiceTest {
         if (configDirectory.exists()) {
             FileUtilities.deleteDirectory(configDirectory);
         }
-        
+
         configDirectory.mkdir();
         File serviceDirectory = new File(configDirectory, "WFS");
         serviceDirectory.mkdir();
@@ -101,10 +99,12 @@ public class WFSServiceTest {
         Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
         Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
         LayerContext context = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
+        context.getCustomParameters().put("transactionSecurized", "false");
+        
         Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
         m.marshal(context, LayerContext);
         GenericDatabaseMarshallerPool.getInstance().release(m);
-        
+
         ConfigDirectory.setConfigDirectory(configDirectory);
         service = new WFSService();
 
@@ -116,7 +116,7 @@ public class WFSServiceTest {
         queryParameters.add("serviceId", "default");
         info.setPathParameters(pathParameters);
         info.setQueryParameters(queryParameters);
-        
+
     }
 
     @AfterClass
@@ -161,7 +161,7 @@ public class WFSServiceTest {
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         FeatureCollection collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
         assertEquals(2, collection.size());
-        
+
         /*
          * we insert the feature
          */
@@ -181,7 +181,7 @@ public class WFSServiceTest {
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
         assertEquals(4, collection.size());
-        
+
         /*
          * we delete the features
          */
@@ -201,7 +201,7 @@ public class WFSServiceTest {
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
         assertEquals(2, collection.size());
-        
+
         /*
          * we insert the feature with another request
          */
@@ -209,7 +209,7 @@ public class WFSServiceTest {
         result = service.doPOSTXml(is);
 
         assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
-        
+
         /*
          * we verify that the features has been inserted
          */
@@ -221,7 +221,7 @@ public class WFSServiceTest {
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
         assertEquals(4, collection.size());
-        
+
     }
 
     private static void initFeatureSource() throws Exception {

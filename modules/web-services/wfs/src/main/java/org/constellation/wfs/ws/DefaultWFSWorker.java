@@ -44,6 +44,7 @@ import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 
 // Geotoolkit dependencies
 import org.constellation.ws.LayerWorker;
+import org.constellation.ws.UnauthorizedException;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.storage.DataStoreException;
@@ -119,7 +120,6 @@ import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
 import org.opengis.filter.capability.FilterCapabilities;
-import org.opengis.filter.expression.Literal;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.spatial.BinarySpatialOperator;
@@ -158,9 +158,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     private ServiceDef actingVersion = ServiceDef.WFS_1_1_0;
 
     private boolean multipleVersionActivated = true;
-    
+
     private static final WFSXmlFactory xmlFactory = new WFSXmlFactory();
-    
+
     private List<StoredQueryDescription> storedQueries = new ArrayList<StoredQueryDescription>();
 
     public DefaultWFSWorker(final String id, final File configurationDirectory) {
@@ -168,7 +168,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (isStarted) {
             LOGGER.log(Level.INFO, "WFS worker {0} running", id);
         }
-        
+
         //listen to changes on the providers to clear the getcapabilities cache
         LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
             @Override
@@ -176,17 +176,17 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 refreshUpdateSequence();
             }
         });
-        
+
         final String multiVersProp = getProperty("multipleVersion");
         if (multiVersProp != null) {
             multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
             LOGGER.log(Level.INFO, "Multiple version activated:{0}", multipleVersionActivated);
         }
-        
+
         // loading stored queries
        loadStoredQueries();
     }
-    
+
     private void loadStoredQueries() {
         // loading stored queries
         if (configurationDirectory != null) {
@@ -212,7 +212,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
         }
     }
-    
+
     private void storedQueries() {
         // loading stored queries
         if (configurationDirectory != null) {
@@ -221,7 +221,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             try {
                 marshaller = getMarshallerPool().acquireMarshaller();
                 marshaller.marshal(new StoredQueries(storedQueries), sqFile);
-                
+
             } catch (JAXBException ex) {
                 LOGGER.log(Level.WARNING, "JAXBExeception while marshalling the stored queries File", ex);
             } finally {
@@ -229,7 +229,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     getMarshallerPool().release(marshaller);
                 }
             }
-            
+
         }
     }
 
@@ -250,9 +250,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, false, true);
         final String currentVersion = actingVersion.version.toString();
 
-        
+
         final WFSCapabilities inCapabilities = (WFSCapabilities) getStaticCapabilitiesObject(currentVersion, "WFS");
-        
+
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence());
         if (returnUS) {
@@ -267,7 +267,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
         if (request.getSections() == null || request.containsSection("featureTypeList")) {
             ftl = xmlFactory.buildFeatureTypeList(currentVersion);
-            
+
             /*
              *  layer providers
              */
@@ -377,7 +377,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             fc = WFSConstants.FILTER_CAPABILITIES_V200;
         } else {
             fc = WFSConstants.FILTER_CAPABILITIES_V110;
-        }    
+        }
         final WFSCapabilities result = xmlFactory.buildWFSCapabilities(currentVersion, si, sp, om, ftl, fc);
 
         LOGGER.log(logLevel, "GetCapabilities treated in {0}ms", (System.currentTimeMillis() - start));
@@ -391,7 +391,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public Schema describeFeatureType(final DescribeFeatureType request) throws CstlServiceException {
         LOGGER.log(logLevel, "DecribeFeatureType request proccesing");
         final long start = System.currentTimeMillis();
-        
+
         // we verify the base attribute
         isWorking();
         verifyBaseRequest(request, false, false);
@@ -493,7 +493,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             throw new CstlServiceException("You must specify a query!", MISSING_PARAMETER_VALUE);
         }
         final List<? extends Query> queries = request.getQuery();
-        
+
         for (StoredQuery storedQuery : request.getStoredQuery()) {
             StoredQueryDescription description = null;
             final List<? extends Parameter> parameters = storedQuery.getParameter();
@@ -522,7 +522,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
             }
         }
-        
+
         for (final Query query : queries) {
             final org.geotoolkit.ogc.xml.SortBy jaxbSortBy = query.getSortBy();
             final Filter jaxbFilter       = query.getFilter();
@@ -669,7 +669,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         } else {
             throw new CstlServiceException("invalid outputFormat:" + request.getOutputFormat(), INVALID_PARAMETER_VALUE, "outputFormat");
         }
-        
+
 
         /**
          * 3 possibility here :
@@ -693,7 +693,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
         return new FeatureCollectionWrapper(FeatureCollection, schemaLocations, gmlVersion, currentVersion);
     }
-    
+
     private List<SortBy> visitJaxbSortBy(final org.geotoolkit.ogc.xml.SortBy jaxbSortby,final Map<String, String> namespaceMapping, final String version) {
         final XMLUtilities util = new XMLUtilities();
         if ("2.0.0".equals(version)) {
@@ -727,6 +727,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         LOGGER.log(logLevel, "Transaction request processing\n");
         final long startTime = System.currentTimeMillis();
         isWorking();
+        if (transactionSecurized && !org.constellation.ws.security.SecurityManager.isAuthenticated()) {
+            throw new UnauthorizedException("You must be authentified to perform an registerSensor request.");
+        }
         verifyBaseRequest(request, true, false);
 
         // we prepare the report
@@ -751,7 +754,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 final String handle = insertRequest.getHandle();
 
                 // we verify the input format
-                if (insertRequest.getInputFormat() != null && !(insertRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1") 
+                if (insertRequest.getInputFormat() != null && !(insertRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")
                                                            ||   insertRequest.getInputFormat().equals("application/gml+xml; version=3.2"))) {
                     throw new CstlServiceException("This only input format supported are: text/xml; subtype=gml/3.1.1 and application/gml+xml; version=3.2",
                             INVALID_PARAMETER_VALUE, "inputFormat");
@@ -827,7 +830,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         for (FeatureId fid : features) {
                             inserted.put(fid.getID(), handle);// get the id of the inserted feature
                             totalInserted++;
-                            LOGGER.finer("fid inserted: " + fid + " total:" + totalInserted);
+                            LOGGER.log(Level.FINER, "fid inserted: {0} total:{1}", new Object[]{fid, totalInserted});
                         }
                     } catch (DataStoreException ex) {
                         Logging.unexpectedException(LOGGER, ex);
@@ -882,7 +885,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 final UpdateElement updateRequest = (UpdateElement) transaction;
 
                 // we verify the input format
-                if (updateRequest.getInputFormat() != null && !(updateRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1") 
+                if (updateRequest.getInputFormat() != null && !(updateRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")
                                                            ||   updateRequest.getInputFormat().equals("application/gml+xml; version=3.2"))) {
                     throw new CstlServiceException("This only input format supported are: text/xml; subtype=gml/3.1.1 and application/gml+xml; version=3.2",
                             INVALID_PARAMETER_VALUE, "inputFormat");
@@ -965,11 +968,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
 
         }
-        
+
         final TransactionResponse response = xmlFactory.buildTransactionResponse(currentVersion,
                                                                                  totalInserted,
                                                                                  totalUpdated,
-                                                                                 totalDeleted, 
+                                                                                 totalDeleted,
                                                                                  inserted);
         LOGGER.log(logLevel, "Transaction request processed in {0} ms", (System.currentTimeMillis() - startTime));
 
@@ -1149,7 +1152,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             throw new CstlServiceException(ex);
         }
     }
-    
+
     private static void applyParameterOnQuery(final Filter filter, final List<? extends Parameter> parameters) throws CstlServiceException {
         if (filter instanceof XMLFilter) {
             final Object filterObject = ((XMLFilter)filter).getFilterObject();
@@ -1168,7 +1171,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         lit.getContent().clear();
                         lit.setContent(s);
                     }
-                    
+
                 }
 
             } else if (filterObject instanceof BinaryComparisonOperator) {
@@ -1197,7 +1200,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             }
         } else {
             throw new CstlServiceException("Expected filter implementation", NO_APPLICABLE_CODE);
-        }        
+        }
     }
 
     /**
@@ -1222,7 +1225,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") ||
                         request.getVersion().toString().isEmpty()  || request.getVersion().toString().equals("1.0.0") ) { // hack for openScale accept 1.0.0
                     this.actingVersion = ServiceDef.WFS_1_1_0;
-                } else if (multipleVersionActivated && (request.getVersion().toString().equals("2.0.0") || request.getVersion().toString().equals("2.0"))) { 
+                } else if (multipleVersionActivated && (request.getVersion().toString().equals("2.0.0") || request.getVersion().toString().equals("2.0"))) {
                     this.actingVersion = ServiceDef.WFS_2_0_0;
 
                 } else {
@@ -1284,11 +1287,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, true, false);
 
         final String currentVersion              = actingVersion.version.toString();
-        
+
         final ListStoredQueriesResponse response = xmlFactory.buildListStoredQueriesResponse(currentVersion, storedQueries);
         LOGGER.log(logLevel, "ListStoredQueries request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
-        
+
     }
 
     @Override
@@ -1324,10 +1327,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, true, false);
         final String currentVersion  = actingVersion.version.toString();
-        
+
         storedQueries.addAll(request.getStoredQueryDefinition());
         storedQueries();
-        
+
         final CreateStoredQueryResponse response = xmlFactory.buildCreateStoredQueryResponse(currentVersion, "OK");
         LOGGER.log(logLevel, "CreateStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
@@ -1340,7 +1343,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         isWorking();
         verifyBaseRequest(request, true, false);
         final String currentVersion  = actingVersion.version.toString();
-        
+
         StoredQueryDescription candidate = null;
         for (StoredQueryDescription sq : storedQueries) {
             if (sq.getId().equals(request.getId())) {
@@ -1353,7 +1356,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             storedQueries.remove(candidate);
         }
         storedQueries();
-        
+
         final DropStoredQueryResponse response = xmlFactory.buildDropStoredQueryResponse(currentVersion, "OK");
         LOGGER.log(logLevel, "dropStoredQuery request processed in {0} ms", (System.currentTimeMillis() - startTime));
         return response;
