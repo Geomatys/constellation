@@ -43,9 +43,9 @@ import org.junit.*;
 public class MDwebCSWworkerTest extends CSWworkerTest {
 
     private static final File dbDirectory = new File("MDCSWWorkerTestDatabase");
-    
+
     private static final File configDir = new File("MDCSWWorkerTest");
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
 
@@ -82,6 +82,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             File configFile = new File(configDir, "config.xml");
             BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
             Automatic configuration = new Automatic("mdweb", bdd);
+            configuration.getCustomparameters().put("transactionSecurized", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);
@@ -157,7 +158,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     public void getRecordsTest() throws Exception {
         super.getRecordsTest();
     }
-    
+
     @Test
     @Override
     public void getRecords191152Test() throws Exception {

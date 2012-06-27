@@ -47,7 +47,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         if (configDir.exists()) {
             FileUtilities.deleteDirectory(configDir);
         }
-        
+
         if (!configDir.exists()) {
             configDir.mkdir();
 
@@ -69,6 +69,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
+            configuration.getCustomparameters().put("transactionSecurized", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);
@@ -137,7 +138,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
     public void getRecordByIdErrorTest() throws Exception {
         super.getRecordByIdErrorTest();
     }
-    
+
     /**
      * Tests the getRecords method
      *
@@ -155,7 +156,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         super.getRecords191152Test();
     }
 
-    
+
     /**
      * Tests the getRecords method
      *
@@ -166,7 +167,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
     public void getRecordsErrorTest() throws Exception {
         super.getRecordsErrorTest();
     }
-    
+
     /**
      * Tests the getDomain method
      *

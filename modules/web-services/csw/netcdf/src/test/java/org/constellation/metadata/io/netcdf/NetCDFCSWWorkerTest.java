@@ -58,9 +58,9 @@ import org.junit.*;
  *  @author Guilhem Legal (Geomatys)
  */
 public class NetCDFCSWWorkerTest extends CSWworkerTest {
-    
+
      private static final File configDir =  new File("NCCSWWorkerTest");
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
@@ -68,7 +68,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         if (configDir.exists()) {
             FileUtilities.deleteDirectory(configDir);
         }
-        
+
         if (!configDir.exists()) {
             configDir.mkdir();
 
@@ -76,10 +76,11 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
             File dataDirectory = new File(configDir, "data");
             dataDirectory.mkdir();
             writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
-            
+
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
+            configuration.getCustomparameters().put("transactionSecurized", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);
@@ -116,7 +117,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
     public void tearDown() throws Exception {
     }
 
-    
+
     /**
      * Tests the getcapabilities method
      *
@@ -141,7 +142,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
 /*        Marshaller marshaller = pool.acquireMarshaller();
         marshaller.marshal(obj, new File("test.xml"));*/
-        
+
         DefaultMetadata isoResult = (DefaultMetadata) obj;
 
         DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/2005092200_sst_21-24.en.xml"));
@@ -150,7 +151,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
         /*
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).
-         
+
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.BRIEF),
                 MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
@@ -170,7 +171,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
         /*
          *  TEST 3 : getRecordById with the first metadata in DC mode (SUMMARY).
-         
+
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
                 MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
@@ -191,7 +192,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
         /*
          *  TEST 4 : getRecordById with the first metadata in DC mode (FULL).
-         
+
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
@@ -212,7 +213,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
         /*
          *  TEST 5 : getRecordById with two metadata in DC mode (FULL).
-         
+
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600","42292_9s_19900610041000"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
@@ -236,7 +237,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
         /*
          *  TEST 6 : getRecordById with the first metadata with no outputSchema.
-         
+
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
                 MimeType.APPLICATION_XML, null, Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
@@ -257,7 +258,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
         /*
          *  TEST 7 : getRecordById with the first metadata with no outputSchema and no ElementSetName.
-         
+
         request = new GetRecordByIdType("CSW", "2.0.2", null,
                 MimeType.APPLICATION_XML, null, Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
@@ -280,7 +281,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         pool.release(unmarshaller);
     }
 
-    
+
     /**
      * Tests the getRecords method
      *
@@ -292,8 +293,8 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         //
     }
 
-    
-   
+
+
     /**
      * Tests the getDomain method
      *

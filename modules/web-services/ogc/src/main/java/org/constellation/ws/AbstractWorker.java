@@ -42,7 +42,7 @@ import org.geotoolkit.xml.MarshallerPool;
  * to perform the logic for a particular WMS instance.
  *
  * @version $Id: AbstractWMSWorker.java 1889 2009-10-14 16:05:52Z eclesia $
- * 
+ *
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  * @author Guilhem Legal (Geomatys)
@@ -58,7 +58,12 @@ public abstract class AbstractWorker implements Worker {
      * A flag indicating if the worker is correctly started.
      */
     protected boolean isStarted;
-    
+
+    /**
+     * A flag indicating if the transaction methods of the worker are securized.
+     */
+    protected boolean transactionSecurized = true;
+
     /**
      * A message keeping the reason of the start error of the service
      */
@@ -98,7 +103,7 @@ public abstract class AbstractWorker implements Worker {
      * A Policy Decision Point (PDP) if some security constraints have been defined.
      */
     protected SimplePDP pdp = null;
-    
+
     private long currentUpdateSequence = System.currentTimeMillis();
 
     public AbstractWorker(final String id, final File configurationDirectory, final Specification specification) {
@@ -106,7 +111,7 @@ public abstract class AbstractWorker implements Worker {
         this.configurationDirectory = configurationDirectory;
         this.specification = specification;
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -143,7 +148,7 @@ public abstract class AbstractWorker implements Worker {
      *
      * @param service The service type identifier. example "WMS"
      * @param version The version of the GetCapabilities.
-     * 
+     *
      * @return The capabilities Object, or {@code null} if none.
      *
      * @throws JAXBException if an error occurs during the unmarshall of the document.
@@ -160,7 +165,7 @@ public abstract class AbstractWorker implements Worker {
      * @param service The service type identifier. example "WMS"
      * @param version The version of the GetCapabilities.
      * @param language The language of the capabilities skeleton.
-     * 
+     *
      * @return The capabilities Object, or {@code null} if none.
      *
      * @throws JAXBException if an error occurs during the unmarshall of the document.
@@ -260,14 +265,14 @@ public abstract class AbstractWorker implements Worker {
     protected String getCurrentUpdateSequence() {
         return Long.toString(currentUpdateSequence);
     }
-    
+
     /**
      * Set the current date to the updateSequence parameter
      */
     protected void refreshUpdateSequence() {
         currentUpdateSequence = System.currentTimeMillis();
     }
-    
+
     protected boolean returnUpdateSequenceDocument(final String updateSequence) throws CstlServiceException {
         if (updateSequence == null) {
             return false;
