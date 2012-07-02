@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
@@ -73,6 +75,18 @@ import org.opengis.util.NoSuchIdentifierException;
 
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.layer.create.CreateMapLayerDescriptor;
+import org.constellation.process.layer.delete.DeleteMapLayerDescriptor;
+import org.constellation.process.layer.update.UpdateMapLayerDescriptor;
+import org.constellation.process.provider.create.CreateProviderDescriptor;
+import org.constellation.process.provider.remove.RemoveProviderDescriptor;
+import org.constellation.process.provider.restart.RestartProviderDescriptor;
+import org.constellation.process.provider.update.UpdateProviderDescriptor;
+import org.constellation.process.style.create.CreateMapStyleDescriptor;
+import org.constellation.process.style.delete.DeleteMapStyleDescriptor;
+import org.constellation.process.style.update.UpdateMapStyleDescriptor;
+import org.geotoolkit.process.ProcessException;
 
 /**
  *
@@ -222,7 +236,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @param parameters The GET KVP parameters send in the request.
      * @param objectRequest The POST parameters send in the request.
      *
-     * @return An acknowledgement informing if the request have been succesfully treated or not.
+     * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
     private AcknowlegementType createProvider(final MultivaluedMap<String, String> parameters,
@@ -233,33 +247,31 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
             final ParameterValueReader reader = new ParameterValueReader(
                     service.getServiceDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
+
             try {
                 // we read the source parameter to add
                 reader.setInput(objectRequest);
                 final ParameterValueGroup sourceToAdd = (ParameterValueGroup) reader.read();
 
-                //check no other provider with this id exist
-                final String id = ProviderParameters.getSourceId(sourceToAdd);
-                for(Provider p : LayerProviderProxy.getInstance().getProviders()){
-                    if(id.equals(p.getId())){
-                        return new AcknowlegementType("Failure", "Provider ID is already used : " + id);
-                    }
-                }
-                for(Provider p : StyleProviderProxy.getInstance().getProviders()){
-                    if(id.equals(p.getId())){
-                        return new AcknowlegementType("Failure", "Provider ID is already used : " + id);
-                    }
+                final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
+
+                final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                inputs.parameter(CreateProviderDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+                inputs.parameter(CreateProviderDescriptor.SOURCE_NAME).setValue(sourceToAdd);
+
+                try {
+                    final org.geotoolkit.process.Process process = desc.createProcess(inputs);
+                    process.call();
+
+                } catch (ProcessException ex) {
+                    return new AcknowlegementType("Failure", ex.getLocalizedMessage());
                 }
 
                 reader.dispose();
-
-                if(service instanceof LayerProviderService){
-                    LayerProviderProxy.getInstance().createProvider((LayerProviderService)service, sourceToAdd);
-                }else if(service instanceof StyleProviderService){
-                    StyleProviderProxy.getInstance().createProvider((StyleProviderService)service, sourceToAdd);
-                }
-
                 return new AcknowlegementType("Success", "The source has been added");
+
+            } catch (NoSuchIdentifierException ex) {
+                throw new CstlServiceException(ex);
             } catch (XMLStreamException ex) {
                 throw new CstlServiceException(ex);
             } catch (IOException ex) {
@@ -276,7 +288,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @param parameters The GET KVP parameters send in the request.
      * @param objectRequest The POST parameters send in the request.
      *
-     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
     private AcknowlegementType updateProvider(final MultivaluedMap<String, String> parameters,
@@ -287,33 +299,33 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         if (service != null) {
 
             ParameterDescriptorGroup desc = service.getServiceDescriptor();
-            desc = (ParameterDescriptorGroup)desc.descriptor("source");
+            desc = (ParameterDescriptorGroup) desc.descriptor("source");
             final ParameterValueReader reader = new ParameterValueReader(desc);
 
             try {
-                // we read the soruce parameter to add
+                // we read the source parameter to add
                 reader.setInput(objectRequest);
                 final ParameterValueGroup sourceToModify = (ParameterValueGroup) reader.read();
+
+                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderDescriptor.NAME);
+
+                final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+                inputs.parameter(UpdateProviderDescriptor.PROVIDER_ID_NAME).setValue(currentId);
+                inputs.parameter(UpdateProviderDescriptor.SOURCE_NAME).setValue(sourceToModify);
+
+                try {
+                    final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                    process.call();
+
+                } catch (ProcessException ex) {
+                    return new AcknowlegementType("Failure", ex.getLocalizedMessage());
+                }
+
                 reader.dispose();
+                return new AcknowlegementType("Success", "The source has been updated");
 
-                Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
-                for (Provider p : providers) {
-                    if (p.getId().equals(currentId)) {
-                        p.updateSource(sourceToModify);
-                        return new AcknowlegementType("Success", "The source has been modified");
-                    }
-                }
-
-                providers = StyleProviderProxy.getInstance().getProviders();
-                for (Provider p : providers) {
-                    if (p.getId().equals(currentId)) {
-                        p.updateSource(sourceToModify);
-                        return new AcknowlegementType("Success", "The source has been modified");
-                    }
-                }
-
-                return new AcknowlegementType("Failure", "Unable to find a source named:" + currentId);
-
+            } catch (NoSuchIdentifierException ex) {
+                throw new CstlServiceException(ex);
             } catch (XMLStreamException ex) {
                 throw new CstlServiceException(ex);
             } catch (IOException ex) {
@@ -356,26 +368,32 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      *
      * @param parameters The GET KVP parameters send in the request.
      *
-     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
     private AcknowlegementType deleteProvider(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String sourceId = getParameter("id", true, parameters);
-        Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
-        for (LayerProvider p : layerProviders) {
-            if (p.getId().equals(sourceId)) {
-                LayerProviderProxy.getInstance().removeProvider(p);
-                return new AcknowlegementType("Success", "The source has been deleted");
+        final String providerId = getParameter("id", true, parameters);
+
+        try {
+
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RemoveProviderDescriptor.NAME);
+            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+            inputs.parameter(RemoveProviderDescriptor.PROVIDER_ID_NAME).setValue(providerId);
+
+            try {
+                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                process.call();
+
+            } catch (ProcessException ex) {
+                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
             }
+
+            return new AcknowlegementType("Success", "The provider has been deleted");
+
+        } catch (NoSuchIdentifierException ex) {
+           throw new CstlServiceException(ex);
         }
-        Collection<StyleProvider> styleProviders = StyleProviderProxy.getInstance().getProviders();
-        for (StyleProvider p : styleProviders) {
-            if (p.getId().equals(sourceId)) {
-                StyleProviderProxy.getInstance().removeProvider(p);
-                return new AcknowlegementType("Success", "The source has been deleted");
-            }
-        }
-        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
+
     }
 
     /**
@@ -383,24 +401,31 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      *
      * @param parameters The GET KVP parameters send in the request.
      *
-     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
     private AcknowlegementType restartProvider(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String sourceId = getParameter("id", true, parameters);
-        for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
-            if (p.getId().equals(sourceId)) {
-                p.reload();
-                return new AcknowlegementType("Success", "The provider has been restarted");
+        final String providerId = getParameter("id", true, parameters);
+
+         try {
+
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartProviderDescriptor.NAME);
+            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+            inputs.parameter(RestartProviderDescriptor.PROVIDER_ID_NAME).setValue(providerId);
+
+            try {
+                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                process.call();
+
+            } catch (ProcessException ex) {
+                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
             }
+
+            return new AcknowlegementType("Success", "The source has been deleted");
+
+        } catch (NoSuchIdentifierException ex) {
+           throw new CstlServiceException(ex);
         }
-        for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
-            if (p.getId().equals(sourceId)) {
-                p.reload();
-                return new AcknowlegementType("Success", "The provider has been restarted");
-            }
-        }
-        return new AcknowlegementType("Failure", "Unable to find a provider named:" + sourceId);
     }
 
 
@@ -410,7 +435,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @param parameters The GET KVP parameters send in the request.
      * @param objectRequest The POST parameters send in the request.
      *
-     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
     private AcknowlegementType createLayer(final MultivaluedMap<String, String> parameters,
@@ -422,19 +447,26 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             // we read the soruce parameter to add
             reader.setInput(objectRequest);
             final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
-            reader.dispose();
 
-            final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-            for (LayerProvider p : providers) {
-                if (p.getId().equals(sourceId)) {
-                    p.getSource().values().add(newLayer);
-                    p.updateSource(p.getSource());
-                    return new AcknowlegementType("Success", "The layer has been added");
-                }
+
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapLayerDescriptor.NAME);
+            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+            inputs.parameter(CreateMapLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(CreateMapLayerDescriptor.LAYER_NAME).setValue(newLayer);
+
+            try {
+                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                process.call();
+
+            } catch (ProcessException ex) {
+                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
             }
-            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
 
+            reader.dispose();
+            return new AcknowlegementType("Success", "The layer has been added");
 
+        } catch (NoSuchIdentifierException ex) {
+           throw new CstlServiceException(ex);
         } catch (XMLStreamException ex) {
             throw new CstlServiceException(ex);
         } catch (IOException ex) {
@@ -447,33 +479,33 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      *
      * @param parameters The GET KVP parameters send in the request.
      *
-     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
     private AcknowlegementType deleteLayer(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String sourceId = getParameter("id", true, parameters);
         final String layerName = getParameter("layerName", true, parameters);
 
-        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-        for (LayerProvider p : providers) {
-            if (p.getId().equals(sourceId)) {
-                for (GeneralParameterValue param : p.getSource().values()) {
-                    if (param instanceof ParameterValueGroup) {
-                        final ParameterValueGroup pvg = (ParameterValueGroup)param;
-                        if (param.getDescriptor().equals(ProviderParameters.LAYER_DESCRIPTOR)) {
-                            final ParameterValue value = pvg.parameter("name");
-                            if (value.stringValue().equals(layerName)) {
-                                p.getSource().values().remove(pvg);
-                                break;
-                            }
-                        }
-                    }
-                }
-                p.updateSource(p.getSource());
-                return new AcknowlegementType("Success", "The layer has been removed");
+        try {
+
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteMapLayerDescriptor.NAME);
+            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+            inputs.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(DeleteMapLayerDescriptor.LAYER_NAME_NAME).setValue(layerName);
+
+            try {
+                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                process.call();
+
+            } catch (ProcessException ex) {
+                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
             }
+
+            return new AcknowlegementType("Success", "The source has been deleted");
+
+        } catch (NoSuchIdentifierException ex) {
+           throw new CstlServiceException(ex);
         }
-        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
     }
 
     /**
@@ -482,7 +514,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @param parameters The GET KVP parameters send in the request.
      * @param objectRequest The POST parameters send in the request.
      *
-     * @return An akcnowledgement informing if the request have been succesfully treated or not.
+     * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
     private AcknowlegementType updateLayer(final MultivaluedMap<String, String> parameters,
@@ -492,38 +524,36 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final String layerName = getParameter("layerName", true, parameters);
 
         final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
-        try {
-            // we read the source parameter to add
-            reader.setInput(objectRequest);
-            ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
-            reader.dispose();
 
-            Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
-            for (LayerProvider p : providers) {
-                if (p.getId().equals(sourceId)) {
-                    for (GeneralParameterValue param : p.getSource().values()) {
-                        if (param instanceof ParameterValueGroup) {
-                            ParameterValueGroup pvg = (ParameterValueGroup)param;
-                            if (param.getDescriptor().equals(ProviderParameters.LAYER_DESCRIPTOR)) {
-                                ParameterValue value = pvg.parameter("name");
-                                if (value.stringValue().equals(layerName)) {
-                                    p.getSource().values().remove(pvg);
-                                    p.getSource().values().add(newLayer);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    p.updateSource(p.getSource());
-                    return new AcknowlegementType("Success", "The layer has been modified");
-                }
+        try {
+            // we read the soruce parameter to add
+            reader.setInput(objectRequest);
+            final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
+
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapLayerDescriptor.NAME);
+            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+            inputs.parameter(UpdateMapLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(UpdateMapLayerDescriptor.LAYER_NAME_NAME).setValue(layerName);
+            inputs.parameter(UpdateMapLayerDescriptor.UPDATE_LAYER_NAME).setValue(newLayer);
+
+            try {
+                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                process.call();
+
+            } catch (ProcessException ex) {
+                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
             }
+
+            reader.dispose();
+            return new AcknowlegementType("Success", "The layer has been modified");
+
+        } catch (NoSuchIdentifierException ex) {
+            throw new CstlServiceException(ex);
         } catch (XMLStreamException ex) {
             throw new CstlServiceException(ex);
         } catch (IOException ex) {
             throw new CstlServiceException(ex);
         }
-        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
     }
 
     /**
@@ -557,7 +587,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @param parameters The GET KVP parameters send in the request.
      * @param objectRequest The POST parameters send in the request.
      *
-     * @return An acknowledgment informing if the request have been succesfully treated or not.
+     * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
     private AcknowlegementType createStyle(final MultivaluedMap<String, String> parameters,
@@ -570,14 +600,28 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             // we read the style to add
             final MutableStyle style = (MutableStyle) objectRequest;
 
-            final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
-            for (StyleProvider p : providers) {
-                if (p.getId().equals(sourceId)) {
-                    p.set(styleId, style);
-                    return new AcknowlegementType("Success", "The style has been added");
+            try {
+                // we read the soruce parameter to add
+
+                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapStyleDescriptor.NAME);
+                final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+                inputs.parameter(CreateMapStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+                inputs.parameter(CreateMapStyleDescriptor.STYLE_ID_NAME).setValue(styleId);
+                inputs.parameter(CreateMapStyleDescriptor.STYLE_NAME).setValue(style);
+
+                try {
+                    final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                    process.call();
+
+                } catch (ProcessException ex) {
+                    return new AcknowlegementType("Failure", ex.getLocalizedMessage());
                 }
+
+                return new AcknowlegementType("Success", "The layer has been added");
+
+            } catch (NoSuchIdentifierException ex) {
+                throw new CstlServiceException(ex);
             }
-            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
         }
         return new AcknowlegementType("Failure", "Passed object is not a style:" + Classes.getShortClassName(objectRequest));
 
@@ -588,21 +632,34 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      *
      * @param parameters The GET KVP parameters send in the request.
      *
-     * @return An acknowledgment informing if the request have been succesfully treated or not.
+     * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
     private AcknowlegementType deleteStyle(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String sourceId = getParameter("id", true, parameters);
         final String styleId = getParameter("styleName", true, parameters);
 
-        final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
-        for (StyleProvider p : providers) {
-            if (p.getId().equals(sourceId)) {
-                p.remove(styleId);
-                return new AcknowlegementType("Success", "The style has been removed");
+        try {
+            // we read the soruce parameter to add
+
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteMapStyleDescriptor.NAME);
+            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+            inputs.parameter(DeleteMapStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(DeleteMapStyleDescriptor.STYLE_ID_NAME).setValue(styleId);
+
+            try {
+                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                process.call();
+
+            } catch (ProcessException ex) {
+                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
             }
+
+            return new AcknowlegementType("Success", "The layer has been removed");
+
+        } catch (NoSuchIdentifierException ex) {
+            throw new CstlServiceException(ex);
         }
-        return new AcknowlegementType("Failure", "Unable to find a provider named:" + sourceId);
     }
 
     /**
@@ -624,14 +681,28 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             // we read the style to add
             final MutableStyle style = (MutableStyle) objectRequest;
 
-            final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
-            for (StyleProvider p : providers) {
-                if (p.getId().equals(sourceId)) {
-                    p.set(styleId, style);
-                    return new AcknowlegementType("Success", "The style has been added");
+            try {
+                // we read the soruce parameter to add
+
+                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapStyleDescriptor.NAME);
+                final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+                inputs.parameter(UpdateMapStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+                inputs.parameter(UpdateMapStyleDescriptor.STYLE_ID_NAME).setValue(styleId);
+                inputs.parameter(UpdateMapStyleDescriptor.STYLE_NAME).setValue(style);
+
+                try {
+                    final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                    process.call();
+
+                } catch (ProcessException ex) {
+                    return new AcknowlegementType("Failure", ex.getLocalizedMessage());
                 }
+
+                return new AcknowlegementType("Success", "The layer has been added");
+
+            } catch (NoSuchIdentifierException ex) {
+                throw new CstlServiceException(ex);
             }
-            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
         }
 
         return new AcknowlegementType("Failure", "Passed object is not a style:" + Classes.getShortClassName(objectRequest));

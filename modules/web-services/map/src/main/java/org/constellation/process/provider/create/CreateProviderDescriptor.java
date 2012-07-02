@@ -38,14 +38,14 @@ public class CreateProviderDescriptor extends AbstractProcessDescriptor {
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new provider in constellation.");
 
 
-    private static final String SERVICE_NAME_NAME = "service_Name";
+    public static final String SERVICE_NAME_NAME = "service_Name";
     private static final String SERVICE_NAME_REMARKS = "The name of the service.";
     public static final ParameterDescriptor<String> SERVICE_NAME =
             new DefaultParameterDescriptor(SERVICE_NAME_NAME, SERVICE_NAME_REMARKS, String.class, null, true);
 
 
 
-    private static final String SOURCE_NAME = "parameters";
+    public static final String SOURCE_NAME = "parameters";
     private static final String SOURCE_REMARKS = "ParameterValueGroup use to create provider.";
     public static final ParameterDescriptor<ParameterValueGroup> SOURCE =
             new DefaultParameterDescriptor(SOURCE_NAME, SOURCE_REMARKS, ParameterValueGroup.class, null, true);

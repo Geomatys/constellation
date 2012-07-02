@@ -40,7 +40,7 @@ public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
     /*
      * Provider to update identifier
      */
-    private static final String PROVIDER_ID_NAME = "provider_id";
+    public static final String PROVIDER_ID_NAME = "provider_id";
     private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to remove.";
     public static final ParameterDescriptor<String> PROVIDER_ID =
             new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
@@ -48,7 +48,7 @@ public class UpdateProviderDescriptor extends AbstractProcessDescriptor {
     /*
      * Source use to update.
      */
-    private static final String SOURCE_NAME = "source";
+    public static final String SOURCE_NAME = "source";
     private static final String SOURCE_REMARKS = "ParameterValueGroup use to update provider source.";
     public static final ParameterDescriptor<ParameterValueGroup> SOURCE =
             new DefaultParameterDescriptor(SOURCE_NAME, SOURCE_REMARKS, ParameterValueGroup.class, null, true);
