@@ -1,5 +1,6 @@
 org.constellation.process.provider.create.CreateProviderDescriptor
 org.constellation.process.provider.remove.RemoveProviderDescriptor
 org.constellation.process.provider.update.UpdateProviderDescriptor
+org.constellation.process.provider.restart.RestartProviderDescriptor
 org.constellation.process.refreshindex.RefreshIndexDescriptor
 org.constellation.process.restart.RestartDescriptor
