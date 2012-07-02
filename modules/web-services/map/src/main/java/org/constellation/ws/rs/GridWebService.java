@@ -25,12 +25,20 @@ import javax.xml.bind.JAXBException;
 
 import org.constellation.ServiceDef;
 import org.constellation.configuration.LayerContext;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.service.configure.ConfigureMapServiceDescriptor;
+import org.constellation.process.service.create.CreateMapServiceDescriptor;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * A Super class for WMS, WMTS, WFS and WCS web-service.
@@ -62,20 +70,46 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
      */
     @Override
     protected void configureInstance(final File instanceDirectory, final Object configuration) throws CstlServiceException {
-        
-        //@TODO use CreateMapService process instead.
+
+
         if (configuration instanceof LayerContext) {
-            final File configurationFile = new File(instanceDirectory, "layerContext.xml");
-            Marshaller marshaller = null;
-            try {
-                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(configuration, configurationFile);
-                
-            } catch(JAXBException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            } finally {
-                if (marshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            if (instanceDirectory.isDirectory()) {
+                if (instanceDirectory.listFiles().length == 0) {
+                    //Create
+                    try {
+                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
+                        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                        inputs.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+                        inputs.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+                        inputs.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
+
+                        final org.geotoolkit.process.Process process = desc.createProcess(inputs);
+                        process.call();
+
+                    } catch (NoSuchIdentifierException ex) {
+                        throw new CstlServiceException(ex);
+                    } catch (ProcessException ex) {
+                        throw new CstlServiceException(ex);
+                    }
+
+                } else {
+                    
+                    //Update
+                    try {
+                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, ConfigureMapServiceDescriptor.NAME);
+                        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                        inputs.parameter(ConfigureMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+                        inputs.parameter(ConfigureMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+                        inputs.parameter(ConfigureMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
+
+                        final org.geotoolkit.process.Process process = desc.createProcess(inputs);
+                        process.call();
+
+                    } catch (NoSuchIdentifierException ex) {
+                        throw new CstlServiceException(ex);
+                    } catch (ProcessException ex) {
+                        throw new CstlServiceException(ex);
+                    }
                 }
             }
         } else {

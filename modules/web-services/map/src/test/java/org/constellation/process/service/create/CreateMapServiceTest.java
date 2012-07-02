@@ -16,8 +16,13 @@
  */
 package org.constellation.process.service.create;
 
-import org.constellation.process.service.create.CreateMapServiceDesciptor;
+import org.constellation.process.service.create.CreateMapServiceDescriptor;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.AbstractMapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -35,18 +40,18 @@ import static org.junit.Assert.*;
 public class CreateMapServiceTest extends AbstractMapServiceTest {
 
     public CreateMapServiceTest() {
-        super(CreateMapServiceDesciptor.NAME);
+        super(CreateMapServiceDescriptor.NAME);
     }
 
     @Test
     public void testCreateWMS() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("wms");
-        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance1");
+        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue("wms");
+        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance1");
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -56,14 +61,39 @@ public class CreateMapServiceTest extends AbstractMapServiceTest {
     }
 
     @Test
+    public void testCreateWMSWithContext() throws ProcessException, NoSuchIdentifierException {
+
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
+
+        final List<Source> sources = new ArrayList<Source>();
+        sources.add(new Source("source1", Boolean.TRUE, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext conf = new LayerContext(layers);
+
+        //WMS
+        ParameterValueGroup in = desc.getInputDescriptor().createValue();
+        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue("wms");
+        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance11");
+        in.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue(conf);
+
+        org.geotoolkit.process.Process proc = desc.createProcess(in);
+        proc.call();
+
+        assertTrue(checkInsanceExist("WMS", "instance11"));
+        assertEquals(conf, getConfig("instance11"));
+        
+        deleteInstance("WMS", "instance11");
+    }
+
+    @Test
     public void testCreateWMTS() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
         //WMTS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("wmTs");
-        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance2");
+        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue("wmTs");
+        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance2");
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -75,15 +105,15 @@ public class CreateMapServiceTest extends AbstractMapServiceTest {
     @Test
     public void testCreateNoConfiguration() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
         // instance directory created but no configuration file
         final File instance3Dir = new File(configDirectory.getAbsolutePath() + "/WMS/instance3");
         instance3Dir.mkdir();
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("WMS");
-        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance3");
+        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue("WMS");
+        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance3");
 
         final org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -95,11 +125,11 @@ public class CreateMapServiceTest extends AbstractMapServiceTest {
     @Test
     public void testCreateUnknowService() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("foo");
-        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance2");
+        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue("foo");
+        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance2");
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -113,11 +143,11 @@ public class CreateMapServiceTest extends AbstractMapServiceTest {
     @Test
     public void testCreateOtherService() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("SOS");
-        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance1");
+        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue("SOS");
+        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance1");
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -131,11 +161,11 @@ public class CreateMapServiceTest extends AbstractMapServiceTest {
     @Test
     public void testCreateEmptyIdentifier() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("WMS");
-        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("");
+        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue("WMS");
+        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("");
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -149,11 +179,11 @@ public class CreateMapServiceTest extends AbstractMapServiceTest {
     @Test
     public void testCreateAleardyExist() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDesciptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDesciptor.SERVICE_NAME_NAME).setValue("WMS");
-        in.parameter(CreateMapServiceDesciptor.IDENTIFIER_NAME).setValue("instance3");
+        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue("WMS");
+        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance3");
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);

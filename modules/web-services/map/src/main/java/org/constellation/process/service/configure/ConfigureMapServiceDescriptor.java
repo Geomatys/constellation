@@ -54,7 +54,7 @@ public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
     public static final String CONFIG_NAME = "configuration";
     private static final String CONFIG_REMARKS = "LayerContext object use to update instance configuration. If not specified the instance will be configured from default LayerContext.";
     public static final ParameterDescriptor<LayerContext> CONFIGURATION =
-            new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, LayerContext.class, new LayerContext(), true);
+            new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, LayerContext.class, null, false);
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =

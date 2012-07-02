@@ -27,7 +27,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.service.create.CreateMapServiceDesciptor.*;
+import static org.constellation.process.service.create.CreateMapServiceDescriptor.*;
 
 /**
  * Process that create a new instance configuration from the service name (WMS, WMTS or WFS) for a specified instance name.
@@ -54,7 +54,7 @@ public class CreateMapService extends AbstractProcess {
 
         String serviceName = value(SERVICE_NAME, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
-        final LayerContext configuration = value(CONFIGURATION, inputParameters);
+        LayerContext configuration = value(CONFIGURATION, inputParameters);
 
         if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) || "WFS".equalsIgnoreCase(serviceName))) {
             serviceName = serviceName.toUpperCase();
@@ -64,6 +64,10 @@ public class CreateMapService extends AbstractProcess {
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
+        }
+
+        if (configuration == null) {
+            configuration = new LayerContext();
         }
 
         //get config directory .constellation

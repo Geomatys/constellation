@@ -33,7 +33,7 @@ import org.opengis.util.InternationalString;
  * ProcessDescriptor for create a new Map service like WMS, WMTS or WFS.
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateMapServiceDesciptor extends AbstractProcessDescriptor {
+public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
 
 
     public static final String NAME = "createMapService";
@@ -55,7 +55,7 @@ public class CreateMapServiceDesciptor extends AbstractProcessDescriptor {
     public static final String CONFIG_NAME = "configuration";
     private static final String CONFIG_REMARKS = "LayerContext object use to configure the instance. If not specified the instance will be configured from default LayerContext.";
     public static final ParameterDescriptor<LayerContext> CONFIGURATION =
-            new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, LayerContext.class, new LayerContext(), true);
+            new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, LayerContext.class, null, false);
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
@@ -70,7 +70,7 @@ public class CreateMapServiceDesciptor extends AbstractProcessDescriptor {
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
-    public CreateMapServiceDesciptor() {
+    public CreateMapServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 

@@ -42,7 +42,7 @@ public class ConfigureMapService extends AbstractProcess {
     /**
      * Update configuration of an existing instance for a specified service and instance name.
      *
-     * @throws ProcessException in cases : 
+     * @throws ProcessException in cases :
      * - if the service name is different from WMS, WMTS of WFS (no mather of case).
      * - if instance name doesn't exist.
      * - if error during file creation or marshalling phase.
@@ -52,7 +52,7 @@ public class ConfigureMapService extends AbstractProcess {
 
         String serviceName = value(SERVICE_NAME, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
-        final LayerContext configuration = value(CONFIGURATION, inputParameters);
+        LayerContext configuration = value(CONFIGURATION, inputParameters);
 
         if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) || "WFS".equalsIgnoreCase(serviceName))) {
             serviceName = serviceName.toUpperCase();
@@ -62,6 +62,10 @@ public class ConfigureMapService extends AbstractProcess {
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
+        }
+
+        if (configuration == null) {
+            configuration = new LayerContext();
         }
 
         //get config directory .constellation
@@ -76,7 +80,7 @@ public class ConfigureMapService extends AbstractProcess {
                 final File instanceDirectory = new File(serviceDir, identifier);
 
                 if (instanceDirectory.exists() && serviceDir.isDirectory()) {
-                    
+
                     //get layerContext.xml file.
                     File configurationFile = new File(instanceDirectory, "layerContext.xml");
                     Marshaller marshaller = null;
@@ -91,15 +95,15 @@ public class ConfigureMapService extends AbstractProcess {
                             GenericDatabaseMarshallerPool.getInstance().release(marshaller);
                         }
                     }
-                    
+
                 } else {
                     throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
                 }
-                
+
             } else {
                 throw new ProcessException("Service directory can't be found for service name : " + serviceName, this, null);
             }
-            
+
         } else {
             throw new ProcessException("Configuration directory can't be found.", this, null);
         }
