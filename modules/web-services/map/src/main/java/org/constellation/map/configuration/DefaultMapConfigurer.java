@@ -80,6 +80,7 @@ import org.constellation.process.layer.create.CreateMapLayerDescriptor;
 import org.constellation.process.layer.delete.DeleteMapLayerDescriptor;
 import org.constellation.process.layer.update.UpdateMapLayerDescriptor;
 import org.constellation.process.provider.create.CreateProviderDescriptor;
+import org.constellation.process.provider.getconfig.GetConfigProviderDescriptor;
 import org.constellation.process.provider.remove.RemoveProviderDescriptor;
 import org.constellation.process.provider.restart.RestartProviderDescriptor;
 import org.constellation.process.provider.update.UpdateProviderDescriptor;
@@ -347,20 +348,25 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     private Object getProviderConfiguration(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String id = getParameter("id", true, parameters);
 
-        Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
-        for (Provider p : providers) {
-            if (p.getId().equals(id)) {
-                return p.getSource();
-            }
-        }
-        providers = StyleProviderProxy.getInstance().getProviders();
-        for (Provider p : providers) {
-            if (p.getId().equals(id)) {
-                return p.getSource();
-            }
-        }
+         try {
 
-        return new AcknowlegementType("Failure", "Unable to find a source named:" + id);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigProviderDescriptor.NAME);
+            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+            inputs.parameter(GetConfigProviderDescriptor.PROVIDER_ID_NAME).setValue(id);
+
+            try {
+                
+                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                final ParameterValueGroup outputs = process.call();
+                return outputs.parameter(GetConfigProviderDescriptor.CONFIG_NAME).getValue();
+
+            } catch (ProcessException ex) {
+                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
+            }
+
+        } catch (NoSuchIdentifierException ex) {
+           throw new CstlServiceException(ex);
+        }
     }
 
     /**
