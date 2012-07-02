@@ -16,6 +16,7 @@
  */
 package org.constellation.process.wms.stop;
 
+import org.constellation.process.wmts.stop.StopWMTSServiceDescriptor;
 import java.io.File;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.wms.WMSProcessTest;
@@ -35,36 +36,36 @@ import org.opengis.util.NoSuchIdentifierException;
 public class StopWMSServiceTest extends WMSProcessTest {
 
     public StopWMSServiceTest() {
-        super(StopWMSServiceDescriptor.NAME);
+        super(StopWMTSServiceDescriptor.NAME);
     }
-    
-    
+
+
     @Test
     public void testStopWMS() throws NoSuchIdentifierException, ProcessException {
-        
+
         startInstance("instance2");
-        
+
         final int initSize = WSEngine.getInstanceSize("WMS");
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopWMSServiceDescriptor.NAME);
-                                                                                                             
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopWMTSServiceDescriptor.NAME);
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StopWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance2");
+        in.parameter(StopWMTSServiceDescriptor.IDENTIFIER_NAME).setValue("instance2");
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
-        
+
         assertTrue(WSEngine.getInstanceSize("WMS") == initSize-1);
         assertFalse(WSEngine.serviceInstanceExist("WMS", "instance2"));
-        
+
         WSEngine.destroyInstances("WMS");
     }
-    
+
     @Test
     public void testFailStopWMS() throws NoSuchIdentifierException, ProcessException {
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopWMSServiceDescriptor.NAME);
-        
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopWMTSServiceDescriptor.NAME);
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StopWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance5");
-        
+        in.parameter(StopWMTSServiceDescriptor.IDENTIFIER_NAME).setValue("instance5");
+
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);
             proc.call();
@@ -73,14 +74,14 @@ public class StopWMSServiceTest extends WMSProcessTest {
             //do nothing
         }
     }
-    
+
     @Test
     public void testAlreadyStopWMS() throws NoSuchIdentifierException, ProcessException {
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopWMSServiceDescriptor.NAME);
-        
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopWMTSServiceDescriptor.NAME);
+
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StopWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance3");
-        
+        in.parameter(StopWMTSServiceDescriptor.IDENTIFIER_NAME).setValue("instance3");
+
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);
             proc.call();

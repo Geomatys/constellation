@@ -16,6 +16,7 @@
  */
 package org.constellation.process.wms.restart;
 
+import org.constellation.process.wmts.restart.RestartWMTSServiceDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.wms.WMSProcessTest;
 import org.constellation.ws.WSEngine;
@@ -34,7 +35,7 @@ import org.opengis.util.NoSuchIdentifierException;
 public class RestartWMSServiceTest extends WMSProcessTest {
 
     public RestartWMSServiceTest() {
-        super(RestartWMSServiceDescriptor.NAME);
+        super(RestartWMTSServiceDescriptor.NAME);
     }
 
 
@@ -44,11 +45,11 @@ public class RestartWMSServiceTest extends WMSProcessTest {
         startInstance("instance1");
 
         final int initSize = WSEngine.getInstanceSize("WMS");
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMTSServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance1");
-        in.parameter(RestartWMSServiceDescriptor.CLOSE_NAME).setValue(false);
+        in.parameter(RestartWMTSServiceDescriptor.IDENTIFIER_NAME).setValue("instance1");
+        in.parameter(RestartWMTSServiceDescriptor.CLOSE_NAME).setValue(false);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
 
@@ -64,11 +65,11 @@ public class RestartWMSServiceTest extends WMSProcessTest {
         startInstance("instance2");
 
         final int initSize = WSEngine.getInstanceSize("WMS");
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMTSServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance2");
-        in.parameter(RestartWMSServiceDescriptor.CLOSE_NAME).setValue(true);
+        in.parameter(RestartWMTSServiceDescriptor.IDENTIFIER_NAME).setValue("instance2");
+        in.parameter(RestartWMTSServiceDescriptor.CLOSE_NAME).setValue(true);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
 
@@ -85,11 +86,11 @@ public class RestartWMSServiceTest extends WMSProcessTest {
         startInstance("instance2");
 
         final int initSize = WSEngine.getInstanceSize("WMS");
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMTSServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue(null);
-        in.parameter(RestartWMSServiceDescriptor.CLOSE_NAME).setValue(false);
+        in.parameter(RestartWMTSServiceDescriptor.IDENTIFIER_NAME).setValue(null);
+        in.parameter(RestartWMTSServiceDescriptor.CLOSE_NAME).setValue(false);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
 
@@ -107,11 +108,11 @@ public class RestartWMSServiceTest extends WMSProcessTest {
         startInstance("instance2");
 
         final int initSize = WSEngine.getInstanceSize("WMS");
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMTSServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue(null);
-        in.parameter(RestartWMSServiceDescriptor.CLOSE_NAME).setValue(true);
+        in.parameter(RestartWMTSServiceDescriptor.IDENTIFIER_NAME).setValue(null);
+        in.parameter(RestartWMTSServiceDescriptor.CLOSE_NAME).setValue(true);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
 
@@ -129,10 +130,10 @@ public class RestartWMSServiceTest extends WMSProcessTest {
      */
     @Test
     public void testFailRestartWMS1() throws NoSuchIdentifierException, ProcessException {
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMTSServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance4");
+        in.parameter(RestartWMTSServiceDescriptor.IDENTIFIER_NAME).setValue("instance4");
 
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -150,10 +151,10 @@ public class RestartWMSServiceTest extends WMSProcessTest {
      */
     @Test
     public void testFailRestartWMS2() throws NoSuchIdentifierException, ProcessException {
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMSServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartWMTSServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartWMSServiceDescriptor.IDENTIFIER_NAME).setValue("instance5");
+        in.parameter(RestartWMTSServiceDescriptor.IDENTIFIER_NAME).setValue("instance5");
 
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);
