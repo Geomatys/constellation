@@ -1,0 +1,3 @@
+org.constellation.process.wmts.start.StartWMTSServiceDescriptor
+org.constellation.process.wmts.stop.StopWMTSServiceDescriptor
+org.constellation.process.wmts.restart.RestartWMTSServiceDescriptor
