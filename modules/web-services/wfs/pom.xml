@@ -184,6 +184,13 @@
        <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+       <groupId>org.constellation.engine</groupId>
+       <artifactId>cstl-engine-process-core</artifactId>
+       <version>${project.version}</version>
+       <type>test-jar</type>
+       <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>
