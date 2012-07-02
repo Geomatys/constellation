@@ -17,9 +17,7 @@
  */
 package org.constellation.ws.rs;
 
-import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import javax.xml.bind.Marshaller;
 import java.io.File;
 import javax.xml.bind.JAXBException;
 
@@ -28,6 +26,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.configure.ConfigureMapServiceDescriptor;
 import org.constellation.process.service.create.CreateMapServiceDescriptor;
+import org.constellation.process.service.getconfig.GetConfigMapServiceDescriptor;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;
@@ -93,7 +92,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
                     }
 
                 } else {
-                    
+
                     //Update
                     try {
                         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, ConfigureMapServiceDescriptor.NAME);
@@ -130,26 +129,23 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
      */
     @Override
     protected Object getInstanceConfiguration(File instanceDirectory) throws CstlServiceException {
-        final File configurationFile = new File(instanceDirectory, "layerContext.xml");
-        if (configurationFile.exists()) {
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(configurationFile);
-                if (obj instanceof LayerContext) {
-                    return obj;
-                } else {
-                    throw new CstlServiceException("The layerContext.xml file does not contain a LayerContext object");
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex);
-            } finally {
-                if (unmarshaller != null) {
-                    GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                }
-            }
-        } else {
-            throw new CstlServiceException("Unable to find a file layerContext.xml");
+
+        try {
+            final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigMapServiceDescriptor.NAME);
+
+            ParameterValueGroup in = desc.getInputDescriptor().createValue();
+            in.parameter(GetConfigMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+            in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+
+            final org.geotoolkit.process.Process proc = desc.createProcess(in);
+            final ParameterValueGroup ouptuts = proc.call();
+
+            return ouptuts.parameter(GetConfigMapServiceDescriptor.CONFIG_NAME).getValue();
+
+        } catch (NoSuchIdentifierException ex) {
+            throw new CstlServiceException(ex);
+        } catch (ProcessException ex) {
+            throw new CstlServiceException(ex);
         }
     }
 }

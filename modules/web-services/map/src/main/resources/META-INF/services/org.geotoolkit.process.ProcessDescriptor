@@ -1,14 +1,22 @@
+#Providers process
 org.constellation.process.provider.create.CreateProviderDescriptor
 org.constellation.process.provider.remove.RemoveProviderDescriptor
 org.constellation.process.provider.update.UpdateProviderDescriptor
 org.constellation.process.provider.restart.RestartProviderDescriptor
 org.constellation.process.provider.getconfig.GetConfigProviderDescriptor
+
+#Service process
 org.constellation.process.service.create.CreateMapServiceDescriptor
 org.constellation.process.service.configure.ConfigureMapServiceDescriptor
 org.constellation.process.service.delete.DeleteMapServiceDescriptor
+org.constellation.process.service.getconfig.GetConfigMapServiceDescriptor
+
+#Layer process
 org.constellation.process.layer.create.CreateMapLayerDescriptor
 org.constellation.process.layer.delete.DeleteMapLayerDescriptor
 org.constellation.process.layer.update.UpdateMapLayerDescriptor
+
+#Style process
 org.constellation.process.style.create.CreateMapStyleDescriptor
 org.constellation.process.style.delete.DeleteMapStyleDescriptor
 org.constellation.process.style.update.UpdateMapStyleDescriptor
