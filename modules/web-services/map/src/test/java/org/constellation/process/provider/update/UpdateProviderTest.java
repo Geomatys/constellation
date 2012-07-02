@@ -42,17 +42,17 @@ public class UpdateProviderTest extends AbstractProviderTest {
     public UpdateProviderTest () {
         super(UpdateProviderDescriptor.NAME);
     }
-    
+
     @Test
     public void testUpdateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
-        
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "updateProvider1", true, EMPTY_CSV));
-        
+
+        addProvider(buildCSVProvider(DATASTORE_SERVICE, "updateProvider10", true, EMPTY_CSV));
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderDescriptor.NAME);
 
-        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "updateProvider1", false, EMPTY_CSV);
+        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "updateProvider10", false, EMPTY_CSV);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("provider_id").setValue("updateProvider1");
+        in.parameter("provider_id").setValue("updateProvider10");
         in.parameter("source").setValue(parameters);
 
         final Process proc = desc.createProcess(in);
@@ -60,34 +60,34 @@ public class UpdateProviderTest extends AbstractProviderTest {
 
         Provider provider = null;
         for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
-            if ("updateProvider1".equals(p.getId())){
+            if ("updateProvider10".equals(p.getId())){
                 provider = p;
             }
-        } 
-            
+        }
+
         assertNotNull(provider);
         assertTrue(parameters.equals(provider.getSource()));
-            
+
         removeProvider("updateProvider1");
     }
-    
+
     @Test
     public void testFailUpdateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
-        
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderDescriptor.NAME);
 
-        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "updateProvider2", false, EMPTY_CSV);
+        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "updateProvider20", false, EMPTY_CSV);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("provider_id").setValue("updateProvider2");
+        in.parameter("provider_id").setValue("updateProvider20");
         in.parameter("source").setValue(parameters);
-        
+
         try {
             final Process proc = desc.createProcess(in);
             proc.call();
             fail();
         } catch (ProcessException ex) {
-            
+
         }
-            
+
     }
 }

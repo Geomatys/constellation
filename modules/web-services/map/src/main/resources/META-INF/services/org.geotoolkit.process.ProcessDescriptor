@@ -1,3 +1,7 @@
+org.constellation.process.provider.create.CreateProviderDescriptor
+org.constellation.process.provider.remove.RemoveProviderDescriptor
+org.constellation.process.provider.update.UpdateProviderDescriptor
+org.constellation.process.provider.restart.RestartProviderDescriptor
 org.constellation.process.service.create.CreateMapServiceDesciptor
 org.constellation.process.service.configure.ConfigureMapServiceDescriptor
 org.constellation.process.service.delete.DeleteMapServiceDescriptor

@@ -19,6 +19,7 @@ package org.constellation.process.provider.restart;
 import java.net.MalformedURLException;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.AbstractProviderTest;
+import org.constellation.process.provider.restart.RestartProviderDescriptor;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;

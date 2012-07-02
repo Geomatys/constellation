@@ -14,19 +14,23 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.provider.remove;
+package org.constellation.process.provider.create;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import org.constellation.process.provider.AbstractProviderTest;
+
 import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.provider.create.CreateProviderDescriptor;
 import org.constellation.provider.*;
+
+import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.junit.Test;
-import org.geotoolkit.process.Process;
+
 import static org.junit.Assert.*;
+import org.junit.Test;
+
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
@@ -34,55 +38,34 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class RemoveProviderTest extends AbstractProviderTest {
+public class CreateProviderTest extends AbstractProviderTest {
 
-    public RemoveProviderTest() {
-        super(RemoveProviderDescriptor.NAME);
+    public CreateProviderTest () {
+        super(CreateProviderDescriptor.NAME);
     }
-    
+
     @Test
-    public void testRemoveProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
-        
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "removeProvider1", true, EMPTY_CSV));
-        
+    public void testCreateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+
         final int nbProvider = LayerProviderProxy.getInstance().getProviders().size();
-        
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RemoveProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
+
+        final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "newProvider", false, EMPTY_CSV);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("provider_id").setValue("removeProvider1");
+        in.parameter("service_Name").setValue(DATASTORE_SERVICE.getName());
+        in.parameter("parameters").setValue(parameters);
 
         final Process proc = desc.createProcess(in);
         proc.call();
 
         Provider provider = null;
         for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
-            if ("removeProvider1".equals(p.getId())){
+            if ("newProvider".equals(p.getId())){
                 provider = p;
             }
         }
-        assertTrue(nbProvider-1 == LayerProviderProxy.getInstance().getProviders().size());
-        assertNull(provider);
-            
-        removeProvider("removeProvider1");
-    }
-    
-    
-    @Test
-    public void testFailRemoveProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
-        
-        
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RemoveProviderDescriptor.NAME);
-        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("provider_id").setValue("deleteProvider10");
+        assertTrue(nbProvider+1 == LayerProviderProxy.getInstance().getProviders().size());
+        assertNotNull(provider);
 
-        try {
-            final Process proc = desc.createProcess(in);
-            proc.call();
-            fail();
-        } catch (ProcessException ex) {
-            
-        }
-            
     }
-    
 }
