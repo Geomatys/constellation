@@ -27,6 +27,8 @@ import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -39,6 +41,7 @@ import org.constellation.configuration.ServiceStatus;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
+import org.constellation.ws.security.SecurityManager;
 
 // Geotoolkit dependencies
 import org.constellation.ws.Worker;
@@ -54,6 +57,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // GeoAPI dependencies
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.util.CodeList;
+import sun.misc.BASE64Decoder;
 
 
 /**
@@ -62,7 +66,7 @@ import org.opengis.util.CodeList;
  * This class
  * </p>
  * <p>
- * The Open Geospatial Consortium (OGC) has defined a number of web services for 
+ * The Open Geospatial Consortium (OGC) has defined a number of web services for
  * geospatial data such as:
  * <ul>
  *   <li><b>CSW</b> -- Catalog Service for the Web</li>
@@ -70,7 +74,7 @@ import org.opengis.util.CodeList;
  *   <li><b>WCS</b> -- Web Coverage Service</li>
  *   <li><b>SOS</b> -- Sensor Observation Service</li>
  * </ul>
- * Many of these Web Services have been defined to work with REST based HTTP 
+ * Many of these Web Services have been defined to work with REST based HTTP
  * message exchange; this class provides base functionality for those services.
  * </p>
  *
@@ -89,7 +93,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     private final UnmodifiableArrayList<ServiceDef> supportedVersions;
 
     final String serviceName;
-    
+
     /**
      * Initialize the basic attributes of a web serviceType.
      *
@@ -108,7 +112,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         serviceName = supportedVersions[0].specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
         WSEngine.registerService(serviceName, "REST");
-        
+
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
 
@@ -153,7 +157,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 
     /**
      * Return the dedicated Web-service configuration directory.
-     * 
+     *
      * @return
      */
     protected File getServiceDirectory() {
@@ -223,18 +227,29 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 
     /**
      * Build a new instance of Web service worker with the specified configuration directory
-     * 
+     *
      * @param instanceDirectory The configuration directory of the instance.
      * @return
      */
-    protected abstract W createWorker(File instanceDirectory);
+    protected abstract W createWorker(final File instanceDirectory);
 
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) {
+    public Response treatIncomingRequest(final Object objectRequest) {
+        try {
+              processAuthentication();
+        } catch (UnknownAccountException ex) {
+            LOGGER.log(Level.FINER, "Unknow acount", ex);
+            SecurityManager.logout();
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        } catch (IncorrectCredentialsException ex) {
+            LOGGER.log(Level.FINER, "incorrect password", ex);
+            SecurityManager.logout();
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
         try {
             final String serviceID = getParameter("serviceId", false);
             // request is send to the specified worker
@@ -244,7 +259,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     final String ip = getHttpServletRequest().getRemoteAddr();
                     final String referer = getHttpContext().getRequest().getHeaderValue("referer");
                     if (!worker.isAuthorized(ip, referer)) {
-                        LOGGER.log(Level.INFO, "Received a request from unauthorized ip:{0} or referer:{1}", 
+                        LOGGER.log(Level.INFO, "Received a request from unauthorized ip:{0} or referer:{1}",
                                 new String[]{ip, referer});
                         return Response.status(Response.Status.UNAUTHORIZED).build();
                     }
@@ -265,10 +280,35 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
     }
 
+    private void processAuthentication() throws UnknownAccountException, IncorrectCredentialsException{
+        final String authorization = getHttpServletRequest().getHeader("authorization");
+        if (authorization != null) {
+            if (authorization.startsWith("Basic ")) {
+                final String toDecode = authorization.substring(6);
+                final BASE64Decoder decoder = new BASE64Decoder();
+                try {
+                    final String logPass = new String(decoder.decodeBuffer(toDecode));
+                    final int separatorIndex = logPass.indexOf(":");
+                    if (separatorIndex != -1) {
+                        final String login = logPass.substring(0, separatorIndex);
+                        final String passw = logPass.substring(separatorIndex + 1);
+                        SecurityManager.login(login, passw);
+                    } else {
+                        LOGGER.warning("separator missing in authorization header");
+                    }
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, "IO exception while cdecoding basic authentication", ex);
+                }
+            } else {
+                LOGGER.info("only basic authorization are handled for now");
+            }
+        }
+    }
+
     /**
      * treat the request sent to the admin instance.
      */
-    private Response treatAdminRequest(Object objectRequest) {
+    private Response treatAdminRequest(final Object objectRequest) {
         try {
             final String request = getParameter("request", true);
 
@@ -341,8 +381,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 LOGGER.info("deleting an instance");
                 final String identifier = getParameter("id", true);
                 WSEngine.shutdownInstance(serviceName, identifier);
-                
-                final AcknowlegementType response;    
+
+                final AcknowlegementType response;
                 final File serviceDirectory = getServiceDirectory();
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     final File instanceDirectory     = new File (serviceDirectory, identifier);
@@ -365,7 +405,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 } else {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
                 }
-                
+
                 return Response.ok(response, "text/xml").build();
 
             } else if ("newInstance".equalsIgnoreCase(request)) {
@@ -386,20 +426,20 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
                 return Response.ok(response, "text/xml").build();
 
-                
+
             } else if ("renameInstance".equalsIgnoreCase(request)) {
                 LOGGER.info("renaming an instance");
                 final String identifier = getParameter("id", true);
                 final String newName    = getParameter("newName", true);
                 // we stop the current worker
-                WSEngine.shutdownInstance(serviceName, identifier); 
-                
+                WSEngine.shutdownInstance(serviceName, identifier);
+
                 final AcknowlegementType response;
                 final File serviceDirectory = getServiceDirectory();
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     final File instanceDirectory = new File (serviceDirectory, identifier);
                     final File newDirectory      = new File (serviceDirectory, newName);
-                    
+
                     if (instanceDirectory.isDirectory()) {
                         if (!newDirectory.exists()) {
                             if (instanceDirectory.renameTo(newDirectory)) {
@@ -493,7 +533,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 }
                 final InstanceReport report = new InstanceReport(instances);
                 return Response.ok(report, "text/xml").build();
-                
+
             } else if ("updateCapabilities".equalsIgnoreCase(request)) {
                 LOGGER.info("updating instance capabilities");
                 final String identifier = getParameter("id", true);
@@ -503,7 +543,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 if (serviceDirectory != null && serviceDirectory.isDirectory()) {
                     File instanceDirectory     = new File (serviceDirectory, identifier);
                     if (instanceDirectory.isDirectory()) {
-                        // recup the file 
+                        // recup the file
                         if (objectRequest instanceof File) {
                             try {
                                 final File newCapabilitiesFile = new File(instanceDirectory, fileName);
@@ -525,7 +565,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
                 }
                 return Response.ok(response, "text/xml").build();
-                
+
             } else {
                 throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
                         INVALID_PARAMETER_VALUE, "request");
@@ -539,7 +579,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 
     /**
      * Receive a file and write it into the static file path.
-     * 
+     *
      * @param in The input stream.
      * @return an Acknowledgment indicating if the operation succeed or not.
      *
@@ -560,7 +600,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 LOGGER.log(Level.WARNING, "Received a PUT request on a not admin instance identifier:{0}", serviceID);
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            
+
         } catch (IOException ex) {
             LOGGER.severe("IO exception while uploading file");
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -572,10 +612,10 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             return processExceptionResponse(ex, mainVersion);
         }
     }
-    
+
     /**
      * Service specific task which has to be executed when a restart is asked.
-     * 
+     *
      * @param identifier the instance identifier or {@code null} for all the instance.
      */
     protected void specificRestart(final String identifier) {
@@ -610,9 +650,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param objectRequest if the server receive a POST request in XML,
      *        this object contain the request. Else for a GET or a POST kvp
      *        request this parameter is {@code null}
-     * 
+     *
      * @param worker the selected worker on which apply the request.
-     * 
+     *
      * @return an xml response.
      */
     protected abstract Response treatIncomingRequest(final Object objectRequest,final  W worker);
@@ -673,7 +713,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 
     /**
      * Return the correct representation of an OWS exceptionCode
-     * 
+     *
      * @param exceptionCode
      * @return
      */
@@ -766,7 +806,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             !ex.getExceptionCode().equals(INVALID_CRS)                && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_CRS) &&
             !ex.getExceptionCode().equals(LAYER_NOT_DEFINED)          && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED) &&
             !ex.getExceptionCode().equals(INVALID_REQUEST)            && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_REQUEST) &&
-            !ex.getExceptionCode().equals(INVALID_UPDATE_SEQUENCE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_UPDATE_SEQUENCE) &&    
+            !ex.getExceptionCode().equals(INVALID_UPDATE_SEQUENCE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_UPDATE_SEQUENCE) &&
             !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_SRS)) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } else {
@@ -780,7 +820,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     protected int getWorkerMapSize() {
         return WSEngine.getInstanceSize(serviceName);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -799,5 +839,5 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     protected MarshallerPool getConfigurationPool() {
         return GenericDatabaseMarshallerPool.getInstance();
     }
-    
+
 }

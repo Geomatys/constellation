@@ -47,6 +47,7 @@ import org.constellation.ws.MimeType;
 
 import static org.constellation.api.QueryConstants.*;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.constellation.ws.UnauthorizedException;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
@@ -189,7 +190,7 @@ public class SOService extends OGCWebService<SOSworker> {
 
     /**
      * Throw an CstlServiceException when a request is not available in GET.
-     * 
+     *
      * @param operationName The name of the request. (example getCapabilities)
      *
      * @throws CstlServiceException every time.
@@ -198,14 +199,18 @@ public class SOService extends OGCWebService<SOSworker> {
         throw new CstlServiceException("The operation " + operationName + " is only requestable in XML via POST method",
                                                   OPERATION_NOT_SUPPORTED, operationName);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
+         // asking for authentication
+        if (ex instanceof UnauthorizedException) {
+            return Response.status(Response.Status.UNAUTHORIZED).header("WWW-Authenticate", " Basic").build();
+        }
         logException(ex);
-        
+
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
@@ -305,7 +310,7 @@ public class SOService extends OGCWebService<SOSworker> {
          throw new CstlServiceException("The operation " + request + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
     }
-    
+
     /**
      * Build a new getCapabilities request from kvp encoding
      */
@@ -325,7 +330,7 @@ public class SOService extends OGCWebService<SOSworker> {
         final AcceptFormatsType formats = new AcceptFormatsType(getParameter(ACCEPT_FORMATS_PARAMETER, false));
 
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
-        
+
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
         final String section = getParameter(SECTIONS_PARAMETER, false);
@@ -366,7 +371,7 @@ public class SOService extends OGCWebService<SOSworker> {
 
 
     }
-    
+
     private GetFeatureOfInterest createGetFeatureOfInterest() throws CstlServiceException {
         final String featureID = getParameter("FeatureOfInterestId", true);
         final List<String> fidList = StringUtilities.toStringList(featureID);

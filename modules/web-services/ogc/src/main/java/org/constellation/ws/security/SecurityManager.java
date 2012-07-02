@@ -17,6 +17,9 @@
 package org.constellation.ws.security;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 
 /**
@@ -25,8 +28,32 @@ import org.apache.shiro.subject.Subject;
  */
 public class SecurityManager {
 
+    public static String getCurrentUserLogin() {
+        final Subject currentUser = SecurityUtils.getSubject();
+        return (String) currentUser.getPrincipal();
+    }
+
     public static boolean isAuthenticated() {
         final Subject currentUser = SecurityUtils.getSubject();
         return currentUser.isAuthenticated();
+    }
+
+    public static boolean isAllowed(final String action) {
+        final Subject currentUser = SecurityUtils.getSubject();
+        return currentUser.isPermitted(action);
+    }
+
+    public static boolean hasRole(final String role) {
+        final Subject currentUser = SecurityUtils.getSubject();
+        return currentUser.hasRole(role);
+    }
+
+    public static void login(final String login, final String pass) throws UnknownAccountException, IncorrectCredentialsException {
+        final UsernamePasswordToken token = new UsernamePasswordToken(login, pass);
+        SecurityUtils.getSubject().login(token);
+    }
+
+    public static void logout() {
+        SecurityUtils.getSubject().logout();
     }
 }
