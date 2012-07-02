@@ -26,6 +26,7 @@ import org.constellation.provider.LayerDetails;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
+import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
@@ -40,10 +41,10 @@ import org.opengis.feature.type.Name;
  * Utility methods for the Portrayal system.
  * <p>
  * <b>Waring</b><br/>
- * None of these methods are currently used. This class is currently a 
+ * None of these methods are currently used. This class is currently a
  * place holder and may be removed soon.
  * </p>
- * 
+ *
  * @author Adrian Custer (Geomatys)
  * @since 0.3
  *
@@ -72,13 +73,15 @@ public final class PortrayalUtil {
             assert (null != layerRef);
             //style can be null
 
-            final MapLayer mapLayer = layerRef.getMapLayer(style, renderingParameters);
+            final MapItem mapLayer = layerRef.getMapLayer(style, renderingParameters);
             if (mapLayer == null) {
                 throw new PortrayalException("Could not create a mapLayer for layer: " + layerRef.getName());
             }
-            mapLayer.setSelectable(true);
+            if(mapLayer instanceof MapLayer){
+                ((MapLayer)mapLayer).setSelectable(true);
+            }
             mapLayer.setVisible(true);
-            context.layers().add(mapLayer);
+            context.items().add(mapLayer);
         }
 
         return context;

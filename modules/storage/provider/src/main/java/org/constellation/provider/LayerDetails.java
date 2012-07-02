@@ -30,6 +30,7 @@ import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
+import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
@@ -147,13 +148,13 @@ public interface LayerDetails {
     Dimension getPreferredLegendSize(final LegendTemplate template, final MutableStyle ms) throws PortrayalException;
 
     /**
-     * Create a MapLayer with the given style and parameters.
+     * Create a MapItem with the given style and parameters.
      * if style is null, the favorite style of this layer will be used.
      *
      * @param style : can be null. reconized types are String/GraphicBuilder/MutableStyle.
      * @param params : can be null.
      */
-    MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException;
+    MapItem getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException;
 
     /**
      * @see Layer#getName
@@ -176,11 +177,11 @@ public interface LayerDetails {
      * Returns the type of provider for a {@linkplain Layer layer}.
      */
     TYPE getType();
-    
+
     /**
      * Origine source of this data can be :
      * FeatureCollection, CoverageRefence, null.
      */
     Object getOrigin();
-    
+
 }

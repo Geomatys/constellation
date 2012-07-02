@@ -31,6 +31,7 @@ import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
+import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
@@ -45,7 +46,7 @@ import org.opengis.style.Style;
 
 /**
  * Abstract layer, handle name and styles.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
@@ -86,7 +87,7 @@ public abstract class AbstractLayerDetails implements LayerDetails{
     public Object getOrigin(){
         return null;
     }
-    
+
     /**
      * Returns the time range of this layer. The default implementation invoked
      * {@link #getAvailableTimes()} and extract the first and last date from it.
@@ -123,6 +124,8 @@ public abstract class AbstractLayerDetails implements LayerDetails{
                                           final Style style, final String rule, final Double scale)
                                           throws PortrayalException
     {
+
+
         MutableStyle mutableStyle = null;
         if (style != null) {
             mutableStyle = (MutableStyle) style;
@@ -135,6 +138,15 @@ public abstract class AbstractLayerDetails implements LayerDetails{
             }
         }
 
+        final MapItem mapItem = getMapLayer(mutableStyle, null);
+
+        if(!(mapItem instanceof MapLayer)){
+            //we can't render a glyph for a muli-layer
+            return DefaultLegendService.portray(template, mapItem, dimension);
+        }
+
+        final MapLayer maplayer = (MapLayer) mapItem;
+
         if (template == null) {
             if (dimension == null) {
                 dimension = DefaultGlyphService.glyphPreferredSize(mutableStyle, dimension, null);
@@ -144,23 +156,20 @@ public abstract class AbstractLayerDetails implements LayerDetails{
             if (rule != null) {
                 final MutableRule mr = findRuleByNameInStyle(rule, mutableStyle);
                 if (mr != null) {
-                    return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
+                    return DefaultGlyphService.create(mr, dimension, maplayer);
                 }
             }
             // Otherwise, if there is a scale, we can filter rules.
             if (scale != null) {
                 final MutableRule mr = findRuleByScaleInStyle(scale, mutableStyle);
                 if (mr != null) {
-                    return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
+                    return DefaultGlyphService.create(mr, dimension, maplayer);
                 }
             }
-            return DefaultGlyphService.create(mutableStyle, dimension, getMapLayer(mutableStyle, null));
+            return DefaultGlyphService.create(mutableStyle, dimension, maplayer);
         }
         try {
-            final MapLayer layer = getMapLayer(mutableStyle, null);
-            final MapContext context = MapBuilder.createContext();
-            context.layers().add(layer);
-            return DefaultLegendService.portray(template, context, dimension);
+            return DefaultLegendService.portray(template, mapItem, dimension);
         } catch (PortrayalException ex) {
             LOGGER.log(Level.INFO, ex.getMessage(), ex);
         }
@@ -173,17 +182,17 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         if (rule != null) {
             final MutableRule mr = findRuleByNameInStyle(rule, mutableStyle);
             if (mr != null) {
-                return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
+                return DefaultGlyphService.create(mr, dimension, maplayer);
             }
         }
         // Otherwise, if there is a scale, we can filter rules.
         if (scale != null) {
             final MutableRule mr = findRuleByScaleInStyle(scale, mutableStyle);
             if (mr != null) {
-                return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
+                return DefaultGlyphService.create(mr, dimension, maplayer);
             }
         }
-        return DefaultGlyphService.create(mutableStyle, dimension, getMapLayer(mutableStyle, null));
+        return DefaultGlyphService.create(mutableStyle, dimension, maplayer);
     }
 
     /**
@@ -191,10 +200,8 @@ public abstract class AbstractLayerDetails implements LayerDetails{
      */
     @Override
     public Dimension getPreferredLegendSize(final LegendTemplate template, final MutableStyle ms) throws PortrayalException {
-        final MapLayer ml = getMapLayer(ms, null);
-        final MapContext mc = MapBuilder.createContext();
-        mc.layers().add(ml);
-        return DefaultLegendService.legendPreferredSize(template, mc);
+        final MapItem ml = getMapLayer(ms, null);
+        return DefaultLegendService.legendPreferredSize(template, ml);
     }
 
     /**
@@ -243,6 +250,6 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         }
         return null;
     }
-    
-    
+
+
 }
