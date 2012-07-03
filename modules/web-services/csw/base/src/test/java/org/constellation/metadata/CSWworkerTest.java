@@ -54,6 +54,7 @@ import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.GetDomainResponse;
 import org.geotoolkit.csw.xml.ElementSetType;
+import org.geotoolkit.csw.xml.GetRecordByIdResponse;
 import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.v202.AcknowledgementType;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
@@ -100,6 +101,7 @@ import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.csw.xml.TypeNames.*;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 
 // GeoAPI dependencies
 import org.opengis.metadata.Datatype;
@@ -112,7 +114,7 @@ import static org.junit.Assert.*;
 
 /**
  * Test the different methods of CSWWorker with a FileSystem reader/writer.
- * 
+ *
  * @author Guilhem Legal (geomatys)
  */
 @Ignore
@@ -239,7 +241,7 @@ public class CSWworkerTest {
         assertTrue(result.getServiceIdentification() != null);
         assertTrue(result.getServiceProvider() == null);
         assertTrue(result != null);
-        
+
         /*
          *  TEST 6 : get capabilities with wrong version (waiting for an exception)
          */
@@ -349,7 +351,7 @@ public class CSWworkerTest {
 
         assertEquals(expRecordResult1.getFormat(), recordResult.getFormat());
         assertEquals(expRecordResult1, recordResult);
-        
+
         /*
          *  TEST 5 : getRecordById with the a metadata in DC mode (FULL).
          */
@@ -365,12 +367,12 @@ public class CSWworkerTest {
         assertTrue(obj instanceof RecordType);
 
         recordResult = (RecordType) obj;
-        
+
         RecordType expRecordResult3 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta3FDC.xml"))).getValue();
 
         assertEquals(expRecordResult3.getFormat(), recordResult.getFormat());
         assertEquals(expRecordResult3, recordResult);
-        
+
 
         /*
          *  TEST 6 : getRecordById with two metadata in DC mode (FULL).
@@ -558,7 +560,7 @@ public class CSWworkerTest {
         /*
          *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: Title LIKE 90008411%
          */
-        
+
         List<QName> typeNames             = Arrays.asList(RECORD_QNAME);
         ElementSetNameType elementSetName = new ElementSetNameType(ElementSetType.FULL);
         SortByType sortBy                 = null;
@@ -693,7 +695,7 @@ public class CSWworkerTest {
          *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE 90008411%
          */
         LOGGER.finer("TEST - 5 begin");
-        
+
         typeNames        = Arrays.asList(RECORD_QNAME);
         List<QName> cust = new ArrayList<QName>();
         cust.add(_Identifier_QNAME);
@@ -832,7 +834,7 @@ public class CSWworkerTest {
 
         List<? extends AbstractRecordType> records = result.getSearchResults().getAbstractRecord();
         for (AbstractRecordType rec : records) {
-            
+
             assertTrue(rec instanceof RecordType);
             RecordType r = (RecordType)rec;
             if (r.getIdentifier().getContent().get(0).equals("42292_9s_19900610041000")){
@@ -845,13 +847,13 @@ public class CSWworkerTest {
                 fail("unexpected metadata:" + r.getIdentifier().getContent().get(0));
             }
         }
-        
+
         expCustomResult2 =  new RecordType();
         expCustomResult2.setIdentifier(new SimpleLiteral("42292_9s_19900610041000"));
         expCustomResult2.setModified(new SimpleLiteral("2009-01-26T12:00:00+01:00"));
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.3667, 36.6, 1.3667, 36.6));
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 12.1, 31.2, 12.1, 31.2));
-        
+
         RecordType expCustomResult3 =  new RecordType();
         expCustomResult3.setIdentifier(new SimpleLiteral("39727_22_19750113062500"));
         expCustomResult3.setModified(new SimpleLiteral("2009-01-26T12:21:45+01:00"));
@@ -867,17 +869,17 @@ public class CSWworkerTest {
         assertEquals(expCustomResult2, customResult2);
         assertEquals(expCustomResult3, customResult3);
         assertEquals(expCustomResult4, customResult4);
-         
+
         pool.release(unmarshaller);
     }
-    
+
     /**
      * Tests the getRecords on ISO 19115-2 method
      *
      * @throws java.lang.Exception
      */
     public void getRecords191152Test() throws Exception {
-        
+
         /*
          *  TEST 1 : getRecords with RESULT - DC mode (FULL) - CQL text: Instrument='Instrument 007'
          */
@@ -907,8 +909,8 @@ public class CSWworkerTest {
         RecordType recordResult = (RecordType) obj;
 
         assertEquals(recordResult.getIdentifier().getContent().get(0), "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        
-        
+
+
         /*
          *  TEST 2 : getRecords with RESULTS - DC mode (FULL) - CQL text: Platform='Platform 007'
          */
@@ -939,7 +941,7 @@ public class CSWworkerTest {
         recordResult = (RecordType) obj;
 
         assertEquals(recordResult.getIdentifier().getContent().get(0), "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        
+
         /*
          *  TEST 3 : getRecords with RESULTS - DC mode (FULL) - CQL text: Operation='Earth Observing System'
          */
@@ -970,7 +972,7 @@ public class CSWworkerTest {
         recordResult = (RecordType) obj;
 
         assertEquals(recordResult.getIdentifier().getContent().get(0), "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        
+
     }
 
     /**
@@ -1033,12 +1035,12 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
-        
+
         pool.release(unmarshaller);
     }
 
     public void getRecordsErrorTest() throws Exception {
-        
+
         /*
          * Test 1 : getRecord with bad outputFormat
          */
@@ -1172,8 +1174,8 @@ public class CSWworkerTest {
         GetDomainResponse expResult = new GetDomainResponseType(domainValues);
 
         assertEquals(expResult, result);
-        
-        
+
+
         /*
          *  TEST 2 : getDomain 2.0.0 parameterName = GetCapabilities.sections
          */
@@ -1438,7 +1440,7 @@ public class CSWworkerTest {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         LOGGER.finer("\n\n--- TRANSACTION DELETE TEST --- \n\n");
-        
+
         /*
          *  TEST 1 : we delete the metadata 42292_5p_19900609195600
          */
@@ -1457,7 +1459,7 @@ public class CSWworkerTest {
         DefaultMetadata isoResult = (DefaultMetadata) obj;
         DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
         metadataEquals(ExpResult1, isoResult);
-        
+
 
         // we delete the metadata
         QueryConstraintType constraint = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
@@ -1583,8 +1585,8 @@ public class CSWworkerTest {
         assertTrue(exe != null);
         assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
         assertEquals(exe.getLocator() , "id");
-        
-        
+
+
         // then we must be sure that the replacement metadata is present
         GetRecordByIdType  requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("CTDF02"));
@@ -1671,7 +1673,7 @@ public class CSWworkerTest {
         constraint = new QueryConstraintType("Language = 'fra'", "1.0.0");
         query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
-        
+
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
@@ -1822,7 +1824,7 @@ public class CSWworkerTest {
 
         assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
 
-        
+
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("WestBoundLongitude = 1.1", "1.0.0");
         query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
@@ -2133,10 +2135,10 @@ public class CSWworkerTest {
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
         /*
-         * 
+         *
         assertEquals(2, response.getSearchResults().getAny().size());
 
-        
+
           TODO FIX this test
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -2147,7 +2149,7 @@ public class CSWworkerTest {
         expResult = new ArrayList<String>();
         expResult.add("39727_22_19750113062500");
         expResult.add("40510_145_19930221211500");
-         
+
          */
 
         assertEquals(expResult, results);
@@ -2196,7 +2198,7 @@ public class CSWworkerTest {
         }
 
         assertTrue(exe != null);
-        
+
 
         /*
          *  TEST 12 : we try to update the metadata 42292_9s_1990061004100 by replacing a numeroted single Property
@@ -2232,7 +2234,7 @@ public class CSWworkerTest {
                                                                                 new SimpleInternationalString("some definition"),
                                                                                 new SimpleInternationalString("some condition"),
                                                                                 Datatype.ABSTRACT_CLASS, null, null, null);
-        
+
         properties.add(new RecordPropertyType("/gmd:MD_Metadata/metadataExtensionInfo/extendedElementInformation[3]", ext));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
@@ -2266,7 +2268,7 @@ public class CSWworkerTest {
         // TODO fix this test assertTrue(removed);
 
 
-         // we update the metadata 42292_9s_1990061004100 by adding a property datasetURI.
+         // TEST 14 we update the metadata 42292_9s_1990061004100 by adding a property datasetURI.
         // this value is not yet present in the metadata.
         constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
         properties = new ArrayList<RecordPropertyType>();
@@ -2290,8 +2292,84 @@ public class CSWworkerTest {
         assertEquals(1 , response.getSearchResults().getAny().size());
 
         DefaultMetadata meta = (DefaultMetadata) response.getSearchResults().getAny().get(0);
-            
+
         assertEquals("someURI", meta.getDataSetUri());
+
+
+        // TEST 15 we update the metadata 42292_9s_1990061004100 by updating the datestamp.
+
+
+        constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.0.0");
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertEquals(1 , response.getSearchResults().getAny().size());
+
+        meta = (DefaultMetadata) response.getSearchResults().getAny().get(0);
+
+        assertEquals(TemporalUtilities.parseDateSafe("2009-01-26T12:00:00+01:00",true, true), meta.getDateStamp());
+
+
+        constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
+        properties = new ArrayList<RecordPropertyType>();
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/dateStamp", "2009-01-18T13:00:00+01:00"));
+        update     = new UpdateType(properties, constraint);
+        request    = new TransactionType("CSW", "2.0.2", update);
+        result     = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
+
+
+        // then we verify that the modified metadata is well modified and indexed
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertEquals(1 , response.getSearchResults().getAny().size());
+
+        meta = (DefaultMetadata) response.getSearchResults().getAny().get(0);
+
+        assertEquals(TemporalUtilities.parseDateSafe("2009-01-18T13:00:00+01:00",true, true), meta.getDateStamp());
+
+        // TEST 16 we replace totaly the metadata 42292_9s_1990061004100 .
+
+
+        // then we verify that the modified metadata is well modified and indexed
+        final DefaultMetadata newMeta = new DefaultMetadata();
+        newMeta.setFileIdentifier("42292_9s_19900610041000");
+        newMeta.setDateStamp(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true));
+
+        constraint = new QueryConstraintType("identifier='42292_9s_19900610041000'", "1.1.0");
+        update     = new UpdateType(newMeta, constraint);
+        request    = new TransactionType("CSW", "2.0.2", update);
+        result     = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalUpdated(), 1);
+
+
+        // then we verify that the modified metadata is well modified and indexed
+        response = (GetRecordsResponseType) worker.getRecords(gr);
+        assertTrue(response != null);
+        assertTrue(response.getSearchResults() != null);
+        assertTrue(response.getSearchResults().getAny() != null);
+        assertEquals(1 , response.getSearchResults().getAny().size());
+
+        meta = (DefaultMetadata) response.getSearchResults().getAny().get(0);
+
+        assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true), meta.getDateStamp());
+        assertEquals(newMeta, meta);
+
+        final GetRecordByIdType grbi = new GetRecordByIdType("CSW", "2.0.2",  new ElementSetNameType(ElementSetType.FULL), "text/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_9s_19900610041000"));
+        final GetRecordByIdResponse resp = worker.getRecordById(grbi);
+        assertEquals(1, resp.getAny().size());
+        meta = (DefaultMetadata) resp.getAny().get(0);
+
+        assertEquals(TemporalUtilities.parseDateSafe("2012-01-01T14:00:00+01:00",true, true), meta.getDateStamp());
+        assertEquals(newMeta, meta);
 
         pool.release(unmarshaller);
     }

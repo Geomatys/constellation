@@ -194,7 +194,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 }
             }
             if (factory != null) {
-                mdReader = factory.getPooledInstance(dataSource, isPostgres);
+                mdReader = factory.getPooledInstance(db.getConnectURL(), dataSource, isPostgres);
                 mdReader.setProperty("readProfile", false);
             } else {
                 throw new MetadataIoException("unable to find a MD_IO factory");
@@ -361,7 +361,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
              throw new MetadataIoException("MD_IO Exception while reading the metadata: " + identifier, e, null, "id");
         }
     }
-    
+
     @Override
     public boolean existMetadata(String identifier) throws MetadataIoException {
         try {
@@ -370,7 +370,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             throw  new MetadataIoException(ex);
         }
     }
-    
+
 
     /**
      * Return an object from a MDWeb record.
@@ -491,7 +491,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
             } else if (classe.equals(Locale.class)) {
                 return Locales.parse(textValue);
-            
+
             // patch for backSlash in URI
             } else if (classe.equals(URI.class)) {
                 textValue = textValue.replace("\\", "%5C");

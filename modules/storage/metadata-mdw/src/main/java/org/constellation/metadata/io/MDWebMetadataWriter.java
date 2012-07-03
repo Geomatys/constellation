@@ -137,12 +137,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         df.setTimeZone(TimeZone.getDefault());
         DATE_FORMAT.add(df);
-        
+
         df = new SimpleDateFormat("yyyy-MM-dd");
         df.setTimeZone(TimeZone.getDefault());
         DATE_FORMAT.add(df);
     }
-    
+
     /**
      * Build a new metadata writer.
      *
@@ -170,7 +170,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 }
             }
             if (factory != null) {
-                mdWriter    = factory.getPooledInstance(dataSource, isPostgres);
+                mdWriter    = factory.getPooledInstance(db.getConnectURL(), dataSource, isPostgres);
                 mdRecordSet = getRecordSet(configuration.getDefaultRecordSet());
                 defaultUser = mdWriter.getUser("admin");
 
@@ -627,7 +627,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 }
             } else if (object.getClass().isEnum()){
                 value =  object.toString().toLowerCase(Locale.US);
-            
+
             } else if (object instanceof URI){
                  value = object.toString();
                  value = value.replace("%5C", "\\");
@@ -695,7 +695,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                           "\nCause: " + e.getMessage());
                             return result;
                         }
-                        
+
                     // special case for xlink
                     } else if ("xLink".equals(propName) && object instanceof IdentifiedObject) {
                         final Object propertyValue = ((IdentifiedObject)object).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK);
@@ -827,7 +827,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             if (object.getClass().equals(XLink.class)) {
                 return mdWriter.getClasse("XLink", mdWriter.getStandard("Xlink"));
             }
-            
+
             // special case for Xlink.Type enum
             if (object.getClass().equals(Type.class)) {
                 return PrimitiveType.STRING;
