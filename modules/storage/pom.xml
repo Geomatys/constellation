@@ -100,8 +100,9 @@
         <module>metadata</module>
         <module>metadata-mdw</module>
     	<module>generic</module>
-	<module>observation</module>
-	<module>provider</module>
+	    <module>observation</module>
+	    <module>provider</module>
+        <module>provider-data-coveragesgroup</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
         <module>provider-data-datastore</module>
@@ -118,7 +119,8 @@
     <profile>
       <id>wms</id>
       <modules>
-	<module>provider</module>
+    	<module>provider</module>
+        <module>provider-data-coveragesgroup</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
         <module>provider-data-coveragestore</module>
@@ -133,7 +135,8 @@
     <profile>
       <id>wcs</id>
       <modules>
-	<module>provider</module>
+    	<module>provider</module>
+        <module>provider-data-coveragesgroup</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
         <module>provider-data-coveragestore</module>
@@ -148,7 +151,8 @@
     <profile>
       <id>wmswcs</id>
       <modules>
-	<module>provider</module>
+    	<module>provider</module>
+        <module>provider-data-coveragesgroup</module>
         <module>provider-data-coveragesql</module>
         <module>provider-data-coveragefile</module>
         <module>provider-data-coveragestore</module>
