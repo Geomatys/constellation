@@ -281,26 +281,28 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     }
 
     private void processAuthentication() throws UnknownAccountException, IncorrectCredentialsException{
-        final String authorization = getHttpServletRequest().getHeader("authorization");
-        if (authorization != null) {
-            if (authorization.startsWith("Basic ")) {
-                final String toDecode = authorization.substring(6);
-                final BASE64Decoder decoder = new BASE64Decoder();
-                try {
-                    final String logPass = new String(decoder.decodeBuffer(toDecode));
-                    final int separatorIndex = logPass.indexOf(":");
-                    if (separatorIndex != -1) {
-                        final String login = logPass.substring(0, separatorIndex);
-                        final String passw = logPass.substring(separatorIndex + 1);
-                        SecurityManager.login(login, passw);
-                    } else {
-                        LOGGER.warning("separator missing in authorization header");
+        if (getHttpServletRequest() != null) {
+            final String authorization = getHttpServletRequest().getHeader("authorization");
+            if (authorization != null) {
+                if (authorization.startsWith("Basic ")) {
+                    final String toDecode = authorization.substring(6);
+                    final BASE64Decoder decoder = new BASE64Decoder();
+                    try {
+                        final String logPass = new String(decoder.decodeBuffer(toDecode));
+                        final int separatorIndex = logPass.indexOf(":");
+                        if (separatorIndex != -1) {
+                            final String login = logPass.substring(0, separatorIndex);
+                            final String passw = logPass.substring(separatorIndex + 1);
+                            SecurityManager.login(login, passw);
+                        } else {
+                            LOGGER.warning("separator missing in authorization header");
+                        }
+                    } catch (IOException ex) {
+                        LOGGER.log(Level.WARNING, "IO exception while cdecoding basic authentication", ex);
                     }
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, "IO exception while cdecoding basic authentication", ex);
+                } else {
+                    LOGGER.info("only basic authorization are handled for now");
                 }
-            } else {
-                LOGGER.info("only basic authorization are handled for now");
             }
         }
     }
