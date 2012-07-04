@@ -92,12 +92,7 @@
     </dependency>
 
     <!-- test dependencies -->
-    <dependency>
-        <groupId>org.constellation.testing</groupId>
-        <artifactId>cstl-test-data</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.constellation.engine</groupId>
       <artifactId>cstl-engine-testing</artifactId>
@@ -130,13 +125,26 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-       <groupId>org.constellation.engine</groupId>
-       <artifactId>cstl-engine-process-core</artifactId>
-       <version>${project.version}</version>
-       <type>test-jar</type>
-       <scope>test</scope>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-process-core</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+        <scope>test</scope>
     </dependency>
-
+    <dependency>
+        <groupId>org.constellation.web-services</groupId>
+        <artifactId>cstl-web-ogc</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.web-services</groupId>
+        <artifactId>cstl-web-map</artifactId>
+        <version>${project.version}</version>
+        <type>test-jar</type>
+        <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

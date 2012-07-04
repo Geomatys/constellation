@@ -70,7 +70,7 @@ import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
              org.geotoolkit.sampling.xml.v100.ObjectFactory.class,
              org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
 public class SOService extends OGCWebService<SOSworker> {
-    
+
     /**
      * Initialize the workers.
      */
@@ -86,10 +86,18 @@ public class SOService extends OGCWebService<SOSworker> {
     protected SOSworker createWorker(final File instanceDirectory) {
         return new SOSworker(instanceDirectory.getName(), instanceDirectory);
     }
-    
+
+     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class getWorkerClass() {
+        return SOSworker.class;
+    }
+
     /**
      * Web service operation describing the service and its capabilities.
-     * 
+     *
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      * @throws SOServiceException
@@ -101,17 +109,17 @@ public class SOService extends OGCWebService<SOSworker> {
             LOGGER.info("received SOAP getCapabilities request");
             final SOSworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            
+
             return worker.getCapabilities(requestCapabilities);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
-    
+
     /**
      * Web service operation which return an sml description of the specified sensor.
-     * 
+     *
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      * @throws SOServiceException
      */
@@ -127,12 +135,12 @@ public class SOService extends OGCWebService<SOSworker> {
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
-    
-    
+
+
     /**
-     * Web service operation which respond a collection of observation satisfying 
+     * Web service operation which respond a collection of observation satisfying
      * the restriction specified in the query.
-     * 
+     *
      * @param requestObservation a document specifying the parameter of the request.
      * @throws SOServiceException
      */
@@ -189,7 +197,7 @@ public class SOService extends OGCWebService<SOSworker> {
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
-    
+
     /**
      * Web service operation
      *
@@ -208,7 +216,7 @@ public class SOService extends OGCWebService<SOSworker> {
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
-    
+
     /**
      * Web service operation which register a Sensor in the SensorML database,
      * and initialize its observation by adding an observation template in the O&M database.
@@ -230,11 +238,11 @@ public class SOService extends OGCWebService<SOSworker> {
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
-    
+
     /**
      * Web service operation which insert a new Observation for the specified sensor
      * in the O&M database.
-     * 
+     *
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
      * @throws SOServiceException
      */
@@ -251,6 +259,6 @@ public class SOService extends OGCWebService<SOSworker> {
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
         }
     }
-    
+
 }
 

@@ -8,7 +8,6 @@ org.constellation.process.provider.getconfig.GetConfigProviderDescriptor
 #Service process
 org.constellation.process.service.create.CreateMapServiceDescriptor
 org.constellation.process.service.configure.ConfigureMapServiceDescriptor
-org.constellation.process.service.delete.DeleteMapServiceDescriptor
 org.constellation.process.service.getconfig.GetConfigMapServiceDescriptor
 
 #Layer process

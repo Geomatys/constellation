@@ -116,8 +116,8 @@ public class WCSService extends GridWebService<WCSWorker> {
      * {@inheritDoc}
      */
     @Override
-    protected WCSWorker createWorker(final File instanceDirectory) {
-        return new WCSWorker(instanceDirectory.getName() , instanceDirectory);
+    protected Class getWorkerClass() {
+        return WCSWorker.class;
     }
 
 
@@ -151,7 +151,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             if (objectRequest instanceof GetCapabilities){
                 final GetCapabilities getcaps = (GetCapabilities)objectRequest;
                 serviceDef              = getVersionFromNumber(getcaps.getVersion());
-               
+
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
                 return Response.ok(capsResponse, MimeType.TEXT_XML).build();
             }
@@ -197,7 +197,7 @@ public class WCSService extends GridWebService<WCSWorker> {
                         "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT,
                         KEY_FORMAT.toLowerCase());
                 }
-                
+
                 format = getOutputFormat(format);
                 return Response.ok(worker.getCoverage(getcov), format).build();
             }
@@ -250,7 +250,7 @@ public class WCSService extends GridWebService<WCSWorker> {
                format.equalsIgnoreCase(GEOTIFF)              ||format.equalsIgnoreCase(NETCDF) ||
                format.equalsIgnoreCase(MATRIX)               ||format.equalsIgnoreCase(ASCII_GRID);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -324,7 +324,7 @@ public class WCSService extends GridWebService<WCSWorker> {
 //            }
 //        }
 //        final ServiceDef finalVersion = getBestVersion(inputVersion);
-        
+
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
 
         final ServiceDef finalVersion = ServiceDef.WCS_1_0_0;
@@ -501,7 +501,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             low[1] = 0;
             high[0] = Integer.valueOf(width);
             high[1] = Integer.valueOf(height);
-            
+
         }
         final GridLimitsType limits = new GridLimitsType(low, high);
         final GridType grid = new GridType(limits, axis);

@@ -21,6 +21,8 @@ package org.constellation.ws.rs;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -39,6 +41,11 @@ import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.service.DeleteServiceDescriptor;
+import org.constellation.process.service.RestartServiceDescriptor;
+import org.constellation.process.service.StartServiceDescriptor;
+import org.constellation.process.service.StopServiceDescriptor;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.security.SecurityManager;
@@ -53,10 +60,15 @@ import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
 
 // GeoAPI dependencies
 import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.CodeList;
+import org.opengis.util.NoSuchIdentifierException;
 import sun.misc.BASE64Decoder;
 
 
@@ -111,7 +123,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
         serviceName = supportedVersions[0].specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
-        WSEngine.registerService(serviceName, "REST");
+        WSEngine.registerService(serviceName, "REST", getWorkerClass());
 
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
@@ -121,7 +133,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
          * service directory.
          */
         if (!WSEngine.isSetService(serviceName)) {
-            buildWorkerMap();
+            startAllInstance();
+            //buildWorkerMap();
         } else {
             LOGGER.log(Level.INFO, "Workers already set for {0}", serviceName);
         }
@@ -148,7 +161,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         }
         serviceName = supportedVersions[0].specification.name();
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
-        WSEngine.registerService(serviceName, "REST");
+        WSEngine.registerService(serviceName, "REST", getWorkerClass());
 
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
@@ -184,36 +197,35 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         return null;
     }
 
-    /**
-     * Scan the configuration directory to instantiate Web service workers.
-     */
-    private void buildWorkerMap() {
-        final Map<String, Worker> workersMap = new HashMap<String, Worker>();
+    private void startAllInstance() {
         final File serviceDirectory = getServiceDirectory();
-        if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-            for (File instanceDirectory : serviceDirectory.listFiles()) {
-                /*
-                 * For each sub-directory we build a new Worker.
-                 */
-                if (instanceDirectory.isDirectory() && !instanceDirectory.getName().startsWith(".")) {
-                    final W newWorker = createWorker(instanceDirectory);
-                    if (newWorker != null) {
-                        workersMap.put(instanceDirectory.getName(), newWorker);
-                    }
+        for (File instanceDirectory : serviceDirectory.listFiles()) {
+            if (instanceDirectory.isDirectory()) {
+                final String instance = instanceDirectory.getName();
+                try {
+                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
+                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                    inputs.parameter(StartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+                    inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(instance);
+
+                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+                    proc.call();
+                } catch (NoSuchIdentifierException ex) {
+                    LOGGER.log(Level.SEVERE, "StartService process is unreachable.");
+                } catch (ProcessException ex) {
+                    LOGGER.log(Level.SEVERE, ex.getLocalizedMessage());
                 }
             }
-        } else {
-            LOGGER.log(Level.WARNING, "no {0} directory.", serviceName);
+
         }
-        WSEngine.setServiceInstances(serviceName, workersMap);
     }
 
-    private W buildWorker(final String identifier) {
+    private Worker buildWorker(final String identifier) {
         final File serviceDirectory = getServiceDirectory();
         if (serviceDirectory != null) {
             final File instanceDirectory = new File(serviceDirectory, identifier);
             if (instanceDirectory.isDirectory()) {
-                final W newWorker = createWorker(instanceDirectory);
+                final Worker newWorker = createWorker(instanceDirectory);
                 if (newWorker != null) {
                     WSEngine.addServiceInstance(serviceName, instanceDirectory.getName(), newWorker);
                 }
@@ -231,8 +243,34 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @param instanceDirectory The configuration directory of the instance.
      * @return
      */
-    protected abstract W createWorker(final File instanceDirectory);
+    private Worker createWorker(final File instanceDirectory) {
+        try {
+            final Class clazz = getWorkerClass();
+            final Constructor constructor = clazz.getConstructor(String.class, File.class);
 
+            Worker worker = (Worker) constructor.newInstance(instanceDirectory.getName(), instanceDirectory);
+            return worker;
+
+        } catch (InstantiationException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (NoSuchMethodException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return  null;
+    }
+
+    /**
+     * @return the worker class of the service.
+     */
+    protected abstract Class getWorkerClass();
 
     /**
      * {@inheritDoc}
@@ -322,90 +360,91 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 LOGGER.info("refreshing the workers");
                 final String identifier      = getParameter("id", false);
                 final String closeFirstValue = getParameter("closeFirst", false);
+                final Class clazz            = getWorkerClass();
                 final boolean closeFirst;
                 if (closeFirstValue != null) {
                     closeFirst = Boolean.parseBoolean(closeFirstValue);
                 } else {
                     closeFirst = true;
                 }
-                specificRestart(identifier);
-                if (identifier == null) {
-                    if (closeFirst) {
-                        WSEngine.destroyInstances(serviceName);
-                    }
-                    buildWorkerMap();
-                } else {
-                    if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
-                        if (closeFirst) {
-                            WSEngine.shutdownInstance(serviceName, identifier);
-                        }
-                        buildWorker(identifier);
-                    } else {
-                        throw new CstlServiceException("There is no instance " + identifier, INVALID_PARAMETER_VALUE, "id");
-                    }
+                AcknowlegementType response;
+                try {
+                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
+                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                    inputs.parameter(RestartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+                    inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
+                    inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(closeFirst);
+
+                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+                    proc.call();
+                    response = new AcknowlegementType("Success", "instances succefully restarted");
+                } catch (NoSuchIdentifierException ex) {
+                    response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
+                } catch (ProcessException ex) {
+                    response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
                 }
-                return Response.ok(new AcknowlegementType("Success", "instances succefully restarted"), "text/xml").build();
+                return Response.ok(response, "text/xml").build();
 
             } else if ("start".equalsIgnoreCase(request)) {
                 LOGGER.info("starting an instance");
                 final String identifier = getParameter("id", true);
-                specificRestart(identifier);
-                final AcknowlegementType response;
-                if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
-                    throw new CstlServiceException("The instance " + identifier + " is already started try restart method instead.", INVALID_PARAMETER_VALUE);
-                } else {
-                    final Worker worker = buildWorker(identifier);
-                    if (worker == null) {
-                        throw new CstlServiceException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", INVALID_PARAMETER_VALUE);
-                    } else {
-                        if (worker.isStarted()) {
-                            response = new AcknowlegementType("Success", "new instance succefully started");
-                        } else {
-                            response = new AcknowlegementType("Error", "unable to start the instance");
-                        }
-                    }
+                final Class clazz       = getWorkerClass();
+                AcknowlegementType response;
+                try {
+                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
+                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                    inputs.parameter(StartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+                    inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
+
+                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+                    proc.call();
+                    response = new AcknowlegementType("Success", "new instance succefully started");
+                } catch (NoSuchIdentifierException ex) {
+                    response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
+                } catch (ProcessException ex) {
+                    response = new AcknowlegementType("Error", "unable to start the instance : " + ex.getMessage());
                 }
                 return Response.ok(response, "text/xml").build();
 
             } else if ("stop".equalsIgnoreCase(request)) {
                 LOGGER.info("stopping an instance");
                 final String identifier = getParameter("id", true);
-                final AcknowlegementType response;
-                if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
-                    WSEngine.shutdownInstance(serviceName, identifier);
+                AcknowlegementType response;
+                try {
+                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopServiceDescriptor.NAME);
+                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                    inputs.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
+                    inputs.parameter(StopServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+
+                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+                    proc.call();
                     response = new AcknowlegementType("Success", "instance succesfully stopped");
-                } else {
-                    response = new AcknowlegementType("Error", "The is no running instance named:" + identifier);
+                } catch (NoSuchIdentifierException ex) {
+                    response = new AcknowlegementType("Error", "unable to stop the instance : " + ex.getMessage());
+                } catch (ProcessException ex) {
+                    response = new AcknowlegementType("Error", "unable to stop the instance : " + ex.getMessage());
                 }
+
                 return Response.ok(response, "text/xml").build();
 
             } else if ("delete".equalsIgnoreCase(request)) {
                 LOGGER.info("deleting an instance");
                 final String identifier = getParameter("id", true);
-                WSEngine.shutdownInstance(serviceName, identifier);
+                AcknowlegementType response;
 
-                final AcknowlegementType response;
-                final File serviceDirectory = getServiceDirectory();
-                if (serviceDirectory != null && serviceDirectory.isDirectory()) {
-                    final File instanceDirectory     = new File (serviceDirectory, identifier);
-                    final File instanceDirectoryBack = new File (serviceDirectory, "." + identifier);
-                    //if the backup directory already exist we delete it
-                    if (instanceDirectoryBack.isDirectory()) {
-                        if (!FileUtilities.deleteDirectory(instanceDirectoryBack)) {
-                            throw new CstlServiceException("The previous backup directory for " + identifier + " instance can not be deleted.", NO_APPLICABLE_CODE);
-                        }
-                    }
-                    if (instanceDirectory.isDirectory()) {
-                        if (instanceDirectory.renameTo(instanceDirectoryBack)) {
-                            response = new AcknowlegementType("Success", "instance succesfully deleted");
-                        } else {
-                            response = new AcknowlegementType("Error", "instance was deactivated but can't be deleted");
-                        }
-                    } else {
-                        throw new CstlServiceException("The instance " + identifier + " does not have a proper directory.", NO_APPLICABLE_CODE);
-                    }
-                } else {
-                    throw new CstlServiceException("Unable to find a configuration directory.", NO_APPLICABLE_CODE);
+                try {
+                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteServiceDescriptor.NAME);
+                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                    inputs.parameter(DeleteServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+                    inputs.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
+
+                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+                    proc.call();
+                    response = new AcknowlegementType("Success", "instance succesfully deleted");
+                } catch (NoSuchIdentifierException ex) {
+                    response = new AcknowlegementType("Error", "unable to delete the instance : " + ex.getMessage());
+                } catch (ProcessException ex) {
+                    response = new AcknowlegementType("Error", "unable to delete the instance : " + ex.getMessage());
                 }
 
                 return Response.ok(response, "text/xml").build();

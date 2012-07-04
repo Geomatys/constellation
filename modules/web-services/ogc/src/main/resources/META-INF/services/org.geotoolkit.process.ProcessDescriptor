@@ -1,0 +1,4 @@
+org.constellation.process.service.StartServiceDescriptor
+org.constellation.process.service.StopServiceDescriptor
+org.constellation.process.service.RestartServiceDescriptor
+org.constellation.process.service.DeleteServiceDescriptor

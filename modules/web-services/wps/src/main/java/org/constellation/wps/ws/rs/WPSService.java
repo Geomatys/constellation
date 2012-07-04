@@ -82,7 +82,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
      * Executor thread pool.
      */
     public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
-        
+
     /**
      * Build a new instance of the webService and initialize the JAXB context.
      */
@@ -92,24 +92,24 @@ public class WPSService extends OGCWebService<WPSWorker> {
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext(WPSMarshallerPool.getInstance());
-        
+
         LOGGER.log(Level.INFO, "WPS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
     @Override
-    protected WPSWorker createWorker(File instanceDirectory) {
-        return new WPSWorker(instanceDirectory.getName(), instanceDirectory);
+    protected Class getWorkerClass() {
+        return WPSWorker.class;
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        
+
         //Shutdown the WPS scheduler.
         EXECUTOR.shutdown();
     }
 
-    
+
     @Override
     protected void configureInstance(File instanceDirectory, Object configuration) throws CstlServiceException {
         if (configuration instanceof ProcessContext) {
@@ -166,7 +166,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         final UriInfo uriContext = getUriContext();
 
         ServiceDef serviceDef = null;
-       
+
         worker.setServiceUrl(getServiceURL());
         try {
             // Handle an empty request by sending a basic web page.
@@ -189,7 +189,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
             if(objectRequest instanceof RequestBaseType){
                 serviceDef = getVersionFromNumber(((RequestBaseType)objectRequest).getVersion());
             }
-            
+
             /*
              * GetCapabilities request
              */
@@ -223,7 +223,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
                         || executeResponse instanceof Boolean || executeResponse instanceof Long) {
                     isTextPlain = true;
                 }
-                if (executeResponse instanceof RenderedImage || executeResponse instanceof BufferedImage 
+                if (executeResponse instanceof RenderedImage || executeResponse instanceof BufferedImage
                         || executeResponse instanceof GridCoverage2D) {
                     isImage = true;
                 }
@@ -297,7 +297,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         capabilities.setService(getParameter(SERVICE_PARAMETER, true));
         capabilities.setLanguage(getParameter(LANGUAGE_PARAMETER, false));
         capabilities.setUpdateSequence(getParameter(UPDATESEQUENCE_PARAMETER, false));
-        
+
         final String acceptVersionsParam = getParameter(ACCEPT_VERSIONS_PARAMETER, false);
         if(acceptVersionsParam!= null){
             final String[] acceptVersions = acceptVersionsParam.split(",");
@@ -321,7 +321,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
         describe.setService(getParameter(SERVICE_PARAMETER, true));
         describe.setVersion(strVersion);
         describe.setLanguage(getParameter(LANGUAGE_PARAMETER, false));
-        
+
         final String allIdentifiers = getParameter(IDENTIFER_PARAMETER, true);
         if (allIdentifiers != null) {
             final String[] splitStr = allIdentifiers.split(",");

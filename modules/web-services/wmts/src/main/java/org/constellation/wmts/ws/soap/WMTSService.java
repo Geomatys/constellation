@@ -76,6 +76,14 @@ public class WMTSService extends OGCWebService<WMTSWorker>{
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class getWorkerClass() {
+        return DefaultWMTSWorker.class;
+    }
+
+    /**
      * Web service operation describing the service and its capabilities.
      *
      * @param requestCapabilities A document specifying the section you would obtain like :

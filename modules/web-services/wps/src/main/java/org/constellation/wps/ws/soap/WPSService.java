@@ -53,7 +53,7 @@ import org.geotoolkit.wps.xml.v100.*;
 @BindingType(value="http://java.sun.com/xml/ns/jaxws/2003/05/soap/bindings/HTTP/")
 @XmlSeeAlso({org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
 public class WPSService extends OGCWebService<WPSWorker> {
-    
+
     /**
      * Initialize the workers.
      */
@@ -69,10 +69,18 @@ public class WPSService extends OGCWebService<WPSWorker> {
     protected WPSWorker createWorker(final File instanceDirectory) {
         return new WPSWorker(instanceDirectory.getName(), instanceDirectory);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class getWorkerClass() {
+        return WPSWorker.class;
+    }
+
     /**
      * Web service operation describing the service and its capabilities.
-     * 
+     *
      * @param requestCapabilities
      * @throws WPSServiceException
      */
@@ -83,17 +91,17 @@ public class WPSService extends OGCWebService<WPSWorker> {
             LOGGER.info("received SOAP getCapabilities request");
             final WPSWorker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            
+
             return worker.getCapabilities(requestCapabilities);
         } catch (CstlServiceException ex) {
             throw new WPSServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.WPS_1_0_0.exceptionVersion.toString());
         }
     }
-    
+
     /**
      * Web service operation which return an process description.
-     * 
+     *
      * @param requestDescProcess A document specifying the id of the process that we want the description.
      * @throws WPSServiceException
      */
@@ -110,11 +118,11 @@ public class WPSService extends OGCWebService<WPSWorker> {
                                          ServiceDef.WPS_1_0_0.exceptionVersion.toString());
         }
     }
-    
-    
+
+
     /**
      * Web service operation which execute a specific process.
-     * 
+     *
      * @param requestObservation a document specifying the parameter of the request.
      * @throws WPSServiceException
      */
@@ -135,6 +143,6 @@ public class WPSService extends OGCWebService<WPSWorker> {
                                          ServiceDef.WPS_1_0_0.exceptionVersion.toString());
         }
     }
-    
+
 }
 

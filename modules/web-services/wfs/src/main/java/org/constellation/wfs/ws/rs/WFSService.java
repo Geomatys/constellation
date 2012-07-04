@@ -127,10 +127,9 @@ public class WFSService extends GridWebService<WFSWorker> {
     }
 
     @Override
-    protected WFSWorker createWorker(final File instanceDirectory) {
-        return new DefaultWFSWorker(instanceDirectory.getName(), instanceDirectory);
+    protected Class getWorkerClass() {
+        return DefaultWFSWorker.class;
     }
-
 
     /**
      * {@inheritDoc}

@@ -85,9 +85,9 @@ public class WPSWorker extends AbstractWorker {
      * Try to create temporary directory.
      */
     private final boolean supportStorage;
-    
+
     private final String temporaryFolderPath;
-    
+
     private final ProcessContext context;
     /**
      * Supported CRS.
@@ -108,7 +108,7 @@ public class WPSWorker extends AbstractWorker {
         WPS_SUPPORTED_CRS.setSupported(supportedCRS);
     }
     private static final int TIMEOUT = 30;
-    
+
     /**
      * List of process descriptor avaible.
      */
@@ -136,12 +136,12 @@ public class WPSWorker extends AbstractWorker {
                     } else {
                         startError = "The process context File does not contain a ProcessContext object";
                         isStarted = false;
-                        LOGGER.log(Level.WARNING, startError);
+                        LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError);
                     }
                 } catch (JAXBException ex) {
                     startError = "JAXBExeception while unmarshalling the process context File";
                     isStarted = false;
-                    LOGGER.log(Level.WARNING, startError, ex);
+                    LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, ex);
                 } finally {
                     if (unmarshaller != null) {
                         GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
@@ -150,7 +150,7 @@ public class WPSWorker extends AbstractWorker {
             } else {
                 startError = "The configuration file processContext.xml has not been found";
                 isStarted = false;
-                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: ", id);
+                LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
             }
         } else {
             startError = "The configuration directory has not been found";
@@ -177,7 +177,7 @@ public class WPSWorker extends AbstractWorker {
     }
 
     /**
-     * Create process list from context file. 
+     * Create process list from context file.
      */
     private void fillProcessList() {
         if (context != null && context.getProcesses() != null) {
@@ -386,9 +386,9 @@ public class WPSWorker extends AbstractWorker {
             descriptionType.setIdentifier(identifier);                                                                      //Process Identifier
             descriptionType.setTitle(WPSUtils.buildProcessTitle(processDesc));                                              //Process Title
             descriptionType.setAbstract(WPSUtils.capitalizeFirstLetter(processDesc.getProcedureDescription().toString()));  //Process abstract
-            descriptionType.setProcessVersion(WPS_1_0_0);                                                                   //Process verstion 
+            descriptionType.setProcessVersion(WPS_1_0_0);                                                                   //Process verstion
             descriptionType.setWSDL(null);                                                                                  //TODO WSDL
-            descriptionType.setStatusSupported(true);         
+            descriptionType.setStatusSupported(true);
             descriptionType.setStoreSupported(supportStorage);
 
             // Get process input and output descriptors
@@ -420,7 +420,7 @@ public class WPSWorker extends AbstractWorker {
                     // BoundingBox type
                     if (WPSIO.isSupportedBBoxInputClass(clazz)) {
                         in.setBoundingBoxData(WPS_SUPPORTED_CRS);
-                        
+
                          //Simple object (Integer, double, ...) and Object which need a conversion from String like affineTransform or WKT Geometry
                     } else if (WPSIO.isSupportedLiteralInputClass(clazz)) {
                         final LiteralInputType literal = new LiteralInputType();
@@ -443,16 +443,16 @@ public class WPSWorker extends AbstractWorker {
 
 
                         in.setLiteralData(literal);
-                        
-                        //Complex type (XML, ...)     
+
+                        //Complex type (XML, ...)
                     } else if (WPSIO.isSupportedComplexInputClass(clazz)) {
                         in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX));
 
-                        //Reference type (XML, ...)    
+                        //Reference type (XML, ...)
                     } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
                         in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.REFERENCE));
-                        
-                       
+
+
 
                     } else {
                         throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
@@ -489,7 +489,7 @@ public class WPSWorker extends AbstractWorker {
                     //BoundingBox type
                     if (WPSIO.isSupportedBBoxOutputClass(clazz)) {
                         out.setBoundingBoxOutput(WPS_SUPPORTED_CRS);
-                        
+
                         //Simple object (Integer, double) and Object which need a conversion from String like affineTransform or Geometry
                     } else if (WPSIO.isSupportedLiteralOutputClass(clazz)) {
 
@@ -500,7 +500,7 @@ public class WPSWorker extends AbstractWorker {
                         }
 
                         out.setLiteralOutput(literal);
-                        
+
                         //Complex type (XML, raster, ...)
                     } else if (WPSIO.isSupportedComplexOutputClass(clazz)) {
                         out.setComplexOutput((SupportedComplexDataInputType) WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX));
@@ -588,7 +588,7 @@ public class WPSWorker extends AbstractWorker {
         if (responseForm == null) {
             throw new CstlServiceException("The response form should be defined.", MISSING_PARAMETER_VALUE, "responseForm");
         }
-        
+
         final OutputDefinitionType rawData = responseForm.getRawDataOutput();
         final ResponseDocumentType respDoc = responseForm.getResponseDocument();
 
@@ -602,7 +602,7 @@ public class WPSWorker extends AbstractWorker {
         if(isOutputRespDoc && respDoc.isStatus() && !respDoc.isStoreExecuteResponse()){
              throw new CstlServiceException("Set the storeExecuteResponse to true if you want to see status in response documents.", INVALID_PARAMETER_VALUE, "storeExecuteResponse");
         }
-        
+
         final StatusType status = new StatusType();
         LOGGER.log(Level.INFO, "Process Execute : {0}", request.getIdentifier().getValue());
         //Find the process
@@ -623,7 +623,7 @@ public class WPSWorker extends AbstractWorker {
             throw new CstlServiceException(ex);
         }
         status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" found.");
-        
+
         String respDocFileName = UUID.randomUUID().toString();
         /*
          * ResponseDocument attributs
@@ -677,13 +677,13 @@ public class WPSWorker extends AbstractWorker {
 
         //Give input parameter to the process
         final org.geotoolkit.process.Process process = processDesc.createProcess(in);
-                
+
         //Sumbit the process execution to the ExecutorService
         final List<GeneralParameterDescriptor> processOutputDesc = processDesc.getOutputDescriptor().descriptors();
         ParameterValueGroup result = null;
-        
+
         if (isOutputRaw) {
-            
+
             ////////
             // RAW Sync no timeout
             ////////
@@ -699,7 +699,7 @@ public class WPSWorker extends AbstractWorker {
             return createRawOutput(rawData, processOutputDesc, result);
 
         } else {
-            
+
             final ExecuteResponse response = new ExecuteResponse();
             response.setService(WPS_SERVICE);
             response.setVersion(WPS_1_0_0);
@@ -708,7 +708,7 @@ public class WPSWorker extends AbstractWorker {
 
             //Give a bief process description into the execute response
             response.setProcess(WPSUtils.generateProcessBrief(processDesc));
-            
+
             //Lineage option.
             if (respDoc.isLineage()) {
                 //Inputs
@@ -718,7 +718,7 @@ public class WPSWorker extends AbstractWorker {
                 //Outputs
                 response.setOutputDefinitions(outputsDef);
             }
-            
+
             if(useStatus){
                 ////////
                 // DOC Async
@@ -726,9 +726,9 @@ public class WPSWorker extends AbstractWorker {
                 response.setStatus(status);
                 process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0, getServiceUrl(), temporaryFolderPath));
                 WPSService.EXECUTOR.submit(process);
-                
+
             } else {
-               
+
                 ////////
                 // DOC Sync + timeout
                 ////////
@@ -747,11 +747,11 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException("Process execution timeout. This process is too long and had been canceled,"
                             + " re-run request with status set to true.", NO_APPLICABLE_CODE);
                 }
-                
+
                 final ExecuteResponse.ProcessOutputs outputs = new ExecuteResponse.ProcessOutputs();
                 fillOutputsFromProcessResult(outputs, wantedOutputs, processOutputDesc, result, getServiceUrl(), temporaryFolderPath);
                 response.setProcessOutputs(outputs);
-                
+
             }
 
             if (respDoc.isStoreExecuteResponse()) {
@@ -762,7 +762,7 @@ public class WPSWorker extends AbstractWorker {
                 WPSUtils.storeResponse(response, temporaryFolderPath, respDocFileName);
             }
 
-            //Delete input temporary files 
+            //Delete input temporary files
             //WPSUtils.cleanTempFiles(files);
             return response;
         }
@@ -859,7 +859,7 @@ public class WPSWorker extends AbstractWorker {
                     LOGGER.log(Level.WARNING, "Error during conversion of reference input {0}.",inputIdentifier);
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
-                
+
                 if (dataValue instanceof File) {
                     if (files == null) {
                         files = new ArrayList<File>();
@@ -932,15 +932,15 @@ public class WPSWorker extends AbstractWorker {
 
                 final LiteralDataType literal = inputRequest.getData().getLiteralData();
                 final String data = literal.getValue();
-                
+
                 if (inputDescriptor.getUnit() != null) {
                     final Unit paramUnit = inputDescriptor.getUnit();
                     final Unit requestedUnit = Unit.valueOf(literal.getUom());
                     final UnitConverter converter = requestedUnit.getConverterTo(paramUnit);
                     dataValue = Double.valueOf(converter.convert(Double.valueOf(data)));
-                    
+
                 } else {
-                    
+
                     try {
                         dataValue = WPSConvertersUtils.convertFromString(data, expectedClass);
                     } catch (NonconvertibleObjectException ex) {
@@ -970,12 +970,12 @@ public class WPSWorker extends AbstractWorker {
      * @throws CstlServiceException
      */
     public static void fillOutputsFromProcessResult(final ProcessOutputs outputs, final List<DocumentOutputDefinitionType> wantedOutputs,
-            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final String serviceURL, final String folderPath) 
+            final List<GeneralParameterDescriptor> processOutputDesc, final ParameterValueGroup result, final String serviceURL, final String folderPath)
             throws CstlServiceException {
         if(result == null){
             throw new CstlServiceException("Empty process result.", NO_APPLICABLE_CODE);
         }
-        
+
         for (final DocumentOutputDefinitionType outputsRequest : wantedOutputs) {
 
             if (outputsRequest.getIdentifier() == null || outputsRequest.getIdentifier().getValue() == null || outputsRequest.getIdentifier().getValue().isEmpty()) {
@@ -999,7 +999,7 @@ public class WPSWorker extends AbstractWorker {
 
             //output value object.
             final Object outputValue = result.parameter(outputIdentifierCode).getValue();
-            
+
             outputs.getOutput().add(createDocumentResponseOutput(outputDescriptor, outputsRequest, outputValue, serviceURL, folderPath));
 
         }//end foreach wanted outputs
@@ -1027,23 +1027,23 @@ public class WPSWorker extends AbstractWorker {
 
         //set Ouput informations
         outData.setIdentifier(new CodeType(outputIdentifier));
-        
+
         //support custom title/abstract.
-        final LanguageStringType titleOut = requestedOutput.getTitle() != null ? 
+        final LanguageStringType titleOut = requestedOutput.getTitle() != null ?
                 requestedOutput.getTitle() : WPSUtils.capitalizeFirstLetter(outputIdentifierCode);
-        final LanguageStringType abstractOut = requestedOutput.getAbstract() != null ? 
+        final LanguageStringType abstractOut = requestedOutput.getAbstract() != null ?
                 requestedOutput.getAbstract() : WPSUtils.capitalizeFirstLetter(outputDescriptor.getRemarks().toString());
         outData.setTitle(titleOut);
         outData.setAbstract(abstractOut);
 
         final Class outClass = outputDescriptor.getValueClass(); // output class
-        
+
         if (requestedOutput.isAsReference()) {
             final OutputReferenceType ref = createReferenceOutput(outputIdentifier, outClass, requestedOutput, outputValue, serviceURL, folderPath);
-            
+
             outData.setReference(ref);
         } else {
-            
+
             final DataType data = new DataType();
 
             if (WPSIO.isSupportedBBoxOutputClass(outClass)) {
@@ -1051,25 +1051,25 @@ public class WPSWorker extends AbstractWorker {
                 data.setBoundingBoxData(new BoundingBoxType(envelop));
 
             } else if (WPSIO.isSupportedComplexOutputClass(outClass)) {
-                
-                try {  
+
+                try {
                     final ComplexDataType complex = WPSConvertersUtils.convertToComplex(
-                            outputValue, 
-                            requestedOutput.getMimeType(), 
-                            requestedOutput.getEncoding(), 
-                            requestedOutput.getSchema(), 
-                            folderPath, 
+                            outputValue,
+                            requestedOutput.getMimeType(),
+                            requestedOutput.getEncoding(),
+                            requestedOutput.getSchema(),
+                            folderPath,
                             WPSUtils.getTempDirectoryURL(serviceURL));
-                
+
                     data.setComplexData(complex);
-                    
+
                 } catch (NonconvertibleObjectException ex) {
                     LOGGER.log(Level.WARNING, "Error during conversion of complex output {0}.", outputIdentifier);
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
 
             } else if (WPSIO.isSupportedLiteralOutputClass(outClass)) {
-                
+
                 final LiteralDataType literal = new LiteralDataType();
                 literal.setDataType(WPSConvertersUtils.getDataTypeString(outClass));
                 literal.setValue(WPSConvertersUtils.convertToString(outputValue));
@@ -1077,39 +1077,39 @@ public class WPSWorker extends AbstractWorker {
                     literal.setUom(outputDescriptor.getUnit().toString());
                 }
                 data.setLiteralData(literal);
-                
+
             } else {
                 throw new CstlServiceException("Process output parameter invalid", MISSING_PARAMETER_VALUE, outputIdentifier);
             }
-            
+
             outData.setData(data);
         }
         return outData;
     }
-    
+
     /**
      * Create reference output.
-     * 
+     *
      * @param clazz
      * @param requestedOutput
      * @param outputValue
      * @param serviceURL
      * @return
-     * @throws CstlServiceException 
+     * @throws CstlServiceException
      */
-    private static OutputReferenceType createReferenceOutput(final String outputIdentifier, final Class clazz, final DocumentOutputDefinitionType requestedOutput, 
+    private static OutputReferenceType createReferenceOutput(final String outputIdentifier, final Class clazz, final DocumentOutputDefinitionType requestedOutput,
             final Object outputValue, final String serviceURL, final String folderPath) throws CstlServiceException {
-        
+
         try {
            final OutputReferenceType reference = (OutputReferenceType) WPSConvertersUtils.convertToReference(
-                    outputValue, 
-                    requestedOutput.getMimeType(), 
-                    requestedOutput.getEncoding(), 
+                    outputValue,
+                    requestedOutput.getMimeType(),
+                    requestedOutput.getEncoding(),
                     requestedOutput.getSchema(),
-                    folderPath,  
-                    WPSUtils.getTempDirectoryURL(serviceURL), 
+                    folderPath,
+                    WPSUtils.getTempDirectoryURL(serviceURL),
                     WPSIO.IOType.OUTPUT);
-            
+
            return reference;
         } catch (NonconvertibleObjectException ex) {
             LOGGER.log(Level.WARNING, "Error during conversion of reference output {0}.", outputIdentifier);
@@ -1119,7 +1119,7 @@ public class WPSWorker extends AbstractWorker {
 
 
     /**
-     * Handle Raw output. 
+     * Handle Raw output.
      *
      * @param outputValue
      * @return
@@ -1148,7 +1148,7 @@ public class WPSWorker extends AbstractWorker {
 
         if (outputValue instanceof Geometry) {
             try {
-                
+
                 final Geometry jtsGeom = (Geometry) outputValue;
                 final AbstractGeometry gmlGeom = JTStoGeometry.toGML("3.1.1", jtsGeom); // TODO determine gml version
                 return gmlGeom;

@@ -16,7 +16,6 @@
  */
 package org.constellation.process.service.configure;
 
-import org.constellation.process.service.configure.ConfigureMapServiceDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 import org.constellation.configuration.LayerContext;
@@ -35,55 +34,55 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class ConfigureMapServiceTest  extends AbstractMapServiceTest {
-    
-    public ConfigureMapServiceTest () {
-        super(ConfigureMapServiceDescriptor.NAME);
+public abstract class ConfigureMapServiceTest  extends AbstractMapServiceTest {
+
+    public ConfigureMapServiceTest (final String serviceName, final Class workerClass) {
+        super(ConfigureMapServiceDescriptor.NAME,serviceName, workerClass);
     }
-    
+
     @Test
     public void testUpdateWMS() throws ProcessException, NoSuchIdentifierException {
 
-        createDefaultInstance("WMS","instance4");
-        
+        createInstance("updateInstance4");
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, ConfigureMapServiceDescriptor.NAME);
 
         final List<Source> sources = new ArrayList<Source>();
         sources.add(new Source("source1", Boolean.TRUE, null, null));
         final Layers layers = new Layers(sources);
         final LayerContext conf = new LayerContext(layers);
-        
+
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(ConfigureMapServiceDescriptor.SERVICE_NAME_NAME).setValue("wms");
-        in.parameter(ConfigureMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance4");
+        in.parameter(ConfigureMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(ConfigureMapServiceDescriptor.IDENTIFIER_NAME).setValue("updateInstance4");
         in.parameter(ConfigureMapServiceDescriptor.CONFIG_NAME).setValue(conf);
-        
+
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
 
-        assertEquals(conf, getConfig("instance4"));
+        assertEquals(conf, getConfig("updateInstance4"));
 
-        deleteInstance("WMS", "instance4");
+        deleteInstance("updateInstance4");
     }
-    
+
     @Test
     public void testUpdateNoInstanceWMS() throws ProcessException, NoSuchIdentifierException {
 
-        
+
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, ConfigureMapServiceDescriptor.NAME);
 
         final List<Source> sources = new ArrayList<Source>();
         sources.add(new Source("source1", Boolean.TRUE, null, null));
         final Layers layers = new Layers(sources);
         final LayerContext conf = new LayerContext(layers);
-        
+
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(ConfigureMapServiceDescriptor.SERVICE_NAME_NAME).setValue("wms");
+        in.parameter(ConfigureMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
         in.parameter(ConfigureMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance10");
         in.parameter(ConfigureMapServiceDescriptor.CONFIG_NAME).setValue(conf);
-        
+
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);
             proc.call();

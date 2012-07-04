@@ -87,8 +87,8 @@ public abstract class OGCWebService<W extends Worker> {
     public OGCWebService(final Specification spec) {
         LOGGER.log(Level.INFO, "Starting the SOAP {0} service facade.\n", spec.name());
         this.specification = spec;
-        WSEngine.registerService(specification.name(), "SOAP");
-        
+        WSEngine.registerService(specification.name(), "SOAP", getWorkerClass());
+
         /*
          * build the map of Workers, by scanning the sub-directories of its
          * service directory.
@@ -148,6 +148,11 @@ public abstract class OGCWebService<W extends Worker> {
     protected abstract W createWorker(final File instanceDirectory);
 
     /**
+     * @return the worker binding class of the current service.
+     */
+    protected abstract Class getWorkerClass();
+
+    /**
      * extract the service URL (before serviceName/serviceID?)
      * @return
      */
@@ -166,7 +171,7 @@ public abstract class OGCWebService<W extends Worker> {
 
     /**
      * Extract the instance ID from the URL.
-     * 
+     *
      * @return
      */
     private String extractWorkerID() {

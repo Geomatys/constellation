@@ -94,9 +94,9 @@ import static org.constellation.api.QueryConstants.*;
 @Path("wms/{serviceId}")
 @Singleton
 public class WMSService extends GridWebService<WMSWorker> {
-    
+
     public static boolean writeDTD = true;
-    
+
     /**
      * Build a new instance of the webService and initialize the JAXB context.
      */
@@ -110,12 +110,10 @@ public class WMSService extends GridWebService<WMSWorker> {
         LOGGER.log(Level.INFO, "WMS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    protected WMSWorker createWorker(File instanceDirectory) {
-        return new DefaultWMSWorker(instanceDirectory.getName(), instanceDirectory);
+    protected Class getWorkerClass() {
+        return DefaultWMSWorker.class;
     }
 
 
@@ -194,7 +192,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                 }
                 worker.setServiceUrl(getServiceURL());
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
-                
+
                 return Response.ok(capabilities, requestCapab.getFormat()).build();
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
@@ -224,7 +222,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                                            OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
         } catch (CstlServiceException ex) {
             return processExceptionResponse(queryContext, ex, version);
-        } 
+        }
     }
 
     /**
@@ -233,7 +231,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      */
     private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, ServiceDef serviceDef) {
         logException(ex);
-        
+
         // Now handle in image response or exception report.
         if (queryContext.isErrorInimage()) {
             final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400), queryContext.isOpaque());
@@ -257,7 +255,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         final ServiceExceptionReport report = new ServiceExceptionReport(version,
                 (locator == null) ? new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode()) :
                                     new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode(), locator));
-        
+
 
         final String schemaLocation;
         if (serviceDef.equals(ServiceDef.WMS_1_1_1_SLD) || serviceDef.equals(ServiceDef.WMS_1_1_1)) {
@@ -330,7 +328,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                      MimeType.APP_WMS_XML : MimeType.TEXT_XML;
         }
         final String updateSequence = getParameter(UPDATESEQUENCE_PARAMETER, false);
-        
+
         return new GetCapabilities(bestVersion.version, format, language, updateSequence);
     }
 
@@ -473,7 +471,7 @@ public class WMSService extends GridWebService<WMSWorker> {
          * we verify that the exception format is an allowed value
          */
         if ("1.3.0".equals(version)) {
-            if (strExceptions != null && 
+            if (strExceptions != null &&
                 (!"XML".equals(strExceptions) && !"INIMAGE".equals(strExceptions) && !"BLANK".equals(strExceptions))) {
                 throw new CstlServiceException("exception format:" + strExceptions + " is not allowed. Use XML, INIMAGE or BLANK", INVALID_PARAMETER_VALUE);
             }

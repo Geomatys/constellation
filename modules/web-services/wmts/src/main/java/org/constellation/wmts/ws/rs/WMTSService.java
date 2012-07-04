@@ -63,9 +63,9 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
 @Path("wmts/{serviceId}")
 @Singleton
 public class WMTSService extends GridWebService<WMTSWorker> {
-    
+
     private static final String NOT_WORKING = "The WMTS service is not running";
-    
+
     /**
      * Builds a new WMTS service REST (both REST Kvp and RESTFUL). This service only
      * provides the version 1.0.0 of OGC WMTS standard, for the moment.
@@ -74,7 +74,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
         super(ServiceDef.WMTS_1_0_0);
         setXMLContext(WMTSMarshallerPool.getInstance());
         setFullRequestLog(true);
-        
+
         LOGGER.log(Level.INFO, "WMTS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
@@ -82,8 +82,8 @@ public class WMTSService extends GridWebService<WMTSWorker> {
      * {@inheritDoc}
      */
     @Override
-    protected WMTSWorker createWorker(final File instanceDirectory) {
-        return new DefaultWMTSWorker(instanceDirectory.getName(), instanceDirectory);
+    protected Class getWorkerClass() {
+        return DefaultWMTSWorker.class;
     }
 
 
@@ -379,7 +379,7 @@ public class WMTSService extends GridWebService<WMTSWorker> {
     @Override
     protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
         logException(ex);
-        
+
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
@@ -388,6 +388,6 @@ public class WMTSService extends GridWebService<WMTSWorker> {
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), codeName,
                 ex.getLocator(), serviceDef.exceptionVersion.toString());
         return Response.ok(report, MimeType.TEXT_XML).build();
-        
+
     }
 }

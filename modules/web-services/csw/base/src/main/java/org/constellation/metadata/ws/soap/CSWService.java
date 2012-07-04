@@ -17,7 +17,7 @@
  */
 package org.constellation.metadata.ws.soap;
 
-// J2SE dependencies 
+// J2SE dependencies
 import java.io.File;
 import java.util.logging.Level;
 
@@ -85,7 +85,7 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
              org.geotoolkit.feature.catalog.PropertyTypeImpl.class,
              org.geotoolkit.util.Multiplicity.class})
 public class CSWService extends OGCWebService<CSWworker>{
-    
+
     /**
      * Initialize the workers.
      */
@@ -103,8 +103,16 @@ public class CSWService extends OGCWebService<CSWworker>{
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Class getWorkerClass() {
+        return CSWworker.class;
+    }
+
+    /**
      * Web service operation describing the service and its capabilities.
-     * 
+     *
      * @param requestCapabilities A document specifying the section you would obtain like :
      *      ServiceIdentification, ServiceProvider, Contents, operationMetadata.
      * @throws SOAPServiceException
@@ -117,14 +125,14 @@ public class CSWService extends OGCWebService<CSWworker>{
             final CSWworker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
             return worker.getCapabilities(requestCapabilities);
-            
+
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), requestCapabilities.getVersion().toString());
         }
     }
-    
+
     /**
-     * Web service operation 
+     * Web service operation
      */
     @WebMethod(action="getDomain")
     @WebResult(name="GetDomainResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
@@ -139,10 +147,10 @@ public class CSWService extends OGCWebService<CSWworker>{
                                            requestGetDomain.getVersion());
         }
     }
-    
-    
+
+
     /**
-     * Web service operation 
+     * Web service operation
      */
     @WebMethod(action="getRecordById")
     @WebResult(name="GetRecordByIdResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
@@ -157,7 +165,7 @@ public class CSWService extends OGCWebService<CSWworker>{
                                            requestRecordById.getVersion());
         }
     }
-    
+
     /**
      * Web service operation
      */
@@ -173,9 +181,9 @@ public class CSWService extends OGCWebService<CSWworker>{
                                            requestRecords.getVersion());
         }
     }
-    
+
     /**
-     * Web service operation 
+     * Web service operation
      */
     @WebMethod(action="describeRecord")
     @WebResult(name="DescribeRecordResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
@@ -190,9 +198,9 @@ public class CSWService extends OGCWebService<CSWworker>{
                                            requestDescribeRecord.getVersion());
         }
     }
-    
+
     /**
-     * Web service operation 
+     * Web service operation
      */
     @WebMethod(action="harvest")
     @WebResult(name="HarvestResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")
@@ -207,9 +215,9 @@ public class CSWService extends OGCWebService<CSWworker>{
                                            requestHarvest.getVersion());
         }
     }
-    
+
     /**
-     * Web service operation 
+     * Web service operation
      */
     @WebMethod(action="transaction")
     @WebResult(name="TransactionResponse", targetNamespace="http://www.opengis.net/cat/csw/2.0.2")

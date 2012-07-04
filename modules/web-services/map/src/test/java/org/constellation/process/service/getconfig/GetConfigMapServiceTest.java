@@ -23,7 +23,6 @@ import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.AbstractMapServiceTest;
-import org.constellation.process.service.configure.ConfigureMapServiceDescriptor;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -36,10 +35,10 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geoamtys)
  */
-public class GetConfigMapServiceTest extends AbstractMapServiceTest {
+public abstract class GetConfigMapServiceTest extends AbstractMapServiceTest {
 
-    public GetConfigMapServiceTest() {
-        super(GetConfigMapServiceDescriptor.NAME);
+    public GetConfigMapServiceTest(final String serviceName, final Class workerClass) {
+        super(GetConfigMapServiceDescriptor.NAME, serviceName, workerClass);
     }
 
      @Test
@@ -50,21 +49,21 @@ public class GetConfigMapServiceTest extends AbstractMapServiceTest {
         final Layers layers = new Layers(sources);
         final LayerContext conf = new LayerContext(layers);
 
-        createInstance("WMS","instance5", conf);
+        createCustomInstance("getConfInstance5", conf);
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigMapServiceDescriptor.NAME);
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(GetConfigMapServiceDescriptor.SERVICE_NAME_NAME).setValue("wms");
-        in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance5");
+        in.parameter(GetConfigMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue("getConfInstance5");
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         ParameterValueGroup ouptuts = proc.call();
 
         assertEquals(conf, ouptuts.parameter(GetConfigMapServiceDescriptor.CONFIG_NAME).getValue());
 
-        deleteInstance("WMS", "instance5");
+        deleteInstance( "getConfInstance5");
     }
 
     @Test
@@ -74,8 +73,8 @@ public class GetConfigMapServiceTest extends AbstractMapServiceTest {
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(GetConfigMapServiceDescriptor.SERVICE_NAME_NAME).setValue("wms");
-        in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance10");
+        in.parameter(GetConfigMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue("getConfInstance10");
 
         try {
             org.geotoolkit.process.Process proc = desc.createProcess(in);

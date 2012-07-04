@@ -1,3 +1,0 @@
-org.constellation.process.wms.start.StartWMSServiceDescriptor
-org.constellation.process.wms.stop.StopWMSServiceDescriptor
-org.constellation.process.wms.restart.RestartWMSServiceDescriptor

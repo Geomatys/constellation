@@ -26,28 +26,30 @@ import org.geotoolkit.util.logging.Logging;
  * @author Guilhem Legal (Geomatys)
  */
 public final class WSEngine {
-    
+
     private WSEngine() {}
-    
+
     private static final Logger LOGGER = Logging.getLogger(WSEngine.class);
-    
+
     /**
      * A map of service worker.
      */
     private static final Map<String, Map<String, Worker>> WORKERS_MAP = new HashMap<String, Map<String, Worker>>();
- 
+
     private static final Map<String, List<String>> REGISTERED_SERVICE = new HashMap<String, List<String>>();
-    
+
+    private static final Map<String, Class> SERVICE_WORKER_CLASS = new HashMap<String, Class>();
+
     private static final List<String> TO_RESTART = new ArrayList<String>();
-    
+
     public static Map<String, Worker> getWorkersMap(final String specification) {
         return WORKERS_MAP.get(specification);
     }
-    
+
     public static void prepareRestart() {
         TO_RESTART.addAll(WORKERS_MAP.keySet());
     }
-    
+
     public static int getInstanceSize(final String specification) {
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap != null) {
@@ -55,7 +57,7 @@ public final class WSEngine {
         }
         return 0;
     }
-    
+
     public static boolean serviceInstanceExist(final String specification, final String serviceID) {
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap != null) {
@@ -63,7 +65,7 @@ public final class WSEngine {
         }
         return false;
     }
-    
+
     public static Set<String> getInstanceNames(final String specification) {
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap != null) {
@@ -71,7 +73,7 @@ public final class WSEngine {
         }
         return new HashSet<String>();
     }
-    
+
     public static Worker getInstance(final String specification, final String serviceID) {
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap != null) {
@@ -79,7 +81,7 @@ public final class WSEngine {
         }
         return null;
     }
-    
+
     public static void destroyInstances(final String specification) {
         if (TO_RESTART.contains(specification)) {
             TO_RESTART.remove(specification);
@@ -94,7 +96,7 @@ public final class WSEngine {
             WORKERS_MAP.put(specification, null);
         }
     }
-    
+
     public static boolean isSetService(final String specification) {
         if (TO_RESTART.contains(specification)) {
             return false;
@@ -102,7 +104,7 @@ public final class WSEngine {
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         return workersMap != null;
     }
-    
+
     public static void setServiceInstances(final String specification, final Map<String, Worker> instances) {
         final Map<String, Worker> oldWorkersMap = WORKERS_MAP.put(specification, instances);
         if (oldWorkersMap != null && !oldWorkersMap.isEmpty()) {
@@ -112,7 +114,7 @@ public final class WSEngine {
             }
         }
     }
-    
+
     public static void addServiceInstance(final String specification, final String serviceID, final Worker instance) {
         Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap == null) {
@@ -136,7 +138,7 @@ public final class WSEngine {
         }
         return response;
     }
-    
+
     public static void shutdownInstance(final String specification, final String serviceID) {
         final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
         if (workersMap != null) {
@@ -147,13 +149,15 @@ public final class WSEngine {
             }
         }
     }
-    
+
      /**
-     * Add a service type to the list of registered service if it is not already registred.
-     * 
+     * Add a service type to the list of registered service if it is not already registered.
+     *
      * @param serviceName A service type (CSW, SOS, WMS, ...).
+     * @param protocol
+     * @param workerClass the class binding of the service worker.
      */
-    public static void registerService(final String serviceName, final String protocol) {
+    public static void registerService(final String serviceName, final String protocol, final Class workerClass) {
         if (REGISTERED_SERVICE.containsKey(serviceName)) {
             final List<String> protocols = REGISTERED_SERVICE.get(serviceName);
             if (!protocols.contains(protocol)) {
@@ -165,9 +169,22 @@ public final class WSEngine {
             protocols.add(protocol);
             REGISTERED_SERVICE.put(serviceName, protocols);
         }
+        SERVICE_WORKER_CLASS.put(serviceName, workerClass);
     }
-    
+
     public static Map<String, List<String>> getRegisteredServices() {
         return REGISTERED_SERVICE;
+    }
+
+    /**
+     * Return the worker class of a registered service.
+     * @param serviceName
+     * @return the worker class of a registered service or null if service not registered.
+     */
+    public static Class getServiceWorkerClass(final String serviceName) {
+        if (SERVICE_WORKER_CLASS.containsKey(serviceName)) {
+            return SERVICE_WORKER_CLASS.get(serviceName);
+        }
+        return null;
     }
 }

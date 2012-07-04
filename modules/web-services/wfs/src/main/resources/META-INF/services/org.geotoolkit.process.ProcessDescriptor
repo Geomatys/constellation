@@ -1,3 +1,0 @@
-org.constellation.process.wfs.start.StartWFSServiceDescriptor
-org.constellation.process.wfs.stop.StopWFSServiceDescriptor
-org.constellation.process.wfs.restart.RestartWFSServiceDescriptor
