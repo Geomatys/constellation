@@ -1,21 +1,21 @@
 #Providers process
-org.constellation.process.provider.create.CreateProviderDescriptor
-org.constellation.process.provider.remove.RemoveProviderDescriptor
-org.constellation.process.provider.update.UpdateProviderDescriptor
-org.constellation.process.provider.restart.RestartProviderDescriptor
-org.constellation.process.provider.getconfig.GetConfigProviderDescriptor
+org.constellation.process.provider.CreateProviderDescriptor
+org.constellation.process.provider.RemoveProviderDescriptor
+org.constellation.process.provider.UpdateProviderDescriptor
+org.constellation.process.provider.RestartProviderDescriptor
+org.constellation.process.provider.GetConfigProviderDescriptor
 
 #Service process
-org.constellation.process.service.create.CreateMapServiceDescriptor
-org.constellation.process.service.configure.ConfigureMapServiceDescriptor
-org.constellation.process.service.getconfig.GetConfigMapServiceDescriptor
+org.constellation.process.service.CreateMapServiceDescriptor
+org.constellation.process.service.ConfigureMapServiceDescriptor
+org.constellation.process.service.GetConfigMapServiceDescriptor
 
 #Layer process
-org.constellation.process.layer.create.CreateMapLayerDescriptor
-org.constellation.process.layer.delete.DeleteMapLayerDescriptor
-org.constellation.process.layer.update.UpdateMapLayerDescriptor
+org.constellation.process.layer.CreateMapLayerDescriptor
+org.constellation.process.layer.DeleteMapLayerDescriptor
+org.constellation.process.layer.UpdateMapLayerDescriptor
 
 #Style process
-org.constellation.process.style.create.CreateMapStyleDescriptor
-org.constellation.process.style.delete.DeleteMapStyleDescriptor
-org.constellation.process.style.update.UpdateMapStyleDescriptor
+org.constellation.process.style.CreateMapStyleDescriptor
+org.constellation.process.style.DeleteMapStyleDescriptor
+org.constellation.process.style.UpdateMapStyleDescriptor

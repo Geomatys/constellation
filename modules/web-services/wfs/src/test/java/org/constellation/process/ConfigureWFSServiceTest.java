@@ -16,7 +16,7 @@
  */
 package org.constellation.process;
 
-import org.constellation.process.service.configure.ConfigureMapServiceTest;
+import org.constellation.process.service.ConfigureMapServiceTest;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 
 /**

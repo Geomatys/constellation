@@ -18,7 +18,7 @@ package org.constellation.process;
 
 import java.io.File;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.process.service.create.CreateMapServiceTest;
+import org.constellation.process.service.CreateMapServiceTest;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.AfterClass;

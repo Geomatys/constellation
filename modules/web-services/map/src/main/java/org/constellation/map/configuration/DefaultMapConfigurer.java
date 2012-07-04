@@ -76,17 +76,17 @@ import org.opengis.util.NoSuchIdentifierException;
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.layer.create.CreateMapLayerDescriptor;
-import org.constellation.process.layer.delete.DeleteMapLayerDescriptor;
-import org.constellation.process.layer.update.UpdateMapLayerDescriptor;
-import org.constellation.process.provider.create.CreateProviderDescriptor;
-import org.constellation.process.provider.getconfig.GetConfigProviderDescriptor;
-import org.constellation.process.provider.remove.RemoveProviderDescriptor;
-import org.constellation.process.provider.restart.RestartProviderDescriptor;
-import org.constellation.process.provider.update.UpdateProviderDescriptor;
-import org.constellation.process.style.create.CreateMapStyleDescriptor;
-import org.constellation.process.style.delete.DeleteMapStyleDescriptor;
-import org.constellation.process.style.update.UpdateMapStyleDescriptor;
+import org.constellation.process.layer.CreateMapLayerDescriptor;
+import org.constellation.process.layer.DeleteMapLayerDescriptor;
+import org.constellation.process.layer.UpdateMapLayerDescriptor;
+import org.constellation.process.provider.CreateProviderDescriptor;
+import org.constellation.process.provider.GetConfigProviderDescriptor;
+import org.constellation.process.provider.RemoveProviderDescriptor;
+import org.constellation.process.provider.RestartProviderDescriptor;
+import org.constellation.process.provider.UpdateProviderDescriptor;
+import org.constellation.process.style.CreateMapStyleDescriptor;
+import org.constellation.process.style.DeleteMapStyleDescriptor;
+import org.constellation.process.style.UpdateMapStyleDescriptor;
 import org.geotoolkit.process.ProcessException;
 
 /**
@@ -355,7 +355,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             inputs.parameter(GetConfigProviderDescriptor.PROVIDER_ID_NAME).setValue(id);
 
             try {
-                
+
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
                 final ParameterValueGroup outputs = process.call();
                 return outputs.parameter(GetConfigProviderDescriptor.CONFIG_NAME).getValue();

@@ -17,7 +17,7 @@
 package org.constellation.process;
 
 import org.constellation.map.ws.DefaultWMSWorker;
-import org.constellation.process.service.create.CreateMapServiceTest;
+import org.constellation.process.service.CreateMapServiceTest;
 
 /**
  *
