@@ -43,6 +43,7 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.test.CstlDOMComparator;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 
 import org.geotoolkit.data.DataStoreRuntimeException;
@@ -137,7 +138,7 @@ public class WFSWorkerTest {
                 Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
                 LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
                 lc.getCustomParameters().put("transactionSecurized", "false");
-                
+
                 //we write the configuration file
                 File configFile = new File(configDir, "layerContext.xml");
                 final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
@@ -195,7 +196,7 @@ public class WFSWorkerTest {
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(result, sw);
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml"),
                 sw.toString());
 
@@ -240,7 +241,7 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml"),
                 sw.toString());
 
@@ -253,7 +254,7 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml"),
                 sw.toString());
 
@@ -266,7 +267,7 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml"),
                 sw.toString());
 
@@ -279,7 +280,7 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml"),
                 sw.toString());
 
@@ -344,7 +345,7 @@ public class WFSWorkerTest {
 
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
 
         /**
          * Test 2 : query on typeName samplingPoint whith HITS result type
@@ -380,7 +381,7 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
 
 
         /**
@@ -404,7 +405,7 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
 
         /**
          * Test 5 : query on typeName samplingPoint whith a filter xpath //gml:name = 10972X0137-PONT
@@ -427,7 +428,7 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
 
         /**
          * Test 6 : query on typeName samplingPoint whith a spatial filter BBOX
@@ -450,7 +451,7 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
 
         /**
          * Test 7 : query on typeName samplingPoint whith a spatial filter BBOX () with no namespace
@@ -473,7 +474,7 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
 
 
         /**
@@ -498,7 +499,7 @@ public class WFSWorkerTest {
          expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
 
 
         /**
@@ -522,7 +523,7 @@ public class WFSWorkerTest {
          expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
 
         /**
          * Test 10 : query on typeName samplingPoint whith HITS result type
@@ -599,7 +600,7 @@ public class WFSWorkerTest {
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
 
         /**
          * Test 2 : query on typeName sml:System avec srsName = EPSG:4326
@@ -623,7 +624,7 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
         /**
          * Test 3 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
          */
@@ -648,7 +649,7 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        DomCompare.compare(expectedResult, writer.toString());
+        domCompare(expectedResult, writer.toString());
     }
 
     /**
@@ -675,7 +676,7 @@ public class WFSWorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"),
                 writer.toString());
 
@@ -697,7 +698,7 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2.xml"),
                 writer.toString());
 
@@ -718,7 +719,7 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
                 writer.toString());
 
@@ -753,7 +754,7 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1_reproj.xml"),
                 writer.toString());
 
@@ -957,7 +958,7 @@ public class WFSWorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
-        DomCompare.compare(
+        domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3.xml"),
                 writer.toString());
 
@@ -1016,7 +1017,7 @@ public class WFSWorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
 
-         DomCompare.compare(
+         domCompare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2.xml"),
                 writer.toString());
     }
@@ -1210,4 +1211,10 @@ public class WFSWorkerTest {
     }
 
 
+    public static void domCompare(final Object actual, final Object expected) throws Exception {
+
+        final CstlDOMComparator comparator = new CstlDOMComparator(expected, actual);
+        comparator.ignoredAttributes.add("xmlns:*");
+        comparator.compare();
+    }
 }
