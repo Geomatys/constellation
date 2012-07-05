@@ -48,29 +48,36 @@ public final class RestartService extends AbstractCstlProcess {
         final String serviceName = value(SERVICE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         final Boolean closeFirst = value(CLOSE, inputParameters);
+        File serviceDir = value(SERVICE_DIRECTORY, inputParameters);
         final Class clazz = WSEngine.getServiceWorkerClass(serviceName);
 
-        final File configDirectory = ConfigDirectory.getConfigDirectory();
-        if (configDirectory != null && configDirectory.isDirectory()) {
+        //get config directory .constellation if null
+        if (serviceDir == null) {
+            final File configDirectory = ConfigDirectory.getConfigDirectory();
 
-            final File serviceDir = new File(configDirectory, serviceName);
-            if (serviceDir.exists() && serviceDir.isDirectory()) {
+            if (configDirectory != null && configDirectory.isDirectory()) {
 
-                if (identifier == null || "".equals(identifier)) {
-                    buildWorkers(serviceDir, null, closeFirst, clazz);
-                } else {
-                    if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
-                        buildWorkers(serviceDir, identifier, closeFirst, clazz);
-                    } else {
-                        throw new ProcessException("There is no instance of" + identifier, this, null);
-                    }
-                }
+                serviceDir = new File(configDirectory, serviceName);
 
             } else {
-                throw new ProcessException("Service directory can' be found for service name : " + serviceName, this, null);
+                throw new ProcessException("Configuration directory can' be found.", this, null);
             }
+        }
+
+        if (serviceDir.exists() && serviceDir.isDirectory()) {
+
+            if (identifier == null || "".equals(identifier)) {
+                buildWorkers(serviceDir, null, closeFirst, clazz);
+            } else {
+                if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
+                    buildWorkers(serviceDir, identifier, closeFirst, clazz);
+                } else {
+                    throw new ProcessException("There is no instance of" + identifier, this, null);
+                }
+            }
+
         } else {
-            throw new ProcessException("Configuration directory can' be found.", this, null);
+            throw new ProcessException("Service directory can' be found for service name : " + serviceName, this, null);
         }
     }
 

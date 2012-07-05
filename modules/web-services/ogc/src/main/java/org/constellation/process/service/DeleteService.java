@@ -33,12 +33,13 @@ import org.geotoolkit.util.FileUtilities;
  */
 public class DeleteService extends AbstractCstlProcess {
 
-     public DeleteService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public DeleteService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
-     /**
+    /**
      * Delete an instance and configuration for a specified service and instance name.
+     *
      * @throws ProcessException in cases :
      * - if identifier doesn't exist or is null/empty.
      * - if error during file erasing phase.
@@ -47,6 +48,8 @@ public class DeleteService extends AbstractCstlProcess {
     protected void execute() throws ProcessException {
         String serviceName = value(SERVICE_NAME, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
+        File serviceDir = value(SERVICE_DIRECTORY, inputParameters);
+
 
         if (serviceName != null && !serviceName.isEmpty()) {
             serviceName = serviceName.toUpperCase();
@@ -58,38 +61,42 @@ public class DeleteService extends AbstractCstlProcess {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
         }
 
-         //get config directory .constellation
-        final File configDirectory = ConfigDirectory.getConfigDirectory();
-        if (configDirectory != null && configDirectory.isDirectory()) {
+        //get config directory .constellation if null
+        if (serviceDir == null) {
+            final File configDirectory = ConfigDirectory.getConfigDirectory();
 
-            //get service directory
-            final File serviceDir = new File(configDirectory, serviceName);
-            if (serviceDir.exists() && serviceDir.isDirectory()) {
+            if (configDirectory != null && configDirectory.isDirectory()) {
 
-                //create service instance directory
-                final File instanceDirectory = new File(serviceDir, identifier);
-                if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+                //get service directory
+                serviceDir = new File(configDirectory, serviceName);
 
-                    //unregister the service instance if exist
-                    if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
-                        WSEngine.shutdownInstance(serviceName, identifier);
-                    }
+            } else {
+                throw new ProcessException("Configuration directory can't be found.", this, null);
+            }
+        }
 
-                    //delete folder
-                    if (!FileUtilities.deleteDirectory(instanceDirectory)) {
-                        throw new ProcessException("Service instance directory " + identifier + " can't be deleted.", this, null);
-                    }
+        if (serviceDir.exists() && serviceDir.isDirectory()) {
 
-                } else {
-                    throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
+            //create service instance directory
+            final File instanceDirectory = new File(serviceDir, identifier);
+            if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+
+                //unregister the service instance if exist
+                if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
+                    WSEngine.shutdownInstance(serviceName, identifier);
+                }
+
+                //delete folder
+                if (!FileUtilities.deleteDirectory(instanceDirectory)) {
+                    throw new ProcessException("Service instance directory " + identifier + " can't be deleted.", this, null);
                 }
 
             } else {
-                throw new ProcessException("Service directory can't be found for service name : "+serviceName, this, null);
+                throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
             }
+
         } else {
-            throw new ProcessException("Configuration directory can't be found.", this, null);
+            throw new ProcessException("Service directory can't be found for service name : " + serviceName, this, null);
         }
     }
-
 }

@@ -81,6 +81,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
                         inputs.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
                         inputs.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
                         inputs.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
+                        inputs.parameter(CreateMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
 
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();
@@ -100,6 +101,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
                         inputs.parameter(ConfigureMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
                         inputs.parameter(ConfigureMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
                         inputs.parameter(ConfigureMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
+                        inputs.parameter(ConfigureMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
 
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();
@@ -136,6 +138,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
             in.parameter(GetConfigMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
             in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+            in.parameter(GetConfigMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
 
             final org.geotoolkit.process.Process proc = desc.createProcess(in);
             final ParameterValueGroup ouptuts = proc.call();

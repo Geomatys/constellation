@@ -134,7 +134,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
          */
         if (!WSEngine.isSetService(serviceName)) {
             startAllInstance();
-            //buildWorkerMap();
         } else {
             LOGGER.log(Level.INFO, "Workers already set for {0}", serviceName);
         }
@@ -207,6 +206,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
                     inputs.parameter(StartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
                     inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(instance);
+                    inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(serviceDirectory);
 
                     org.geotoolkit.process.Process proc = desc.createProcess(inputs);
                     proc.call();
@@ -216,7 +216,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     LOGGER.log(Level.SEVERE, ex.getLocalizedMessage());
                 }
             }
-
         }
     }
 
@@ -374,6 +373,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     inputs.parameter(RestartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
                     inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
                     inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(closeFirst);
+                    inputs.parameter(RestartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
 
                     org.geotoolkit.process.Process proc = desc.createProcess(inputs);
                     proc.call();
@@ -395,6 +395,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
                     inputs.parameter(StartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
                     inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
+                    inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
 
                     org.geotoolkit.process.Process proc = desc.createProcess(inputs);
                     proc.call();
@@ -437,6 +438,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
                     inputs.parameter(DeleteServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
                     inputs.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
+                    inputs.parameter(DeleteServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
 
                     org.geotoolkit.process.Process proc = desc.createProcess(inputs);
                     proc.call();

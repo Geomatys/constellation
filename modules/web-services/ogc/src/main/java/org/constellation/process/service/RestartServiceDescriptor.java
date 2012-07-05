@@ -16,6 +16,7 @@
  */
 package org.constellation.process.service;
 
+import java.io.File;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -52,10 +53,15 @@ public class RestartServiceDescriptor  extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<Boolean> CLOSE =
             new DefaultParameterDescriptor(CLOSE_NAME, CLOSE_REMARKS, Boolean.class, true, true);
 
+    public static final String SERVICE_DIRECTORY_NAME = "serviceDirectory";
+    private static final String SERVICE_DIRECTORY_REMARKS = "Service directory. Use default constellation config directory if not set.";
+    public static final ParameterDescriptor<File> SERVICE_DIRECTORY =
+            new DefaultParameterDescriptor(SERVICE_DIRECTORY_NAME, SERVICE_DIRECTORY_REMARKS, File.class, null, false);
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE, IDENTIFIER, CLOSE});
+            new GeneralParameterDescriptor[]{SERVICE, IDENTIFIER, CLOSE, SERVICE_DIRECTORY});
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");

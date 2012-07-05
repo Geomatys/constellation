@@ -16,6 +16,7 @@
  */
 package org.constellation.process.service;
 
+import java.io.File;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
@@ -50,11 +51,15 @@ public class GetConfigMapServiceDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<String> IDENTIFIER =
             new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, "default", true);
 
+    public static final String INSTANCE_DIRECTORY_NAME = "instanceDirectory";
+    private static final String INSTANCE_DIRECTORY_REMARKS = "Configuration directory. Use default constellation config directory if not set.";
+    public static final ParameterDescriptor<File> INSTANCE_DIRECTORY =
+            new DefaultParameterDescriptor(INSTANCE_DIRECTORY_NAME, INSTANCE_DIRECTORY_REMARKS, File.class, null, false);
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_NAME, IDENTIFIER});
+            new GeneralParameterDescriptor[]{SERVICE_NAME, IDENTIFIER, INSTANCE_DIRECTORY});
 
 
     public static final String CONFIG_NAME = "configuration";

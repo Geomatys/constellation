@@ -44,7 +44,7 @@ public class GetConfigMapService extends AbstractProcess {
      * Get the configuration of an existing instance for a specified service and instance name.
      *
      * @throws ProcessException in cases :
-     * - if the service name is different from WMS, WMTS of WFS (no mather of case).
+     * - if the service name is different from WMS, WMTS of WFS (no matter of case).
      * - if instance name doesn't exist.
      * - if error during file creation or unmarshalling phase.
      */
@@ -53,6 +53,7 @@ public class GetConfigMapService extends AbstractProcess {
 
         String serviceName = value(SERVICE_NAME, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
+        File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
 
         if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) || "WFS".equalsIgnoreCase(serviceName))) {
             serviceName = serviceName.toUpperCase();
@@ -64,49 +65,54 @@ public class GetConfigMapService extends AbstractProcess {
             throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
         }
 
-        //get config directory .constellation
-        final File configDirectory = ConfigDirectory.getConfigDirectory();
-        if (configDirectory != null && configDirectory.isDirectory()) {
+        //get config directory .constellation if null
+        if (instanceDirectory == null) {
+            final File configDirectory = ConfigDirectory.getConfigDirectory();
 
-            //get service directory ("WMS", "WMTS", "WFS")
-            final File serviceDir = new File(configDirectory, serviceName);
-            if (serviceDir.exists() && serviceDir.isDirectory()) {
 
-                //get service instance directory
-                final File instanceDirectory = new File(serviceDir, identifier);
+            if (configDirectory != null && configDirectory.isDirectory()) {
 
-                if (instanceDirectory.exists() && serviceDir.isDirectory()) {
+                //get service directory ("WMS", "WMTS", "WFS")
+                final File serviceDir = new File(configDirectory, serviceName);
+                if (serviceDir.exists() && serviceDir.isDirectory()) {
 
-                    //get layerContext.xml file.
-                    final File configurationFile = new File(instanceDirectory, "layerContext.xml");
-                    if (configurationFile.exists()) {
-                        Unmarshaller unmarshaller = null;
-                        try {
-                            unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                            Object obj = unmarshaller.unmarshal(configurationFile);
-                            if (obj instanceof LayerContext) {
-                                getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
-                            } else {
-                                throw new ProcessException("The layerContext.xml file does not contain a LayerContext object", this, null);
-                            }
-                        } catch (JAXBException ex) {
-                            throw new ProcessException(null,this,ex);
-                        } finally {
-                            if (unmarshaller != null) {
-                                GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-                            }
-                        }
-                    }
+                    //get service instance directory
+                    instanceDirectory = new File(serviceDir, identifier);
                 } else {
-                    throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
+                    throw new ProcessException("Service directory can't be found for service name : " + serviceName, this, null);
                 }
-
             } else {
-                throw new ProcessException("Service directory can't be found for service name : " + serviceName, this, null);
+                throw new ProcessException("Configuration directory can't be found.", this, null);
             }
+        }
 
+
+        if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+
+            //get layerContext.xml file.
+            final File configurationFile = new File(instanceDirectory, "layerContext.xml");
+            if (configurationFile.exists()) {
+                Unmarshaller unmarshaller = null;
+                try {
+                    unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    Object obj = unmarshaller.unmarshal(configurationFile);
+                    if (obj instanceof LayerContext) {
+                        getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
+                    } else {
+                        throw new ProcessException("The layerContext.xml file does not contain a LayerContext object", this, null);
+                    }
+                } catch (JAXBException ex) {
+                    throw new ProcessException(null, this, ex);
+                } finally {
+                    if (unmarshaller != null) {
+                        GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                    }
+                }
+            } else {
+                throw new ProcessException("Service instance " + identifier + " doesn't have any configuration file.", this, null);
+            }
         } else {
-            throw new ProcessException("Configuration directory can't be found.", this, null);
+            throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
         }
     }
 }

@@ -43,7 +43,7 @@ public class ConfigureMapService extends AbstractProcess {
      * Update configuration of an existing instance for a specified service and instance name.
      *
      * @throws ProcessException in cases :
-     * - if the service name is different from WMS, WMTS of WFS (no mather of case).
+     * - if the service name is different from WMS, WMTS of WFS (no matter of case).
      * - if instance name doesn't exist.
      * - if error during file creation or marshalling phase.
      */
@@ -53,6 +53,7 @@ public class ConfigureMapService extends AbstractProcess {
         String serviceName = value(SERVICE_NAME, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         LayerContext configuration = value(CONFIGURATION, inputParameters);
+        File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
 
         if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) || "WFS".equalsIgnoreCase(serviceName))) {
             serviceName = serviceName.toUpperCase();
@@ -68,44 +69,48 @@ public class ConfigureMapService extends AbstractProcess {
             configuration = new LayerContext();
         }
 
-        //get config directory .constellation
-        final File configDirectory = ConfigDirectory.getConfigDirectory();
-        if (configDirectory != null && configDirectory.isDirectory()) {
+        //get config directory .constellation if null
+        if (instanceDirectory == null) {
+            final File configDirectory = ConfigDirectory.getConfigDirectory();
 
-            //get service directory ("WMS", "WMTS", "WFS")
-            final File serviceDir = new File(configDirectory, serviceName);
-            if (serviceDir.exists() && serviceDir.isDirectory()) {
 
-                //get service instance directory
-                final File instanceDirectory = new File(serviceDir, identifier);
+            if (configDirectory != null && configDirectory.isDirectory()) {
 
-                if (instanceDirectory.exists() && serviceDir.isDirectory()) {
+                //get service directory ("WMS", "WMTS", "WFS")
+                final File serviceDir = new File(configDirectory, serviceName);
+                if (serviceDir.exists() && serviceDir.isDirectory()) {
 
-                    //get layerContext.xml file.
-                    File configurationFile = new File(instanceDirectory, "layerContext.xml");
-                    Marshaller marshaller = null;
-                    try {
-                        marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                        marshaller.marshal(configuration, configurationFile);
-
-                    } catch (JAXBException ex) {
-                        throw new ProcessException(null, this, ex);
-                    } finally {
-                        if (marshaller != null) {
-                            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-                        }
-                    }
+                    //get service instance directory
+                    instanceDirectory = new File(serviceDir, identifier);
 
                 } else {
-                    throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
+                    throw new ProcessException("Service directory can't be found for service name : " + serviceName, this, null);
                 }
 
             } else {
-                throw new ProcessException("Service directory can't be found for service name : " + serviceName, this, null);
+                throw new ProcessException("Configuration directory can't be found.", this, null);
+            }
+        }
+
+        if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+
+            //get layerContext.xml file.
+            File configurationFile = new File(instanceDirectory, "layerContext.xml");
+            Marshaller marshaller = null;
+            try {
+                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                marshaller.marshal(configuration, configurationFile);
+
+            } catch (JAXBException ex) {
+                throw new ProcessException(null, this, ex);
+            } finally {
+                if (marshaller != null) {
+                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                }
             }
 
         } else {
-            throw new ProcessException("Configuration directory can't be found.", this, null);
+            throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
         }
     }
 }

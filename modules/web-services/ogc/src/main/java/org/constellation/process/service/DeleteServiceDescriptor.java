@@ -16,6 +16,7 @@
  */
 package org.constellation.process.service;
 
+import java.io.File;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -49,10 +50,15 @@ public class DeleteServiceDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<String> IDENTIFIER =
             new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, null, true);
 
+    public static final String SERVICE_DIRECTORY_NAME = "serviceDirectory";
+    private static final String SERVICE_DIRECTORY_REMARKS = "Service directory. Use default constellation config directory if not set.";
+    public static final ParameterDescriptor<File> SERVICE_DIRECTORY =
+            new DefaultParameterDescriptor(SERVICE_DIRECTORY_NAME, SERVICE_DIRECTORY_REMARKS, File.class, null, false);
+
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_NAME, IDENTIFIER});
+            new GeneralParameterDescriptor[]{SERVICE_NAME, IDENTIFIER, SERVICE_DIRECTORY});
 
 
     /**Output parameters */
