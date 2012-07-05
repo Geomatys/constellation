@@ -67,10 +67,10 @@ public final class RestartService extends AbstractCstlProcess {
         if (serviceDir.exists() && serviceDir.isDirectory()) {
 
             if (identifier == null || "".equals(identifier)) {
-                buildWorkers(serviceDir, null, closeFirst, clazz);
+                buildWorkers(serviceDir, serviceName, null, closeFirst, clazz);
             } else {
                 if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
-                    buildWorkers(serviceDir, identifier, closeFirst, clazz);
+                    buildWorkers(serviceDir, serviceName, identifier, closeFirst, clazz);
                 } else {
                     throw new ProcessException("There is no instance of" + identifier, this, null);
                 }
@@ -88,7 +88,7 @@ public final class RestartService extends AbstractCstlProcess {
      * @param identifier
      * @throws ProcessException
      */
-    private void buildWorkers(final File serviceDir, final String identifier, final boolean closeInstance, final Class clazz) throws ProcessException {
+    private void buildWorkers(final File serviceDir, final String serviceName, final String identifier, final boolean closeInstance, final Class clazz) throws ProcessException {
 
         if (identifier != null) {
             if (closeInstance) {
@@ -132,7 +132,10 @@ public final class RestartService extends AbstractCstlProcess {
 
         } else {
 
-            final Map<String, Worker> oldWorkersMap = new HashMap<String, Worker>(WSEngine.getWorkersMap(serviceDir.getName()));
+            Map<String, Worker> oldWorkersMap = null;
+            if (WSEngine.getWorkersMap(serviceName) != null ) {
+                oldWorkersMap = new HashMap<String, Worker>(WSEngine.getWorkersMap(serviceName));
+            }
             final Map<String, Worker> workersMap = new HashMap<String, Worker>();
 
             if (closeInstance) {
