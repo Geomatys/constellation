@@ -32,7 +32,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.sql.DataSource;
@@ -69,7 +68,6 @@ import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.UnlimitedInteger;
 import org.geotoolkit.xml.IdentifierSpace;
-import org.geotoolkit.xml.IdentifiedObject;
 import org.geotoolkit.xml.XLink;
 
 // GeoAPI dependencies
@@ -416,7 +414,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @return a GeotoolKit metadata object.
      */
     private Object getObjectFromValue(final Value value, final int mode) {
-        Class classe = null;
+        final Class classe;
         // we get the value's class
         if (value.getType() != null) {
             classe = getClassFromName(value.getType(), mode);
@@ -626,7 +624,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     try {
                         u = new UnlimitedInteger(Integer.parseInt(intValue));
                     } catch (NumberFormatException ex) {
-                        LOGGER.warning("Unable to parse value for Unlimited Integer: " + intValue);
+                        LOGGER.log(Level.WARNING, "Unable to parse value for Unlimited Integer: {0}", intValue);
                     }
                 }
 

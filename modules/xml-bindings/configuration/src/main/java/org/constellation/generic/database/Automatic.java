@@ -390,6 +390,7 @@ public class Automatic {
 
     /**
      * @return the enableThread
+     * @deprecated use getParameter("enableThread")
      */
     public String getEnableThread() {
         return enableThread;
@@ -397,6 +398,7 @@ public class Automatic {
 
     /**
      * @param enableThread the enableThread to set
+     * @deprecated use putParameter("enableThread", boolean)
      */
     public void setEnableThread(final String enableThread) {
         this.enableThread = enableThread;
@@ -404,6 +406,7 @@ public class Automatic {
 
     /**
      * @return the enableCache flag.
+     * @deprecated use getParameter("enableCache")
      */
     public String getEnableCache() {
         return enableCache;
@@ -411,6 +414,7 @@ public class Automatic {
 
     /**
      * @param enablecache the enableCache flag to set
+     * @deprecated use putParameter("enableCache", boolean)
      */
     public void setEnablecache(final String enableCache) {
         this.enableCache = enableCache;
@@ -418,6 +422,7 @@ public class Automatic {
 
     /**
      * @return the storeMapping
+     * @deprecated use getParameter("storeMapping")
      */
     public String getStoreMapping() {
         return storeMapping;
@@ -432,6 +437,7 @@ public class Automatic {
 
     /**
      * @return the noIndexation
+     * @deprecated use getParameter("noIndexation")
      */
     public String getNoIndexation() {
         return noIndexation;
@@ -446,6 +452,7 @@ public class Automatic {
 
     /**
      * @return the defaultRecordSet
+     * @deprecated use getParameter("defaultRecordSet")
      */
     public String getDefaultRecordSet() {
         return defaultRecordSet;
@@ -460,6 +467,7 @@ public class Automatic {
 
      /**
      * @return the byIdHarvester
+     * @deprecated use getParameter("harvester")
      */
     public String getHarvester() {
         return harvester;
@@ -474,6 +482,7 @@ public class Automatic {
 
     /**
      * @return the identifierDirectory
+     * @deprecated use getParameter("identifierDirectory")
      */
     public String getIdentifierDirectory() {
         return identifierDirectory;
@@ -488,6 +497,7 @@ public class Automatic {
 
     /**
      * @return the indexOnlyPublishedMetadata
+     * @deprecated use getParameter("indexOnlyPublishedMetadata")
      */
     public boolean getIndexOnlyPublishedMetadata() {
         if (indexOnlyPublishedMetadata == null) {
@@ -505,6 +515,7 @@ public class Automatic {
 
     /**
      * @return the indexInternalRecordset
+     * @deprecated use getParameter("indexInternalRecordset")
      */
     public boolean getIndexInternalRecordset() {
         if (indexInternalRecordset == null) {
@@ -535,6 +546,7 @@ public class Automatic {
 
     /**
      * @return the indexExternalRecordset
+     * @deprecated use getParameter("indexExternalRecordset")
      */
     public Boolean getIndexExternalRecordset() {
         if (indexExternalRecordset == null) {
