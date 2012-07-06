@@ -264,7 +264,7 @@ public class CSWworker extends AbstractWorker {
             setLogLevel(configuration.getLogLevel());
 
             // look for transaction security
-            final String ts = configuration.getCustomparameters().get("transactionSecurized");
+            final String ts = configuration.getParameter("transactionSecurized");
             if (ts != null && !ts.isEmpty()) {
                 transactionSecurized = Boolean.parseBoolean(ts);
             }

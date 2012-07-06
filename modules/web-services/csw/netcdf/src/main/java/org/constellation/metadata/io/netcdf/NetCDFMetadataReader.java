@@ -80,20 +80,20 @@ import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.identification.Identification;
 
 /**
- * 
+ *
  *
  * @author Guilhem Legal (Geomatys)
  * @since 0.8.4
  */
 public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWMetadataReader {
-    
+
     /**
      * The directory containing the data XML files.
      */
     private final File dataDirectory;
-    
+
     private static final String METAFILE_MSG = "The netcdf file : ";
-    
+
     /**
      * A date formatter used to display the Date object for Dublin core translation.
      */
@@ -101,11 +101,11 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     static {
         FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     }
-    
+
     private final String CURRENT_EXT;
-    
+
     private final boolean usePathAsIdentifier;
-    
+
     /**
      * Build a new CSW NetCDF File Reader.
      *
@@ -124,20 +124,20 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         } else if (!dataDirectory.exists()) {
             dataDirectory.mkdir();
         }
-        final String extension = configuration.getCustomparameters().get("netcdfExtension");
+        final String extension = configuration.getParameter("netcdfExtension");
         if (extension != null) {
             CURRENT_EXT = extension;
         } else {
             CURRENT_EXT = NETCDF_EXT;
         }
-        final String usePathAsIdentifierValue = configuration.getCustomparameters().get("usePathAsIdentifier");
+        final String usePathAsIdentifierValue = configuration.getParameter("usePathAsIdentifier");
         if (usePathAsIdentifierValue != null) {
             usePathAsIdentifier = Boolean.valueOf(usePathAsIdentifierValue);
         } else {
             usePathAsIdentifier = false;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -159,7 +159,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         }
         return obj;
     }
-    
+
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
         final File metadataFile;
@@ -206,7 +206,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         }
         return null;
     }
-    
+
     /**
      * Try to find a file named identifier.nc or identifier recursively
      * in the specified directory and its sub-directories.
@@ -216,7 +216,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * @return
      */
     public static File getFileFromPathIdentifier(final String identifier, final File directory, final String ext) {
-        
+
         // if where are in the final directory
         if (identifier.indexOf(':') == -1) {
             // 1) try to find the file in the current directory
@@ -284,13 +284,13 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                     LOGGER.log(Level.WARNING, null, ex);
                 }
             }
-        } 
+        }
         throw new MetadataIoException(METAFILE_MSG + identifier + ".nc is not present", INVALID_PARAMETER_VALUE);
     }
 
     /**
      * Apply the elementSet (Brief, Summary or full) or the custom elementSetName on the specified record.
-     * 
+     *
      * @param record A dublinCore record.
      * @param type The ElementSetType to apply on this record.
      * @param elementName A list of QName corresponding to the requested attribute. this parameter is ignored if type is not null.
@@ -299,7 +299,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      * @throws MetadataIoException If the type and the element name are null.
      */
     private AbstractRecordType applyElementSet(final RecordType record, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        
+
         if (type != null) {
             if (type.equals(ElementSetType.SUMMARY)) {
                 return record.toSummary();
@@ -495,7 +495,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 }
             }
             if (creator.isEmpty()) creator = null;
-            
+
             if (elementName != null && elementName.contains(_Creator_QNAME)) {
                 customRecord.setCreator(creator);
             }
@@ -570,14 +570,14 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 throw new MetadataIoException("The property " + token + " is not queryable for now",
                         INVALID_PARAMETER_VALUE, "propertyName");
             }
-            
+
         }
         return responseList;
     }
 
     /**
      * Return all the String values corresponding to the specified list of path through the metadata.
-     * 
+     *
      * @param paths
      * @return
      * @throws MetadataIoException
@@ -588,7 +588,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         final ImageCoverageReader reader = new ImageCoverageReader();
         try {
             for (File metadataFile : directory.listFiles()) {
-                
+
                 final String fileName = metadataFile.getName();
                 if (fileName.endsWith(CURRENT_EXT)) {
                     try {
@@ -603,7 +603,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                                 result.add(obj.toString());
                             }
                         }
-                        //continue to the next file   
+                        //continue to the next file
                     } catch (CoverageStoreException ex) {
                         LOGGER.warning(METAFILE_MSG + metadataFile.getName() + " can not be read\ncause: " + ex.getMessage());
                     } catch (IllegalArgumentException ex) {
@@ -617,7 +617,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                     //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
                 }
             }
-            
+
         } finally {
             try {
                 reader.dispose();
@@ -625,7 +625,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
                 LOGGER.log(Level.WARNING, null, ex);
             }
         }
-        
+
         Collections.sort(result);
         return result;
     }
@@ -635,7 +635,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public void destroy() {
-        
+
     }
 
     /**
@@ -653,7 +653,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     public List<? extends Object> getAllEntries() throws MetadataIoException {
         return getAllEntries(dataDirectory, null);
     }
-    
+
     /**
      *
      */
@@ -703,7 +703,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     }
 
     /**
-     * 
+     *
      */
     public List<String> getAllIdentifiers(final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
         final String identifierPrefix = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
@@ -729,7 +729,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             return fileName.substring(0, fileName.lastIndexOf(CURRENT_EXT));
         }
     }
-    
+
     private String conputeIdentifierPrefix(final File directory, final String identifierPrefix) {
         if (usePathAsIdentifier) {
             if (identifierPrefix == null) {
@@ -740,7 +740,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */

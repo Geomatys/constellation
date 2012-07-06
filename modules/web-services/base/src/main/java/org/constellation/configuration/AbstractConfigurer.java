@@ -35,14 +35,14 @@ import org.geotoolkit.util.logging.Logging;
  * @author Guilhem Legal (Geomatys)
  */
 public abstract class AbstractConfigurer {
-    
+
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.configuration.ws.rs");
-    
+
     /**
-     * A container notifier allowing to restart the webService. 
+     * A container notifier allowing to restart the webService.
      */
     protected ContainerNotifierImpl containerNotifier;
-    
+
     /**
      * Because the injectable fields are null at initialization time
      * @param containerNotifier
@@ -50,7 +50,7 @@ public abstract class AbstractConfigurer {
     public void setContainerNotifier(final ContainerNotifierImpl containerNotifier) {
         this.containerNotifier = containerNotifier;
     }
-    
+
     /**
      * Extracts the value, for a parameter specified, from a query.
      *
@@ -72,7 +72,23 @@ public abstract class AbstractConfigurer {
         }
         return values;
     }
-    
+
+    /**
+     * Extracts the value, for a parameter specified, from a query.
+     * If it is a mandatory one, and if it is {@code null}, it throws an exception.
+     * Otherwise returns {@code null} in the case of an optional parameter not found.
+     * The parameter is then parsed as boolean.
+     *
+     * @param parameterName The name of the parameter.
+     * @param mandatory true if this parameter is mandatory, false if its optional.
+      *
+     * @return the parameter, or {@code null} if not specified and not mandatory.
+     * @throw CstlServiceException
+     */
+    protected boolean getBooleanParameter(final String parameterName, final boolean mandatory, final MultivaluedMap<String,String> parameters) throws CstlServiceException {
+        return Boolean.parseBoolean(getParameter(parameterName, mandatory, parameters));
+    }
+
     /**
      * Extracts the value, for a parameter specified, from a query.
      * If it is a mandatory one, and if it is {@code null}, it throws an exception.
@@ -103,49 +119,49 @@ public abstract class AbstractConfigurer {
             }
         }
     }
-    
+
     /**
      * Check if the configurer can handle the given request.
-     * 
+     *
      * @param request : request name
      * @return true if the request is supported
      */
     public boolean needCustomUnmarshall(final String request, final MultivaluedMap<String,String> parameters){
         return false;
     }
-    
-    public Object unmarshall(final String request, final MultivaluedMap<String,String> parameters, InputStream stream) 
+
+    public Object unmarshall(final String request, final MultivaluedMap<String,String> parameters, InputStream stream)
             throws JAXBException, CstlServiceException{
         return null;
     }
-    
+
     public abstract Object treatRequest(final String request, final MultivaluedMap<String,String> parameters, final Object objectRequest) throws CstlServiceException;
-        
+
     /**
      * Return true if the restart must be refused.
      */
     public boolean isLock() {
         return false;
     }
-        
+
     /**
      * destroy all the resource and close the connections.
      */
     public void destroy() {
-       // do nothing must be overriden if needed 
+       // do nothing must be overriden if needed
     }
-    
+
     /**
      * Stop operation going on because the service is going to be restarted.
      */
     public void closeForced() {
-        // do nothing must be overriden if needed 
+        // do nothing must be overriden if needed
     }
-    
+
     /**
      * Do specific work before a service restart
      */
     public void beforeRestart() {
-        // do nothing must be overriden if needed 
+        // do nothing must be overriden if needed
     }
 }

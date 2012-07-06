@@ -359,7 +359,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 LOGGER.info("refreshing the workers");
                 final String identifier      = getParameter("id", false);
                 final String closeFirstValue = getParameter("closeFirst", false);
-                final Class clazz            = getWorkerClass();
                 final boolean closeFirst;
                 if (closeFirstValue != null) {
                     closeFirst = Boolean.parseBoolean(closeFirstValue);

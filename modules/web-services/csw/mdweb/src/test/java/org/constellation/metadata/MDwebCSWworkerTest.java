@@ -82,7 +82,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             File configFile = new File(configDir, "config.xml");
             BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
             Automatic configuration = new Automatic("mdweb", bdd);
-            configuration.getCustomparameters().put("transactionSecurized", "false");
+            configuration.putParameter("transactionSecurized", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);

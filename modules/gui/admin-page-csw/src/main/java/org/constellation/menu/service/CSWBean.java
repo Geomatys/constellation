@@ -49,27 +49,27 @@ import org.apache.commons.fileupload.FileItem;
 public class CSWBean extends AbstractServiceBean {
 
     private String configType;
-    
+
     private String profile;
-    
+
     private String dataDirectory;
-    
+
     private String driverClass = "org.postgresql.Driver";
-    
+
     private String connectURL;
-    
+
     private String userName;
-    
+
     private String userPass;
-    
+
     private UploadedFile uploadedRecord;
-    
+
     private boolean indexOnlyPublished;
-    
+
     private boolean indexInternalRecordset;
-    
+
     private boolean ncmlFile;
-    
+
     public CSWBean() {
         super(Specification.CSW,
                 "/service/csw.xhtml",
@@ -97,7 +97,7 @@ public class CSWBean extends AbstractServiceBean {
         }
         return selectItems;
     }
-    
+
     public List<SelectItem> getProfiles() {
         final List<SelectItem> selectItems = new ArrayList<SelectItem>();
         selectItems.add(new SelectItem("discovery"));
@@ -280,7 +280,7 @@ public class CSWBean extends AbstractServiceBean {
             this.userPass = userPass;
         }
     }
-    
+
     /**
      * @return the indexOnlyPublished
      */
@@ -302,7 +302,7 @@ public class CSWBean extends AbstractServiceBean {
         }
         this.indexOnlyPublished = indexOnlyPublished;
     }
-    
+
     /**
      * @return the indexInternalRecordset
      */
@@ -324,11 +324,11 @@ public class CSWBean extends AbstractServiceBean {
         }
         this.indexInternalRecordset = indexInternalRecordset;
     }
-    
+
     public boolean getNcmlFile() {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
-            final String ext = config.getCustomparameters().get("netcdfExtension");
+            final String ext = config.getParameter("netcdfExtension");
             this.ncmlFile = ".ncml".equals(ext);
         }
         return ncmlFile;
@@ -338,15 +338,15 @@ public class CSWBean extends AbstractServiceBean {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
             if  (ncmlFile) {
-                config.getCustomparameters().put("netcdfExtension", ".ncml");
+                config.putParameter("netcdfExtension", ".ncml");
             } else {
-                config.getCustomparameters().remove("netcdfExtension");
+                config.removeParameter("netcdfExtension");
             }
         }
         this.ncmlFile = ncmlFile;
     }
-    
-    
+
+
     public void setUploadedRecord(UploadedFile uploadedRecord) {
         this.uploadedRecord = uploadedRecord;
     }
@@ -354,12 +354,12 @@ public class CSWBean extends AbstractServiceBean {
     public UploadedFile getUploadedRecord() {
         return uploadedRecord;
     }
-    
+
     /**
      * Build an MDWeb Database
      */
     public void buildDatabase() {
-        
+
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
             try {
@@ -374,9 +374,9 @@ public class CSWBean extends AbstractServiceBean {
                 LOGGER.log(Level.WARNING, "Error while creating the database", ex);
             }
         }
-        
+
     }
-    
+
     public boolean getNeedBuildDatabase() {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
@@ -389,7 +389,7 @@ public class CSWBean extends AbstractServiceBean {
                     } else {
                        LOGGER.finer("No datasource available for build");
                        return false;
-                    } 
+                    }
                 }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while looking for database structure presence", ex);
@@ -397,7 +397,7 @@ public class CSWBean extends AbstractServiceBean {
         }
         return false;
     }
-    
+
     public void updateDatabase() {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
@@ -407,17 +407,17 @@ public class CSWBean extends AbstractServiceBean {
                     if (ds != null) {
                         final DatabaseUpdater dbUpdater = new DefaultDatabaseUpdater(ds, true);
                         if (dbUpdater.isToUpgradeDatabase()) {
-                            dbUpdater.upgradeDatabase();          
+                            dbUpdater.upgradeDatabase();
                         }
-                    }      
+                    }
                 }
             } catch (SQLException ex) {
                 LOGGER.log(Level.WARNING, "Error while updating the database", ex);
             }
         }
-        
+
     }
-    
+
     public boolean getNeedUpdateDatabase() {
         if (configurationObject instanceof Automatic) {
             final Automatic config = (Automatic) configurationObject;
@@ -439,7 +439,7 @@ public class CSWBean extends AbstractServiceBean {
         }
         return false;
     }
-    
+
     /**
      * Refresh the cSW instance lucene index.
      */
@@ -451,7 +451,7 @@ public class CSWBean extends AbstractServiceBean {
              server.services.restartInstance("CSW", instanceId);
          }
      }
-     
+
      /**
      * Build an MDWeb Database
      */
@@ -465,7 +465,7 @@ public class CSWBean extends AbstractServiceBean {
              || "text/xml".equals(contentType)
              || "application/x-httpd-php".equals(contentType)
              || "application/x-zip-compressed".equals(contentType)) {
-               
+
                 final String instanceId = getConfiguredInstance().getName();
                 try {
                     final File tmp = File.createTempFile("cstl", null);
@@ -477,7 +477,7 @@ public class CSWBean extends AbstractServiceBean {
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
                 }
-                
+
             } else {
                 LOGGER.log(Level.WARNING, "This content type can not be read : {0}", contentType);
             }
@@ -486,7 +486,7 @@ public class CSWBean extends AbstractServiceBean {
         }
     }
 
-    
+
      /**
      * Import a record
      */
@@ -503,7 +503,7 @@ public class CSWBean extends AbstractServiceBean {
              || "text/xml".equals(contentType)
              || "application/x-httpd-php".equals(contentType)
              || "application/x-zip-compressed".equals(contentType)) {
-               
+
                 final String instanceId = getConfiguredInstance().getName();
                 try {
                     final File tmp = File.createTempFile("cstl", null);
@@ -515,7 +515,7 @@ public class CSWBean extends AbstractServiceBean {
                 } catch (IOException ex) {
                     LOGGER.log(Level.WARNING, "IO exception while reading imported file", ex);
                 }
-                
+
             } else {
                 LOGGER.log(Level.WARNING, "This content type can not be read : {0}", contentType);
             }

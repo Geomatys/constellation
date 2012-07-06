@@ -122,7 +122,7 @@ public abstract class WebService {
      * The default debugging logger for all web services.
      */
     protected static final Logger LOGGER = Logging.getLogger(WebService.class);
-    
+
     /**
      * Automatically set by Jersey.
      *
@@ -135,7 +135,7 @@ public abstract class WebService {
 
     /**
      * Automatically set by Jersey.
-     * 
+     *
      * Used to communicate with the Servlet container, for example, to obtain
      * the MIME type of a file, to dispatch requests or to write to a log file.
      * The field is injected, thanks to the annotation, when a request arrives.
@@ -145,7 +145,7 @@ public abstract class WebService {
 
     /**
      * Automatically set by Jersey.
-     * 
+     *
      * The HTTP context used to get information about the client which sent the
      * request. The field is injected, thanks to the annotation, when a request
      * arrives.
@@ -168,7 +168,7 @@ public abstract class WebService {
      * instead of the parameters map.
      */
     private boolean fullRequestLog = false;
-    
+
     /**
      * If this flag is set r false the method logParameters() will write nothing in the logs
      */
@@ -191,8 +191,8 @@ public abstract class WebService {
 
     /**
      * Provides access to the URI used in the method call, for instance, to
-     * obtain the Key-Value Pairs in the request. 
-     * 
+     * obtain the Key-Value Pairs in the request.
+     *
      * @return
      */
     protected final UriInfo getUriContext(){
@@ -210,7 +210,7 @@ public abstract class WebService {
     }
 
     /**
-     * The HTTP servlet request used to get information about the client which 
+     * The HTTP servlet request used to get information about the client which
      * sent the request.
      *
      * @return
@@ -222,7 +222,7 @@ public abstract class WebService {
     /**
      * The HTTP context used to get information about the client which sent the
      * request.
-     * 
+     *
      * @return
      */
     protected final HttpContext getHttpContext(){
@@ -378,7 +378,7 @@ public abstract class WebService {
 
                 return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, null);
             } catch (CstlServiceException e) {
-                
+
                 return launchException(e.getMessage(), e.getExceptionCode().identifier(), e.getLocator());
             } finally {
                 if (unmarshaller != null)  {
@@ -396,7 +396,7 @@ public abstract class WebService {
             if (request != null) {
                 if (request instanceof JAXBElement) {
                     request = ((JAXBElement) request).getValue();
-                } 
+                }
                 LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
             }
             return treatIncomingRequest(request);
@@ -404,15 +404,15 @@ public abstract class WebService {
             return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();
         }
     }
-    
+
     /**
      * A method simply unmarshalling the request with the specified unmarshaller from the specified inputStream.
      * can be overriden by child class in case of specific extractionfrom the stream.
-     * 
+     *
      * @param unmarshaller A JAXB Unmarshaller correspounding to the service context.
      * @param is The request input stream.
      * @return
-     * @throws JAXBException 
+     * @throws JAXBException
      */
     protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException, CstlServiceException {
         return unmarshaller.unmarshal(is);
@@ -470,7 +470,23 @@ public abstract class WebService {
         }
         return values;
     }
-    
+
+    /**
+     * Extracts the value, for a parameter specified, from a query.
+     * If it is a mandatory one, and if it is {@code null}, it throws an exception.
+     * Otherwise returns {@code null} in the case of an optional parameter not found.
+     * The parameter is then parsed as boolean.
+     *
+     * @param parameterName The name of the parameter.
+     * @param mandatory true if this parameter is mandatory, false if its optional.
+      *
+     * @return the parameter, or {@code null} if not specified and not mandatory.
+     * @throw CstlServiceException
+     */
+    protected boolean getBooleanParameter(final String parameterName, final boolean mandatory) throws CstlServiceException {
+        return Boolean.parseBoolean(getParameter(parameterName, mandatory));
+    }
+
     /**
      * Extracts the value, for a parameter specified, from a query.
      * If it is a mandatory one, and if it is {@code null}, it throws an exception.
@@ -629,12 +645,12 @@ public abstract class WebService {
     public void setPrintRequestParameter(boolean printRequestParameter) {
         this.printRequestParameter = printRequestParameter;
     }
-    
+
     /**
      * Enable the request validation.
      * When a request will arrive, the service will try to validate it against the specified
      * XSD specified in mainXsdPath.
-     * 
+     *
      * @param mainXsdPath The URL to the xsd.
      */
     public void activateRequestValidation(String mainXsdPath) {
@@ -647,5 +663,5 @@ public abstract class WebService {
      * @return
      */
     protected abstract MarshallerPool getConfigurationPool();
-    
+
 }

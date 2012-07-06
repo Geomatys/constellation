@@ -80,7 +80,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
-            configuration.getCustomparameters().put("transactionSecurized", "false");
+            configuration.putParameter("transactionSecurized", "false");
             final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
             GenericDatabaseMarshallerPool.getInstance().release(marshaller);

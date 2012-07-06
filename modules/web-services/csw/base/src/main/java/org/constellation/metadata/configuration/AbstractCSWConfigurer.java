@@ -73,12 +73,12 @@ import org.geotoolkit.lucene.index.IndexDirectoryFilter;
  * @author Guilhem Legal
  */
 public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
-    
+
     /**
      * A Map of service configuration.
      */
     protected Map<String, Automatic> serviceConfiguration = new HashMap<String, Automatic>();
-    
+
     /**
      * A flag indicating if an indexation is going on.
      */
@@ -88,10 +88,10 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
      * The list of service currently indexing.
      */
     private final List<String> SERVICE_INDEXING = new ArrayList<String>();
-    
+
     /**
      * Build a new CSW configurer.
-     * 
+     *
      * @param cn a injected container notifier allowing to reload all the jersey web-services.
      * @throws org.constellation.configuration.exception.ConfigurationException
      */
@@ -100,15 +100,15 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         indexing = false;
         refreshServiceConfiguration();
     }
-    
-    
+
+
     @Override
     public Object treatRequest(final String request, final MultivaluedMap<String,String> parameters, final Object objectRequest) throws CstlServiceException {
-        
+
         if ("RefreshIndex".equalsIgnoreCase(request)) {
-            final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false, parameters));
-            final String id = getParameter("ID", true, parameters);
-            final boolean forced = Boolean.parseBoolean((String) getParameter("FORCED", false, parameters));
+            final boolean asynchrone = getBooleanParameter("ASYNCHRONE", false, parameters);
+            final String id          = getParameter("ID", true, parameters);
+            final boolean forced     = getBooleanParameter("FORCED", false, parameters);
 
             if (isIndexing(id) && !forced) {
                 final AcknowlegementType refused = new AcknowlegementType("Failure",
@@ -127,58 +127,58 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             }
             return ack;
         }
-        
+
         if ("AddToIndex".equalsIgnoreCase(request)) {
-            
+
             final String id = getParameter("ID", true, parameters);
             final String identifierList = getParameter("IDENTIFIERS", true, parameters);
             return addToIndex(id, identifierList);
         }
-        
+
         if ("stopIndex".equalsIgnoreCase(request)) {
 
             final String id = getParameter("ID", false, parameters);
             return stopIndexation(id);
         }
-        
+
         if ("importRecords".equalsIgnoreCase(request)) {
 
             final String id       = getParameter("ID", true, parameters);
             final String fileName = getParameter("fileName", true, parameters);
             return importRecords(id, (File)objectRequest, fileName);
         }
-        
+
         if ("deleteRecords".equalsIgnoreCase(request)) {
 
             final String id       = getParameter("ID", true, parameters);
             final String metadata = getParameter("metadata", true, parameters);
             return deleteMetadata(id, metadata);
         }
-        
+
         if ("metadataExist".equalsIgnoreCase(request)) {
 
             final String id       = getParameter("ID", true, parameters);
             final String metadata = getParameter("metadata", true, parameters);
             return metadataExist(id, metadata);
         }
-        
+
         if ("GetCSWDatasourceType".equalsIgnoreCase(request)) {
             return getAvailableCSWDataSourceType();
         }
 
         return null;
     }
-    
+
     @Override
     public boolean isLock() {
         return indexing;
     }
-    
+
     @Override
     public void closeForced() {
         AbstractIndexer.stopIndexation();
     }
-    
+
     /**
      * Return true if the select service (identified by his ID) is currently indexing (CSW).
      * @param id
@@ -210,7 +210,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             SERVICE_INDEXING.remove(id);
         }
     }
-    
+
     /**
      * Stop all the indexation going on.
      *
@@ -225,12 +225,12 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             return new AcknowlegementType("Success", "The indexation have been stopped");
         }
     }
-    
+
     /**
      * Select the good CSW factory in the available ones in function of the dataSource type.
-     * 
+     *
      * @param type
-     * @return 
+     * @return
      */
     private AbstractCSWFactory getCSWFactory(DataSourceType type) {
         final Iterator<AbstractCSWFactory> ite = ServiceRegistry.lookupProviders(AbstractCSWFactory.class);
@@ -242,10 +242,10 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         }
         throw new FactoryNotFoundException("No CSW factory has been found for type:" + type);
     }
-    
+
     /**
      * Build a new Indexer for the specified service ID.
-     * 
+     *
      * @param serviceID the service identifier (form multiple CSW) default: ""
      * @param cswConfigDir the CSW configuration directory.
      *
@@ -297,7 +297,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             throw new CstlServiceException("there is no configuration file correspounding to this ID:" + serviceID, NO_APPLICABLE_CODE);
         }
     }
-    
+
     /**
      * Build a new Metadata writer for the specified service ID.
      *
@@ -338,7 +338,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
 
     /**
      * Refresh the map of configuration object.
-     * 
+     *
      * @throws ConfigurationException
      */
     protected void refreshServiceConfiguration() throws ConfigurationException {
@@ -372,13 +372,13 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             LOGGER.warning("No CSW configuration directory.");
         }
     }
-    
+
     /**
      * Destroy the CSW index directory in order that it will be recreated.
-     * 
+     *
      * @param asynchrone a flag for indexation mode.
      * @param id The service identifier.
-     * 
+     *
      * @return
      * @throws CstlServiceException
      */
@@ -460,7 +460,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
      *
      * @param id The service identifier.
      * @param configurationDirectory  The CSW configuration directory.
-     * 
+     *
      * @throws org.constellation.ws.CstlServiceException
      */
     private void asynchroneIndexRefresh(final List<File> cswInstanceDirectories) throws CstlServiceException {
@@ -539,11 +539,11 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
                 indexer.destroy();
             }
         }
-        
+
         final String msg = "The specified record have been added to the CSW index";
         return new AcknowlegementType("Success", msg);
     }
-    
+
     private AcknowlegementType importRecords(final String id, final File f, final String fileName) throws CstlServiceException {
         LOGGER.info("Importing record");
         final CSWMetadataWriter writer = initWriter(id);
@@ -588,7 +588,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
         }
         return new AcknowlegementType("Error", "An error occurs during the process");
     }
-    
+
     private AcknowlegementType metadataExist(final String id, final String metadataName) throws CstlServiceException {
         final CSWMetadataReader reader = initReader(id);
         try {
@@ -604,7 +604,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             throw new CstlServiceException(ex);
         }
     }
-    
+
     private AcknowlegementType deleteMetadata(final String id, final String metadataName) throws CstlServiceException {
         final CSWMetadataWriter writer = initWriter(id);
         try {
@@ -655,7 +655,7 @@ public abstract class AbstractCSWConfigurer extends AbstractConfigurer {
             return cswConfigDir;
         }
     }
-    
+
     /*
      * Return the configuration directory for the specified instance identifier.
      */

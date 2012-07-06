@@ -40,7 +40,7 @@ import org.geotoolkit.util.logging.Logging;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "automatic")
 public class Automatic {
-    
+
     @XmlTransient
     public static final int DEFAULT     = 0;
     @XmlTransient
@@ -49,7 +49,7 @@ public class Automatic {
     public static final int BYID        = 2;
 
     private static final Logger LOGGER = Logging.getLogger(Automatic.class);
-    
+
     /**
      * The database connection informations.
      */
@@ -88,54 +88,6 @@ public class Automatic {
     private String profile;
 
     /**
-     * Enable the paralele execution.
-     */
-    private String enableThread;
-
-    /**
-     * Enable the cache of metadata
-     * (caution in case of large amount of data)
-     */
-    private String enableCache;
-
-    /**
-     * Enable the indexation of published/all metadata.
-     * -- MDWeb specific flag
-     */
-    private Boolean indexOnlyPublishedMetadata;
-    
-    /**
-     * Enable the indexation of external recordSet.
-     * -- MDWeb specific flag
-     */
-    private Boolean indexExternalRecordset;
-
-    /**
-     * Enable the indexation of internal recordSet.
-     *  -- MDWeb specific flag
-     */
-    private Boolean indexInternalRecordset;
-
-    /**
-     * In the case of a MDWeb implementation,
-     * this flag allow to send all the metadata in the specified RecordSet.
-     *  -- MDWeb specific flag
-     */
-    private String defaultRecordSet;
-    
-    /**
-     * Allow to store the mapping between MDWeb classes and GEOTK classes
-     * in a properties file at the shutdown of the reader.
-     */
-    private String storeMapping;
-
-    /**
-     * Allow to disable the indexation part in of the metadataReader,
-     * In the operation Harvest and transaction.
-     */
-    private String noIndexation;
-
-    /**
      * In the case of a fileSystem implementation,
      * this attribute contains the path of the directory containing the data.
      *  -- FileSystem specific flag
@@ -143,21 +95,89 @@ public class Automatic {
     private String dataDirectory;
 
     /**
+     * Enable the paralele execution.
+     * @deprecated use getParameter("enableThread")
+     */
+    @Deprecated
+    private String enableThread;
+
+    /**
+     * Enable the cache of metadata
+     * (caution in case of large amount of data)
+     * @deprecated use getParameter("enableCache")
+     */
+    @Deprecated
+    private String enableCache;
+
+    /**
+     * Enable the indexation of published/all metadata.
+     * -- MDWeb specific flag
+     * @deprecated use getParameter("indexOnlyPublishedMetadata")
+     */
+    @Deprecated
+    private Boolean indexOnlyPublishedMetadata;
+
+    /**
+     * Enable the indexation of external recordSet.
+     * -- MDWeb specific flag
+     * @deprecated use getParameter("indexExternalRecordset")
+     */
+    @Deprecated
+    private Boolean indexExternalRecordset;
+
+    /**
+     * Enable the indexation of internal recordSet.
+     *  -- MDWeb specific flag
+     * @deprecated use getParameter("indexInternalRecordset")
+     */
+    @Deprecated
+    private Boolean indexInternalRecordset;
+
+    /**
+     * In the case of a MDWeb implementation,
+     * this flag allow to send all the metadata in the specified RecordSet.
+     *  -- MDWeb specific flag
+     * @deprecated use getParameter("defaultRecordSet")
+     */
+    @Deprecated
+    private String defaultRecordSet;
+
+    /**
+     * Allow to store the mapping between MDWeb classes and GEOTK classes
+     * in a properties file at the shutdown of the reader.
+     * @deprecated use getParameter("storeMapping")
+     */
+    @Deprecated
+    private String storeMapping;
+
+    /**
+     * Allow to disable the indexation part in of the metadataReader,
+     * In the operation Harvest and transaction.
+     * @deprecated use getParameter("noIndexation")
+     */
+    @Deprecated
+    private String noIndexation;
+
+    /**
      * In the case of a CSW configuration,
      * you can use this flag to substitute the Default catalog harvester,
      * by a ByIdHarvester or a fileSystemHarvester.
+     * @deprecated use getParameter("harvester")
      */
+    @Deprecated
     private String harvester;
 
     /**
      * In the case of CSW with a ByIdHarvester,
      * you must set this parameter to indicate
      * to the harvester where to find the file containing the identifiers.
+     * @deprecated use getParameter("identifierDirectory")
      */
+    @Deprecated
     private String identifierDirectory;
-    
+
     private String logLevel;
-    
+
     private HashMap<String, String> customparameters = new HashMap<String, String>();
 
     /**
@@ -165,7 +185,7 @@ public class Automatic {
      * this object contains all the SQL queries used to retrieve and build metadata.
      */
     private Queries queries;
-    
+
     /**
      * Constructor used by JAXB
      */
@@ -255,7 +275,7 @@ public class Automatic {
 
     /**
      * set the type of implementation.
-     * 
+     *
      * @param format
      */
     public void setFormat(final String format) {
@@ -281,7 +301,7 @@ public class Automatic {
         }
         return result;
     }
-    
+
     public String getDataDirectoryValue() {
         return dataDirectory;
     }
@@ -324,7 +344,7 @@ public class Automatic {
             return 0;
         return 1;
     }
-    
+
     public String getProfileValue() {
         return profile;
     }
@@ -336,7 +356,7 @@ public class Automatic {
     public void setProfile(final String profile) {
         this.profile = profile;
     }
-    
+
     /**
      * @return the Thesaurus database informations
      */
@@ -512,7 +532,7 @@ public class Automatic {
     public void setIndexInternalRecordset(final Boolean indexInternalRecordset) {
         this.indexInternalRecordset = indexInternalRecordset;
     }
-    
+
     /**
      * @return the indexExternalRecordset
      */
@@ -529,7 +549,7 @@ public class Automatic {
     public void setIndexExternalRecordset(final Boolean indexExternalRecordset) {
         this.indexExternalRecordset = indexExternalRecordset;
     }
-    
+
     /**
      * @return the logLevel
      */
@@ -551,7 +571,7 @@ public class Automatic {
     public void setLogLevel(String logLevel) {
         this.logLevel = logLevel;
     }
-    
+
      /**
      * @return the customparameters
      */
@@ -568,21 +588,28 @@ public class Automatic {
         }
         this.customparameters.put(key, value);
     }
-    
+
     public String getParameter(final String key) {
         if (customparameters == null) {
             customparameters = new HashMap<String, String>();
         }
         return customparameters.get(key);
     }
-    
+
+    public void removeParameter(final String key) {
+        if (customparameters == null) {
+            customparameters = new HashMap<String, String>();
+        }
+        customparameters.remove(key);
+    }
+
     /**
      * @param customparameters the customparameters to set
      */
     public void setCustomparameters(final HashMap<String, String> customparameters) {
         this.customparameters = customparameters;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Automatic]");
@@ -639,7 +666,7 @@ public class Automatic {
         }
         return s.toString();
     }
-    
+
     /**
      * Verify if this entry is identical to the specified object.
      */

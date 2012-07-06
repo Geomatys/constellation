@@ -82,9 +82,9 @@ import org.mdweb.model.auth.UserAuthnInfo;
 /**
  * Web service for administration and configuration operations.
  * <p>
- * This web service enables basic remote management of a Constellation server. 
+ * This web service enables basic remote management of a Constellation server.
  * </p>
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  * @since 0.1
  */
@@ -93,13 +93,13 @@ import org.mdweb.model.auth.UserAuthnInfo;
 public final class ConfigurationService extends WebService  {
 
     private static WeakReference<ConfigurationService> INSTANCE = null;
-    
+
     /**
      * A container notifier allowing to dynamically reload all the active service.
      */
     @Context
     protected volatile ContainerNotifierImpl cn;
-    
+
     /**
      * The implementation specific configurers.
      */
@@ -109,7 +109,7 @@ public final class ConfigurationService extends WebService  {
      * The factory registry allowing to load the correct implementation specific configurer.
      */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractConfigurerFactory.class);
-    
+
 
     /**
      * Construct the ConfigurationService and configure its context.
@@ -130,19 +130,19 @@ public final class ConfigurationService extends WebService  {
                 }
 
             }
-            
+
         } catch (FactoryNotFoundException ex) {
             LOGGER.warning("Factory not found for Configurer, specific operation will not be available.");
-            
+
         }
         LOGGER.info("Configuration service runing");
-        
+
         if(INSTANCE == null || INSTANCE.get() == null){
             INSTANCE = new WeakReference<ConfigurationService>(this);
         }
-        
+
     }
-    
+
     private AuthenticationReader getAuthReader() {
         final File authProperties = ConfigDirectory.getAuthConfigFile();
         final Properties prop = new Properties();
@@ -157,7 +157,7 @@ public final class ConfigurationService extends WebService  {
         }
         return null;
     }
-    
+
     /**
      * Handle the various types of requests made to the service.
      */
@@ -171,59 +171,59 @@ public final class ConfigurationService extends WebService  {
             for (AbstractConfigurer configurer: configurers) {
                 configurer.setContainerNotifier(cn);
             }
-            
+
             if (REQUEST_FULL_RESTART.equalsIgnoreCase(request)) {
-                final boolean force = Boolean.parseBoolean(getParameter("FORCED", false));
+                final boolean force = getBooleanParameter("FORCED", false);
                 return Response.ok(restartService(force), MimeType.TEXT_XML).build();
             }
-            
-            else if (REQUEST_DOWNLOAD.equalsIgnoreCase(request)) {    
+
+            else if (REQUEST_DOWNLOAD.equalsIgnoreCase(request)) {
                 final File f = downloadFile();
-                return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
+                return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build();
             }
-                    
-            else if (REQUEST_LIST_SERVICE.equalsIgnoreCase(request)) {    
+
+            else if (REQUEST_LIST_SERVICE.equalsIgnoreCase(request)) {
                 final ServiceReport response = new ServiceReport(WSEngine.getRegisteredServices());
-                return Response.ok(response, MediaType.TEXT_XML).build(); 
-            } 
-            
+                return Response.ok(response, MediaType.TEXT_XML).build();
+            }
+
             else if (REQUEST_GET_CONFIG_PATH.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = getConfigPath();
-                return Response.ok(response, MediaType.TEXT_XML).build(); 
-            } 
-            
+                return Response.ok(response, MediaType.TEXT_XML).build();
+            }
+
             else if (REQUEST_SET_CONFIG_PATH.equalsIgnoreCase(request)) {
                 final String path = getParameter("path", false);
                 final AcknowlegementType response = setConfigPath(path);
-                return Response.ok(response, MediaType.TEXT_XML).build(); 
+                return Response.ok(response, MediaType.TEXT_XML).build();
             }
-            
+
             else if (REQUEST_UPDATE_USER.equalsIgnoreCase(request)) {
                 final String userName = getParameter("userName", true);
                 final String password = getParameter("password", true);
                 final String oldLogin = getParameter("oldLogin", true);
                 final AcknowlegementType response = updateUser(userName, password, oldLogin);
-                return Response.ok(response, MediaType.TEXT_XML).build(); 
+                return Response.ok(response, MediaType.TEXT_XML).build();
             }
-            
+
             else if (REQUEST_DELETE_USER.equalsIgnoreCase(request)) {
                 final String userName = getParameter("userName", true);
                 final AcknowlegementType response = deleteUser(userName);
-                return Response.ok(response, MediaType.TEXT_XML).build(); 
+                return Response.ok(response, MediaType.TEXT_XML).build();
             }
-            
+
             else if (REQUEST_GET_USER_NAME.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = getUserName();
-                return Response.ok(response, MediaType.TEXT_XML).build(); 
+                return Response.ok(response, MediaType.TEXT_XML).build();
             }
-            
+
             else if (REQUEST_ACCESS.equalsIgnoreCase(request)) {
                 final AcknowlegementType response = new AcknowlegementType("Success", "You have access to the configuration service");
-                return Response.ok(response, MediaType.TEXT_XML).build(); 
+                return Response.ok(response, MediaType.TEXT_XML).build();
             }
-            
+
             /* specific operations */
-            
+
             else {
                 for (AbstractConfigurer configurer : configurers) {
                     final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters(), objectRequest);
@@ -232,10 +232,10 @@ public final class ConfigurationService extends WebService  {
                     }
                 }
             }
-            
+
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
-            
+
 
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error while marshalling the configuration service response", ex);
@@ -252,13 +252,13 @@ public final class ConfigurationService extends WebService  {
                 LOGGER.info(ex.getMessage());
             }
             return Response.ok(report, MimeType.TEXT_XML).build();
-            
+
         } finally {
             if (marshaller != null) {
                 getMarshallerPool().release(marshaller);
             }
         }
-        
+
     }
 
     /**
@@ -279,7 +279,7 @@ public final class ConfigurationService extends WebService  {
      * Restart all the web-services, reload the providers.
      * If some services are currently indexing, the service will not restart
      * unless you specified the flag "forced".
-     * 
+     *
      * @return an Acknowledgment if the restart succeed.
      */
     private AcknowlegementType restartService(final boolean forced) {
@@ -288,7 +288,7 @@ public final class ConfigurationService extends WebService  {
         for (AbstractConfigurer configurer : configurers) {
             configurer.beforeRestart();
         }
-        
+
         if (cn != null) {
             if (!configurerLock()) {
                 BDD.clearConnectionPool();
@@ -309,9 +309,9 @@ public final class ConfigurationService extends WebService  {
         } else {
             return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");
         }
-        
+
     }
-    
+
     private boolean configurerLock() {
         for (AbstractConfigurer configurer : configurers) {
             if (configurer.isLock()) return true;
@@ -321,7 +321,7 @@ public final class ConfigurationService extends WebService  {
 
     /**
      * Receive a file and write it into the static file path.
-     * 
+     *
      * @param in The input stream.
      * @return an Acknowledgment indicating if the operation succeed or not.
      *
@@ -336,17 +336,17 @@ public final class ConfigurationService extends WebService  {
             final File uploadedFile = FileUtilities.buildFileFromStream(in, tmp);
             in.close();
             return treatIncomingRequest(uploadedFile);
-            
+
         } catch (IOException ex) {
             LOGGER.severe("IO exception while uploading file");
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
         return Response.ok("error while uploading the file", MimeType.TEXT_PLAIN).build();
     }
-    
+
     /**
      * Return a static file present on the server.
-     * 
+     *
      * @return a file.
      *
      * @todo Not implemented. This is just a placeholder where we can customize the
@@ -355,12 +355,12 @@ public final class ConfigurationService extends WebService  {
     private File downloadFile() throws CstlServiceException {
         throw new CstlServiceException("Download operation not implemented", OPERATION_NOT_SUPPORTED);
     }
-    
+
     private AcknowlegementType getConfigPath() throws CstlServiceException{
         final String path = ConfigDirectory.getConfigDirectory().getPath();
         return new AcknowlegementType("Success", path);
     }
-    
+
     private AcknowlegementType setConfigPath(final String path) throws CstlServiceException{
         // Set the new user directory
         if (path != null && !path.isEmpty()) {
@@ -385,7 +385,7 @@ public final class ConfigurationService extends WebService  {
         }
         return new AcknowlegementType("Failure", "An error occurs");
     }
-    
+
     private AcknowlegementType deleteUser(final String userName) {
         try {
             final AuthenticationReader authReader = getAuthReader();
@@ -397,7 +397,7 @@ public final class ConfigurationService extends WebService  {
         }
         return new AcknowlegementType("Failure", "An error occurs");
     }
-    
+
     private AcknowlegementType getUserName() {
         try {
             final AuthenticationReader authReader = getAuthReader();
@@ -413,7 +413,7 @@ public final class ConfigurationService extends WebService  {
         }
         return new AcknowlegementType("Failure", "An error occurs");
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -438,7 +438,7 @@ public final class ConfigurationService extends WebService  {
 
     @Override
     protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException, CstlServiceException {
-        
+
         final String request = (String) getParameter("REQUEST", true);
         final MultivaluedMap<String,String> parameters = getParameters();
         for (AbstractConfigurer configurer: configurers) {
@@ -448,5 +448,5 @@ public final class ConfigurationService extends WebService  {
         }
         return super.unmarshallRequest(unmarshaller, is);
     }
-    
+
 }
