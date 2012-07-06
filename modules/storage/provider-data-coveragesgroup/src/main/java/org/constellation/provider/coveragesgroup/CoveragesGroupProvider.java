@@ -46,6 +46,7 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
 
     public CoveragesGroupProvider(final ProviderService service, final ParameterValueGroup param) {
         super(service,param);
+        visit();
     }
 
     /**
@@ -72,6 +73,27 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
             return groups.get(0);
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void reload() {
+        synchronized(this){
+            index.clear();
+            visit();
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void dispose() {
+        synchronized(this){
+            index.clear();
+        }
     }
 
     /**
