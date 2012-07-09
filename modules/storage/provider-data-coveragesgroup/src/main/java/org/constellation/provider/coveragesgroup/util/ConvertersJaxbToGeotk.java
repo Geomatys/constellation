@@ -36,7 +36,7 @@ public final class ConvertersJaxbToGeotk {
     private static final Logger LOGGER = Logging.getLogger(ConvertersJaxbToGeotk.class);
 
     public static MapItem convertsMapLayer(final org.geotoolkit.providers.xml.MapLayer mapLayer) {
-        final String providerName = mapLayer.getProviderReference().getValue();
+        final String providerName = mapLayer.getDataReference().getValue();
         final LayerDetails ld = LayerProviderProxy.getInstance().getByIdentifier(new DefaultName(providerName));
         try {
             return ld.getMapLayer(null, null);
