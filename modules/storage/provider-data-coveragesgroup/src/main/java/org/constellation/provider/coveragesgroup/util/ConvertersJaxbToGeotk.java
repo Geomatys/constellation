@@ -36,11 +36,16 @@ public final class ConvertersJaxbToGeotk {
     private static final Logger LOGGER = Logging.getLogger(ConvertersJaxbToGeotk.class);
 
     public static MapItem convertsMapLayer(final org.geotoolkit.providers.xml.MapLayer mapLayer) {
-        String layerName = mapLayer.getDataReference().getValue();
-        // remove provider / service name
-        int index = layerName.indexOf(":");
+        final String dataReference = mapLayer.getDataReference().getValue();
+        final String layerName;
+        final String providerName; // what to do with this ?
+
+        int index = dataReference.lastIndexOf(":");
         if (index != -1) {
-            layerName = layerName.substring(index + 1);
+            layerName = dataReference.substring(index + 1);
+            providerName = dataReference.substring(0, index);
+        } else {
+            throw new IllegalArgumentException("data reference must contain a ':' separator.");
         }
         final LayerDetails ld = LayerProviderProxy.getInstance().getByIdentifier(new DefaultName(layerName));
         if (ld != null) {
@@ -59,7 +64,9 @@ public final class ConvertersJaxbToGeotk {
         final MapItem mi = MapBuilder.createItem();
         for (org.geotoolkit.providers.xml.MapItem currentMapItem : mapItem.getMapItems()) {
             if (currentMapItem instanceof org.geotoolkit.providers.xml.MapLayer) {
-                mi.items().add(convertsMapLayer((org.geotoolkit.providers.xml.MapLayer)currentMapItem));
+                final MapItem layer = convertsMapLayer((org.geotoolkit.providers.xml.MapLayer)currentMapItem);
+                layer.setUserPropertie("original_config", currentMapItem);
+                mi.items().add(layer);
             } else {
                 mi.items().add(convertsMapItem(currentMapItem));
             }
