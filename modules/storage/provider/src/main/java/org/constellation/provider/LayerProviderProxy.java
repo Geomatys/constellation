@@ -21,13 +21,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
+import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
 
 import org.opengis.feature.type.Name;
 
 /**
- * Main data provider for MapLayer objects. This class act as a proxy for 
+ * Main data provider for MapLayer objects. This class act as a proxy for
  * different kind of data sources, postgrid, shapefile ...
  *
  * @version $Id$
@@ -40,7 +41,7 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
     private static final LayerProviderProxy INSTANCE = new LayerProviderProxy();
     //all providers factories, unmodifiable
     private static final Collection<LayerProviderService> SERVICES;
-    
+
     static {
         final List<LayerProviderService> cache = new ArrayList<LayerProviderService>();
         final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
@@ -79,15 +80,18 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
     public Collection<LayerProviderService> getServices() {
         return SERVICES;
     }
-    
+
     @Override
     public LayerDetails getByIdentifier(Name key) {
+        LayerDetails result = null;
         for(final Name n : getKeys()){
             if(n.equals(key)){
                 return get(n);
+            } else if (DefaultName.match(n, key)) {
+                result = get(n);
             }
         }
-        return null;
+        return result;
     }
 
     /**

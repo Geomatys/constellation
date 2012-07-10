@@ -68,13 +68,13 @@ public class SLDProvider extends AbstractStyleProvider{
         MASKS.add(".xml");
         MASKS.add(".sld");
     }
-    
+
     private final XMLUtilities sldParser = new XMLUtilities();
     private File folder;
     private final Map<String,File> index = new ConcurrentHashMap<String, File>();
     private final Cache<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
-    
-    
+
+
     protected SLDProvider(final SLDProviderService service, final ParameterValueGroup source){
         super(service,source);
         reload();
@@ -112,6 +112,7 @@ public class SLDProvider extends AbstractStyleProvider{
                             final MutableStyledLayerDescriptor sld = sldParser.readSLD(f, StyledLayerDescriptor.V_1_1_0);
                             value = getFirstStyle(sld);
                             if(value != null){
+                                value.setName(key);
                                 LOGGER.log(Level.FINE, "{0}{1} is an SLD 1.1.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
@@ -123,6 +124,7 @@ public class SLDProvider extends AbstractStyleProvider{
                             final MutableStyledLayerDescriptor sld = sldParser.readSLD(f, StyledLayerDescriptor.V_1_0_0);
                             value = getFirstStyle(sld);
                             if(value != null){
+                                value.setName(key);
                                 LOGGER.log(Level.FINE, "{0}{1} is an SLD 1.0.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
@@ -133,6 +135,7 @@ public class SLDProvider extends AbstractStyleProvider{
                         try {
                             value = sldParser.readStyle(f, SymbologyEncoding.V_1_1_0);
                             if(value != null){
+                                value.setName(key);
                                 LOGGER.log(Level.FINE, "{0}{1} is a UserStyle SLD 1.1.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
@@ -143,6 +146,7 @@ public class SLDProvider extends AbstractStyleProvider{
                         try {
                             value = sldParser.readStyle(f, SymbologyEncoding.SLD_1_0_0);
                             if(value != null){
+                                value.setName(key);
                                 LOGGER.log(Level.FINE, "{0}{1} is a UserStyle SLD 1.0.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
@@ -155,6 +159,7 @@ public class SLDProvider extends AbstractStyleProvider{
                             value = SF.style();
                             value.featureTypeStyles().add(fts);
                             if(value != null){
+                                value.setName(key);
                                 LOGGER.log(Level.FINE, "{0}{1} is FeatureTypeStyle SE 1.1", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
@@ -167,6 +172,7 @@ public class SLDProvider extends AbstractStyleProvider{
                             value = SF.style();
                             value.featureTypeStyles().add(fts);
                             if(value != null){
+                                value.setName(key);
                                 LOGGER.log(Level.FINE, "{0}{1} is an FeatureTypeStyle SLD 1.0", new Object[]{baseErrorMsg, key});
                                 return value;
                             }
@@ -186,13 +192,13 @@ public class SLDProvider extends AbstractStyleProvider{
 
     @Override
     public synchronized void set(final String key, final MutableStyle style){
-        
+
         File f = index.get(key);
         if(f == null){
             //file doesnt exist, create it
             f = new File(folder, key+".xml");
         }
-        
+
         final XMLUtilities util = new XMLUtilities();
         try {
             util.writeStyle(f, style, StyledLayerDescriptor.V_1_1_0);
@@ -201,9 +207,9 @@ public class SLDProvider extends AbstractStyleProvider{
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
-        
+
     }
-    
+
     @Override
     public synchronized void rename(final String key, final String newName){
         final File f = index.get(key);
@@ -213,12 +219,12 @@ public class SLDProvider extends AbstractStyleProvider{
         if(f == null){
             throw new IllegalArgumentException("Style "+ newName +" do not exist.");
         }
-        
+
         final File newFile = new File(f.getParentFile(), newName+".xml");
         f.renameTo(newFile);
         reload();
     }
-    
+
     @Override
     public synchronized void remove(final String key){
         final File f = index.get(key);
@@ -227,7 +233,7 @@ public class SLDProvider extends AbstractStyleProvider{
             reload();
         }
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -239,7 +245,7 @@ public class SLDProvider extends AbstractStyleProvider{
 
             final ParameterValueGroup srcConfig = getSource().groups(
                     getService().getSourceDescriptor().getName().getCode()).get(0);
-            
+
             final ParameterValue param = srcConfig.parameter(FOLDER_DESCRIPTOR.getName().getCode());
 
             if(param == null || param.getValue() == null){
@@ -268,7 +274,7 @@ public class SLDProvider extends AbstractStyleProvider{
             cache.clear();
         }
     }
-        
+
     private void visit(final File file) {
 
         if (file.isDirectory()) {
@@ -282,7 +288,7 @@ public class SLDProvider extends AbstractStyleProvider{
             test(file);
         }
     }
-    
+
     private void test(final File candidate){
         if(candidate.isFile()){
             final String fullName = candidate.getName();
@@ -298,7 +304,7 @@ public class SLDProvider extends AbstractStyleProvider{
             }
         }
     }
-    
+
     private static MutableStyle getFirstStyle(final MutableStyledLayerDescriptor sld){
         if(sld == null) return null;
         for(final MutableLayer layer : sld.layers()){

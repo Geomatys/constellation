@@ -36,12 +36,21 @@ public final class ConvertersJaxbToGeotk {
     private static final Logger LOGGER = Logging.getLogger(ConvertersJaxbToGeotk.class);
 
     public static MapItem convertsMapLayer(final org.geotoolkit.providers.xml.MapLayer mapLayer) {
-        final String providerName = mapLayer.getDataReference().getValue();
-        final LayerDetails ld = LayerProviderProxy.getInstance().getByIdentifier(new DefaultName(providerName));
-        try {
-            return ld.getMapLayer(null, null);
-        } catch (PortrayalException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+        String layerName = mapLayer.getDataReference().getValue();
+        // remove provider / service name
+        int index = layerName.indexOf(":");
+        if (index != -1) {
+            layerName = layerName.substring(index + 1);
+        }
+        final LayerDetails ld = LayerProviderProxy.getInstance().getByIdentifier(new DefaultName(layerName));
+        if (ld != null) {
+            try {
+                return ld.getMapLayer(null, null);
+            } catch (PortrayalException e) {
+                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            }
+        } else {
+            LOGGER.warning("unable to find a layer named:" + layerName);
         }
         return null;
     }

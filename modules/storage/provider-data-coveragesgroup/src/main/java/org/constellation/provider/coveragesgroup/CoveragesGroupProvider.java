@@ -63,7 +63,10 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
     @Override
     public LayerDetails get(final Name key) {
         final File mapContextFile = index.get(key);
-        return new CoveragesGroupLayerDetails(key, mapContextFile);
+        if (mapContextFile != null) {
+            return new CoveragesGroupLayerDetails(key, mapContextFile);
+        }
+        return null;
     }
 
     private static ParameterValueGroup getSourceConfiguration(final ParameterValueGroup params){
