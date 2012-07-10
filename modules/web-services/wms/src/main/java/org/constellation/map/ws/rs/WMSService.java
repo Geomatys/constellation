@@ -17,6 +17,7 @@
  */
 package org.constellation.map.ws.rs;
 
+import org.constellation.map.visitor.GetFeatureInfoVisitor;
 import com.sun.jersey.spi.resource.Singleton;
 
 //J2SE dependencies
@@ -159,7 +160,8 @@ public class WMSService extends GridWebService<WMSWorker> {
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo(versionSt, queryContext);
                 version = getVersionFromNumber(requestFeatureInfo.getVersion());
-                final String result = worker.getFeatureInfo(requestFeatureInfo);
+                final GetFeatureInfoVisitor visitor = worker.getFeatureInfo(requestFeatureInfo);
+                final Object result = visitor.getResult();
                 //Need to reset the GML mime format to XML for browsers
                 String infoFormat = requestFeatureInfo.getInfoFormat();
                 if (infoFormat.equals(GML) || infoFormat.equals(GML3)) {

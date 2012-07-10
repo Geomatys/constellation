@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
+import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
@@ -64,10 +65,8 @@ import javax.xml.bind.JAXBException;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AttributionType;
-import org.constellation.map.visitor.CSVGraphicVisitor;
-import org.constellation.map.visitor.GMLGraphicVisitor;
-import org.constellation.map.visitor.HTMLGraphicVisitor;
-import org.constellation.map.visitor.TextGraphicVisitor;
+import org.constellation.map.visitor.GetFeatureInfoVisitor;
+import org.constellation.map.visitor.WMSVisitorFactory;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
@@ -151,6 +150,20 @@ import org.geotoolkit.wms.xml.v111.Request;
  * @since 0.3
  */
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
+
+    private static final WMSVisitorFactory[] VISITOR_FACTORIES;
+
+    static {
+        final List<WMSVisitorFactory> factories = new ArrayList<WMSVisitorFactory>();
+
+        final Iterator<WMSVisitorFactory> ite = ServiceRegistry.lookupProviders(WMSVisitorFactory.class);
+        while(ite.hasNext()){
+            factories.add(ite.next());
+        }
+
+        VISITOR_FACTORIES = factories.toArray(new WMSVisitorFactory[factories.size()]);
+    }
+
 
     /**
      * Output responses of a GetCapabilities request.
@@ -236,7 +249,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         final AbstractWMSCapabilities inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS", currentLanguage);
-        
+
         final AbstractRequest request;
         final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
@@ -464,7 +477,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             "Vector data", "Vector data", DEFAULT_CRS, bbox,
                             outputBBox, queryable, dimensions, styles);
                 }
-                
+
                 outputLayer = customizeLayer111(outputLayer111, configLayer);
             } else {
                 /*
@@ -544,7 +557,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
          * INSPIRE PART
          */
         if (queryVersion.equals(ServiceDef.WMS_1_3_0.version.toString()) || queryVersion.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
-           
+
             Capability capa = (Capability) inCapabilities.getCapability();
             ExtendedCapabilitiesType inspireExtension =  capa.getInspireExtendedCapabilities();
 
@@ -565,7 +578,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             }
 
-        } 
+        }
         CAPS_RESPONSE.put(keyCache, inCapabilities);
         return inCapabilities;
     }
@@ -642,7 +655,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     /**
      * Apply the layer customization extracted from the configuration.
-     * 
+     *
      * @param outputLayer130
      * @param configLayer
      * @return
@@ -719,7 +732,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @throws CstlServiceException
      */
     @Override
-    public String getFeatureInfo(final GetFeatureInfo getFI) throws CstlServiceException {
+    public GetFeatureInfoVisitor getFeatureInfo(final GetFeatureInfo getFI) throws CstlServiceException {
         isWorking();
     	//
     	// Note this is almost the same logic as in getMap
@@ -801,23 +814,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             //Should not happen since the info format parameter is mandatory for the GetFeatureInfo request.
             infoFormat = MimeType.TEXT_PLAIN;
         }
-        final TextGraphicVisitor visitor;
-        if (infoFormat.equalsIgnoreCase(MimeType.TEXT_PLAIN)) {
-            // TEXT / PLAIN
-            visitor = new CSVGraphicVisitor(getFI);
-        } else if (infoFormat.equalsIgnoreCase(MimeType.TEXT_HTML)) {
-            // TEXT / HTML
-            visitor = new HTMLGraphicVisitor(getFI, layerRefs);
-        } else if (infoFormat.equalsIgnoreCase(MimeType.APP_GML) || infoFormat.equalsIgnoreCase(MimeType.TEXT_XML) ||
-                   infoFormat.equalsIgnoreCase(MimeType.APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
-                   infoFormat.equalsIgnoreCase(GML))
-        {
-            // GML
-            visitor = new GMLGraphicVisitor(getFI, 0);
-        } else if (infoFormat.equalsIgnoreCase(GML3)) {
-            // GML 3
-            visitor = new GMLGraphicVisitor(getFI, 1);
-        } else {
+
+        GetFeatureInfoVisitor visitor = null;
+        for(final WMSVisitorFactory vf : VISITOR_FACTORIES){
+            visitor = vf.createVisitor(getFI, layerRefs, infoFormat);
+            if(visitor != null) break;
+        }
+
+        if(visitor == null) {
             throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
                     "You have to choose between: "+ MimeType.TEXT_PLAIN +", "+ MimeType.TEXT_HTML +", "+ MimeType.APP_GML +", "+ GML +
                     ", "+ MimeType.APP_XML +", "+ XML+", "+ MimeType.TEXT_XML,
@@ -828,10 +832,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         visitDef.setArea(selectionArea);
         visitDef.setVisitor(visitor);
 
-
         try {
             //force longitude first
-            vdef.setLongitudeFirst();            
+            vdef.setLongitudeFirst();
         } catch (TransformException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         } catch (FactoryException ex) {
@@ -841,12 +844,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         // We now build the response, according to the format chosen.
         try {
-        	Cstl.getPortrayalService().visit(sdef,vdef,cdef,visitDef);
+            Cstl.getPortrayalService().visit(sdef,vdef,cdef,visitDef);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
-        return visitor.getResult();
+        return visitor;
     }
 
     /**
@@ -1010,7 +1013,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 2. VIEW
         final Envelope refEnv;
         try {
-            if (getMap.getEnvelope2D().getLowerCorner().getOrdinate(0) > getMap.getEnvelope2D().getUpperCorner().getOrdinate(0) || 
+            if (getMap.getEnvelope2D().getLowerCorner().getOrdinate(0) > getMap.getEnvelope2D().getUpperCorner().getOrdinate(0) ||
                 getMap.getEnvelope2D().getLowerCorner().getOrdinate(1) > getMap.getEnvelope2D().getUpperCorner().getOrdinate(1)) {
                 throw new CstlServiceException("BBOX parameter minimum is greater than the maximum", INVALID_PARAMETER_VALUE, KEY_BBOX.toLowerCase());
             }
@@ -1019,7 +1022,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             throw new CstlServiceException(ex);
         }
 
-        
+
         final double azimuth = getMap.getAzimuth();
         final ViewDef vdef = new ViewDef(refEnv,azimuth);
 
@@ -1041,7 +1044,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         try {
             //force longitude first
-            vdef.setLongitudeFirst();            
+            vdef.setLongitudeFirst();
         } catch (TransformException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         } catch (FactoryException ex) {
@@ -1049,7 +1052,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         final PortrayalResponse response = new PortrayalResponse(cdef, sdef, vdef, odef);
-        
+
         if(!mapDecoration.writeInStream()){
             try {
                 response.prepareNow();
@@ -1136,12 +1139,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     }
 
     /**
-     * Overriden from AbstractWorker because the behaviour is different when the request updateSequence 
+     * Overriden from AbstractWorker because the behaviour is different when the request updateSequence
      * is equal to the current.
-     * 
+     *
      * @param updateSequence
      * @return
-     * @throws CstlServiceException 
+     * @throws CstlServiceException
      */
     @Override
     protected boolean returnUpdateSequenceDocument(final String updateSequence) throws CstlServiceException {
@@ -1160,9 +1163,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         } catch(NumberFormatException ex) {
             throw new CstlServiceException("The update sequence must be an integer", ex, INVALID_PARAMETER_VALUE, "updateSequence");
         }
-        
+
     }
-    
+
     /**
      * {@inheritDoc}
      */

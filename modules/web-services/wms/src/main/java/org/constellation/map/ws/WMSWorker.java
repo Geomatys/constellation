@@ -20,6 +20,7 @@ package org.constellation.map.ws;
 import java.awt.image.BufferedImage;
 
 //Constellation dependencies
+import org.constellation.map.visitor.GetFeatureInfoVisitor;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
@@ -39,7 +40,7 @@ import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
  * to perform the logic for a particular WMS instance.
  *
  * @version $Id$
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public interface WMSWorker extends Worker{
@@ -66,7 +67,7 @@ public interface WMSWorker extends Worker{
      * @param getFeatureInfo The {@linkplain GetFeatureInfo get feature info} request done on this service.
      * @throws CstlServiceException
      */
-    String getFeatureInfo(final GetFeatureInfo getFeatureInfo) throws CstlServiceException;
+    GetFeatureInfoVisitor getFeatureInfo(final GetFeatureInfo getFeatureInfo) throws CstlServiceException;
 
     /**
      * Returns a {@link BufferedImage}, which is the result of a {@code GetLegendGraphic} request.

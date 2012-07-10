@@ -37,6 +37,7 @@ import javax.measure.unit.Unit;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 
+import org.constellation.ws.MimeType;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
@@ -72,7 +73,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Cédric Briançon (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
-public final class GMLGraphicVisitor extends TextGraphicVisitor {
+public final class GMLGraphicVisitor extends TextGraphicVisitor implements GetFeatureInfoVisitor{
     private static final Logger LOGGER = Logging.getLogger(GMLGraphicVisitor.class);
 
     private final LayerProviderProxy dp = LayerProviderProxy.getInstance();
@@ -103,7 +104,6 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         }
         pool = candidate;
     }
-
 
     public GMLGraphicVisitor(GetFeatureInfo gfi, int mode) {
         super(gfi);
@@ -401,6 +401,11 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
 
         values.clear();
         return builder.toString();
+    }
+
+    @Override
+    public String getMimeType() {
+        return MimeType.APP_XML;
     }
 
     /**

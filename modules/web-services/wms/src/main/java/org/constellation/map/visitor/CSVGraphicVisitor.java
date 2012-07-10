@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import javax.measure.unit.Unit;
 
+import org.constellation.ws.MimeType;
 import org.geotoolkit.coverage.GridSampleDimension;
 
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
@@ -37,7 +38,7 @@ import org.opengis.feature.type.Name;
  *
  * @author Johann Sorel (Geomatys)
  */
-public final class CSVGraphicVisitor extends TextGraphicVisitor {
+public final class CSVGraphicVisitor extends TextGraphicVisitor implements GetFeatureInfoVisitor {
 
     private int index = 0;
 
@@ -131,4 +132,10 @@ public final class CSVGraphicVisitor extends TextGraphicVisitor {
         values.clear();
         return builder.toString();
     }
+
+    @Override
+    public String getMimeType() {
+        return MimeType.TEXT_PLAIN;
+    }
+
 }

@@ -26,6 +26,7 @@ import javax.measure.unit.Unit;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDetails.TYPE;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.coverage.GridSampleDimension;
 
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
@@ -46,7 +47,7 @@ import org.opengis.feature.type.PropertyDescriptor;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public final class HTMLGraphicVisitor extends TextGraphicVisitor {
+public final class HTMLGraphicVisitor extends TextGraphicVisitor implements GetFeatureInfoVisitor{
     /**
      * Contains the values for all coverage layers requested.
      */
@@ -223,6 +224,11 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
 
         coverages.clear();
         return response.toString();
+    }
+
+    @Override
+    public String getMimeType() {
+        return MimeType.TEXT_HTML;
     }
 
 }
