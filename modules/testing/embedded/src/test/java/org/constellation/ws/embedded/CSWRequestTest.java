@@ -47,11 +47,11 @@ import static org.junit.Assert.*;
 public class CSWRequestTest extends AbstractTestRequest {
 
     private static final String CSW_POST_URL = "http://localhost:9090/csw/default?";
-    
+
     private static final String CSW2_POST_URL = "http://localhost:9090/csw/csw2?";
 
     private static final String CSW_GETCAPABILITIES_URL = "http://localhost:9090/csw/default?request=GetCapabilities&service=CSW&version=2.0.2";
-    
+
     private static final String CSW_GETCAPABILITIES_URL2 = "http://localhost:9090/csw/csw2?request=GetCapabilities&service=CSW&version=2.0.2";
 
     /**
@@ -74,6 +74,8 @@ public class CSWRequestTest extends AbstractTestRequest {
     @Test
     public void testCSWGetCapabilities() throws Exception {
 
+        waitForStart();
+        
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL(CSW_POST_URL);
 
@@ -82,7 +84,7 @@ public class CSWRequestTest extends AbstractTestRequest {
         URLConnection conec = getCapsUrl.openConnection();
 
         final GetCapabilitiesType request = new GetCapabilitiesType("CSW");
-        
+
         postRequestObject(conec, request);
         Object obj = unmarshallResponse(conec);
 
@@ -106,37 +108,37 @@ public class CSWRequestTest extends AbstractTestRequest {
         // Try to marshall something from the response returned by the server.
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof Capabilities);
-        
+
         Capabilities capa = (Capabilities) obj;
-        
+
         String currentURL = capa.getOperationsMetadata().getOperation("getRecords").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
-        
+
         assertEquals(CSW_POST_URL, currentURL);
-        
-        
+
+
          // Creates a valid GetCapabilties url.
         getCapsUrl = new URL(CSW_GETCAPABILITIES_URL2);
-        
+
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof Capabilities);
-        
+
         capa = (Capabilities) obj;
-        
+
         currentURL = capa.getOperationsMetadata().getOperation("getRecords").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
-        
+
         assertEquals(CSW2_POST_URL, currentURL);
-        
-        
+
+
          // Creates a valid GetCapabilties url.
         getCapsUrl = new URL(CSW_GETCAPABILITIES_URL);
-        
+
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof Capabilities);
-        
+
         capa = (Capabilities) obj;
-        
+
         currentURL = capa.getOperationsMetadata().getOperation("getRecords").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
-        
+
         assertEquals(CSW_POST_URL, currentURL);
     }
 
@@ -179,7 +181,7 @@ public class CSWRequestTest extends AbstractTestRequest {
         Object result = unmarshallResponse(conec);
 
         assertTrue(result instanceof GetDomainResponseType);
-        
+
         List<DomainValues> values = new ArrayList<DomainValues>();
         ListOfValuesType list = new ListOfValuesType(Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata","Filter_Capabilities"));
         values.add(new DomainValuesType("GetCapabilities.sections", null, list, new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities")));
@@ -232,7 +234,7 @@ public class CSWRequestTest extends AbstractTestRequest {
                 "text/xml", null, Arrays.asList("urn:uuid:ab42a8c4-95e8-4630-bf79-33e59241605a"));
 
         conec = getCapsUrl.openConnection();
-        
+
         postRequestObject(conec, factory.createGetRecordById(request));
         result = unmarshallResponse(conec);
 
@@ -256,7 +258,7 @@ public class CSWRequestTest extends AbstractTestRequest {
         QueryConstraintType constraint = new QueryConstraintType("identifier='urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f'", "1.1.0");
         QueryType query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
         GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 10, query, null);
-                
+
         postRequestObject(conec, request);
         Object result = unmarshallResponse(conec);
 
@@ -264,27 +266,27 @@ public class CSWRequestTest extends AbstractTestRequest {
 
         GetRecordsResponseType grResult = (GetRecordsResponseType) result;
         assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
-        
+
         /**
          * get all the records
          */
         conec = getCapsUrl.openConnection();
-        
+
         constraint = new QueryConstraintType("identifier like '%%'", "1.1.0");
         query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
         request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 20, query, null);
-                
+
         postRequestObject(conec, request);
         result = unmarshallResponse(conec);
 
         assertTrue(result instanceof GetRecordsResponseType);
 
         grResult = (GetRecordsResponseType) result;
-        
+
         assertEquals(12, grResult.getSearchResults().getAbstractRecord().size());
 
     }
-    
+
     @Test
     public void testDistributedCSWGetRecords() throws Exception {
 
@@ -299,7 +301,7 @@ public class CSWRequestTest extends AbstractTestRequest {
         QueryType query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
         DistributedSearchType dist = new DistributedSearchType(1);
         GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 20, query, dist);
-                
+
         postRequestObject(conec, request);
         Object result = unmarshallResponse(conec);
 
@@ -307,40 +309,40 @@ public class CSWRequestTest extends AbstractTestRequest {
 
         GetRecordsResponseType grResult = (GetRecordsResponseType) result;
         assertEquals(13, grResult.getSearchResults().getAbstractRecord().size());
-        
-        
-        
+
+
+
         // no distribution
         conec = getCapsUrl.openConnection();
-        
+
         constraint = new QueryConstraintType("identifier like '%%'", "1.1.0");
         query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
         request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 20, query, null);
-                
+
         postRequestObject(conec, request);
         result = unmarshallResponse(conec);
 
         assertTrue(result instanceof GetRecordsResponseType);
 
         grResult = (GetRecordsResponseType) result;
-        
+
         assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
-        
+
         // distribution with 0 hopcount
         conec = getCapsUrl.openConnection();
-        
+
         constraint = new QueryConstraintType("identifier like '%%'", "1.1.0");
         query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
         dist = new DistributedSearchType(0);
         request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 20, query, dist);
-                
+
         postRequestObject(conec, request);
         result = unmarshallResponse(conec);
 
         assertTrue(result instanceof GetRecordsResponseType);
 
         grResult = (GetRecordsResponseType) result;
-        
+
         assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
      }
 }

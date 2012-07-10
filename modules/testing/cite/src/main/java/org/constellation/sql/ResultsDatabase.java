@@ -55,7 +55,7 @@ import org.geotoolkit.util.logging.Logging;
  * @since 0.4
  */
 public class ResultsDatabase {
-    
+
     private static final Logger LOGGER = Logging.getLogger("org.constellation.sql");
     /**
      * The pattern for the ouput of a date.
@@ -69,7 +69,7 @@ public class ResultsDatabase {
     private static final String PROTOCOL = "jdbc:postgresql";
     private static final String HOST     = "flupke.geomatys.com";
     private static final String USER     = "cite";
-    private static final String PASS     = "cite";
+    private static final String PASS     = "WreewnUg";
 
     /**
      * Insertion requests.
@@ -209,7 +209,7 @@ public class ResultsDatabase {
             }
             int nbPreviousTest = previousTestsFailed.size() + previousTestsPassed.size();
             missingTest = nbCurrentTest < nbPreviousTest;
-            
+
             //if some test have been deactivated we list them
             if (missingTest) {
                 previousTestsPassed.addAll(previousTestsFailed);
@@ -611,7 +611,7 @@ public class ResultsDatabase {
                 assertion = rs2.getString(1);
             } else {
                 assertion = extractDescription(id, directory);
-            } 
+            }
             results.add(new Result(rs.getTimestamp(1), id, directory, true, isGroupNode, assertion));
             rs2.close();
         }
