@@ -127,7 +127,6 @@ import org.geotoolkit.ows.xml.v110.MetadataType;
 import org.geotoolkit.wcs.xml.v100.MetadataLinkType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
@@ -157,7 +156,7 @@ import org.opengis.coverage.grid.RectifiedGrid;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-public final class WCSWorker extends LayerWorker {
+public final class DefaultWCSWorker extends LayerWorker {
     /**
      * The date format to match.
      */
@@ -207,12 +206,12 @@ public final class WCSWorker extends LayerWorker {
     private static final Map<String,GetCapabilitiesResponse> CAPS_RESPONSE =
             new HashMap<String,GetCapabilitiesResponse>();
 
-    public WCSWorker(final String id, final File configurationDirectory) {
+    public DefaultWCSWorker(final String id, final File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WCS);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WCS worker {0} running", id);
         }
-        
+
         //listen to changes on the providers to clear the getcapabilities cache
         LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
             @Override
@@ -277,7 +276,7 @@ public final class WCSWorker extends LayerWorker {
      */
     private DescribeCoverageResponse describeCoverage100(final org.geotoolkit.wcs.xml.v100.DescribeCoverageType request)
             throws CstlServiceException {
-        
+
         if (request.getCoverage().isEmpty()) {
             throw new CstlServiceException("The parameter COVERAGE must be specified.",
                     MISSING_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
@@ -530,11 +529,11 @@ public final class WCSWorker extends LayerWorker {
             } catch (DataStoreException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
             }
-                
+
             // spatial metadata
             final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
                     new org.geotoolkit.wcs.xml.v111.SpatialDomainType(bboxs, grid, null, null, null);
-            
+
 
             //general metadata
             final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
@@ -611,7 +610,7 @@ public final class WCSWorker extends LayerWorker {
             // For the moment the only version that we really support is this one.
             version = "1.0.0";
         }
-        
+
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(request.getUpdateSequence(), version);
         if (returnUS) {
@@ -691,7 +690,7 @@ public final class WCSWorker extends LayerWorker {
 
         // We unmarshall the static capabilities document.
         final WCSCapabilitiesType staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
-        
+
         if (requestedSection == null || "/WCS_Capabilities/Capability".equals(requestedSection) || "/".equals(requestedSection))
         {
             //we update the url in the static part.
@@ -835,7 +834,7 @@ public final class WCSWorker extends LayerWorker {
 
         // We unmarshall the static capabilities document.
         final Capabilities staticCapabilities = (Capabilities) getStaticCapabilitiesObject(ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
-        
+
         ServiceIdentification si = null;
         ServiceProvider sp       = null;
         OperationsMetadata om    = null;
@@ -871,7 +870,7 @@ public final class WCSWorker extends LayerWorker {
             for (Name name : layers.keySet()) {
                 final LayerDetails layer = namedProxy.get(name);
                 final Layer configLayer  = layers.get(name);
-                
+
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
                     continue;
                 }
@@ -1144,7 +1143,7 @@ public final class WCSWorker extends LayerWorker {
 
             // SCENE
             final Map<String, Object> renderParameters = new HashMap<String, Object>();
-            
+
             renderParameters.put(KEY_TIME, date);
             renderParameters.put("ELEVATION", elevation);
             final SceneDef sdef = new SceneDef();
@@ -1215,13 +1214,13 @@ public final class WCSWorker extends LayerWorker {
     }
 
     /**
-     * Overriden from AbstractWorker because in version 1.0.0 the behaviour is different when the request updateSequence 
+     * Overriden from AbstractWorker because in version 1.0.0 the behaviour is different when the request updateSequence
      * is equal to the current.
-     * 
+     *
      * @param updateSequence
      * @param version
      * @return
-     * @throws CstlServiceException 
+     * @throws CstlServiceException
      */
     private boolean returnUpdateSequenceDocument(final String updateSequence, final String version) throws CstlServiceException {
         if (updateSequence == null) {
@@ -1244,7 +1243,7 @@ public final class WCSWorker extends LayerWorker {
             return returnUpdateSequenceDocument(updateSequence);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
