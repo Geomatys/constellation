@@ -19,7 +19,6 @@ package org.constellation.coverage.ws.rs;
 
 // Jersey dependencies
 import java.util.logging.Level;
-import java.io.File;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.ExceptionResponse;
 import com.sun.jersey.spi.resource.Singleton;
@@ -42,6 +41,7 @@ import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 import static org.constellation.query.Query.*;
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.coverage.ws.DefaultWCSWorker;
 import static org.constellation.coverage.ws.WCSConstant.*;
 import org.constellation.ws.ExceptionCode;
 
@@ -117,7 +117,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      */
     @Override
     protected Class getWorkerClass() {
-        return WCSWorker.class;
+        return DefaultWCSWorker.class;
     }
 
 

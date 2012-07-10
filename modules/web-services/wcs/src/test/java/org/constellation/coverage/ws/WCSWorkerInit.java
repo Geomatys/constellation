@@ -105,7 +105,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
             if (!configDir.exists()) {
                 configDir.mkdir();
                 Source s1 = new Source("src", Boolean.TRUE, null, null);
-                
+
                 LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1)));
 
                 //we write the configuration file
@@ -118,10 +118,10 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        WORKER = new WCSWorker("default", configDir);
+        WORKER = new DefaultWCSWorker("default", configDir);
         // Default instanciation of the worker' servlet context and uri context.
         WORKER.setServiceUrl("http://localhost:9090");
-        
+
     }
 
     @AfterClass

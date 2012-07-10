@@ -156,7 +156,7 @@ import org.opengis.coverage.grid.RectifiedGrid;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-public final class DefaultWCSWorker extends LayerWorker {
+public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
     /**
      * The date format to match.
      */
@@ -243,6 +243,7 @@ public final class DefaultWCSWorker extends LayerWorker {
      * @return An XML document giving the full description of the requested coverages.
      * @throws CstlServiceException
      */
+    @Override
     public DescribeCoverageResponse describeCoverage(final DescribeCoverage request) throws CstlServiceException {
         isWorking();
         final String version = request.getVersion().toString();
@@ -602,6 +603,7 @@ public final class DefaultWCSWorker extends LayerWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
+    @Override
     public GetCapabilitiesResponse getCapabilities(final GetCapabilities request) throws CstlServiceException {
         isWorking();
         //we begin by extract the base attribute
