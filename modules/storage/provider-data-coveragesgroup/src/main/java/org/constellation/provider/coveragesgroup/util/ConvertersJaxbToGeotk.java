@@ -65,8 +65,10 @@ public final class ConvertersJaxbToGeotk {
         for (org.geotoolkit.providers.xml.MapItem currentMapItem : mapItem.getMapItems()) {
             if (currentMapItem instanceof org.geotoolkit.providers.xml.MapLayer) {
                 final MapItem layer = convertsMapLayer((org.geotoolkit.providers.xml.MapLayer)currentMapItem);
-                layer.setUserPropertie("original_config", currentMapItem);
-                mi.items().add(layer);
+                if (layer != null) {
+                    layer.setUserPropertie("original_config", currentMapItem);
+                    mi.items().add(layer);
+                }
             } else {
                 mi.items().add(convertsMapItem(currentMapItem));
             }
