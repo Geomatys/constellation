@@ -163,7 +163,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                 final GetFeatureInfoVisitor visitor = worker.getFeatureInfo(requestFeatureInfo);
                 final Object result = visitor.getResult();
                 //Need to reset the GML mime format to XML for browsers
-                String infoFormat = requestFeatureInfo.getInfoFormat();
+                String infoFormat = visitor.getMimeType();
                 if (infoFormat.equals(GML) || infoFormat.equals(GML3)) {
                     infoFormat = MimeType.APP_XML;
                 }

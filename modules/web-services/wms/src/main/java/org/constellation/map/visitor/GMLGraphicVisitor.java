@@ -86,6 +86,8 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor implements GetFe
      */
     private final int mode;
 
+    private final String mimeType;
+
     /**
      * A Map of namespace / prefix
      */
@@ -105,9 +107,10 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor implements GetFe
         pool = candidate;
     }
 
-    public GMLGraphicVisitor(GetFeatureInfo gfi, int mode) {
+    public GMLGraphicVisitor(GetFeatureInfo gfi, int mode, String mimeType) {
         super(gfi);
         this.mode = mode;
+        this.mimeType = mimeType;
         prefixMap.put("http://www.opengis.net/gml", "gml");
     }
 
@@ -405,7 +408,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor implements GetFe
 
     @Override
     public String getMimeType() {
-        return MimeType.APP_XML;
+        return mimeType;
     }
 
     /**

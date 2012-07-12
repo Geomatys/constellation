@@ -152,13 +152,16 @@ import org.geotoolkit.wms.xml.v111.Request;
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     private static final WMSVisitorFactory[] VISITOR_FACTORIES;
+    private static final List<String> GFI_MIME_TYPES = new ArrayList<String>();
 
     static {
         final List<WMSVisitorFactory> factories = new ArrayList<WMSVisitorFactory>();
 
         final Iterator<WMSVisitorFactory> ite = ServiceRegistry.lookupProviders(WMSVisitorFactory.class);
         while(ite.hasNext()){
-            factories.add(ite.next());
+            final WMSVisitorFactory f = ite.next();
+            factories.add(f);
+            GFI_MIME_TYPES.addAll(Arrays.asList(f.getSupportedMimeTypes()));
         }
 
         VISITOR_FACTORIES = factories.toArray(new WMSVisitorFactory[factories.size()]);
@@ -253,10 +256,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final AbstractRequest request;
         final List<String> exceptionFormats;
         if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
-            request          = new Request(WMSConstant.REQUEST_111);
+            request          = new Request(WMSConstant.createRequest111(GFI_MIME_TYPES));
             exceptionFormats = WMSConstant.EXCEPTION_111;
         } else {
-            request          = new org.geotoolkit.wms.xml.v130.Request(WMSConstant.REQUEST_130);
+            request          = new org.geotoolkit.wms.xml.v130.Request(WMSConstant.createRequest130(GFI_MIME_TYPES));
             exceptionFormats = WMSConstant.EXCEPTION_130;
         }
         request.updateURL(getServiceUrl());

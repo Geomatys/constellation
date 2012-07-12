@@ -19,6 +19,7 @@ package org.constellation.map.ws;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import net.jcip.annotations.Immutable;
 import org.geotoolkit.wms.xml.v111.DescribeLayer;
@@ -45,15 +46,14 @@ public final class WMSConstant {
 
     private WMSConstant() {}
 
-    public static final Request REQUEST_130;
-    static {
+    public static Request createRequest130(final List<String> gfi_mimetypes){
         final DCPType dcp = new DCPType(new HTTP(new Get(new OnlineResource("someurl")), new Post(new OnlineResource("someurl"))));
 
         final OperationType getCapabilities = new OperationType(Arrays.asList("text/xml", "application/vnd.ogc.wms_xml"), dcp);
         final OperationType getMap          = new OperationType(Arrays.asList("image/gif","image/png","image/jpeg","image/bmp","image/tiff","image/x-portable-pixmap"), dcp);
-        final OperationType getFeatureInfo  = new OperationType(Arrays.asList("text/xml","text/plain","text/html", "application/vnd.ogc.gml", "application/vnd.ogc.xml", "xml", "gml", "gml3"), dcp);
+        final OperationType getFeatureInfo  = new OperationType(gfi_mimetypes, dcp);
 
-        REQUEST_130 = new Request(getCapabilities, getMap, getFeatureInfo);
+        final Request REQUEST_130 = new Request(getCapabilities, getMap, getFeatureInfo);
 
         /*
          * Extended Operation
@@ -66,11 +66,10 @@ public final class WMSConstant {
         REQUEST_130.getExtendedOperation().add(factory.createDescribeLayer(describeLayer));
 
         REQUEST_130.getExtendedOperation().add(factory.createGetLegendGraphic(getLegendGraphic));
-
+        return REQUEST_130;
     }
 
-    public static final org.geotoolkit.wms.xml.v111.Request REQUEST_111;
-    static {
+    public static org.geotoolkit.wms.xml.v111.Request createRequest111(final List<String> gfi_mimetypes){
         final org.geotoolkit.wms.xml.v111.Post post   = new org.geotoolkit.wms.xml.v111.Post(new org.geotoolkit.wms.xml.v111.OnlineResource("someurl"));
         final org.geotoolkit.wms.xml.v111.Get get     = new org.geotoolkit.wms.xml.v111.Get(new org.geotoolkit.wms.xml.v111.OnlineResource("someurl"));
         final org.geotoolkit.wms.xml.v111.HTTP http   = new org.geotoolkit.wms.xml.v111.HTTP(get, post);
@@ -78,7 +77,7 @@ public final class WMSConstant {
 
         final GetCapabilities getCapabilities = new GetCapabilities(Arrays.asList("text/xml", "application/vnd.ogc.wms_xml"), dcp);
         final GetMap getMap                   = new GetMap(Arrays.asList("image/gif","image/png","image/jpeg","image/bmp","image/tiff","image/x-portable-pixmap"), dcp);
-        final GetFeatureInfo getFeatureInfo   = new GetFeatureInfo(Arrays.asList("text/xml","text/plain","text/html","application/vnd.ogc.gml","application/vnd.ogc.xml", "xml", "gml", "gml3"), dcp);
+        final GetFeatureInfo getFeatureInfo   = new GetFeatureInfo(gfi_mimetypes, dcp);
 
          /*
          * Extended Operation
@@ -86,7 +85,8 @@ public final class WMSConstant {
         final DescribeLayer describeLayer       = new DescribeLayer(Arrays.asList("text/xml"), dcp);
         final GetLegendGraphic getLegendGraphic = new GetLegendGraphic(Arrays.asList("image/png","image/jpeg","image/gif","image/tiff"), dcp);
 
-        REQUEST_111 = new org.geotoolkit.wms.xml.v111.Request(getCapabilities, getMap, getFeatureInfo, describeLayer, getLegendGraphic, null, null);
+        org.geotoolkit.wms.xml.v111.Request REQUEST_111 = new org.geotoolkit.wms.xml.v111.Request(getCapabilities, getMap, getFeatureInfo, describeLayer, getLegendGraphic, null, null);
+        return REQUEST_111;
     }
 
     public static final List<String> EXCEPTION_111 = new ArrayList<String>();

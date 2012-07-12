@@ -28,6 +28,12 @@ import org.geotoolkit.wms.xml.GetFeatureInfo;
  */
 public interface WMSVisitorFactory {
 
+    /**
+     * List handle mime types.
+     * @return String[]
+     */
+    String[] getSupportedMimeTypes();
+
     GetFeatureInfoVisitor createVisitor(final GetFeatureInfo gfi,
             final List<LayerDetails> layerDetails, final String mimeType);
 

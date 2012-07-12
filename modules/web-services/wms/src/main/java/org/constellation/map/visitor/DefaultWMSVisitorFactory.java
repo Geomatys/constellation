@@ -35,6 +35,20 @@ import org.geotoolkit.wms.xml.GetFeatureInfo;
 public class DefaultWMSVisitorFactory implements WMSVisitorFactory {
 
     @Override
+    public String[] getSupportedMimeTypes() {
+        return new String[]{
+            "text/xml",
+            "text/plain",
+            "text/html",
+            "application/vnd.ogc.gml",
+            "application/vnd.ogc.xml",
+            "xml",
+            "gml",
+            "gml3"
+        };
+    }
+
+    @Override
     public GetFeatureInfoVisitor createVisitor(final GetFeatureInfo gfi,
             final List<LayerDetails> layerDetails, final String mimeType) {
         if (MimeType.TEXT_PLAIN.equalsIgnoreCase(mimeType)) {
@@ -47,13 +61,14 @@ public class DefaultWMSVisitorFactory implements WMSVisitorFactory {
                 || Query.XML.equalsIgnoreCase(mimeType)
                 || Query.GML.equalsIgnoreCase(mimeType)) {
             // GML
-           return new GMLGraphicVisitor(gfi, 0);
+           return new GMLGraphicVisitor(gfi, 0,mimeType);
         } else if (Query.GML3.equalsIgnoreCase(mimeType)) {
             // GML 3
-            return new GMLGraphicVisitor(gfi, 1);
+            return new GMLGraphicVisitor(gfi, 1, mimeType);
         }
 
         return null;
     }
+
 
 }
