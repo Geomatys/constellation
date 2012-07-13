@@ -76,17 +76,17 @@ import org.opengis.util.NoSuchIdentifierException;
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.layer.CreateMapLayerDescriptor;
-import org.constellation.process.layer.DeleteMapLayerDescriptor;
-import org.constellation.process.layer.UpdateMapLayerDescriptor;
+import org.constellation.process.layer.CreateProviderLayerDescriptor;
+import org.constellation.process.layer.DeleteProviderLayerDescriptor;
+import org.constellation.process.layer.UpdateProviderLayerDescriptor;
 import org.constellation.process.provider.CreateProviderDescriptor;
 import org.constellation.process.provider.GetConfigProviderDescriptor;
-import org.constellation.process.provider.RemoveProviderDescriptor;
+import org.constellation.process.provider.DeleteProviderDescriptor;
 import org.constellation.process.provider.RestartProviderDescriptor;
 import org.constellation.process.provider.UpdateProviderDescriptor;
-import org.constellation.process.style.CreateMapStyleDescriptor;
-import org.constellation.process.style.DeleteMapStyleDescriptor;
-import org.constellation.process.style.UpdateMapStyleDescriptor;
+import org.constellation.process.style.CreateStyleProviderDescriptor;
+import org.constellation.process.style.DeleteStyleProviderDescriptor;
+import org.constellation.process.style.UpdateStyleProviderDescriptor;
 import org.geotoolkit.process.ProcessException;
 
 /**
@@ -382,9 +382,9 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         try {
 
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RemoveProviderDescriptor.NAME);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(RemoveProviderDescriptor.PROVIDER_ID_NAME).setValue(providerId);
+            inputs.parameter(DeleteProviderDescriptor.PROVIDER_ID_NAME).setValue(providerId);
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -455,10 +455,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
 
 
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapLayerDescriptor.NAME);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderLayerDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(CreateMapLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(CreateMapLayerDescriptor.LAYER_NAME).setValue(newLayer);
+            inputs.parameter(CreateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(CreateProviderLayerDescriptor.LAYER_NAME).setValue(newLayer);
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -494,10 +494,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         try {
 
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteMapLayerDescriptor.NAME);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(DeleteMapLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(DeleteMapLayerDescriptor.LAYER_NAME_NAME).setValue(layerName);
+            inputs.parameter(DeleteProviderLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(DeleteProviderLayerDescriptor.LAYER_NAME_NAME).setValue(layerName);
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -536,11 +536,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             reader.setInput(objectRequest);
             final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
 
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapLayerDescriptor.NAME);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(UpdateMapLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(UpdateMapLayerDescriptor.LAYER_NAME_NAME).setValue(layerName);
-            inputs.parameter(UpdateMapLayerDescriptor.UPDATE_LAYER_NAME).setValue(newLayer);
+            inputs.parameter(UpdateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(UpdateProviderLayerDescriptor.LAYER_NAME_NAME).setValue(layerName);
+            inputs.parameter(UpdateProviderLayerDescriptor.UPDATE_LAYER_NAME).setValue(newLayer);
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -609,11 +609,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             try {
                 // we read the soruce parameter to add
 
-                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapStyleDescriptor.NAME);
+                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateStyleProviderDescriptor.NAME);
                 final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-                inputs.parameter(CreateMapStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-                inputs.parameter(CreateMapStyleDescriptor.STYLE_ID_NAME).setValue(styleId);
-                inputs.parameter(CreateMapStyleDescriptor.STYLE_NAME).setValue(style);
+                inputs.parameter(CreateStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+                inputs.parameter(CreateStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
+                inputs.parameter(CreateStyleProviderDescriptor.STYLE_NAME).setValue(style);
 
                 try {
                     final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -648,10 +648,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         try {
             // we read the soruce parameter to add
 
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteMapStyleDescriptor.NAME);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleProviderDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(DeleteMapStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(DeleteMapStyleDescriptor.STYLE_ID_NAME).setValue(styleId);
+            inputs.parameter(DeleteStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(DeleteStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -690,11 +690,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             try {
                 // we read the soruce parameter to add
 
-                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateMapStyleDescriptor.NAME);
+                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateStyleProviderDescriptor.NAME);
                 final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-                inputs.parameter(UpdateMapStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-                inputs.parameter(UpdateMapStyleDescriptor.STYLE_ID_NAME).setValue(styleId);
-                inputs.parameter(UpdateMapStyleDescriptor.STYLE_NAME).setValue(style);
+                inputs.parameter(UpdateStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+                inputs.parameter(UpdateStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
+                inputs.parameter(UpdateStyleProviderDescriptor.STYLE_NAME).setValue(style);
 
                 try {
                     final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);

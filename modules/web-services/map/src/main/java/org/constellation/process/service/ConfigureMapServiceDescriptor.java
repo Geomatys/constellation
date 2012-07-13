@@ -36,7 +36,7 @@ import org.opengis.util.InternationalString;
 public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
 
 
-    public static final String NAME = "configureMapService";
+    public static final String NAME = "map_service.configure";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Update configuration of an existing map service (WMS, WMTS, WFS) in constellation.");
 
 

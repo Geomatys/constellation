@@ -22,7 +22,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.style.CreateMapStyleDescriptor.*;
+import static org.constellation.process.style.CreateStyleProviderDescriptor.*;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.style.MutableStyle;
@@ -32,9 +32,9 @@ import org.geotoolkit.style.MutableStyle;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateMapStyle extends AbstractCstlProcess {
+public class CreateStyleProvider extends AbstractCstlProcess {
 
-    public CreateMapStyle(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public CreateStyleProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 

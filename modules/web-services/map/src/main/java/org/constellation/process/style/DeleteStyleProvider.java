@@ -22,24 +22,23 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.style.UpdateMapStyleDescriptor.*;
+import static org.constellation.process.style.DeleteStyleProviderDescriptor.*;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
-import org.geotoolkit.style.MutableStyle;
 
 /**
- * Update a style of an existing style provider.
+ * Remove a style from an existing style provider.
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class UpdateMapStyle extends AbstractCstlProcess {
+public class DeleteStyleProvider extends AbstractCstlProcess {
 
-    public UpdateMapStyle(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public DeleteStyleProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
     /**
-     * Update a style of an existing style provider.
+     * Remove a style from an existing style provider.
      * @throws ProcessException if :
      * - provider identifier is null/empty or not found in LayerProvider list.
      * - style name is null/empty.
@@ -49,7 +48,6 @@ public class UpdateMapStyle extends AbstractCstlProcess {
 
         final String providerId = value(PROVIDER_ID, inputParameters);
         final String styleName = value(STYLE_ID, inputParameters);
-        final MutableStyle style = value(STYLE, inputParameters);
 
         if (providerId == null || "".equals(providerId.trim())) {
             throw new ProcessException("Provider identifier can't be null or empty.", this, null);
@@ -59,24 +57,19 @@ public class UpdateMapStyle extends AbstractCstlProcess {
             throw new ProcessException("Provider identifier can't be null or empty.", this, null);
         }
 
-        if (style != null) {
-            final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+        final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
 
-            boolean found = false;
-            for (final StyleProvider p : providers) {
-                if (p.getId().equals(providerId)) {
-                    p.set(styleName, style);
-                    found = true;
-                    break;
-                }
+        boolean found = false;
+        for (final StyleProvider p : providers) {
+            if (p.getId().equals(providerId)) {
+                p.remove(styleName);
+                found = true;
+                break;
             }
+        }
 
-            if (!found) {
-                throw new ProcessException("Provider with id "+providerId+" not found.", this, null);
-            }
-
-        } else {
-            throw new ProcessException("Style can't be null.", this, null);
+        if (!found) {
+            throw new ProcessException("Provider with id "+providerId+" not found.", this, null);
         }
     }
 }

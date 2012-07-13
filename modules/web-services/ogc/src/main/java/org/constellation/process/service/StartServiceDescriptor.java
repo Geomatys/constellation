@@ -35,7 +35,7 @@ import org.opengis.util.InternationalString;
  */
 public final class StartServiceDescriptor extends AbstractProcessDescriptor {
 
-    public static final String NAME = "startService";
+    public static final String NAME = "service.start";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Start a new instance for the specified service identifier.");
 
     public static final String SERVICE_NAME = "serviceName";

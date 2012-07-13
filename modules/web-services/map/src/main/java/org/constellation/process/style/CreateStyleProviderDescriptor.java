@@ -14,12 +14,13 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.layer;
+package org.constellation.process.style;
 
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -28,52 +29,58 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 
 /**
- * Add a layer to an existing provider.
+ * Add a style to an existing style provider.
+ *
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateMapLayerDescriptor extends AbstractProcessDescriptor {
+public class CreateStyleProviderDescriptor extends AbstractProcessDescriptor {
 
-
-    public static final String NAME = "createMapLayer";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Attach a new layer to a specified provider.");
+    public static final String NAME = "style_provider.create";
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Attach a new style to a specified provider.");
 
     /*
      * Provider identifier
      */
     public static final String PROVIDER_ID_NAME = "provider_id";
-    private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to add layer.";
+    private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to set style.";
     public static final ParameterDescriptor<String> PROVIDER_ID =
             new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
 
     /*
-     * Layer to attach.
+     * Style name.
      */
-    public static final String LAYER_NAME = "layer";
-    private static final String LAYER_REMARKS = "ParameterValueGroup of the new layer.";
-    public static final ParameterDescriptor<ParameterValueGroup> LAYER =
-            new DefaultParameterDescriptor(LAYER_NAME, LAYER_REMARKS, ParameterValueGroup.class, null, true);
+    public static final String STYLE_ID_NAME = "style_Name";
+    private static final String STYLE_ID_REMARKS = "Name/Identifier of the style.";
+    public static final ParameterDescriptor<String> STYLE_ID =
+            new DefaultParameterDescriptor(STYLE_ID_NAME, STYLE_ID_REMARKS, String.class, null, true);
 
+    /*
+     * Style
+     */
+    public static final String STYLE_NAME = "style";
+    private static final String STYLE_REMARKS = "Style to add.";
+    public static final ParameterDescriptor<MutableStyle> STYLE =
+            new DefaultParameterDescriptor(STYLE_NAME, STYLE_REMARKS, MutableStyle.class, null, true);
 
-    /**Input parameters */
+    /**
+     * Input parameters
+     */
     public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, LAYER});
-
-
-    /**Output parameters */
+            new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, STYLE_ID, STYLE});
+    /**
+     * Output parameters
+     */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
-
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
-    public CreateMapLayerDescriptor() {
+    public CreateStyleProviderDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
-        return new CreateMapLayer(this, input);
+        return new CreateStyleProvider(this, input);
     }
-
-
 }

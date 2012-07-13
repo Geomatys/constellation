@@ -33,7 +33,7 @@ import org.opengis.util.InternationalString;
  */
 public class RestartProviderDescriptor extends AbstractProcessDescriptor {
 
-     public static final String NAME = "restartProvider";
+     public static final String NAME = "provider.restart";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Restart a provider in constellation.");
 
 

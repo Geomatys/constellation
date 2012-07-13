@@ -31,10 +31,10 @@ import org.opengis.util.InternationalString;
  * Update a provider layer.
  * @author Quentin Boileau (Geomatys).
  */
-public class UpdateMapLayerDescriptor extends AbstractProcessDescriptor {
+public class UpdateProviderLayerDescriptor extends AbstractProcessDescriptor {
 
 
-    public static final String NAME = "updateMapLayer";
+    public static final String NAME = "providerLayer.update";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Update a map layer for a specified provider.");
 
     /*
@@ -48,7 +48,7 @@ public class UpdateMapLayerDescriptor extends AbstractProcessDescriptor {
     /*
      * Layer name to update
      */
-    public static final String LAYER_NAME_NAME = "layer";
+    public static final String LAYER_NAME_NAME = "layerName";
     private static final String LAYER_NAME_REMARKS = "The name of he layer to update.";
     public static final ParameterDescriptor<String> LAYER_NAME =
             new DefaultParameterDescriptor(LAYER_NAME_NAME, LAYER_NAME_REMARKS, String.class, null, true);
@@ -56,7 +56,7 @@ public class UpdateMapLayerDescriptor extends AbstractProcessDescriptor {
      /*
      * Updated layer
      */
-    public static final String UPDATE_LAYER_NAME = "updateLayer";
+    public static final String UPDATE_LAYER_NAME = "updateLayerParameter";
     private static final String UPDATE_LAYER_REMARKS = "ParameterValueGroup of the updated layer.";
     public static final ParameterDescriptor<ParameterValueGroup> UPDATE_LAYER =
             new DefaultParameterDescriptor(UPDATE_LAYER_NAME, UPDATE_LAYER_REMARKS, ParameterValueGroup.class, null, true);
@@ -74,13 +74,13 @@ public class UpdateMapLayerDescriptor extends AbstractProcessDescriptor {
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
-    public UpdateMapLayerDescriptor() {
+    public UpdateProviderLayerDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
-        return new UpdateMapLayer(this, input);
+        return new UpdateProviderLayer(this, input);
     }
 
 }

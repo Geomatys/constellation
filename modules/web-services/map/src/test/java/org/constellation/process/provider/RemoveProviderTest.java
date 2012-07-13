@@ -20,7 +20,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import org.constellation.process.provider.AbstractProviderTest;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.provider.RemoveProviderDescriptor;
+import org.constellation.process.provider.DeleteProviderDescriptor;
 import org.constellation.provider.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -38,7 +38,7 @@ import org.opengis.util.NoSuchIdentifierException;
 public class RemoveProviderTest extends AbstractProviderTest {
 
     public RemoveProviderTest() {
-        super(RemoveProviderDescriptor.NAME);
+        super(DeleteProviderDescriptor.NAME);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class RemoveProviderTest extends AbstractProviderTest {
 
         final int nbProvider = LayerProviderProxy.getInstance().getProviders().size();
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RemoveProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderDescriptor.NAME);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter("provider_id").setValue("removeProvider1");
 
@@ -72,7 +72,7 @@ public class RemoveProviderTest extends AbstractProviderTest {
     public void testFailRemoveProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
 
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RemoveProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderDescriptor.NAME);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter("provider_id").setValue("deleteProvider10");
 

@@ -33,7 +33,7 @@ import org.opengis.util.InternationalString;
  */
 public class StopServiceDescriptor extends AbstractProcessDescriptor {
 
-    public static final String NAME = "stopService";
+    public static final String NAME = "service.stop";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Stop the instance for the specified service instance.");
 
 

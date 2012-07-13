@@ -21,7 +21,7 @@ import org.constellation.process.AbstractCstlProcess;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.process.provider.RemoveProviderDescriptor.*;
+import static org.constellation.process.provider.DeleteProviderDescriptor.*;
 import org.constellation.provider.*;
 import static org.geotoolkit.parameter.Parameters.*;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -31,9 +31,9 @@ import org.geotoolkit.process.ProcessDescriptor;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public final class RemoveProvider extends AbstractCstlProcess{
+public final class DeleteProvider extends AbstractCstlProcess{
 
-    public RemoveProvider( final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public DeleteProvider( final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 

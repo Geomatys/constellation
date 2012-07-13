@@ -34,7 +34,7 @@ import org.opengis.util.InternationalString;
  */
 public class CreateProviderDescriptor extends AbstractProcessDescriptor {
 
-    public static final String NAME = "createProvider";
+    public static final String NAME = "provider.create";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new provider in constellation.");
 
 

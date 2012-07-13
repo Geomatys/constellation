@@ -28,19 +28,21 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 
 import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.layer.DeleteMapLayerDescriptor.*;
+import static org.constellation.process.layer.UpdateProviderLayerDescriptor.*;
+
 /**
- *
+ * Update a layer from an existing provider.
  * @author Quentin Boileau (Geomatys).
  */
-public class DeleteMapLayer extends AbstractCstlProcess {
+public class UpdateProviderLayer extends AbstractCstlProcess {
 
-     public DeleteMapLayer(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+     public UpdateProviderLayer(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
     /**
-     * Remove a layer from an existing provider.
+     * Update a layer from an existing provider.
+     *
      * @throws ProcessException if :
      * - Provider identifier is null/empty or not found in LayerProvider list.
      * - layer name is null/empty or not found in LayerProvider list.
@@ -50,6 +52,7 @@ public class DeleteMapLayer extends AbstractCstlProcess {
 
         final String providerId = value(PROVIDER_ID, inputParameters);
         final String layerName = value(LAYER_NAME, inputParameters);
+        final ParameterValueGroup updateLayer = value(UPDATE_LAYER, inputParameters);
 
         if (providerId == null || "".equals(providerId.trim())) {
             throw new ProcessException("Provider identifier can't be null or empty.", this, null);
@@ -59,10 +62,14 @@ public class DeleteMapLayer extends AbstractCstlProcess {
             throw new ProcessException("Layer name can't be null or empty.", this, null);
         }
 
+        if (updateLayer == null) {
+            throw new ProcessException("Layer can't be null.", this, null);
+        }
+
         final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
 
         boolean providerFound = false;
-        boolean removed = false;
+        boolean updated = false;
         for (final LayerProvider p : providers) {
             if (p.getId().equals(providerId)) {
                 for (final GeneralParameterValue param : p.getSource().values()) {
@@ -72,7 +79,8 @@ public class DeleteMapLayer extends AbstractCstlProcess {
                             final ParameterValue value = pvg.parameter("name");
                             if (value.stringValue().equals(layerName)) {
                                 p.getSource().values().remove(pvg);
-                                removed = true;
+                                p.getSource().values().add(updateLayer);
+                                updated = true;
                                 break;
                             }
                         }
@@ -87,7 +95,7 @@ public class DeleteMapLayer extends AbstractCstlProcess {
         if (!providerFound) {
             throw new ProcessException("Provider with id "+providerId+" can't be found.", this, null);
         } else {
-            if (!removed) {
+            if (!updated) {
                 throw new ProcessException("Layer with name "+layerName+" can't be found in provider "+providerId+" layers.", this, null);
             }
         }

@@ -34,7 +34,7 @@ import org.opengis.util.InternationalString;
  */
 public class RestartServiceDescriptor  extends AbstractProcessDescriptor {
 
-    public static final String NAME = "restartService";
+    public static final String NAME = "service.restart";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Restart an instance for the specified service instance. "
             + "Or all service instances if identifier is not specified.");
 

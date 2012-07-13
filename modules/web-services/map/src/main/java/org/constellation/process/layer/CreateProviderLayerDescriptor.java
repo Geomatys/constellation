@@ -28,35 +28,35 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 
 /**
- *
+ * Add a layer to an existing provider.
  * @author Quentin Boileau (Geomatys).
  */
-public class DeleteMapLayerDescriptor extends AbstractProcessDescriptor {
+public class CreateProviderLayerDescriptor extends AbstractProcessDescriptor {
 
 
-    public static final String NAME = "deleteMapLayer";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Delete a map layer from a specified provider.");
+    public static final String NAME = "providerLayer.create";
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Attach a new layer to a specified provider.");
 
     /*
-     * Provider idenifier
+     * Provider identifier
      */
     public static final String PROVIDER_ID_NAME = "provider_id";
-    private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to remove layer.";
+    private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to add layer.";
     public static final ParameterDescriptor<String> PROVIDER_ID =
             new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
 
     /*
-     * Layer name to delete
+     * Layer to attach.
      */
-    public static final String LAYER_NAME_NAME = "layer";
-    private static final String LAYER_NAME_REMARKS = "The name of he layer to remove.";
-    public static final ParameterDescriptor<String> LAYER_NAME =
-            new DefaultParameterDescriptor(LAYER_NAME_NAME, LAYER_NAME_REMARKS, String.class, null, true);
+    public static final String LAYER_NAME = "layerParameters";
+    private static final String LAYER_REMARKS = "ParameterValueGroup of the new layer.";
+    public static final ParameterDescriptor<ParameterValueGroup> LAYER =
+            new DefaultParameterDescriptor(LAYER_NAME, LAYER_REMARKS, ParameterValueGroup.class, null, true);
 
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, LAYER_NAME});
+            new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, LAYER});
 
 
     /**Output parameters */
@@ -66,13 +66,14 @@ public class DeleteMapLayerDescriptor extends AbstractProcessDescriptor {
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
-    public DeleteMapLayerDescriptor() {
+    public CreateProviderLayerDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
-        return new DeleteMapLayer(this, input);
+        return new CreateProviderLayer(this, input);
     }
+
 
 }

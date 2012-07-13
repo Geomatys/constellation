@@ -1,6 +1,6 @@
 #Providers process
 org.constellation.process.provider.CreateProviderDescriptor
-org.constellation.process.provider.RemoveProviderDescriptor
+org.constellation.process.provider.DeleteProviderDescriptor
 org.constellation.process.provider.UpdateProviderDescriptor
 org.constellation.process.provider.RestartProviderDescriptor
 org.constellation.process.provider.GetConfigProviderDescriptor
@@ -10,12 +10,12 @@ org.constellation.process.service.CreateMapServiceDescriptor
 org.constellation.process.service.ConfigureMapServiceDescriptor
 org.constellation.process.service.GetConfigMapServiceDescriptor
 
-#Layer process
-org.constellation.process.layer.CreateMapLayerDescriptor
-org.constellation.process.layer.DeleteMapLayerDescriptor
-org.constellation.process.layer.UpdateMapLayerDescriptor
+#ProviderLayer process
+org.constellation.process.layer.CreateProviderLayerDescriptor
+org.constellation.process.layer.DeleteProviderLayerDescriptor
+org.constellation.process.layer.UpdateProviderLayerDescriptor
 
-#Style process
-org.constellation.process.style.CreateMapStyleDescriptor
-org.constellation.process.style.DeleteMapStyleDescriptor
-org.constellation.process.style.UpdateMapStyleDescriptor
+#StyleProvider process
+org.constellation.process.style.CreateStyleProviderDescriptor
+org.constellation.process.style.DeleteStyleProviderDescriptor
+org.constellation.process.style.UpdateStyleProviderDescriptor

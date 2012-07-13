@@ -35,7 +35,7 @@ import org.opengis.util.InternationalString;
 public class DeleteServiceDescriptor extends AbstractProcessDescriptor {
 
 
-     public static final String NAME = "deleteService";
+     public static final String NAME = "service.delete";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Delete a service instance in constellation.");
 
 
