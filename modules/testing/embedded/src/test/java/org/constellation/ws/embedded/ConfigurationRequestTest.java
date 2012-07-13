@@ -60,12 +60,20 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         }
     }
 
+    private static String getConfigurationURL() {
+        return "http://localhost:" +  grizzly.getCurrentPort() + "/configuration?";
+    }
+
+    private static String getCswURL() {
+        return "http://localhost:" +  grizzly.getCurrentPort() + "/csw/default?";
+    }
+
     @Test
     public void testRestart() throws Exception {
 
         waitForStart();
-        
-        URL niUrl = new URL("http://localhost:9090/configuration?request=restart");
+
+        URL niUrl = new URL(getConfigurationURL() + "request=restart");
 
 
         // for a POST request
@@ -81,7 +89,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
     @Test
     public void testDownloadFile() throws Exception {
 
-        URL niUrl = new URL("http://localhost:9090/configuration?request=download");
+        URL niUrl = new URL(getConfigurationURL() + "request=download");
 
 
         // for a POST request
@@ -101,7 +109,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         /*
          * try to get a missing parameter error
          */
-        URL niUrl = new URL("http://localhost:9090/configuration?request=refreshIndex");
+        URL niUrl = new URL(getConfigurationURL() + "request=refreshIndex");
 
         URLConnection conec = niUrl.openConnection();
 
@@ -114,7 +122,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
 
         // first we make a getRecords request to count the number of record
-        niUrl = new URL("http://localhost:9090/csw/default?request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
 
         conec = niUrl.openConnection();
 
@@ -140,7 +148,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         pool.release(m);
 
 
-        niUrl = new URL("http://localhost:9090/configuration?request=refreshIndex&id=default");
+        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
 
         // for a POST request
         conec = niUrl.openConnection();
@@ -151,7 +159,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         AcknowlegementType expResult = new AcknowlegementType("Success",  "CSW index succefully recreated");
         assertEquals(expResult, obj);
 
-        niUrl = new URL("http://localhost:9090/csw/default?request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
 
         conec = niUrl.openConnection();
 
@@ -167,7 +175,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
     public void testCSWAddToIndex() throws Exception {
 
         // first we make a getRecords request to count the number of record
-        URL niUrl = new URL("http://localhost:9090/csw/default?request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+        URL niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
 
         URLConnection conec = niUrl.openConnection();
 
@@ -188,7 +196,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
         pool.release(m);
 
         // add a metadata to the index
-        niUrl = new URL("http://localhost:9090/configuration?request=addToIndex&id=default&identifiers=urn_test");
+        niUrl = new URL(getConfigurationURL() + "request=addToIndex&id=default&identifiers=urn_test");
 
         // for a POST request
         conec = niUrl.openConnection();
@@ -201,13 +209,13 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
 
         //normally we don't have to restart the CSW TODO
-        niUrl = new URL("http://localhost:9090/csw/admin?request=restart&id=default");
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=restart&id=default");
         conec = niUrl.openConnection();
         obj = unmarshallResponse(conec);
 
 
          // verify that the number of record have increased
-        niUrl = new URL("http://localhost:9090/csw/default?request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
+        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
 
         conec = niUrl.openConnection();
 
@@ -221,7 +229,7 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
 
     @Test
     public void testListAvailableService() throws Exception {
-        URL niUrl = new URL("http://localhost:9090/configuration?request=ListAvailableService");
+        URL niUrl = new URL(getConfigurationURL() + "request=ListAvailableService");
 
 
         // for a POST request

@@ -46,12 +46,6 @@ import static org.junit.Assert.*;
  */
 public class CSWRequestTest extends AbstractTestRequest {
 
-    private static final String CSW_POST_URL = "http://localhost:9090/csw/default?";
-
-    private static final String CSW2_POST_URL = "http://localhost:9090/csw/csw2?";
-
-    private static final String CSW_GETCAPABILITIES_URL = "http://localhost:9090/csw/default?request=GetCapabilities&service=CSW&version=2.0.2";
-
     private static final String CSW_GETCAPABILITIES_URL2 = "http://localhost:9090/csw/csw2?request=GetCapabilities&service=CSW&version=2.0.2";
 
     /**
@@ -71,13 +65,21 @@ public class CSWRequestTest extends AbstractTestRequest {
         }
     }
 
+    private static String getDefaultURL() {
+        return "http://localhost:" +  grizzly.getCurrentPort() + "/csw/default?";
+    }
+
+    private static String getCsw2URL() {
+        return "http://localhost:" +  grizzly.getCurrentPort() + "/csw/csw2?";
+    }
+
     @Test
     public void testCSWGetCapabilities() throws Exception {
 
         waitForStart();
-        
+
         // Creates a valid GetCapabilities url.
-        URL getCapsUrl = new URL(CSW_POST_URL);
+        URL getCapsUrl = new URL(getDefaultURL());
 
 
         // for a POST request
@@ -99,10 +101,10 @@ public class CSWRequestTest extends AbstractTestRequest {
         assertTrue(op != null);
         assertTrue(op.getDCP().size() > 0);
 
-        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), CSW_POST_URL);
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), getDefaultURL());
 
         // Creates a valid GetCapabilties url.
-        getCapsUrl = new URL(CSW_GETCAPABILITIES_URL);
+        getCapsUrl = new URL(getDefaultURL() + "request=GetCapabilities&service=CSW&version=2.0.2");
 
 
         // Try to marshall something from the response returned by the server.
@@ -113,11 +115,11 @@ public class CSWRequestTest extends AbstractTestRequest {
 
         String currentURL = capa.getOperationsMetadata().getOperation("getRecords").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
 
-        assertEquals(CSW_POST_URL, currentURL);
+        assertEquals(getDefaultURL(), currentURL);
 
 
          // Creates a valid GetCapabilties url.
-        getCapsUrl = new URL(CSW_GETCAPABILITIES_URL2);
+        getCapsUrl = new URL(getCsw2URL() + "request=GetCapabilities&service=CSW&version=2.0.2");
 
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof Capabilities);
@@ -126,11 +128,11 @@ public class CSWRequestTest extends AbstractTestRequest {
 
         currentURL = capa.getOperationsMetadata().getOperation("getRecords").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
 
-        assertEquals(CSW2_POST_URL, currentURL);
+        assertEquals(getCsw2URL(), currentURL);
 
 
          // Creates a valid GetCapabilties url.
-        getCapsUrl = new URL(CSW_GETCAPABILITIES_URL);
+        getCapsUrl = new URL(getDefaultURL() + "request=GetCapabilities&service=CSW&version=2.0.2");
 
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof Capabilities);
@@ -139,14 +141,14 @@ public class CSWRequestTest extends AbstractTestRequest {
 
         currentURL = capa.getOperationsMetadata().getOperation("getRecords").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
 
-        assertEquals(CSW_POST_URL, currentURL);
+        assertEquals(getDefaultURL(), currentURL);
     }
 
     @Test
     public void testCSWError() throws Exception {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(CSW_POST_URL);
+        final URL getCapsUrl = new URL(getDefaultURL());
 
 
         // for a POST request
@@ -169,7 +171,7 @@ public class CSWRequestTest extends AbstractTestRequest {
     public void testCSWGetDomain() throws Exception {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(CSW_POST_URL);
+        final URL getCapsUrl = new URL(getDefaultURL());
 
 
         // for a POST request
@@ -211,7 +213,7 @@ public class CSWRequestTest extends AbstractTestRequest {
     public void testCSWGetRecordByID() throws Exception {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(CSW_POST_URL);
+        final URL getCapsUrl = new URL(getDefaultURL());
 
 
         // for a POST request
@@ -249,7 +251,7 @@ public class CSWRequestTest extends AbstractTestRequest {
     public void testCSWGetRecords() throws Exception {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(CSW_POST_URL);
+        final URL getCapsUrl = new URL(getDefaultURL());
 
 
         // for a POST request
@@ -291,7 +293,7 @@ public class CSWRequestTest extends AbstractTestRequest {
     public void testDistributedCSWGetRecords() throws Exception {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(CSW2_POST_URL);
+        final URL getCapsUrl = new URL(getCsw2URL());
 
 
         // for a POST request

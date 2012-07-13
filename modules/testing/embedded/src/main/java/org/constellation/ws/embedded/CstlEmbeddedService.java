@@ -109,6 +109,10 @@ public class CstlEmbeddedService extends CommandLine {
     @Option
     public Integer duration = 20 * 60 * 1000; //minutes*seconds*millseconds; set to <=0 to last until <enter>
 
+    public boolean findAvailablePort = false;
+
+    public Integer currentPort;
+
     final URI uri;
     final URI uriSoap;
     final DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -194,6 +198,32 @@ public class CstlEmbeddedService extends CommandLine {
 
     }
 
+    private HttpServer buildThreadSelector() {
+        HttpServer threadSelector = null;
+        final String base         = "http://" + host + "/";
+        URI currentUri            = uri;
+        currentPort               = port;
+        boolean working           = false;
+        while (!working) {
+            working = true;
+            try {
+                if (grizzlyWebContainerProperties.isEmpty()) {
+                    threadSelector = GrizzlyWebContainerFactory.create(currentUri, CstlServletContainer.class);
+                } else {
+                    threadSelector = GrizzlyWebContainerFactory.create(currentUri, CstlServletContainer.class, grizzlyWebContainerProperties);
+                }
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                if (findAvailablePort) {
+                    working = false;
+                    currentPort++;
+                    currentUri = UriBuilder.fromUri(base).port(currentPort).build();
+                }
+            }
+        }
+        return threadSelector;
+    }
+
     /**
      * Should be called by the {@code main()} method for any web service wishing
      * to implement a JAX-RS REST facade.
@@ -205,23 +235,15 @@ public class CstlEmbeddedService extends CommandLine {
 
         LOGGER.log(Level.INFO, "Starting grizzly server at: {0}", f.format(new Date()));
 
-        HttpServer threadSelector = null;
-        try {
-            if (grizzlyWebContainerProperties.isEmpty()) {
-                threadSelector = GrizzlyWebContainerFactory.create(uri, CstlServletContainer.class);
-            } else {
-                threadSelector = GrizzlyWebContainerFactory.create(uri, CstlServletContainer.class, grizzlyWebContainerProperties);
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+        final HttpServer threadSelector = buildThreadSelector();
 
         LOGGER.log(Level.INFO, "Started Grizzly application server for: {0}", uri);
         LOGGER.log(Level.INFO, "The service definition file can be found at: {0}application.wadl", uri);
 
         stayAlive();
-
-        threadSelector.stop();
+        if (threadSelector != null) {
+            threadSelector.stop();
+        }
         LOGGER.log(Level.INFO, "*Stopped grizzly server at: {0}.", f.format(new Date()));
     }
 
@@ -235,7 +257,6 @@ public class CstlEmbeddedService extends CommandLine {
             LOGGER.info("The SOAP Service Endpoint Instance was never defined.");
             System.exit(0);
         }
-
 
         LOGGER.log(Level.INFO, "Starting jax-ws server at: {0}", f.format(new Date()));
 
@@ -268,16 +289,7 @@ public class CstlEmbeddedService extends CommandLine {
 
         LOGGER.log(Level.INFO, "Starting grizzly server at: {0}", f.format(new Date()));
 
-        HttpServer threadSelector = null;
-        try {
-            if (grizzlyWebContainerProperties.isEmpty()) {
-                threadSelector = GrizzlyWebContainerFactory.create(uri, CstlServletContainer.class);
-            } else {
-                threadSelector = GrizzlyWebContainerFactory.create(uri, CstlServletContainer.class, grizzlyWebContainerProperties);
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+        final HttpServer threadSelector = buildThreadSelector();
 
         LOGGER.log(Level.INFO, "Started Grizzly application server for: {0}", uri);
         LOGGER.log(Level.INFO, "The service definition file can be found at: {0}application.wadl", uri);

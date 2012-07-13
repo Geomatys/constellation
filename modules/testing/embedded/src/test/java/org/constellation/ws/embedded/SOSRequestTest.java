@@ -44,14 +44,17 @@ import static org.junit.Assert.*;
  */
 public class SOSRequestTest extends AbstractTestRequest {
 
-    private static final String SOS_POST_URL = "http://localhost:9090/sos/default?";
-    private static final String SOS_POST_URL2 = "http://localhost:9090/sos/test?";
-
-    private static final String SOS_GETCAPABILITIES_URL = "http://localhost:9090/sos/default?request=GetCapabilities&service=SOS&version=1.0.0";
-
-    private static final String SOS_GETCAPABILITIES_URL2 = "http://localhost:9090/sos/test?request=GetCapabilities&service=SOS&version=1.0.0";
-
     private static final String SOS_GETFEATUROFINTEREST_URL = "http://localhost:9090/sos/default?request=GetFeatureOfInterest&service=SOS&version=1.0.0&FeatureOfInterestId=sampling-point-001";
+
+
+    private static String getDefaultURL() {
+        return "http://localhost:" +  grizzly.getCurrentPort() + "/sos/default?";
+    }
+
+    private static String getTestURL() {
+        return "http://localhost:" +  grizzly.getCurrentPort() + "/sos/test?";
+    }
+
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -74,9 +77,9 @@ public class SOSRequestTest extends AbstractTestRequest {
     public void testSOSInvalidRequest() throws Exception {
 
         waitForStart();
-        
+
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(SOS_POST_URL);
+        final URL getCapsUrl = new URL(getDefaultURL());
 
 
         // for a POST request
@@ -96,7 +99,7 @@ public class SOSRequestTest extends AbstractTestRequest {
     @Test
     public void testSOSGetCapabilities() throws Exception {
         // Creates a valid GetCapabilities url.
-        URL getCapsUrl = new URL(SOS_POST_URL);
+        URL getCapsUrl = new URL(getDefaultURL());
 
 
         // for a POST request
@@ -118,10 +121,10 @@ public class SOSRequestTest extends AbstractTestRequest {
         assertTrue(op != null);
         assertTrue(op.getDCP().size() > 0);
 
-        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), SOS_POST_URL);
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), getDefaultURL());
 
         // Creates a valid GetCapabilties url.
-        getCapsUrl = new URL(SOS_GETCAPABILITIES_URL2);
+        getCapsUrl = new URL(getTestURL() + "request=GetCapabilities&service=SOS&version=1.0.0");
 
         // Try to marshall something from the response returned by the server.
         // The response should be a Capabilities.
@@ -132,10 +135,10 @@ public class SOSRequestTest extends AbstractTestRequest {
 
         op = c.getOperationsMetadata().getOperation("GetObservation");
 
-        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), SOS_POST_URL2);
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), getTestURL());
 
         // Creates a valid GetCapabilties url.
-        getCapsUrl = new URL(SOS_GETCAPABILITIES_URL);
+        getCapsUrl = new URL(getDefaultURL()+ "request=GetCapabilities&service=SOS&version=1.0.0");
 
         // Try to marshall something from the response returned by the server.
         // The response should be a Capabilities.
@@ -146,7 +149,7 @@ public class SOSRequestTest extends AbstractTestRequest {
 
         op = c.getOperationsMetadata().getOperation("GetObservation");
 
-        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), SOS_POST_URL);
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), getDefaultURL());
 
 
     }
@@ -154,7 +157,7 @@ public class SOSRequestTest extends AbstractTestRequest {
     @Test
     public void testSOSDescribeSensor() throws Exception {
         // Creates a valid DescribeSensor url.
-        final URL getCapsUrl = new URL(SOS_POST_URL);
+        final URL getCapsUrl = new URL(getDefaultURL());
 
 
         // for a POST request
@@ -175,7 +178,7 @@ public class SOSRequestTest extends AbstractTestRequest {
     @Test
     public void testSOSGetObservation() throws Exception {
         // Creates a valid GetObservation url.
-        final URL getCapsUrl = new URL(SOS_POST_URL);
+        final URL getCapsUrl = new URL(getDefaultURL());
 
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
@@ -205,7 +208,7 @@ public class SOSRequestTest extends AbstractTestRequest {
     @Test
     public void testSOSGetFeatureOfInterest() throws Exception {
         // Creates a valid GetObservation url.
-        final URL getCapsUrl = new URL(SOS_POST_URL);
+        final URL getCapsUrl = new URL(getDefaultURL());
 
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
@@ -222,7 +225,7 @@ public class SOSRequestTest extends AbstractTestRequest {
         assertTrue("expecting SamplingPointType but was: " + type, obj instanceof SamplingPointType);
 
         // Creates a valid GetFeatureFInterest url.
-        final URL getFoiUrl = new URL(SOS_GETFEATUROFINTEREST_URL);
+        final URL getFoiUrl = new URL(getDefaultURL() + "request=GetFeatureOfInterest&service=SOS&version=1.0.0&FeatureOfInterestId=sampling-point-001");
 
 
         // Try to marshall something from the response returned by the server.
