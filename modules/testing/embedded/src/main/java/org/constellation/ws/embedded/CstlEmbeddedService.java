@@ -41,11 +41,11 @@ import org.geotoolkit.util.logging.Logging;
 /**
  * An Abstract class to run the web service in an embedded container.
  * <p>
- * For now, the services are run only using the Grizzly web server. In the 
+ * For now, the services are run only using the Grizzly web server. In the
  * future, we may look into working on the embedded Glassfish system.
  * </p>
  * <p>
- * Classes wishing to run an embedded service should extend this class. The 
+ * Classes wishing to run an embedded service should extend this class. The
  * responsibilities of each extending class is to:
  * <ol>
  *   <li>Call this constructor with the arguments of the main method.
@@ -53,7 +53,7 @@ import org.geotoolkit.util.logging.Logging;
  *     super(args);
  * </pre>
  *   </li>
- *   <li>For JAX-RS, REST based services, add parameters to the configuration 
+ *   <li>For JAX-RS, REST based services, add parameters to the configuration
  *       {@code Map}.
  * <pre>
  *     map.put("com.sun.jersey.config.property.packages", "org.constellation.map.ws.rs");
@@ -61,7 +61,7 @@ import org.geotoolkit.util.logging.Logging;
  *     map.put(TODO: get providers line from Cedric);
  * </pre>
  *   </li>
- *   <li>For JAX-WS, SOAP based services, set the reference of the Service 
+ *   <li>For JAX-WS, SOAP based services, set the reference of the Service
  *       Endpoint Interface.
  * <pre>
  *     serviceInstanceSOAP = new org.constellation.sos.ws.soap.SOSService();
@@ -70,22 +70,22 @@ import org.geotoolkit.util.logging.Logging;
  *   <li>Add a simple main, such as:
  * <pre>
  *    public static void main(String[] args) {
- *	    
+ *
  *        EXTENDOR sei = new EXTENDOR(args);
  *        if (useFacadeREST){
  *            sei.runREST();
  *        } else {
  *            sei.runSOAP();
  *        }
- *        
+ *
  *        System.exit(0);
- *        
+ *
  *    }
  * </pre>
  *   </li>
  * </ol>
  * </p>
- * 
+ *
  * @author Adrian Custer (Geomatys)
  * @since 0.3
  *
@@ -105,7 +105,7 @@ public class CstlEmbeddedService extends CommandLine {
     @Option
     protected Integer port = 9090;       //Default value
     @Option
-    protected Integer portsoap = 9191;      
+    protected Integer portsoap = 9191;
     @Option
     public Integer duration = 20 * 60 * 1000; //minutes*seconds*millseconds; set to <=0 to last until <enter>
 
@@ -129,14 +129,14 @@ public class CstlEmbeddedService extends CommandLine {
 
     //INCLUDE THIS MAIN.
 //	public static void main(String[] args) {
-//		
+//
 //		EXTENDOR sei = new EXTENDOR(args);
 //	    if (useFacadeREST){
 //		    sei.runREST();
 //      } else {
 //          sei.runSOAP();
 //      }
-//		
+//
 //		System.exit(0);
 //
 //	}
@@ -248,7 +248,7 @@ public class CstlEmbeddedService extends CommandLine {
             LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
             LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
         }
-        
+
 
         stayAlive();
         for (Endpoint ep : eps) {
@@ -292,10 +292,11 @@ public class CstlEmbeddedService extends CommandLine {
             LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
             LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
         }
-        
-        stayAlive();
 
-        threadSelector.stop();
+        stayAlive();
+        if (threadSelector != null) {
+            threadSelector.stop();
+        }
         for (Endpoint ep : eps) {
             ep.stop();
         }
