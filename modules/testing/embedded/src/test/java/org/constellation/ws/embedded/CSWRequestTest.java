@@ -46,8 +46,6 @@ import static org.junit.Assert.*;
  */
 public class CSWRequestTest extends AbstractTestRequest {
 
-    private static final String CSW_GETCAPABILITIES_URL2 = "http://localhost:9090/csw/csw2?request=GetCapabilities&service=CSW&version=2.0.2";
-
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
