@@ -687,14 +687,14 @@ public class WPSWorker extends AbstractWorker {
             ////////
             // RAW Sync no timeout
             ////////
-            final Future<ParameterValueGroup> future = WPSService.EXECUTOR.submit(process);
+            final Future<ParameterValueGroup> future = WPSService.getExecutor().submit(process);
             try {
                 result = future.get();
 
             } catch (InterruptedException ex) {
-                throw new CstlServiceException("", ex, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Process interupted.", ex, NO_APPLICABLE_CODE);
             } catch (ExecutionException ex) {
-                throw new CstlServiceException("Process execution failed", ex, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Process execution failed.", ex, NO_APPLICABLE_CODE);
             }
             return createRawOutput(rawData, processOutputDesc, result);
 
@@ -725,14 +725,14 @@ public class WPSWorker extends AbstractWorker {
                 ////////
                 response.setStatus(status);
                 process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0, getServiceUrl(), temporaryFolderPath));
-                WPSService.EXECUTOR.submit(process);
+                WPSService.getExecutor().submit(process);
 
             } else {
 
                 ////////
                 // DOC Sync + timeout
                 ////////
-                final Future<ParameterValueGroup> future = WPSService.EXECUTOR.submit(process);
+                final Future<ParameterValueGroup> future = WPSService.getExecutor().submit(process);
                 try {
                     result = future.get(TIMEOUT, TimeUnit.SECONDS);
 

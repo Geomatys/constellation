@@ -81,7 +81,7 @@ public class WPSService extends OGCWebService<WPSWorker> {
     /**
      * Executor thread pool.
      */
-    public static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+    public static ExecutorService EXECUTOR;
 
     /**
      * Build a new instance of the webService and initialize the JAXB context.
@@ -106,9 +106,17 @@ public class WPSService extends OGCWebService<WPSWorker> {
         super.destroy();
 
         //Shutdown the WPS scheduler.
-        EXECUTOR.shutdown();
+        if (EXECUTOR != null) {
+            EXECUTOR.shutdown();
+        }
     }
 
+    public static synchronized ExecutorService getExecutor() {
+        if (EXECUTOR == null) {
+            EXECUTOR = Executors.newCachedThreadPool();
+        }
+        return EXECUTOR;
+    }
 
     @Override
     protected void configureInstance(File instanceDirectory, Object configuration) throws CstlServiceException {
