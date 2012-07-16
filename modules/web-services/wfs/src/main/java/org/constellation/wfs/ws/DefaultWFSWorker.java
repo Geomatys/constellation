@@ -75,6 +75,7 @@ import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.ogc.xml.XMLFilter;
 import org.geotoolkit.ogc.xml.XMLLiteral;
+import org.geotoolkit.ogc.xml.v200.BBOXType;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
@@ -1171,7 +1172,17 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         lit.getContent().clear();
                         lit.setContent(s);
                     }
+                }
 
+            } else if (filterObject instanceof BBOXType) {
+                final BBOXType bb = (BBOXType) filterObject;
+                if (bb.getAny() != null && bb.getAny() instanceof String) {
+                    String s = (String)bb.getAny();
+                    for (Parameter param : parameters) {
+                        if (s.indexOf('$' + param.getName()) != -1) {
+                            bb.setAny(param.getContent().get(0));
+                        }
+                    }
                 }
 
             } else if (filterObject instanceof BinaryComparisonOperator) {

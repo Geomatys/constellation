@@ -44,9 +44,6 @@ import static org.junit.Assert.*;
  */
 public class SOSRequestTest extends AbstractTestRequest {
 
-    private static final String SOS_GETFEATUROFINTEREST_URL = "http://localhost:9090/sos/default?request=GetFeatureOfInterest&service=SOS&version=1.0.0&FeatureOfInterestId=sampling-point-001";
-
-
     private static String getDefaultURL() {
         return "http://localhost:" +  grizzly.getCurrentPort() + "/sos/default?";
     }

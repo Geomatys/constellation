@@ -53,6 +53,8 @@ import org.geotoolkit.data.om.OMDataStoreFactory;
 import org.geotoolkit.data.sml.SMLDataStoreFactory;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
+import org.geotoolkit.gml.xml.v321.DirectPositionType;
+import org.geotoolkit.gml.xml.v321.EnvelopeType;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.ogc.xml.v200.BBOXType;
@@ -93,7 +95,6 @@ import org.geotoolkit.wfs.xml.v200.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v200.TransactionType;
 import org.geotoolkit.wfs.xml.v200.UpdateType;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
-import org.geotoolkit.xml.DomCompare;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
@@ -790,7 +791,7 @@ public class WFS2WorkerTest {
 
         result = worker.getFeature(request);
 
-        FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
+        FeatureCollectionType resultHits = (FeatureCollectionType)result;
 
         assertTrue(resultHits.getNumberReturned() == 2);
 
@@ -1183,6 +1184,20 @@ public class WFS2WorkerTest {
         queryEx.getContent().add(factory.createQuery(query));
         final StoredQueryDescriptionType desc1 = new StoredQueryDescriptionType("geomQuery", "Geom query" , "filter on geom for Bridge", param, queryEx);
         desc.add(desc1);
+
+        final ParameterExpressionType envParam = new ParameterExpressionType("envelope", "envelope parameter", "A parameter on the geometry \"the_geom\" of the feature", new QName("http://www.opengis.net/gml/3.2.1", "EnvelopeType", "gml"));
+        final List<QName> types2 = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+        final SpatialOpsType bbox = new BBOXType("{http://www.opengis.net/sampling/1.0}position", "$envelope");
+        final FilterType filter2 = new FilterType(bbox);
+        final QueryType query2 = new QueryType(filter2, types2, "2.0.0");
+        final QueryExpressionTextType queryEx2 = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types2);
+        queryEx2.getContent().add(factory.createQuery(query2));
+        final StoredQueryDescriptionType desc2 = new StoredQueryDescriptionType("envelopeQuery", "Envelope query" , "BBOX filter on geom for Sampling point", envParam, queryEx2);
+        desc.add(desc2);
+
+
+
+
         final CreateStoredQueryType request = new CreateStoredQueryType("WFS", "2.0.0", null, desc);
         final CreateStoredQueryResponse resultI = worker.createStoredQuery(request);
 
@@ -1192,6 +1207,9 @@ public class WFS2WorkerTest {
         final CreateStoredQueryResponseType expResult =  new CreateStoredQueryResponseType("OK");
         assertEquals(expResult, result);
 
+        /**
+         * verify that thes queries are well stored
+         */
         final ListStoredQueriesType requestlsq = new ListStoredQueriesType("WFS", "2.0.0", null);
 
         ListStoredQueriesResponse resultlsqI = worker.listStoredQueries(requestlsq);
@@ -1200,11 +1218,12 @@ public class WFS2WorkerTest {
         ListStoredQueriesResponseType resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
-        items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("geomQuery", Arrays.asList(new Title("Geom query")), Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "Bridges"))));
+        items.add(new StoredQueryListItemType("nameQuery",     Arrays.asList(new Title("Name query")),     Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
+        items.add(new StoredQueryListItemType("geomQuery",     Arrays.asList(new Title("Geom query")),     Arrays.asList(new QName("http://www.opengis.net/gml/3.2.1", "Bridges"))));
+        items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
 
-        assertEquals(2, resultlsq.getStoredQuery().size());
+        assertEquals(3, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1221,7 +1240,7 @@ public class WFS2WorkerTest {
         resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
 
-        assertEquals(2, resultlsq.getStoredQuery().size());
+        assertEquals(3, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1249,9 +1268,10 @@ public class WFS2WorkerTest {
 
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
+        items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
 
-        assertEquals(1, resultlsq.getStoredQuery().size());
+        assertEquals(2, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1268,7 +1288,7 @@ public class WFS2WorkerTest {
         resultlsq = (ListStoredQueriesResponseType) resultlsqI;
 
 
-        assertEquals(1, resultlsq.getStoredQuery().size());
+        assertEquals(2, resultlsq.getStoredQuery().size());
         assertEquals(expResultlsq.getStoredQuery(), resultlsq.getStoredQuery());
         assertEquals(expResultlsq, resultlsq);
 
@@ -1282,11 +1302,11 @@ public class WFS2WorkerTest {
     public void getFeatureOMStoredQueriesTest() throws Exception {
 
         /**
-         * Test 1 : query on typeName samplingPoint
+         * Test 1 : query on typeName samplingPoint with name parameter
          */
         GetFeatureType request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
         ObjectFactory factory = new ObjectFactory();
-        final List<ParameterType> params = new ArrayList<ParameterType>();
+        List<ParameterType> params = new ArrayList<ParameterType>();
         params.add(new ParameterType("name", "10972X0137-PONT"));
         StoredQueryType query = new StoredQueryType("nameQuery", null, params);
         request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
@@ -1302,6 +1322,35 @@ public class WFS2WorkerTest {
         featureWriter.write((FeatureCollection)result,writer);
 
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+
+        /**
+         * Test 2 : query on typeName samplingPoint with a BBOX parameter
+         */
+        request = new GetFeatureType("WFS", "2.0.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        params = new ArrayList<ParameterType>();
+        DirectPositionType lower = new DirectPositionType( 65300.0, 1731360.0);
+        DirectPositionType upper = new DirectPositionType(65500.0, 1731400.0);
+        EnvelopeType env = new EnvelopeType(lower, upper, "urn:ogc:def:crs:epsg:7.6:27582");
+
+        params.add(new ParameterType("envelope", env));
+        query = new StoredQueryType("envelopeQuery", null, params);
+        request.getAbstractQueryExpression().add(factory.createStoredQuery(query));
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+        System.out.println(writer.toString());
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         domCompare(expectedResult, writer.toString());
