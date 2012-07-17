@@ -38,14 +38,14 @@ import org.mdweb.io.MD_IOException;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.PrimitiveType;
 import org.mdweb.model.schemas.Property;
-import org.mdweb.model.storage.Form;
+import org.mdweb.model.storage.FullRecord;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 
 /**
  * A CSW Metadata Writer specific for MDweb data source.
  * It allows to write, update and delete metadatas, it also keep the lucene Index of the CSW up to date.
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
 public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMetadataWriter {
@@ -69,7 +69,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      * {@inheritDoc}
      */
     @Override
-    public void indexDocument(final Form f) {
+    public void indexDocument(final FullRecord f) {
         if (indexer != null) {
             indexer.indexDocument(f);
         }
@@ -95,7 +95,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
     public boolean updateMetadata(final String metadataID, final List<RecordPropertyType> properties) throws MetadataIoException {
         LOGGER.log(logLevel, "metadataID: {0}", metadataID);
 
-        Form f = null;
+        FullRecord f = null;
         try {
             f  = mdWriter.getForm(metadataID);
         } catch (MD_IOException ex) {

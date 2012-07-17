@@ -48,7 +48,7 @@ import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.util.StringUtilities;
 
 import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.Form;
+import org.mdweb.model.storage.FullRecord;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.storage.TextValue;
@@ -63,7 +63,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 /**
  * A CSW Metadata reader specific for MDweb data source.
  * It allows to read metadata from the dataSource.
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
 public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMetadataReader {
@@ -91,7 +91,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         isoMap.put("rights",      "ISO 19115:MD_Metadata:identificationInfo:resourceConstraint:useLimitation");
         isoMap.put("description", "ISO 19115:MD_Metadata:identificationInfo:graphicOverview:fileName");
         DUBLINCORE_PATH_MAP.put(Standard.ISO_19115, isoMap);
-        
+
         final Map<String, String> iso2Map = new HashMap<String, String>();
         iso2Map.put("identifier",  "ISO 19115-2:MI_Metadata:fileIdentifier");
         iso2Map.put("type",        "ISO 19115-2:MI_Metadata:hierarchyLevel");
@@ -132,7 +132,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      */
     private final Map<String, URI> conceptMap = new HashMap<String, URI>();
 
-    
+
     public MDWebCSWMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(configuration);
 
@@ -228,8 +228,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             if (mode == ISO_19115 || mode == EBRIM || mode == SENSORML) {
 
                 if (result == null) {
-                    final Form f = mdReader.getForm(identifier);
-                    result = getObjectFromForm(identifier, f, mode);
+                    final FullRecord f = mdReader.getForm(identifier);
+                    result = getObjectFromRecord(identifier, f, mode);
                 } else {
                     LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
                 }
@@ -249,7 +249,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
             } else if (mode == DUBLINCORE) {
 
-                final Form form                   = mdReader.getForm(identifier);
+                final FullRecord form             = mdReader.getForm(identifier);
                 if (form != null) {
                     final Value top               = form.getRoot();
                     final Standard recordStandard = top.getType().getStandard();
@@ -261,7 +261,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                      */
                     if (!recordStandard.equals(Standard.CSW) || result == null) {
                         try {
-                            result = getRecordFromForm(identifier, form, type, elementName);
+                            result = getRecordFromMDRecord(identifier, form, type, elementName);
                         }  catch (IllegalArgumentException ex) {
                             LOGGER.warning(ex.getMessage());
                             // the metadata is not convertible to DublinCore
@@ -334,7 +334,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                             paramClass = List.class;
                         }
                         setter = ReflectionUtilities.getSetterFromName(qn.getLocalPart(), paramClass, recordClass);
-                    
+
                         if (setter != null) {
                             ReflectionUtilities.invokeMethod(setter, filtredResult, param);
                         } else {
@@ -357,18 +357,18 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * @param form the MDWeb record.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromForm(final String identifier, final Form form, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
+    private AbstractRecordType getRecordFromMDRecord(final String identifier, final FullRecord form, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
         final Value top                   = form.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
 
-        if (recordStandard.equals(Standard.ISO_19115)   || 
-            recordStandard.equals(Standard.ISO_19115_2) || 
-            recordStandard.equals(Standard.ISO_19115_FRA) || 
+        if (recordStandard.equals(Standard.ISO_19115)   ||
+            recordStandard.equals(Standard.ISO_19115_2) ||
+            recordStandard.equals(Standard.ISO_19115_FRA) ||
             recordStandard.equals(Standard.EBRIM_V3)) {
-            return transformMDFormInRecord(form, type, elementName);
+            return transformMDRecordInRecord(form, type, elementName);
 
         } else {
-            final Object obj =  getObjectFromForm(identifier, form, DUBLINCORE);
+            final Object obj =  getObjectFromRecord(identifier, form, DUBLINCORE);
 
             if (obj instanceof AbstractRecordType) {
                 return (AbstractRecordType) obj;
@@ -378,7 +378,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 if (obj != null)
                     objType = obj.getClass().getName();
 
-                throw new IllegalArgumentException("Unexpected type in getRecordFromForm. waiting for AbstractRecordType, got: " + objType);
+                throw new IllegalArgumentException("Unexpected type in getRecordFromMDRecord. waiting for AbstractRecordType, got: " + objType);
             }
         }
     }
@@ -387,16 +387,16 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * Return a dublinCore record from a ISO 19115 MDWeb record
      *
      * @Todo (improvement) return Brief, Summary record before getting all the property.
-     * 
+     *
      * @param form the MDWeb record.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType transformMDFormInRecord(final Form form, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
-        
+    private AbstractRecordType transformMDRecordInRecord(final FullRecord form, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
+
         final Value top                   = form.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
         final Map<String, String> pathMap = DUBLINCORE_PATH_MAP.get(recordStandard);
-        
+
         if (pathMap == null) {
             LOGGER.log(Level.WARNING, "No dublin core path_mapping for standard:{0}", recordStandard.getName());
             return null;
@@ -524,7 +524,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
         }
         final SimpleLiteral _abstract = new SimpleLiteral(null, abstracts);
-        
+
         // the description
         final List<Value>   descriptionValues   = form.getValueFromPath(pathMap.get("description"));
         final List<SimpleLiteral>  descriptions = new ArrayList<SimpleLiteral>();
@@ -649,7 +649,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     /**
      * Create a bounding box from a geographiqueElement Value
      */
-    private BoundingBoxType createBoundingBoxFromValue(final String idValue, final Form f, final Standard mainStandard) throws MD_IOException {
+    private BoundingBoxType createBoundingBoxFromValue(final String idValue, final FullRecord f, final Standard mainStandard) throws MD_IOException {
         Double  southValue  = null;
         Double eastValue    = null;
         Double  westValue   = null;

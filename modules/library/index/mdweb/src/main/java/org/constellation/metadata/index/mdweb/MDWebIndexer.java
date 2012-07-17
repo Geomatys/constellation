@@ -45,7 +45,7 @@ import org.mdweb.model.schemas.CodeList;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.RecordSet;
-import org.mdweb.model.storage.Form;
+import org.mdweb.model.storage.FullRecord;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.io.Reader;
@@ -58,7 +58,7 @@ import org.mdweb.model.storage.RecordSet.EXPOSURE;
  *
  * @author Guilhem Legal
  */
-public class MDWebIndexer extends AbstractCSWIndexer<Form> {
+public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
 
     /**
      * The Reader of this lucene index (MDWeb DB mode).
@@ -78,13 +78,13 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     private final boolean indexOnlyPusblishedMetadata;
 
     private final boolean indexInternalRecordset;
-    
+
     private final boolean indexExternalRecordset;
 
     public MDWebIndexer(final Automatic configuration, final String serviceID) throws IndexingException {
         this(configuration, serviceID, INSPIRE_QUERYABLE);
     }
-    
+
     /**
      * Creates a new CSW indexer for a MDWeb database.
      *
@@ -97,7 +97,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         this.indexOnlyPusblishedMetadata = configuration.getIndexOnlyPublishedMetadata();
         this.indexInternalRecordset      = configuration.getIndexInternalRecordset();
         this.indexExternalRecordset      = configuration.getIndexExternalRecordset();
-        
+
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
@@ -133,14 +133,14 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
     /**
      * Load the ebrim classes from the MDWeb database.
-     * 
+     *
      * @throws MD_IOException
      */
     private void initEbrimClasses() throws MD_IOException {
         identifiable   = mdWebReader.getClasse("Identifiable", Standard.EBRIM_V3);
         registryObject = mdWebReader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -171,37 +171,37 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             throw new IndexingException("MD_IOException while reading all identifiers", ex);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Form getEntry(final String identifier) throws IndexingException {
+    protected FullRecord getEntry(final String identifier) throws IndexingException {
         try {
             return mdWebReader.getForm(identifier);
         } catch (MD_IOException ex) {
             throw new IndexingException("MD_IOException while reading entry for:" + identifier, ex);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected String getIdentifier(Form obj) {
+    protected String getIdentifier(FullRecord obj) {
         return obj.getTitle();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void indexSpecialField(final Form metadata, final Document doc) throws IndexingException {
+    protected void indexSpecialField(final FullRecord metadata, final Document doc) throws IndexingException {
         if (metadata.getRoot() == null) {
-            throw new IndexingException("unable to index form:" + metadata.getId() + " top value is null");
+            throw new IndexingException("unable to index record:" + metadata.getId() + " top value is null");
 
         } else if (metadata.getRoot().getType() == null) {
-            throw new IndexingException("unable to index form:" + metadata.getId() + " top value type is null");
+            throw new IndexingException("unable to index record:" + metadata.getId() + " top value type is null");
         }
 
         final String identifier = metadata.getIdentifier();
@@ -213,40 +213,40 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      * {@inheritDoc}
      */
     @Override
-    protected boolean isISO19139(Form form) {
-       return form.getRoot().getType().getName().equals("MD_Metadata") ||
-              form.getRoot().getType().getName().equals("MI_Metadata");
+    protected boolean isISO19139(FullRecord record) {
+       return record.getRoot().getType().getName().equals("MD_Metadata") ||
+              record.getRoot().getType().getName().equals("MI_Metadata");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean isDublinCore(Form form) {
-        return form.getRoot().getType().getName().equals("Record");
+    protected boolean isDublinCore(FullRecord record) {
+        return record.getRoot().getType().getName().equals("Record");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean isEbrim25(Form form) {
-        return form.getRoot().getType().isSubClassOf(registryObject);
+    protected boolean isEbrim25(FullRecord record) {
+        return record.getRoot().getType().isSubClassOf(registryObject);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean isEbrim30(Form form) {
-        return form.getRoot().getType().isSubClassOf(identifiable);
+    protected boolean isEbrim30(FullRecord record) {
+        return record.getRoot().getType().isSubClassOf(identifiable);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected String getType(Form f) {
+    protected String getType(FullRecord f) {
         return f.getRoot().getType().getName();
     }
 
@@ -254,25 +254,25 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      * {@inheritDoc}
      */
     @Override
-    protected void indexQueryableSet(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
+    protected void indexQueryableSet(final Document doc, final FullRecord record, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
         for (Entry<String,List<String>> entry :queryableSet.entrySet()) {
-            final List<Object> values = getValuesList(form, entry.getValue());
+            final List<Object> values = getValuesList(record, entry.getValue());
             indexFields(values, entry.getKey(), anyText, doc);
         }
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      */
     @Override
     @Deprecated
-    protected String getValues(final Form form, final List<String> paths) throws IndexingException {
+    protected String getValues(final FullRecord record, final List<String> paths) throws IndexingException {
         final StringBuilder response  = new StringBuilder();
         if (paths != null) {
             for (String fullPathID: paths) {
                 try {
-                    final List<Value> values = getValuesFromPathID(fullPathID, form);
+                    final List<Value> values = getValuesFromPathID(fullPathID, record);
                     for (final Value v: values) {
                         //only handle textvalue
                         if (!(v instanceof TextValue)) continue;
@@ -298,12 +298,12 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         return response.toString();
     }
 
-    protected List<Object> getValuesList(final Form form, final List<String> paths) throws IndexingException {
+    protected List<Object> getValuesList(final FullRecord record, final List<String> paths) throws IndexingException {
         final List<Object> response  = new ArrayList<Object>();
         if (paths != null) {
             for (String fullPathID: paths) {
                 try {
-                    final List<Value> values = getValuesFromPathID(fullPathID, form);
+                    final List<Value> values = getValuesFromPathID(fullPathID, record);
                     for (final Value v: values) {
                         //only handle textvalue
                         if (!(v instanceof TextValue)) continue;
@@ -324,15 +324,15 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             response.add("null");
         }
         return response;
-    
+
     }
-    
+
     /**
      * Return the String description of An MDWeb textValue :
      * For almost all the value it return TextValue.getValue()
      * but for the value with codeList type it return the label of the codelist element
      * instead of the code.
-     * 
+     *
      * @param tv A TextValue
      *
      * @return S String label
@@ -354,22 +354,22 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         }
         return value;
     }
-    
+
     /**
      *  Return a List of MDWeb Value from the specified path.
-     * 
+     *
      * @param fullPathID
-     * @param form
+     * @param record
      * @return A list of Values.
      *
      * @throws MD_IOException
      */
-    public static List<Value> getValuesFromPathID(String fullPathID, final Form form) throws MD_IOException {
+    public static List<Value> getValuesFromPathID(String fullPathID, final FullRecord record) throws MD_IOException {
         String pathID            = null;
         String conditionalPathID = null;
         String conditionalValue  = null;
         int ordinal              = -1;
-        
+
         // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
         final int separator = fullPathID.indexOf('#');
         if (separator != -1) {
@@ -379,7 +379,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             final String temp = fullPathID.substring(fullPathID.indexOf('=') + 1);
             conditionalValue  = temp.substring(0, temp.indexOf(':'));
             pathID            = pathID + temp.substring(temp.indexOf(':'));
-            
+
             LOGGER.finer("pathID           : " + pathID + '\n'
                        + "conditionalPathID: " + conditionalPathID + '\n'
                        + "conditionalValue : " + conditionalValue);
@@ -401,7 +401,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
         final List<Value> values;
         if (conditionalPathID == null) {
-            values = form.getValueFromPath(pathID);
+            values = record.getValueFromPath(pathID);
             if (ordinal != -1) {
                 final List<Value> toRemove = new ArrayList<Value>();
                 for (Value v : values) {
@@ -413,7 +413,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             }
 
         } else {
-            final Value v = form.getConditionalValueFromPath(pathID, conditionalPathID, conditionalValue);
+            final Value v = record.getConditionalValueFromPath(pathID, conditionalPathID, conditionalValue);
             if (v != null) {
                 values = Collections.singletonList(v);
             } else {
@@ -425,7 +425,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
     /**
      * Return a Date representation in ISO syntax into Lucene date format
-     * 
+     *
      * @param value
      * @return
      */
@@ -443,7 +443,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
     /**
      * Return the text associated with a codeList textValue.
-     * 
+     *
      * @param tv A TextValue with a type instance of CodeList.
      *
      * @return A text description of the codeList element.

@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 // MDWeb dependencies
 import org.mdweb.model.storage.Value;
 import org.mdweb.io.Reader;
-import org.mdweb.model.storage.Form;
+import org.mdweb.model.storage.FullRecord;
 import org.mdweb.io.MD_IOFactory;
 
 // Constellation dependencies
@@ -77,7 +77,7 @@ public class MdwebIndexTest {
 
 
     private static DefaultDataSource ds;
-    
+
     private static final Logger logger = Logging.getLogger("org.constellation.metadata");
 
     private static LuceneIndexSearcher indexSearcher;
@@ -216,7 +216,7 @@ public class MdwebIndexTest {
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 4 simple search: Title = 92005711.ctd
          */
@@ -230,10 +230,10 @@ public class MdwebIndexTest {
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("40510_145_19930221211500");
-        
+
 
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 5 simple search: creator = IFREMER / IDM/SISMER
          */
@@ -247,11 +247,11 @@ public class MdwebIndexTest {
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("40510_145_19930221211500");
-        
+
 
         assertEquals(expectedResult, result);
     }
-    
+
     /**
      * Test simple lucene search.
      *
@@ -281,7 +281,7 @@ public class MdwebIndexTest {
 
         /**
          * Test 2 numeric search: CloudCover <= 25
-         */                              
+         */
         spatialQuery = new SpatialQuery("CloudCover:[-2147483648 TO 25]", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
@@ -312,7 +312,7 @@ public class MdwebIndexTest {
         assertEquals(2, result.size());
         assertTrue(result.contains("42292_5p_19900609195600"));
         assertTrue(result.contains("39727_22_19750113062500"));
-        
+
         /**
          * Test 4 numeric search: CloudCover => 60
          */
@@ -326,7 +326,7 @@ public class MdwebIndexTest {
         logger.log(Level.FINER, "numericComparisonSearch 4:\n{0}", resultReport);
 
         assertEquals(0, result.size());
-        
+
          /**
          * Test 5 numeric search: CloudCover => 50
          */
@@ -342,10 +342,10 @@ public class MdwebIndexTest {
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_5p_19900609195600");
-        
+
         //issues here it found
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 6 numeric search: CloudCover = 50.0
          */
@@ -363,7 +363,7 @@ public class MdwebIndexTest {
 
         //issues here it found
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 7 numeric search: CloudCover = 50.0
          */
@@ -408,8 +408,8 @@ public class MdwebIndexTest {
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
-        
-        
+
+
         assertEquals(expectedResult, result);
 
         /**
@@ -446,9 +446,9 @@ public class MdwebIndexTest {
         assertTrue(result.contains("42292_9s_19900610041000"));
         assertTrue(result.contains("39727_22_19750113062500"));
         assertTrue(result.contains("40510_145_19930221211500"));
-        
+
         assertEquals(4, result.size());
-        
+
         /**
          * Test 4 wildChar search: title like *.ctd
          */
@@ -465,9 +465,9 @@ public class MdwebIndexTest {
         assertTrue(result.contains("42292_9s_19900610041000"));
         assertTrue(result.contains("39727_22_19750113062500"));
         assertTrue(result.contains("40510_145_19930221211500"));
-        
+
         assertEquals(4, result.size());
-        
+
 
         /**
          * Test 5 wildCharSearch: abstract LIKE *onnees CTD NEDIPROD VI 120
@@ -588,7 +588,7 @@ public class MdwebIndexTest {
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
-        
+
         assertEquals(expectedResult, result);
 
         /**
@@ -605,7 +605,7 @@ public class MdwebIndexTest {
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
-        
+
         assertEquals(expectedResult, result);
 
 
@@ -755,9 +755,9 @@ public class MdwebIndexTest {
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals(expectedResult, result);
-        
+
         /**
-         * Test 5 sorted search: orderBy CloudCover ASC with SortField.STRING => bad order 
+         * Test 5 sorted search: orderBy CloudCover ASC with SortField.STRING => bad order
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("CloudCover:[0 TO 2147483648]", nullFilter, SerialChainFilter.AND);
@@ -777,10 +777,10 @@ public class MdwebIndexTest {
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
-        
+
 
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 5 sorted search: orderBy CloudCover ASC with SortField.DOUBLE => good order
          */
@@ -801,7 +801,7 @@ public class MdwebIndexTest {
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
-        
+
 
         assertEquals(expectedResult, result);
     }
@@ -969,7 +969,7 @@ public class MdwebIndexTest {
 
     @Test
     public void extractValuesTest() throws Exception {
-        
+
         MD_IOFactory factory = null;
         final Iterator<MD_IOFactory> ite = ServiceRegistry.lookupProviders(MD_IOFactory.class);
         while (ite.hasNext()) {
@@ -978,25 +978,25 @@ public class MdwebIndexTest {
                 factory = currentFactory;
             }
         }
-        
+
         Reader reader = factory.getReaderInstance(ds, false);
-        Form form = reader.getForm("40510_145_19930221211500");
-        
+        FullRecord form = reader.getForm("40510_145_19930221211500");
+
         assertNotNull(form);
         
         List<Value> result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date", form);
         assertEquals(0, result.size());
-        
-        
+
+
         result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=revision:date", form);
         assertEquals(1, result.size());
-        
+
         result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=originator:organisationName:value", form);
         assertEquals(1, result.size());
         assertTrue(result.get(0) instanceof TextValue);
         TextValue resultValue = (TextValue)result.get(0);
         assertEquals("IFREMER / IDM/SISMER", resultValue.getValue());
-        
+
         result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=custodian:organisationName:value", form);
         assertEquals(0, result.size());
     }

@@ -48,7 +48,7 @@ import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.Path;
 import org.mdweb.model.storage.RecordSet;
-import org.mdweb.model.storage.Form;
+import org.mdweb.model.storage.FullRecord;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.storage.LinkedValue;
@@ -348,8 +348,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             }
 
             if (result == null) {
-                final Form f = mdReader.getForm(identifier);
-                result       = getObjectFromForm(identifier, f, mode);
+                final FullRecord f = mdReader.getForm(identifier);
+                result       = getObjectFromRecord(identifier, f, mode);
             } else {
                 LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
             }
@@ -379,7 +379,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @return a GeotoolKit/constellation object representing the metadata.
      */
-    public Object getObjectFromForm(final String identifier, final Form form, final int mode) {
+    public Object getObjectFromRecord(final String identifier, final FullRecord form, final int mode) {
 
         if (form != null && form.getRoot() != null && form.getRoot().getType() != null) {
             final Value topValue = form.getRoot();
@@ -1170,10 +1170,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public List<? extends Object> getAllEntries() throws MetadataIoException {
         final List<Object> results = new ArrayList<Object>();
         try {
-            final List<RecordSet> recordSets = mdReader.getRecordSets();
-            final Collection<Form> forms     = mdReader.getAllForm(recordSets);
-            for (Form f: forms) {
-                results.add(getObjectFromForm("no cache", f, -1));
+            final List<RecordSet> recordSets   = mdReader.getRecordSets();
+            final Collection<FullRecord> forms = mdReader.getAllForm(recordSets);
+            for (FullRecord f: forms) {
+                results.add(getObjectFromRecord("no cache", f, -1));
             }
         } catch (MD_IOException ex) {
             throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());

@@ -63,7 +63,7 @@ import org.mdweb.model.schemas.PrimitiveType;
 import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.RecordSet;
-import org.mdweb.model.storage.Form;
+import org.mdweb.model.storage.FullRecord;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
@@ -73,17 +73,17 @@ import org.opengis.filter.FilterFactory2;
 
 
 /**
- * Test class for constellation lucene index 
- * 
+ * Test class for constellation lucene index
+ *
  * @author Guilhem Legal
  */
 public class MdwebFormIndexTest {
 
     protected static final FilterFactory2 FF = (FilterFactory2)
             FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
-    
+
     private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
-   
+
     private static LuceneIndexSearcher indexSearcher;
 
     private static File configDirectory;
@@ -91,7 +91,7 @@ public class MdwebFormIndexTest {
     private static final Level LOG_LEVEL = Level.FINER;
 
     private static DefaultDataSource ds;
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         configDirectory = new File("config-test");
@@ -117,7 +117,7 @@ public class MdwebFormIndexTest {
                 factory = currentFactory;
             }
         }
-        
+
         Writer writer = factory.getWriterInstance(ds, false);
         fillTestData(writer);
         writer.close();
@@ -125,7 +125,7 @@ public class MdwebFormIndexTest {
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
         final Automatic configuration = new Automatic("mdweb", bdd);
         configuration.setConfigurationDirectory(configDirectory);
-        
+
         final MDWebIndexer indexer    = new MDWebIndexer(configuration, "");
         indexer.destroy();
         indexSearcher                   = new LuceneIndexSearcher(configDirectory, "", null, true);
@@ -154,71 +154,71 @@ public class MdwebFormIndexTest {
     }
 
     /**
-     * Test simple lucene search. 
-     * 
+     * Test simple lucene search.
+     *
      * @throws java.lang.Exception
      */
     @Test
     public void simpleSearchTest() throws Exception {
         Filter nullFilter   = null;
         String resultReport = "";
-        
+
         /**
          * Test 1 simple search: title = title1
          */
         SpatialQuery spatialQuery = new SpatialQuery("title:title1", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
-        
+
         for (String s: result)
             resultReport = resultReport + s + '\n';
-        
+
         LOGGER.log(LOG_LEVEL, "SimpleSearch 1:\n{0}", resultReport);
-        
+
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("2345-aa453-ade456");
-        
+
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 2 simple search: title like tit*
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("title:tit*", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
-        
+
         for (String s: result)
             resultReport = resultReport + s + '\n';
-        
+
         LOGGER.log(LOG_LEVEL, "SimpleSearch 2:\n{0}", resultReport);
-        
+
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         expectedResult.add("test-5");
         expectedResult.add("test-6");
-        
+
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 3 simple search: identifier != 2345-aa453-ade456
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc NOT identifier:\"2345-aa453-ade456\"", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
-        
+
         for (String s: result)
             resultReport = resultReport + s + '\n';
-        
+
         LOGGER.log(LOG_LEVEL, "SimpleSearch 3:\n{0}", resultReport);
-        
+
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         expectedResult.add("test-5");
         expectedResult.add("test-6");
-        
+
         assertEquals(expectedResult, result);
 
         /**
@@ -427,32 +427,32 @@ public class MdwebFormIndexTest {
         assertEquals(expectedResult, result);
 
     }
-    
+
     /**
-     * Test sorted lucene search. 
-     * 
+     * Test sorted lucene search.
+     *
      * @throws java.lang.Exception
      */
     @Test
     public void sortedSearchTest() throws Exception {
-        
+
         Filter nullFilter   = null;
         String resultReport = "";
-        
+
         /**
          * Test 1 sorted search: all orderBy type ASC
          */
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
         SortField sf = new SortField("type_sort", SortField.STRING, false);
         spatialQuery.setSort(new Sort(sf));
-        
+
         Set<String> result = indexSearcher.doSearch(spatialQuery);
-        
+
         for (String s: result)
             resultReport = resultReport + s + '\n';
-        
+
         LOGGER.log(LOG_LEVEL, "SortedSearch 1:\n{0}", resultReport);
-        
+
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("test-5");
         expectedResult.add("test-6");
@@ -460,9 +460,9 @@ public class MdwebFormIndexTest {
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
-        
+
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 2 sorted search: all orderBy type DSC
          */
@@ -470,14 +470,14 @@ public class MdwebFormIndexTest {
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
         sf           = new SortField("type_sort", SortField.STRING, true);
         spatialQuery.setSort(new Sort(sf));
-        
+
         result = indexSearcher.doSearch(spatialQuery);
-        
+
         for (String s: result)
             resultReport = resultReport + s + '\n';
-        
+
         LOGGER.log(LOG_LEVEL, "SortedSearch 2:\n{0}", resultReport);
-        
+
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         expectedResult.add("2345-aa453-ade456");
@@ -485,9 +485,9 @@ public class MdwebFormIndexTest {
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("test-6");
         expectedResult.add("test-5");
-        
+
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 3 sorted search: all orderBy identifier ASC
          */
@@ -495,14 +495,14 @@ public class MdwebFormIndexTest {
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
         sf           = new SortField("identifier_sort", SortField.STRING, false);
         spatialQuery.setSort(new Sort(sf));
-        
+
         result = indexSearcher.doSearch(spatialQuery);
-        
+
         for (String s: result)
             resultReport = resultReport + s + '\n';
-        
+
         LOGGER.log(LOG_LEVEL, "SortedSearch 3:\n{0}", resultReport);
-        
+
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
@@ -510,9 +510,9 @@ public class MdwebFormIndexTest {
         expectedResult.add("test-5");
         expectedResult.add("test-6");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
-        
+
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 4 sorted search: all orderBy identifier DSC
          */
@@ -520,14 +520,14 @@ public class MdwebFormIndexTest {
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
         sf           = new SortField("identifier_sort", SortField.STRING, true);
         spatialQuery.setSort(new Sort(sf));
-        
+
         result = indexSearcher.doSearch(spatialQuery);
-        
+
         for (String s: result)
             resultReport = resultReport + s + '\n';
-        
+
         LOGGER.log(LOG_LEVEL, "SortedSearch 4:\n{0}", resultReport);
-        
+
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
         expectedResult.add("test-6");
@@ -535,40 +535,40 @@ public class MdwebFormIndexTest {
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
-        
+
         assertEquals(expectedResult, result);
     }
-    
+
     /**
-     * Test spatial lucene search. 
-     * 
+     * Test spatial lucene search.
+     *
      * @throws java.lang.Exception
      */
     @Test
     public void spatialSearchTest() throws Exception {
-        
+
         String resultReport = "";
-        
+
         /**
          * Test 1 spatial search: BBOX filter
          */
         LuceneOGCFilter sf          = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", sf, SerialChainFilter.AND);
-        
+
         Set<String> result = indexSearcher.doSearch(spatialQuery);
-        
+
         for (String s: result)
             resultReport = resultReport + s + '\n';
-        
+
         LOGGER.log(LOG_LEVEL, "spatialSearch 1:\n{0}", resultReport);
-        
+
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("00180e67-b7cf-40a3-861d-b3a09337b195");
         expectedResult.add("09844e51-e5cd-52c3-737d-b3a61366d028");
         expectedResult.add("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
-        
+
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 1 spatial search: NOT BBOX filter
          */
@@ -579,25 +579,25 @@ public class MdwebFormIndexTest {
         int[] op = {SerialChainFilter.NOT};
         SerialChainFilter f = new SerialChainFilter(lf, op);
         spatialQuery = new SpatialQuery("metafile:doc", f, SerialChainFilter.AND);
-        
+
         result = indexSearcher.doSearch(spatialQuery);
-        
+
         for (String s: result)
             resultReport = resultReport + s + '\n';
-        
+
         LOGGER.log(LOG_LEVEL, "spatialSearch 2:\n{0}", resultReport);
-        
+
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("2345-aa453-ade456");
         expectedResult.add("test-5");
         expectedResult.add("test-6");
-        
+
         assertEquals(expectedResult, result);
     }
 
-    
+
     public static void fillTestData(Writer writer) throws MD_IOException {
-        
+
         //we create a new Catalog
         RecordSet cat             = new RecordSet("CATEST", "CATEST");
         writer.writeRecordSet(cat);
@@ -627,46 +627,46 @@ public class MdwebFormIndexTest {
         Classe registryObject   = new Classe(Standard.EBRIM_V2_5, "RegsitryObject", "ro", "no definition", null, false, ' ');
         writer.writeClasse(identifiable);
         writer.writeClasse(registryObject);
-        
+
         //The paths
         writer.writeStandard(Standard.CSW);
         writer.writeStandard(Standard.DUBLINCORE);
         writer.writeStandard(Standard.OWS);
-        
+
         Path recordPath      = new Path(Standard.CSW, recordClass);
-        
+
         Path identifierPath  = new Path(recordPath, identifierProp);
         Path idenContentPath = new Path(identifierPath, contentProp);
-        
+
         Path titlePath       = new Path(recordPath, titleProp);
         Path titContentPath  = new Path(titlePath, contentProp);
-        
+
         Path typePath        = new Path(recordPath, typeProp);
         Path typContentPath  = new Path(typePath, contentProp);
-        
+
         Path bboxPath        = new Path(recordPath, bboxProp);
         Path lowerCornPath   = new Path(bboxPath, lowerProp);
         Path upperCornPath   = new Path(bboxPath, upperProp);
-        
+
         writer.writePath(recordPath);
         writer.writePath(identifierPath);
         writer.writePath(idenContentPath);
 
         writer.writePath(titlePath);
         writer.writePath(titContentPath);
-        
+
         writer.writePath(typePath);
         writer.writePath(typContentPath);
         writer.writePath(bboxPath);
         writer.writePath(lowerCornPath);
         writer.writePath(upperCornPath);
-        
+
         //The forms
         Date d = new Date(120);
         User inputUser = new User("admin", "adminadmin", null, d, d);
         writer.writeUser(inputUser);
-        
-        Form f1 = new Form(1, "2345-aa453-ade456", cat, "title1", inputUser, null, null, d, d, null, true, true, Form.TYPE.NORMALFORM);
+
+        FullRecord f1 = new FullRecord(1, "2345-aa453-ade456", cat, "title1", inputUser, null, null, d, d, null, true, true, FullRecord.TYPE.NORMALFORM);
         Value f1_rootValue    = new Value(recordPath, f1, 1, recordClass, null);
         Value f1_ident        = new Value(identifierPath, f1, 1, sLiteralClass, f1_rootValue);
         TextValue f1_idValue  = new TextValue(idenContentPath, f1, 1, "2345-aa453-ade456", PrimitiveType.STRING, f1_ident);
@@ -679,8 +679,8 @@ public class MdwebFormIndexTest {
         TextValue f1_lcyValue = new TextValue(lowerCornPath, f1, 2, "0", PrimitiveType.STRING, f1_bbox);
         TextValue f1_ucxValue = new TextValue(upperCornPath, f1, 1, "50", PrimitiveType.STRING, f1_bbox);
         TextValue f1_ucyValue = new TextValue(upperCornPath, f1, 2, "15", PrimitiveType.STRING, f1_bbox);
-        
-        Form f2 = new Form(2, "00180e67-b7cf-40a3-861d-b3a09337b195", cat, "title2", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+
+        FullRecord f2 = new FullRecord(2, "00180e67-b7cf-40a3-861d-b3a09337b195", cat, "title2", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
         Value f2_rootValue    = new Value(recordPath, f2, 1, recordClass, null);
         Value f2_ident        = new Value(identifierPath, f2, 1, sLiteralClass, f2_rootValue);
         TextValue f2_idValue  = new TextValue(idenContentPath, f2, 1, "00180e67-b7cf-40a3-861d-b3a09337b195", PrimitiveType.STRING, f2_ident);
@@ -693,8 +693,8 @@ public class MdwebFormIndexTest {
         TextValue f2_lcyValue = new TextValue(lowerCornPath, f2, 2, "0", PrimitiveType.STRING, f2_bbox);
         TextValue f2_ucxValue = new TextValue(upperCornPath, f2, 1, "-15", PrimitiveType.STRING, f2_bbox);
         TextValue f2_ucyValue = new TextValue(upperCornPath, f2, 2, "10", PrimitiveType.STRING, f2_bbox);
-        
-        Form f3 = new Form(3, "09844e51-e5cd-52c3-737d-b3a61366d028", cat, "bo", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+
+        FullRecord f3 = new FullRecord(3, "09844e51-e5cd-52c3-737d-b3a61366d028", cat, "bo", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
         Value f3_rootValue    = new Value(recordPath, f3, 1, recordClass, null);
         Value f3_ident        = new Value(identifierPath, f3, 1, sLiteralClass, f3_rootValue);
         TextValue f3_idValue  = new TextValue(idenContentPath, f3, 1, "09844e51-e5cd-52c3-737d-b3a61366d028", PrimitiveType.STRING, f3_ident);
@@ -707,8 +707,8 @@ public class MdwebFormIndexTest {
         TextValue f3_lcyValue = new TextValue(lowerCornPath, f3, 2, "10", PrimitiveType.STRING, f3_bbox);
         TextValue f3_ucxValue = new TextValue(upperCornPath, f3, 1, "10", PrimitiveType.STRING, f3_bbox);
         TextValue f3_ucyValue = new TextValue(upperCornPath, f3, 2, "15", PrimitiveType.STRING, f3_bbox);
-        
-        Form f4 = new Form(4, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", cat, "title4", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+
+        FullRecord f4 = new FullRecord(4, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", cat, "title4", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
         Value f4_rootValue    = new Value(recordPath, f4, 1, recordClass, null);
         Value f4_ident        = new Value(identifierPath, f4, 1, sLiteralClass, f4_rootValue);
         TextValue f4_idValue  = new TextValue(idenContentPath, f4, 1, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", PrimitiveType.STRING, f4_ident);
@@ -722,7 +722,7 @@ public class MdwebFormIndexTest {
         TextValue f4_ucxValue = new TextValue(upperCornPath, f4, 1, "10", PrimitiveType.STRING, f4_bbox);
         TextValue f4_ucyValue = new TextValue(upperCornPath, f4, 2, "15", PrimitiveType.STRING, f4_bbox);
 
-        Form f5 = new Form(5, "test-5", cat, "title5", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+        FullRecord f5 = new FullRecord(5, "test-5", cat, "title5", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
         Value f5_rootValue    = new Value(recordPath, f5, 1, recordClass, null);
         Value f5_title        = new Value(titlePath, f5, 1, sLiteralClass, f5_rootValue);
         TextValue f5_tiValue  = new TextValue(titContentPath, f5, 1, "title5", PrimitiveType.STRING, f4_title);
@@ -732,7 +732,7 @@ public class MdwebFormIndexTest {
         TextValue f5_tyValue  = new TextValue(typContentPath, f5, 1, "218a", PrimitiveType.STRING, f5_type);
 
 
-        Form f6 = new Form(6, "test-6", cat, "title6", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
+        FullRecord f6 = new FullRecord(6, "test-6", cat, "title6", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
         Value f6_rootValue    = new Value(recordPath, f6, 1, recordClass, null);
         Value f6_ident        = new Value(identifierPath, f6, 1, sLiteralClass, f6_rootValue);
         TextValue f6_idValue  = new TextValue(idenContentPath, f6, 1, "test-6", PrimitiveType.STRING, f6_ident);
@@ -741,14 +741,14 @@ public class MdwebFormIndexTest {
         Value f6_title        = new Value(titlePath, f6, 1, sLiteralClass, f6_rootValue);
         TextValue f6_tiValue  = new TextValue(titContentPath, f6, 1, "title6", PrimitiveType.STRING, f6_title);
 
-        
+
         writer.writeForm(f1, false, true);
         writer.writeForm(f2, false, true);
         writer.writeForm(f3, false, true);
         writer.writeForm(f4, false, true);
         writer.writeForm(f5, false, true);
         writer.writeForm(f6, false, true);
-        
-        
+
+
     }
 }

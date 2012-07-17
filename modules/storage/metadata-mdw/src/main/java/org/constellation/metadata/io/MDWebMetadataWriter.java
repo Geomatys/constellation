@@ -61,7 +61,7 @@ import org.mdweb.model.schemas.Path;
 import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.RecordSet;
-import org.mdweb.model.storage.Form;
+import org.mdweb.model.storage.FullRecord;
 import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
@@ -335,49 +335,49 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @throws MD_IOException
      */
     private void initContactMap() throws MD_IOException {
-        final Collection<Form> contactForms = mdWriter.getContacts();
-        if (contactForms.size() > 0) {
-            LOGGER.log(Level.INFO, "initiazing {0} contacts", contactForms.size());
+        final Collection<FullRecord> contactRecords = mdWriter.getContacts();
+        if (contactRecords.size() > 0) {
+            LOGGER.log(Level.INFO, "initiazing {0} contacts", contactRecords.size());
             final MDWebMetadataReader reader = new MDWebMetadataReader(mdWriter);
-            for (Form contactForm : contactForms) {
-                Object responsibleParty = reader.getObjectFromForm(null, contactForm, AbstractMetadataReader.ISO_19115);
-                contacts.put(responsibleParty, contactForm.getRoot());
+            for (FullRecord contactRecord : contactRecords) {
+                Object responsibleParty = reader.getObjectFromRecord(null, contactRecord, AbstractMetadataReader.ISO_19115);
+                contacts.put(responsibleParty, contactRecord.getRoot());
             }
         }
 
     }
 
     /**
-     * Return an MDWeb {@link Form} from an object.
+     * Return an MDWeb {@link FullRecord} from an object.
      *
      * @param object The object to transform in form.
-     * @return an MDWeb {@link Form} representing the metadata object.
+     * @return an MDWeb {@link FullRecord} representing the metadata object.
      */
-    protected Form getFormFromObject(final Object object) throws MD_IOException {
+    protected FullRecord getRecordFromObject(final Object object) throws MD_IOException {
         final String title = Utils.findTitle(object);
-        return getFormFromObject(object, defaultUser, mdRecordSet, null, title);
+        return getRecordFromObject(object, defaultUser, mdRecordSet, null, title);
     }
 
     /**
-     * Return an MDWeb {@link Form} from an object.
+     * Return an MDWeb {@link FullRecord} from an object.
      *
      * @param object The object to transform in form.
-     * @return an MDWeb {@link Form} representing the metadata object.
+     * @return an MDWeb {@link FullRecord} representing the metadata object.
      */
-    protected Form getFormFromObject(final Object object, String title) throws MD_IOException {
+    protected FullRecord getRecordFromObject(final Object object, String title) throws MD_IOException {
         if (title == null) {
             title = Utils.findTitle(object);
         }
-        return getFormFromObject(object, defaultUser, mdRecordSet, null, title);
+        return getRecordFromObject(object, defaultUser, mdRecordSet, null, title);
     }
 
     /**
-     * Return an MDWeb {@link Form} from an object.
+     * Return an MDWeb {@link FullRecord} from an object.
      *
      * @param object The object to transform in form.
-     * @return an MDWeb {@link Form} representing the metadata object.
+     * @return an MDWeb {@link FullRecord} representing the metadata object.
      */
-    public Form getFormFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
+    public FullRecord getRecordFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
 
         if (user == null) {
             throw new MD_IOException("The User must not be null");
@@ -428,7 +428,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             if (mdWriter.isAlreadyUsedIdentifier(identifier)) {
                 throw new MD_IOException("The identifier " + identifier + " is already used");
             }
-            final Form form = new Form(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, Form.TYPE.NORMALFORM);
+            final FullRecord form = new FullRecord(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, FullRecord.TYPE.NORMALFORM);
 
             final Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
@@ -453,7 +453,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @param form The created form.
      *
      */
-    protected List<Value> addValueFromObject(final Form form, Object object, Path path, Value parentValue) throws MD_IOException {
+    protected List<Value> addValueFromObject(final FullRecord form, Object object, Path path, Value parentValue) throws MD_IOException {
 
         final List<Value> result = new ArrayList<Value>();
 
@@ -1020,7 +1020,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
 
         // we create a MDWeb form form the object
-        Form form       = null;
+        FullRecord form       = null;
         Profile profile = null;
         try {
             // we try to determine the profile for the Object
@@ -1031,7 +1031,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
 
             final long startTrans = System.currentTimeMillis();
-            form                  = getFormFromObject(obj, title);
+            form                  = getRecordFromObject(obj, title);
             transTime             = System.currentTimeMillis() - startTrans;
 
         } catch (IllegalArgumentException e) {
@@ -1062,7 +1062,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             final long time = System.currentTimeMillis() - start;
 
-            final StringBuilder report = new StringBuilder("inserted new Form: ");
+            final StringBuilder report = new StringBuilder("inserted new FullRecord: ");
             report.append(form.getTitle()).append('[').append(form.getIdentifier()).append(']').append("( ID:").append(form.getId());
             report.append(" in ").append(time).append(" ms (transformation: ").append(transTime).append(" DB write: ").append(writeTime).append(")");
             LOGGER.log(logLevel, report.toString());
@@ -1075,7 +1075,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return false;
     }
 
-    protected void indexDocument(final Form f) {
+    protected void indexDocument(final FullRecord f) {
         //need to be override by child
     }
 

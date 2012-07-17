@@ -85,7 +85,7 @@ public final class CreateProvider extends AbstractCstlProcess {
             }
 
         } else {
-            throw new ProcessException("Service name not found.", this, null);
+            throw new ProcessException("Service name not found:" + serviceName, this, null);
         }
     }
 
