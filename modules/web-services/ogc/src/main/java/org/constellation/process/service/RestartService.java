@@ -45,7 +45,7 @@ public final class RestartService extends AbstractCstlProcess {
 
     @Override
     protected void execute() throws ProcessException {
-        final String serviceName = value(SERVICE, inputParameters);
+        final String serviceName = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         final Boolean closeFirst = value(CLOSE, inputParameters);
         File serviceDir = value(SERVICE_DIRECTORY, inputParameters);

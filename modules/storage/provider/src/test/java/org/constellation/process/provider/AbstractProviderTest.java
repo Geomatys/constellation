@@ -67,7 +67,6 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
         configDirectory.mkdir();
         File providerDirectory = new File(configDirectory, "provider");
         providerDirectory.mkdir();
-        File datastore = new File(providerDirectory, "data-store.xml");
         ConfigDirectory.setConfigDirectory(configDirectory);
 
         File csv = new File(configDirectory, "file.csv");

@@ -38,7 +38,7 @@ public class StopService extends AbstractCstlProcess {
 
     @Override
     protected void execute() throws ProcessException {
-        final String service = value(SERVICE, inputParameters);
+        final String service = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
 
         if (identifier == null || identifier.isEmpty()) {

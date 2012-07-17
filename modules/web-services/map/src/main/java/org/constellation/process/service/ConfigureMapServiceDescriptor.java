@@ -17,6 +17,8 @@
 package org.constellation.process.service;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
@@ -27,6 +29,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
 
 /**
@@ -40,10 +43,19 @@ public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Update configuration of an existing map service (WMS, WMTS, WFS) in constellation.");
 
 
-    public static final String SERVICE_NAME_NAME = "service_Name";
-    private static final String SERVICE_NAME_REMARKS = "The name of the service (WMS, WMTS, WFS).";
-    public static final ParameterDescriptor<String> SERVICE_NAME =
-            new DefaultParameterDescriptor(SERVICE_NAME_NAME, SERVICE_NAME_REMARKS, String.class, null, true);
+    public static final String SERVICE_TYPE_NAME = "service_type";
+    private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS.";
+    private static final Map<String, Object> SERVICE_TYPE_PROPERTIES;
+    private static final String[] SERVICE_TYPE_VALID_VALUES;
+    static {
+        SERVICE_TYPE_PROPERTIES = new HashMap<String, Object>();
+        SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.NAME_KEY, SERVICE_TYPE_NAME);
+        SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.REMARKS_KEY, SERVICE_TYPE_REMARKS);
+
+        SERVICE_TYPE_VALID_VALUES = new String [] {"WMS", "WFS", "WMTS"};
+    }
+    public static final ParameterDescriptor<String> SERVICE_TYPE =
+            new DefaultParameterDescriptor(SERVICE_TYPE_PROPERTIES, String.class, SERVICE_TYPE_VALID_VALUES, null, null, null, null, true);
 
 
     public static final String IDENTIFIER_NAME = "identifier";
@@ -65,7 +77,7 @@ public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_NAME, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY});
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");

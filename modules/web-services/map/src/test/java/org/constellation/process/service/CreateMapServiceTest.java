@@ -50,7 +50,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance1");
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -72,7 +72,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance11");
         in.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue(conf);
 
@@ -91,7 +91,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("");
 
         try {
@@ -111,7 +111,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance3");
 
         try {

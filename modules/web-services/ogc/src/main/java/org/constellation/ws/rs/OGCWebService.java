@@ -204,7 +204,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 try {
                     ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
                     ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                    inputs.parameter(StartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+                    inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
                     inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(instance);
                     inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(serviceDirectory);
 
@@ -369,7 +369,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 try {
                     ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
                     ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                    inputs.parameter(RestartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+                    inputs.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
                     inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
                     inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(closeFirst);
                     inputs.parameter(RestartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
@@ -392,7 +392,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 try {
                     ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
                     ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                    inputs.parameter(StartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+                    inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
                     inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
                     inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
 
@@ -414,7 +414,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopServiceDescriptor.NAME);
                     ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
                     inputs.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-                    inputs.parameter(StopServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+                    inputs.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
 
                     org.geotoolkit.process.Process proc = desc.createProcess(inputs);
                     proc.call();
@@ -435,7 +435,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 try {
                     ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteServiceDescriptor.NAME);
                     ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                    inputs.parameter(DeleteServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+                    inputs.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
                     inputs.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
                     inputs.parameter(DeleteServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(getServiceDirectory());
 

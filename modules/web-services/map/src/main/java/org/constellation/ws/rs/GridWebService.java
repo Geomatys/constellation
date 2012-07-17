@@ -78,7 +78,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
                     try {
                         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
                         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(CreateMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+                        inputs.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
                         inputs.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
                         inputs.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
                         inputs.parameter(CreateMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
@@ -98,7 +98,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
                     try {
                         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, ConfigureMapServiceDescriptor.NAME);
                         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(ConfigureMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+                        inputs.parameter(ConfigureMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
                         inputs.parameter(ConfigureMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
                         inputs.parameter(ConfigureMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
                         inputs.parameter(ConfigureMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
@@ -136,7 +136,7 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
             final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigMapServiceDescriptor.NAME);
 
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
-            in.parameter(GetConfigMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+            in.parameter(GetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
             in.parameter(GetConfigMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
 

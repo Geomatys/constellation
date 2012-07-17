@@ -46,7 +46,7 @@ public class DeleteService extends AbstractCstlProcess {
      */
     @Override
     protected void execute() throws ProcessException {
-        String serviceName = value(SERVICE_NAME, inputParameters);
+        String serviceName = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         File serviceDir = value(SERVICE_DIRECTORY, inputParameters);
 

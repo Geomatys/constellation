@@ -52,13 +52,13 @@ public class CreateProviderTest extends AbstractProviderTest {
 
         final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "newProvider", false, EMPTY_CSV);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter("service_Name").setValue(DATASTORE_SERVICE.getName());
+        in.parameter("provider_type").setValue(DATASTORE_SERVICE.getName());
         in.parameter("parameters").setValue(parameters);
 
         final Process proc = desc.createProcess(in);
         proc.call();
 
-        Provider provider = null;
+        LayerProvider provider = null;
         for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
             if ("newProvider".equals(p.getId())){
                 provider = p;
@@ -66,6 +66,9 @@ public class CreateProviderTest extends AbstractProviderTest {
         }
         assertTrue(nbProvider+1 == LayerProviderProxy.getInstance().getProviders().size());
         assertNotNull(provider);
+
+        LayerProviderProxy.getInstance().removeProvider(provider);
+        removeProvider("newProvider");
 
     }
 }

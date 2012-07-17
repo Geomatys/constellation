@@ -48,7 +48,7 @@ public abstract class StopServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StopServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue("stopInstance1");
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -64,7 +64,7 @@ public abstract class StopServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StopServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StopServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue("stopInstance5");
 
         try {
@@ -83,7 +83,7 @@ public abstract class StopServiceTest extends ServiceProcessTest {
         createInstance("stopInstance3");
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StopServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue("stopInstance3");
 
         try {

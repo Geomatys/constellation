@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
@@ -257,7 +255,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
 
                 final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                inputs.parameter(CreateProviderDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+                inputs.parameter(CreateProviderDescriptor.PROVIDER_TYPE_NAME).setValue(serviceName);
                 inputs.parameter(CreateProviderDescriptor.SOURCE_NAME).setValue(sourceToAdd);
 
                 try {

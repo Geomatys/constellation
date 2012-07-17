@@ -1,0 +1,6 @@
+#Providers process
+org.constellation.process.provider.CreateProviderDescriptor
+org.constellation.process.provider.DeleteProviderDescriptor
+org.constellation.process.provider.UpdateProviderDescriptor
+org.constellation.process.provider.RestartProviderDescriptor
+org.constellation.process.provider.GetConfigProviderDescriptor

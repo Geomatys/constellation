@@ -16,6 +16,10 @@
  */
 package org.constellation.process.provider;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -26,6 +30,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
 
 /**
@@ -38,10 +43,23 @@ public class CreateProviderDescriptor extends AbstractProcessDescriptor {
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new provider in constellation.");
 
 
-    public static final String SERVICE_NAME_NAME = "service_Name";
-    private static final String SERVICE_NAME_REMARKS = "The name of the service.";
-    public static final ParameterDescriptor<String> SERVICE_NAME =
-            new DefaultParameterDescriptor(SERVICE_NAME_NAME, SERVICE_NAME_REMARKS, String.class, null, true);
+    public static final String PROVIDER_TYPE_NAME = "provider_type";
+    private static final String PROVIDER_TYPE_REMARKS = "The type of he provider like 'data-store', 'coverage-store', ... .";
+    private static final Map<String, Object> PROVIDER_TYPE_PROPERTIES;
+    private static final String[] PROVIDER_TYPE_VALID_VALUES;
+    static {
+        PROVIDER_TYPE_PROPERTIES = new HashMap<String, Object>();
+        PROVIDER_TYPE_PROPERTIES.put(IdentifiedObject.NAME_KEY, PROVIDER_TYPE_NAME);
+        PROVIDER_TYPE_PROPERTIES.put(IdentifiedObject.REMARKS_KEY, PROVIDER_TYPE_REMARKS);
+
+        final List<String> validValues = new ArrayList<String>();
+        for (ProviderType providerType : ProviderType.values()) {
+            validValues.add(providerType.getCode());
+        }
+        PROVIDER_TYPE_VALID_VALUES = validValues.toArray(new String[validValues.size()]);
+    }
+    public static final ParameterDescriptor<String> PROVIDER_TYPE =
+            new DefaultParameterDescriptor(PROVIDER_TYPE_PROPERTIES, String.class, PROVIDER_TYPE_VALID_VALUES, ProviderType.DATA_STORE.getCode(), null, null, null, true);
 
 
 
@@ -53,7 +71,7 @@ public class CreateProviderDescriptor extends AbstractProcessDescriptor {
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_NAME, SOURCE});
+            new GeneralParameterDescriptor[]{PROVIDER_TYPE, SOURCE});
 
 
     /**Output parameters */

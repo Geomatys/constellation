@@ -17,7 +17,13 @@
 
 package org.constellation.provider;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.stream.XMLStreamException;
+import org.constellation.configuration.ConfigDirectory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,6 +35,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import static org.junit.Assert.*;
 import static org.constellation.provider.MockLayerProviderService.*;
+import org.constellation.provider.configuration.ProviderParameters;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 
 /**
@@ -54,7 +61,7 @@ public class ConfiguratorTest {
     @Test
     public void testServiceAvailable(){
         final Collection<LayerProviderService> services = LayerProviderProxy.getInstance().getServices();
-        assertEquals(1, services.size());
+        assertEquals(2, services.size());
         assertTrue(services.iterator().next() instanceof MockLayerProviderService);
     }
 
@@ -106,7 +113,22 @@ public class ConfiguratorTest {
 
             @Override
             public void saveConfiguration(String serviceName, ParameterValueGroup params) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                final String fileName = serviceName + ".xml";
+                final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+
+                if(configFile.exists()){
+                    //make a backup
+                    configFile.delete();
+                }
+
+                //write the configuration
+                try {
+                    ProviderParameters.write(configFile, params);
+                } catch (XMLStreamException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
@@ -123,7 +145,7 @@ public class ConfiguratorTest {
     public void testLayersConfig(){
 
         final Configurator config = new Configurator() {
-            
+
             @Override
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
                 final ParameterValueGroup config = desc.createValue();
@@ -150,7 +172,22 @@ public class ConfiguratorTest {
 
             @Override
             public void saveConfiguration(String serviceName, ParameterValueGroup params) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                final String fileName = serviceName + ".xml";
+                final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+
+                if(configFile.exists()){
+                    //make a backup
+                    configFile.delete();
+                }
+                try {
+                    //write the configuration
+                        ProviderParameters.write(configFile, params);
+                } catch (IOException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.WARNING, null, ex);
+                } catch (XMLStreamException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.WARNING, null, ex);
+                }
+
             }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
@@ -198,7 +235,22 @@ public class ConfiguratorTest {
 
             @Override
             public void saveConfiguration(String serviceName, ParameterValueGroup params) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                final String fileName = serviceName + ".xml";
+                final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+
+                if(configFile.exists()){
+                    //make a backup
+                    configFile.delete();
+                }
+
+                //write the configuration
+                try {
+                    ProviderParameters.write(configFile, params);
+                } catch (XMLStreamException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
@@ -246,7 +298,22 @@ public class ConfiguratorTest {
 
             @Override
             public void saveConfiguration(String serviceName, ParameterValueGroup params) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                final String fileName = serviceName + ".xml";
+                final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+
+                if(configFile.exists()){
+                    //make a backup
+                    configFile.delete();
+                }
+
+                //write the configuration
+                try {
+                    ProviderParameters.write(configFile, params);
+                } catch (XMLStreamException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         };
         LayerProviderProxy.getInstance().setConfigurator(config);
@@ -260,7 +327,7 @@ public class ConfiguratorTest {
         assertEquals(3, LayerProviderProxy.getInstance().getProviders().size());
         assertEquals(9, LayerProviderProxy.getInstance().getKeys().size());
 
-        
+
         //set an empty configuration and verify nothing remains
         LayerProviderProxy.getInstance().setConfigurator(new Configurator() {
             @Override
@@ -270,7 +337,22 @@ public class ConfiguratorTest {
 
             @Override
             public void saveConfiguration(String serviceName, ParameterValueGroup params) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                final String fileName = serviceName + ".xml";
+                final File configFile = ConfigDirectory.getProviderConfigFile(fileName);
+
+                if(configFile.exists()){
+                    //make a backup
+                    configFile.delete();
+                }
+
+                //write the configuration
+                try {
+                    ProviderParameters.write(configFile, params);
+                } catch (XMLStreamException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(ConfiguratorTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
 

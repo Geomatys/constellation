@@ -16,6 +16,8 @@
  */
 package org.constellation.process.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
@@ -25,6 +27,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
 
 /**
@@ -36,21 +39,27 @@ public class StopServiceDescriptor extends AbstractProcessDescriptor {
     public static final String NAME = "service.stop";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Stop the instance for the specified service instance.");
 
+    public static final String SERVICE_TYPE_NAME = "service_type";
+    private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS.";
+    private static final Map<String, Object> SERVICE_TYPE_PROPERTIES;
+    private static final String[] SERVICE_TYPE_VALID_VALUES = ServiceProcessCommon.servicesAvaible();
+    static {
+        SERVICE_TYPE_PROPERTIES = new HashMap<String, Object>();
+        SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.NAME_KEY, SERVICE_TYPE_NAME);
+        SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.REMARKS_KEY, SERVICE_TYPE_REMARKS);
+    }
+    public static final ParameterDescriptor<String> SERVICE_TYPE =
+            new DefaultParameterDescriptor(SERVICE_TYPE_PROPERTIES, String.class, SERVICE_TYPE_VALID_VALUES, null, null, null, null, true);
 
     public static final String IDENTIFIER_NAME = "identifier";
     private static final String IDENTIFIER_REMARKS = "Identifier of the new service instance.";
     public static final ParameterDescriptor<String> IDENTIFIER =
             new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, null, true);
 
-     public static final String SERVICE_NAME = "service";
-    private static final String SERVICE_REMARKS = "The service name.";
-    public static final ParameterDescriptor<String> SERVICE =
-            new DefaultParameterDescriptor(SERVICE_NAME, SERVICE_REMARKS, String.class, null, true);
-
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{IDENTIFIER, SERVICE});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER});
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");

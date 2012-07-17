@@ -47,7 +47,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("restartInstance1");
         in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(false);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -69,7 +69,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("restartInstance2");
         in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(true);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -93,7 +93,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(null);
         in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(false);
         org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -120,7 +120,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(null);
         in.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(true);
 
@@ -145,7 +145,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("resartInstance4");
 
         try {
@@ -167,7 +167,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(RestartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue("restartInstance5");
 
         try {

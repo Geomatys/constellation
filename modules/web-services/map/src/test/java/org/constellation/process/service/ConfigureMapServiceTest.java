@@ -55,7 +55,7 @@ public abstract class ConfigureMapServiceTest  extends AbstractMapServiceTest {
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(ConfigureMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(ConfigureMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(ConfigureMapServiceDescriptor.IDENTIFIER_NAME).setValue("updateInstance4");
         in.parameter(ConfigureMapServiceDescriptor.CONFIG_NAME).setValue(conf);
 
@@ -80,7 +80,7 @@ public abstract class ConfigureMapServiceTest  extends AbstractMapServiceTest {
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(ConfigureMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(ConfigureMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(ConfigureMapServiceDescriptor.IDENTIFIER_NAME).setValue("instance10");
         in.parameter(ConfigureMapServiceDescriptor.CONFIG_NAME).setValue(conf);
 

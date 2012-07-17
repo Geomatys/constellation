@@ -47,7 +47,7 @@ public abstract class StartServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue("startInstance1");
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -63,7 +63,7 @@ public abstract class StartServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(StartServiceDescriptor.SERVICE_NAME).setValue(serviceName);
+        in.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue("startInstance5");
 
         try {

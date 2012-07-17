@@ -49,29 +49,62 @@
     Required dependencies for building. These dependencies wil be included into
     the JARs list that Maven will put into the directory "target/binaries".
   -->
-  <dependencies>
-    <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-jaxp-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-filter</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-go2-style-extension</artifactId>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.constellation.library</groupId>
+            <artifactId>cstl-lib-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-process-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-jaxp-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-filter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-go2-style-extension</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>net.java.dev.stax-utils</groupId>
-      <artifactId>stax-utils</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>net.java.dev.stax-utils</groupId>
+            <artifactId>stax-utils</artifactId>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-process-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-data-datastore</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-style-sld</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.web-services</groupId>
+            <artifactId>cstl-web-ogc</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
 
   </dependencies>
 

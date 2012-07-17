@@ -40,7 +40,7 @@ public final class CreateProvider extends AbstractCstlProcess {
 
     @Override
     protected void execute() throws ProcessException {
-        final String serviceName = value(SERVICE_NAME, inputParameters);
+        final String providerType = value(PROVIDER_TYPE, inputParameters);
         final ParameterValueGroup source = (ParameterValueGroup) value(SOURCE, inputParameters);
 
         //initialize list of avaible Povider services
@@ -54,7 +54,7 @@ public final class CreateProvider extends AbstractCstlProcess {
             services.put(service.getName(), service);
         }
 
-        final ProviderService service = services.get(serviceName);
+        final ProviderService service = services.get(providerType);
         if (service != null) {
 
             //check no other provider with this id exist
@@ -85,7 +85,7 @@ public final class CreateProvider extends AbstractCstlProcess {
             }
 
         } else {
-            throw new ProcessException("Service name not found:" + serviceName, this, null);
+            throw new ProcessException("Provider type not found:" + providerType, this, null);
         }
     }
 

@@ -42,7 +42,7 @@ public final class StartService extends AbstractCstlProcess {
     @Override
     protected void execute() throws ProcessException {
         final String identifier = value(IDENTIFIER, inputParameters);
-        final String serviceName = value(SERVICE, inputParameters);
+        final String serviceName = value(SERVICE_TYPE, inputParameters);
         File serviceDir = value(SERVICE_DIRECTORY, inputParameters);
 
         if (identifier == null || identifier.isEmpty()) {

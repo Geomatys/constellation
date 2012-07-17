@@ -44,7 +44,7 @@ public abstract class DeleteServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteServiceDescriptor.NAME);
 
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue("deleteInstance1");
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -62,7 +62,7 @@ public abstract class DeleteServiceTest extends ServiceProcessTest {
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteServiceDescriptor.NAME);
 
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue("unknowInstance");
 
         try {

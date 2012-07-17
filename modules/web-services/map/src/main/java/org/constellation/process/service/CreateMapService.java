@@ -52,7 +52,7 @@ public class CreateMapService extends AbstractProcess {
     @Override
     protected void execute() throws ProcessException {
 
-        String serviceName = value(SERVICE_NAME, inputParameters);
+        String serviceName = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         LayerContext configuration = value(CONFIGURATION, inputParameters);
         File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);

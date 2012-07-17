@@ -56,7 +56,7 @@ public abstract class GetConfigMapServiceTest extends AbstractMapServiceTest {
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(GetConfigMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(GetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue("getConfInstance5");
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -74,7 +74,7 @@ public abstract class GetConfigMapServiceTest extends AbstractMapServiceTest {
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(GetConfigMapServiceDescriptor.SERVICE_NAME_NAME).setValue(serviceName);
+        in.parameter(GetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(GetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue("getConfInstance10");
 
         try {
