@@ -228,7 +228,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             if (mode == ISO_19115 || mode == EBRIM || mode == SENSORML) {
 
                 if (result == null) {
-                    final FullRecord f = mdReader.getForm(identifier);
+                    final FullRecord f = mdReader.getRecord(identifier);
                     result = getObjectFromRecord(identifier, f, mode);
                 } else {
                     LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
@@ -249,9 +249,9 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
             } else if (mode == DUBLINCORE) {
 
-                final FullRecord form             = mdReader.getForm(identifier);
-                if (form != null) {
-                    final Value top               = form.getRoot();
+                final FullRecord record             = mdReader.getRecord(identifier);
+                if (record != null) {
+                    final Value top               = record.getRoot();
                     final Standard recordStandard = top.getType().getStandard();
 
                     /*
@@ -261,7 +261,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                      */
                     if (!recordStandard.equals(Standard.CSW) || result == null) {
                         try {
-                            result = getRecordFromMDRecord(identifier, form, type, elementName);
+                            result = getRecordFromMDRecord(identifier, record, type, elementName);
                         }  catch (IllegalArgumentException ex) {
                             LOGGER.warning(ex.getMessage());
                             // the metadata is not convertible to DublinCore
@@ -270,7 +270,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                     }
                     result = applyElementSet(result, type, elementName);
                 } else {
-                    throw new MetadataIoException("Unable to read the form: " + identifier, NO_APPLICABLE_CODE, "id");
+                    throw new MetadataIoException("Unable to read the record: " + identifier, NO_APPLICABLE_CODE, "id");
                 }
 
             } else {
@@ -354,21 +354,21 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     /**
      * Return a dublinCore record from a MDWeb record.
      *
-     * @param form the MDWeb record.
+     * @param record the MDWeb record.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromMDRecord(final String identifier, final FullRecord form, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
-        final Value top                   = form.getRoot();
+    private AbstractRecordType getRecordFromMDRecord(final String identifier, final FullRecord record, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
+        final Value top                   = record.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
 
         if (recordStandard.equals(Standard.ISO_19115)   ||
             recordStandard.equals(Standard.ISO_19115_2) ||
             recordStandard.equals(Standard.ISO_19115_FRA) ||
             recordStandard.equals(Standard.EBRIM_V3)) {
-            return transformMDRecordInRecord(form, type, elementName);
+            return transformMDRecordInRecord(record, type, elementName);
 
         } else {
-            final Object obj =  getObjectFromRecord(identifier, form, DUBLINCORE);
+            final Object obj =  getObjectFromRecord(identifier, record, DUBLINCORE);
 
             if (obj instanceof AbstractRecordType) {
                 return (AbstractRecordType) obj;
@@ -388,12 +388,12 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      *
      * @Todo (improvement) return Brief, Summary record before getting all the property.
      *
-     * @param form the MDWeb record.
+     * @param record the MDWeb record.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType transformMDRecordInRecord(final FullRecord form, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
+    private AbstractRecordType transformMDRecordInRecord(final FullRecord record, final ElementSetType type, final List<QName> elementName) throws MD_IOException {
 
-        final Value top                   = form.getRoot();
+        final Value top                   = record.getRoot();
         final Standard  recordStandard    = top.getType().getStandard();
         final Map<String, String> pathMap = DUBLINCORE_PATH_MAP.get(recordStandard);
 
@@ -401,11 +401,11 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             LOGGER.log(Level.WARNING, "No dublin core path_mapping for standard:{0}", recordStandard.getName());
             return null;
         }
-        // we get the title of the form
-        final SimpleLiteral title             = new SimpleLiteral(null, form.getTitle());
+        // we get the title of the record
+        final SimpleLiteral title             = new SimpleLiteral(null, record.getTitle());
 
         // we get the file identifier(s)
-        final List<Value>   identifierValues  = form.getValueFromPath(pathMap.get("identifier"));
+        final List<Value>   identifierValues  = record.getValueFromPath(pathMap.get("identifier"));
         final List<String>  identifiers       = new ArrayList<String>();
         for (Value v: identifierValues) {
             if (v instanceof TextValue) {
@@ -415,14 +415,14 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final SimpleLiteral identifier = new SimpleLiteral(null, identifiers);
 
         //we get The boundingBox(es)
-        final List<Value>   bboxValues     = form.getValueFromPath(pathMap.get("boundingBox"));
+        final List<Value>   bboxValues     = record.getValueFromPath(pathMap.get("boundingBox"));
         final List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
         for (Value v: bboxValues) {
-            bboxes.add(createBoundingBoxFromValue(v.getIdValue(), form, recordStandard));
+            bboxes.add(createBoundingBoxFromValue(v.getIdValue(), record, recordStandard));
         }
 
         //we get the type of the data
-        final List<Value> typeValues  = form.getValueFromPath(pathMap.get("type"));
+        final List<Value> typeValues  = record.getValueFromPath(pathMap.get("type"));
         String dataType               = null;
         SimpleLiteral litType         = null;
         try {
@@ -452,8 +452,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
 
         // we get the keywords
-        final List<Value> keywordsValues  = form.getValueFromPath(pathMap.get("subject3"));
-        keywordsValues.addAll(form.getValueFromPath(pathMap.get("subject")));
+        final List<Value> keywordsValues  = record.getValueFromPath(pathMap.get("subject3"));
+        keywordsValues.addAll(record.getValueFromPath(pathMap.get("subject")));
         final List<SimpleLiteral> keywords = new ArrayList<SimpleLiteral>();
         for (Value v: keywordsValues) {
             if (v instanceof TextValue) {
@@ -462,7 +462,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
 
         // we get the topic category
-        final List<Value> topicCategoriesValues  = form.getValueFromPath(pathMap.get("subject2"));
+        final List<Value> topicCategoriesValues  = record.getValueFromPath(pathMap.get("subject2"));
         for (Value v: topicCategoriesValues) {
             if (v instanceof TextValue) {
                 final String value = ((TextValue)v).getValue();
@@ -489,7 +489,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
         }
         // and the topicCategeoryy
-        final List<Value> formatsValues  = form.getValueFromPath(pathMap.get("format"));
+        final List<Value> formatsValues  = record.getValueFromPath(pathMap.get("format"));
         final List<String> formats = new ArrayList<String>();
         for (Value v: formatsValues) {
             if (v instanceof TextValue) {
@@ -503,7 +503,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             format = null;
         }
 
-        final List<Value> dateValues  = form.getValueFromPath(pathMap.get("date"));
+        final List<Value> dateValues  = record.getValueFromPath(pathMap.get("date"));
         final List<String> dates = new ArrayList<String>();
         for (Value v: dateValues) {
             if (v instanceof TextValue) {
@@ -516,7 +516,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final SimpleLiteral modified = new SimpleLiteral(null, dates);
 
         // the abstracts
-        final List<Value>   abstractValues = form.getValueFromPath(pathMap.get("abstract"));
+        final List<Value>   abstractValues = record.getValueFromPath(pathMap.get("abstract"));
         final List<String>  abstracts      = new ArrayList<String>();
         for (Value v: abstractValues) {
             if (v instanceof TextValue) {
@@ -526,7 +526,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final SimpleLiteral _abstract = new SimpleLiteral(null, abstracts);
 
         // the description
-        final List<Value>   descriptionValues   = form.getValueFromPath(pathMap.get("description"));
+        final List<Value>   descriptionValues   = record.getValueFromPath(pathMap.get("description"));
         final List<SimpleLiteral>  descriptions = new ArrayList<SimpleLiteral>();
         for (Value v: descriptionValues) {
             if (v instanceof TextValue) {
@@ -539,7 +539,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
 
         // the creator of the data
-        final List<Value>   creatorValues = form.getValueFromPath(pathMap.get("creator"));
+        final List<Value>   creatorValues = record.getValueFromPath(pathMap.get("creator"));
         final List<String>  creators      = new ArrayList<String>();
         for (Value v: creatorValues) {
             if (v instanceof TextValue) {
@@ -554,7 +554,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
 
         // the publisher of the data
-        final List<Value>   publisherValues = form.getValueFromPath(pathMap.get("publisher"));
+        final List<Value>   publisherValues = record.getValueFromPath(pathMap.get("publisher"));
         final List<String>  publishers      = new ArrayList<String>();
         for (Value v: publisherValues) {
             if (v instanceof TextValue) {
@@ -567,7 +567,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         // TODO the source of the data
 
         // The rights
-        final List<Value>   rightValues = form.getValueFromPath(pathMap.get("rights"));
+        final List<Value>   rightValues = record.getValueFromPath(pathMap.get("rights"));
         final List<String>  rights      = new ArrayList<String>();
         for (Value v: rightValues) {
             if (v instanceof TextValue) {
@@ -583,7 +583,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         }
 
         // the language
-        final List<Value>   languageValues = form.getValueFromPath(pathMap.get("language"));
+        final List<Value>   languageValues = record.getValueFromPath(pathMap.get("language"));
         final List<String>  languages      = new ArrayList<String>();
         for (Value v: languageValues) {
             if (v instanceof TextValue) {

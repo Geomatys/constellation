@@ -81,7 +81,7 @@ import org.opengis.util.TypeName;
 /**
  * A database Reader designed for an MDweb database.
  *
- * It read The MDweb forms into the database and instantiate them into GeotoolKit object.
+ * It read The MDweb records into the database and instantiate them into GeotoolKit object.
  * When an object have been read it is stored in cache.
  *
  * @author Guilhem legal
@@ -348,7 +348,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             }
 
             if (result == null) {
-                final FullRecord f = mdReader.getForm(identifier);
+                final FullRecord f = mdReader.getRecord(identifier);
                 result       = getObjectFromRecord(identifier, f, mode);
             } else {
                 LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
@@ -374,15 +374,15 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * Return an object from a MDWeb record.
      *
      * @param identifier The metadata Identifier.
-     * @param form the MDWeb record.
+     * @param record the MDWeb record.
      * @param mode The data type (EBRIM, SENSORML, ISO)
      *
      * @return a GeotoolKit/constellation object representing the metadata.
      */
-    public Object getObjectFromRecord(final String identifier, final FullRecord form, final int mode) {
+    public Object getObjectFromRecord(final String identifier, final FullRecord record, final int mode) {
 
-        if (form != null && form.getRoot() != null && form.getRoot().getType() != null) {
-            final Value topValue = form.getRoot();
+        if (record != null && record.getRoot() != null && record.getRoot().getType() != null) {
+            final Value topValue = record.getRoot();
             final Object result  = getObjectFromValue(topValue, mode);
 
             //we put the full object in the already read metadatas.
@@ -391,11 +391,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             }
             return result;
 
-        //debugging part to see why the form cannot be read.
+        //debugging part to see why the record cannot be read.
         } else {
-            if (form == null) {
-                LOGGER.warning("form is null");
-            } else if (form.getRoot() == null) {
+            if (record == null) {
+                LOGGER.warning("record is null");
+            } else if (record.getRoot() == null) {
                 LOGGER.severe("Top value is null");
             } else {
                 LOGGER.severe("Top value Type is null");
@@ -408,7 +408,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * Return a GeotoolKit object from a MDWeb value (this value can be see as a tree).
      * This method build the value and all is attribute recursively.
      *
-     * @param form the MDWeb record containing this value.
+     * @param record the MDWeb record containing this value.
      * @param value The value to build.
      *
      * @return a GeotoolKit metadata object.
@@ -1171,8 +1171,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         final List<Object> results = new ArrayList<Object>();
         try {
             final List<RecordSet> recordSets   = mdReader.getRecordSets();
-            final Collection<FullRecord> forms = mdReader.getAllForm(recordSets);
-            for (FullRecord f: forms) {
+            final Collection<FullRecord> records = mdReader.getAllRecord(recordSets);
+            for (FullRecord f: records) {
                 results.add(getObjectFromRecord("no cache", f, -1));
             }
         } catch (MD_IOException ex) {

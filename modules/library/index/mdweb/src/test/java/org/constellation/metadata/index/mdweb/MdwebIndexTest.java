@@ -980,24 +980,24 @@ public class MdwebIndexTest {
         }
 
         Reader reader = factory.getReaderInstance(ds, false);
-        FullRecord form = reader.getForm("40510_145_19930221211500");
+        FullRecord record = reader.getRecord("40510_145_19930221211500");
 
-        assertNotNull(form);
-        
-        List<Value> result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date", form);
+        assertNotNull(record);
+
+        List<Value> result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=creation:date", record);
         assertEquals(0, result.size());
 
 
-        result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=revision:date", form);
+        result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:citation:date#dateType=revision:date", record);
         assertEquals(1, result.size());
 
-        result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=originator:organisationName:value", form);
+        result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=originator:organisationName:value", record);
         assertEquals(1, result.size());
         assertTrue(result.get(0) instanceof TextValue);
         TextValue resultValue = (TextValue)result.get(0);
         assertEquals("IFREMER / IDM/SISMER", resultValue.getValue());
 
-        result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=custodian:organisationName:value", form);
+        result = MDWebIndexer.getValuesFromPathID("ISO 19115:MD_Metadata:identificationInfo:pointOfContact#role=custodian:organisationName:value", record);
         assertEquals(0, result.size());
     }
 }

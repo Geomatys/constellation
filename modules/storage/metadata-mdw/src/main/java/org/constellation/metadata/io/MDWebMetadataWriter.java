@@ -70,7 +70,7 @@ import org.mdweb.io.MD_IOException;
 import org.mdweb.io.MD_IOFactory;
 import org.mdweb.io.Writer;
 import org.mdweb.model.schemas.PrimitiveType;
-import org.mdweb.model.storage.FormInfo;
+import org.mdweb.model.storage.RecordInfo;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
 import org.opengis.annotation.UML;
 import org.opengis.metadata.Metadata;
@@ -82,12 +82,12 @@ import org.opengis.metadata.Metadata;
 public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     /**
-     * A MDWeb RecordSets where write the form.
+     * A MDWeb RecordSets where write the record.
      */
     private RecordSet mdRecordSet;
 
     /**
-     * The MDWeb user who owe the inserted form.
+     * The MDWeb user who owe the inserted record.
      */
     private final User defaultUser;
 
@@ -350,7 +350,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * Return an MDWeb {@link FullRecord} from an object.
      *
-     * @param object The object to transform in form.
+     * @param object The object to transform in record.
      * @return an MDWeb {@link FullRecord} representing the metadata object.
      */
     protected FullRecord getRecordFromObject(final Object object) throws MD_IOException {
@@ -361,7 +361,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * Return an MDWeb {@link FullRecord} from an object.
      *
-     * @param object The object to transform in form.
+     * @param object The object to transform in record.
      * @return an MDWeb {@link FullRecord} representing the metadata object.
      */
     protected FullRecord getRecordFromObject(final Object object, String title) throws MD_IOException {
@@ -374,7 +374,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * Return an MDWeb {@link FullRecord} from an object.
      *
-     * @param object The object to transform in form.
+     * @param object The object to transform in record.
      * @return an MDWeb {@link FullRecord} representing the metadata object.
      */
     public FullRecord getRecordFromObject(final Object object, final User user, final RecordSet recordSet, Profile profile, String title) throws MD_IOException {
@@ -428,32 +428,32 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             if (mdWriter.isAlreadyUsedIdentifier(identifier)) {
                 throw new MD_IOException("The identifier " + identifier + " is already used");
             }
-            final FullRecord form = new FullRecord(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, FullRecord.TYPE.NORMALFORM);
+            final FullRecord record = new FullRecord(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, FullRecord.TYPE.NORMALRECORD);
 
             final Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
                 alreadyWrite.clear();
                 final Path rootPath = new Path(rootClasse.getStandard(), rootClasse);
-                final List<Value> collection = addValueFromObject(form, object, rootPath, null);
+                final List<Value> collection = addValueFromObject(record, object, rootPath, null);
                 collection.clear();
-                return form;
+                return record;
             } else {
                 LOGGER.log(Level.SEVERE, "unable to find the root class:{0}", object.getClass().getSimpleName());
                 return null;
             }
         } else {
-            LOGGER.severe("unable to create form object is null");
+            LOGGER.severe("unable to create record object is null");
             return null;
         }
     }
 
     /**
-     * Add a MDWeb value (and his children)to the specified form.
+     * Add a MDWeb value (and his children)to the specified record.
      *
-     * @param form The created form.
+     * @param record The created record.
      *
      */
-    protected List<Value> addValueFromObject(final FullRecord form, Object object, Path path, Value parentValue) throws MD_IOException {
+    protected List<Value> addValueFromObject(final FullRecord record, Object object, Path path, Value parentValue) throws MD_IOException {
 
         final List<Value> result = new ArrayList<Value>();
 
@@ -479,7 +479,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 if (path.getName().equals("geographicElement2") && obj instanceof DefaultGeographicDescription) {
                     path = mdWriter.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3");
                 }
-                result.addAll(addValueFromObject(form, obj, path, parentValue));
+                result.addAll(addValueFromObject(record, obj, path, parentValue));
 
             }
             return result;
@@ -515,13 +515,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final DefaultInternationalString dis = (DefaultInternationalString) object;
 
             // 1. the root Value PT_FreeText
-            final Value rootValue = new Value(path, form, ordinal, classe, parentValue);
+            final Value rootValue = new Value(path, record, ordinal, classe, parentValue);
             result.add(rootValue);
 
             // 2. The default value
             final String defaultValue = dis.toString(null);
             final Path defaultValuePath = new Path(path, classe.getPropertyByName("value"));
-            final TextValue textValue = new TextValue(defaultValuePath, form , ordinal, defaultValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), rootValue);
+            final TextValue textValue = new TextValue(defaultValuePath, record , ordinal, defaultValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), rootValue);
             result.add(textValue);
 
             // 3. the localised values
@@ -530,17 +530,17 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 if (locale == null) continue;
 
                 final Path valuePath = new Path(path, classe.getPropertyByName("textGroup"));
-                final Value value = new Value(valuePath, form, ordinal, localisedString, rootValue);
+                final Value value = new Value(valuePath, record, ordinal, localisedString, rootValue);
                 result.add(value);
 
                 final String localisedValue = dis.toString(locale);
                 final Path locValuePath = new Path(valuePath, localisedString.getPropertyByName("value"));
-                final TextValue locValValue = new TextValue(locValuePath, form , ordinal, localisedValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value);
+                final TextValue locValValue = new TextValue(locValuePath, record , ordinal, localisedValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value);
                 result.add(locValValue);
 
                 final Path localePath = new Path(valuePath, localisedString.getPropertyByName("locale"));
                 final String localeDesc = "#locale-" + locale.getISO3Language();
-                final TextValue localeValue = new TextValue(localePath, form , ordinal, localeDesc, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value);
+                final TextValue localeValue = new TextValue(localePath, record , ordinal, localeDesc, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value);
                 result.add(localeValue);
             }
 
@@ -549,19 +549,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final Locale loc = (Locale) object;
 
             // 1. the root Value PT_Locale
-            final Value rootValue = new Value(path, form, ordinal, classe, parentValue);
+            final Value rootValue = new Value(path, record, ordinal, classe, parentValue);
             result.add(rootValue);
 
             // 2. The languageCode value
             final String languageValue   = loc.getLanguage();
             final Path languageValuePath = new Path(path, classe.getPropertyByName("languageCode"));
-            final TextValue lanTextValue = new TextValue(languageValuePath, form , ordinal, languageValue, mdWriter.getClasse("LanguageCode", Standard.ISO_19115), rootValue);
+            final TextValue lanTextValue = new TextValue(languageValuePath, record , ordinal, languageValue, mdWriter.getClasse("LanguageCode", Standard.ISO_19115), rootValue);
             result.add(lanTextValue);
 
             // 3. the country value
             final String countryValue    = loc.getCountry();
             final Path countryValuePath  = new Path(path, classe.getPropertyByName("country"));
-            final TextValue couTextValue = new TextValue(countryValuePath, form , ordinal, countryValue, mdWriter.getClasse("CountryCode", Standard.ISO_19115), rootValue);
+            final TextValue couTextValue = new TextValue(countryValuePath, record , ordinal, countryValue, mdWriter.getClasse("CountryCode", Standard.ISO_19115), rootValue);
             result.add(couTextValue);
 
             // 4. the encoding value "LOST for now" TODO
@@ -635,19 +635,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 value = object.toString();
             }
 
-            final TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);
+            final TextValue textValue = new TextValue(path, record , ordinal, value, classe, parentValue);
             result.add(textValue);
 
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
 
-            final LinkedValue value = new LinkedValue(path, form, ordinal, linkedValue.getForm(), linkedValue, classe, parentValue);
+            final LinkedValue value = new LinkedValue(path, record, ordinal, linkedValue.getRecord(), linkedValue, classe, parentValue);
             result.add(value);
 
         // else we build a Value node.
         } else {
 
-            final Value value = new Value(path, form, ordinal, classe, parentValue);
+            final Value value = new Value(path, record, ordinal, classe, parentValue);
             result.add(value);
             //we add this object to the listed of already write element
             if (!isNoLink()) {
@@ -684,7 +684,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                 if (mdWriter.getPath(childPath.getId()) == null) {
                                     mdWriter.writePath(childPath);
                                 }
-                                result.addAll(addValueFromObject(form, propertyValue, childPath, value));
+                                result.addAll(addValueFromObject(record, propertyValue, childPath, value));
                             }
 
                         } catch (IllegalAccessException e) {
@@ -706,7 +706,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             if (mdWriter.getPath(childPath.getId()) == null) {
                                 mdWriter.writePath(childPath);
                             }
-                            result.addAll(addValueFromObject(form, propertyValue, childPath, value));
+                            result.addAll(addValueFromObject(record, propertyValue, childPath, value));
                         }
                     } else if (!"unitOfMeasure".equals(propName) && !"verticalDatum".equals(propName)) {
                         final Class valueClass     = object.getClass();
@@ -718,7 +718,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             if (mdWriter.getPath(childPath.getId()) == null) {
                                 mdWriter.writePath(childPath);
                             }
-                            result.addAll(addValueFromObject(form, propertyValue, childPath, value));
+                            result.addAll(addValueFromObject(record, propertyValue, childPath, value));
                         }
                     } else {
                         LOGGER.warning("no getter found for:" + propName + " class: " + object.getClass().getName());
@@ -1019,8 +1019,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             obj = ((JAXBElement)obj).getValue();
         }
 
-        // we create a MDWeb form form the object
-        FullRecord form       = null;
+        // we create a MDWeb record the object
+        FullRecord record       = null;
         Profile profile = null;
         try {
             // we try to determine the profile for the Object
@@ -1031,7 +1031,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
 
             final long startTrans = System.currentTimeMillis();
-            form                  = getRecordFromObject(obj, title);
+            record                  = getRecordFromObject(obj, title);
             transTime             = System.currentTimeMillis() - startTrans;
 
         } catch (IllegalArgumentException e) {
@@ -1042,18 +1042,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
 
         // and we store it in the database
-        if (form != null) {
+        if (record != null) {
 
             if (profile != null) {
-	        form.setProfile(profile);
+	        record.setProfile(profile);
             // if the profile is null we set the level completion to complete
             } else {
-                form.setInputLevelCompletion(new boolean[]{true, true, true}, new Date(System.currentTimeMillis()));
+                record.setInputLevelCompletion(new boolean[]{true, true, true}, new Date(System.currentTimeMillis()));
             }
 
             try {
                 final long startWrite = System.currentTimeMillis();
-                mdWriter.writeForm(form, false, true);
+                mdWriter.writeRecord(record, false, true);
                 writeTime             = System.currentTimeMillis() - startWrite;
 
             } catch (MD_IOException e) {
@@ -1063,11 +1063,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final long time = System.currentTimeMillis() - start;
 
             final StringBuilder report = new StringBuilder("inserted new FullRecord: ");
-            report.append(form.getTitle()).append('[').append(form.getIdentifier()).append(']').append("( ID:").append(form.getId());
+            report.append(record.getTitle()).append('[').append(record.getIdentifier()).append(']').append("( ID:").append(record.getId());
             report.append(" in ").append(time).append(" ms (transformation: ").append(transTime).append(" DB write: ").append(writeTime).append(")");
             LOGGER.log(logLevel, report.toString());
             if (!noIndexation) {
-                indexDocument(form);
+                indexDocument(record);
             }
             return true;
 
@@ -1123,10 +1123,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             return false;
         }
         try {
-            // TODO is a way more fast to know that the form exist? method  isAlreadyRecordedForm(int id) writer20
-            final FormInfo f          = mdWriter.getFormInfo(identifier);
+            // TODO is a way more fast to know that the record exist? method  isAlreadyRecordedRecord(int id) writer20
+            final RecordInfo f          = mdWriter.getRecordInfo(identifier);
             if (f != null) {
-                mdWriter.deleteForm(f);
+                mdWriter.deleteRecord(f);
             } else {
                 LOGGER.log(logLevel, "The metadata is not registered, nothing to delete");
                 return false;

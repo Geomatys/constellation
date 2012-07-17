@@ -97,7 +97,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
 
         FullRecord f = null;
         try {
-            f  = mdWriter.getForm(metadataID);
+            f  = mdWriter.getRecord(metadataID);
         } catch (MD_IOException ex) {
             throw new MetadataIoException("The service has throw an SQLException while updating the metadata: " + ex.getMessage(),
                         NO_APPLICABLE_CODE);

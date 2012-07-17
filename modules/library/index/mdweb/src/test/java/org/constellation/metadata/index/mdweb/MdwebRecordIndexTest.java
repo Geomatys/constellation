@@ -77,7 +77,7 @@ import org.opengis.filter.FilterFactory2;
  *
  * @author Guilhem Legal
  */
-public class MdwebFormIndexTest {
+public class MdwebRecordIndexTest {
 
     protected static final FilterFactory2 FF = (FilterFactory2)
             FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
@@ -661,12 +661,12 @@ public class MdwebFormIndexTest {
         writer.writePath(lowerCornPath);
         writer.writePath(upperCornPath);
 
-        //The forms
+        //The records
         Date d = new Date(120);
         User inputUser = new User("admin", "adminadmin", null, d, d);
         writer.writeUser(inputUser);
 
-        FullRecord f1 = new FullRecord(1, "2345-aa453-ade456", cat, "title1", inputUser, null, null, d, d, null, true, true, FullRecord.TYPE.NORMALFORM);
+        FullRecord f1 = new FullRecord(1, "2345-aa453-ade456", cat, "title1", inputUser, null, null, d, d, null, true, true, FullRecord.TYPE.NORMALRECORD);
         Value f1_rootValue    = new Value(recordPath, f1, 1, recordClass, null);
         Value f1_ident        = new Value(identifierPath, f1, 1, sLiteralClass, f1_rootValue);
         TextValue f1_idValue  = new TextValue(idenContentPath, f1, 1, "2345-aa453-ade456", PrimitiveType.STRING, f1_ident);
@@ -680,7 +680,7 @@ public class MdwebFormIndexTest {
         TextValue f1_ucxValue = new TextValue(upperCornPath, f1, 1, "50", PrimitiveType.STRING, f1_bbox);
         TextValue f1_ucyValue = new TextValue(upperCornPath, f1, 2, "15", PrimitiveType.STRING, f1_bbox);
 
-        FullRecord f2 = new FullRecord(2, "00180e67-b7cf-40a3-861d-b3a09337b195", cat, "title2", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
+        FullRecord f2 = new FullRecord(2, "00180e67-b7cf-40a3-861d-b3a09337b195", cat, "title2", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALRECORD);
         Value f2_rootValue    = new Value(recordPath, f2, 1, recordClass, null);
         Value f2_ident        = new Value(identifierPath, f2, 1, sLiteralClass, f2_rootValue);
         TextValue f2_idValue  = new TextValue(idenContentPath, f2, 1, "00180e67-b7cf-40a3-861d-b3a09337b195", PrimitiveType.STRING, f2_ident);
@@ -694,7 +694,7 @@ public class MdwebFormIndexTest {
         TextValue f2_ucxValue = new TextValue(upperCornPath, f2, 1, "-15", PrimitiveType.STRING, f2_bbox);
         TextValue f2_ucyValue = new TextValue(upperCornPath, f2, 2, "10", PrimitiveType.STRING, f2_bbox);
 
-        FullRecord f3 = new FullRecord(3, "09844e51-e5cd-52c3-737d-b3a61366d028", cat, "bo", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
+        FullRecord f3 = new FullRecord(3, "09844e51-e5cd-52c3-737d-b3a61366d028", cat, "bo", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALRECORD);
         Value f3_rootValue    = new Value(recordPath, f3, 1, recordClass, null);
         Value f3_ident        = new Value(identifierPath, f3, 1, sLiteralClass, f3_rootValue);
         TextValue f3_idValue  = new TextValue(idenContentPath, f3, 1, "09844e51-e5cd-52c3-737d-b3a61366d028", PrimitiveType.STRING, f3_ident);
@@ -708,7 +708,7 @@ public class MdwebFormIndexTest {
         TextValue f3_ucxValue = new TextValue(upperCornPath, f3, 1, "10", PrimitiveType.STRING, f3_bbox);
         TextValue f3_ucyValue = new TextValue(upperCornPath, f3, 2, "15", PrimitiveType.STRING, f3_bbox);
 
-        FullRecord f4 = new FullRecord(4, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", cat, "title4", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
+        FullRecord f4 = new FullRecord(4, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", cat, "title4", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALRECORD);
         Value f4_rootValue    = new Value(recordPath, f4, 1, recordClass, null);
         Value f4_ident        = new Value(identifierPath, f4, 1, sLiteralClass, f4_rootValue);
         TextValue f4_idValue  = new TextValue(idenContentPath, f4, 1, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", PrimitiveType.STRING, f4_ident);
@@ -722,7 +722,7 @@ public class MdwebFormIndexTest {
         TextValue f4_ucxValue = new TextValue(upperCornPath, f4, 1, "10", PrimitiveType.STRING, f4_bbox);
         TextValue f4_ucyValue = new TextValue(upperCornPath, f4, 2, "15", PrimitiveType.STRING, f4_bbox);
 
-        FullRecord f5 = new FullRecord(5, "test-5", cat, "title5", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
+        FullRecord f5 = new FullRecord(5, "test-5", cat, "title5", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALRECORD);
         Value f5_rootValue    = new Value(recordPath, f5, 1, recordClass, null);
         Value f5_title        = new Value(titlePath, f5, 1, sLiteralClass, f5_rootValue);
         TextValue f5_tiValue  = new TextValue(titContentPath, f5, 1, "title5", PrimitiveType.STRING, f4_title);
@@ -732,7 +732,7 @@ public class MdwebFormIndexTest {
         TextValue f5_tyValue  = new TextValue(typContentPath, f5, 1, "218a", PrimitiveType.STRING, f5_type);
 
 
-        FullRecord f6 = new FullRecord(6, "test-6", cat, "title6", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALFORM);
+        FullRecord f6 = new FullRecord(6, "test-6", cat, "title6", inputUser, null, null, d, d, null,true, true, FullRecord.TYPE.NORMALRECORD);
         Value f6_rootValue    = new Value(recordPath, f6, 1, recordClass, null);
         Value f6_ident        = new Value(identifierPath, f6, 1, sLiteralClass, f6_rootValue);
         TextValue f6_idValue  = new TextValue(idenContentPath, f6, 1, "test-6", PrimitiveType.STRING, f6_ident);
@@ -742,12 +742,12 @@ public class MdwebFormIndexTest {
         TextValue f6_tiValue  = new TextValue(titContentPath, f6, 1, "title6", PrimitiveType.STRING, f6_title);
 
 
-        writer.writeForm(f1, false, true);
-        writer.writeForm(f2, false, true);
-        writer.writeForm(f3, false, true);
-        writer.writeForm(f4, false, true);
-        writer.writeForm(f5, false, true);
-        writer.writeForm(f6, false, true);
+        writer.writeRecord(f1, false, true);
+        writer.writeRecord(f2, false, true);
+        writer.writeRecord(f3, false, true);
+        writer.writeRecord(f4, false, true);
+        writer.writeRecord(f5, false, true);
+        writer.writeRecord(f6, false, true);
 
 
     }

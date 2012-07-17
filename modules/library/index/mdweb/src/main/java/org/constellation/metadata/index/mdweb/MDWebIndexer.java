@@ -178,7 +178,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
     @Override
     protected FullRecord getEntry(final String identifier) throws IndexingException {
         try {
-            return mdWebReader.getForm(identifier);
+            return mdWebReader.getRecord(identifier);
         } catch (MD_IOException ex) {
             throw new IndexingException("MD_IOException while reading entry for:" + identifier, ex);
         }
