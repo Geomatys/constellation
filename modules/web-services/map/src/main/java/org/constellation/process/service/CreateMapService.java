@@ -120,5 +120,7 @@ public class CreateMapService extends AbstractProcess {
                 GenericDatabaseMarshallerPool.getInstance().release(marshaller);
             }
         }
+
+        getOrCreate(OUT_CONFIGURATION, outputParameters).setValue(configuration);
     }
 }

@@ -82,8 +82,13 @@ public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
             new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY});
 
 
+    public static final String OUT_CONFIG_NAME = "out_configuration";
+    private static final String OUT_CONFIG_REMARKS = "The LayerContext configuration for the new instance.";
+    public static final ParameterDescriptor<LayerContext> OUT_CONFIGURATION =
+            new DefaultParameterDescriptor(OUT_CONFIG_NAME, OUT_CONFIG_REMARKS, LayerContext.class, null, false);
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
+            new GeneralParameterDescriptor[]{OUT_CONFIGURATION});
 
 
     /**
