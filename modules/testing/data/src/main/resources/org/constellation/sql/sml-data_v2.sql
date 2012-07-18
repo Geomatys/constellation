@@ -1,8 +1,8 @@
 
 
 INSERT INTO "Storage"."RecordSets"("code", "name", "exposure", "shared", "hidden") VALUES('SMLC', 'SensorML Data catalog', 'EXTERNAL', false, false);
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (12, 'SMLC', 'urn:ogc:object:sensor:GEOM:1','urn:ogc:object:sensor:GEOM:1', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALFORM');
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (13, 'SMLC', 'urn:ogc:object:sensor:GEOM:2','urn:ogc:object:sensor:GEOM:2', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (12, 'SMLC', 'urn:ogc:object:sensor:GEOM:1','urn:ogc:object:sensor:GEOM:1', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALRECORD');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (13, 'SMLC', 'urn:ogc:object:sensor:GEOM:2','urn:ogc:object:sensor:GEOM:2', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALRECORD');
 
 
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (12, 'SensorML:SensorML', 1, 'SensorML', 'SensorML', 'SensorML:SensorML.1');
@@ -403,7 +403,7 @@ INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStan
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (13, 'SensorML:SensorML:member:process:parameters:parameterList:parameter:value:value', 2, 'Double', 'ISO 19103', 'SensorML:SensorML.1:member.1:process.1:parameters.1:parameterList.1:parameter.3:value.1:value.2', '10.0');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (13, 'SensorML:SensorML:member:process:method:href', 1, 'CharacterString', 'ISO 19103', 'SensorML:SensorML.1:member.1:process.1:method.1:href.1', 'some_method');
 
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (14, 'SMLC', 'urn:ogc:object:sensor:GEOM:3','urn:ogc:object:sensor:GEOM:3', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (14, 'SMLC', 'urn:ogc:object:sensor:GEOM:3','urn:ogc:object:sensor:GEOM:3', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALRECORD');
 
 
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (14, 'SensorML:SensorML', 1, 'SensorML', 'SensorML', 'SensorML:SensorML.1');

@@ -1,4 +1,4 @@
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (9, 'CSWCat', 'mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4', 'WMS Server for CORINE Land Cover France', 'admin', 'admin', NULL, '2009-07-01', 0, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (9, 'CSWCat', 'mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4', 'WMS Server for CORINE Land Cover France', 'admin', 'admin', NULL, '2009-07-01', 0, 1, 'NORMALRECORD');
 
 INSERT INTO "Storage"."Values" VALUES (9, 'ISO 19115:MD_Metadata', 1, 'MD_Metadata', 'ISO 19115', 'ISO 19115:MD_Metadata.1');
 INSERT INTO "Storage"."Values" VALUES (9, 'ISO 19115:MD_Metadata:identificationInfo', 1, 'SV_ServiceIdentification', 'ISO 19119', 'ISO 19115:MD_Metadata.1:identificationInfo.1');

@@ -1,8 +1,8 @@
 
 INSERT INTO "Storage"."RecordSets"("code", "name", "exposure", "shared", "hidden") VALUES('SMLC', 'SensorML Data catalog', 'EXTERNAL', false, false);
 
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (12, 'SMLC', 'a04afcb5-a748-4057-a4e3-ceda9d98c874','urn:ogc:object:sensor:GEOM:1', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALFORM');
-INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (13, 'SMLC', '0d2c2840-e488-49c8-93b7-1370248edf5e','urn:ogc:object:sensor:GEOM:2', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (12, 'SMLC', 'a04afcb5-a748-4057-a4e3-ceda9d98c874','urn:ogc:object:sensor:GEOM:1', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALRECORD');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (13, 'SMLC', '0d2c2840-e488-49c8-93b7-1370248edf5e','urn:ogc:object:sensor:GEOM:2', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALRECORD');
 
 
 
