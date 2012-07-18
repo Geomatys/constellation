@@ -36,6 +36,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.xml.MarshallerPool;
+import org.junit.Assert;
 
 /**
  *
@@ -80,7 +81,7 @@ public class AbstractTestRequest extends AbstractGrizzlyServer {
         final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
         wr.write(request);
         wr.flush();
-        
+
     }
 
     public void postRequestObject(URLConnection conec, Object request) throws IOException, JAXBException {
@@ -151,7 +152,7 @@ public class AbstractTestRequest extends AbstractGrizzlyServer {
         }
         return obj;
     }
-    
+
     /**
      * Returned the {@link BufferedImage} from an URL requesting an image.
      *
@@ -183,20 +184,29 @@ public class AbstractTestRequest extends AbstractGrizzlyServer {
 //        }
         return image;
     }
-    
+
     public void waitForStart() throws Exception {
-        final URL u = new URL("http://localhost:9090/configuration?request=access");
         boolean ex = true;
-        
+        int cpt = 0;
         while (ex) {
             Thread.sleep(1 * 1000);
+            final URL u;
+            if (grizzly != null) {
+                u = new URL("http://localhost:" + grizzly.getCurrentPort()  + "/configuration?request=access");
+            } else {
+                u = new URL("http://localhost:9090/configuration?request=access");
+            }
             ex = false;
             URLConnection conec = u.openConnection();
             try {
                 conec.getInputStream();
-            } catch (ConnectException e) {
+            } catch (IOException e) {
                 ex = true;
             }
+            if (cpt == 30) {
+                Assert.fail("The grizzly server never start");
+            }
+            cpt++;
         }
     }
 }

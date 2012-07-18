@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import org.constellation.configuration.AcknowlegementType;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.*;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
@@ -76,17 +77,23 @@ public class CSWRequestTest extends AbstractTestRequest {
 
         waitForStart();
 
+        //update the federated catalog in case of busy port
+        URL fedCatURL = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/csw/admin?request=setFederatedCatalog&id=csw2&servers=" + getDefaultURL());
+        URLConnection conec = fedCatURL.openConnection();
+
+        Object obj = getStringResponse(conec);
+
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL(getDefaultURL());
 
 
         // for a POST request
-        URLConnection conec = getCapsUrl.openConnection();
+        conec = getCapsUrl.openConnection();
 
         final GetCapabilitiesType request = new GetCapabilitiesType("CSW");
 
         postRequestObject(conec, request);
-        Object obj = unmarshallResponse(conec);
+        obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof Capabilities);
 
@@ -290,6 +297,7 @@ public class CSWRequestTest extends AbstractTestRequest {
     @Test
     public void testDistributedCSWGetRecords() throws Exception {
 
+        System.out.println("\n\n DISTIBUTED SEARCH \n\n");
         // Creates a valid GetCapabilities url.
         final URL getCapsUrl = new URL(getCsw2URL());
 

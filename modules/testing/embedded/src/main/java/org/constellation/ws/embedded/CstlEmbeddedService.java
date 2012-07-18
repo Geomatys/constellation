@@ -113,7 +113,7 @@ public class CstlEmbeddedService extends CommandLine {
 
     public Integer currentPort;
 
-    final URI uri;
+    private URI uri;
     final URI uriSoap;
     final DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     /* ***********************************************************************
@@ -221,6 +221,7 @@ public class CstlEmbeddedService extends CommandLine {
                 }
             }
         }
+        uri = currentUri;
         return threadSelector;
     }
 

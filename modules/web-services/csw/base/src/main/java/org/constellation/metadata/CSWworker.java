@@ -21,8 +21,10 @@ package org.constellation.metadata;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.sql.SQLException;
@@ -475,6 +477,28 @@ public class CSWworker extends AbstractWorker {
             LOGGER.info("no cascaded CSW server found (optionnal)");
         } catch (IOException e) {
             LOGGER.info("no cascaded CSW server found (optionnal) (IO Exception)");
+        }
+    }
+
+
+    public void setCascadedService(final List<String> urls) throws CstlServiceException {
+        cascadedCSWservers = urls;
+        final StringBuilder s = new StringBuilder("Cascaded Services:\n");
+        for (String servURL: urls) {
+            s.append(servURL).append('\n');
+        }
+        LOGGER.info(s.toString());
+
+        final File f = new File(configurationDirectory, "CSWCascading.properties");
+        try {
+            final OutputStream out = new FileOutputStream(f);
+            final Properties cascad = new Properties();
+            for (int i = 0; i < urls.size(); i++) {
+                cascad.put("csw" + i, urls.get(i));
+            }
+            cascad.store(out, "updated by admin service");
+        } catch (IOException ex) {
+            throw new CstlServiceException("IO excrption while storing cacadedService", ex, NO_APPLICABLE_CODE);
         }
     }
 

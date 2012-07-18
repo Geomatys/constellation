@@ -70,7 +70,7 @@ public class AbstractTestRequest extends AbstractGrizzlyServer {
             URLConnection conec = u.openConnection();
             try {
                 conec.getInputStream();
-            } catch (ConnectException e) {
+            } catch (IOException e) {
                 ex = true;
             }
             if (cpt == 30) {

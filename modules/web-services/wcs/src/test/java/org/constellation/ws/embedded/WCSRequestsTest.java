@@ -72,48 +72,37 @@ public class WCSRequestsTest extends AbstractTestRequest {
      * The layer to test.
      */
     private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
-    
+
     /**
      * URLs which will be tested on the server.
      */
-    private static final String WCS_URL  ="http://localhost:9090/wcs/default?SERVICE=WCS&";
-    private static final String WCS_URL2 ="http://localhost:9090/wcs/test?SERVICE=WCS&";
-    
-    private static final String WCS_FALSE_REQUEST =
-            "http://localhost:9090/wcs/default?request=SomethingElse";
+    private static final String WCS_FALSE_REQUEST ="request=SomethingElse";
 
-    private static final String WCS_FALSE_REQUEST_100 =
-            "http://localhost:9090/wcs/default?request=GetCoverage&service=WCS&version=1.0.0&" +
+    private static final String WCS_FALSE_REQUEST_100 ="request=GetCoverage&service=WCS&version=1.0.0&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "coverage=wrongLayer";
 
-    private static final String WCS_FALSE_REQUEST_111 =
-            "http://localhost:9090/wcs/default?request=GetCoverage&service=WCS&version=1.1.1&" +
+    private static final String WCS_FALSE_REQUEST_111 ="request=GetCoverage&service=WCS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=EPSG:4326&boundingbox=-180,-90,180,90,EPSG4326&" +
                                       "identifier=wrongLayer";
 
-    private static final String WCS_GETCOVERAGE =
-            "http://localhost:9090/wcs/default?request=GetCoverage&service=WCS&version=1.0.0&" +
+    private static final String WCS_GETCOVERAGE ="request=GetCoverage&service=WCS&version=1.0.0&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "coverage="+ LAYER_TEST;
 
-    private static final String WCS_GETCOVERAGE_MATRIX =
-            "http://localhost:9090/wcs/default?request=GetCoverage&service=WCS&version=1.0.0&" +
+    private static final String WCS_GETCOVERAGE_MATRIX ="request=GetCoverage&service=WCS&version=1.0.0&" +
                                       "format=matrix&width=1024&height=512&" +
                                       "crs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "coverage="+ LAYER_TEST;
 
-    private static final String WCS_GETCAPABILITIES =
-            "http://localhost:9090/wcs/default?request=GetCapabilities&service=WCS&version=1.0.0";
-    
-    private static final String WCS_GETCAPABILITIES2 =
-            "http://localhost:9090/wcs/test?request=GetCapabilities&service=WCS&version=1.0.0";
+    private static final String WCS_GETCAPABILITIES ="request=GetCapabilities&service=WCS&version=1.0.0";
 
-    private static final String WCS_DESCRIBECOVERAGE =
-            "http://localhost:9090/wcs/default?request=DescribeCoverage&coverage=SST_tests&service=wcs&version=1.0.0";
+    private static final String WCS_GETCAPABILITIES2 ="request=GetCapabilities&service=WCS&version=1.0.0";
+
+    private static final String WCS_DESCRIBECOVERAGE ="request=DescribeCoverage&coverage=SST_tests&service=wcs&version=1.0.0";
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -121,13 +110,13 @@ public class WCSRequestsTest extends AbstractTestRequest {
     @BeforeClass
     public static void initLayerList() throws JAXBException {
         pool = WCSMarshallerPool.getInstance();
-        
+
         final Configurator config = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
 
                 final ParameterValueGroup config = desc.createValue();
-                
+
                 if("coverage-sql".equals(serviceName)){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
@@ -155,9 +144,9 @@ public class WCSRequestsTest extends AbstractTestRequest {
         };
 
         LayerProviderProxy.getInstance().setConfigurator(config);
-        
+
         WorldFileImageReader.Spi.registerDefaults(null);
-        
+
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
@@ -176,11 +165,11 @@ public class WCSRequestsTest extends AbstractTestRequest {
     @Test
     public void testWCSWrongRequest() throws Exception {
         waitForStart();
-        
+
         // Creates an intentional wrong url, regarding the WCS version 1.0.0 standard
         URL wrongUrl;
         try {
-            wrongUrl = new URL(WCS_FALSE_REQUEST);
+            wrongUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&" + WCS_FALSE_REQUEST);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -192,7 +181,7 @@ public class WCSRequestsTest extends AbstractTestRequest {
         assertTrue(obj instanceof ServiceExceptionReport);
 
         try {
-            wrongUrl = new URL(WCS_FALSE_REQUEST_100);
+            wrongUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&" + WCS_FALSE_REQUEST_100);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -204,7 +193,7 @@ public class WCSRequestsTest extends AbstractTestRequest {
         assertTrue(obj instanceof ServiceExceptionReport);
 
         try {
-            wrongUrl = new URL(WCS_FALSE_REQUEST_111);
+            wrongUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&" + WCS_FALSE_REQUEST_111);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -225,7 +214,7 @@ public class WCSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
         try {
-            getCoverageUrl = new URL(WCS_GETCOVERAGE);
+            getCoverageUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&" + WCS_GETCOVERAGE);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -256,7 +245,7 @@ public class WCSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetCoverage url.
         final URL getCovMatrixUrl;
         try {
-            getCovMatrixUrl = new URL(WCS_GETCOVERAGE_MATRIX);
+            getCovMatrixUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&" + WCS_GETCOVERAGE_MATRIX);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -276,7 +265,7 @@ public class WCSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL(WCS_GETCAPABILITIES);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&" + WCS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -308,12 +297,12 @@ public class WCSRequestsTest extends AbstractTestRequest {
         if (layerTestFound == false) {
             throw new AssertionError("The layer \""+ LAYER_TEST +"\" was not found in the returned GetCapabilities.");
         }
-        
+
         Get get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0);
-        assertEquals(WCS_URL, get.getOnlineResource().getHref());
-        
+        assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&", get.getOnlineResource().getHref());
+
         try {
-            getCapsUrl = new URL(WCS_GETCAPABILITIES2);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/test?SERVICE=WCS&" + WCS_GETCAPABILITIES2);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -325,13 +314,13 @@ public class WCSRequestsTest extends AbstractTestRequest {
         assertTrue(obj instanceof WCSCapabilitiesType);
 
         responseCaps = (WCSCapabilitiesType)obj;
-        
+
         get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0);
-        assertEquals(WCS_URL2, get.getOnlineResource().getHref());
-        
-        
+        assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/test?SERVICE=WCS&", get.getOnlineResource().getHref());
+
+
         try {
-            getCapsUrl = new URL(WCS_GETCAPABILITIES);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&" + WCS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -343,9 +332,9 @@ public class WCSRequestsTest extends AbstractTestRequest {
         assertTrue(obj instanceof WCSCapabilitiesType);
 
         responseCaps = (WCSCapabilitiesType)obj;
-        
+
         get = (Get) responseCaps.getCapability().getRequest().getGetCapabilities().getDCPType().get(0).getHTTP().getGetOrPost().get(0);
-        assertEquals(WCS_URL, get.getOnlineResource().getHref());
+        assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&", get.getOnlineResource().getHref());
     }
 
     /**
@@ -357,7 +346,7 @@ public class WCSRequestsTest extends AbstractTestRequest {
         // Creates a valid DescribeCoverage url.
         final URL getCapsUrl;
         try {
-            getCapsUrl = new URL(WCS_DESCRIBECOVERAGE);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wcs/default?SERVICE=WCS&" + WCS_DESCRIBECOVERAGE);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;

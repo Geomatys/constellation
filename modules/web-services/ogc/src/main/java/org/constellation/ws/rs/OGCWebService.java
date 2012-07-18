@@ -609,14 +609,21 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                 return Response.ok(response, "text/xml").build();
 
             } else {
-                throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
-                        INVALID_PARAMETER_VALUE, "request");
+                return treatSpecificAdminRequest(request);
             }
         } catch (CstlServiceException ex) {
             LOGGER.log(Level.WARNING, "Sending admin exception:{0}", ex.getMessage());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getMessage());
             return Response.ok(report, "text/xml").build();
         }
+    }
+
+    /**
+     * need to be overriden by subClasses to add specific admin operation
+     */
+    protected Response treatSpecificAdminRequest(final String request) throws CstlServiceException {
+        throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
+                        INVALID_PARAMETER_VALUE, "request");
     }
 
     /**

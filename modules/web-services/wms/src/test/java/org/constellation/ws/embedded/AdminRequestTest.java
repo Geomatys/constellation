@@ -64,11 +64,11 @@ public class AdminRequestTest extends AbstractTestRequest {
     public void testNewInstance() throws Exception {
 
         waitForStart();
-        
+
         /*
          * we build a new instance
          */
-        URL niUrl = new URL("http://localhost:9090/wms/admin?request=newInstance&id=wms2");
+        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=newInstance&id=wms2");
 
 
         // for a POST request
@@ -77,14 +77,14 @@ public class AdminRequestTest extends AbstractTestRequest {
         Object obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
-        
+
         AcknowlegementType expResult = new AcknowlegementType("Success", "instance succefully created");
         assertEquals(expResult, obj);
 
         /*
          * we see the instance with a status NOT_STARTED
          */
-        URL liUrl = new URL("http://localhost:9090/wms/admin?request=listInstance");
+        URL liUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=listInstance");
 
 
         // for a POST request
@@ -122,7 +122,7 @@ public class AdminRequestTest extends AbstractTestRequest {
         /*
          * we start the instance created at the previous test
          */
-        URL niUrl = new URL("http://localhost:9090/wms/admin?request=start&id=wms2");
+        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=start&id=wms2");
 
 
         // for a POST request
@@ -138,7 +138,7 @@ public class AdminRequestTest extends AbstractTestRequest {
          /*
          * we verify tat the instance has now a status WORKING
          */
-        URL liUrl = new URL("http://localhost:9090/wms/admin?request=listInstance");
+        URL liUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=listInstance");
 
 
         // for a POST request
@@ -163,7 +163,7 @@ public class AdminRequestTest extends AbstractTestRequest {
         /*
          * we configure the instance created at the previous test
          */
-        URL niUrl = new URL("http://localhost:9090/wms/admin?request=configure&id=wms2");
+        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=configure&id=wms2");
 
 
         // for a POST request
@@ -185,7 +185,7 @@ public class AdminRequestTest extends AbstractTestRequest {
         /*
          * we restart the instance to take change in count
          */
-        niUrl = new URL("http://localhost:9090/wms/admin?request=restart&id=wms2");
+        niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=restart&id=wms2");
 
 
         // for a POST request
@@ -198,13 +198,13 @@ public class AdminRequestTest extends AbstractTestRequest {
         expResult = new AcknowlegementType("Success", "instances succefully restarted");
         assertEquals(expResult, obj);
 
-        URL gcDefaultURL = new URL("http://localhost:9090/wms/default?request=GetCapabilities&service=WMS&version=1.1.1");
-        URL gcWms2URL    = new URL("http://localhost:9090/wms/wms2?request=GetCapabilities&service=WMS&version=1.1.1");
+        URL gcDefaultURL = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/default?request=GetCapabilities&service=WMS&version=1.1.1");
+        URL gcWms2URL    = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/wms2?request=GetCapabilities&service=WMS&version=1.1.1");
 
         String expCapabiliites = getStringResponse(gcDefaultURL.openConnection());
         String resCapabiliites = getStringResponse(gcWms2URL.openConnection());
 
-        resCapabiliites = resCapabiliites.replace("http://localhost:9090/wms/wms2", "http://localhost:9090/wms/default");
+        resCapabiliites = resCapabiliites.replace("http://localhost:" +  grizzly.getCurrentPort() + "/wms/wms2", "http://localhost:" +  grizzly.getCurrentPort() + "/wms/default");
 
         assertEquals(expCapabiliites, resCapabiliites);
     }
@@ -214,7 +214,7 @@ public class AdminRequestTest extends AbstractTestRequest {
         /*
          * we stop the instance created at the previous test
          */
-        URL niUrl = new URL("http://localhost:9090/wms/admin?request=stop&id=wms2");
+        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=stop&id=wms2");
 
 
         // for a POST request
@@ -230,7 +230,7 @@ public class AdminRequestTest extends AbstractTestRequest {
          /*
          * we see the instance has now a status NOT_STARTED
          */
-        URL liUrl = new URL("http://localhost:9090/wms/admin?request=listInstance");
+        URL liUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=listInstance");
 
 
         // for a POST request
@@ -253,7 +253,7 @@ public class AdminRequestTest extends AbstractTestRequest {
         /*
          * we stop the instance created at the previous test
          */
-        URL niUrl = new URL("http://localhost:9090/wms/admin?request=delete&id=wms2");
+        URL niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/admin?request=delete&id=wms2");
 
 
         // for a POST request
@@ -269,7 +269,7 @@ public class AdminRequestTest extends AbstractTestRequest {
          /*
          * we see the instance has now a status NOT_STARTED
          */
-        URL liUrl = new URL("http://localhost:9090/wms/admin?request=listInstance");
+        URL liUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/admin?request=listInstance");
 
 
         // for a POST request

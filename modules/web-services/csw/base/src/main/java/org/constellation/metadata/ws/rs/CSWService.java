@@ -54,8 +54,10 @@ import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.configuration.AcknowlegementType;
 import static org.constellation.metadata.CSWConstants.*;
 import org.constellation.ws.UnauthorizedException;
+import org.constellation.ws.WSEngine;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWResponse;
@@ -90,6 +92,7 @@ import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.util.StringUtilities;
 
 /**
  * RestFul CSW service.
@@ -218,6 +221,28 @@ public class CSWService extends OGCWebService<CSWworker> {
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef);
 
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Response treatSpecificAdminRequest(final String request) throws CstlServiceException {
+        if ("setFederatedCatalog".equals(request)) {
+            final String identifier = getParameter("id", true);
+            final List<String> servers = StringUtilities.toStringList(getParameter("servers", true));
+            final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
+            if (worker != null) {
+                worker.setCascadedService(servers);
+                return Response.ok(new AcknowlegementType("Success", "Federated catalogs updated"), "text/xml").build();
+            } else {
+                throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
+                        INVALID_PARAMETER_VALUE, "id");
+            }
+        } else {
+            throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
+                        INVALID_PARAMETER_VALUE, "request");
         }
     }
 

@@ -72,14 +72,21 @@ public class ConfigurationRequestTest extends AbstractTestRequest {
     public void testRestart() throws Exception {
 
         waitForStart();
+        //update the federated catalog in case of busy port
+        URL fedCatURL = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/csw/admin?request=setFederatedCatalog&id=csw2&servers=" + getCswURL());
+        URLConnection conec = fedCatURL.openConnection();
+
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof AcknowlegementType);
+
 
         URL niUrl = new URL(getConfigurationURL() + "request=restart");
 
-
         // for a POST request
-        URLConnection conec = niUrl.openConnection();
+        conec = niUrl.openConnection();
 
-        Object obj = unmarshallResponse(conec);
+        obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
         AcknowlegementType expResult = new AcknowlegementType("Success",  "services succefully restarted");

@@ -66,57 +66,50 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @since 0.3
  */
 public class WMSAxesOrderTest extends AbstractTestRequest {
-    
+
     /**
      * The layer to test.
      */
     private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
-    
+
     /**
      * A list of available layers to be requested in WMS.
      */
     private static List<LayerDetails> layers;
-    
+
     /**
      * Checksum value on the returned image expressed in a geographic CRS for the SST_tests layer.
      */
     private Long sstChecksumGeo = null;
-    
+
     /**
      * URLs which will be tested on the server.
      */
-    private static final String WMS_GETMAP_111_PROJ =
-            "http://localhost:9090/wms/default?request=GetMap&service=WMS&version=1.1.1&" +
+    private static final String WMS_GETMAP_111_PROJ ="request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:3395&bbox=-19000000,-19000000,19000000,19000000&" +
                                       "layers="+ LAYER_TEST +"&styles=";
-    private static final String WMS_GETMAP_130_PROJ =
-            "http://localhost:9090/wms/default?request=GetMap&service=WMS&version=1.3.0&" +
+    private static final String WMS_GETMAP_130_PROJ ="request=GetMap&service=WMS&version=1.3.0&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=EPSG:3395&bbox=-19000000,-19000000,19000000,19000000&" +
                                       "layers="+ LAYER_TEST +"&styles=";
-    private static final String WMS_GETMAP_111_GEO =
-            "http://localhost:9090/wms/default?request=GetMap&service=WMS&version=1.1.1&" +
+    private static final String WMS_GETMAP_111_GEO ="request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4022&bbox=-90,-180,90,180&" +
                                       "layers="+ LAYER_TEST +"&styles=";
-    private static final String WMS_GETMAP_111_EPSG_4326 =
-            "http://localhost:9090/wms/default?request=GetMap&service=WMS&version=1.1.1&" +
+    private static final String WMS_GETMAP_111_EPSG_4326 ="request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
-    private static final String WMS_GETMAP_130_EPSG_4326 =
-            "http://localhost:9090/wms/default?request=GetMap&service=WMS&version=1.3.0&" +
+    private static final String WMS_GETMAP_130_EPSG_4326 ="request=GetMap&service=WMS&version=1.3.0&" +
                                       "format=image/png&width=512&height=1024&" +
                                       "crs=EPSG:4326&bbox=-90,-180,90,180&" +
                                       "layers="+ LAYER_TEST +"&styles=";
-    private static final String WMS_GETMAP_111_CRS_84 =
-            "http://localhost:9090/wms/default?request=GetMap&service=WMS&version=1.1.1&" +
+    private static final String WMS_GETMAP_111_CRS_84 ="request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=CRS:84&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
-    private static final String WMS_GETMAP_130_CRS_84 =
-            "http://localhost:9090/wms/default?request=GetMap&service=WMS&version=1.3.0&" +
+    private static final String WMS_GETMAP_130_CRS_84 ="request=GetMap&service=WMS&version=1.3.0&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=CRS:84&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
@@ -126,13 +119,13 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initLayerList() {
-        
+
         final Configurator config = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
 
                 final ParameterValueGroup config = desc.createValue();
-                
+
                 if("coverage-sql".equals(serviceName)){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
@@ -159,11 +152,11 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
         };
 
         LayerProviderProxy.getInstance().setConfigurator(config);
-     
-        
+
+
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSMapDecoration.setEmptyExtension(true);
-        
+
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
@@ -173,7 +166,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
         for(String jn : ImageIO.getWriterFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
         }
-        
+
         // Get the list of layers
         try {
             layers = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD);
@@ -182,7 +175,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
             assumeNoException(ex);
         }
     }
-    
+
     /**
      * Returns {@code true} if the {@code SST_tests} layer is found in the list of
      * available layers. It means the postgrid database, pointed by the postgrid.xml
@@ -197,7 +190,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
         }
         return false;
     }
-    
+
     /**
      * Free some resources.
      */
@@ -218,7 +211,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
     @Test
     public void testGetMap111And130Projected() throws Exception {
         waitForStart();
-        
+
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -226,8 +219,8 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMap111Url, getMap130Url;
         try {
-            getMap111Url = new URL(WMS_GETMAP_111_PROJ);
-            getMap130Url = new URL(WMS_GETMAP_130_PROJ);
+            getMap111Url = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_111_PROJ);
+            getMap130Url = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_130_PROJ);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -263,7 +256,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_111_GEO);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_111_GEO);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -290,7 +283,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_111_EPSG_4326);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_111_EPSG_4326);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -323,7 +316,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_130_EPSG_4326);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_130_EPSG_4326);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -355,7 +348,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_111_CRS_84);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_111_CRS_84);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -391,7 +384,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_130_CRS_84);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_130_CRS_84);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;

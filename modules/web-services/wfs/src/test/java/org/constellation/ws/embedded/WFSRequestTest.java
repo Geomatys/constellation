@@ -72,14 +72,11 @@ import org.opengis.parameter.ParameterValueGroup;
 public class WFSRequestTest extends AbstractTestRequest {
 
     private static boolean datasourceCreated = false;
-    
-    private static final String WFS_POST_URL = "http://localhost:9090/wfs/default?";
-    private static final String WFS_POST_URL2 = "http://localhost:9090/wfs/test?";
-    
-    private static final String WFS_GETCAPABILITIES_URL = "http://localhost:9090/wfs/default?request=GetCapabilities&version=1.1.0&service=WFS";
-    private static final String WFS_GETCAPABILITIES_URL2 = "http://localhost:9090/wfs/test?request=GetCapabilities&version=1.1.0&service=WFS";
 
-    private static final String WFS_GETFEATURE_URL = "http://localhost:9090/wfs/default?request=getFeature&service=WFS&version=1.1.0&"
+    private static final String WFS_GETCAPABILITIES_URL = "request=GetCapabilities&version=1.1.0&service=WFS";
+    private static final String WFS_GETCAPABILITIES_URL2 = "request=GetCapabilities&version=1.1.0&service=WFS";
+
+    private static final String WFS_GETFEATURE_URL = "request=getFeature&service=WFS&version=1.1.0&"
             + "typename=sa:SamplingPoint&namespace=xmlns(sa=http://www.opengis.net/sampling/1.0)&"
             + "filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%20xmlns:gml=%22http://www.opengis.net/gml%22%3E"
             + "%3Cogc:PropertyIsEqualTo%3E"
@@ -88,11 +85,11 @@ public class WFSRequestTest extends AbstractTestRequest {
             + "%3C/ogc:PropertyIsEqualTo%3E"
             + "%3C/ogc:Filter%3E";
 
-     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL = "http://localhost:9090/wfs/default?request=DescribeFeatureType&service=WFS&version=1.1.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.1.1";
-     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL_V2 = "http://localhost:9090/wfs/default?request=DescribeFeatureType&service=WFS&version=2.0.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.2";
+     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL = "request=DescribeFeatureType&service=WFS&version=1.1.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.1.1";
+     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL_V2 = "request=DescribeFeatureType&service=WFS&version=2.0.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.2";
 
     private static String EPSG_VERSION;
-    
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -105,14 +102,14 @@ public class WFSRequestTest extends AbstractTestRequest {
                           ":org.geotoolkit.xsd.xml.v2001" +
                           ":org.geotoolkit.sampling.xml.v100" +
                          ":org.geotoolkit.internal.jaxb.geometry");
-        
-        
+
+
        final Configurator config = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
 
                 final ParameterValueGroup config = desc.createValue();
-                
+
                 if("observation".equals(serviceName)){
                     try{
                         final String url = "jdbc:derby:memory:TestEmbeddedWFSWorker";
@@ -139,7 +136,7 @@ public class WFSRequestTest extends AbstractTestRequest {
                 }else if("shapefile".equals(serviceName)){
                     try{
                         final File outputDir = initDataDirectory();
-                        
+
                         final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                         final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
                         source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
@@ -148,7 +145,7 @@ public class WFSRequestTest extends AbstractTestRequest {
                                 .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
                         srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
                                 .setValue("http://www.opengis.net/gml");
-                        
+
                         ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
                         layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
                         layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
@@ -160,19 +157,19 @@ public class WFSRequestTest extends AbstractTestRequest {
                     // Defines a PostGis data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(PostgisNGDataStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                    
+
                     srcconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
                     srcconfig.parameter(PORT.getName().getCode()).setValue(5432);
                     srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
                     srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
                     srcconfig.parameter(USER.getName().getCode()).setValue("test");
-                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");                    
+                    srcconfig.parameter(PASSWD.getName().getCode()).setValue("test");
                     srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                    
+
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
-                    
-                    //add a custom sql query layer                    
+
+                    //add a custom sql query layer
                     ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
                     layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("CustomSQLQuery");
                     layer.parameter(LAYER_QUERY_LANGUAGE.getName().getCode()).setValue("CUSTOM-SQL");
@@ -192,7 +189,7 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         LayerProviderProxy.getInstance().setConfigurator(config);
     }
-    
+
     /**
      * Initializes the data directory in unzipping the jar containing the resources
      * into a temporary directory.
@@ -241,7 +238,7 @@ public class WFSRequestTest extends AbstractTestRequest {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL(WFS_GETCAPABILITIES_URL);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETCAPABILITIES_URL);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -253,13 +250,13 @@ public class WFSRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof WFSCapabilitiesType);
 
         WFSCapabilitiesType responseCaps = (WFSCapabilitiesType)obj;
-        
-        
+
+
         String currentUrl =  responseCaps.getOperationsMetadata().getOperation("GetCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
-        assertEquals(WFS_POST_URL, currentUrl);
-        
+        assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?", currentUrl);
+
         try {
-            getCapsUrl = new URL(WFS_GETCAPABILITIES_URL2);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test?" + WFS_GETCAPABILITIES_URL2);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -271,13 +268,13 @@ public class WFSRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof WFSCapabilitiesType);
 
         responseCaps = (WFSCapabilitiesType)obj;
-        
+
         currentUrl =  responseCaps.getOperationsMetadata().getOperation("GetCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
-        assertEquals(WFS_POST_URL2, currentUrl);
-        
-        
+        assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test?", currentUrl);
+
+
         try {
-            getCapsUrl = new URL(WFS_GETCAPABILITIES_URL);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETCAPABILITIES_URL);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -289,23 +286,23 @@ public class WFSRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof WFSCapabilitiesType);
 
         responseCaps = (WFSCapabilitiesType)obj;
-        
+
         currentUrl =  responseCaps.getOperationsMetadata().getOperation("GetCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
-        assertEquals(WFS_POST_URL, currentUrl);
+        assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?", currentUrl);
     }
-    
+
     /**
      */
     @Test
     public void testWFSGetFeaturePOST() throws Exception {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(WFS_POST_URL);
+        final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?");
 
         final List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         final GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, 2, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.1.1");
-        
+
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
         postRequestObject(conec, request);
@@ -321,7 +318,7 @@ public class WFSRequestTest extends AbstractTestRequest {
     public void testWFSGetFeatureGET() throws Exception {
         final URL getfeatsUrl;
         try {
-            getfeatsUrl = new URL(WFS_GETFEATURE_URL);
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_GETFEATURE_URL);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -347,7 +344,7 @@ public class WFSRequestTest extends AbstractTestRequest {
     public void testWFSDescribeFeatureGET() throws Exception {
         URL getfeatsUrl;
         try {
-            getfeatsUrl = new URL(WFS_DESCRIBE_FEATURE_TYPE_URL);
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?" + WFS_DESCRIBE_FEATURE_TYPE_URL);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -359,9 +356,9 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         Schema schema = (Schema) obj;
         assertEquals(17, schema.getElements().size());
-        
+
         try {
-            getfeatsUrl = new URL(WFS_DESCRIBE_FEATURE_TYPE_URL_V2);
+            getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test?" + WFS_DESCRIBE_FEATURE_TYPE_URL_V2);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -382,15 +379,15 @@ public class WFSRequestTest extends AbstractTestRequest {
     public void testWFSTransactionInsert() throws Exception {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(WFS_POST_URL);
-        
+        final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?");
+
 
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
         postRequestFile(conec, "org/constellation/xml/Insert-SamplingPoint-1.xml");
         Object obj = unmarshallResponse(conec);
-        
+
         assertTrue(obj instanceof TransactionResponseType);
 
         TransactionResponseType result = (TransactionResponseType) obj;
@@ -429,7 +426,7 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         // Try to unmarshall something from the response returned by the server.
         obj = unmarshallResponse(conec);
-        
+
         assertTrue(obj instanceof TransactionResponseType);
 
         result = (TransactionResponseType) obj;
@@ -457,10 +454,10 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         // Try to unmarshall something from the response returned by the server.
         xmlResult    = getStringResponse(conec);
-        
+
         xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-2.xml");
         xmlExpResult = xmlExpResult.replace("EPSG_VERSION", EPSG_VERSION);
-        
+
         assertEquals(xmlExpResult, xmlResult);
 
 
@@ -468,7 +465,7 @@ public class WFSRequestTest extends AbstractTestRequest {
         conec = getCapsUrl.openConnection();
 
         postRequestFile(conec, "org/constellation/xml/Insert-SamplingPoint-3.xml");
-        
+
         // Try to unmarshall something from the response returned by the server.
         obj = unmarshallResponse(conec);
 
@@ -496,7 +493,7 @@ public class WFSRequestTest extends AbstractTestRequest {
         conec = getCapsUrl.openConnection();
 
         postRequestObject(conec, request);
-        
+
         // Try to unmarshall something from the response returned by the server.
         xmlResult    = getStringResponse(conec);
         xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-3.xml");
@@ -510,13 +507,13 @@ public class WFSRequestTest extends AbstractTestRequest {
     public void testWFSTransactionUpdate() throws Exception {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(WFS_POST_URL);
-        
+        final URL getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/default?");
+
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
         postRequestFile(conec, "org/constellation/xml/Update-NamedPlaces-1.xml");
-        
+
         // Try to unmarshall something from the response returned by the server.
         Object obj = unmarshallResponse(conec);
 
@@ -545,6 +542,7 @@ public class WFSRequestTest extends AbstractTestRequest {
         // Try to unmarshall something from the response returned by the server.
         String xmlResult    = getStringResponse(conec);
         String xmlExpResult = getStringFromFile("org/constellation/xml/namedPlacesCollection-1.xml");
+        xmlExpResult = xmlExpResult.replace("9090", grizzly.getCurrentPort() + "");
 
         assertEquals(xmlExpResult, xmlResult);
     }

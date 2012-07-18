@@ -20,9 +20,6 @@ package org.constellation.ws.embedded.wps;
 
 // J2SE dependencies
 import java.io.File;
-import java.net.ConnectException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,17 +94,23 @@ public abstract class AbstractGrizzlyServer { // extends CoverageSQLTestCase {
      * Requests will be done on this working server.
      */
     protected static class GrizzlyThread extends Thread {
+      final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{}, new String[] {
+            "org.constellation.wps.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"
+        });
+
+        public int getCurrentPort() {
+            return cstlServer.currentPort;
+        }
+
         /**
          * Runs a Grizzly server for five minutes.
          */
         @Override
         public void run() {
-            final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{}, new String[] {
-            "org.constellation.wps.ws.rs",
-            "org.constellation.configuration.ws.rs",
-            "org.constellation.ws.rs.provider"
-        });
             cstlServer.duration = 5*60*1000;
+            cstlServer.findAvailablePort = true;
             try {
                 cstlServer.serviceInstanceSOAP.put("wps", new WPSService());
             } catch (CstlServiceException ex) {

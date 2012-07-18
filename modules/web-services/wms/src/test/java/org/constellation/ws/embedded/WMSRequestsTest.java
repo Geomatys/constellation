@@ -80,79 +80,65 @@ public class WMSRequestsTest extends AbstractTestRequest {
      * The layer to test.
      */
     private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
-    
+
     /**
      * URLs which will be tested on the server.
      */
-    private static final String WMS_DEFAULT = "http://localhost:9090/wms/default?";
-    
-    private static final String WMS_WMS1 = "http://localhost:9090/wms/wms1?";
-    
-    private static final String WMS_GETCAPABILITIES =
-            "http://localhost:9090/wms/default?request=GetCapabilities&service=WMS&version=1.1.1";
+    private static final String WMS_GETCAPABILITIES ="request=GetCapabilities&service=WMS&version=1.1.1";
 
-    private static final String WMS_GETCAPABILITIES_WMS1_111 =
-            "http://localhost:9090/wms/wms1?request=GetCapabilities&service=WMS&version=1.1.1";
-    
-    private static final String WMS_GETCAPABILITIES_WMS1 =
-            "http://localhost:9090/wms/wms1?request=GetCapabilities&service=WMS&version=1.3.0";
+    private static final String WMS_GETCAPABILITIES_WMS1_111 ="request=GetCapabilities&service=WMS&version=1.1.1";
 
-    private static final String WMS_GETCAPABILITIES_WMS1_FRE =
-            "http://localhost:9090/wms/wms1?request=GetCapabilities&service=WMS&version=1.3.0&language=fre";
+    private static final String WMS_GETCAPABILITIES_WMS1 ="request=GetCapabilities&service=WMS&version=1.3.0";
 
-    private static final String WMS_GETCAPABILITIES_WMS1_ENG =
-            "http://localhost:9090/wms/wms1?request=GetCapabilities&service=WMS&version=1.3.0&language=eng";
+    private static final String WMS_GETCAPABILITIES_WMS1_FRE ="request=GetCapabilities&service=WMS&version=1.3.0&language=fre";
 
-    private static final String WMS_FALSE_REQUEST =
-            "http://localhost:9090/wms/default?request=SomethingElse";
+    private static final String WMS_GETCAPABILITIES_WMS1_ENG ="request=GetCapabilities&service=WMS&version=1.3.0&language=eng";
 
-    private static final String WMS_GETMAP =
-            "http://localhost:9090/wms/default?request=GetMap&service=WMS&version=1.1.1&" +
+    private static final String WMS_FALSE_REQUEST ="request=SomethingElse";
+
+    private static final String WMS_GETMAP ="request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
 
-    private static final String WMS_GETFEATUREINFO =
-            "http://localhost:9090/wms/default?request=GetFeatureInfo&service=WMS&version=1.1.1&" +
+    private static final String WMS_GETFEATUREINFO ="request=GetFeatureInfo&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=&" +
                                       "query_layers="+ LAYER_TEST +"&" + "info_format=text/plain&" +
                                       "X=300&Y=200";
 
-    private static final String WMS_GETLEGENDGRAPHIC =
-            "http://localhost:9090/wms/default?request=GetLegendGraphic&service=wms&" +
+    private static final String WMS_GETLEGENDGRAPHIC = "request=GetLegendGraphic&service=wms&" +
             "width=200&height=40&layer="+ LAYER_TEST +"&format=image/png&version=1.1.0";
 
-    private static final String WMS_DESCRIBELAYER =
-            "http://localhost:9090/wms/default?request=DescribeLayer&service=WMS&" +
+    private static final String WMS_DESCRIBELAYER ="request=DescribeLayer&service=WMS&" +
             "version=1.1.1&layers="+ LAYER_TEST;
 
-    private static final String WMS_GETMAP2 = "http://localhost:9090/wms/default?" +
+    private static final String WMS_GETMAP2 =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/png&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
-    private static final String WMS_GETMAP_BMP = "http://localhost:9090/wms/default?" +
+    private static final String WMS_GETMAP_BMP =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/bmp&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
-    private static final String WMS_GETMAP_PPM = "http://localhost:9090/wms/default?" +
+    private static final String WMS_GETMAP_PPM =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/x-portable-pixmap&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
-    private static final String WMS_GETMAP_GIF = "http://localhost:9090/wms/default?" +
+    private static final String WMS_GETMAP_GIF =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/gif&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
-    
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
         pool = WMSMarshallerPool.getInstance();
-        
+
         final Configurator config = new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
 
                 final ParameterValueGroup config = desc.createValue();
-                
+
                 if("coverage-sql".equals(serviceName)){
                     // Defines a PostGrid data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
@@ -170,7 +156,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
                 }else if("shapefile".equals(serviceName)){
                     try{
                         final File outputDir = initDataDirectory();
-                        
+
                         final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                         final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
                         source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
@@ -179,7 +165,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
                                 .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
                         srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
                                 .setValue("http://www.opengis.net/gml");
-                        
+
                         ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
                         layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
                         layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
@@ -199,10 +185,10 @@ public class WMSRequestsTest extends AbstractTestRequest {
         };
 
         LayerProviderProxy.getInstance().setConfigurator(config);
-        
+
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSMapDecoration.setEmptyExtension(true);
-        
+
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
@@ -213,7 +199,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
             Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
         }
     }
-    
+
     /**
      * Initializes the data directory in unzipping the jar containing the resources
      * into a temporary directory.
@@ -254,13 +240,13 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @Test
     public void testWMSWrongRequest() throws Exception {
-        
+
         waitForStart();
-        
+
         // Creates an intentional wrong url, regarding the WMS version 1.1.1 standard
         final URL wrongUrl;
         try {
-            wrongUrl = new URL(WMS_FALSE_REQUEST);
+            wrongUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_FALSE_REQUEST);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -280,7 +266,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -304,7 +290,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
                 // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_GIF);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_GIF);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -319,7 +305,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertEquals(100,  image.getHeight());
         assertTrue  (ImageTesting.getNumColors(image) > 2);
     }
-    
+
     /**
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
@@ -328,7 +314,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP2);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP2);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -352,7 +338,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_BMP);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_BMP);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -376,7 +362,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_PPM);
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_PPM);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -401,7 +387,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL(WMS_GETCAPABILITIES);
+            getCapsUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -422,14 +408,14 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertTrue(bboxGeo.getSouthBoundLatitude() ==  -90d);
         assertTrue(bboxGeo.getEastBoundLongitude() ==  180d);
         assertTrue(bboxGeo.getNorthBoundLatitude() ==   90d);
-        
+
         String currentUrl = responseCaps.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().getHref();
-        
-        assertEquals(WMS_DEFAULT, currentUrl);
+
+        assertEquals("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?", currentUrl);
 
         // Creates a valid GetCapabilities url.
         try {
-            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1_111);
+            getCapsUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/wms1?" + WMS_GETCAPABILITIES_WMS1_111);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -448,27 +434,27 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // The layer lake must be included
         layer = (Layer) responseCaps.getLayerFromName("http://www.opengis.net/gml:Lakes");
         assertNotNull(layer);
-        
+
         currentUrl = responseCaps.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().getHref();
-        
-        assertEquals(WMS_WMS1, currentUrl);
-        
+
+        assertEquals("http://localhost:" + grizzly.getCurrentPort() + "/wms/wms1?", currentUrl);
+
         try {
-            getCapsUrl = new URL(WMS_GETCAPABILITIES);
+            getCapsUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
         }
-        
+
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
         obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof WMT_MS_Capabilities);
         responseCaps = (WMT_MS_Capabilities) obj;
-        
+
         currentUrl = responseCaps.getCapability().getRequest().getGetMap().getDCPType().get(0).getHTTP().getGet().getOnlineResource().getHref();
-        
-        assertEquals(WMS_DEFAULT, currentUrl);
+
+        assertEquals("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?", currentUrl);
 
     }
 
@@ -477,7 +463,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
          // Creates a valid GetMap url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1);
+            getCapsUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/wms1?" +WMS_GETCAPABILITIES_WMS1);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -499,7 +485,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertEquals("this is the default english capabilities", responseCaps130.getService().getName());
 
         try {
-            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1_ENG);
+            getCapsUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/wms1?" +WMS_GETCAPABILITIES_WMS1_ENG);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -517,7 +503,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertEquals("this is the default english capabilities", responseCaps130.getService().getName());
 
         try {
-            getCapsUrl = new URL(WMS_GETCAPABILITIES_WMS1_FRE);
+            getCapsUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/wms1?" +WMS_GETCAPABILITIES_WMS1_FRE);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -545,7 +531,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetFeatureInfo url.
         final URL gfi;
         try {
-            gfi = new URL(WMS_GETFEATUREINFO);
+            gfi = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETFEATUREINFO);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -586,7 +572,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // Creates a valid GetLegendGraphic url.
         final URL getLegendUrl;
         try {
-            getLegendUrl = new URL(WMS_GETLEGENDGRAPHIC);
+            getLegendUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETLEGENDGRAPHIC);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -609,7 +595,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
         // Creates a valid DescribeLayer url.
         final URL describeUrl;
         try {
-            describeUrl = new URL(WMS_DESCRIBELAYER);
+            describeUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_DESCRIBELAYER);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;

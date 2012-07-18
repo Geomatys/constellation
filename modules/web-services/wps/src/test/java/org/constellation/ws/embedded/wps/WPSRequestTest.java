@@ -17,7 +17,6 @@
 package org.constellation.ws.embedded.wps;
 
 // JUnit dependencies
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.bind.JAXBException;
@@ -33,26 +32,20 @@ import static org.junit.Assume.*;
  * @since 0.9
  */
 public class WPSRequestTest  extends AbstractTestRequest {
-    
-    private static final String WPS_DEFAULT = "http://localhost:9090/wps/default?";
-    
-    private static final String WPS_TEST = "http://localhost:9090/wps/test?";
-    
-    private static final String WPS_GETCAPABILITIES =
-            "http://localhost:9090/wps/default?request=GetCapabilities&service=WPS&version=1.0.0";
 
-    private static final String WPS_GETCAPABILITIES2 =
-            "http://localhost:9090/wps/test?request=GetCapabilities&service=WpS&version=1.0.0";
-    
+    private static final String WPS_GETCAPABILITIES ="request=GetCapabilities&service=WPS&version=1.0.0";
+
+    private static final String WPS_GETCAPABILITIES2 ="request=GetCapabilities&service=WpS&version=1.0.0";
+
     @BeforeClass
     public static void initLayerList() throws JAXBException {
         pool = WPSMarshallerPool.getInstance();
     }
-      
+
     @AfterClass
     public static void finish() {
     }
-    
+
     /**
      * Ensures that a valid GetCapabilities request returns indeed a valid GetCapabilities
      */
@@ -63,7 +56,7 @@ public class WPSRequestTest  extends AbstractTestRequest {
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL(WPS_GETCAPABILITIES);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?" + WPS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -75,13 +68,13 @@ public class WPSRequestTest  extends AbstractTestRequest {
         assertTrue(obj instanceof WPSCapabilitiesType);
 
         WPSCapabilitiesType responseCaps = (WPSCapabilitiesType)obj;
-        
-        
+
+
         String currentUrl = responseCaps.getOperationsMetadata().getOperation("getCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
-        assertEquals(WPS_DEFAULT, currentUrl);
-        
+        assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?", currentUrl);
+
         try {
-            getCapsUrl = new URL(WPS_GETCAPABILITIES2);
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/test?" + WPS_GETCAPABILITIES2);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -93,11 +86,11 @@ public class WPSRequestTest  extends AbstractTestRequest {
         assertTrue(obj instanceof WPSCapabilitiesType);
 
         responseCaps = (WPSCapabilitiesType)obj;
-        
+
         currentUrl = responseCaps.getOperationsMetadata().getOperation("getCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
-        assertEquals(WPS_TEST, currentUrl);
-        
-        
+        assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wps/test?", currentUrl);
+
+
         try {
             getCapsUrl = new URL(WPS_GETCAPABILITIES);
         } catch (MalformedURLException ex) {
@@ -111,9 +104,9 @@ public class WPSRequestTest  extends AbstractTestRequest {
         assertTrue(obj instanceof WPSCapabilitiesType);
 
         responseCaps = (WPSCapabilitiesType)obj;
-        
+
         currentUrl = responseCaps.getOperationsMetadata().getOperation("getCapabilities").getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref();
-        assertEquals(WPS_DEFAULT, currentUrl);
+        assertEquals("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?", currentUrl);
     }
 
 }
