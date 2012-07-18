@@ -42,7 +42,7 @@ public class RestartServiceDescriptor  extends AbstractProcessDescriptor {
             + "Or all service instances if identifier is not specified.");
 
     public static final String SERVICE_TYPE_NAME = "service_type";
-    private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS.";
+    private static final String SERVICE_TYPE_REMARKS = "The type of the service.";
     private static final Map<String, Object> SERVICE_TYPE_PROPERTIES;
     private static final String[] SERVICE_TYPE_VALID_VALUES = ServiceProcessCommon.servicesAvaible();
     static {

@@ -18,8 +18,7 @@ package org.constellation.process.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import org.constellation.ws.WSEngine;
+import org.constellation.ServiceDef;
 
 /**
  *
@@ -33,10 +32,13 @@ public final class ServiceProcessCommon {
     public static String[] servicesAvaible() {
 
         final List<String> validValues = new ArrayList <String>();
-        final Map<String, List<String>> regisredService = WSEngine.getRegisteredServices();
-        for (Map.Entry<String, List<String>> service : regisredService.entrySet()) {
-            validValues.add(service.getKey());
-        }
+
+        final ServiceDef.Specification[] spec = ServiceDef.Specification.values();
+         for (ServiceDef.Specification specification : spec) {
+             if (!"NONE".equals(specification.name())) {
+                 validValues.add(specification.name());
+             }
+         }
 
         return validValues.toArray(new String[validValues.size()]);
     }

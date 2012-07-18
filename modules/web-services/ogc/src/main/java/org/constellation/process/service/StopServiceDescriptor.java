@@ -40,7 +40,7 @@ public class StopServiceDescriptor extends AbstractProcessDescriptor {
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Stop the instance for the specified service instance.");
 
     public static final String SERVICE_TYPE_NAME = "service_type";
-    private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS.";
+    private static final String SERVICE_TYPE_REMARKS = "The type of the service.";
     private static final Map<String, Object> SERVICE_TYPE_PROPERTIES;
     private static final String[] SERVICE_TYPE_VALID_VALUES = ServiceProcessCommon.servicesAvaible();
     static {
