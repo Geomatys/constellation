@@ -56,7 +56,7 @@
             <h4>UpdateSequence Values</h4>
             <p>
                The WMS spec allows servers to use an UpdateSequence value for
-               maintaining cache consistency as described in 
+               maintaining cache consistency as described in
                <a href="http://cite.opengeospatial.org/OGCTestData/wms/1.3.0/spec/wms1_3.html#wmsops.getcapabilities.params.updatesequence">Section 7.2.3.5 of the specification</a>.
                If the server advertises an UpdateSequence value and the
                Automatic option is selected below, the test suite will attempt to
@@ -160,7 +160,7 @@
       <ctl:code>
          <xsl:variable name="capabilities">
             <ctl:request>
-               <ctl:url>http://localhost:9090/wms/default</ctl:url>
+               <ctl:url>http://localhost:9091/wms/default</ctl:url>
                <ctl:method>get</ctl:method>
                <ctl:param name="SERVICE">WMS</ctl:param>
                <ctl:param name="VERSION">1.3.0</ctl:param>

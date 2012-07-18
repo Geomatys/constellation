@@ -250,7 +250,7 @@ offering. Enter the grid resolutions below.</p>
       <ctl:code>
          <xsl:variable name="VAR_WCS_CAPABILITIES">
             <ctl:request>
-               <ctl:url>http://localhost:9090/wcs/default</ctl:url>
+               <ctl:url>http://localhost:9091/wcs/default</ctl:url>
                <ctl:method>get</ctl:method>
                <ctl:param name="request">GetCapabilities</ctl:param>
                <ctl:param name="service">WCS</ctl:param>
@@ -2288,7 +2288,7 @@ offering. Enter the grid resolutions below.</p>
                <ctl:header name="Content-type">text/xml</ctl:header>
                <ctl:body><![CDATA[<DescribeCoverage xmlns="http://www.opengis.net/wcs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/describeCoverage.xsd"  service="WCS" >
 <Coverage>]]><xsl:value-of select="$VAR_WCS_COVERAGE_1"/><![CDATA[</Coverage>
- 
+
 </DescribeCoverage >]]></ctl:body>
             </ctl:request>
          </xsl:variable>
@@ -2316,7 +2316,7 @@ offering. Enter the grid resolutions below.</p>
                <ctl:header name="Content-type">text/xml</ctl:header>
                <ctl:body><![CDATA[<DescribeCoverage xmlns="http://www.opengis.net/wcs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/describeCoverage.xsd"  service="WCS"  version="0.0.0">
 <Coverage>]]><xsl:value-of select="$VAR_WCS_COVERAGE_1"/><![CDATA[</Coverage>
- 
+
 </DescribeCoverage >]]></ctl:body>
             </ctl:request>
          </xsl:variable>
@@ -3125,7 +3125,7 @@ offering. Enter the grid resolutions below.</p>
                </ctl:url>
                <ctl:method>post</ctl:method>
                <ctl:header name="Content-type">text/xml</ctl:header>
-               <ctl:body><![CDATA[<GetCapabilities xmlns="http://www.opengis.net/wcs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/wcsCapabilities.xsd" version="1.0.0" service="WCS" > 
+               <ctl:body><![CDATA[<GetCapabilities xmlns="http://www.opengis.net/wcs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/wcsCapabilities.xsd" version="1.0.0" service="WCS" >
 </GetCapabilities>]]></ctl:body>
                <xsl:copy-of select="$parser"/>
             </ctl:request>
@@ -4716,7 +4716,7 @@ offering. Enter the grid resolutions below.</p>
       <ctl:param name="VAR_WCS_FORMAT_1_HEADER"/>
       <ctl:param name="VAR_WCS_DESCRIBE_COVERAGE_HTTP_GET_URL"/>
       <ctl:param name="VAR_WCS_GET_COVERAGE_HTTP_GET_URL"/>
-      <ctl:assertion>When a GetCoverage request is made with EXCEPTIONS contains value  "application/vnd.ogc.se_xml", the server recognize it. 
+      <ctl:assertion>When a GetCoverage request is made with EXCEPTIONS contains value  "application/vnd.ogc.se_xml", the server recognize it.
 </ctl:assertion>
       <ctl:comment><![CDATA[Check for content-type header = [[VAR_WCS_FORMAT_1_HEADER]]]]></ctl:comment>
       <ctl:link title="OGC 03-065r6: cl. 9.2.2.13">http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.13_EXCEPTIONS</ctl:link>
@@ -4912,7 +4912,7 @@ offering. Enter the grid resolutions below.</p>
       <ctl:param name="VAR_WCS_FORMAT_1_HEADER"/>
       <ctl:param name="VAR_WCS_DESCRIBE_COVERAGE_HTTP_GET_URL"/>
       <ctl:param name="VAR_WCS_GET_COVERAGE_HTTP_POST_URL"/>
-      <ctl:assertion>When a GetCoverage request is made with EXCEPTIONS contains value  "application/vnd.ogc.se_xml", the server recognize it. 
+      <ctl:assertion>When a GetCoverage request is made with EXCEPTIONS contains value  "application/vnd.ogc.se_xml", the server recognize it.
 </ctl:assertion>
       <ctl:comment><![CDATA[Check for content-type header = [[VAR_WCS_FORMAT_1_HEADER]]]]></ctl:comment>
       <ctl:link title="OGC 03-065r6: cl. 9.2.2.13">http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.13_EXCEPTIONS</ctl:link>

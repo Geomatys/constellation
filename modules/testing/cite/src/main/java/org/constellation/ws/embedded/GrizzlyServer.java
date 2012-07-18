@@ -178,7 +178,7 @@ public final class GrizzlyServer {
                     layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
                     layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("Streams");
                     layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_Streams");
-                    
+
                 }else if("postgis".equals(serviceName)){
                     // Defines a PostGis data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
@@ -238,7 +238,7 @@ public final class GrizzlyServer {
         for(String jn : ImageIO.getWriterFormatNames()){
             Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
         }
-        
+
         // Starting the grizzly server
         grizzly.start();
 
@@ -321,22 +321,27 @@ public final class GrizzlyServer {
      * Requests will be done on this working server.
      */
     private static class GrizzlyThread extends Thread {
+        final CstlEmbeddedService cstlServer = new CstlEmbeddedService(9091, new String[]{}, new String[] {
+            "org.constellation.map.ws.rs",
+            "org.constellation.coverage.ws.rs",
+            "org.constellation.sos.ws.rs",
+            "org.constellation.metadata.ws.rs",
+            "org.constellation.wfs.ws.rs",
+            "org.constellation.wps.ws.rs",
+            "org.constellation.ws.rs.provider"
+        });
+
+        public int getCurrentPort() {
+            return cstlServer.currentPort;
+        }
+
         /**
-         * Runs a Grizzly server for two hours. Of course this value is far too high,
-         * and the process will be killed as soon as the last test suite finishes.
+         * Runs a Grizzly server for five minutes.
          */
         @Override
         public void run() {
-            final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{}, new String[] {
-                "org.constellation.map.ws.rs",
-                "org.constellation.coverage.ws.rs",
-                "org.constellation.sos.ws.rs",
-                "org.constellation.metadata.ws.rs",
-                "org.constellation.wfs.ws.rs",
-                "org.constellation.wps.ws.rs",
-                "org.constellation.ws.rs.provider"
-            });
             cstlServer.duration = 2*60*60*1000;
+            cstlServer.findAvailablePort = true;
             cstlServer.runREST();
         }
     }

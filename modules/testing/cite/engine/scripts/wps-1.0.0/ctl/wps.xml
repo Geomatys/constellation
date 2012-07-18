@@ -1,56 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ctl:package 
+<ctl:package
 	xmlns:wpsFunctions="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/functions.xml"
 	xmlns:getCapabilities="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/GetCapabilities.xml"
 	xmlns:describeProcess="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/DescribeProcess.xml"
 	xmlns:execute="https://cite.opengeospatial.org/wps-1.0.0/src/ctl/Execute.xml"
 	xmlns:owsTests="https://www.cite.opengeospatial.org/ows-1.0/tests"
-	xmlns:ctl="http://www.occamlab.com/ctl" 
-	xmlns:html="http://www.w3.org/1999/xhtml" 	
-	xmlns:saxon="http://saxon.sf.net/" 
-	xmlns:tep="http://teamengine.sourceforge.net/parsers" 
-	xmlns:xi="http://www.w3.org/2001/XInclude" 
+	xmlns:ctl="http://www.occamlab.com/ctl"
+	xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:saxon="http://saxon.sf.net/"
+	xmlns:tep="http://teamengine.sourceforge.net/parsers"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:parsers="http://www.occamlab.com/te/parsers"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-	xmlns:ows="http://www.opengis.net/ows/1.1" 
-	xmlns:gml="http://www.opengis.net/gml" 
-	xmlns:wps="http://www.opengis.net/wps/1.0.0"	
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:ows="http://www.opengis.net/ows/1.1"
+	xmlns:gml="http://www.opengis.net/gml"
+	xmlns:wps="http://www.opengis.net/wps/1.0.0"
 	xmlns:xml="http://www.w3.org/XML/1998/namespace"
 	xmlns:ogc="http://www.opengis.net/ogc"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	
+
     <ctl:suite name="wps:suite">
         <ctl:title>WPS 1.0 Compliance Test Suite</ctl:title>
         <ctl:description>Verifies that an WPS 1.0.0 implementation complies with a given conformance class.</ctl:description>
-        <ctl:link>docs/wps/1.0/</ctl:link>		
+        <ctl:link>docs/wps/1.0/</ctl:link>
         <ctl:starting-test>wps:Main</ctl:starting-test>
     </ctl:suite>
-	
+
 	<ctl:test name="wps:Main">
 		<ctl:assertion>The IUT satisfies all applicable assertions.</ctl:assertion>
 		<ctl:code>
-		         
+
 		<!--xsl:variable name="form-values">
                 <ctl:form height="640" width="800">
                     <body>
                         <h2>Compliance test suite for Web Processing Service (WPS) 1.0</h2>
                         <h3>Service metadata</h3>
                         <p>
-                            Please provide a URL from which a capabilities document can 
-                            be retrieved. Modify the URL template below to specify the 
-                            location of an OGC WPS implementation 
+                            Please provide a URL from which a capabilities document can
+                            be retrieved. Modify the URL template below to specify the
+                            location of an OGC WPS implementation
                             under test.
                         </p>
                         <blockquote>
                             <table border="1" padding="4" bgcolor="#00ffff">
                                 <tr>
-                                    <td align="left">Service URL:</td>                        
+                                    <td align="left">Service URL:</td>
                                     <td align="center">
                                         <input name="service-url" size="128" type="text" value="http://hostname:port/path"/>
                                     </td>
-                                </tr>				
+                                </tr>
                             </table>
                         </blockquote>
                         <h4>UpdateSequence Values</h4>
@@ -85,26 +85,26 @@
                     </body>
                 </ctl:form>
 		</xsl:variable-->
-		 
-			<!-- Get user input: >	
+
+			<!-- Get user input: >
                         <xsl:variable name="wps.service.url" select="$form-values/values/value[@key='service-url']"/>
                         <xsl:variable name="wps.updatesequence.high" select="$form-values/values/value[@key='updatesequence-high']"/>
                         <xsl:variable name="wps.updatesequence.low" select="$form-values/values/value[@key='updatesequence-low']"/-->
-                        
+
                         <!-- headless version -->
-			<xsl:variable name="wps.service.url" select="'http://localhost:9090/wps/default'"/>
+			<xsl:variable name="wps.service.url" select="'http://localhost:9091/wps/default'"/>
                         <xsl:variable name="wps.updatesequence.high" select="'9999999999999'"/>
                         <xsl:variable name="wps.updatesequence.low" select="'1'"/>
-        
-			<!-- set other "global" variables -->			
+
+			<!-- set other "global" variables -->
 			<xsl:variable name="ogc.schema.root" select="'http://schemas.opengis.net/'"/>
 			<xsl:variable name="wps.schema.root" select="$ogc.schema.root"/>
-			
-			<xsl:variable name="wps.version" select="'1.0.0'"/>		
+
+			<xsl:variable name="wps.version" select="'1.0.0'"/>
 			<xsl:variable name="ows.version" select="'1.1.0'"/>
 			<xsl:variable name="exceptionReportSchema" select="wpsFunctions:exceptionReportSchemaPath($ogc.schema.root, $ows.version)"/>
-			<ctl:message select="concat('WPS service URL: ',$wps.service.url)"/>	
-                        
+			<ctl:message select="concat('WPS service URL: ',$wps.service.url)"/>
+
                         <xsl:if test="$wps.updatesequence.high!=''">
                             <ctl:message select="concat('High value of update sequence: ', $wps.updatesequence.high)"/>
                         </xsl:if>
@@ -113,7 +113,7 @@
                             <ctl:message select="concat('Low value of update sequence: ', $wps.updatesequence.low)"/>
                         </xsl:if>
 
-		
+
 			<ctl:call-test name="wps:ows-main">
 				<ctl:with-param name="serviceURL" select="$wps.service.url" />
 				<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema" />
@@ -126,20 +126,20 @@
 			<ctl:call-test name="wps:general-main">
 				<ctl:with-param name="serviceURL" select="$wps.service.url" />
 				<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema" />
-			</ctl:call-test>			
+			</ctl:call-test>
 
 			<ctl:call-test name="wps:core-main">
 				<ctl:with-param name="serviceURL" select="$wps.service.url" />
 				<ctl:with-param name="ogcSchemaRoot" select="$ogc.schema.root" />
 				<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema" />
-				<ctl:with-param name="wpsSchemaRoot" select="$wps.schema.root" />			
-				<ctl:with-param name="wpsVersion" select="$wps.version"/>			
+				<ctl:with-param name="wpsSchemaRoot" select="$wps.schema.root" />
+				<ctl:with-param name="wpsVersion" select="$wps.version"/>
 			</ctl:call-test>
 
 		</ctl:code>
 	</ctl:test>
 	<ctl:package>
-	
+
 		<ctl:test name="wps:ows-main">
 		<ctl:param name="serviceURL" />
 		<ctl:param name="exceptionReportSchema" />
@@ -170,7 +170,7 @@
 		</ctl:code>
 		</ctl:test>
 	</ctl:package>
-	
+
   <ctl:package>
     <ctl:test name="wps:general-main">
       <ctl:param name="serviceURL" />
@@ -205,7 +205,7 @@
                     2.)  Validate the response against the ExceptionReport schema.
                     3.)  If the response validates, then check that the exceptionCode value is "InvalidRequest"
                 -->
-        <ctl:message>Issuing an invalid request to:  <xsl:value-of select="$serviceURL" /></ctl:message>		     
+        <ctl:message>Issuing an invalid request to:  <xsl:value-of select="$serviceURL" /></ctl:message>
 		<ctl:message select="'The body of the request will be &quot;test&quot;'"/>
         <xsl:variable name="invalidRequestResponse">
                 <ctl:request>
@@ -214,11 +214,11 @@
                     </ctl:url>
                     <ctl:method>post</ctl:method>
                     <ctl:body>test</ctl:body>
-					<ctl:call-function name="wpsFunctions:xmlValidatingParser">	
+					<ctl:call-function name="wpsFunctions:xmlValidatingParser">
 						<ctl:with-param name="schemaFile" select="$exceptionReportSchema"/>
 					</ctl:call-function>
                 </ctl:request>
-        </xsl:variable>        
+        </xsl:variable>
         <xsl:choose>
             <xsl:when test="not($invalidRequestResponse/*)">
                 <ctl:message>FAILURE:  The server did not return a response to an invalid request or the response from the server was not a valid exception report.  The response from the server was:  "<xsl:copy-of select="$invalidRequestResponse/*" />"</ctl:message>
@@ -266,17 +266,17 @@
 			<ctl:param name="wpsSchemaRoot"/>
 			<ctl:param name="wpsVersion"/>
 
-	
+
 			<ctl:assertion>All assertions for "core" conformance are satisfied.</ctl:assertion>
 			<ctl:comment>Test driver for the core module.</ctl:comment>
 			<ctl:link title="3. Core">docs/wps/1.0/WPS 1.0 ATS.html#core</ctl:link>
-			<ctl:code>		
+			<ctl:code>
 				<ctl:message></ctl:message>
 				<ctl:message select="'********************************************************'"/>
 				<ctl:message select="''"/>
 
 				<ctl:message select="'********************************************************'"/>
-				<ctl:message select="''"/>				
+				<ctl:message select="''"/>
 				<ctl:message select="'A request for a valid capabilities document will now be made.'"/>
 				<ctl:message select="'The optional &quot;version&quot; parameter will be omitted.'"/>
 				<ctl:message select="'If this response passes schema validation, further tests will be performed on the GetCapabilities response.'"/>
@@ -285,16 +285,16 @@
 				<xsl:variable name="getCapabilitiesRequest">
 					<ctl:request>
 						<ctl:url>
-							<xsl:value-of select="$serviceURL"/>								
+							<xsl:value-of select="$serviceURL"/>
 						</ctl:url>
-						<ctl:method>get</ctl:method>	
+						<ctl:method>get</ctl:method>
 						<ctl:param name="request">GetCapabilities</ctl:param>
-						<ctl:param name="service">WPS</ctl:param> 
+						<ctl:param name="service">WPS</ctl:param>
 
-						<ctl:call-function name="wpsFunctions:xmlValidatingParser">					
+						<ctl:call-function name="wpsFunctions:xmlValidatingParser">
 							<ctl:with-param name="schemaFile" select="wpsFunctions:schemaPath($wpsSchemaRoot, $wpsVersion,'wps', 'wpsGetCapabilities_response.xsd')"/>
 						</ctl:call-function>
-					  
+
 					</ctl:request>
 				</xsl:variable>
 
@@ -312,18 +312,18 @@
 					</xsl:when>
 					<xsl:otherwise>
 						<ctl:message select="'********************************************************'"/>
-						<ctl:message select="''"/>					
+						<ctl:message select="''"/>
 						<ctl:message>Capabilities response is valid, continuing...</ctl:message>
-						<ctl:message select="''"/>	
+						<ctl:message select="''"/>
 
 		 				<ctl:message></ctl:message>
 						<ctl:message select="'********************************************************'"/>
-						<ctl:message select="''"/>						
+						<ctl:message select="''"/>
 						<ctl:call-test name="getCapabilities:core-WPS.GetCapabilities-KVPRequestParameterHandling.1">
 							<ctl:with-param name="serviceURL" select="$serviceURL"/>
 							<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>
 						</ctl:call-test>
-						
+
 		 				<ctl:message></ctl:message>
 						<ctl:message select="'********************************************************'"/>
 						<ctl:message select="''"/>
@@ -331,156 +331,156 @@
 							<ctl:with-param name="serviceURL" select="$serviceURL"/>
 							<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>
 						</ctl:call-test>
-						
+
 						<ctl:message select="'********************************************************'"/>
-						<ctl:message select="''"/>		
+						<ctl:message select="''"/>
 						<ctl:call-test name="getCapabilities:core-WPS.GetCapabilities-KVPRequestRequestParameterHandling.1">
 							<ctl:with-param name="serviceURL" select="$serviceURL"/>
 							<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>
 						</ctl:call-test>
-				
+
 						<ctl:message select="'********************************************************'"/>
-						<ctl:message select="''"/>						
+						<ctl:message select="''"/>
 						<ctl:call-test name="getCapabilities:core-WPS.GetCapabilities-OperationsMetadataMandatoryOperations.1">
 							<ctl:with-param name="capabilitiesDocument" select="$getCapabilitiesRequest"/>
 						</ctl:call-test>
-				
+
 						<ctl:message select="'********************************************************'"/>
-						<ctl:message select="''"/>							
+						<ctl:message select="''"/>
 						<ctl:call-test name="getCapabilities:core-WPS.GetCapabilities-ResponseContentsValidProccesIdentifier.1">
 							<ctl:with-param name="capabilitiesDocument" select="$getCapabilitiesRequest"/>
 						</ctl:call-test>
-						
-                                                
-                                                <!--**********************************************************************************************-->		
-						<!--********************   Create variables for DescribeProcess **********************************-->		
+
+
+                                                <!--**********************************************************************************************-->
+						<!--********************   Create variables for DescribeProcess **********************************-->
                                                 <!--**********************************************************************************************-->
 
 						<xsl:variable name="describeProcessPostURL" select="wpsFunctions:operationPostURL($getCapabilitiesRequest, 'DescribeProcess')"/>
                                                 <xsl:variable name="describeProcessGetURL" select="wpsFunctions:operationGetURL($getCapabilitiesRequest, 'DescribeProcess')"/>
-                                                
+
 						<xsl:variable name="describeProcessVersion" select="wpsFunctions:operationVersion($getCapabilitiesRequest, 'DescribeProcess')"/>
 						<xsl:variable name="describeProcessIdentifier" select="wpsFunctions:capabilitiesFirstProcess($getCapabilitiesRequest)"/>
 						<xsl:variable name="describeProcessSchemaFile" select="wpsFunctions:schemaPath($wpsSchemaRoot, $wpsVersion,'wps', 'wpsDescribeProcess_response.xsd')"/>
-					
+
 						<ctl:message></ctl:message>
-						<ctl:message select="'*************************************'"/>	
+						<ctl:message select="'*************************************'"/>
 						<ctl:message select="'*     Describe Process POST Tests   *'"/>
 						<ctl:message select="'*************************************'"/>
 						<ctl:message select="concat('All DescribeProcess tests will use the &quot;Post&quot; method at the following url: ', $describeProcessPostURL)"/>
 						<ctl:message select="'This url was obtained from the GetCapabilities response'"/>
-						<ctl:message select="''"/>												
-						
-						<xsl:choose>															
+						<ctl:message select="''"/>
+
+						<xsl:choose>
 							<xsl:when test="not($describeProcessPostURL)">
 								<ctl:message>Failure</ctl:message>
 								<ctl:message select="'This service does not implement the &quot;POST&quot; for the DescribeProcess operation.'"/>
 								<ctl:message select="'The POST method must be implemented.'"/>
 								<ctl:fail/>
 							</xsl:when>
-							
+
 							<xsl:otherwise>
 
 								<ctl:message select="'********************************************************'"/>
-								<ctl:message select="''"/>												
-								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-POST-RequestInvalidLanguage.1">							
+								<ctl:message select="''"/>
+								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-POST-RequestInvalidLanguage.1">
 									<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>
 									<ctl:with-param name="postURL" select="$describeProcessPostURL"/>
 									<ctl:with-param name="describeProcessVersion" select="$describeProcessVersion"/>
-									<ctl:with-param name="identifier" select="$describeProcessIdentifier"/>						
+									<ctl:with-param name="identifier" select="$describeProcessIdentifier"/>
 								</ctl:call-test>
 
 								<ctl:message select="'********************************************************'"/>
-								<ctl:message select="''"/>						
-								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-POST-RequestInvalidIdentifier.1">									
+								<ctl:message select="''"/>
+								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-POST-RequestInvalidIdentifier.1">
 									<ctl:with-param name="postURL" select="$describeProcessPostURL"/>
 									<ctl:with-param name="describeProcessVersion" select="$describeProcessVersion"/>
-									<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>									
+									<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>
 								</ctl:call-test>
 
 								<ctl:message select="'********************************************************'"/>
-								<ctl:message select="''"/>									
-								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-POST-ResponseMatchingProcessIdentifier.1">								
+								<ctl:message select="''"/>
+								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-POST-ResponseMatchingProcessIdentifier.1">
 									<ctl:with-param name="capabilitiesDocument" select="$getCapabilitiesRequest"/>
 									<ctl:with-param name="postURL" select="$describeProcessPostURL"/>
 									<ctl:with-param name="describeProcessVersion" select="$describeProcessVersion"/>
-									<ctl:with-param name="schemaFile" select="$describeProcessSchemaFile"/>	
+									<ctl:with-param name="schemaFile" select="$describeProcessSchemaFile"/>
 								</ctl:call-test>
-								
+
 							</xsl:otherwise>
 						</xsl:choose>
-                                                
+
                                                 <ctl:message></ctl:message>
-						<ctl:message select="'*************************************'"/>	
+						<ctl:message select="'*************************************'"/>
 						<ctl:message select="'*     Describe Process GET Tests    *'"/>
 						<ctl:message select="'*************************************'"/>
 						<ctl:message select="concat('All DescribeProcess tests will use the &quot;Get&quot; method at the following url: ', $describeProcessGetURL)"/>
 						<ctl:message select="'This url was obtained from the GetCapabilities response'"/>
-						<ctl:message select="''"/>												
-						
-						<xsl:choose>															
+						<ctl:message select="''"/>
+
+						<xsl:choose>
 							<xsl:when test="not($describeProcessGetURL)">
 								<ctl:message>Failure</ctl:message>
 								<ctl:message select="'This service does not implement the &quot;Get&quot; for the DescribeProcess operation.'"/>
 								<ctl:message select="'The GET method must be implemented.'"/>
 								<ctl:fail/>
 							</xsl:when>
-							
+
 							<xsl:otherwise>
 
 								<ctl:message select="'********************************************************'"/>
-								<ctl:message select="''"/>												
-								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-GET-RequestInvalidLanguage.1">							
+								<ctl:message select="''"/>
+								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-GET-RequestInvalidLanguage.1">
 									<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>
 									<ctl:with-param name="getURL" select="$describeProcessGetURL"/>
 									<ctl:with-param name="describeProcessVersion" select="$describeProcessVersion"/>
-									<ctl:with-param name="identifier" select="$describeProcessIdentifier"/>						
+									<ctl:with-param name="identifier" select="$describeProcessIdentifier"/>
 								</ctl:call-test>
 
 								<ctl:message select="'********************************************************'"/>
-								<ctl:message select="''"/>						
-								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-GET-RequestInvalidIdentifier.1">									
+								<ctl:message select="''"/>
+								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-GET-RequestInvalidIdentifier.1">
 									<ctl:with-param name="getURL" select="$describeProcessGetURL"/>
 									<ctl:with-param name="describeProcessVersion" select="$describeProcessVersion"/>
-									<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>									
+									<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>
 								</ctl:call-test>
 
 								<ctl:message select="'********************************************************'"/>
-								<ctl:message select="''"/>									
-								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-GET-ResponseMatchingProcessIdentifier.1">								
+								<ctl:message select="''"/>
+								<ctl:call-test name="describeProcess:core-WPS.DescribeProcess-GET-ResponseMatchingProcessIdentifier.1">
 									<ctl:with-param name="capabilitiesDocument" select="$getCapabilitiesRequest"/>
 									<ctl:with-param name="getURL" select="$describeProcessGetURL"/>
 									<ctl:with-param name="describeProcessVersion" select="$describeProcessVersion"/>
-									<ctl:with-param name="schemaFile" select="$describeProcessSchemaFile"/>	
+									<ctl:with-param name="schemaFile" select="$describeProcessSchemaFile"/>
 								</ctl:call-test>
-								
+
 							</xsl:otherwise>
 						</xsl:choose>
 
                                                 <!--**************************************************************************************-->
-						<!--********************   Create variables for Execute **********************************-->	
+						<!--********************   Create variables for Execute **********************************-->
                                                 <!--**************************************************************************************-->
 
 						<xsl:variable name="executePostURL" select="wpsFunctions:operationPostURL($getCapabilitiesRequest, 'Execute')"/>
 						<xsl:variable name="executeVersion" select="wpsFunctions:operationVersion($getCapabilitiesRequest, 'Execute')"/>
 						<xsl:variable name="processIdentifier"	select="wpsFunctions:capabilitiesFirstProcess($getCapabilitiesRequest)"/>
 						<ctl:message></ctl:message>
-						<ctl:message select="'*********************************'"/>	
+						<ctl:message select="'*********************************'"/>
 						<ctl:message select="'*     Execute Tests 	  *'"/>
 						<ctl:message select="'*********************************'"/>
 						<ctl:message select="concat('All Execute tests will use the &quot;Post&quot; method at the following url: ', $executePostURL)"/>
 						<ctl:message select="'This url was obtained from the GetCapabilities response'"/>
 						<ctl:message select="''"/>
-	
+
 						<xsl:choose>
-							
+
 							<xsl:when test="not($executePostURL)">
 								<ctl:message>Failure</ctl:message>
 								<ctl:message select="'This service does not implement the &quot;POST&quot; for the Execute operation.'"/>
 								<ctl:message select="'The POST method must be implemented.'"/>
 								<ctl:fail/>
 							</xsl:when>
-							
+
 							<xsl:when test="not($processIdentifier)">
 								<ctl:message>Failure</ctl:message>
 								<ctl:message select="'There are no process in the capabilities document.'"/>
@@ -488,25 +488,25 @@
 								<ctl:message select="'The WPS must have process in order to be tested.'"/>
 								<ctl:fail/>
 							</xsl:when>
-							
-							<xsl:otherwise>											
+
+							<xsl:otherwise>
 
 								<ctl:message select="'********************************************************'"/>
-								<ctl:message select="''"/>									
-								<ctl:call-test name="execute:core-WPS.Execute-POST-RequestInvalidIdentifier.1">							
+								<ctl:message select="''"/>
+								<ctl:call-test name="execute:core-WPS.Execute-POST-RequestInvalidIdentifier.1">
 									<ctl:with-param name="exceptionReportSchema" select="$exceptionReportSchema"/>
 									<ctl:with-param name="postURL" select="$executePostURL"/>
 									<ctl:with-param name="executeVersion" select="$executeVersion"/>
 								</ctl:call-test>
-							</xsl:otherwise>					
-						</xsl:choose>		
+							</xsl:otherwise>
+						</xsl:choose>
 
-					</xsl:otherwise>					
-				</xsl:choose>		
+					</xsl:otherwise>
+				</xsl:choose>
 
 			</ctl:code>
-		</ctl:test> 
-	
+		</ctl:test>
+
 
 	</ctl:package>
 </ctl:package>

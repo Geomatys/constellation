@@ -13,8 +13,8 @@
          xmlns:wms="http://www.opengis.net/wms"
          xmlns:xlink="http://www.w3.org/1999/xlink"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform">         
-   
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
    <parser name="wms:CustomTransformer">
       <java class="com.occamlab.te.parsers.CustomTransformer" method="parse"/>
    </parser>
@@ -48,7 +48,7 @@
          </with-param>
       </java>
    </parser>
-   
+
    <ctl:suite name="wms:main_wms">
       <title>Web Map Service (WMS) 1.1.1 Test Suite</title>
       <description>Validates that a WMS 1.1.1 is compliant with the spec.</description>
@@ -240,7 +240,7 @@ longitude</td>
                </body>
             </ctl:form-->
   </ctl:suite>
-   
+
    <test name="wms:wms_main">
       <param name="VAR_WMS_CAPABILITIES_URL"/>
       <param name="updatesequence"/>
@@ -255,7 +255,7 @@ longitude</td>
       <code>
          <xsl:variable name="VAR_WMS_CAPABILITIES">
             <request>
-               <url>http://localhost:9090/wms/default</url>
+               <url>http://localhost:9091/wms/default</url>
                <method>get</method>
                <param name="SERVICE">WMS</param>
                <param name="VERSION">1.1.1</param>
@@ -1498,11 +1498,11 @@ longitude</td>
 	            </ctl:call-test>
 	         </ctl:for-each>
 
-            <call-test name="wms:wmsops-getmap-layer-encoded-name">             
+            <call-test name="wms:wmsops-getmap-layer-encoded-name">
                <with-param name="WMS_CAPABILITIES" select="$VAR_WMS_CAPABILITIES/*" />
             </call-test>
 
-            <call-test name="wms:basic_elements-validate-exception">             
+            <call-test name="wms:basic_elements-validate-exception">
                <with-param name="WMS_CAPABILITIES" select="$VAR_WMS_CAPABILITIES/*" />
             </call-test>
 
@@ -5537,7 +5537,7 @@ longitude</td>
                   <input type="submit" name="submit" value="no"/>
                </p>
             </ctl:form-->
-         
+
          <xsl:if test="not($form-values='yes')">
             <fail/>
          </xsl:if>
@@ -5587,7 +5587,7 @@ longitude</td>
                </p>
                <p>
 					Refer to the <a href="{$hosturl}/OGCTestData/wms/1.1.1/data/WmsTestData_files/bluelake_features.gif"
-                     target="_blank">Overview of Blue Lake vicinity features</a> 
+                     target="_blank">Overview of Blue Lake vicinity features</a>
 					for a diagram of the Blue Lake vicinity features.
                </p>
             </ctl:form!-->
@@ -5670,13 +5670,13 @@ longitude</td>
                </param>
                <param name="ReQuEsT">GetMap</param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="RGB"&gt;
 								&lt;count bands="RGB" sample="all"&gt;&lt;/count&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -5762,13 +5762,13 @@ longitude</td>
                <param name="ReQuEsT">GetMap</param>
                <param name="BbOx">359.9978,0.0014,359.9988,0.0022</param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="RGB"&gt;
 								&lt;count bands="RGB" sample="all"&gt;&lt;/count&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -5890,13 +5890,13 @@ longitude</td>
                   <xsl:value-of select="$VAR_PONDS"/>
                </param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="ARGB"&gt;
 								&lt;checksum&gt;&lt;/checksum&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -5930,13 +5930,13 @@ longitude</td>
                   <xsl:value-of select="$VAR_LOSSLESS_FORMAT"/>
                </param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="ARGB"&gt;
 								&lt;checksum&gt;&lt;/checksum&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -6065,13 +6065,13 @@ longitude</td>
                   <xsl:value-of select="$VAR_WMS_VERSION"/>
                </param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="ARGB"&gt;
 								&lt;checksum&gt;&lt;/checksum&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -6105,13 +6105,13 @@ longitude</td>
                </param>
                <param name="ReQuEsT">GetMap</param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="ARGB"&gt;
 								&lt;checksum&gt;&lt;/checksum&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -6197,7 +6197,7 @@ longitude</td>
                   <xsl:value-of select="$VAR_WMS_VERSION"/>
                </param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="RGB"&gt;
 								&lt;subimage x="0" y="0" width="10" height="1"&gt;
@@ -6214,7 +6214,7 @@ longitude</td>
 								&lt;/subimage&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -6632,13 +6632,13 @@ longitude</td>
                   <xsl:value-of select="$VAR_WMS_VERSION"/>
                </param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="RGB"&gt;
 								&lt;count bands="RGB" sample="all"&gt;&lt;/count&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -6724,7 +6724,7 @@ longitude</td>
                </param>
                <param name="StYlEs"/>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="RGB"&gt;
 								&lt;subimage x="0" y="0" width="25" height="100"&gt;
@@ -6735,7 +6735,7 @@ longitude</td>
 								&lt;/subimage&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -6827,7 +6827,7 @@ longitude</td>
                   <xsl:value-of select="$VAR_WMS_VERSION"/>
                </param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="RGB"&gt;
 								&lt;subimage x="0" y="0" width="25" height="100"&gt;
@@ -6838,7 +6838,7 @@ longitude</td>
 								&lt;/subimage&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -7210,13 +7210,13 @@ longitude</td>
                <param name="HeIgHt">100</param>
                <param name="BbOx">-1,-1,1,1</param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="RGB"&gt;
 								&lt;count bands="RGB" sample="0xff0000"&gt;&lt;/count&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -7307,13 +7307,13 @@ longitude</td>
                <param name="WiDtH">100</param>
                <param name="HeIgHt">100</param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="ARGB"&gt;
 								&lt;count bands="A" sample="0x00"&gt;&lt;/count&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -8066,12 +8066,12 @@ longitude</td>
                </p>
                <p>
 					Refer to the <a href="{$hosturl}/OGCTestData/wms/1.1.1/data/WmsTestData_files/bluelake_features.gif"
-                     target="_blank">Overview of Blue Lake vicinity features</a> 
+                     target="_blank">Overview of Blue Lake vicinity features</a>
 					for a diagram of the relevant features.
                </p>
             </ctl:form-->
-            
-         
+
+
          <xsl:if test="not($form-values='yes')">
             <fail/>
          </xsl:if>
@@ -9583,13 +9583,13 @@ longitude</td>
                </param>
                <param name="HeIgHt">100</param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="ARGB"&gt;
 								&lt;count bands="A" sample="0xff"&gt;&lt;/count&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -9679,13 +9679,13 @@ longitude</td>
                   <xsl:value-of select="$VAR_LAKES"/>
                </param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="ARGB"&gt;
 								&lt;count bands="A" sample="0xff"&gt;&lt;/count&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -9775,13 +9775,13 @@ longitude</td>
                <param name="ReQuEsT">GetMap</param>
                <param name="SrS">EPSG:4326</param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;model value="ARGB"&gt;
 								&lt;count bands="A" sample="0x00"&gt;&lt;/count&gt;
 							&lt;/model&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -9952,12 +9952,12 @@ longitude</td>
                <param name="SrS">EPSG:4326</param>
                <param name="WiDtH">1024</param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;height&gt;&lt;/height&gt;
 							&lt;width&gt;&lt;/width&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -10043,12 +10043,12 @@ longitude</td>
                </param>
                <param name="SrS">EPSG:4326</param>
                <example:ImageStats>
-					
+
 						&lt;image_stats&gt;
 							&lt;height&gt;&lt;/height&gt;
 							&lt;width&gt;&lt;/width&gt;
 						&lt;/image_stats&gt;
-					
+
 				</example:ImageStats>
             </request>
          </xsl:variable>
@@ -10101,13 +10101,13 @@ longitude</td>
                   <input xmlns="" type="submit" name="submit" value="no"/>
                </p>
             </ctl:form-->
-            
+
          <xsl:if test="not($form-values='yes')">
             <fail/>
          </xsl:if>
       </code>
    </test>
-   
+
    <ctl:test name="wms:wmsops-getfeatureinfo-each-info_format">
       <ctl:param name="WMS_CAPABILITIES"/>
       <ctl:param name="FORMAT"/>
@@ -10489,7 +10489,7 @@ longitude</td>
          </xsl:if>
       </ctl:code>
    </ctl:test>
-   
+
    <ctl:test name="wms:wmsops-getmap-layer-encoded-name">
       <ctl:param name="WMS_CAPABILITIES"/>
       <ctl:assertion>When a layer is requested using encoded characters in its name, the response is a map.</ctl:assertion>
@@ -10544,7 +10544,7 @@ longitude</td>
          </xsl:if>
       </ctl:code>
    </ctl:test>
-   
+
   <ctl:test name="wms:basic_elements-validate-exception">
   <param name="WMS_CAPABILITIES" />
      <ctl:assertion>When an exception is generated, it validates.</ctl:assertion>
@@ -10561,7 +10561,7 @@ longitude</td>
                <ctl:with-param name="preferred-width">200</ctl:with-param>
                <ctl:with-param name="preferred-height">100</ctl:with-param>
             </ctl:call-function>
-         </xsl:variable>         
+         </xsl:variable>
          <xsl:variable name="response">
             <ctl:request>
                <ctl:url>
@@ -10597,5 +10597,5 @@ longitude</td>
          </xsl:for-each>
       </ctl:code>
    </ctl:test>
-   
+
 </package>

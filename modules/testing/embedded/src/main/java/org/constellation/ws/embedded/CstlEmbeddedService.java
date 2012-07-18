@@ -169,6 +169,13 @@ public class CstlEmbeddedService extends CommandLine {
         });
     }
 
+    public CstlEmbeddedService(final int port, final String[] args, final String[] providerPackages) {
+        this(args, providerPackages);
+        this.port = port;
+        final String base = "http://" + host + "/";
+        this.uri =  UriBuilder.fromUri(base).port(port).build();
+    }
+
     /**
      * Constructor which passes the arguments for processing to the
      * CommandLine parent and sets the URI.
