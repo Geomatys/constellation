@@ -22,15 +22,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.*;
+import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.map.CoverageMapLayer;
+import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.map.MapItem;
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.*;
-import org.geotoolkit.feature.DefaultName;
 
 /**
  *
@@ -70,12 +76,76 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
     }
 
     private static ParameterValueGroup getSourceConfiguration(final ParameterValueGroup params){
-
         final List<ParameterValueGroup> groups = params.groups(SOURCE_CONFIG_DESCRIPTOR.getName().getCode());
         if(!groups.isEmpty()){
             return groups.get(0);
         }
         return null;
+    }
+
+    /**
+     * Write a Geotk {@link MapContext} in an xml file.
+     *
+     * @param key file key, where to store the xml.
+     * @param mapContext A map context to parse.
+     * @throws JAXBException
+     */
+    public void write(final Name key, final MapContext mapContext) throws JAXBException {
+        final File mapContextFile = index.get(key);
+
+        final org.geotoolkit.providers.xml.MapItem finalMapItem = new org.geotoolkit.providers.xml.MapItem(null);
+        final org.geotoolkit.providers.xml.MapContext finalMapContext = new org.geotoolkit.providers.xml.MapContext(finalMapItem);
+        if (mapContextFile != null) {
+            for (final MapItem mapItem : mapContext.items()) {
+                if (mapItem instanceof FeatureMapLayer) {
+                    final FeatureMapLayer fml = (FeatureMapLayer) mapItem;
+                    final String id = fml.getCollection().getID();
+                    final String styleId = fml.getSelectionStyle().getName();
+                    final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
+                            new org.geotoolkit.providers.xml.DataReference(id), new org.geotoolkit.providers.xml.StyleReference(styleId));
+                    finalMapItem.getMapItems().add(ml);
+                } else if (mapItem instanceof CoverageMapLayer) {
+                    final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
+                    final String id = cml.getCoverageReference().getName().getLocalPart();
+                    final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
+                            new org.geotoolkit.providers.xml.DataReference(id), (org.geotoolkit.providers.xml.StyleReference)null);
+                    finalMapItem.getMapItems().add(ml);
+                } else {
+                    visitMapItem(mapItem, finalMapItem);
+                }
+            }
+        }
+
+        // write finalMapContext
+        if (mapContextFile != null && mapContextFile.exists()) {
+            final MarshallerPool pool = new MarshallerPool(org.geotoolkit.providers.xml.MapContext.class, org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class);
+            final Marshaller marshaller = pool.acquireMarshaller();
+            marshaller.marshal(finalMapContext, mapContextFile);
+            pool.release(marshaller);
+        }
+    }
+
+    private void visitMapItem(final MapItem mapItemOrig, final org.geotoolkit.providers.xml.MapItem finalMapItem) {
+        for (final MapItem mapItem : mapItemOrig.items()) {
+            if (mapItem instanceof FeatureMapLayer) {
+                final FeatureMapLayer fml = (FeatureMapLayer) mapItem;
+                final String id = fml.getCollection().getID();
+                final String styleId = fml.getSelectionStyle().getName();
+                final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
+                            new org.geotoolkit.providers.xml.DataReference(id), new org.geotoolkit.providers.xml.StyleReference(styleId));
+                    finalMapItem.getMapItems().add(ml);
+            } else if (mapItem instanceof CoverageMapLayer) {
+                final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
+                final String id = cml.getCoverageReference().getName().getLocalPart();
+                final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
+                            new org.geotoolkit.providers.xml.DataReference(id), (org.geotoolkit.providers.xml.StyleReference)null);
+                    finalMapItem.getMapItems().add(ml);
+            } else {
+                final org.geotoolkit.providers.xml.MapItem finalMapItemChild = new org.geotoolkit.providers.xml.MapItem(null);
+                finalMapItem.getMapItems().add(finalMapItemChild);
+                visitMapItem(mapItem, finalMapItemChild);
+            }
+        }
     }
 
     /**
