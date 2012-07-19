@@ -37,7 +37,7 @@ public interface Worker {
 
     /**
      * Set The Logging level for all the info message in the worker
-     * 
+     *
      * @param logLevel
      */
     void setLogLevel(Level logLevel);
@@ -67,4 +67,10 @@ public interface Worker {
      * @return {@code True} if the requestor is authorized, {@code false} otherwise.
      */
     boolean isAuthorized(String ip, String referer);
+
+    /**
+     * Return the service URL.
+     * @return String
+     */
+    String getServiceUrl();
 }

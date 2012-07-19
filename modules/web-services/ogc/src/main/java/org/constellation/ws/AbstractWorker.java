@@ -124,7 +124,7 @@ public abstract class AbstractWorker implements Worker {
      * return the current service URL.
      * @return
      */
-    protected synchronized String getServiceUrl(){
+    public synchronized String getServiceUrl(){
         return serviceUrl;
     }
 
