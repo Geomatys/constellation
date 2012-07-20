@@ -70,7 +70,7 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
     }
 
     private MapContext createMapContextForFile(final File file) throws JAXBException {
-        pool = new MarshallerPool(org.geotoolkit.providers.xml.MapContext.class);
+        pool = new MarshallerPool(org.geotoolkit.providers.xml.MapContext.class, org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class);
         unmarshaller = pool.acquireUnmarshaller();
         final Object result = unmarshaller.unmarshal(file);
         if (!(result instanceof org.geotoolkit.providers.xml.MapContext)) {
