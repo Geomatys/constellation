@@ -21,6 +21,7 @@ import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
+import org.geotoolkit.map.MapContext;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.feature.type.Name;
@@ -31,6 +32,7 @@ import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProvider.*;
 
 
 /**
@@ -42,10 +44,13 @@ public class CoveragesGroupProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
     public static final ParameterDescriptor<String> FOLDER_DESCRIPTOR =
-             new DefaultParameterDescriptor<String>("path", "", String.class, null, true);
+             new DefaultParameterDescriptor<String>(KEY_FOLDER_PATH, "Folder path", String.class, null, true);
+
+    public static final ParameterDescriptor<MapContext> MAP_CONTEXT_DESCRIPTOR =
+             new DefaultParameterDescriptor<MapContext>(KEY_MAP_CONTEXT, "Map context", MapContext.class, null, false);
 
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup("coveragesgroup", FOLDER_DESCRIPTOR);
+            new DefaultParameterDescriptorGroup("coveragesgroup", FOLDER_DESCRIPTOR, MAP_CONTEXT_DESCRIPTOR);
 
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);

@@ -45,6 +45,7 @@ import org.opengis.parameter.ParameterValueGroup;
 public class CoveragesGroupProvider extends AbstractLayerProvider {
 
     public static final String KEY_FOLDER_PATH = "path";
+    public static final String KEY_MAP_CONTEXT = "mapContext";
 
     private final Map<Name,File> index = new HashMap<Name,File>();
 
@@ -174,14 +175,14 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      */
     @Override
     protected void visit() {
-        final ParameterValue<String> param = (ParameterValue<String>) getSourceConfiguration(getSource()).parameter(FOLDER_DESCRIPTOR.getName().getCode());
+        final ParameterValue<String> paramFolder = (ParameterValue<String>) getSourceConfiguration(getSource()).parameter(FOLDER_DESCRIPTOR.getName().getCode());
 
-        if(param == null){
+        if(paramFolder == null){
             getLogger().log(Level.WARNING,"Provided File path is not defined.");
             return;
         }
 
-        final String path = param.getValue();
+        final String path = paramFolder.getValue();
 
         if (path == null) {
             getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
@@ -196,6 +197,25 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
         }
 
         visit(folder);
+
+        final ParameterValue<MapContext> paramMapContext = (ParameterValue<MapContext>) getSourceConfiguration(getSource()).parameter(MAP_CONTEXT_DESCRIPTOR.getName().getCode());
+        if (paramMapContext != null) {
+            final MapContext mapContext = paramMapContext.getValue();
+            if (mapContext != null) {
+                final DefaultName name = new DefaultName(mapContext.getName());
+                File tempFile = index.get(name);
+                if (tempFile == null) {
+                    tempFile = new File(folder, mapContext.getName() + ".xml");
+                    index.put(name, tempFile);
+                }
+                try {
+                    write(name, mapContext);
+                } catch (JAXBException e) {
+                    getLogger().log(Level.INFO, "Unable to do the marshalling of the map context object");
+                }
+            }
+        }
+
         super.visit();
     }
 
