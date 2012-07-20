@@ -139,7 +139,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
         }
     }
 
-    public static Name containsOnlyLocalPart(Collection<Name> index, Name layerName) {
+    public static Name containsOnlyLocalPart(final Collection<Name> index, final Name layerName) {
         if (layerName != null) {
             if (layerName.getNamespaceURI() == null) {
                 for (Name name : index) {

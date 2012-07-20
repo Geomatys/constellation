@@ -442,7 +442,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 try {
                     types.add(getFeatureTypeFromLayer((FeatureLayerDetails)layer));
                 } catch (DataStoreException ex) {
-                    LOGGER.log(Level.WARNING, "error while getting featureType for:{0}", layer.getName());
+                    LOGGER.log(Level.WARNING, "error while getting featureType for:"+ layer.getName(), ex);
                 }
             }
         }

@@ -104,7 +104,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         } else {
             final List<String> styles = getLayerStyles(layer);
             return new DefaultDataStoreLayerDetails(
-                    key, store, styles,
+                    goodKey, store, styles,
                     value(LAYER_DATE_START_FIELD_DESCRIPTOR, layer),
                     value(LAYER_DATE_END_FIELD_DESCRIPTOR, layer),
                     value(LAYER_ELEVATION_START_FIELD_DESCRIPTOR, layer),
