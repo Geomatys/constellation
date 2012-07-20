@@ -68,8 +68,6 @@ public class CstlDomComparatorTest {
         cmp.ignoredNodes.add("form");
         cmp.compare();
 
-        System.out.println("\n\n");
-
         cmp = new CstlDOMComparator(
             "<ns1:body xmlns:ns1=\"http:/test.com\">\n" +
             "  <ns1:form id=\"MyForm\">\n" +
@@ -90,8 +88,6 @@ public class CstlDomComparatorTest {
         cmp.ignoredAttributes.add("xmlns:*");
         cmp.compare(); // should not fail
 
-        System.out.println("\n\n");
-
         cmp = new CstlDOMComparator(
             "<ns1:body xmlns:ns1=\"http:/test.com\">\n" +
             "  <ns1:form id=\"MyForm\">\n" +
@@ -111,8 +107,6 @@ public class CstlDomComparatorTest {
 
         cmp.ignoredAttributes.add("xmlns:*");
         cmp.compare(); // should not fail
-
-        System.out.println("\n\n");
     }
 
     /**

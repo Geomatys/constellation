@@ -84,16 +84,22 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(Name key) {
+    public LayerDetails get(final Name key) {
+        Name goodKey;
         if (!index.contains(key)) {
-            key = containsOnlyLocalPart(index, key);
-            if (key == null) {
-                return null;
+            goodKey = containsOnlyLocalPart(index, key);
+            if (goodKey == null) {
+                goodKey = containsWithNamespaceError(index, key);
+                if (goodKey == null) {
+                    return null;
+                }
             }
+        } else {
+            goodKey = key;
         }
-        final ParameterValueGroup layer = getLayer(getSource(), key.getLocalPart());
+        final ParameterValueGroup layer = getLayer(getSource(), goodKey.getLocalPart());
         if (layer == null) {
-            return new DefaultDataStoreLayerDetails(key, store, null, null, null, null, null);
+            return new DefaultDataStoreLayerDetails(goodKey, store, null, null, null, null, null);
 
         } else {
             final List<String> styles = getLayerStyles(layer);
@@ -177,7 +183,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         final boolean loadAll = isLoadAll(getSource());
         // if we have only queryLayer we skip this part
         if (loadAll || !getLayers(source).isEmpty()) {
-            
+
             try {
                 for (final Name name : store.getNames()) {
                     if ((loadAll || containLayer(getSource(), name.getLocalPart())) && !index.contains(name)) {

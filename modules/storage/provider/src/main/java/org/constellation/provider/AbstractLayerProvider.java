@@ -75,7 +75,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
         }
         return false;
     }
-    
+
     /**
      * Fill namespace on name is not present.
      */
@@ -87,7 +87,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
         }
         return key;
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -146,6 +146,17 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
                     if (name.getLocalPart().equals(layerName.getLocalPart())) {
                         return name;
                     }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Name containsWithNamespaceError(final Collection<Name> index, final Name layerName) {
+        if (layerName != null) {
+            for (Name name : index) {
+                if (name.getLocalPart().equals(layerName.getLocalPart())) {
+                    return name;
                 }
             }
         }
