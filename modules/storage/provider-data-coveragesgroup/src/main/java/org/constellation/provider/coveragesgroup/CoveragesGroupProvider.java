@@ -33,6 +33,7 @@ import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValue;
@@ -101,9 +102,11 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
                 if (mapItem instanceof FeatureMapLayer) {
                     final FeatureMapLayer fml = (FeatureMapLayer) mapItem;
                     final String id = fml.getCollection().getID();
-                    final String styleId = fml.getSelectionStyle().getName();
+                    final MutableStyle ms = fml.getSelectionStyle();
+                    final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
+                            new org.geotoolkit.providers.xml.StyleReference(ms.getName());
                     final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), new org.geotoolkit.providers.xml.StyleReference(styleId));
+                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
                     finalMapItem.getMapItems().add(ml);
                 } else if (mapItem instanceof CoverageMapLayer) {
                     final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
@@ -131,9 +134,11 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
             if (mapItem instanceof FeatureMapLayer) {
                 final FeatureMapLayer fml = (FeatureMapLayer) mapItem;
                 final String id = fml.getCollection().getID();
-                final String styleId = fml.getSelectionStyle().getName();
-                final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), new org.geotoolkit.providers.xml.StyleReference(styleId));
+                final MutableStyle ms = fml.getSelectionStyle();
+                    final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
+                            new org.geotoolkit.providers.xml.StyleReference(ms.getName());
+                    final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
+                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
                     finalMapItem.getMapItems().add(ml);
             } else if (mapItem instanceof CoverageMapLayer) {
                 final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
