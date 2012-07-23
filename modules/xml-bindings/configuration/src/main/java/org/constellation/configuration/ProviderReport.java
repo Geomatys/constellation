@@ -28,18 +28,16 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Johann Sorel (Geomatys)
  */
-@XmlRootElement(name ="ProviderReport")
+@XmlRootElement(name = "ProviderReport")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProviderReport {
-    
+
     @XmlAttribute
     private String id;
-    
     @XmlElement(name = "item")
     private List<String> items;
-    
+
     public ProviderReport() {
-        
     }
 
     /**
@@ -55,17 +53,17 @@ public class ProviderReport {
     public void setId(String id) {
         this.id = id;
     }
-    
-    public ProviderReport(final String id,final List<String> items) {
+
+    public ProviderReport(final String id, final List<String> items) {
         this.id = id;
         this.items = items;
     }
-    
+
     /**
      * @return the provider items (styles or layers)
      */
     public List<String> getItems() {
-        if(items == null){
+        if (items == null) {
             items = new ArrayList<String>();
         }
         return items;
@@ -77,5 +75,26 @@ public class ProviderReport {
     public void setItems(List<String> items) {
         this.items = items;
     }
-    
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other instanceof ProviderReport) {
+            ProviderReport compar = (ProviderReport) other;
+            if (compar.getId().equals(getId()) && compar.getItems().equals(getItems())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 89 * hash + (this.items != null ? this.items.hashCode() : 0);
+        return hash;
+    }
 }

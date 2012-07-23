@@ -29,18 +29,15 @@ import javax.xml.bind.annotation.XmlElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProviderServiceReport {
-    
+
     @XmlAttribute
     private String type;
-    
     @XmlAttribute
     private boolean styleService;
-    
     @XmlElement(name = "provider")
     private List<ProviderReport> providers;
-    
+
     public ProviderServiceReport() {
-        
     }
 
     public ProviderServiceReport(final String type, final boolean styleService, final List<ProviderReport> providers) {
@@ -48,7 +45,7 @@ public class ProviderServiceReport {
         this.styleService = styleService;
         this.providers = providers;
     }
-    
+
     /**
      * @return the type
      */
@@ -71,7 +68,7 @@ public class ProviderServiceReport {
     }
 
     /**
-     * @param stylingService 
+     * @param stylingService
      */
     public void setStyleService(boolean stylingService) {
         this.styleService = stylingService;
@@ -81,7 +78,7 @@ public class ProviderServiceReport {
      * @return the providers
      */
     public List<ProviderReport> getProviders() {
-        if(providers == null){
+        if (providers == null) {
             providers = new ArrayList<ProviderReport>();
         }
         return providers;
@@ -93,18 +90,40 @@ public class ProviderServiceReport {
     public void setProviders(List<ProviderReport> providers) {
         this.providers = providers;
     }
-    
+
     /**
-     * Return report for the given Id.
-     * null if it doesn't exist.
+     * Return report for the given Id. null if it doesn't exist.
      */
-    public ProviderReport getProvider(final String id){
-        for(ProviderReport report : getProviders()){
-            if(report.getId().equals(id)){
+    public ProviderReport getProvider(final String id) {
+        for (ProviderReport report : getProviders()) {
+            if (report.getId().equals(id)) {
                 return report;
             }
         }
         return null;
     }
-    
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other instanceof ProviderServiceReport) {
+            ProviderServiceReport compar = (ProviderServiceReport) other;
+            if (compar.getType().equals(getType()) && compar.isStyleService() == isStyleService()) {
+                if (compar.getProviders().equals(getProviders())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 23 * hash + (this.providers != null ? this.providers.hashCode() : 0);
+        return hash;
+    }
 }
