@@ -17,6 +17,8 @@
 package org.constellation.provider.coveragesgroup;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -180,21 +182,26 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      */
     @Override
     protected void visit() {
-        final ParameterValue<String> paramFolder = (ParameterValue<String>) getSourceConfiguration(getSource()).parameter(FOLDER_DESCRIPTOR.getName().getCode());
+        final ParameterValue<URL> paramFolder = (ParameterValue<URL>) getSourceConfiguration(getSource()).parameter(FOLDER_DESCRIPTOR.getName().getCode());
 
         if(paramFolder == null){
             getLogger().log(Level.WARNING,"Provided File path is not defined.");
             return;
         }
 
-        final String path = paramFolder.getValue();
+        final URL path = paramFolder.getValue();
 
         if (path == null) {
             getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");
             return;
         }
 
-        folder = new File(path);
+        try {
+            folder = new File(path.toURI());
+        } catch (URISyntaxException e) {
+            getLogger().log(Level.INFO,"Fails to convert path url to file.");
+            folder = new File(path.getPath());
+        }
 
         if (folder == null || !folder.exists() || !folder.isDirectory()) {
             getLogger().log(Level.WARNING,"Provided File does not exits or is not a folder.");

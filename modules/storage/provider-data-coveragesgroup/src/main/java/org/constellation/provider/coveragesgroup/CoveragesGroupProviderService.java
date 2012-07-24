@@ -16,6 +16,7 @@
  */
 package org.constellation.provider.coveragesgroup;
 
+import java.net.URL;
 import java.util.logging.Level;
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
@@ -43,8 +44,8 @@ import static org.constellation.provider.coveragesgroup.CoveragesGroupProvider.*
 public class CoveragesGroupProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
-    public static final ParameterDescriptor<String> FOLDER_DESCRIPTOR =
-             new DefaultParameterDescriptor<String>(KEY_FOLDER_PATH, "Folder path", String.class, null, true);
+    public static final ParameterDescriptor<URL> FOLDER_DESCRIPTOR =
+             new DefaultParameterDescriptor<URL>(KEY_FOLDER_PATH, "Folder path", URL.class, null, true);
 
     public static final ParameterDescriptor<MapContext> MAP_CONTEXT_DESCRIPTOR =
              new DefaultParameterDescriptor<MapContext>(KEY_MAP_CONTEXT, "Map context", MapContext.class, null, false);
