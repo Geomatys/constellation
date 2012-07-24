@@ -48,13 +48,13 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:hg:http://hg.geomatys.com/constellation</connection>
-        <url>http://hg.geomatys.com/constellation</url>
+        <connection>scm:hg:http://hg.geomatys.com/Public/constellation</connection>
+        <url>http://hg.geomatys.com/Public/constellation</url>
     </scm>
 
     <ciManagement>
-        <system>hudson</system>
-        <url>http://hudson.geomatys.com/job/Constellation/</url>
+        <system>jenkins</system>
+        <url>http://dev.geomatys.com/jenkins/job/Constellation</url>
     </ciManagement>
 
 
