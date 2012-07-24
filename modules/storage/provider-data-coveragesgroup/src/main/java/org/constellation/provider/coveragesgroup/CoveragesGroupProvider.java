@@ -121,7 +121,7 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
         }
 
         // write finalMapContext
-        if (mapContextFile != null && mapContextFile.exists()) {
+        if (mapContextFile != null) {
             final MarshallerPool pool = new MarshallerPool(org.geotoolkit.providers.xml.MapContext.class, org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class);
             final Marshaller marshaller = pool.acquireMarshaller();
             marshaller.marshal(finalMapContext, mapContextFile);
