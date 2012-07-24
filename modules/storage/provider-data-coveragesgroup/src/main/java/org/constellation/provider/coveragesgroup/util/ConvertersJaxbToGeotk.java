@@ -16,15 +16,18 @@
  */
 package org.constellation.provider.coveragesgroup.util;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderProxy;
-import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.feature.DefaultName;
+import org.constellation.util.DataReference;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.map.CoverageMapLayer;
+import org.geotoolkit.map.EmptyMapLayer;
+import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
+import org.geotoolkit.style.DefaultStyleFactory;
+import org.geotoolkit.util.Converters;
 import org.geotoolkit.util.logging.Logging;
 
 
@@ -40,24 +43,26 @@ public final class ConvertersJaxbToGeotk {
         final String layerName;
         final String providerName; // what to do with this ?
 
-        int index = dataReference.lastIndexOf(":");
-        if (index != -1) {
-            layerName = dataReference.substring(index + 1);
-            providerName = dataReference.substring(0, index);
-        } else {
-            throw new IllegalArgumentException("data reference must contain a ':' separator.");
+
+        DataReference ref = new DataReference(dataReference);
+
+        Object obj = Converters.convert(ref, FeatureCollection.class);
+        if(obj == null) obj = Converters.convert(ref, CoverageReference.class);
+
+
+        if(obj instanceof FeatureCollection){
+            final FeatureMapLayer layer = MapBuilder.createFeatureLayer((FeatureCollection)obj, new DefaultStyleFactory().style());
+            return layer;
+
+        }else if(obj instanceof CoverageReference){
+            final CoverageMapLayer layer = MapBuilder.createCoverageLayer(
+                    (CoverageReference)obj, new DefaultStyleFactory().style(), "");
+            return layer;
         }
-        final LayerDetails ld = LayerProviderProxy.getInstance().getByIdentifier(new DefaultName(layerName));
-        if (ld != null) {
-            try {
-                return ld.getMapLayer(null, null);
-            } catch (PortrayalException e) {
-                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            }
-        } else {
-            LOGGER.warning("unable to find a layer named:" + layerName);
-        }
-        return null;
+
+        final EmptyMapLayer emptyLayer = MapBuilder.createEmptyMapLayer();
+        emptyLayer.setName(dataReference);
+        return emptyLayer;
     }
 
     public static MapItem convertsMapItem(final org.geotoolkit.providers.xml.MapItem mapItem) {
