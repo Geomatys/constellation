@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.style;
+package org.constellation.process.provider.style;
 
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
@@ -33,16 +33,17 @@ import org.opengis.util.InternationalString;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateStyleProviderDescriptor extends AbstractProcessDescriptor {
+public class AddStyleToStyleProviderDescriptor extends AbstractProcessDescriptor {
 
-    public static final String NAME = "style_provider.create";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Attach a new style to a specified provider.");
+    public static final String NAME = "style_provider.add_style";
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Add a style to an exising StyleProvider."
+            + "If style name already exist, process will throw a ProcessException.");
 
     /*
-     * Provider identifier
+     * StyleProvider identifier
      */
     public static final String PROVIDER_ID_NAME = "provider_id";
-    private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to set style.";
+    private static final String PROVIDER_ID_REMARKS = "Identifier of the StyleProvider where the new style will be added.";
     public static final ParameterDescriptor<String> PROVIDER_ID =
             new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
 
@@ -50,7 +51,7 @@ public class CreateStyleProviderDescriptor extends AbstractProcessDescriptor {
      * Style name.
      */
     public static final String STYLE_ID_NAME = "style_Name";
-    private static final String STYLE_ID_REMARKS = "Name/Identifier of the style.";
+    private static final String STYLE_ID_REMARKS = "Name/Identifier of the new style.";
     public static final ParameterDescriptor<String> STYLE_ID =
             new DefaultParameterDescriptor(STYLE_ID_NAME, STYLE_ID_REMARKS, String.class, null, true);
 
@@ -75,12 +76,12 @@ public class CreateStyleProviderDescriptor extends AbstractProcessDescriptor {
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
-    public CreateStyleProviderDescriptor() {
+    public AddStyleToStyleProviderDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
-        return new CreateStyleProvider(this, input);
+        return new AddStyleToStyleProvider(this, input);
     }
 }

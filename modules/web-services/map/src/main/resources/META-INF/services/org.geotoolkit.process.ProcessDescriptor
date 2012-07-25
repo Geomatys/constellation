@@ -2,8 +2,3 @@
 org.constellation.process.service.CreateMapServiceDescriptor
 org.constellation.process.service.ConfigureMapServiceDescriptor
 org.constellation.process.service.GetConfigMapServiceDescriptor
-
-#StyleProvider process
-org.constellation.process.style.CreateStyleProviderDescriptor
-org.constellation.process.style.DeleteStyleProviderDescriptor
-org.constellation.process.style.UpdateStyleProviderDescriptor

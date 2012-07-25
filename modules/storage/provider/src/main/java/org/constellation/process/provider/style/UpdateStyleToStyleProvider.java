@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.style;
+package org.constellation.process.provider.style;
 
 import java.util.Collection;
 import org.constellation.process.AbstractCstlProcess;
@@ -22,7 +22,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.style.UpdateStyleProviderDescriptor.*;
+import static org.constellation.process.provider.style.UpdateStyleToStyleProviderDescriptor.*;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.style.MutableStyle;
@@ -32,9 +32,9 @@ import org.geotoolkit.style.MutableStyle;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class UpdateStyleProvider extends AbstractCstlProcess {
+public class UpdateStyleToStyleProvider extends AbstractCstlProcess {
 
-    public UpdateStyleProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public UpdateStyleToStyleProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 

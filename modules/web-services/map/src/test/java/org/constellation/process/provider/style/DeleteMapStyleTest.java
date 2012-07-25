@@ -14,13 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.style;
+package org.constellation.process.provider.style;
 
-import org.constellation.process.style.DeleteStyleProviderDescriptor;
 import java.io.File;
 import java.net.MalformedURLException;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.style.AbstractMapStyleTest;
 import org.constellation.provider.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -38,7 +36,7 @@ import org.opengis.util.NoSuchIdentifierException;
 public class DeleteMapStyleTest extends AbstractMapStyleTest {
 
     public DeleteMapStyleTest() {
-        super(DeleteStyleProviderDescriptor.NAME);
+        super(DeleteStyleToStyleProviderDescriptor.NAME);
     }
 
     @Test
@@ -46,7 +44,7 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
 
         addProvider(buildProvider("deleteStyleProvider1", true));
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleToStyleProviderDescriptor.NAME);
 
         final MutableStyleFactory msf = new DefaultStyleFactory();
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
@@ -58,8 +56,8 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
         }
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("deleteStyleProvider1");
-        in.parameter(DeleteStyleProviderDescriptor.STYLE_ID_NAME).setValue("styleToDelete");
+        in.parameter(DeleteStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("deleteStyleProvider1");
+        in.parameter(DeleteStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue("styleToDelete");
 
         desc.createProcess(in).call();
 
@@ -83,11 +81,11 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
     @Test
     public void testFailDeleteStyle1() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleToStyleProviderDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("deleteStyleProvider2");
-        in.parameter(DeleteStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
+        in.parameter(DeleteStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("deleteStyleProvider2");
+        in.parameter(DeleteStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
 
         try {
             desc.createProcess(in).call();
@@ -103,11 +101,11 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
     @Test
     public void testFailDeleteStyle2() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleToStyleProviderDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("");
-        in.parameter(DeleteStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
+        in.parameter(DeleteStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("");
+        in.parameter(DeleteStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
 
         try {
             desc.createProcess(in).call();
@@ -125,12 +123,12 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
 
         addProvider(buildProvider("deleteStyleProvider3", true));
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleToStyleProviderDescriptor.NAME);
 
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("deleteStyleProvider3");
-        in.parameter(DeleteStyleProviderDescriptor.STYLE_ID_NAME).setValue("");
+        in.parameter(DeleteStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("deleteStyleProvider3");
+        in.parameter(DeleteStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue("");
 
         try {
             desc.createProcess(in).call();

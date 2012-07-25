@@ -14,13 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.style;
+package org.constellation.process.provider.style;
 
-import org.constellation.process.style.CreateStyleProviderDescriptor;
 import java.io.File;
 import java.net.MalformedURLException;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.style.AbstractMapStyleTest;
 import org.constellation.provider.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -38,7 +36,7 @@ import org.opengis.util.NoSuchIdentifierException;
 public class CreateMapStyleTest extends AbstractMapStyleTest {
 
     public CreateMapStyleTest() {
-        super(CreateStyleProviderDescriptor.NAME);
+        super(AddStyleToStyleProviderDescriptor.NAME);
     }
 
     @Test
@@ -46,15 +44,15 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
 
         addProvider(buildProvider("createStyleProvider1", true));
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateStyleProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, AddStyleToStyleProviderDescriptor.NAME);
 
         final MutableStyleFactory msf = new DefaultStyleFactory();
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider1");
-        in.parameter(CreateStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
-        in.parameter(CreateStyleProviderDescriptor.STYLE_NAME).setValue(style);
+        in.parameter(AddStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider1");
+        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
+        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
 
         desc.createProcess(in).call();
 
@@ -78,15 +76,15 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
     @Test
     public void testFailCreateStyle1() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateStyleProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, AddStyleToStyleProviderDescriptor.NAME);
 
         final MutableStyleFactory msf = new DefaultStyleFactory();
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider2");
-        in.parameter(CreateStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
-        in.parameter(CreateStyleProviderDescriptor.STYLE_NAME).setValue(style);
+        in.parameter(AddStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider2");
+        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
+        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
 
         try {
             desc.createProcess(in).call();
@@ -102,15 +100,15 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
     @Test
     public void testFailCreateStyle2() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateStyleProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, AddStyleToStyleProviderDescriptor.NAME);
 
         final MutableStyleFactory msf = new DefaultStyleFactory();
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("");
-        in.parameter(CreateStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
-        in.parameter(CreateStyleProviderDescriptor.STYLE_NAME).setValue(style);
+        in.parameter(AddStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("");
+        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue("myStyle");
+        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
 
         try {
             desc.createProcess(in).call();
@@ -128,15 +126,15 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
 
         addProvider(buildProvider("createStyleProvider3", true));
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateStyleProviderDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, AddStyleToStyleProviderDescriptor.NAME);
 
         final MutableStyleFactory msf = new DefaultStyleFactory();
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider3");
-        in.parameter(CreateStyleProviderDescriptor.STYLE_ID_NAME).setValue("");
-        in.parameter(CreateStyleProviderDescriptor.STYLE_NAME).setValue(style);
+        in.parameter(AddStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider3");
+        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue("");
+        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
 
         try {
             desc.createProcess(in).call();

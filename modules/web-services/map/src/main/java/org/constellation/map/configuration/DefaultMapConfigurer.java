@@ -82,9 +82,9 @@ import org.constellation.process.provider.GetConfigProviderDescriptor;
 import org.constellation.process.provider.DeleteProviderDescriptor;
 import org.constellation.process.provider.RestartProviderDescriptor;
 import org.constellation.process.provider.UpdateProviderDescriptor;
-import org.constellation.process.style.CreateStyleProviderDescriptor;
-import org.constellation.process.style.DeleteStyleProviderDescriptor;
-import org.constellation.process.style.UpdateStyleProviderDescriptor;
+import org.constellation.process.provider.style.AddStyleToStyleProviderDescriptor;
+import org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor;
+import org.constellation.process.provider.style.UpdateStyleToStyleProviderDescriptor;
 import org.geotoolkit.process.ProcessException;
 
 /**
@@ -607,11 +607,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             try {
                 // we read the soruce parameter to add
 
-                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateStyleProviderDescriptor.NAME);
+                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, AddStyleToStyleProviderDescriptor.NAME);
                 final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-                inputs.parameter(CreateStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-                inputs.parameter(CreateStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
-                inputs.parameter(CreateStyleProviderDescriptor.STYLE_NAME).setValue(style);
+                inputs.parameter(AddStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+                inputs.parameter(AddStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
+                inputs.parameter(AddStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
 
                 try {
                     final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -646,10 +646,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         try {
             // we read the soruce parameter to add
 
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleProviderDescriptor.NAME);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleToStyleProviderDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(DeleteStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(DeleteStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
+            inputs.parameter(DeleteStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(DeleteStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -688,11 +688,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             try {
                 // we read the soruce parameter to add
 
-                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateStyleProviderDescriptor.NAME);
+                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateStyleToStyleProviderDescriptor.NAME);
                 final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-                inputs.parameter(UpdateStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-                inputs.parameter(UpdateStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
-                inputs.parameter(UpdateStyleProviderDescriptor.STYLE_NAME).setValue(style);
+                inputs.parameter(UpdateStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+                inputs.parameter(UpdateStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
+                inputs.parameter(UpdateStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
 
                 try {
                     final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
