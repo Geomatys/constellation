@@ -14,12 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.layer;
+package org.constellation.process.provider.layer;
 
-import org.constellation.process.layer.DeleteProviderLayerDescriptor;
 import java.net.MalformedURLException;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.layer.AbstractMapLayerTest;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;
@@ -38,7 +36,7 @@ import org.opengis.util.NoSuchIdentifierException;
 public class DeleteMapLayerTest extends AbstractMapLayerTest {
 
     public DeleteMapLayerTest() {
-        super(DeleteProviderLayerDescriptor.NAME);
+        super(DeleteProviderLayerStyleDescriptor.NAME);
     }
 
     @Test
@@ -48,11 +46,11 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
 
         ParameterValueGroup emptyProvider = buildCSVProvider(DATASTORE_SERVICE, "deleteProvider1", true, EMPTY_CSV, null);
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider1");
-        in.parameter(DeleteProviderLayerDescriptor.LAYER_NAME_NAME).setValue( "provider2Layer");
+        in.parameter(DeleteProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider1");
+        in.parameter(DeleteProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue( "provider2Layer");
 
         desc.createProcess(in).call();
 
@@ -78,11 +76,11 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
 
         addProvider(buildCSVProvider(DATASTORE_SERVICE, "deleteProvider2", true, EMPTY_CSV, "provider2Layer"));
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider2");
-        in.parameter(DeleteProviderLayerDescriptor.LAYER_NAME_NAME).setValue("layer22");
+        in.parameter(DeleteProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider2");
+        in.parameter(DeleteProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue("layer22");
 
         try {
             desc.createProcess(in).call();
@@ -101,11 +99,11 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testFailDeleteLayer2() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider3");
-        in.parameter(DeleteProviderLayerDescriptor.LAYER_NAME_NAME).setValue("layer2");
+        in.parameter(DeleteProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider3");
+        in.parameter(DeleteProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue("layer2");
 
         try {
             desc.createProcess(in).call();
@@ -122,11 +120,11 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testFailDeleteLayer3() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("");
-        in.parameter(DeleteProviderLayerDescriptor.LAYER_NAME_NAME).setValue("layer2");
+        in.parameter(DeleteProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("");
+        in.parameter(DeleteProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue("layer2");
 
         try {
             desc.createProcess(in).call();
@@ -142,11 +140,11 @@ public class DeleteMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testFailDeleteLayer4() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(DeleteProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider4");
-        in.parameter(DeleteProviderLayerDescriptor.LAYER_NAME_NAME).setValue("");
+        in.parameter(DeleteProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("deleteProvider4");
+        in.parameter(DeleteProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue("");
 
         try {
             desc.createProcess(in).call();

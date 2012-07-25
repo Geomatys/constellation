@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.layer;
+package org.constellation.process.provider.layer;
 
 import java.util.Collection;
 import org.constellation.process.AbstractCstlProcess;
@@ -28,14 +28,14 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 
 import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.layer.DeleteProviderLayerDescriptor.*;
+import static org.constellation.process.provider.layer.DeleteProviderLayerStyleDescriptor.*;
 /**
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class DeleteProviderLayer extends AbstractCstlProcess {
+public class DeleteProviderLayerStyle extends AbstractCstlProcess {
 
-     public DeleteProviderLayer(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+     public DeleteProviderLayerStyle(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 

@@ -14,12 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.layer;
+package org.constellation.process.provider.layer;
 
-import org.constellation.process.layer.UpdateProviderLayerDescriptor;
 import java.net.MalformedURLException;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.layer.AbstractMapLayerTest;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;
@@ -38,7 +36,7 @@ import org.opengis.util.NoSuchIdentifierException;
 public class UpdateMapLayerTest extends AbstractMapLayerTest {
 
     public UpdateMapLayerTest() {
-        super(UpdateProviderLayerDescriptor.NAME);
+        super(UpdateProviderLayerStyleDescriptor.NAME);
     }
 
     @Test
@@ -48,13 +46,13 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
 
         final ParameterValueGroup expectedProvider = buildCSVProvider(DATASTORE_SERVICE, "updateProvider1", true, EMPTY_CSV, "newLayer");
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(UpdateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("updateProvider1");
-        in.parameter(UpdateProviderLayerDescriptor.LAYER_NAME_NAME).setValue( "provider2Layer");
-        in.parameter(UpdateProviderLayerDescriptor.UPDATE_LAYER_NAME).setValue(layer);
+        in.parameter(UpdateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("updateProvider1");
+        in.parameter(UpdateProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue( "provider2Layer");
+        in.parameter(UpdateProviderLayerStyleDescriptor.UPDATE_LAYER_NAME).setValue(layer);
 
         desc.createProcess(in).call();
 
@@ -80,13 +78,13 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
 
         addProvider(buildCSVProvider(DATASTORE_SERVICE, "updateProvider2", true, EMPTY_CSV, "provider2Layer"));
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(UpdateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("updateProvider2");
-        in.parameter(UpdateProviderLayerDescriptor.LAYER_NAME_NAME).setValue("layer22");
-        in.parameter(UpdateProviderLayerDescriptor.UPDATE_LAYER_NAME).setValue(layer);
+        in.parameter(UpdateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("updateProvider2");
+        in.parameter(UpdateProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue("layer22");
+        in.parameter(UpdateProviderLayerStyleDescriptor.UPDATE_LAYER_NAME).setValue(layer);
 
         try {
             desc.createProcess(in).call();
@@ -105,13 +103,13 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testFailUpdateLayer2() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(UpdateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("updateProvider3");
-        in.parameter(UpdateProviderLayerDescriptor.LAYER_NAME_NAME).setValue("layer2");
-        in.parameter(UpdateProviderLayerDescriptor.UPDATE_LAYER_NAME).setValue(layer);
+        in.parameter(UpdateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("updateProvider3");
+        in.parameter(UpdateProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue("layer2");
+        in.parameter(UpdateProviderLayerStyleDescriptor.UPDATE_LAYER_NAME).setValue(layer);
 
         try {
             desc.createProcess(in).call();
@@ -128,13 +126,13 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testFailUpdateLayer3() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(UpdateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("");
-        in.parameter(UpdateProviderLayerDescriptor.LAYER_NAME_NAME).setValue("layer2");
-        in.parameter(UpdateProviderLayerDescriptor.UPDATE_LAYER_NAME).setValue(layer);
+        in.parameter(UpdateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("");
+        in.parameter(UpdateProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue("layer2");
+        in.parameter(UpdateProviderLayerStyleDescriptor.UPDATE_LAYER_NAME).setValue(layer);
 
         try {
             desc.createProcess(in).call();
@@ -150,13 +148,13 @@ public class UpdateMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testFailUpdateLayer4() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "newLayer");
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(UpdateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("updateProvider4");
-        in.parameter(UpdateProviderLayerDescriptor.LAYER_NAME_NAME).setValue("");
-        in.parameter(UpdateProviderLayerDescriptor.UPDATE_LAYER_NAME).setValue(layer);
+        in.parameter(UpdateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("updateProvider4");
+        in.parameter(UpdateProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue("");
+        in.parameter(UpdateProviderLayerStyleDescriptor.UPDATE_LAYER_NAME).setValue(layer);
 
         try {
             desc.createProcess(in).call();

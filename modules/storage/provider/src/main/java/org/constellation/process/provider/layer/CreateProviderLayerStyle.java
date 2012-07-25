@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.layer;
+package org.constellation.process.provider.layer;
 
 import java.util.Collection;
 import org.constellation.process.AbstractCstlProcess;
@@ -22,7 +22,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.layer.CreateProviderLayerDescriptor.*;
+import static org.constellation.process.provider.layer.CreateProviderLayerStyleDescriptor.*;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 
@@ -31,9 +31,9 @@ import org.constellation.provider.LayerProviderProxy;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateProviderLayer extends AbstractCstlProcess {
+public class CreateProviderLayerStyle extends AbstractCstlProcess {
 
-    public CreateProviderLayer(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public CreateProviderLayerStyle(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 

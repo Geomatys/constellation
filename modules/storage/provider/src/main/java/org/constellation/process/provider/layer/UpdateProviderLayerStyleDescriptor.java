@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.layer;
+package org.constellation.process.provider.layer;
 
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
@@ -28,35 +28,43 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
 
 /**
- *
+ * Update a provider layer.
  * @author Quentin Boileau (Geomatys).
  */
-public class DeleteProviderLayerDescriptor extends AbstractProcessDescriptor {
+public class UpdateProviderLayerStyleDescriptor extends AbstractProcessDescriptor {
 
 
-    public static final String NAME = "providerLayer.delete";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Delete a map layer from a specified provider.");
+    public static final String NAME = "provider.update_layer_style";
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Update layer style of a specified provider.");
 
     /*
      * Provider idenifier
      */
     public static final String PROVIDER_ID_NAME = "provider_id";
-    private static final String PROVIDER_ID_REMARKS = "Identifier of the provider to remove layer.";
+    private static final String PROVIDER_ID_REMARKS = "Input provider identifier.";
     public static final ParameterDescriptor<String> PROVIDER_ID =
             new DefaultParameterDescriptor(PROVIDER_ID_NAME, PROVIDER_ID_REMARKS, String.class, null, true);
 
     /*
-     * Layer name to delete
+     * Layer name to update
      */
     public static final String LAYER_NAME_NAME = "layerName";
-    private static final String LAYER_NAME_REMARKS = "The name of he layer to remove.";
+    private static final String LAYER_NAME_REMARKS = "Input layer identifier to update.";
     public static final ParameterDescriptor<String> LAYER_NAME =
             new DefaultParameterDescriptor(LAYER_NAME_NAME, LAYER_NAME_REMARKS, String.class, null, true);
+
+     /*
+     * Updated layer
+     */
+    public static final String UPDATE_LAYER_NAME = "updateLayerParameter";
+    private static final String UPDATE_LAYER_REMARKS = "ParameterValueGroup of the updated layer.";
+    public static final ParameterDescriptor<ParameterValueGroup> UPDATE_LAYER =
+            new DefaultParameterDescriptor(UPDATE_LAYER_NAME, UPDATE_LAYER_REMARKS, ParameterValueGroup.class, null, true);
 
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
-            new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, LAYER_NAME});
+            new DefaultParameterDescriptorGroup("InputParameters", new GeneralParameterDescriptor[]{PROVIDER_ID, LAYER_NAME, UPDATE_LAYER});
 
 
     /**Output parameters */
@@ -66,13 +74,13 @@ public class DeleteProviderLayerDescriptor extends AbstractProcessDescriptor {
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
-    public DeleteProviderLayerDescriptor() {
+    public UpdateProviderLayerStyleDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
-        return new DeleteProviderLayer(this, input);
+        return new UpdateProviderLayerStyle(this, input);
     }
 
 }

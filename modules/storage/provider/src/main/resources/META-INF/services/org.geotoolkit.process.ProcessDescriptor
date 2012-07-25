@@ -4,3 +4,8 @@ org.constellation.process.provider.DeleteProviderDescriptor
 org.constellation.process.provider.UpdateProviderDescriptor
 org.constellation.process.provider.RestartProviderDescriptor
 org.constellation.process.provider.GetConfigProviderDescriptor
+
+#ProviderLayer Style process
+org.constellation.process.provider.layer.CreateProviderLayerStyleDescriptor
+org.constellation.process.provider.layer.DeleteProviderLayerStyleDescriptor
+org.constellation.process.provider.layer.UpdateProviderLayerStyleDescriptor

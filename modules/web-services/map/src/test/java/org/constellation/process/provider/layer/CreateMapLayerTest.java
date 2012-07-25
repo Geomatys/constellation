@@ -14,12 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.layer;
+package org.constellation.process.provider.layer;
 
-import org.constellation.process.layer.CreateProviderLayerDescriptor;
 import java.net.MalformedURLException;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.layer.AbstractMapLayerTest;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;
@@ -38,7 +36,7 @@ import org.opengis.util.NoSuchIdentifierException;
 public class CreateMapLayerTest extends AbstractMapLayerTest {
 
     public CreateMapLayerTest() {
-        super(CreateProviderLayerDescriptor.NAME);
+        super(CreateProviderLayerStyleDescriptor.NAME);
     }
 
     @Test
@@ -48,12 +46,12 @@ public class CreateMapLayerTest extends AbstractMapLayerTest {
 
         ParameterValueGroup expectedProvider = buildCSVProvider(DATASTORE_SERVICE, "createProvider1", true, EMPTY_CSV, "layer1");
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "layer1");
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("createProvider1");
-        in.parameter(CreateProviderLayerDescriptor.LAYER_NAME).setValue(layer);
+        in.parameter(CreateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("createProvider1");
+        in.parameter(CreateProviderLayerStyleDescriptor.LAYER_NAME).setValue(layer);
 
         desc.createProcess(in).call();
 
@@ -76,12 +74,12 @@ public class CreateMapLayerTest extends AbstractMapLayerTest {
     @Test
     public void testFailCreateLayer() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderLayerDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderLayerStyleDescriptor.NAME);
 
         final ParameterValueGroup layer = buildLayer(DATASTORE_SERVICE, "layer2");
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue("createProvider2");
-        in.parameter(CreateProviderLayerDescriptor.LAYER_NAME).setValue(layer);
+        in.parameter(CreateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue("createProvider2");
+        in.parameter(CreateProviderLayerStyleDescriptor.LAYER_NAME).setValue(layer);
 
         try {
             desc.createProcess(in).call();

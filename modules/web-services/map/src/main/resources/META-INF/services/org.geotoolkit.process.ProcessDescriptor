@@ -3,11 +3,6 @@ org.constellation.process.service.CreateMapServiceDescriptor
 org.constellation.process.service.ConfigureMapServiceDescriptor
 org.constellation.process.service.GetConfigMapServiceDescriptor
 
-#ProviderLayer process
-org.constellation.process.layer.CreateProviderLayerDescriptor
-org.constellation.process.layer.DeleteProviderLayerDescriptor
-org.constellation.process.layer.UpdateProviderLayerDescriptor
-
 #StyleProvider process
 org.constellation.process.style.CreateStyleProviderDescriptor
 org.constellation.process.style.DeleteStyleProviderDescriptor

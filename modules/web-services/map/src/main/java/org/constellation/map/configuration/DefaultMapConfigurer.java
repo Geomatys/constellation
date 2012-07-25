@@ -74,9 +74,9 @@ import org.opengis.util.NoSuchIdentifierException;
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.layer.CreateProviderLayerDescriptor;
-import org.constellation.process.layer.DeleteProviderLayerDescriptor;
-import org.constellation.process.layer.UpdateProviderLayerDescriptor;
+import org.constellation.process.provider.layer.CreateProviderLayerStyleDescriptor;
+import org.constellation.process.provider.layer.DeleteProviderLayerStyleDescriptor;
+import org.constellation.process.provider.layer.UpdateProviderLayerStyleDescriptor;
 import org.constellation.process.provider.CreateProviderDescriptor;
 import org.constellation.process.provider.GetConfigProviderDescriptor;
 import org.constellation.process.provider.DeleteProviderDescriptor;
@@ -453,10 +453,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
 
 
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderLayerDescriptor.NAME);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderLayerStyleDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(CreateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(CreateProviderLayerDescriptor.LAYER_NAME).setValue(newLayer);
+            inputs.parameter(CreateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(CreateProviderLayerStyleDescriptor.LAYER_NAME).setValue(newLayer);
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -492,10 +492,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         try {
 
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerDescriptor.NAME);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerStyleDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(DeleteProviderLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(DeleteProviderLayerDescriptor.LAYER_NAME_NAME).setValue(layerName);
+            inputs.parameter(DeleteProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(DeleteProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue(layerName);
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
@@ -534,11 +534,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             reader.setInput(objectRequest);
             final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
 
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerDescriptor.NAME);
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerStyleDescriptor.NAME);
             final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(UpdateProviderLayerDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(UpdateProviderLayerDescriptor.LAYER_NAME_NAME).setValue(layerName);
-            inputs.parameter(UpdateProviderLayerDescriptor.UPDATE_LAYER_NAME).setValue(newLayer);
+            inputs.parameter(UpdateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+            inputs.parameter(UpdateProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue(layerName);
+            inputs.parameter(UpdateProviderLayerStyleDescriptor.UPDATE_LAYER_NAME).setValue(newLayer);
 
             try {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);

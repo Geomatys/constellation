@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.layer;
+package org.constellation.process.provider.layer;
 
 import java.util.Collection;
 import org.constellation.process.AbstractCstlProcess;
@@ -28,15 +28,15 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
 
 import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.layer.UpdateProviderLayerDescriptor.*;
+import static org.constellation.process.provider.layer.UpdateProviderLayerStyleDescriptor.*;
 
 /**
  * Update a layer from an existing provider.
  * @author Quentin Boileau (Geomatys).
  */
-public class UpdateProviderLayer extends AbstractCstlProcess {
+public class UpdateProviderLayerStyle extends AbstractCstlProcess {
 
-     public UpdateProviderLayer(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+     public UpdateProviderLayerStyle(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
