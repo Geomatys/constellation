@@ -1,7 +1,7 @@
 INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (7, 'CSWCat', 'urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd', 'urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd', 'admin', NULL, NULL, '2009-10-14', 1, 1, 'NORMALRECORD');
 INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (8, 'CSWCat', 'CTDF02', 'FRENCH CTD DATA - VERTICAL PROFILES', 'admin', NULL, NULL, '2009-10-14', 1, 1, 'NORMALRECORD');
 
-INSERT INTO "Storage"."Values" VALUES (7, 'Catalog Web Service:Record', 1, 'Record', 'Catalog Web Service', 'Catalog Web Service:Record.1'),
+INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (7, 'Catalog Web Service:Record', 1, 'Record', 'Catalog Web Service', 'Catalog Web Service:Record.1'),
                                       (7, 'Catalog Web Service:Record:subject', 1, 'SimpleLiteral', 'DublinCore', 'Catalog Web Service:Record.1:subject.1'),
                                       (7, 'Catalog Web Service:Record:abstract', 1, 'SimpleLiteral', 'DublinCore', 'Catalog Web Service:Record.1:abstract.1'),
                                       (7, 'Catalog Web Service:Record:identifier', 1, 'SimpleLiteral', 'DublinCore', 'Catalog Web Service:Record.1:identifier.1'),
@@ -48,7 +48,7 @@ INSERT INTO "Storage"."Values" VALUES (7, 'Catalog Web Service:Record', 1, 'Reco
                                       (8, 'ISO 19115:MD_Metadata:portrayalCatalogueInfo:portrayalCatalogueCitation', 1, 'CI_Citation', 'ISO 19115', 'ISO 19115:MD_Metadata.1:portrayalCatalogueInfo.1:portrayalCatalogueCitation.1'),
                                       (8, 'ISO 19115:MD_Metadata:portrayalCatalogueInfo:portrayalCatalogueCitation:date', 1, 'CI_Date', 'ISO 19115', 'ISO 19115:MD_Metadata.1:portrayalCatalogueInfo.1:portrayalCatalogueCitation.1:date.1');
 
-INSERT INTO "Storage"."TextValues" VALUES (7, 'Catalog Web Service:Record:subject:content', 1, 'CharacterString', 'ISO 19103', 'Catalog Web Service:Record.1:subject.1:content.1', 'Transmittance and attenuance of the water column'),
+INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (7, 'Catalog Web Service:Record:subject:content', 1, 'CharacterString', 'ISO 19103', 'Catalog Web Service:Record.1:subject.1:content.1', 'Transmittance and attenuance of the water column'),
                                           (7, 'Catalog Web Service:Record:abstract:content', 1, 'CharacterString', 'ISO 19103', 'Catalog Web Service:Record.1:abstract.1:content.1', 'Proin sit amet justo. In justo. Aenean adipiscing nulla id tellus.'),
                                           (7, 'Catalog Web Service:Record:identifier:content', 1, 'CharacterString', 'ISO 19103', 'Catalog Web Service:Record.1:identifier.1:content.1', 'urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd'),
                                           (7, 'Catalog Web Service:Record:type:content', 1, 'CharacterString', 'ISO 19103', 'Catalog Web Service:Record.1:type.1:content.1', 'http://purl.org/dc/dcmitype/Service'),

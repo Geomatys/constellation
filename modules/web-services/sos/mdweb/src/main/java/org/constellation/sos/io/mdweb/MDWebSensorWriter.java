@@ -70,7 +70,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      * The properties file allowing to store the id mapping between physical and database ID.
      */
     private final Properties map;
-    
+
     public MDWebSensorWriter(final Automatic configuration, final Map<String, Object> properties) throws MetadataIoException {
         super(configuration);
         final String sensorIdBase = (String) properties.get(OMFactory.SENSOR_ID_BASE);
@@ -82,7 +82,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             final String version = ((AbstractReader)mdWriter).getVersion();
             if ("2.0".equals(version)) {
                 newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Storage\".\"Forms\" WHERE \"title\" LIKE '%" + sensorIdBase + "%' ");
-            } else if (version.startsWith("2.1") || version.startsWith("2.2") || version.startsWith("2.3")) {
+            } else if (version.startsWith("2.1") || version.startsWith("2.2") || version.startsWith("2.3") || version.startsWith("2.4")) {
                 newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Storage\".\"Records\" WHERE \"title\" LIKE '%" + sensorIdBase + "%' ");
             } else {
                 throw new IllegalArgumentException("unexpected MDWeb database version:" + version);
@@ -94,7 +94,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new MetadataIoException("SQLException while starting the MDweb Sensor writer: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
-        } 
+        }
     }
 
     /**
@@ -115,7 +115,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      */
     @Override
     public boolean writeSensor(final String id, final AbstractSensorML process) throws CstlServiceException {
-       
+
         try {
             return super.storeMetadata(process, id);
 
@@ -158,7 +158,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             throw new CstlServiceException("the service has throw a Metadata IO Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         }
-        
+
     }
 
     /**
