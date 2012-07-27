@@ -28,18 +28,18 @@ import org.geotoolkit.util.logging.Logging;
 
 /**
  * Class responsible for starting and stopping geotoolkit.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public final class Installer implements ServletContextListener{
 
     private static final Logger LOGGER = Logging.getLogger(Installer.class);
-    
+
     @Override
     public synchronized void contextInitialized(ServletContextEvent sce) {
-        
+
         LOGGER.log(Level.WARNING, "=== Starting GeotoolKit ===");
-        
+
         try{
             Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 
@@ -62,7 +62,7 @@ public final class Installer implements ServletContextListener{
 
     @Override
     public synchronized void contextDestroyed(ServletContextEvent sce) {
-        
+
         LOGGER.log(Level.WARNING, "=== Stopping GeotoolKit ===");
         try{
             Setup.shutdown();
@@ -70,8 +70,8 @@ public final class Installer implements ServletContextListener{
             wait(2000);
             LOGGER.log(Level.WARNING, "=== GeotoolKit sucessfully stopped ===");
         }catch(Exception ex){
-            LOGGER.log(Level.WARNING, "=== GeotoolKit failed to stop ===\n"+ex.getLocalizedMessage(), ex);            
-        }        
+            LOGGER.log(Level.WARNING, "=== GeotoolKit failed to stop ===\n"+ex.getLocalizedMessage(), ex);
+        }
     }
-    
+
 }

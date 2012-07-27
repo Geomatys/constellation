@@ -515,13 +515,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final DefaultInternationalString dis = (DefaultInternationalString) object;
 
             // 1. the root Value PT_FreeText
-            final Value rootValue = new Value(path, record, ordinal, classe, parentValue);
+            final Value rootValue = new Value(path, record, ordinal, classe, parentValue, null);
             result.add(rootValue);
 
             // 2. The default value
             final String defaultValue = dis.toString(null);
             final Path defaultValuePath = new Path(path, classe.getPropertyByName("value"));
-            final TextValue textValue = new TextValue(defaultValuePath, record , ordinal, defaultValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), rootValue);
+            final TextValue textValue = new TextValue(defaultValuePath, record , ordinal, defaultValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), rootValue, null);
             result.add(textValue);
 
             // 3. the localised values
@@ -530,17 +530,17 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 if (locale == null) continue;
 
                 final Path valuePath = new Path(path, classe.getPropertyByName("textGroup"));
-                final Value value = new Value(valuePath, record, ordinal, localisedString, rootValue);
+                final Value value = new Value(valuePath, record, ordinal, localisedString, rootValue, null);
                 result.add(value);
 
                 final String localisedValue = dis.toString(locale);
                 final Path locValuePath = new Path(valuePath, localisedString.getPropertyByName("value"));
-                final TextValue locValValue = new TextValue(locValuePath, record , ordinal, localisedValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value);
+                final TextValue locValValue = new TextValue(locValuePath, record , ordinal, localisedValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value, null);
                 result.add(locValValue);
 
                 final Path localePath = new Path(valuePath, localisedString.getPropertyByName("locale"));
                 final String localeDesc = "#locale-" + locale.getISO3Language();
-                final TextValue localeValue = new TextValue(localePath, record , ordinal, localeDesc, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value);
+                final TextValue localeValue = new TextValue(localePath, record , ordinal, localeDesc, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value, null);
                 result.add(localeValue);
             }
 
@@ -549,19 +549,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final Locale loc = (Locale) object;
 
             // 1. the root Value PT_Locale
-            final Value rootValue = new Value(path, record, ordinal, classe, parentValue);
+            final Value rootValue = new Value(path, record, ordinal, classe, parentValue, null);
             result.add(rootValue);
 
             // 2. The languageCode value
             final String languageValue   = loc.getLanguage();
             final Path languageValuePath = new Path(path, classe.getPropertyByName("languageCode"));
-            final TextValue lanTextValue = new TextValue(languageValuePath, record , ordinal, languageValue, mdWriter.getClasse("LanguageCode", Standard.ISO_19115), rootValue);
+            final TextValue lanTextValue = new TextValue(languageValuePath, record , ordinal, languageValue, mdWriter.getClasse("LanguageCode", Standard.ISO_19115), rootValue, null);
             result.add(lanTextValue);
 
             // 3. the country value
             final String countryValue    = loc.getCountry();
             final Path countryValuePath  = new Path(path, classe.getPropertyByName("country"));
-            final TextValue couTextValue = new TextValue(countryValuePath, record , ordinal, countryValue, mdWriter.getClasse("CountryCode", Standard.ISO_19115), rootValue);
+            final TextValue couTextValue = new TextValue(countryValuePath, record , ordinal, countryValue, mdWriter.getClasse("CountryCode", Standard.ISO_19115), rootValue, null);
             result.add(couTextValue);
 
             // 4. the encoding value "LOST for now" TODO
@@ -635,19 +635,19 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 value = object.toString();
             }
 
-            final TextValue textValue = new TextValue(path, record , ordinal, value, classe, parentValue);
+            final TextValue textValue = new TextValue(path, record , ordinal, value, classe, parentValue, null);
             result.add(textValue);
 
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
 
-            final LinkedValue value = new LinkedValue(path, record, ordinal, linkedValue.getRecord(), linkedValue, classe, parentValue);
+            final LinkedValue value = new LinkedValue(path, record, ordinal, linkedValue.getRecord(), linkedValue, classe, parentValue, null);
             result.add(value);
 
         // else we build a Value node.
         } else {
 
-            final Value value = new Value(path, record, ordinal, classe, parentValue);
+            final Value value = new Value(path, record, ordinal, classe, parentValue, null);
             result.add(value);
             //we add this object to the listed of already write element
             if (!isNoLink()) {

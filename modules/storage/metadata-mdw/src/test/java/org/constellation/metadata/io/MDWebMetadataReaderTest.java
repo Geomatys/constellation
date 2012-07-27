@@ -77,17 +77,17 @@ public class MDWebMetadataReaderTest {
         Connection con = ds.getConnection();
 
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/model/mdw_schema_2.3(derby).sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115-2.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/users/creation_user.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.3(derby).sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19110.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115-2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/catalog_web_service.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv2.5.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv3.0.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
@@ -96,8 +96,8 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.5.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
-        
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));
+
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
 
         //we write the configuration file
@@ -148,7 +148,7 @@ public class MDWebMetadataReaderTest {
 
         pool.release(unmarshaller);
     }
-    
+
     /**
      * Tests the getMetadata method for ISO 19139 data
      *
@@ -209,7 +209,7 @@ public class MDWebMetadataReaderTest {
 
         assertTrue(result instanceof DefaultMetadata);
         metadataEquals(expResult, (DefaultMetadata)result);
-        
+
         result = reader.getMetadata("999-666-999", AbstractMetadataReader.ISO_19115);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_21));
@@ -217,10 +217,10 @@ public class MDWebMetadataReaderTest {
         assertTrue(result instanceof DefaultMetadata);
         assertTrue(Utilities.deepEquals(expResult, (DefaultMetadata)result, ComparisonMode.BY_CONTRACT));
         assertFalse(Utilities.equals(expResult, (DefaultMetadata)result));
-        
+
         pool.release(unmarshaller);
     }
-    
+
      /**
      * Tests the getMetadata method for ISO 19139 data with GML geometries
      *
@@ -407,7 +407,7 @@ public class MDWebMetadataReaderTest {
     @Test
     public void getMetadataSystemSMLTest() throws Exception {
 
-        
+
         Object absResult = reader.getMetadata("urn:ogc:object:sensor:GEOM:1", AbstractMetadataReader.SENSORML);
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -428,7 +428,7 @@ public class MDWebMetadataReaderTest {
         absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system2.xml"));
 
         pool.release(unmarshaller);
-        
+
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
         assertTrue(absExpResult instanceof SensorML);
@@ -437,7 +437,7 @@ public class MDWebMetadataReaderTest {
 
 
         systemSMLEquals(expResult, result);
-        
+
     }
 
     /**
@@ -452,7 +452,7 @@ public class MDWebMetadataReaderTest {
         Object absResult = reader.getMetadata("urn:ogc:object:sensor:GEOM:2", AbstractMetadataReader.SENSORML);
 
         AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
-        
+
         pool.release(unmarshaller);
 
         assertTrue(absResult != null);
@@ -460,7 +460,7 @@ public class MDWebMetadataReaderTest {
         assertTrue(absExpResult instanceof SensorML);
         SensorML result = (SensorML) absResult;
         SensorML expResult = (SensorML) absExpResult;
-        
+
         componentEquals(expResult, result);
     }
 

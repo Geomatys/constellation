@@ -74,7 +74,7 @@ public class MDWebMetadataWriterTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        
+
         Setup.initialize(null);
         pool = EBRIMMarshallerPool.getInstance();
         StaticMetadata.fillPoolAnchor((AnchoredMarshallerPool) pool);
@@ -85,26 +85,26 @@ public class MDWebMetadataWriterTest {
         Connection con = ds.getConnection();
 
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/model/mdw_schema_2.3(derby).sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115-2.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v23/metadata/users/creation_user.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/profiles/inputLevels.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/profiles/user_profile.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
-        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.3(derby).sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115-2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19110.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/profiles/inputLevels.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/profiles/user_profile.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/catalog_web_service.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv2.5.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv3.0.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/contact.sql"));
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
         configuration = new Automatic("mdweb", bdd);
-        
+
         reader = new MDWebMetadataReader(configuration);
         writer = new MDWebMetadataWriter(configuration);
 
@@ -161,7 +161,7 @@ public class MDWebMetadataWriterTest {
 
         componentEquals(expResult, result);
     }
-    
+
     /**
      * Tests the storeMetadata method for SensorML data
      *
@@ -201,9 +201,9 @@ public class MDWebMetadataWriterTest {
         expResult = (SensorML) absExpResult;
 
         systemSMLEquals(expResult, result);
-        
+
     }
-    
+
     /**
      * Tests the storeMetadata method for ISO 19139 data with GML geometries
      *
@@ -225,8 +225,8 @@ public class MDWebMetadataWriterTest {
         assertEquals(new URI("http://test.com"), ((IdentifiedObject)expId).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK).getHRef());
         assertEquals(new URI("http://test.com"), ((IdentifiedObject)resId).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK).getHRef());
         metadataEquals(expResult,result);
-        
-        
+
+
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_21));
         writer.storeMetadata(absExpResult);
         absResult = reader.getMetadata("999-666-999", AbstractMetadataReader.ISO_19115);
@@ -239,9 +239,9 @@ public class MDWebMetadataWriterTest {
         resId = ((ServiceIdentificationImpl)result.getIdentificationInfo().iterator().next()).getOperatesOn().iterator().next();
         assertEquals(new URI("http://test2.com"), ((IdentifiedObject)expId).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK).getHRef());
         assertEquals(new URI("http://test2.com"), ((IdentifiedObject)resId).getIdentifierMap().getSpecialized(IdentifierSpace.XLINK).getHRef());
-        
+
         metadataEquals(expResult, result, ComparisonMode.BY_CONTRACT);
-        
+
         pool.release(unmarshaller);
     }
 
@@ -263,8 +263,8 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta10.xml"));
 
         metadataEquals(expResult,result);
-        
-        
+
+
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_11));
         writer.storeMetadata(absExpResult);
         absResult = reader.getMetadata("af24f70a-818c-4da1-9afb-1fc1e0058760", AbstractMetadataReader.ISO_19115);
@@ -401,7 +401,7 @@ public class MDWebMetadataWriterTest {
         pool.release(unmarshaller);
         assertEquals(expResult,result);
     }
-    
+
     /**
      * Tests the storeMetadata method for ISO 19139 data
      *
@@ -411,7 +411,7 @@ public class MDWebMetadataWriterTest {
     public void writeMetadataISO19115Test() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        
+
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta7.xml"));
         writer.storeMetadata(absExpResult);
         Object absResult = reader.getMetadata("MDWeb_FR_SY_couche_vecteur_258", AbstractMetadataReader.ISO_19115);
@@ -421,7 +421,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta7.xml"));
 
         metadataEquals(expResult,result);
-        
+
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
         writer.storeMetadata(absExpResult);
         absResult = reader.getMetadata("42292_5p_19900609195600", AbstractMetadataReader.ISO_19115);
@@ -488,7 +488,7 @@ public class MDWebMetadataWriterTest {
             exceptionMsg = ex.getMessage();
         }
         assertTrue(exceptionMsg.contains("is already used"));
-        
+
         /*Object absResult = reader.getMetadata("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
