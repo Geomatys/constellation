@@ -9,19 +9,20 @@ import org.opengis.feature.type.Name;
  * The reference pattern depend of the type of input data.
  *
  * If DataReference is from a provider layer, the pattern will be like :
- * <code>${providerLayerType:providerId:layerId}</code> for example <code>${providerLayerType:shapeFileProvider:CountiesLayer}</code>
+ * <code>${providerLayerType|providerId|layerId}</code> for example <code>${providerLayerType|shapeFileProvider|CountiesLayer}</code>
  *
  * If DataReference is from a provider Style, the pattern will be like :
- * <code>${providerStyleType:providerId:layerId}</code> for example <code>${providerStyleType:sldProvider:flashyStyle}</code>
+ * <code>${providerStyleType|providerId|layerId}</code> for example <code>${providerStyleType|sldProvider|flashyStyle}</code>
  *
  * If DataReference is from a Service, the pattern will be like :
- * <code>${serviceType:serviceSpec:serviceId:layerId}</code> for example <code>${serviceType:WMS:defaultInstance:CountiesLayer}</code>
+ * <code>${serviceType|serviceURL|serviceSpec|serviceId|layerId}</code> for example <code>${serviceType|http://localhost:8080/cstl/WS/wms/defaultInstance|WMS|defaultInstance|CountiesLayer}</code>
  *
  * @author Johann Sorel (Geomatys)
  * @author Quentin Boileau (Geomatys).
  */
 public class DataReference implements CharSequence{
 
+    private static final String SEPARATOR = "|";
     /*
      * Data types
      */
@@ -32,6 +33,7 @@ public class DataReference implements CharSequence{
     private String reference;
     private String type;
     private String providerId;
+    private String serviceURL;
     private String serviceSpec;
     private String serviceId;
     private String layerId;
@@ -41,16 +43,16 @@ public class DataReference implements CharSequence{
         computeReferenceParts();
     }
 
-    public DataReference (final String dataType, final String providerId, final String serviceSpec, final String serviceId, final String layerId) {
+    public DataReference (final String dataType, final String providerId, final String serviceURL, final String serviceSpec, final String serviceId, final String layerId) {
         if (dataType != null && (dataType.equals(PROVIDER_LAYER_TYPE) || dataType.equals(PROVIDER_STYLE_TYPE) || dataType.equals(SERVICE_TYPE))) {
             this.type       = dataType;
         }
-
+        this.serviceURL     = serviceURL;
         this.providerId     = providerId;
         this.serviceSpec    = serviceSpec;
         this.serviceId      = serviceId;
         this.layerId        = layerId;
-        this.reference = buildRefrenceString();
+        this.reference      = buildRefrenceString();
     }
 
 
@@ -63,9 +65,9 @@ public class DataReference implements CharSequence{
      */
     public static DataReference createProviderDataReference(final String providerType, final String providerId, final String layerId) {
         if (providerType != null && (providerType.equals(PROVIDER_LAYER_TYPE) || providerType.equals(PROVIDER_STYLE_TYPE))) {
-            return new DataReference(providerType, providerId, null, null, layerId);
+            return new DataReference(providerType, providerId, null, null, null, layerId);
         }
-        throw new IllegalArgumentException("Reference should match pattern ${providerLayerType:providerId:layerId} or ${providerStyleType:providerId:layerId} or ${serviceType:serviceSpec:serviceId:layerId}.");
+        throw new IllegalArgumentException("Reference should match pattern ${providerLayerType|providerId|layerId} or ${providerStyleType|providerId|layerId} or ${serviceType|serviceURL|serviceSpec|serviceId|layerId}.");
     }
 
     /**
@@ -75,8 +77,8 @@ public class DataReference implements CharSequence{
      * @param layerId layer identifier
      * @return DataReference
      */
-    public static DataReference createServiceDataReference(final String serviceSpec, final String serviceId, final String layerId) {
-        return new DataReference(SERVICE_TYPE, null, serviceSpec, serviceId, layerId);
+    public static DataReference createServiceDataReference(final String serviceURL, final String serviceSpec, final String serviceId, final String layerId) {
+        return new DataReference(SERVICE_TYPE, null,serviceURL, serviceSpec, serviceId, layerId);
     }
 
     public String getReference() {
@@ -95,11 +97,14 @@ public class DataReference implements CharSequence{
         if (reference != null && reference.startsWith("${") && reference.endsWith("}")) {
             final String datas = reference.substring(2,reference.length()-1);
 
-            final String datatype = datas.substring(0, datas.indexOf(":"));
+            final String[] dataSplit = datas.split("\\"+SEPARATOR);
+            final int groupCount = dataSplit.length;
+
+            final String datatype = dataSplit[0];
             //get data type
-            if (!datatype.isEmpty() && (datatype.equals(PROVIDER_LAYER_TYPE) || datatype.equals(PROVIDER_STYLE_TYPE) )) {
+            if (!datatype.isEmpty() && (datatype.equals(PROVIDER_LAYER_TYPE) || datatype.equals(PROVIDER_STYLE_TYPE) ) && groupCount == 3 ) {
                 type = datatype;
-            } else if (!datatype.isEmpty() && datatype.equals(SERVICE_TYPE)) {
+            } else if (!datatype.isEmpty() && datatype.equals(SERVICE_TYPE) && groupCount == 5) {
                 type = datatype;
             } else {
                 throw new IllegalArgumentException("Reference data should be type of providerLayerType or providerStyleType or serviceType.");
@@ -107,24 +112,22 @@ public class DataReference implements CharSequence{
 
             if (type.equals(PROVIDER_LAYER_TYPE) || type.equals(PROVIDER_STYLE_TYPE)) {
 
-                final String providerDatas = datas.substring(datas.indexOf(":")+1);                     //providerID:layerID
                 this.serviceSpec = null;
                 this.serviceId = null;
-                this.providerId = providerDatas.substring(0, providerDatas.indexOf(":"));               //providerID
-                this.layerId = providerDatas.substring(providerDatas.indexOf(":")+1);                   //layerID
+                this.providerId = dataSplit[1];     //providerID
+                this.layerId = dataSplit[2];        //layerID
 
             } else if (type.equals(SERVICE_TYPE)) {
 
-                final String serviceDatas = datas.substring(datas.indexOf(":")+1);                      //WMS:serviceID:layerID
-                final String serviceIdLayerId = serviceDatas.substring(serviceDatas.indexOf(":")+1);    //sericeID:layerID
                 this.providerId = null;
-                this.serviceSpec = serviceDatas.substring(0, serviceDatas.indexOf(":"));                //WMS
-                this.serviceId = serviceIdLayerId.substring(0, serviceIdLayerId.indexOf(":"));          //serviceID
-                this.layerId = serviceIdLayerId.substring(serviceIdLayerId.indexOf(":")+1);             //layerID
+                this.serviceURL = dataSplit[1];     //http://localhost:8080/cstl/WS/wms/serviceID
+                this.serviceSpec = dataSplit[2];    //WMS
+                this.serviceId = dataSplit[3];      //serviceID
+                this.layerId = dataSplit[4];        //layerID
 
             }
         } else {
-            throw new IllegalArgumentException("Reference should match pattern ${providerLayerType:providerId:layerId} or ${providerStyleType:providerId:layerId} or ${serviceType:serviceSpec:serviceId:layerId}.");
+            throw new IllegalArgumentException("Reference should match pattern ${providerLayerType|providerId|layerId} or ${providerStyleType|providerId|layerId} or ${serviceType|serviceURL|serviceSpec|serviceId|layerId}.");
         }
     }
 
@@ -133,18 +136,18 @@ public class DataReference implements CharSequence{
      */
     private String buildRefrenceString() {
         final StringBuffer buffer = new StringBuffer("${");
+        buffer.append(getDataType()).append(SEPARATOR);
 
         if (type.equals(PROVIDER_LAYER_TYPE) || type.equals(PROVIDER_STYLE_TYPE)) {
 
-            buffer.append(getDataType()).append(":");
-            buffer.append(providerId).append(":");
+            buffer.append(providerId).append(SEPARATOR);
             buffer.append(layerId);
 
         } else if (type.equals(SERVICE_TYPE)) {
 
-            buffer.append(getDataType()).append(":");
-            buffer.append(serviceSpec).append(":");
-            buffer.append(serviceId).append(":");
+            buffer.append(serviceURL).append(SEPARATOR);
+            buffer.append(serviceSpec).append(SEPARATOR);
+            buffer.append(serviceId).append(SEPARATOR);
             buffer.append(layerId);
         }
 
@@ -166,6 +169,14 @@ public class DataReference implements CharSequence{
      */
     public String getServiceSpec(){
         return serviceSpec;
+    }
+
+    /**
+     * The service server URL part of the data.
+     * @return String
+     */
+    public String getServiceURL(){
+        return serviceURL;
     }
 
     /**
