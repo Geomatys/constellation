@@ -37,6 +37,9 @@ public class Layer {
     @XmlAttribute
     private QName name;
 
+    @XmlAttribute
+    private String style;
+
     @XmlElement(name="Title")
     private String title;
 
@@ -66,7 +69,7 @@ public class Layer {
 
     @XmlElement(name="CRS")
     private List<String> crs;
-    
+
     public Layer() {
 
     }
@@ -77,8 +80,16 @@ public class Layer {
 
     public Layer(final QName name, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
+            final List<String> crs)
+    {
+        this(name, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
+    }
+
+    public Layer(final QName name, final String style, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+            final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs) {
         this.name         = name;
+        this.style        = style;
         this.title        = title;
         this.abstrac      = abstrac;
         this.keywords     = keywords;
@@ -90,7 +101,7 @@ public class Layer {
         this.opaque       = opaque;
         this.crs          = crs;
     }
-    
+
     /**
      * @return the name
      */
@@ -103,6 +114,14 @@ public class Layer {
      */
     public void setName(final QName name) {
         this.name = name;
+    }
+
+    public String getStyle() {
+        return style;
+    }
+
+    public void setStyle(final String style) {
+        this.style = style;
     }
 
     public String getTitle() {
@@ -201,10 +220,16 @@ public class Layer {
     public void setCrs(final List<String> crs) {
         this.crs = crs;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Layer]");
+        if (name != null) {
+            sb.append("name:\n").append(name).append('\n');
+        }
+        if (style != null) {
+            sb.append("style:\n").append(style).append('\n');
+        }
         if (abstrac != null) {
             sb.append("abstract=").append(abstrac).append('\n');
         }
@@ -229,9 +254,6 @@ public class Layer {
         if (metadataURL != null) {
             sb.append("metadataURL:\n").append(metadataURL).append('\n');
         }
-        if (name != null) {
-            sb.append("name:\n").append(name).append('\n');
-        }
         if (opaque != null) {
             sb.append("opaque:\n").append(opaque).append('\n');
         }
@@ -240,7 +262,7 @@ public class Layer {
         }
         return sb.toString();
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Layer) {
@@ -254,6 +276,7 @@ public class Layer {
                    Utilities.equals(this.keywords,     that.keywords) &&
                    Utilities.equals(this.metadataURL,  that.metadataURL) &&
                    Utilities.equals(this.name,         that.name) &&
+                   Utilities.equals(this.style,        that.style) &&
                    Utilities.equals(this.opaque,       that.opaque) &&
                    Utilities.equals(this.title,        that.title);
         }
@@ -264,6 +287,7 @@ public class Layer {
     public int hashCode() {
         int hash = 7;
         hash = 79 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 79 * hash + (this.style != null ? this.style.hashCode() : 0);
         hash = 79 * hash + (this.title != null ? this.title.hashCode() : 0);
         hash = 79 * hash + (this.abstrac != null ? this.abstrac.hashCode() : 0);
         hash = 79 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
