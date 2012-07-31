@@ -31,7 +31,11 @@ public final class GenericDatabaseMarshallerPool {
     private static MarshallerPool instance;
     static {
         try {
-            instance = new MarshallerPool("org.constellation.configuration:org.constellation.generic.database");
+            instance = new MarshallerPool("org.constellation.configuration:"       +
+                                          "org.constellation.generic.database:"    +
+                                          "org.geotoolkit.ogc.xml.v110:"           +
+                                          "org.geotoolkit.internal.jaxb.geometry:" +
+                                          "org.geotoolkit.gml.xml.v311");
         } catch (JAXBException ex) {
             Logging.getLogger(GenericDatabaseMarshallerPool.class.getName()).log(Level.SEVERE, null, ex);
         }
