@@ -24,11 +24,13 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
+import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.util.Utilities;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  * @since 0.6
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -39,6 +41,9 @@ public class Layer {
 
     @XmlAttribute
     private String style;
+
+    @XmlElement(name="Filter")
+    private FilterType filter;
 
     @XmlElement(name="Title")
     private String title;
@@ -82,14 +87,15 @@ public class Layer {
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs)
     {
-        this(name, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
+        this(name, null, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
     }
 
-    public Layer(final QName name, final String style, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+    public Layer(final QName name, final String style, final FilterType filter, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs) {
         this.name         = name;
         this.style        = style;
+        this.filter       = filter;
         this.title        = title;
         this.abstrac      = abstrac;
         this.keywords     = keywords;
@@ -122,6 +128,14 @@ public class Layer {
 
     public void setStyle(final String style) {
         this.style = style;
+    }
+
+    public FilterType getFilter() {
+        return filter;
+    }
+
+    public void setFilter(final FilterType filter) {
+        this.filter = filter;
     }
 
     public String getTitle() {
@@ -230,6 +244,9 @@ public class Layer {
         if (style != null) {
             sb.append("style:\n").append(style).append('\n');
         }
+        if (filter != null) {
+            sb.append("filter:\n").append(filter).append('\n');
+        }
         if (abstrac != null) {
             sb.append("abstract=").append(abstrac).append('\n');
         }
@@ -272,6 +289,7 @@ public class Layer {
                    Utilities.equals(this.authorityURL, that.authorityURL) &&
                    Utilities.equals(this.crs,          that.crs) &&
                    Utilities.equals(this.dataURL,      that.dataURL) &&
+                   Utilities.equals(this.filter,       that.filter) &&
                    Utilities.equals(this.identifier,   that.identifier) &&
                    Utilities.equals(this.keywords,     that.keywords) &&
                    Utilities.equals(this.metadataURL,  that.metadataURL) &&
@@ -288,6 +306,7 @@ public class Layer {
         int hash = 7;
         hash = 79 * hash + (this.name != null ? this.name.hashCode() : 0);
         hash = 79 * hash + (this.style != null ? this.style.hashCode() : 0);
+        hash = 79 * hash + (this.filter != null ? this.filter.hashCode() : 0);
         hash = 79 * hash + (this.title != null ? this.title.hashCode() : 0);
         hash = 79 * hash + (this.abstrac != null ? this.abstrac.hashCode() : 0);
         hash = 79 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);

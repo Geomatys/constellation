@@ -112,6 +112,10 @@
             <artifactId>geotk-utility-jdbc</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.geotoolkit.pending</groupId>
+            <artifactId>geotk-xml-ogc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>ojdbc</groupId>
             <artifactId>ojdbc</artifactId>
             <scope>provided</scope>
