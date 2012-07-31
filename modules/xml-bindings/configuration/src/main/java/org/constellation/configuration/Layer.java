@@ -42,6 +42,9 @@ public class Layer {
     @XmlAttribute
     private String style;
 
+    @XmlAttribute
+    private String alias;
+
     @XmlElement(name="Filter")
     private FilterType filter;
 
@@ -87,15 +90,16 @@ public class Layer {
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs)
     {
-        this(name, null, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
+        this(name, null, null, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
     }
 
-    public Layer(final QName name, final String style, final FilterType filter, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+    public Layer(final QName name, final String style, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs) {
         this.name         = name;
         this.style        = style;
         this.filter       = filter;
+        this.alias        = alias;
         this.title        = title;
         this.abstrac      = abstrac;
         this.keywords     = keywords;
@@ -136,6 +140,14 @@ public class Layer {
 
     public void setFilter(final FilterType filter) {
         this.filter = filter;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(final String alias) {
+        this.alias = alias;
     }
 
     public String getTitle() {
@@ -247,6 +259,9 @@ public class Layer {
         if (filter != null) {
             sb.append("filter:\n").append(filter).append('\n');
         }
+        if (alias != null) {
+            sb.append("alias:\n").append(alias).append('\n');
+        }
         if (abstrac != null) {
             sb.append("abstract=").append(abstrac).append('\n');
         }
@@ -290,6 +305,7 @@ public class Layer {
                    Utilities.equals(this.crs,          that.crs) &&
                    Utilities.equals(this.dataURL,      that.dataURL) &&
                    Utilities.equals(this.filter,       that.filter) &&
+                   Utilities.equals(this.alias,        that.alias) &&
                    Utilities.equals(this.identifier,   that.identifier) &&
                    Utilities.equals(this.keywords,     that.keywords) &&
                    Utilities.equals(this.metadataURL,  that.metadataURL) &&
@@ -307,6 +323,7 @@ public class Layer {
         hash = 79 * hash + (this.name != null ? this.name.hashCode() : 0);
         hash = 79 * hash + (this.style != null ? this.style.hashCode() : 0);
         hash = 79 * hash + (this.filter != null ? this.filter.hashCode() : 0);
+        hash = 79 * hash + (this.alias != null ? this.alias.hashCode() : 0);
         hash = 79 * hash + (this.title != null ? this.title.hashCode() : 0);
         hash = 79 * hash + (this.abstrac != null ? this.abstrac.hashCode() : 0);
         hash = 79 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
