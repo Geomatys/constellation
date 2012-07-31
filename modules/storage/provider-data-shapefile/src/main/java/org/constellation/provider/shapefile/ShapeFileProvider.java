@@ -120,7 +120,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             final ParameterValueGroup layer = getLayer(getSource(), key.getLocalPart());
             if (layer == null) {
                 return new DefaultDataStoreLayerDetails(key, store, null, null, null, null, null);
-                
+
             } else {
                 final List<String> styles = getLayerStyles(layer);
                 return new DefaultDataStoreLayerDetails(key, store, styles,
@@ -239,7 +239,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         try {
             params.parameter(URLP.getName().getCode()).setValue(f.toURI().toURL());
             params.parameter(NAMESPACE.getName().getCode()).setValue(namespace);
-            return DataStoreFinder.get(params);
+            return DataStoreFinder.open(params);
        } catch (DataStoreException ex) {
             getLogger().log(Level.WARNING, null, ex);
             return null;

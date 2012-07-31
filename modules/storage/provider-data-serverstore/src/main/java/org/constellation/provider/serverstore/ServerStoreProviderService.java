@@ -44,30 +44,30 @@ public class ServerStoreProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
-    
+
     static {
         final List<ParameterDescriptorGroup> descs = new ArrayList<ParameterDescriptorGroup>();
-        final Iterator<ServerFactory> ite = ServerFinder.getAllFactories();
+        final Iterator<ServerFactory> ite = ServerFinder.getAllFactories(null).iterator();
         while(ite.hasNext()){
             //copy the descriptor with a minimum number of zero
             final ParameterDescriptorGroup desc = ite.next().getParametersDescriptor();
-            
+
             final DefaultParameterDescriptorGroup mindesc = new DefaultParameterDescriptorGroup(
                     Collections.singletonMap("name", desc.getName()),
                     0, 1,
                     desc.descriptors().toArray(new GeneralParameterDescriptor[0]));
-            
+
             descs.add(mindesc);
         }
-        
+
         SOURCE_CONFIG_DESCRIPTOR = new DefaultParameterDescriptorGroup(
             "choice", descs.toArray(new GeneralParameterDescriptor[0]));
-        
+
     }
-    
+
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
-    
+
     public ServerStoreProviderService(){
         super("server-store");
     }
@@ -87,7 +87,7 @@ public class ServerStoreProviderService extends AbstractProviderService
         if(!canProcess(ps)){
             return null;
         }
-        
+
         final ServerStoreProvider provider = new ServerStoreProvider(this,ps);
         getLogger().log(Level.INFO, "[PROVIDER]> server-store provider created.");
         return provider;
