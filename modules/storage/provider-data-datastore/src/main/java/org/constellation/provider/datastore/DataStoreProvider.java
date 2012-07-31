@@ -67,7 +67,7 @@ public class DataStoreProvider extends AbstractLayerProvider{
         }
         try {
             //create the store
-            store = DataStoreFinder.get(factoryconfig);
+            store = DataStoreFinder.open(factoryconfig);
             if(store == null){
                 throw new DataStoreException("Could not create data store for parameters : "+factoryconfig);
             }

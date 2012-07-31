@@ -66,7 +66,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
         }
         try {
             //create the store
-            server = ServerFinder.get(factoryconfig);
+            server = ServerFinder.open(factoryconfig);
             if(server == null){
                 throw new DataStoreException("Could not create server store for parameters : "+factoryconfig);
             }

@@ -47,7 +47,7 @@ public class ServerStoreProviderService extends AbstractProviderService
     
     static {
         final List<ParameterDescriptorGroup> descs = new ArrayList<ParameterDescriptorGroup>();
-        final Iterator<ServerFactory> ite = ServerFinder.getAllFactories();
+        final Iterator<ServerFactory> ite = ServerFinder.getAllFactories(null).iterator();
         while(ite.hasNext()){
             //copy the descriptor with a minimum number of zero
             final ParameterDescriptorGroup desc = ite.next().getParametersDescriptor();

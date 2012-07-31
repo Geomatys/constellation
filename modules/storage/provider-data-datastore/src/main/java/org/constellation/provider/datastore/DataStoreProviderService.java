@@ -47,7 +47,7 @@ public class DataStoreProviderService extends AbstractProviderService
     
     static {
         final List<ParameterDescriptorGroup> descs = new ArrayList<ParameterDescriptorGroup>();
-        final Iterator<DataStoreFactory> ite = DataStoreFinder.getAllFactories();
+        final Iterator<DataStoreFactory> ite = DataStoreFinder.getAllFactories(null).iterator();
         while(ite.hasNext()){
             //copy the descriptor with a minimum number of zero
             final ParameterDescriptorGroup desc = ite.next().getParametersDescriptor();

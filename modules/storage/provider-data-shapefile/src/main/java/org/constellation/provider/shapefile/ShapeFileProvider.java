@@ -239,7 +239,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         try {
             params.parameter(URLP.getName().getCode()).setValue(f.toURI().toURL());
             params.parameter(NAMESPACE.getName().getCode()).setValue(namespace);
-            return DataStoreFinder.get(params);
+            return DataStoreFinder.open(params);
        } catch (DataStoreException ex) {
             getLogger().log(Level.WARNING, null, ex);
             return null;
