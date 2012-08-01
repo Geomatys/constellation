@@ -304,6 +304,32 @@ public class ConfigurationXmlBindingTest {
         result =  removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
+        sources = new ArrayList<Source>();
+        include = new ArrayList<Layer>();
+        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"));
+        include.add(l1);
+        s1 = new Source("source1", false, include, null);
+        sources.add(s1);
+        context = new LayerContext(new Layers(sources));
+        sw = new StringWriter();
+        marshaller.marshal(context, sw);
+
+        expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext >" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source load_all=\"false\" id=\"source1\">" + '\n'
+                + "            <ns2:include>" + '\n'
+                + "                <ns2:Layer name=\"layer1\">" + '\n'
+                + "                    <ns2:Style>${providerStyleType|sldProviderId|styleName}</ns2:Style>" + '\n'
+                + "                </ns2:Layer>" + '\n'
+                + "            </ns2:include>" + '\n'
+                + "        </ns2:Source>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        result =  removeXmlns(sw.toString());
+        assertEquals(expresult, result);
     }
 
     /**
@@ -625,6 +651,33 @@ public class ConfigurationXmlBindingTest {
         expresult.getCustomParameters().put("transactionSecurized", "false");
         assertEquals(expresult.getLayers(), result.getLayers());
         assertEquals(expresult, result);
+
+        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source load_all=\"false\" id=\"source1\">" + '\n'
+                + "            <ns2:include>" + '\n'
+                + "                <ns2:Layer name=\"layer1\">" + '\n'
+                + "                    <ns2:Style>${providerStyleType|sldProviderId|styleName}</ns2:Style>" + '\n'
+                + "                </ns2:Layer>" + '\n'
+                + "            </ns2:include>" + '\n'
+                + "        </ns2:Source>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        sources = new ArrayList<Source>();
+        include = new ArrayList<Layer>();
+        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"));
+        include.add(l1);
+        s1 = new Source("source1", false, include, null);
+        sources.add(s1);
+        expresult = new LayerContext(new Layers(sources));
+
+        result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
+
+        assertEquals(expresult, result);
+
     }
 
     public static String removeXmlns(String xml) {

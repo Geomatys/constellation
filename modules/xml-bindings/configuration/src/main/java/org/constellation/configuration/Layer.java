@@ -40,10 +40,10 @@ public class Layer {
     private QName name;
 
     @XmlAttribute
-    private String style;
-
-    @XmlAttribute
     private String alias;
+
+    @XmlElement(name="Style")
+    private List<String> styles;
 
     @XmlElement(name="Filter")
     private FilterType filter;
@@ -86,6 +86,11 @@ public class Layer {
         this.name = name;
     }
 
+    public Layer(final QName name, final List<String> styles) {
+        this.name = name;
+        this.styles = styles;
+    }
+
     public Layer(final QName name, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs)
@@ -93,11 +98,11 @@ public class Layer {
         this(name, null, null, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
     }
 
-    public Layer(final QName name, final String style, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+    public Layer(final QName name, final List<String> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs) {
         this.name         = name;
-        this.style        = style;
+        this.styles       = styles;
         this.filter       = filter;
         this.alias        = alias;
         this.title        = title;
@@ -126,12 +131,15 @@ public class Layer {
         this.name = name;
     }
 
-    public String getStyle() {
-        return style;
+    public List<String> getStyles() {
+        if (styles == null) {
+            styles = new ArrayList<String>();
+        }
+        return styles;
     }
 
-    public void setStyle(final String style) {
-        this.style = style;
+    public void setStyles(final List<String> styles) {
+        this.styles = styles;
     }
 
     public FilterType getFilter() {
@@ -253,8 +261,11 @@ public class Layer {
         if (name != null) {
             sb.append("name:\n").append(name).append('\n');
         }
-        if (style != null) {
-            sb.append("style:\n").append(style).append('\n');
+        if (styles != null && !styles.isEmpty()) {
+            sb.append("styles:\n").append(styles).append('\n');
+            for (String style : styles) {
+                sb.append("style:\n").append(style).append('\n');
+            }
         }
         if (filter != null) {
             sb.append("filter:\n").append(filter).append('\n');
@@ -310,7 +321,7 @@ public class Layer {
                    Utilities.equals(this.keywords,     that.keywords) &&
                    Utilities.equals(this.metadataURL,  that.metadataURL) &&
                    Utilities.equals(this.name,         that.name) &&
-                   Utilities.equals(this.style,        that.style) &&
+                   Utilities.equals(this.styles,       that.styles) &&
                    Utilities.equals(this.opaque,       that.opaque) &&
                    Utilities.equals(this.title,        that.title);
         }
@@ -321,7 +332,7 @@ public class Layer {
     public int hashCode() {
         int hash = 7;
         hash = 79 * hash + (this.name != null ? this.name.hashCode() : 0);
-        hash = 79 * hash + (this.style != null ? this.style.hashCode() : 0);
+        hash = 79 * hash + (this.styles != null ? this.styles.hashCode() : 0);
         hash = 79 * hash + (this.filter != null ? this.filter.hashCode() : 0);
         hash = 79 * hash + (this.alias != null ? this.alias.hashCode() : 0);
         hash = 79 * hash + (this.title != null ? this.title.hashCode() : 0);

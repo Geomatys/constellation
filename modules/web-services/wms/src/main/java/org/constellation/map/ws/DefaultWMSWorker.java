@@ -571,10 +571,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (configLayer == null) {
             return outputLayer111;
         }
-        if (configLayer.getStyle() != null) {
+        if (configLayer.getStyles() != null && !configLayer.getStyles().isEmpty()) {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
-            final DataReference dr = new DataReference(configLayer.getStyle());
+            final DataReference dr = new DataReference(configLayer.getStyles().get(0));
             Style style = null;
             try {
                 style = DataReferenceConverter.convertDataReferenceToStyle(dr);
@@ -692,10 +692,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (configLayer == null) {
             return outputLayer130;
         }
-        if (configLayer.getStyle() != null) {
+        if (configLayer.getStyles() != null && !configLayer.getStyles().isEmpty()) {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
-            final DataReference dr = new DataReference(configLayer.getStyle());
+            final DataReference dr = new DataReference(configLayer.getStyles().get(0));
             Style style = null;
             try {
                 style = DataReferenceConverter.convertDataReferenceToStyle(dr);
@@ -1215,9 +1215,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 final Map<Name,Layer> layers = getLayers();
                 final Layer layer = layers.get(layerRefs.get(i).getName());
 
-                final String defaultStyleRef = layer.getStyle();
-                if (defaultStyleRef != null && !defaultStyleRef.isEmpty()) {
-                    final DataReference styleRef = new DataReference(defaultStyleRef);
+                final List<String> defaultStyleRefs = layer.getStyles();
+                if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
+                    final DataReference styleRef = new DataReference(defaultStyleRefs.get(0));
                     style = (styleRef == null || styleRef.getLayerId() == null) ? null :
                             StyleProviderProxy.getInstance().get(styleRef.getLayerId().getLocalPart());
                 } else {
