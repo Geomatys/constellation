@@ -795,7 +795,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_GIF, or,
                 dimension.width, dimension.height);
 
-        final String styleName = ms.getName();
+        String styleName = ms.getName();
+        if (!styleName.isEmpty() && styleName.startsWith("${")) {
+            final DataReference dataRef = new DataReference(styleName);
+            styleName = dataRef.getLayerId().getLocalPart();
+        }
         return new org.geotoolkit.wms.xml.v130.Style(
                 styleName, styleName, null, null, null, legendURL1, legendURL2);
     }
@@ -1211,8 +1215,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 final Map<Name,Layer> layers = getLayers();
                 final Layer layer = layers.get(layerRefs.get(i).getName());
 
-                final String defaultStyleName = layer.getStyle();
-                style = (defaultStyleName == null || defaultStyleName.isEmpty()) ? null : StyleProviderProxy.getInstance().get(defaultStyleName);
+                final String defaultStyleRef = layer.getStyle();
+                if (defaultStyleRef != null && !defaultStyleRef.isEmpty()) {
+                    final DataReference styleRef = new DataReference(defaultStyleRef);
+                    style = (styleRef == null || styleRef.getLayerId() == null) ? null :
+                            StyleProviderProxy.getInstance().get(styleRef.getLayerId().getLocalPart());
+                } else {
+                    style = null;
+                }
             }
             styles.add(style);
         }
