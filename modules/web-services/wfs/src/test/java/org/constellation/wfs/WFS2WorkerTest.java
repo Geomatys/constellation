@@ -46,6 +46,7 @@ import org.constellation.ws.CstlServiceException;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.test.CstlDOMComparator;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
+import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 
 import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
@@ -53,6 +54,7 @@ import org.geotoolkit.data.om.OMDataStoreFactory;
 import org.geotoolkit.data.sml.SMLDataStoreFactory;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamValueCollectionWriter;
 import org.geotoolkit.gml.xml.v321.DirectPositionType;
 import org.geotoolkit.gml.xml.v321.EnvelopeType;
 import org.geotoolkit.internal.io.IOUtilities;
@@ -128,6 +130,8 @@ public class WFS2WorkerTest {
     private static DefaultDataSource ds2 = null;
 
     private XmlFeatureWriter featureWriter;
+
+    private XmlFeatureWriter valueWriter;
 
     private static String EPSG_VERSION;
 
@@ -629,27 +633,39 @@ public class WFS2WorkerTest {
      * test the feature marshall
      *
      */
-    @Ignore
+    @Test
     public void getPropertyValueOMTest() throws Exception {
 
         /**
-         * Test 1 : query on typeName samplingPoint
+         * Test 1 : query on typeName samplingPoint with HITS
          */
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
-        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        final String valueReference = "sampledFeature";
+        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
+        request.setValueReference(valueReference);
 
         Object result = worker.getPropertyValue(request);
 
-        assertTrue(result instanceof FeatureCollectionWrapper);
-        FeatureCollectionWrapper wrapper = (FeatureCollectionWrapper) result;
+        assertTrue(result instanceof ValueCollection);
+        assertEquals(2, ((ValueCollection)result).getNumberReturned());
+
+        /**
+         * Test 2 : query on typeName samplingPoint with RESULTS
+         */
+        request.setResultType(ResultTypeType.RESULTS);
+        result = worker.getPropertyValue(request);
+
+        assertTrue(result instanceof ValueCollectionWrapper);
+        ValueCollectionWrapper wrapper = (ValueCollectionWrapper) result;
         result = wrapper.getFeatureCollection();
         assertEquals("3.2.1", wrapper.getGmlVersion());
 
-        StringWriter writer = new StringWriter();
-        featureWriter.write((FeatureCollection)result,writer);
+        valueWriter   = new JAXPStreamValueCollectionWriter(valueReference);
 
-        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
-        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+        StringWriter writer = new StringWriter();
+        valueWriter.write((FeatureCollection)result,writer);
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.ValueCollectionOM1.xml"));
         domCompare(expectedResult, writer.toString());
     }
 

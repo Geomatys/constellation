@@ -206,7 +206,7 @@ public class WFSService extends GridWebService<WFSWorker> {
                 } else {
                     outputFormat = MediaType.valueOf(requestOutputFormat);
                 }
-                final ValueCollection response = worker.getPropertyValue(model);
+                final Object response = worker.getPropertyValue(model);
                 return Response.ok(response, outputFormat).build();
 
             } else if (request instanceof CreateStoredQuery) {

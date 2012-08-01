@@ -14,29 +14,29 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.wfs.ws.rs;
 
-import java.util.Map;
 import org.geotoolkit.data.FeatureCollection;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FeatureCollectionWrapper {
+public class ValueCollectionWrapper {
+
 
     private final FeatureCollection featureCollection;
 
-    private final Map<String, String> schemaLocations;
+    private final String valueReference;
 
     private final String gmlVersion;
 
-    private final String wfsVersion;
-
-    public FeatureCollectionWrapper(final FeatureCollection featureCollection, final Map<String, String> schemaLocations, final String gmlVersion, final String wfsVersion) {
+    public ValueCollectionWrapper(final FeatureCollection featureCollection, final String valueReference, final String gmlVersion) {
         this.featureCollection = featureCollection;
-        this.gmlVersion = gmlVersion;
-        this.wfsVersion = wfsVersion;
-        this.schemaLocations = schemaLocations;
+        this.gmlVersion        = gmlVersion;
+        this.valueReference    = valueReference;
+
     }
 
     /**
@@ -47,13 +47,6 @@ public class FeatureCollectionWrapper {
     }
 
     /**
-     * @return the schemaLocations
-     */
-    public Map<String, String> getSchemaLocations() {
-        return schemaLocations;
-    }
-
-    /**
      * @return the gmlVersion
      */
     public String getGmlVersion() {
@@ -61,11 +54,9 @@ public class FeatureCollectionWrapper {
     }
 
     /**
-     * @return the wfsVersion
+     * @return the valueReference
      */
-    public String getWfsVersion() {
-        return wfsVersion;
+    public String getValueReference() {
+        return valueReference;
     }
-
-
 }

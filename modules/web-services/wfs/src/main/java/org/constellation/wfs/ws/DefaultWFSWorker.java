@@ -41,6 +41,7 @@ import org.constellation.util.NameComparator;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.wfs.ws.WFSConstants.*;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
+import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 
 // Geotoolkit dependencies
 import org.constellation.ws.LayerWorker;
@@ -680,23 +681,23 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          *
          * result TODO find an id and a member type
          */
-        final FeatureCollection FeatureCollection;
+        final FeatureCollection featureCollection;
 	if (collections.size() > 1) {
-            FeatureCollection = DataUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
+            featureCollection = DataUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
         } else if (collections.size() == 1) {
-            FeatureCollection = collections.get(0);
+            featureCollection = collections.get(0);
         } else {
-            FeatureCollection = DataUtilities.collection("collection-1", null);
+            featureCollection = DataUtilities.collection("collection-1", null);
         }
         if (request.getResultType() == ResultTypeType.HITS) {
-            return xmlFactory.buildFeatureCollection(currentVersion, "collection-1", FeatureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+            return xmlFactory.buildFeatureCollection(currentVersion, "collection-1", featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
         }
         LOGGER.log(logLevel, "GetFeature treated in {0}ms", (System.currentTimeMillis() - start));
-        return new FeatureCollectionWrapper(FeatureCollection, schemaLocations, gmlVersion, currentVersion);
+        return new FeatureCollectionWrapper(featureCollection, schemaLocations, gmlVersion, currentVersion);
     }
 
     @Override
-    public ValueCollection getPropertyValue(final GetPropertyValue request) throws CstlServiceException {
+    public Object getPropertyValue(final GetPropertyValue request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetPropertyValue request processing\n");
         final long startTime = System.currentTimeMillis();
         isWorking();
@@ -785,23 +786,20 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          *
          * result TODO find an id and a member type
          */
-        final FeatureCollection FeatureCollection;
+        final FeatureCollection featureCollection;
 	if (collections.size() > 1) {
-            FeatureCollection = DataUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
+            featureCollection = DataUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
         } else if (collections.size() == 1) {
-            FeatureCollection = collections.get(0);
+            featureCollection = collections.get(0);
         } else {
-            FeatureCollection = DataUtilities.collection("collection-1", null);
+            featureCollection = DataUtilities.collection("collection-1", null);
         }
 
-        final ValueCollection response;
-        if (request.getResultType() == ResultTypeType.HITS) {
-            response = xmlFactory.buildValueCollection(currentVersion, FeatureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
-        } else {
-            response = xmlFactory.buildValueCollection(currentVersion, FeatureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
-        }
         LOGGER.log(logLevel, "GetPropertyValue request processed in {0} ms", (System.currentTimeMillis() - startTime));
-        return response;
+        if (request.getResultType() == ResultTypeType.HITS) {
+            return xmlFactory.buildValueCollection(currentVersion, featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+        }
+        return new ValueCollectionWrapper(featureCollection, request.getValueReference(), "3.2.1");
     }
 
     private List<SortBy> visitJaxbSortBy(final org.geotoolkit.ogc.xml.SortBy jaxbSortby,final Map<String, String> namespaceMapping, final String version) {

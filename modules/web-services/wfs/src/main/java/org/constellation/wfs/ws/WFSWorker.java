@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2012, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,7 @@ public interface WFSWorker extends Worker {
 
     /**
      * Allows retrieval of features from a web feature service.
-     * 
+     *
      * @param request a request containing typeNames, comparison filter, spatial filter, etc.
      * @return features instances.
      * @throws CstlServiceException
@@ -71,16 +71,16 @@ public interface WFSWorker extends Worker {
      * Allows retrieval of features and elements by ID from a web feature service.
      *
      * @param grbi a getGMLObject request containing IDs.
-     * 
+     *
      * @return A GML representation of a feature instance or element.
      * @throws CstlServiceException
      */
     AbstractGML getGMLObject(final GetGmlObject grbi) throws CstlServiceException;
 
     ListStoredQueriesResponse listStoredQueries(final ListStoredQueries request)  throws CstlServiceException;
-    
+
     DescribeStoredQueriesResponse describeStoredQueries(final DescribeStoredQueries request) throws CstlServiceException;
-    
+
     /**
      * lock request on one or more instances of a feature type for the duration of a transaction
      *
@@ -106,7 +106,7 @@ public interface WFSWorker extends Worker {
      */
     List<FeatureType> getFeatureTypes();
 
-    ValueCollection getPropertyValue(final GetPropertyValue request) throws CstlServiceException;
+    Object getPropertyValue(final GetPropertyValue request) throws CstlServiceException;
 
     CreateStoredQueryResponse createStoredQuery(final CreateStoredQuery request) throws CstlServiceException;
 
