@@ -158,7 +158,7 @@
     </ns9:OperationsMetadata>
     <ns8:FeatureTypeList>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:BasicPolygons</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:BasicPolygons</ns8:Name>
             <ns8:Title>BasicPolygons</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -169,7 +169,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:Bridges</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:Bridges</ns8:Name>
             <ns8:Title>Bridges</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -180,7 +180,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:BuildingCenters</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:BuildingCenters</ns8:Name>
             <ns8:Title>BuildingCenters</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -191,7 +191,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:Buildings</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:Buildings</ns8:Name>
             <ns8:Title>Buildings</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -224,7 +224,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:DividedRoutes</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:DividedRoutes</ns8:Name>
             <ns8:Title>DividedRoutes</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -235,7 +235,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:Forests</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:Forests</ns8:Name>
             <ns8:Title>Forests</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -246,7 +246,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:Lakes</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:Lakes</ns8:Name>
             <ns8:Title>Lakes</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -257,7 +257,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:MapNeatline</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:MapNeatline</ns8:Name>
             <ns8:Title>MapNeatline</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -268,7 +268,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:NamedPlaces</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:NamedPlaces</ns8:Name>
             <ns8:Title>NamedPlaces</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -279,7 +279,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:Ponds</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:Ponds</ns8:Name>
             <ns8:Title>Ponds</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -312,7 +312,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:RoadSegments</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:RoadSegments</ns8:Name>
             <ns8:Title>RoadSegments</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -334,7 +334,7 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2.1">ns11:Streams</ns8:Name>
+            <ns8:Name xmlns:ns11="http://www.opengis.net/gml/3.2">ns11:Streams</ns8:Name>
             <ns8:Title>Streams</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
@@ -376,10 +376,10 @@
         </fes:Scalar_Capabilities>
         <fes:Spatial_Capabilities>
             <fes:GeometryOperands>
-                <fes:GeometryOperand name="ns11:Envelope" xmlns:ns11="http://www.opengis.net/gml/3.2.1"/>
-                <fes:GeometryOperand name="ns11:Point" xmlns:ns11="http://www.opengis.net/gml/3.2.1"/>
-                <fes:GeometryOperand name="ns11:LineString" xmlns:ns11="http://www.opengis.net/gml/3.2.1"/>
-                <fes:GeometryOperand name="ns11:Polygon" xmlns:ns11="http://www.opengis.net/gml/3.2.1"/>
+                <fes:GeometryOperand name="ns11:Envelope" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
+                <fes:GeometryOperand name="ns11:Point" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
+                <fes:GeometryOperand name="ns11:LineString" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
+                <fes:GeometryOperand name="ns11:Polygon" xmlns:ns11="http://www.opengis.net/gml/3.2"/>
             </fes:GeometryOperands>
             <fes:SpatialOperators>
                 <fes:SpatialOperator name="DISJOINT"/>

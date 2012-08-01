@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.opengis.net/gml/3.2.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2.1">
-    <xsd:import schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd" namespace="http://www.opengis.net/gml/3.2.1"/>
+<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.opengis.net/gml/3.2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2">
+    <xsd:import schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd" namespace="http://www.opengis.net/gml/3.2"/>
     <xsd:element name="BasicPolygons" type="gml:BasicPolygonsType" />
     <xsd:complexType name="BasicPolygonsType">
         <xsd:complexContent>

@@ -76,7 +76,7 @@ public final class WFSConstants {
      * The Mime type for describe feature GML 3.1.1
      */
     public final static MediaType GML_3_1_1 = new MediaType("text", "xml; subtype=gml/3.1.1");
-    
+
     public final static MediaType GML_3_2_1 = new MediaType("text", "xml; subtype=gml/3.2.1");
 
     public static final FilterCapabilities FILTER_CAPABILITIES_V110;
@@ -122,14 +122,14 @@ public final class WFSConstants {
         FILTER_CAPABILITIES_V110 = new FilterCapabilities(scalarCapabilities, spatialCapabilties, idCapabilities);
 
     }
-    
+
     public static final org.geotoolkit.ogc.xml.v200.FilterCapabilities FILTER_CAPABILITIES_V200;
     static {
         final List<QName> operandList = new ArrayList<QName>();
-        operandList.add(new QName("http://www.opengis.net/gml/3.2.1", "Envelope"));
-        operandList.add(new QName("http://www.opengis.net/gml/3.2.1", "Point"));
-        operandList.add(new QName("http://www.opengis.net/gml/3.2.1", "LineString"));
-        operandList.add(new QName("http://www.opengis.net/gml/3.2.1", "Polygon"));
+        operandList.add(new QName("http://www.opengis.net/gml/3.2", "Envelope"));
+        operandList.add(new QName("http://www.opengis.net/gml/3.2", "Point"));
+        operandList.add(new QName("http://www.opengis.net/gml/3.2", "LineString"));
+        operandList.add(new QName("http://www.opengis.net/gml/3.2", "Polygon"));
         final org.geotoolkit.ogc.xml.v200.GeometryOperandsType operands = new org.geotoolkit.ogc.xml.v200.GeometryOperandsType(operandList);
         final SpatialOperator[] operatorList = new SpatialOperator[10];
         operatorList[0] = new org.geotoolkit.ogc.xml.v200.SpatialOperatorType("DISJOINT", null);
@@ -213,11 +213,11 @@ public final class WFSConstants {
 
         OPERATIONS_METADATA_V110 = new OperationsMetadata(operations, null, null, null);
     }
-    
+
     public static final org.geotoolkit.ows.xml.v110.OperationsMetadata OPERATIONS_METADATA_V200;
     static {
         final List<org.geotoolkit.ows.xml.v110.DCP> dcps = new ArrayList<org.geotoolkit.ows.xml.v110.DCP>();
-        dcps.add(new org.geotoolkit.ows.xml.v110.DCP(new org.geotoolkit.ows.xml.v110.HTTP(new org.geotoolkit.ows.xml.v110.RequestMethodType("somURL"), 
+        dcps.add(new org.geotoolkit.ows.xml.v110.DCP(new org.geotoolkit.ows.xml.v110.HTTP(new org.geotoolkit.ows.xml.v110.RequestMethodType("somURL"),
                                                                                           new org.geotoolkit.ows.xml.v110.RequestMethodType("someURL"))));
 
         final List<org.geotoolkit.ows.xml.v110.DCP> dcps2 = new ArrayList<org.geotoolkit.ows.xml.v110.DCP>();
