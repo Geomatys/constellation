@@ -104,7 +104,6 @@ public class Layer {
         this.name         = name;
         this.styles       = styles;
         this.filter       = filter;
-        this.alias        = alias;
         this.title        = title;
         this.abstrac      = abstrac;
         this.keywords     = keywords;
@@ -115,6 +114,7 @@ public class Layer {
         this.attribution  = attribution;
         this.opaque       = opaque;
         this.crs          = crs;
+        setAlias(alias);
     }
 
     /**
@@ -154,7 +154,8 @@ public class Layer {
         return alias;
     }
 
-    public void setAlias(final String alias) {
+    public void setAlias(String alias) {
+        if (alias != null) alias =  alias.trim().replaceAll(" ", "_");
         this.alias = alias;
     }
 

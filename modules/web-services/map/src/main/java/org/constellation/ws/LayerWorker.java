@@ -222,8 +222,11 @@ public abstract class LayerWorker extends AbstractWorker {
             //search in alias if any
             for (Map.Entry<Name, Layer> l: layers.entrySet()) {
                 final Layer layer = l.getValue();
-                if (layer.getAlias() != null && layer.getAlias().equals(name.getLocalPart())) {
-                    return l.getKey();
+                if (layer.getAlias() != null && !layer.getAlias().isEmpty()) {
+                    final String alias = layer.getAlias().trim().replaceAll(" ", "_");
+                    if (alias.equals(name.getLocalPart())) {
+                        return l.getKey();
+                    }
                 }
             }
 

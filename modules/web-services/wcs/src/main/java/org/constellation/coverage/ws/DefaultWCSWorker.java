@@ -302,7 +302,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             final String coverageName;
 
             if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
-                coverageName = configLayer.getAlias();
+                coverageName = configLayer.getAlias().trim().replaceAll(" ", "_");
             } else {
 
                 if (fullCoverageName.getNamespaceURI() != null && !fullCoverageName.getNamespaceURI().isEmpty()) {
@@ -492,7 +492,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             final String coverageName;
 
             if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
-                coverageName = configLayer.getAlias();
+                coverageName = configLayer.getAlias().trim().replaceAll(" ", "_");
             } else {
 
                 if (fullCoverageName.getNamespaceURI() != null && !fullCoverageName.getNamespaceURI().isEmpty()) {
@@ -755,7 +755,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 final Name fullLayerName = layer.getName();
                 final String layerName;
                 if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
-                    layerName = configLayer.getAlias();
+                    layerName = configLayer.getAlias().trim().replaceAll(" ", "_");
                 } else {
 
                     if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {

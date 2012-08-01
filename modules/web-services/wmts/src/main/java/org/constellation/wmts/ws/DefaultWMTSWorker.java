@@ -228,7 +228,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     final PyramidSet set = model.getPyramidSet();
                     String name;
                     if (configlayer.getAlias() != null && !configlayer.getAlias().isEmpty()) {
-                        name = configlayer.getAlias();
+                        name = configlayer.getAlias().trim().replaceAll(" ", "_");
                     } else {
                         name = n.getLocalPart();
                     }
