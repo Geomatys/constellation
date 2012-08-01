@@ -581,19 +581,23 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (configLayer.getStyles() != null && !configLayer.getStyles().isEmpty()) {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
-            final DataReference dr = new DataReference(configLayer.getStyles().get(0));
-            Style style = null;
-            try {
-                style = DataReferenceConverter.convertDataReferenceToStyle(dr);
-            } catch (NonconvertibleObjectException e) {
-                // The given style reference was invalid, we can't get a style from that
-                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
+            for (String styl : configLayer.getStyles()) {
+                final DataReference dr = new DataReference(styl);
+                Style style = null;
+                try {
+                    style = DataReferenceConverter.convertDataReferenceToStyle(dr);
+                } catch (NonconvertibleObjectException e) {
+                    // The given style reference was invalid, we can't get a style from that
+                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                }
+                if (style != null) {
+                    final MutableStyle ms = StyleUtilities.copy(style);
+                    final org.geotoolkit.wms.xml.v111.Style wmsStyle = convertMutableStyleToWmsStyle111(ms, layerDetails, legendUrlPng, legendUrlGif);
+                    styles.add(wmsStyle);
+                }
             }
-            if (style != null) {
-                final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
-                final MutableStyle ms = StyleUtilities.copy(style);
-                final org.geotoolkit.wms.xml.v111.Style wmsStyle = convertMutableStyleToWmsStyle111(ms, layerDetails, legendUrlPng, legendUrlGif);
-                styles.add(wmsStyle);
+            if (!styles.isEmpty()) {
                 outputLayer111.setStyle(styles);
             }
         }
@@ -702,19 +706,23 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if (configLayer.getStyles() != null && !configLayer.getStyles().isEmpty()) {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
-            final DataReference dr = new DataReference(configLayer.getStyles().get(0));
-            Style style = null;
-            try {
-                style = DataReferenceConverter.convertDataReferenceToStyle(dr);
-            } catch (NonconvertibleObjectException e) {
-                // The given style reference was invalid, we can't get a style from that
-                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
+            for (String styl : configLayer.getStyles()) {
+                final DataReference dr = new DataReference(styl);
+                Style style = null;
+                try {
+                    style = DataReferenceConverter.convertDataReferenceToStyle(dr);
+                } catch (NonconvertibleObjectException e) {
+                    // The given style reference was invalid, we can't get a style from that
+                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                }
+                if (style != null) {
+                    final MutableStyle ms = StyleUtilities.copy(style);
+                    final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
+                    styles.add(wmsStyle);
+                }
             }
-            if (style != null) {
-                final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
-                final MutableStyle ms = StyleUtilities.copy(style);
-                final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
-                styles.add(wmsStyle);
+            if (!styles.isEmpty()) {
                 outputLayer130.setStyle(styles);
             }
         }
