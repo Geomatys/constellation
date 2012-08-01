@@ -44,7 +44,7 @@ public class GetConfigMapService extends AbstractProcess {
      * Get the configuration of an existing instance for a specified service and instance name.
      *
      * @throws ProcessException in cases :
-     * - if the service name is different from WMS, WMTS of WFS (no matter of case).
+     * - if the service name is different from WMS, WMTS, WCS of WFS (no matter of case).
      * - if instance name doesn't exist.
      * - if error during file creation or unmarshalling phase.
      */
@@ -55,10 +55,11 @@ public class GetConfigMapService extends AbstractProcess {
         final String identifier = value(IDENTIFIER, inputParameters);
         File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
 
-        if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) || "WFS".equalsIgnoreCase(serviceName))) {
+        if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName)
+                || "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName))) {
             serviceName = serviceName.toUpperCase();
         } else {
-            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\").", this, null);
+            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\").", this, null);
         }
 
         if (identifier == null || identifier.isEmpty()) {
@@ -72,7 +73,7 @@ public class GetConfigMapService extends AbstractProcess {
 
             if (configDirectory != null && configDirectory.isDirectory()) {
 
-                //get service directory ("WMS", "WMTS", "WFS")
+                //get service directory ("WMS", "WMTS", "WFS", "WCS")
                 final File serviceDir = new File(configDirectory, serviceName);
                 if (serviceDir.exists() && serviceDir.isDirectory()) {
 

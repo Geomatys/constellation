@@ -30,7 +30,7 @@ import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.process.service.CreateMapServiceDescriptor.*;
 
 /**
- * Process that create a new instance configuration from the service name (WMS, WMTS or WFS) for a specified instance name.
+ * Process that create a new instance configuration from the service name (WMS, WMTS, WCS or WFS) for a specified instance name.
  * If the instance directory is created but no configuration file exist, the process will create one.
  * Execution will throw ProcessExeption if the service name is different from WMS, WMTS of WFS (no matter of case) or if
  * a configuration file already exist fo this instance name.
@@ -45,7 +45,7 @@ public class CreateMapService extends AbstractProcess {
     /**
      * Create a new instance and configuration for a specified service and instance name.
      * @throws ProcessException in cases :
-     * - if the service name is different from WMS, WMTS of WFS (no matter of case)
+     * - if the service name is different from WMS, WMTS, WCS of WFS (no matter of case)
      * - if a configuration file already exist for this instance name.
      * - if error during file creation or marshalling phase.
      */
@@ -57,10 +57,11 @@ public class CreateMapService extends AbstractProcess {
         LayerContext configuration = value(CONFIGURATION, inputParameters);
         File instanceDirectory = value(INSTANCE_DIRECTORY, inputParameters);
 
-        if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName) || "WFS".equalsIgnoreCase(serviceName))) {
+        if (serviceName != null && !serviceName.isEmpty() && ("WMS".equalsIgnoreCase(serviceName) || "WMTS".equalsIgnoreCase(serviceName)
+                || "WFS".equalsIgnoreCase(serviceName) || "WCS".equalsIgnoreCase(serviceName))) {
             serviceName = serviceName.toUpperCase();
         } else {
-            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\").", this, null);
+            throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\").", this, null);
         }
 
         if (identifier == null || identifier.isEmpty()) {
@@ -78,7 +79,7 @@ public class CreateMapService extends AbstractProcess {
 
             if (configDirectory != null && configDirectory.isDirectory()) {
 
-                //get service directory ("WMS", "WMTS", "WFS")
+                //get service directory ("WMS", "WMTS", "WFS", "WCS")
                 final File serviceDir = new File(configDirectory, serviceName);
                 if (serviceDir.exists() && serviceDir.isDirectory()) {
 

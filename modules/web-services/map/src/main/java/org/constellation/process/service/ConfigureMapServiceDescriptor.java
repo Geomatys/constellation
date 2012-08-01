@@ -40,11 +40,11 @@ public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
 
 
     public static final String NAME = "map_service.configure";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Update configuration of an existing map service (WMS, WMTS, WFS) in constellation.");
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Update configuration of an existing map service (WMS, WMTS, WFS, WCS) in constellation.");
 
 
     public static final String SERVICE_TYPE_NAME = "service_type";
-    private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS.";
+    private static final String SERVICE_TYPE_REMARKS = "The type of the service WMS, WFS, WMTS, WCS.";
     private static final Map<String, Object> SERVICE_TYPE_PROPERTIES;
     private static final String[] SERVICE_TYPE_VALID_VALUES;
     static {
@@ -52,7 +52,7 @@ public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
         SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.NAME_KEY, SERVICE_TYPE_NAME);
         SERVICE_TYPE_PROPERTIES.put(IdentifiedObject.REMARKS_KEY, SERVICE_TYPE_REMARKS);
 
-        SERVICE_TYPE_VALID_VALUES = new String [] {"WMS", "WFS", "WMTS"};
+        SERVICE_TYPE_VALID_VALUES = new String [] {"WMS", "WFS", "WMTS", "WCS"};
     }
     public static final ParameterDescriptor<String> SERVICE_TYPE =
             new DefaultParameterDescriptor(SERVICE_TYPE_PROPERTIES, String.class, SERVICE_TYPE_VALID_VALUES, null, null, null, null, true);
