@@ -84,7 +84,7 @@ import org.opengis.referencing.operation.TransformException;
  * @since 0.3
  */
 public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
-    
+
     /**
      * A list of supported MIME type
      */
@@ -141,13 +141,13 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
-        
+
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(requestCapabilities.getUpdateSequence());
         if (returnUS) {
             return new Capabilities("1.0.0", getCurrentUpdateSequence());
         }
-        
+
         final AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 ) {
             boolean found = false;
@@ -201,17 +201,18 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         }
 
         if (sections.containsSection("Contents") || sections.containsSection("All")) {
-            
+
             // Build the list of layers
             final List<LayerType> outputLayers = new ArrayList<LayerType>();
             // and the list of matrix set
             final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
-            
+
             final Map<Name,Layer> declaredLayers = getLayers();
-            
+
             for(final Name n : declaredLayers.keySet()){
                 final LayerDetails details = LayerProviderProxy.getInstance().get(n);
-                final Object origin = details.getOrigin();                
+                final Layer configlayer = declaredLayers.get(n);
+                final Object origin = details.getOrigin();
                 if(!(origin instanceof CoverageReference)){
                     //WMTS only handle CoverageRefenrece object
                     continue;
@@ -221,46 +222,51 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     //WMTS only handle PyramidalModel
                     continue;
                 }
-                
-                try{                    
+
+                try{
                     final PyramidalModel model = (PyramidalModel) ref;
                     final PyramidSet set = model.getPyramidSet();
-                    final String name = n.getLocalPart();
-                    
+                    String name;
+                    if (configlayer.getAlias() != null && !configlayer.getAlias().isEmpty()) {
+                        name = configlayer.getAlias();
+                    } else {
+                        name = n.getLocalPart();
+                    }
+
                     Envelope env = set.getEnvelope();
-                    
+
                     env = CRS.transform(env, DefaultGeographicCRS.WGS84);
-                    
+
                     final BoundingBoxType bbox = new WGS84BoundingBoxType(
                             env.getMinimum(0),
                             env.getMinimum(1),
                             env.getMaximum(0),
                             env.getMaximum(1));
-                    
+
                     final List<Dimension> dims = new ArrayList<Dimension>();
-                    
+
                     final LayerType outputLayer = new LayerType(
-                            name, 
-                            "remarks", 
-                            bbox, 
-                            Collections.EMPTY_LIST, 
+                            name,
+                            "remarks",
+                            bbox,
+                            Collections.EMPTY_LIST,
                             dims);
 
                     outputLayer.setTitle(name);
                     outputLayer.setAbstract(name);
-                    
+
                     for(Pyramid pr : set.getPyramids()){
                         final TileMatrixSet tms = new TileMatrixSet();
                         tms.setIdentifier(new CodeType(pr.getId()));
                         tms.setSupportedCRS(IdentifiedObjects.getIdentifier(pr.getCoordinateReferenceSystem()));
-                        
+
                         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
                         final double[] scales = pr.getScales();
                         for(int i=0; i<scales.length; i++){
                             final GridMosaic mosaic = pr.getMosaic(i);
-                            double scale = mosaic.getScale();               
+                            double scale = mosaic.getScale();
                             //convert scale in the strange WMTS scale denominator
-                            scale = WMTSUtilities.toScaleDenominator(pr.getCoordinateReferenceSystem(), scale);       
+                            scale = WMTSUtilities.toScaleDenominator(pr.getCoordinateReferenceSystem(), scale);
                             final TileMatrix matrix = new TileMatrix();
                             matrix.setIdentifier(new CodeType(mosaic.getId()));
                             matrix.setScaleDenominator(scale);
@@ -273,13 +279,13 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                             tm.add(matrix);
                         }
                         tms.setTileMatrix(tm);
-                                                
+
                         final TileMatrixSetLink tmsl = new TileMatrixSetLink();
                         tmsl.setTileMatrixSet(pr.getId());
                         outputLayer.getTileMatrixSetLink().add(tmsl);
                         tileSets.add(tms);
                     }
-                    
+
                     outputLayers.add(outputLayer);
                 } catch(DataStoreException ex) {
                     LOGGER.log(Level.WARNING, ex.getMessage(),ex);
@@ -287,15 +293,15 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     LOGGER.log(Level.WARNING, ex.getMessage(),ex);
                 }
             }
-            
+
             cont = new ContentsType();
             cont.setLayers(outputLayers);
             cont.setTileMatrixSet(tileSets);
         }
-        
+
         if (sections.containsSection("Themes") || sections.containsSection("All")) {
             // TODO
-            
+
             themes = new ArrayList<Themes>();
         }
 
@@ -304,7 +310,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         LOGGER.log(logLevel, "getCapabilities processed in {0}ms.\n", (System.currentTimeMillis() - start));
         return c;
 
-        
+
     }
 
     /**
@@ -312,7 +318,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      */
     @Override
     public String getFeatureInfo(GetFeatureInfo request) throws CstlServiceException {
-       
+
         //       -- get the List of layer references
         final GetTile getTile = request.getGetTile();
 
@@ -430,7 +436,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      */
     @Override
     public TileReference getTile(GetTile request) throws CstlServiceException {
-        
+
         //1 LAYER NOT USED FOR NOW
         final Name layerName = Util.parseLayerName(request.getLayer());
 
@@ -465,22 +471,22 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final int rowIndex            = request.getTileRow();
         final String matrixSetName    = request.getTileMatrixSet();
         final String level            = request.getTileMatrix();
-        
-        
+
+
         // 5. we verify the parameters
         if (columnIndex < 0 || rowIndex < 0) {
             throw new CstlServiceException("TileCol and TileRow must be > 0", INVALID_PARAMETER_VALUE);
         }
-        
-        
+
+
         try{
             final LayerDetails details = LayerProviderProxy.getInstance().get(layerName);
-            
+
             if(details == null){
                 throw new CstlServiceException("No layer for name : " + layerName , INVALID_PARAMETER_VALUE, "layerName");
             }
-            
-            final Object origin = details.getOrigin();                
+
+            final Object origin = details.getOrigin();
             if(!(origin instanceof CoverageReference)){
                 //WMTS only handle CoverageRefenrece object
                 throw new CstlServiceException("Unvalid layer :" + layerName + " , layer is not a pyramid model" + layerName, INVALID_PARAMETER_VALUE, "layerName");
@@ -490,8 +496,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 //WMTS only handle PyramidalModel
                 throw new CstlServiceException("Unvalid layer :" + layerName + " , layer is not a pyramid model" + layerName, INVALID_PARAMETER_VALUE, "layerName");
             }
-            
-            
+
+
             final PyramidalModel model = (PyramidalModel) ref;
             final PyramidSet set = model.getPyramidSet();
             Pyramid pyramid = null;
@@ -515,24 +521,24 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             if (mosaic == null) {
                 throw new CstlServiceException("Undefined matrix:" + level + " for matrixSet:" + matrixSetName, INVALID_PARAMETER_VALUE, "tilematrix");
             }
-            
+
             if (columnIndex >= mosaic.getGridSize().width) {
                 throw new CstlServiceException("TileCol out of band" + columnIndex + " > " +  mosaic.getGridSize().width, INVALID_PARAMETER_VALUE, "tilecol");
             }
             if (rowIndex >= mosaic.getGridSize().height) {
                 throw new CstlServiceException("TileRow out of band" + rowIndex + " > " +  mosaic.getGridSize().height, INVALID_PARAMETER_VALUE, "tilerow");
             }
-            
+
             final Map hints = new HashMap();
             final TileReference tile = mosaic.getTile(columnIndex, rowIndex, hints);
             return tile;
-                
+
         } catch(DataStoreException ex) {
             throw new CstlServiceException("Unexpected error : " + ex.getMessage(), ex , NO_APPLICABLE_CODE);
         }
-        
+
     }
-    
+
     private static MutableStyle getStyle(final String styleName) throws CstlServiceException {
         final MutableStyle style;
         if (styleName != null && !styleName.isEmpty()) {

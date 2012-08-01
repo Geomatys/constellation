@@ -298,12 +298,20 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
             final Name fullCoverageName = coverageRef.getName();
+            final Layer configLayer = getLayers().get(fullCoverageName);
             final String coverageName;
-            if (fullCoverageName.getNamespaceURI() != null) {
-                coverageName = fullCoverageName.getNamespaceURI() + ':' + fullCoverageName.getLocalPart();
+
+            if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
+                coverageName = configLayer.getAlias();
             } else {
-                coverageName = fullCoverageName.getLocalPart();
+
+                if (fullCoverageName.getNamespaceURI() != null && !fullCoverageName.getNamespaceURI().isEmpty()) {
+                    coverageName = fullCoverageName.getNamespaceURI() + ':' + fullCoverageName.getLocalPart();
+                } else {
+                    coverageName = fullCoverageName.getLocalPart();
+                }
             }
+
             if (!coverageRef.isQueryable(ServiceDef.Query.WCS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
                         coverageName + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
@@ -480,11 +488,18 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
             final Name fullCoverageName = coverageRef.getName();
+            final Layer configLayer = getLayers().get(fullCoverageName);
             final String coverageName;
-            if (fullCoverageName.getNamespaceURI() != null) {
-                coverageName = fullCoverageName.getNamespaceURI() + ':' + fullCoverageName.getLocalPart();
+
+            if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
+                coverageName = configLayer.getAlias();
             } else {
-                coverageName = fullCoverageName.getLocalPart();
+
+                if (fullCoverageName.getNamespaceURI() != null && !fullCoverageName.getNamespaceURI().isEmpty()) {
+                    coverageName = fullCoverageName.getNamespaceURI() + ':' + fullCoverageName.getLocalPart();
+                } else {
+                    coverageName = fullCoverageName.getLocalPart();
+                }
             }
             if (!coverageRef.isQueryable(ServiceDef.Query.WCS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
@@ -739,10 +754,15 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 final CoverageOfferingBriefType co = new CoverageOfferingBriefType();
                 final Name fullLayerName = layer.getName();
                 final String layerName;
-                if (fullLayerName.getNamespaceURI() != null) {
-                    layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
+                if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
+                    layerName = configLayer.getAlias();
                 } else {
-                    layerName = fullLayerName.getLocalPart();
+
+                    if (fullLayerName.getNamespaceURI() != null && !fullLayerName.getNamespaceURI().isEmpty()) {
+                        layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
+                    } else {
+                        layerName = fullLayerName.getLocalPart();
+                    }
                 }
 
                 co.addRest(wcs100Factory.createName(layerName));
