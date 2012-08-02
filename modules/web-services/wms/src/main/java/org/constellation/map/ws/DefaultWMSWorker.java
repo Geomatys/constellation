@@ -130,6 +130,11 @@ import org.opengis.sld.StyledLayerDescriptor;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
 import org.constellation.util.DataReference;
+import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapItem;
+import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.StyleUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wms.xml.v111.Request;
@@ -1095,7 +1100,36 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         try {
-            final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
+            final MapContext context = MapBuilder.createContext();
+            final Map<Name,Layer> layersContext = getLayers();
+
+            for (int i = 0; i < layerRefs.size(); i++) {
+                final LayerDetails layerRef = layerRefs.get(i);
+                final MutableStyle style = styles.get(i);
+
+                assert (null != layerRef);
+                //style can be null
+
+                final MapItem mapLayer = layerRef.getMapLayer(style, params);
+                if (mapLayer == null) {
+                    throw new PortrayalException("Could not create a mapLayer for layer: " + layerRef.getName());
+                }
+                if(mapLayer instanceof MapLayer){
+                    ((MapLayer)mapLayer).setSelectable(true);
+                }
+                if (mapLayer instanceof FeatureMapLayer) {
+                    final FeatureMapLayer fml = (FeatureMapLayer)mapLayer;
+                    if (fml != null) {
+                        final Layer layerContext = layersContext.get(layerRef.getName());
+                        if (layerContext.getFilter() != null) {
+                            fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), layerContext.getFilter()));
+                        }
+                    }
+                }
+                mapLayer.setVisible(true);
+                context.items().add(mapLayer);
+            }
+
             sdef.setContext(context);
         } catch (PortrayalException ex) {
             if (errorInImage) {

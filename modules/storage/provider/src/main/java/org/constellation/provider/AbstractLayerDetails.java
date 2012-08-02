@@ -24,13 +24,12 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.ServiceDef.Query;
 
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.DefaultLegendService;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
-import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.storage.DataStoreException;
@@ -52,7 +51,7 @@ import org.opengis.style.Style;
  */
 public abstract class AbstractLayerDetails implements LayerDetails{
 
-    protected static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
+    protected static final Logger LOGGER = Logging.getLogger(AbstractLayerDetails.class);
 
     /**
      * Favorites styles associated with this layer.
@@ -251,5 +250,12 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         return null;
     }
 
+    /**
+     * Always returns {@code true}.
+     */
+    @Override
+    public boolean isQueryable(final Query query) {
+        return true;
+    }
 
 }
