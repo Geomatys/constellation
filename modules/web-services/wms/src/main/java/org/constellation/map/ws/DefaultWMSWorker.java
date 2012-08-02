@@ -122,6 +122,7 @@ import org.geotoolkit.wms.xml.v130.Identifier;
 import org.geotoolkit.wms.xml.v130.KeywordList;
 import org.geotoolkit.wms.xml.v130.LogoURL;
 import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
@@ -1122,7 +1123,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     if (fml != null) {
                         final Layer layerContext = layersContext.get(layerRef.getName());
                         if (layerContext.getFilter() != null) {
-                            fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), layerContext.getFilter()));
+                            final XMLUtilities xmlUtil = new XMLUtilities();
+                            Filter filterGt = Filter.INCLUDE;
+                            try {
+                                filterGt = xmlUtil.getTransformer110().visitFilter(layerContext.getFilter());
+                            } catch (FactoryException e) {
+                                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                            }
+
+                            fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filterGt));
                         }
                     }
                 }
