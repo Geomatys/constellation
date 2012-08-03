@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.Collections;
-import java.util.StringTokenizer;
 import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -122,7 +121,7 @@ public final class ProviderParameters {
         return configDescriptor;
     }
 
-    public static ParameterValueGroup read(final Object input, 
+    public static ParameterValueGroup read(final Object input,
             final ParameterDescriptorGroup desc) throws IOException, XMLStreamException{
         final ParameterValueReader reader = new ParameterValueReader(desc);
         reader.setInput(input);
@@ -187,20 +186,6 @@ public final class ProviderParameters {
 
     public static boolean containLayer(final ParameterValueGroup source, final String name){
         return getLayer(source, name) != null;
-    }
-
-    public static List<String> getLayerStyles(final ParameterValueGroup layer){
-        final String strStyles = value(LAYER_STYLE_DESCRIPTOR, layer);
-        final List<String> styles = new ArrayList<String>();
-
-        if(strStyles != null && !strStyles.trim().isEmpty()){
-            final StringTokenizer token = new StringTokenizer(strStyles.trim(),";",false);
-            while(token.hasMoreTokens()){
-                styles.add(token.nextToken());
-            }
-        }
-
-        return styles;
     }
 
     public static ParameterValueGroup getSourceConfiguration(

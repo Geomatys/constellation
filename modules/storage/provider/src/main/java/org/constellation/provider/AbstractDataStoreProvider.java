@@ -19,7 +19,6 @@ package org.constellation.provider;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -102,9 +101,8 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
             return new DefaultDataStoreLayerDetails(goodKey, store, null, null, null, null, null);
 
         } else {
-            final List<String> styles = getLayerStyles(layer);
             return new DefaultDataStoreLayerDetails(
-                    goodKey, store, styles,
+                    goodKey, store, null,
                     value(LAYER_DATE_START_FIELD_DESCRIPTOR, layer),
                     value(LAYER_DATE_END_FIELD_DESCRIPTOR, layer),
                     value(LAYER_ELEVATION_START_FIELD_DESCRIPTOR, layer),

@@ -19,10 +19,8 @@ package org.constellation.provider.shapefile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -122,8 +120,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
                 return new DefaultDataStoreLayerDetails(key, store, null, null, null, null, null);
 
             } else {
-                final List<String> styles = getLayerStyles(layer);
-                return new DefaultDataStoreLayerDetails(key, store, styles,
+                return new DefaultDataStoreLayerDetails(key, store, null,
                         value(LAYER_DATE_START_FIELD_DESCRIPTOR, layer),
                         value(LAYER_DATE_END_FIELD_DESCRIPTOR, layer),
                         value(LAYER_ELEVATION_START_FIELD_DESCRIPTOR, layer),

@@ -153,11 +153,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
             final ParameterValueGroup layer = getLayer(getSource(), name);
             final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
             final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
-            if (layer == null) {
-                return new GridCoverageReaderLayerDetails(reader,null,em,key);
-            } else {
-                return new GridCoverageReaderLayerDetails(reader,getLayerStyles(layer),em,key);
-            }
+            return new GridCoverageReaderLayerDetails(reader,null,em,key);
         }
 
         return null;
@@ -284,7 +280,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                 return MapBuilder.createElevationModel(pgld.getReader());
             }
         }
-        
+
         return null;
     }
 

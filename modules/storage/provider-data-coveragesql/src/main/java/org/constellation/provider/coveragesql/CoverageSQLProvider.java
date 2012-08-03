@@ -71,7 +71,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         if(database != null){
             return;
         }
-        
+
         final ParameterValueGroup params = getSourceConfiguration();
         database = new CoverageDatabase(params);
     }
@@ -113,12 +113,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
             final ParameterValueGroup layer = getLayer(getSource(), name);
             final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
             final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
-            if (layer == null) {
-                return new CoverageSQLLayerDetails(reader,null,em,key);
-
-            } else {
-                return new CoverageSQLLayerDetails(reader,getLayerStyles(layer),em,key);
-            }
+            return new CoverageSQLLayerDetails(reader,null,em,key);
         }
 
         return null;
@@ -214,7 +209,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
                 return MapBuilder.createElevationModel(pgld.getReader());
             }
         }
-        
+
         return null;
     }
 

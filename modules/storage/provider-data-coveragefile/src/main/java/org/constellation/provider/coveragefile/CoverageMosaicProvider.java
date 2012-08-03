@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -35,13 +34,11 @@ import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.image.io.mosaic.TileManager;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import static org.constellation.provider.coveragefile.CoverageMosaicProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
@@ -114,13 +111,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             final ParameterValueGroup layer = getLayer(getSource(), name);
             final String elemodel = (layer==null)?null:value(LAYER_ELEVATION_MODEL_DESCRIPTOR, layer);
             final Name em = (layer == null || elemodel == null) ? null : DefaultName.valueOf(elemodel);
-            if (layer == null) {
-                return new GridCoverageReaderLayerDetails(reader,null,em, key);
-
-            } else {
-                List<String> styles = getLayerStyles(layer);
-                return new GridCoverageReaderLayerDetails(reader,styles,em,key);
-            }
+            return new GridCoverageReaderLayerDetails(reader,null,em, key);
         }
 
         return null;
@@ -182,7 +173,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             }catch(CoverageStoreException ex){
                 Logging.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
             }
-            
+
         }
     }
 
@@ -214,7 +205,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
                 return MapBuilder.createElevationModel(pgld.getReader());
             }
         }
-        
+
         return null;
     }
 

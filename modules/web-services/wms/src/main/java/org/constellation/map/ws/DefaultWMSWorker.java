@@ -691,7 +691,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_GIF, or,
                 dimension.width, dimension.height);
 
-        final String styleName = ms.getName();
+        String styleName = ms.getName();
+        if (!styleName.isEmpty() && styleName.startsWith("${")) {
+            final DataReference dataRef = new DataReference(styleName);
+            styleName = dataRef.getLayerId().getLocalPart();
+        }
         return new org.geotoolkit.wms.xml.v111.Style(
                 styleName, styleName, null, null, null, legendURL1, legendURL2);
     }
