@@ -46,7 +46,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
     public synchronized void reload() {
         super.reload();
         dispose();
-                
+
         //pameter is a choice of different types
         //extract the first one
         ParameterValueGroup param = getSource();
@@ -58,7 +58,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
                 break;
             }
         }
-        
+
         if(factoryconfig == null){
             getLogger().log(Level.WARNING, "No configuration for server store source.");
             names = Collections.EMPTY_SET;
@@ -70,7 +70,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
             if(server == null){
                 throw new DataStoreException("Could not create server store for parameters : "+factoryconfig);
             }
-            
+
             if(server instanceof DataStore){
                 names = ((DataStore)server).getNames();
             }else if(server instanceof CoverageStore){
@@ -78,12 +78,12 @@ public class ServerStoreProvider extends AbstractLayerProvider{
             }else{
                 names = Collections.EMPTY_SET;
             }
-            
+
         } catch (DataStoreException ex) {
             names = Collections.EMPTY_SET;
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
-        
+
     }
 
     @Override
@@ -94,7 +94,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
             names = null;
         }
     }
-        
+
     @Override
     public Set<Name> getKeys() {
         if(names == null){
@@ -102,14 +102,14 @@ public class ServerStoreProvider extends AbstractLayerProvider{
         }
         return names;
     }
-    
+
     @Override
     public LayerDetails get(Name key) {
-        key = fullyQualified(key);        
+        key = fullyQualified(key);
         if(!contains(key)){
             return null;
         }
-        
+
         if(server instanceof DataStore){
             final DataStore store = (DataStore) server;
             return new DefaultDataStoreLayerDetails(key, store, null);
@@ -121,7 +121,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
                 getLogger().log(Level.WARNING, ex.getMessage(), ex);
             }
         }
-        
+
         return null;
     }
 

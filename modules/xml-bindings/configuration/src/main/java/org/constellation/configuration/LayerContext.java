@@ -41,7 +41,7 @@ public class LayerContext {
     private String security;
 
     private Languages supportedLanguages;
-    
+
     private final Map<String, String> customParameters = new HashMap<String, String>();
 
     public LayerContext() {
@@ -118,14 +118,14 @@ public class LayerContext {
     public void setSupportedLanguages(Languages supportedLanguages) {
         this.supportedLanguages = supportedLanguages;
     }
-    
+
     /**
      * @return the customParameters
      */
     public Map<String, String> getCustomParameters() {
         return customParameters;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();

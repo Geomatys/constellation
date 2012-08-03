@@ -47,7 +47,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
     public synchronized void reload() {
         super.reload();
         dispose();
-                
+
         //pameter is a choice of different types
         //extract the first one
         ParameterValueGroup param = getSource();
@@ -59,7 +59,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
                 break;
             }
         }
-        
+
         if(factoryconfig == null){
             getLogger().log(Level.WARNING, "No configuration for coverage store source.");
             names = Collections.EMPTY_SET;
@@ -76,7 +76,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
             names = Collections.EMPTY_SET;
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
         }
-        
+
     }
 
     @Override
@@ -88,7 +88,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
             names = null;
         }
     }
-        
+
     @Override
     public Set<Name> getKeys() {
         if(names == null){
@@ -96,10 +96,10 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         }
         return names;
     }
-    
+
     @Override
     public LayerDetails get(Name key) {
-        key = fullyQualified(key);        
+        key = fullyQualified(key);
         if(!contains(key)){
             return null;
         }

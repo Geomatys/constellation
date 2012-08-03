@@ -14,9 +14,13 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.geotoolkit.ogc.xml.v110.BBOXType;
+import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.opengis.filter.FilterVisitor;
 
 /**
  *
@@ -304,6 +308,73 @@ public class ConfigurationXmlBindingTest {
         result =  removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
+        sources = new ArrayList<Source>();
+        include = new ArrayList<Layer>();
+        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"));
+        include.add(l1);
+        s1 = new Source("source1", false, include, null);
+        sources.add(s1);
+        context = new LayerContext(new Layers(sources));
+        sw = new StringWriter();
+        marshaller.marshal(context, sw);
+
+        expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext >" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source load_all=\"false\" id=\"source1\">" + '\n'
+                + "            <ns2:include>" + '\n'
+                + "                <ns2:Layer name=\"layer1\">" + '\n'
+                + "                    <ns2:Style>${providerStyleType|sldProviderId|styleName}</ns2:Style>" + '\n'
+                + "                </ns2:Layer>" + '\n'
+                + "            </ns2:include>" + '\n'
+                + "        </ns2:Source>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        result =  removeXmlns(sw.toString());
+        assertEquals(expresult, result);
+
+        sources = new ArrayList<Source>();
+        include = new ArrayList<Layer>();
+        final FilterType filter = new FilterType();
+
+        final BBOXType bbox = new BBOXType("property", -180, -90, 180, 90, "CRS:84");
+        filter.setSpatialOps(bbox);
+        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"),
+                       filter, null, null, null, null, null, null, null, null, null, null, null);
+        include.add(l1);
+        s1 = new Source("source1", false, include, null);
+        sources.add(s1);
+        context = new LayerContext(new Layers(sources));
+        sw = new StringWriter();
+        marshaller.marshal(context, sw);
+
+        expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext >" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source load_all=\"false\" id=\"source1\">" + '\n'
+                + "            <ns2:include>" + '\n'
+                + "                <ns2:Layer name=\"layer1\">" + '\n'
+                + "                    <ns2:Style>${providerStyleType|sldProviderId|styleName}</ns2:Style>" + '\n'
+                + "                    <ns2:Filter>" + '\n'
+                + "                        <ogc:BBOX>"+ '\n'
+                + "                            <ogc:PropertyName>property</ogc:PropertyName>"+ '\n'
+                + "                            <gml:Envelope srsName=\"CRS:84\">" + '\n'
+                + "                                <gml:lowerCorner>-180.0 -90.0</gml:lowerCorner>" + '\n'
+                + "                                <gml:upperCorner>180.0 90.0</gml:upperCorner>" + '\n'
+                + "                            </gml:Envelope>" + '\n'
+                + "                        </ogc:BBOX>" + '\n'
+                + "                    </ns2:Filter>"+ '\n'
+                + "                </ns2:Layer>" + '\n'
+                + "            </ns2:include>" + '\n'
+                + "        </ns2:Source>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        result = removeXmlns(sw.toString());
+        assertEquals(expresult, result);
     }
 
     /**
@@ -625,6 +696,90 @@ public class ConfigurationXmlBindingTest {
         expresult.getCustomParameters().put("transactionSecurized", "false");
         assertEquals(expresult.getLayers(), result.getLayers());
         assertEquals(expresult, result);
+
+        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source load_all=\"false\" id=\"source1\">" + '\n'
+                + "            <ns2:include>" + '\n'
+                + "                <ns2:Layer name=\"layer1\">" + '\n'
+                + "                    <ns2:Style>${providerStyleType|sldProviderId|styleName}</ns2:Style>" + '\n'
+                + "                </ns2:Layer>" + '\n'
+                + "            </ns2:include>" + '\n'
+                + "        </ns2:Source>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        sources = new ArrayList<Source>();
+        include = new ArrayList<Layer>();
+        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"));
+        include.add(l1);
+        s1 = new Source("source1", false, include, null);
+        sources.add(s1);
+        expresult = new LayerContext(new Layers(sources));
+
+        result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
+
+        assertEquals(expresult, result);
+
+        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source load_all=\"false\" id=\"source1\">" + '\n'
+                + "            <ns2:include>" + '\n'
+                + "                <ns2:Layer name=\"layer1\">" + '\n'
+                + "                    <ns2:Style>${providerStyleType|sldProviderId|styleName}</ns2:Style>" + '\n'
+                + "                    <ns2:Filter>" + '\n'
+                + "                        <ogc:BBOX>"+ '\n'
+                + "                            <ogc:PropertyName>property</ogc:PropertyName>"+ '\n'
+                + "                            <gml:Envelope srsName=\"CRS:84\">" + '\n'
+                + "                                <gml:lowerCorner>-180.0 -90.0</gml:lowerCorner>" + '\n'
+                + "                                <gml:upperCorner>180.0 90.0</gml:upperCorner>" + '\n'
+                + "                            </gml:Envelope>" + '\n'
+                + "                        </ogc:BBOX>" + '\n'
+                + "                    </ns2:Filter>"+ '\n'
+                + "                </ns2:Layer>" + '\n'
+                + "            </ns2:include>" + '\n'
+                + "        </ns2:Source>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        sources = new ArrayList<Source>();
+        include = new ArrayList<Layer>();
+        final FilterType filter = new FilterType();
+
+        final BBOXType bbox = new BBOXType("property", -180, -90, 180, 90, "CRS:84");
+        filter.setSpatialOps(bbox);
+        l1 = new Layer(new QName("layer1"), Collections.singletonList("${providerStyleType|sldProviderId|styleName}"),
+                       filter, null, null, null, null, null, null, null, null, null, null, null);
+        include.add(l1);
+        s1 = new Source("source1", false, include, null);
+        sources.add(s1);
+
+        expresult = new LayerContext(new Layers(sources));
+
+        result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
+        assertEquals(expresult.getMainLayer(), result.getMainLayer());
+        assertEquals(expresult.getSecurity(), result.getSecurity());
+        assertEquals(expresult.getCustomParameters(), result.getCustomParameters());
+        assertEquals(expresult.getLayers().size(), result.getLayers().size());
+        assertEquals(expresult.getLayers().get(0).getId(), result.getLayers().get(0).getId());
+        assertEquals(expresult.getLayers().get(0).getExclude(), result.getLayers().get(0).getExclude());
+        assertEquals(expresult.getLayers().get(0).getLoadAll(), result.getLayers().get(0).getLoadAll());
+        assertEquals(expresult.getLayers().get(0).getInclude().get(0).getStyles(), result.getLayers().get(0).getInclude().get(0).getStyles());
+
+        assertEquals(expresult.getLayers().get(0).getInclude().get(0).getFilter(), result.getLayers().get(0).getInclude().get(0).getFilter());
+
+        assertEquals(expresult.getLayers().get(0).getInclude().get(0).getFilter().getId(), result.getLayers().get(0).getInclude().get(0).getFilter().getId());
+        assertEquals(expresult.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getDeclaredType(), result.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getDeclaredType());
+        assertEquals(expresult.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getName(), result.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getName());
+        assertEquals(expresult.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getValue(), result.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getValue());
+        assertEquals(expresult.getLayers().get(0).getInclude(), result.getLayers().get(0).getInclude());
+        assertEquals(expresult.getLayers(), result.getLayers());
+        assertEquals(expresult, result);
+
     }
 
     public static String removeXmlns(String xml) {

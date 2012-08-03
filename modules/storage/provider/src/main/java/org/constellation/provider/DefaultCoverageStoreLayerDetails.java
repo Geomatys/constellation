@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
-import org.constellation.ServiceDef.Query;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -49,12 +48,12 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
 
-    private static final MutableStyle DEFAULT = 
+    private static final MutableStyle DEFAULT =
             new DefaultStyleFactory().style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER);
-    
+
     private final CoverageReference ref;
-    
-    public DefaultCoverageStoreLayerDetails(Name name, CoverageReference ref){
+
+    public DefaultCoverageStoreLayerDetails(final Name name, final CoverageReference ref){
         super(name, Collections.EMPTY_LIST);
         this.ref = ref;
     }
@@ -63,11 +62,16 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
     public Object getOrigin() {
         return ref;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public GridCoverage2D getCoverage(Envelope envelope, Dimension dimension, Double elevation, Date time) throws DataStoreException, IOException {
+    public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension, final Double elevation,
+                                      final Date time) throws DataStoreException, IOException
+    {
         final GridCoverageReader reader = ref.createReader();
-        
+
         final GridCoverageReadParam param = new GridCoverageReadParam();
         param.setEnvelope(envelope);
         try {
@@ -77,20 +81,23 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
         }finally{
             reader.dispose();
         }
-        
+
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
         final GridCoverageReader reader = ref.createReader();
-        
+
         try {
             final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
             if (generalGridGeom == null) {
                 LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
                 return null;
             }
-            
+
             final Envelope env = generalGridGeom.getEnvelope();
             return new DefaultGeographicBoundingBox(env);
         } catch (CancellationException ex) {
@@ -100,32 +107,44 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
         } finally {
             reader.dispose();
         }
-        
+
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public MapLayer getMapLayer(MutableStyle style, Map<String, Object> params) throws PortrayalException {
+    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException {
         if(style == null){
             style = getDefaultStyle();
         }
-        
+
         final MapLayer layer = MapBuilder.createCoverageLayer(
-                    ref, 
-                    style, 
+                    ref,
+                    style,
                     getName().getLocalPart());
         return layer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected MutableStyle getDefaultStyle() {
         return DEFAULT;
     }
 
+    /**
+     * Returns an empty set.
+     */
     @Override
     public SortedSet<Date> getAvailableTimes() throws DataStoreException {
         return new TreeSet<Date>();
     }
 
+    /**
+     * Returns an empty set.
+     */
     @Override
     public SortedSet<Number> getAvailableElevations() throws DataStoreException {
         return new TreeSet<Number>();
@@ -137,13 +156,8 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
     }
 
     @Override
-    public boolean isQueryable(Query query) {
-        return true;
-    }
-
-    @Override
     public TYPE getType() {
         return TYPE.COVERAGE;
     }
-    
+
 }

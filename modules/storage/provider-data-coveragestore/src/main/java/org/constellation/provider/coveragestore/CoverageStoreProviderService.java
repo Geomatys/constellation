@@ -44,30 +44,30 @@ public class CoverageStoreProviderService extends AbstractProviderService
         <Name,LayerDetails,LayerProvider> implements LayerProviderService {
 
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
-    
+
     static {
         final List<ParameterDescriptorGroup> descs = new ArrayList<ParameterDescriptorGroup>();
         final Iterator<CoverageStoreFactory> ite = CoverageStoreFinder.getAllFactories(null).iterator();
         while(ite.hasNext()){
             //copy the descriptor with a minimum number of zero
             final ParameterDescriptorGroup desc = ite.next().getParametersDescriptor();
-            
+
             final DefaultParameterDescriptorGroup mindesc = new DefaultParameterDescriptorGroup(
                     Collections.singletonMap("name", desc.getName()),
                     0, 1,
                     desc.descriptors().toArray(new GeneralParameterDescriptor[0]));
-            
+
             descs.add(mindesc);
         }
-        
+
         SOURCE_CONFIG_DESCRIPTOR = new DefaultParameterDescriptorGroup(
             "choice", descs.toArray(new GeneralParameterDescriptor[0]));
-        
+
     }
-    
+
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
-    
+
     public CoverageStoreProviderService(){
         super("coverage-store");
     }
@@ -87,7 +87,7 @@ public class CoverageStoreProviderService extends AbstractProviderService
         if(!canProcess(ps)){
             return null;
         }
-        
+
         final CoverageStoreProvider provider = new CoverageStoreProvider(this,ps);
         getLogger().log(Level.INFO, "[PROVIDER]> coverage-store provider created.");
         return provider;

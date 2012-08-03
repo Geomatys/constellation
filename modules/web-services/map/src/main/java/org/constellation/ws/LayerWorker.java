@@ -164,6 +164,12 @@ public abstract class LayerWorker extends AbstractWorker {
         return layers;
     }
 
+    /**
+     * Return all layers details in LayerProviders from there names.
+     * @param layerNames
+     * @return a list of LayerDetails
+     * @throws CstlServiceException
+     */
     protected List<LayerDetails> getLayerReferences(final List<Name> layerNames) throws CstlServiceException {
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
         for (Name layerName : layerNames) {
@@ -172,6 +178,12 @@ public abstract class LayerWorker extends AbstractWorker {
         return layerRefs;
     }
 
+    /**
+     * Search layer real name and return the LayerDetails from LayerProvider.
+     * @param layerName
+     * @return a LayerDetails
+     * @throws CstlServiceException
+     */
     protected LayerDetails getLayerReference(final Name layerName) throws CstlServiceException {
         final LayerDetails layerRef;
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
@@ -186,7 +198,7 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     /**
-     * We can use directly layers.containsKey because it may miss the namespace
+     * We can't use directly layers.containsKey because it may miss the namespace or the alias.
      * @param name
      */
     protected Name layersContainsKey(Name name) {
@@ -200,11 +212,24 @@ public abstract class LayerWorker extends AbstractWorker {
         }
 
         if (!layers.containsKey(name)) {
+            //search with only localpart
             for (Name layerName: layers.keySet()) {
                 if (layerName.getLocalPart().equals(name.getLocalPart())) {
                     return layerName;
                 }
             }
+
+            //search in alias if any
+            for (Map.Entry<Name, Layer> l: layers.entrySet()) {
+                final Layer layer = l.getValue();
+                if (layer.getAlias() != null && !layer.getAlias().isEmpty()) {
+                    final String alias = layer.getAlias().trim().replaceAll(" ", "_");
+                    if (alias.equals(name.getLocalPart())) {
+                        return l.getKey();
+                    }
+                }
+            }
+
             return null;
         }
         return name;

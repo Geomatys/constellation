@@ -179,7 +179,7 @@ public interface LayerDetails {
     TYPE getType();
 
     /**
-     * Origine source of this data can be :
+     * Origin source of this data can be :
      * FeatureCollection, CoverageRefence, null.
      */
     Object getOrigin();

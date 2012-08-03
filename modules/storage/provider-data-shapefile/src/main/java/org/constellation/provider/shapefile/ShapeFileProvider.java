@@ -120,7 +120,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             final ParameterValueGroup layer = getLayer(getSource(), key.getLocalPart());
             if (layer == null) {
                 return new DefaultDataStoreLayerDetails(key, store, null, null, null, null, null);
-                
+
             } else {
                 final List<String> styles = getLayerStyles(layer);
                 return new DefaultDataStoreLayerDetails(key, store, styles,

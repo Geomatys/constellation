@@ -28,8 +28,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
-import org.constellation.ServiceDef;
-
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.query.Query;
@@ -62,13 +60,12 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
  * Abstract LayerDetail used by Feature providers.
- * 
- * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
 public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails implements FeatureLayerDetails {
-    
+
     protected static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     protected static final GeographicBoundingBox DUMMY_BBOX =
             new DefaultGeographicBoundingBox(-180, 180, -77, +77);
@@ -86,13 +83,13 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
 
     protected AbstractFeatureLayerDetails(Name name, DataStore store, List<String> favorites){
         this(name,store,favorites,null,null,null,null);
-        
+
     }
-    
+
     protected AbstractFeatureLayerDetails(Name name, DataStore store, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         super(name,favorites);
-        
+
         if(store == null){
             throw new IllegalArgumentException("FeatureSource can not be null.");
         }
@@ -105,25 +102,25 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
         }*/
 
         this.store = store;
-       
+
         final FilterFactory ff = FactoryFinder.getFilterFactory(null);
 
         if(dateStart != null)       this.dateStartField = ff.property(dateStart);
         else                        this.dateStartField = null;
-        
+
         if(dateEnd != null)         this.dateEndField = ff.property(dateEnd);
         else                        this.dateEndField = null;
-        
+
         if(elevationStart != null)      this.elevationStartField = ff.property(elevationStart);
         else                            this.elevationStartField = null;
-        
+
         if(elevationEnd != null)        this.elevationEndField = ff.property(elevationEnd);
         else                            this.elevationEndField = null;
-        
+
     }
 
     /**
-     * {@inheritDoc }
+     * {@inheritDoc}
      */
     @Override
     public DataStore getStore(){
@@ -135,14 +132,14 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      */
     @Override
     public final MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException{
-        
+
         final MapLayer layer;
         try {
             layer = createMapLayer(style, params);
         } catch (DataStoreException ex) {
             throw new PortrayalException(ex);
         }
-        
+
         // EXTRA FILTER extra parameter ////////////////////////////////////////
         if (params != null && layer instanceof FeatureMapLayer) {
             final Map<String,?> extras = (Map<String, ?>) params.get(KEY_EXTRA_PARAMETERS);
@@ -159,7 +156,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
                                 final FeatureMapLayer fml = (FeatureMapLayer) layer;
                                 fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filter));
                             }
-                            
+
                         } catch (CQLException ex) {
                             LOGGER.log(Level.INFO,  ex.getMessage(),ex);
                         }
@@ -169,16 +166,8 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
             }
         }
         ////////////////////////////////////////////////////////////////////////
-        
-        return layer;
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isQueryable(ServiceDef.Query query) {
-        return true;
+        return layer;
     }
 
     /**
@@ -213,7 +202,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
         FeatureIterator<SimpleFeature> features = null;
         if(dateStartField != null){
             try{
-                final AttributeDescriptor desc = (AttributeDescriptor) 
+                final AttributeDescriptor desc = (AttributeDescriptor)
                         dateStartField.evaluate((SimpleFeatureType)store.getFeatureType(name));
 
                 if(desc == null){
@@ -246,9 +235,9 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
             } finally {
                 if(features != null) features.close();
             }
-            
+
         }
-        
+
         return dates;
     }
 
@@ -288,17 +277,17 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
                     if(ele != null){
                         elevations.add(ele);
                     }
-                    
+
                 }
-                
+
             } catch(DataStoreException ex) {
                 LOGGER.log(Level.WARNING , "Could not evaluate elevationss",ex);
             } finally {
                 if(features != null) features.close();
             }
-            
+
         }
-        
+
         return elevations;
     }
 
@@ -335,13 +324,22 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
     }
 
     /**
+     * Returns a {@linkplain FeatureCollection feature collection} containing all the data.
+     */
+    @Override
+    public Object getOrigin() {
+        return store.createSession(false).getFeatureCollection(QueryBuilder.all(name));
+    }
+
+
+    /**
      * Specifies that the type of this layer is feature.
      */
     @Override
     public TYPE getType() {
         return TYPE.FEATURE;
     }
-    
+
     protected abstract MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws DataStoreException;
-    
+
 }

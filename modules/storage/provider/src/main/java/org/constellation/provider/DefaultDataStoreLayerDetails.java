@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.storage.DataStoreException;
-import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
@@ -33,8 +33,7 @@ import org.opengis.feature.type.Name;
 
 /**
  * Default layer details for a datastore type.
- * 
- * @version $Id$
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
@@ -42,7 +41,7 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
     public DefaultDataStoreLayerDetails(Name name, DataStore store, List<String> favorites){
         this(name,store,favorites,null,null,null,null);
     }
-    
+
     public DefaultDataStoreLayerDetails(Name name, DataStore store, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         super(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
@@ -50,8 +49,6 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
 
     @Override
     protected MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws DataStoreException {
-        FeatureMapLayer layer = null;
-
         if(style == null && favorites.size() > 0){
             //no style provided, try to get the favorite one
             //there are some favorites styles
@@ -65,15 +62,15 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
             style = RANDOM_FACTORY.createDefaultVectorStyle(featureType);
         }
 
-        layer = MapBuilder.createFeatureLayer(store.createSession(false).getFeatureCollection(QueryBuilder.all(name)), style);
-        
+        final FeatureMapLayer layer = MapBuilder.createFeatureLayer((FeatureCollection)getOrigin(), style);
+
         layer.setElevationRange(elevationStartField, elevationEndField);
         layer.setTemporalRange(dateStartField, dateEndField);
 
         final String title = getName().getLocalPart();
-        layer.setName(title);        
+        layer.setName(title);
         layer.setDescription(STYLE_FACTORY.description(title,title));
-        
+
         return layer;
     }
 

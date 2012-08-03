@@ -24,11 +24,13 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
+import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.util.Utilities;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  * @since 0.6
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -36,6 +38,15 @@ public class Layer {
 
     @XmlAttribute
     private QName name;
+
+    @XmlAttribute
+    private String alias;
+
+    @XmlElement(name="Style")
+    private List<String> styles;
+
+    @XmlElement(name="Filter")
+    private FilterType filter;
 
     @XmlElement(name="Title")
     private String title;
@@ -66,7 +77,7 @@ public class Layer {
 
     @XmlElement(name="CRS")
     private List<String> crs;
-    
+
     public Layer() {
 
     }
@@ -75,10 +86,24 @@ public class Layer {
         this.name = name;
     }
 
+    public Layer(final QName name, final List<String> styles) {
+        this.name = name;
+        this.styles = styles;
+    }
+
     public Layer(final QName name, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+            final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
+            final List<String> crs)
+    {
+        this(name, null, null, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
+    }
+
+    public Layer(final QName name, final List<String> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs) {
         this.name         = name;
+        this.styles       = styles;
+        this.filter       = filter;
         this.title        = title;
         this.abstrac      = abstrac;
         this.keywords     = keywords;
@@ -89,8 +114,9 @@ public class Layer {
         this.attribution  = attribution;
         this.opaque       = opaque;
         this.crs          = crs;
+        setAlias(alias);
     }
-    
+
     /**
      * @return the name
      */
@@ -103,6 +129,34 @@ public class Layer {
      */
     public void setName(final QName name) {
         this.name = name;
+    }
+
+    public List<String> getStyles() {
+        if (styles == null) {
+            styles = new ArrayList<String>();
+        }
+        return styles;
+    }
+
+    public void setStyles(final List<String> styles) {
+        this.styles = styles;
+    }
+
+    public FilterType getFilter() {
+        return filter;
+    }
+
+    public void setFilter(final FilterType filter) {
+        this.filter = filter;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        if (alias != null) alias =  alias.trim().replaceAll(" ", "_");
+        this.alias = alias;
     }
 
     public String getTitle() {
@@ -201,10 +255,25 @@ public class Layer {
     public void setCrs(final List<String> crs) {
         this.crs = crs;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Layer]");
+        if (name != null) {
+            sb.append("name:\n").append(name).append('\n');
+        }
+        if (styles != null && !styles.isEmpty()) {
+            sb.append("styles:\n").append(styles).append('\n');
+            for (String style : styles) {
+                sb.append("style:\n").append(style).append('\n');
+            }
+        }
+        if (filter != null) {
+            sb.append("filter:\n").append(filter).append('\n');
+        }
+        if (alias != null) {
+            sb.append("alias:\n").append(alias).append('\n');
+        }
         if (abstrac != null) {
             sb.append("abstract=").append(abstrac).append('\n');
         }
@@ -229,9 +298,6 @@ public class Layer {
         if (metadataURL != null) {
             sb.append("metadataURL:\n").append(metadataURL).append('\n');
         }
-        if (name != null) {
-            sb.append("name:\n").append(name).append('\n');
-        }
         if (opaque != null) {
             sb.append("opaque:\n").append(opaque).append('\n');
         }
@@ -240,7 +306,7 @@ public class Layer {
         }
         return sb.toString();
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Layer) {
@@ -250,10 +316,13 @@ public class Layer {
                    Utilities.equals(this.authorityURL, that.authorityURL) &&
                    Utilities.equals(this.crs,          that.crs) &&
                    Utilities.equals(this.dataURL,      that.dataURL) &&
+                   Utilities.equals(this.filter,       that.filter) &&
+                   Utilities.equals(this.alias,        that.alias) &&
                    Utilities.equals(this.identifier,   that.identifier) &&
                    Utilities.equals(this.keywords,     that.keywords) &&
                    Utilities.equals(this.metadataURL,  that.metadataURL) &&
                    Utilities.equals(this.name,         that.name) &&
+                   Utilities.equals(this.styles,       that.styles) &&
                    Utilities.equals(this.opaque,       that.opaque) &&
                    Utilities.equals(this.title,        that.title);
         }
@@ -264,6 +333,9 @@ public class Layer {
     public int hashCode() {
         int hash = 7;
         hash = 79 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 79 * hash + (this.styles != null ? this.styles.hashCode() : 0);
+        hash = 79 * hash + (this.filter != null ? this.filter.hashCode() : 0);
+        hash = 79 * hash + (this.alias != null ? this.alias.hashCode() : 0);
         hash = 79 * hash + (this.title != null ? this.title.hashCode() : 0);
         hash = 79 * hash + (this.abstrac != null ? this.abstrac.hashCode() : 0);
         hash = 79 * hash + (this.keywords != null ? this.keywords.hashCode() : 0);
