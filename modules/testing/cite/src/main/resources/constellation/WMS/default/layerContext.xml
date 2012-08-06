@@ -1,7 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LayerContext xmlns="http://www.constellation.org/config">
     <layers>
-        <Source id="shapeSrc" load_all="true"/>
+        <Source id="shapeSrc" load_all="true">
+            <include>
+                <Layer name="BasicPolygons">
+                    <Style>cite_style_BasicPolygons</Style>
+                </Layer>
+                <Layer name="Bridges">
+                    <Style>cite_style_Bridges</Style>
+                </Layer>
+                <Layer name="BuildingCenters">
+                    <Style>cite_style_BuildingCenters</Style>
+                </Layer>
+                <Layer name="Buildings">
+                    <Style>cite_style_Buildings</Style>
+                </Layer>
+                <Layer name="DividedRoutes">
+                    <Style>cite_style_DividedRoutes</Style>
+                </Layer>
+                <Layer name="Forests">
+                    <Style>cite_style_Forests</Style>
+                </Layer>
+                <Layer name="Lakes">
+                    <Style>cite_style_Lakes</Style>
+                </Layer>
+                <Layer name="MapNeatline">
+                    <Style>cite_style_MapNeatLine</Style>
+                </Layer>
+                <Layer name="NamedPlaces">
+                    <Style>cite_style_NamedPlaces</Style>
+                </Layer>
+                <Layer name="Ponds">
+                    <Style>cite_style_Ponds</Style>
+                </Layer>
+                <Layer name="RoadSegments">
+                    <Style>cite_style_RoadSegments</Style>
+                </Layer>
+                <Layer name="Streams">
+                    <Style>cite_style_Streams</Style>
+                </Layer>
+            </include>
+        </Source>
     </layers>
 </LayerContext>
 

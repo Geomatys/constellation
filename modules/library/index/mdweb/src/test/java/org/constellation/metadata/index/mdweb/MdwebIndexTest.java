@@ -78,7 +78,7 @@ public class MdwebIndexTest {
 
     private static DefaultDataSource ds;
 
-    private static final Logger logger = Logging.getLogger("org.constellation.metadata");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
 
     private static LuceneIndexSearcher indexSearcher;
 
@@ -161,7 +161,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -180,7 +180,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -210,7 +210,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -226,7 +226,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SimpleSearch 4:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SimpleSearch 4:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("40510_145_19930221211500");
@@ -243,7 +243,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SimpleSearch 5:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SimpleSearch 5:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("40510_145_19930221211500");
@@ -271,7 +271,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "numericComparisonSearch 1:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "numericComparisonSearch 1:\n{0}", resultReport);
 
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -289,7 +289,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "numericComparisonSearch 2:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "numericComparisonSearch 2:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -307,7 +307,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "numericComparisonSearch 3:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "numericComparisonSearch 3:\n{0}", resultReport);
 
         assertEquals(2, result.size());
         assertTrue(result.contains("42292_5p_19900609195600"));
@@ -323,7 +323,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "numericComparisonSearch 4:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "numericComparisonSearch 4:\n{0}", resultReport);
 
         assertEquals(0, result.size());
 
@@ -337,7 +337,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "numericComparisonSearch 5:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "numericComparisonSearch 5:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("39727_22_19750113062500");
@@ -356,7 +356,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "numericComparisonSearch 6:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "numericComparisonSearch 6:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -374,7 +374,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "numericComparisonSearch 7:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "numericComparisonSearch 7:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         //expectedResult.add("42292_5p_19900609195600");
@@ -403,7 +403,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -422,7 +422,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -440,7 +440,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "wilCharSearch 3:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "wilCharSearch 3:\n{0}", resultReport);
 
         assertTrue(result.contains("42292_5p_19900609195600"));
         assertTrue(result.contains("42292_9s_19900610041000"));
@@ -459,7 +459,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "wilCharSearch 4:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "wilCharSearch 4:\n{0}", resultReport);
 
         assertTrue(result.contains("42292_5p_19900609195600"));
         assertTrue(result.contains("42292_9s_19900610041000"));
@@ -479,7 +479,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_5p_19900609195600");
@@ -508,7 +508,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -527,7 +527,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "DateSearch 2:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "DateSearch 2:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -545,7 +545,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "DateSearch 3:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "DateSearch 3:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("40510_145_19930221211500");
@@ -563,7 +563,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "DateSearch 4:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "DateSearch 4:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -581,7 +581,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "DateSearch 5:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "DateSearch 5:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -600,7 +600,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "DateSearch 6:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "DateSearch 6:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -634,7 +634,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -667,7 +667,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
@@ -701,7 +701,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("cat-1"); // TODO why cat-1 in first he is not indexable
@@ -735,7 +735,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("484fc4d9-8d11-48a5-a386-65c19398f7c3");
@@ -769,7 +769,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
 
@@ -794,7 +794,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "SortedSearch 5:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
 
@@ -833,7 +833,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
         Set<String> expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
@@ -860,7 +860,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
+        LOGGER.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("42292_9s_19900610041000");
@@ -895,7 +895,7 @@ public class MdwebIndexTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.log(Level.FINER, "identifier query 1:\n{0}", result);
+        LOGGER.log(Level.FINER, "identifier query 1:\n{0}", result);
 
         String expectedResult = "39727_22_19750113062500";
 
@@ -908,7 +908,7 @@ public class MdwebIndexTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.log(Level.FINER, "identifier query 2:\n{0}", result);
+        LOGGER.log(Level.FINER, "identifier query 2:\n{0}", result);
 
         expectedResult = "CTDF02";
 
@@ -921,7 +921,7 @@ public class MdwebIndexTest {
         identifier = "urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.log(Level.FINER, "identifier query 3:\n{0}", result);
+        LOGGER.log(Level.FINER, "identifier query 3:\n{0}", result);
 
         expectedResult = "urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd";
 
@@ -947,7 +947,7 @@ public class MdwebIndexTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.log(Level.FINER, "identifier query 1:\n{0}", result);
+        LOGGER.log(Level.FINER, "identifier query 1:\n{0}", result);
 
         String expectedResult = "39727_22_19750113062500";
 
@@ -960,7 +960,7 @@ public class MdwebIndexTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.log(Level.FINER, "identifier query 2:\n{0}", result);
+        LOGGER.log(Level.FINER, "identifier query 2:\n{0}", result);
 
         expectedResult = null;
 
