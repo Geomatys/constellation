@@ -589,19 +589,23 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             // ${providerStyleType|providerStyleId|styleName}
             final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
             for (String styl : configLayer.getStyles()) {
-                final DataReference dr = new DataReference(styl);
-                Style style = null;
-                try {
-                    style = DataReferenceConverter.convertDataReferenceToStyle(dr);
-                } catch (NonconvertibleObjectException e) {
-                    // The given style reference was invalid, we can't get a style from that
-                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                final MutableStyle ms;
+                if (styl.startsWith("${")) {
+                    final DataReference dr = new DataReference(styl);
+                    Style style = null;
+                    try {
+                        style = DataReferenceConverter.convertDataReferenceToStyle(dr);
+                    } catch (NonconvertibleObjectException e) {
+                        // The given style reference was invalid, we can't get a style from that
+                        LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                    }
+                    ms = StyleUtilities.copy(style);
+                } else {
+                    ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
                 }
-                if (style != null) {
-                    final MutableStyle ms = StyleUtilities.copy(style);
-                    final org.geotoolkit.wms.xml.v111.Style wmsStyle = convertMutableStyleToWmsStyle111(ms, layerDetails, legendUrlPng, legendUrlGif);
-                    styles.add(wmsStyle);
-                }
+
+                final org.geotoolkit.wms.xml.v111.Style wmsStyle = convertMutableStyleToWmsStyle111(ms, layerDetails, legendUrlPng, legendUrlGif);
+                styles.add(wmsStyle);
             }
             if (!styles.isEmpty()) {
                 outputLayer111.setStyle(styles);
@@ -718,19 +722,23 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             // ${providerStyleType|providerStyleId|styleName}
             final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
             for (String styl : configLayer.getStyles()) {
-                final DataReference dr = new DataReference(styl);
-                Style style = null;
-                try {
-                    style = DataReferenceConverter.convertDataReferenceToStyle(dr);
-                } catch (NonconvertibleObjectException e) {
-                    // The given style reference was invalid, we can't get a style from that
-                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                final MutableStyle ms;
+                if (styl.startsWith("${")) {
+                    final DataReference dr = new DataReference(styl);
+                    Style style = null;
+                    try {
+                        style = DataReferenceConverter.convertDataReferenceToStyle(dr);
+                    } catch (NonconvertibleObjectException e) {
+                        // The given style reference was invalid, we can't get a style from that
+                        LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                    }
+                    ms = StyleUtilities.copy(style);
+                } else {
+                    ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
                 }
-                if (style != null) {
-                    final MutableStyle ms = StyleUtilities.copy(style);
-                    final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
-                    styles.add(wmsStyle);
-                }
+
+                final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
+                styles.add(wmsStyle);
             }
             if (!styles.isEmpty()) {
                 outputLayer130.setStyle(styles);
@@ -1279,9 +1287,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
                 final List<String> defaultStyleRefs = layer.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
-                    final DataReference styleRef = new DataReference(defaultStyleRefs.get(0));
-                    style = (styleRef == null || styleRef.getLayerId() == null) ? null :
-                            StyleProviderProxy.getInstance().get(styleRef.getLayerId().getLocalPart());
+                    final String styleId = defaultStyleRefs.get(0);
+                    if (styleId.startsWith("${")) {
+                        final DataReference styleRef = new DataReference(styleId);
+                        style = (styleRef == null || styleRef.getLayerId() == null) ? null :
+                                StyleProviderProxy.getInstance().get(styleRef.getLayerId().getLocalPart());
+                    } else {
+                        style = StyleProviderProxy.getInstance().getByIdentifier(styleId);
+                    }
                 } else {
                     style = null;
                 }
