@@ -117,7 +117,8 @@ public class ProviderReference implements CharSequence {
 
     @Override
     public int hashCode() {
-        int hash = 3;
+        int hash = 5;
+        hash = 59 * hash + (this.reference != null ? this.reference.hashCode() : 0);
         return hash;
     }
 
@@ -134,6 +135,15 @@ public class ProviderReference implements CharSequence {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[ProviderReference]");
+        sb.append("reference:\n").append(reference).append('\n');
+        sb.append("providerType:\n").append(providerType).append('\n');
+        sb.append("providerId:\n").append(providerId).append('\n');
+        return sb.toString();
     }
 
 }
