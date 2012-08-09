@@ -582,7 +582,31 @@ public class WFS2WorkerTest {
         domCompare(expectedResult, writer.toString());
 
         /**
-         * Test 10 : query on typeName samplingPoint whith HITS result type
+         * Test 10 : query on typeName samplingPoint with sort on gml:name and startIndex and maxFeature
+         */
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        query.setAbstractSortingClause(ogcFactory.createSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC)))));
+        queries.add(query);
+        request = new GetFeatureType("WFS", "2.0.0", null, 2, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.2.1");
+        request.setStartIndex(2);
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollectionWrapper);
+        wrapper = (FeatureCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-9v2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+
+        domCompare(expectedResult, writer.toString());
+
+        /**
+         * Test 11 : query on typeName samplingPoint whith HITS result type
          */
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
@@ -595,7 +619,7 @@ public class WFS2WorkerTest {
 
 
         /**
-         * Test 11 : query on typeName samplingPoint whith a filter with unexpected property
+         * Test 12 : query on typeName samplingPoint whith a filter with unexpected property
          */
 
         queries = new ArrayList<QueryType>();
@@ -612,7 +636,7 @@ public class WFS2WorkerTest {
         }
 
         /**
-         * Test 12 : query on typeName samplingPoint whith a an unexpected property in propertyNames
+         * Test 13 : query on typeName samplingPoint whith a an unexpected property in propertyNames
          */
 
         queries = new ArrayList<QueryType>();
