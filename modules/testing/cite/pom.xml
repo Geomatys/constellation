@@ -74,11 +74,13 @@
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
+    <!--
     <dependency>
       <groupId>greenpepper-open</groupId>
       <artifactId>greenpepper-core</artifactId>
       <version>2.7</version>
     </dependency>
+    -->
     <!-- Apache maven plugin -->
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -192,7 +194,10 @@
 
   <build>
     <plugins>
-      <plugin>
+      <!--
+            Comment the greenpepper configuration, no more used at the moment
+      -->
+      <!--plugin>
         <groupId>greenpepper</groupId>
         <artifactId>greenpepper-maven-plugin</artifactId>
         <version>2.7</version>
@@ -225,7 +230,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin-->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <dependencies>
@@ -550,7 +555,10 @@
   </profiles>
 
 
-  <repositories>
+  <!--
+      Comment the greenpepper configuration, no more used at the moment
+  -->
+  <!--repositories>
       <repository>
       <id>GreenPepper</id>
       <name>GreenPepper</name>
@@ -564,7 +572,7 @@
       <name>GreenPepper</name>
       <url>http://www.greenpeppersoftware.com/nexus/content/groups/public</url>
     </pluginRepository>
-  </pluginRepositories>
+  </pluginRepositories-->
 
 
 </project>
