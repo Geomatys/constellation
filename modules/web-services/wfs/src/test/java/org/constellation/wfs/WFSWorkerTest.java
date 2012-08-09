@@ -356,7 +356,7 @@ public class WFSWorkerTest {
 
         FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
 
-        assertTrue(resultHits.getNumberOfFeatures() == 2);
+        assertTrue(resultHits.getNumberOfFeatures() == 5);
 
 
         /**
@@ -447,7 +447,7 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-8.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         domCompare(expectedResult, writer.toString());
@@ -470,7 +470,7 @@ public class WFSWorkerTest {
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-8.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         domCompare(expectedResult, writer.toString());
@@ -534,7 +534,7 @@ public class WFSWorkerTest {
 
         resultHits = (FeatureCollectionType) worker.getFeature(request);
 
-        assertTrue(resultHits.getNumberOfFeatures() == 2);
+        assertTrue(resultHits.getNumberOfFeatures() == 5);
 
 
         /**

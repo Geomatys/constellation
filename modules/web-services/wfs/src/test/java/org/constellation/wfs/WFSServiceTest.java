@@ -160,7 +160,7 @@ public class WFSServiceTest {
 
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         FeatureCollection collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
-        assertEquals(2, collection.size());
+        assertEquals(5, collection.size());
 
         /*
          * we insert the feature
@@ -180,7 +180,7 @@ public class WFSServiceTest {
 
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
-        assertEquals(4, collection.size());
+        assertEquals(7, collection.size());
 
         /*
          * we delete the features
@@ -200,7 +200,7 @@ public class WFSServiceTest {
 
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
-        assertEquals(2, collection.size());
+        assertEquals(5, collection.size());
 
         /*
          * we insert the feature with another request
@@ -220,7 +220,7 @@ public class WFSServiceTest {
 
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
-        assertEquals(4, collection.size());
+        assertEquals(7, collection.size());
 
     }
 

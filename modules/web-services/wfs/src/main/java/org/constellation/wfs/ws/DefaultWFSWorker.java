@@ -108,7 +108,6 @@ import org.geotoolkit.wfs.xml.FeatureTypeList;
 import org.geotoolkit.wfs.xml.UpdateElement;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v200.PropertyName;
-import org.geotoolkit.wfs.xml.ValueCollection;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.wfs.xml.*;
@@ -415,7 +414,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             //search all types
             for (final Name name : layers.keySet()) {
                 final LayerDetails layer = namedProxy.get(name);
-                if (!(layer instanceof FeatureLayerDetails)) continue;
+                if (!(layer instanceof FeatureLayerDetails)) {continue;}
 
                 try {
                     types.add(getFeatureTypeFromLayer((FeatureLayerDetails)layer));
@@ -427,7 +426,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             //search only the given list
             for (final QName name : names) {
-                if (name == null) continue;
+                if (name == null) {continue;}
 
                 final Name n = Utils.getNameFromQname(name);
                 if (layersContainsKey(n) == null) {
@@ -584,7 +583,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
         final String currentVersion                = actingVersion.version.toString();
         final String featureId                     = request.getFeatureId();
-        final Integer maxFeatures                  = request.getCount();
+        final int maxFeatures                      = request.getCount();
+        final Integer startIndex                   = request.getStartIndex();
         final List<FeatureCollection> collections  = new ArrayList<FeatureCollection>();
         final Map<String, String> schemaLocations  = new HashMap<String, String>();
         final Map<Name,Layer> layers               = getLayers();
@@ -623,8 +623,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             if (!sortBys.isEmpty()) {
                 queryBuilder.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
             }
-            if (maxFeatures != null && maxFeatures != 0){
+            if (maxFeatures != 0){
                 queryBuilder.setMaxFeatures(maxFeatures);
+            }
+            if (startIndex != 0){
+                queryBuilder.setStartIndex(startIndex);
             }
 
             for (QName typeName : typeNames) {
@@ -635,7 +638,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
                 final LayerDetails layerD = getLayerReference(fullTypeName);
 
-                if (!(layerD instanceof FeatureLayerDetails)) continue;
+                if (!(layerD instanceof FeatureLayerDetails)) {continue;}
 
                 final FeatureLayerDetails layer = (FeatureLayerDetails) layerD;
 
@@ -752,7 +755,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
                 final LayerDetails layerD = getLayerReference(fullTypeName);
 
-                if (!(layerD instanceof FeatureLayerDetails)) continue;
+                if (!(layerD instanceof FeatureLayerDetails)) {continue;}
 
                 final FeatureLayerDetails layer = (FeatureLayerDetails) layerD;
 
@@ -1133,7 +1136,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         else{
             temp.append(node.getTextContent());
         }
-        if (!node.getNodeName().equals("#text")) temp.append("</").append(node.getNodeName()).append(">");
+        if (!node.getNodeName().equals("#text")) {temp.append("</").append(node.getNodeName()).append(">");}
         return temp;
     }
 
@@ -1390,7 +1393,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         //search all types
         for (final Name name : layers.keySet()) {
             final LayerDetails layer = namedProxy.get(name);
-            if (!(layer instanceof FeatureLayerDetails)) continue;
+            if (!(layer instanceof FeatureLayerDetails)) {continue;}
 
             try {
                 types.add(getFeatureTypeFromLayer((FeatureLayerDetails)layer));

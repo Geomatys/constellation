@@ -394,8 +394,8 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         TransactionSummaryType sum        = new TransactionSummaryType(2, 0, 0);
         List<InsertedFeatureType> insertedFeatures = new ArrayList<InsertedFeatureType>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-003"), null));
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-004"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-006"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-007"), null));
         InsertResultsType insertResult    = new InsertResultsType(insertedFeatures);
         TransactionResponseType ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
 
@@ -433,8 +433,8 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         sum              = new TransactionSummaryType(2, 0, 0);
         insertedFeatures = new ArrayList<InsertedFeatureType>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-005"), null));
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-006"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-008"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-009"), null));
         insertResult    = new InsertResultsType(insertedFeatures);
         ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
 
@@ -475,8 +475,8 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         sum              = new TransactionSummaryType(2, 0, 0);
         insertedFeatures = new ArrayList<InsertedFeatureType>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-007"), null));
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-008"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-010"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-011"), null));
         insertResult    = new InsertResultsType(insertedFeatures);
         ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
 
