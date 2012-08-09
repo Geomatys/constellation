@@ -111,6 +111,10 @@ import org.geotoolkit.wfs.xml.v200.PropertyName;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.wfs.xml.*;
+import org.geotoolkit.wfs.xml.v200.ObjectFactory;
+import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
+import org.geotoolkit.wfs.xml.v200.QueryType;
+import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
 
 // GeoAPI dependencies
 import org.opengis.feature.Feature;
@@ -201,7 +205,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         StoredQueries candidate = (StoredQueries) obj;
                         this.storedQueries = candidate.getStoredQuery();
                     } else {
-                        LOGGER.log(Level.WARNING, "The storedQueries FIle does not contains proper object");
+                        LOGGER.log(Level.WARNING, "The storedQueries File does not contains proper object");
                     }
                 } catch (JAXBException ex) {
                     LOGGER.log(Level.WARNING, "JAXBExeception while unmarshalling the stored queries File", ex);
@@ -212,6 +216,23 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
             }
         }
+        // we verify if the identifier query is loaded (if not we load it)
+       boolean found = false;
+       for (StoredQueryDescription squery : storedQueries) {
+           if ("identifierQuery".equals(squery.getId())) {
+               found = true;
+               break;
+           }
+       }
+       if (!found) {
+           final List<QName> typeNames = Utils.getQNameListFromNameSet(getLayers().keySet());
+           final QueryType query = new QueryType(IDENTIFIER_FILTER, typeNames, "2.0.0");
+           final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, typeNames);
+           final ObjectFactory factory = new ObjectFactory();
+           queryEx.getContent().add(factory.createQuery(query));
+           final StoredQueryDescriptionType idQ = new StoredQueryDescriptionType("identifierQuery", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
+           storedQueries.add(idQ);
+       }
     }
 
     private void storedQueries() {
@@ -657,10 +678,13 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 // we verify that all the properties contained in the filter are known by the feature type.
                 verifyFilterProperty(ft, filter);
 
-                collections.add(layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery()));
-
-                // we write The SchemaLocation
-                putSchemaLocation(typeName, schemaLocations);
+                System.out.println(queryBuilder.buildQuery());
+                final FeatureCollection collection = layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery());
+                if (!collection.isEmpty()) {
+                    collections.add(collection);
+                    // we write The SchemaLocation
+                    putSchemaLocation(typeName, schemaLocations);
+                }
             }
         }
         final String gmlVersion;

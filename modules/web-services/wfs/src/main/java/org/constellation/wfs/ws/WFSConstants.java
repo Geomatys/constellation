@@ -33,6 +33,9 @@ import org.geotoolkit.ogc.xml.v110.ScalarCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.SpatialCapabilitiesType;
 import org.geotoolkit.ogc.xml.v110.SpatialOperatorType;
 import org.geotoolkit.ogc.xml.v110.SpatialOperatorsType;
+import org.geotoolkit.ogc.xml.v200.FilterType;
+import org.geotoolkit.ogc.xml.v200.LiteralType;
+import org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v200.ResourceIdentifierType;
 import org.geotoolkit.ows.xml.v100.DCP;
 import org.geotoolkit.ows.xml.v100.DomainType;
@@ -41,6 +44,11 @@ import org.geotoolkit.ows.xml.v100.Operation;
 import org.geotoolkit.ows.xml.v100.OperationsMetadata;
 import org.geotoolkit.ows.xml.v100.RequestMethodType;
 import org.geotoolkit.ows.xml.v110.AllowedValues;
+import org.geotoolkit.wfs.xml.v200.ObjectFactory;
+import org.geotoolkit.wfs.xml.v200.ParameterExpressionType;
+import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
+import org.geotoolkit.wfs.xml.v200.QueryType;
+import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
 import org.opengis.filter.capability.Operator;
 import org.opengis.filter.capability.SpatialOperator;
 
@@ -261,5 +269,23 @@ public final class WFSConstants {
 
 
         OPERATIONS_METADATA_V200 = new org.geotoolkit.ows.xml.v110.OperationsMetadata(operations, null, null, null);
+    }
+
+    /**
+     * this static member is not yet useable because of clone issues for the featureType names.
+     * build your own {@linkplain StoredQueryDescriptionType} with IDENTIFIER_FILTER
+     */
+    public static final StoredQueryDescriptionType IDENTIFIER_STORED_QUERY;
+    public static final FilterType IDENTIFIER_FILTER;
+    public static final ParameterExpressionType IDENTIFIER_PARAM;
+    static {
+        IDENTIFIER_PARAM = new ParameterExpressionType("id", "id Parameter", "A parameter on the id of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$@id"), "@id", true);
+        IDENTIFIER_FILTER = new FilterType(pis);
+        final QueryType query = new QueryType(IDENTIFIER_FILTER, null, "2.0.0");
+        final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, null);
+        final ObjectFactory factory = new ObjectFactory();
+        queryEx.getContent().add(factory.createQuery(query));
+        IDENTIFIER_STORED_QUERY = new StoredQueryDescriptionType("identifierQuery", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
     }
 }
