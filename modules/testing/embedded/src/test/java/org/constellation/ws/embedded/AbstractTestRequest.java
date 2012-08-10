@@ -61,7 +61,7 @@ public class AbstractTestRequest extends AbstractGrizzlyServer {
         while (ex) {
             Thread.sleep(1 * 1000);
             final URL u;
-            if (grizzly != null) {
+            if (grizzly != null &&  grizzly.getCurrentPort() != null) {
                 u = new URL("http://localhost:" + grizzly.getCurrentPort()  + "/configuration?request=access");
             } else {
                 u = new URL("http://localhost:9090/configuration?request=access");

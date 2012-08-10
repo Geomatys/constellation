@@ -21,7 +21,7 @@
         </swe:CompositePhenomenon>
     </om:observedProperty>
     <om:featureOfInterest>
-        <sa:SamplingCurve gml:id="station-003">
+        <sa:SamplingCurve gml:id="station-006">
             <gml:description>Geology traverse</gml:description>
             <gml:name>cycle1</gml:name>
             <gml:boundedBy>

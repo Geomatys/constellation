@@ -69,7 +69,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             featureDirectory.mkdir();
             writeDataFile(featureDirectory, "feature1.xml", "station-001");
             writeDataFile(featureDirectory, "feature2.xml", "station-002");
-            writeDataFile(featureDirectory, "feature3.xml", "station-003");
+            writeDataFile(featureDirectory, "feature3.xml", "station-006");
 
             File observationsDirectory = new File(configDir, "observations");
             observationsDirectory.mkdir();

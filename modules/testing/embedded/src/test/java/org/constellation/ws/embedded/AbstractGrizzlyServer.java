@@ -95,7 +95,7 @@ public abstract class AbstractGrizzlyServer { // extends CoverageSQLTestCase {
     protected static class GrizzlyThread extends Thread {
         private final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{});
 
-        public int getCurrentPort() {
+        public Integer getCurrentPort() {
             return cstlServer.currentPort;
         }
 

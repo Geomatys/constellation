@@ -98,14 +98,14 @@ public class SOSWorkerTest {
         capabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         marshallerPool.release(unmarshaller);
     }
-    
+
     /**
      * Tests the getcapabilities method
      *
      * @throws java.lang.Exception
      */
     public void getCapabilitiesErrorTest() throws Exception {
-        
+
         /**
          *  TEST 1 : get capabilities with wrong version (waiting for an exception)
          */
@@ -140,7 +140,7 @@ public class SOSWorkerTest {
         }
 
     }
-    
+
     /**
      * Tests the getcapabilities method
      *
@@ -315,7 +315,7 @@ public class SOSWorkerTest {
         assertTrue(exLaunched);
 
     }
-    
+
     /**
      * Tests the DescribeSensor method
      *
@@ -324,7 +324,7 @@ public class SOSWorkerTest {
     public void DescribeSensorTest() throws Exception {
         Unmarshaller unmarshaller = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
 
-       
+
         /**
          * Test 1 system sensor
          */
@@ -704,7 +704,7 @@ public class SOSWorkerTest {
          */
         GetObservation request  = new GetObservation("1.0.0",
                                       "offering-allSensor",
-                                      null,           
+                                      null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
                                       null,
@@ -972,7 +972,7 @@ public class SOSWorkerTest {
         obsR      = (DataArrayPropertyType) obsResult.getResult();
         assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 5);
 
-        
+
         /**
          *  Test 9: getObservation with procedure urn:ogc:object:sensor:GEOM:4
          *           with resultTemplate mode
@@ -1318,7 +1318,7 @@ public class SOSWorkerTest {
         result = (ObservationCollectionType) worker.getObservation(request);
 
         assertTrue(result.getMember().iterator().next() instanceof MeasurementType);
-        
+
         MeasurementType measResult =  (MeasurementType) result.getMember().iterator().next();
         assertTrue(measResult != null);
 
@@ -1388,7 +1388,7 @@ public class SOSWorkerTest {
         collExpResult = new ObservationCollectionType("urn:ogc:def:nil:OGC:inapplicable");
         assertEquals(collExpResult, result);
 
-        
+
         marshallerPool.release(unmarshaller);
     }
 
@@ -1481,7 +1481,7 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionType) worker.getObservation(request);
         obsResult = (ObservationType) result.getMember().iterator().next();
-        
+
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation6.xml"));
         expResult = (ObservationType)obj.getValue();
 
@@ -1493,7 +1493,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 3: getObservation with no procedure And FID = station-003
+         *  Test 3: getObservation with no procedure And FID = station-006
          *
          */
         request  = new GetObservation("1.0.0",
@@ -1501,7 +1501,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
-                                      new GetObservation.FeatureOfInterest(Arrays.asList("station-003")),
+                                      new GetObservation.FeatureOfInterest(Arrays.asList("station-006")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
                                       OBSERVATION_QNAME,
@@ -1573,7 +1573,7 @@ public class SOSWorkerTest {
         }
         assertTrue(exLaunched);
     }
-    
+
     /**
      * Tests the GetResult method
      *
@@ -1581,8 +1581,8 @@ public class SOSWorkerTest {
      */
     public void GetResultTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-        
-        
+
+
 
         // we make a getObservation request in order to get a template
 
@@ -1868,7 +1868,7 @@ public class SOSWorkerTest {
         assertEquals(templateExpResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(templateExpResult, obsResult);
 
-        
+
         /**
          * Test 7:  getResult with no TimeFilter
          */
@@ -2077,7 +2077,7 @@ public class SOSWorkerTest {
          * Test 1 we register a system sensor
          */
         AbstractSensorML sensorDescription = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
-        
+
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-6.xml"));
 
         ObservationType obsTemplate = (ObservationType)obj.getValue();
@@ -2094,7 +2094,7 @@ public class SOSWorkerTest {
         DescribeSensor DSrequest  = new DescribeSensor("1.0.0","SOS","urn:ogc:object:sensor:GEOM:6", "text/xml;subtype=\"SensorML/1.0.0\"");
         AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(DSrequest);
 
-        
+
         assertTrue(absResult instanceof SensorML);
         assertTrue(sensorDescription instanceof SensorML);
         SensorML result = (SensorML) absResult;
@@ -2132,7 +2132,7 @@ public class SOSWorkerTest {
          */
         exLaunched = false;
         request = new GetFeatureOfInterest("1.0.0", "SOS", new ArrayList<String>());
-        
+
         try {
             worker.getFeatureOfInterest(request);
         } catch (CstlServiceException ex) {
@@ -2170,11 +2170,11 @@ public class SOSWorkerTest {
          * Test 1 : getFeatureOfInterest with featureID filter
          */
         SamplingPoint expResult = ((JAXBElement<SamplingPoint>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/feature1.xml"))).getValue();
-         
+
         GetFeatureOfInterest request = new GetFeatureOfInterest("1.0.0", "SOS", "station-001");
 
         AbstractFeatureType result = worker.getFeatureOfInterest(request);
-        
+
         assertTrue (result instanceof SamplingPoint);
 
         assertEquals(expResult, result);
@@ -2184,7 +2184,7 @@ public class SOSWorkerTest {
          */
         SamplingCurveType expResultC = ((JAXBElement<SamplingCurveType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/feature3.xml"))).getValue();
 
-        request = new GetFeatureOfInterest("1.0.0", "SOS", "station-003");
+        request = new GetFeatureOfInterest("1.0.0", "SOS", "station-006");
 
         result = worker.getFeatureOfInterest(request);
 
@@ -2194,7 +2194,7 @@ public class SOSWorkerTest {
 
         /**
          * Test 3 : getFeatureOfInterest with BBOX filter restore when multiple works
-         
+
         request = new GetFeatureOfInterest("1.0.0", "SOS", new GetFeatureOfInterest.Location(new BBOXType(null, 64000.0, 1730000.0, 66000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")));
 
         result = worker.getFeatureOfInterest(request);
@@ -2203,7 +2203,7 @@ public class SOSWorkerTest {
 
         assertEquals(expResult, result);*/
 
-        
+
 
         marshallerPool.release(unmarshaller);
     }

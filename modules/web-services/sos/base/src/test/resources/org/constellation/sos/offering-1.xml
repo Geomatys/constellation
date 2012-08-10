@@ -46,7 +46,7 @@
     <sos:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:temperature"/>
     <sos:featureOfInterest xlink:href="station-001"/>
     <sos:featureOfInterest xlink:href="station-002"/>
-    <sos:featureOfInterest xlink:href="station-003"/>
+    <sos:featureOfInterest xlink:href="station-006"/>
     <sos:responseFormat>application/xml</sos:responseFormat>
     <sos:resultModel>om:Observation</sos:resultModel>
     <sos:resultModel>om:Measurement</sos:resultModel>
