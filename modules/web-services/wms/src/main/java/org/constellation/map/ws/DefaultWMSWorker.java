@@ -1040,11 +1040,21 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             } else {
                 // No sld given, we use the style.
-                final String style = getLegend.getStyle();
-                if (style == null) {
-                    ms = null;
+                final Map<Name,Layer> layers = getLayers();
+                final Layer layerRef = layers.get(layer.getName());
+
+                final List<String> defaultStyleRefs = layerRef.getStyles();
+                if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
+                    final String styleId = defaultStyleRefs.get(0);
+                    if (styleId.startsWith("${")) {
+                        final DataReference styleRef = new DataReference(styleId);
+                        ms = (styleRef == null || styleRef.getLayerId() == null) ? null :
+                                StyleProviderProxy.getInstance().get(styleRef.getLayerId().getLocalPart());
+                    } else {
+                        ms = StyleProviderProxy.getInstance().getByIdentifier(styleId);
+                    }
                 } else {
-                    ms = StyleProviderProxy.getInstance().get(style);
+                    ms = null;
                 }
             }
             image = layer.getLegendGraphic(dims, mapDecoration.getDefaultLegendTemplate(), ms, rule, scale);
