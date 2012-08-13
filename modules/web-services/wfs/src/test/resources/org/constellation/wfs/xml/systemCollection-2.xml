@@ -9,9 +9,13 @@
     <gml:featureMember>
         <sml:System gml:id="12">
             <gml:name>Piezometer Test</gml:name>
-            <sml:keywords>piezometer</sml:keywords>
-            <sml:keywords>geosciences</sml:keywords>
-            <sml:keywords>point d'eau</sml:keywords>
+            <sml:keywords>
+                <sml:KeywordList>
+                    <sml:keyword>piezometer</sml:keyword>
+                    <sml:keyword>geosciences</sml:keyword>
+                    <sml:keyword>point d'eau</sml:keyword>
+                </sml:KeywordList>
+            </sml:keywords>
             <sml:location>
                 <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
                     <gml:pos>65400.0 1731368.0</gml:pos>

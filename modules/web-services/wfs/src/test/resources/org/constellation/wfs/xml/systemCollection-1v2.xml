@@ -10,9 +10,13 @@
         <sml:System gml:id="12">
             <gml:description>information about the piezometer</gml:description>
             <gml:name>Piezometer Test</gml:name>
-            <sml:keywords>piezometer</sml:keywords>
-            <sml:keywords>geosciences</sml:keywords>
-            <sml:keywords>point d'eau</sml:keywords>
+            <sml:keywords>
+                <sml:KeywordList>
+                    <sml:keyword>piezometer</sml:keyword>
+                    <sml:keyword>geosciences</sml:keyword>
+                    <sml:keyword>point d'eau</sml:keyword>
+                </sml:KeywordList>
+            </sml:keywords>
             <sml:location>
                 <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
                     <ns3:pos srsDimension="2" srsName="EPSG:27582">65400.0 1731368.0</ns3:pos>

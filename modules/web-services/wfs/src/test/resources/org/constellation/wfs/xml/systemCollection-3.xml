@@ -10,9 +10,13 @@
         <sml:System gml:id="12">
             <gml:description>information about the piezometer</gml:description>
             <gml:name>Piezometer Test</gml:name>
-            <sml:keywords>piezometer</sml:keywords>
-            <sml:keywords>geosciences</sml:keywords>
-            <sml:keywords>point d'eau</sml:keywords>
+            <sml:keywords>
+                <sml:KeywordList>
+                    <sml:keyword>piezometer</sml:keyword>
+                    <sml:keyword>geosciences</sml:keyword>
+                    <sml:keyword>point d'eau</sml:keyword>
+                </sml:KeywordList>
+            </sml:keywords>
             <sml:location>
                 <gml:Point srsName="EPSG:4326">
                     <gml:pos>-4.14498462789604 42.387988622819975</gml:pos>

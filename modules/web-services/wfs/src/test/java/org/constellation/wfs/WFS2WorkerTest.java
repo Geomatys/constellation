@@ -140,6 +140,28 @@ public class WFS2WorkerTest {
     private static final ObjectFactory wfsFactory = new ObjectFactory();
     private static final org.geotoolkit.ogc.xml.v200.ObjectFactory ogcFactory = new org.geotoolkit.ogc.xml.v200.ObjectFactory();
 
+    private static final List<QName> alltypes = new ArrayList<QName>();
+    static {
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","BuildingCenters"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","BasicPolygons"));
+        alltypes.add(new QName("http://www.opengis.net/sml/1.0","System"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","Bridges"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","Streams"));
+        alltypes.add(new QName("http://www.opengis.net/sml/1.0","Component"));
+        alltypes.add(new QName("http://www.opengis.net/sml/1.0","DataSourceType"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","Lakes"));
+        alltypes.add(new QName("http://www.opengis.net/sampling/1.0","SamplingPoint"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","NamedPlaces"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","Buildings"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","RoadSegments"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","DividedRoutes"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","Forests"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","MapNeatline"));
+        alltypes.add(new QName("http://www.opengis.net/sml/1.0","ProcessModel"));
+        alltypes.add(new QName("http://www.opengis.net/sml/1.0","ProcessChain"));
+        alltypes.add(new QName("http://www.opengis.net/gml/3.2","Ponds"));
+    }
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
@@ -230,7 +252,7 @@ public class WFS2WorkerTest {
      * test the feature marshall
      *
      */
-    @Ignore
+    @Test
     public void getCapabilitiesTest() throws Exception {
         final Marshaller marshaller = pool.acquireMarshaller();
 
@@ -338,7 +360,7 @@ public class WFS2WorkerTest {
      * test the Getfeature operations with bad parameter causing exception return
      *
      */
-    @Ignore
+    @Test
     public void getFeatureErrorTest() throws Exception {
         /**
          * Test 1 : empty query => error
@@ -371,7 +393,7 @@ public class WFS2WorkerTest {
      * test the feature marshall
      *
      */
-    @Ignore
+    @Test
     public void getFeatureOMTest() throws Exception {
 
         /**
@@ -657,7 +679,7 @@ public class WFS2WorkerTest {
      * test the feature marshall
      *
      */
-    @Ignore
+    @Test
     public void getPropertyValueOMTest() throws Exception {
 
         /**
@@ -718,7 +740,7 @@ public class WFS2WorkerTest {
      * test the feature marshall
      *
      */
-    @Ignore
+    @Test
     public void getFeatureSMLTest() throws Exception {
 
         /**
@@ -800,7 +822,7 @@ public class WFS2WorkerTest {
      * test the feature marshall
      *
      */
-    @Ignore
+    @Test
     public void getFeatureShapeFileTest() throws Exception {
 
         /**
@@ -964,7 +986,7 @@ public class WFS2WorkerTest {
      *
      *
      */
-    @Ignore
+    @Test
     public void DescribeFeatureTest() throws Exception {
         Unmarshaller unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
 
@@ -1014,7 +1036,7 @@ public class WFS2WorkerTest {
      *
      *
      */
-    @Ignore
+    @Test
     public void TransactionUpdateTest() throws Exception {
 
         /**
@@ -1118,7 +1140,7 @@ public class WFS2WorkerTest {
 
     }
 
-    @Ignore
+    @Test
     public void TransactionDeleteTest() throws Exception {
 
         /**
@@ -1179,7 +1201,7 @@ public class WFS2WorkerTest {
      *
      *
      */
-    @Ignore
+    @Test
     public void TransactionInsertTest() throws Exception {
 
         /**
@@ -1204,7 +1226,7 @@ public class WFS2WorkerTest {
      *
      *
      */
-    @Ignore
+    @Test
     public void listStoredQueriesTest() throws Exception {
 
         final ListStoredQueriesType request = new ListStoredQueriesType("WFS", "2.0.0", null);
@@ -1216,10 +1238,16 @@ public class WFS2WorkerTest {
 
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("identifierQuery", Arrays.asList(new Title("Identifier query")), new ArrayList<QName>()));
+        items.add(new StoredQueryListItemType("identifierQuery", Arrays.asList(new Title("Identifier query")), alltypes));
         final ListStoredQueriesResponseType expResult = new ListStoredQueriesResponseType(items);
 
         assertEquals(2, result.getStoredQuery().size());
+        for (int i = 0; i < result.getStoredQuery().size(); i++) {
+            final StoredQueryListItemType expIt = items.get(i);
+            final StoredQueryListItemType resIt = result.getStoredQuery().get(i);
+            assertEquals(expIt.getReturnFeatureType(), resIt.getReturnFeatureType());
+            assertEquals(expIt, resIt);
+        }
         assertEquals(expResult, result);
 
     }
@@ -1228,7 +1256,7 @@ public class WFS2WorkerTest {
      *
      *
      */
-    @Ignore
+    @Test
     public void describeStoredQueriesTest() throws Exception {
         final DescribeStoredQueriesType request = new DescribeStoredQueriesType("WFS", "2.0.0", null, Arrays.asList("nameQuery"));
         final DescribeStoredQueriesResponse resultI = worker.describeStoredQueries(request);
@@ -1260,7 +1288,7 @@ public class WFS2WorkerTest {
      *
      *
      */
-    @Ignore
+    @Test
     public void createStoredQueriesTest() throws Exception {
         final List<StoredQueryDescriptionType> desc = new ArrayList<StoredQueryDescriptionType>();
 
@@ -1309,7 +1337,7 @@ public class WFS2WorkerTest {
 
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery",     Arrays.asList(new Title("Name query")),     Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("identifierQuery", Arrays.asList(new Title("Identifier query")), new ArrayList<QName>()));
+        items.add(new StoredQueryListItemType("identifierQuery", Arrays.asList(new Title("Identifier query")), alltypes));
         items.add(new StoredQueryListItemType("geomQuery",     Arrays.asList(new Title("Geom query")),     Arrays.asList(new QName("http://www.opengis.net/gml/3.2", "Bridges"))));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
@@ -1338,7 +1366,7 @@ public class WFS2WorkerTest {
 
     }
 
-    @Ignore
+    @Test
     public void dropStoredQueriesTest() throws Exception {
         final DropStoredQueryType request = new DropStoredQueryType("WFS", "2.0.0", null, "geomQuery");
         final DropStoredQueryResponse resultI = worker.dropStoredQuery(request);
@@ -1359,7 +1387,7 @@ public class WFS2WorkerTest {
 
         final List<StoredQueryListItemType> items = new ArrayList<StoredQueryListItemType>();
         items.add(new StoredQueryListItemType("nameQuery", Arrays.asList(new Title("Name query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
-        items.add(new StoredQueryListItemType("identifierQuery", Arrays.asList(new Title("Identifier query")), new ArrayList<QName>()));
+        items.add(new StoredQueryListItemType("identifierQuery", Arrays.asList(new Title("Identifier query")), alltypes));
         items.add(new StoredQueryListItemType("envelopeQuery", Arrays.asList(new Title("Envelope query")), Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"))));
         final ListStoredQueriesResponseType expResultlsq = new ListStoredQueriesResponseType(items);
 
@@ -1386,7 +1414,7 @@ public class WFS2WorkerTest {
 
     }
 
-    @Ignore
+    @Test
     public void getFeatureOMStoredQueriesTest() throws Exception {
 
         /**

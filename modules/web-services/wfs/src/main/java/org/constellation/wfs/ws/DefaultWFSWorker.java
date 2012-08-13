@@ -678,7 +678,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 // we verify that all the properties contained in the filter are known by the feature type.
                 verifyFilterProperty(ft, filter);
 
-                System.out.println(queryBuilder.buildQuery());
                 final FeatureCollection collection = layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery());
                 if (!collection.isEmpty()) {
                     collections.add(collection);
