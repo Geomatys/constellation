@@ -107,6 +107,8 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.v200.*;
 import org.geotoolkit.wfs.xml.v200.Title;
+import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
+import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -1027,6 +1029,18 @@ public class WFS2WorkerTest {
 
         ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system2.xsd"));
 
+        assertEquals(ExpResult.getElements().size(), result.getElements().size());
+        for (int i = 0; i < ExpResult.getElements().size(); i++) {
+            TopLevelElement expElem = ExpResult.getElements().get(i);
+            TopLevelElement resElem = result.getElements().get(i);
+            assertEquals(expElem, resElem);
+        }
+        assertEquals(ExpResult.getComplexTypes().size(), result.getComplexTypes().size());
+        for (int i = 0; i < ExpResult.getComplexTypes().size(); i++) {
+            TopLevelComplexType expElem = ExpResult.getComplexTypes().get(i);
+            TopLevelComplexType resElem = result.getComplexTypes().get(i);
+            assertEquals(expElem, resElem);
+        }
         assertEquals(ExpResult, result);
 
         XSDMarshallerPool.getInstance().release(unmarshaller);

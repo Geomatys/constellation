@@ -8,7 +8,7 @@
                 <xsd:sequence>
                     <xsd:element name="description" maxOccurs="1" minOccurs="0" type="xsd:string"/>
                     <xsd:element name="name" maxOccurs="1" minOccurs="1" type="xsd:string"/>
-                    <xsd:element name="keywords" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
+                    <xsd:element name="keywords" maxOccurs="unbounded" minOccurs="0" type="sml:KeywordListType"/>
                     <xsd:element name="phenomenons" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
                     <xsd:element name="smltype" maxOccurs="1" minOccurs="1" type="xsd:string"/>
                     <xsd:element name="smlref" maxOccurs="1" minOccurs="1" type="xsd:string"/>
@@ -21,4 +21,15 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+     <xsd:complexType name="KeywordListPropertyType">
+        <xsd:sequence>
+            <xsd:element name="KeywordList" type="sml:KeywordListType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+     <xsd:complexType name="KeywordListType">
+      <xsd:sequence>
+         <xsd:element name="codespace" maxOccurs="1" minOccurs="0" nillable="true" type="xsd:string"/>
+         <xsd:element name="keyword"   maxOccurs="unbounded" minOccurs="0" nillable="true" type="xsd:string"/>
+      </xsd:sequence>
+   </xsd:complexType>
 </xsd:schema>
