@@ -92,6 +92,8 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
+import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -599,6 +601,7 @@ public class WFSWorkerTest {
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
+        //System.out.println(writer.toString());
         domCompare(expectedResult, writer.toString());
 
         /**
@@ -850,6 +853,19 @@ public class WFSWorkerTest {
         result = worker.describeFeatureType(request);
 
         ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd"));
+
+        assertEquals(ExpResult.getElements().size(), result.getElements().size());
+        for (int i = 0; i < ExpResult.getElements().size(); i++) {
+            TopLevelElement expElem = ExpResult.getElements().get(i);
+            TopLevelElement resElem = result.getElements().get(i);
+            assertEquals(expElem, resElem);
+        }
+        assertEquals(ExpResult.getComplexTypes().size(), result.getComplexTypes().size());
+        for (int i = 0; i < ExpResult.getComplexTypes().size(); i++) {
+            TopLevelComplexType expElem = ExpResult.getComplexTypes().get(i);
+            TopLevelComplexType resElem = result.getComplexTypes().get(i);
+            assertEquals(expElem, resElem);
+        }
 
         assertEquals(ExpResult, result);
 

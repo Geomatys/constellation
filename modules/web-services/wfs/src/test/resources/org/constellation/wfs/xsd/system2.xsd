@@ -12,8 +12,8 @@
                     <xsd:element name="phenomenons" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
                     <xsd:element name="smltype" maxOccurs="1" minOccurs="1" type="xsd:string"/>
                     <xsd:element name="smlref" maxOccurs="1" minOccurs="1" type="xsd:string"/>
-                    <xsd:element name="inputs" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
-                    <xsd:element name="outputs" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
+                    <xsd:element name="inputs" maxOccurs="unbounded" minOccurs="0" type="sml:InputListPropertyType"/>
+                    <xsd:element name="outputs" maxOccurs="unbounded" minOccurs="0" type="sml:OutputListPropertyType"/>
                     <xsd:element name="producer" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
                     <xsd:element name="components" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
                     <xsd:element name="location" maxOccurs="1" minOccurs="1" type="gml:Point"/>
@@ -26,10 +26,52 @@
             <xsd:element name="KeywordList" type="sml:KeywordListType"/>
         </xsd:sequence>
     </xsd:complexType>
-     <xsd:complexType name="KeywordListType">
-      <xsd:sequence>
-         <xsd:element name="codespace" maxOccurs="1" minOccurs="0" nillable="true" type="xsd:string"/>
-         <xsd:element name="keyword"   maxOccurs="unbounded" minOccurs="0" nillable="true" type="xsd:string"/>
-      </xsd:sequence>
-   </xsd:complexType>
+    <xsd:complexType name="KeywordListType">
+        <xsd:sequence>
+            <xsd:element name="codespace" maxOccurs="1" minOccurs="0" nillable="true" type="xsd:string"/>
+            <xsd:element name="keyword"   maxOccurs="unbounded" minOccurs="0" nillable="true" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="InputListPropertyType">
+        <xsd:sequence>
+            <xsd:element name="InputList" type="sml:InputListType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="InputPropertyType">
+        <xsd:sequence>
+            <xsd:element name="Input" type="sml:InputType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="InputType">
+        <xsd:sequence>
+            <xsd:element name="name"       maxOccurs="1" minOccurs="0" nillable="true" type="xsd:string"/>
+            <xsd:element name="description" maxOccurs="1" minOccurs="0" nillable="true" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="InputListType">
+        <xsd:sequence>
+            <xsd:element name="input" maxOccurs="unbounded" minOccurs="0" nillable="true" type="sml:InputPropertyType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="OutputListPropertyType">
+        <xsd:sequence>
+            <xsd:element name="OutputList" type="sml:OutputListType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="OutputPropertyType">
+        <xsd:sequence>
+            <xsd:element name="Output" type="sml:OutputType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="OutputType">
+        <xsd:sequence>
+            <xsd:element name="name"       maxOccurs="1" minOccurs="0" nillable="true" type="xsd:string"/>
+            <xsd:element name="description" maxOccurs="1" minOccurs="0" nillable="true" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="OutputListType">
+        <xsd:sequence>
+            <xsd:element name="output" maxOccurs="unbounded" minOccurs="0" nillable="true" type="sml:OutputPropertyType"/>
+        </xsd:sequence>
+    </xsd:complexType>
 </xsd:schema>
