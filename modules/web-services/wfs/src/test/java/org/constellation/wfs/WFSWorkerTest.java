@@ -129,27 +129,24 @@ public class WFSWorkerTest {
             FileUtilities.deleteDirectory(new File("WFSWorkerTest"));
         }
 
-        try {
-            pool = WFSMarshallerPool.getInstance();
 
-            if (!configDir.exists()) {
-                configDir.mkdir();
-                Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
-                Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
-                Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
-                LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
-                lc.getCustomParameters().put("transactionSecurized", "false");
+        pool = WFSMarshallerPool.getInstance();
 
-                //we write the configuration file
-                File configFile = new File(configDir, "layerContext.xml");
-                final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                marshaller.marshal(lc, configFile);
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
-            }
+        if (!configDir.exists()) {
+            configDir.mkdir();
+            Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
+            Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
+            Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
+            LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
+            lc.getCustomParameters().put("transactionSecurized", "false");
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            //we write the configuration file
+            File configFile = new File(configDir, "layerContext.xml");
+            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+            marshaller.marshal(lc, configFile);
+            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
         }
+
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");
@@ -205,7 +202,7 @@ public class WFSWorkerTest {
         request = new GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
 
         try {
-            result = worker.getCapabilities(request);
+            worker.getCapabilities(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
@@ -215,7 +212,7 @@ public class WFSWorkerTest {
         request = new GetCapabilitiesType(acceptVersion, null, null, null, "WPS");
 
         try {
-            result = worker.getCapabilities(request);
+            worker.getCapabilities(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
@@ -225,7 +222,7 @@ public class WFSWorkerTest {
         request = new GetCapabilitiesType(null);
 
         try {
-            result = worker.getCapabilities(request);
+            worker.getCapabilities(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
@@ -550,7 +547,7 @@ public class WFSWorkerTest {
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
         try {
-            result = worker.getFeature(request);
+            worker.getFeature(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             //ok
@@ -567,7 +564,7 @@ public class WFSWorkerTest {
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
         try {
-            result = worker.getFeature(request);
+            worker.getFeature(request);
             fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);

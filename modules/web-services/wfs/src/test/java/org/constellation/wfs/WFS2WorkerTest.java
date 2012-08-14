@@ -173,48 +173,46 @@ public class WFS2WorkerTest {
             FileUtilities.deleteDirectory(new File("WFSWorker2Test"));
         }
 
-        try {
-            pool = WFSMarshallerPool.getInstance();
 
-            if (!configDir.exists()) {
+        pool = WFSMarshallerPool.getInstance();
 
-                configDir.mkdir();
+        if (!configDir.exists()) {
 
-                Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
-                Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
-                Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
-                LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
-                lc.getCustomParameters().put("transactionSecurized", "false");
+            configDir.mkdir();
 
-                //we write the configuration file
-                Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                File configFile = new File(configDir, "layerContext.xml");
-                marshaller.marshal(lc, configFile);
+            Source s1 = new Source("shapeSrc", Boolean.TRUE, null, null);
+            Source s2 = new Source("omSrc", Boolean.TRUE, null, null);
+            Source s3 = new Source("smlSrc", Boolean.TRUE, null, null);
+            LayerContext lc = new LayerContext(new Layers(Arrays.asList(s1, s2, s3)));
+            lc.getCustomParameters().put("transactionSecurized", "false");
 
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            //we write the configuration file
+            Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+            File configFile = new File(configDir, "layerContext.xml");
+            marshaller.marshal(lc, configFile);
 
-                final List<StoredQueryDescription> descriptions = new ArrayList<StoredQueryDescription>();
-                final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
-                final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-                final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
-                final FilterType filter = new FilterType(pis);
-                final QueryType query = new QueryType(filter, types, "2.0.0");
-                final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", query, types);
-                final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
-                descriptions.add(des1);
-                final StoredQueries storesQueries = new StoredQueries(descriptions);
+            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
 
-                //we write the configuration file
-                marshaller = WFSMarshallerPool.getInstance().acquireMarshaller();
-                configFile = new File(configDir, "StoredQueries.xml");
-                marshaller.marshal(storesQueries, configFile);
-                WFSMarshallerPool.getInstance().release(marshaller);
+            final List<StoredQueryDescription> descriptions = new ArrayList<StoredQueryDescription>();
+            final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+            final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+            final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
+            final FilterType filter = new FilterType(pis);
+            final QueryType query = new QueryType(filter, types, "2.0.0");
+            final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", query, types);
+            final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
+            descriptions.add(des1);
+            final StoredQueries storesQueries = new StoredQueries(descriptions);
 
-            }
+            //we write the configuration file
+            marshaller = WFSMarshallerPool.getInstance().acquireMarshaller();
+            configFile = new File(configDir, "StoredQueries.xml");
+            marshaller.marshal(storesQueries, configFile);
+            WFSMarshallerPool.getInstance().release(marshaller);
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
+
+
         worker = new DefaultWFSWorker("default", configDir);
         worker.setLogLevel(Level.FINER);
         worker.setServiceUrl("http://geomatys.com/constellation/WS/");

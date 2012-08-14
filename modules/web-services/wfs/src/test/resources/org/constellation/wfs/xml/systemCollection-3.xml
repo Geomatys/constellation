@@ -27,7 +27,7 @@
             <sml:phenomenons>validity</sml:phenomenons>
             <sml:smltype>System</sml:smltype>
             <sml:smlref>http://ades.eaufrance.fr/FichePtEau.aspx?code=10972X0137/PONT</sml:smlref>
-                        <sml:inputs>
+            <sml:inputs>
                 <sml:InputList>
                     <sml:input>
                         <sml:Input>
@@ -37,15 +37,23 @@
                     </sml:input>
                 </sml:InputList>
             </sml:inputs>
-            <sml:outputs>
+             <sml:outputs>
                 <sml:OutputList>
                     <sml:output>
                         <sml:Output>
                             <gml:name>time</gml:name>
-                            <gml:name>depth</gml:name>
-                            <gml:name>validity</gml:name>
                             <gml:description>urn:x-ogc:def:phenomenon:observationTime</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>depth</gml:name>
                             <gml:description>urn:x-ogc:def:phenomenon:OGC:depth</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>validity</gml:name>
                             <gml:description>urn:x-ogc:def:phenomenon:BRGM:validity</gml:description>
                         </sml:Output>
                     </sml:output>

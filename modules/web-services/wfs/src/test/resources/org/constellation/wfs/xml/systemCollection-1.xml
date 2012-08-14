@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sml="http://www.opengis.net/sml/1.0">
+<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs" xmlns:gml="http://www.opengis.net/gml" gml:id="id" xmlns:sml="http://www.opengis.net/sml/1.0">
     <gml:boundedBy>
-        <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582">
             <gml:lowerCorner>65400.0 1731368.0</gml:lowerCorner>
             <gml:upperCorner>65400.0 1731368.0</gml:upperCorner>
         </gml:Envelope>
@@ -18,7 +18,7 @@
                 </sml:KeywordList>
             </sml:keywords>
             <sml:location>
-                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+                <gml:Point srsName="urn:ogc:def:crs:epsg:7.9:27582">
                     <gml:pos>65400.0 1731368.0</gml:pos>
                 </gml:Point>
             </sml:location>
@@ -42,10 +42,18 @@
                     <sml:output>
                         <sml:Output>
                             <gml:name>time</gml:name>
-                            <gml:name>depth</gml:name>
-                            <gml:name>validity</gml:name>
                             <gml:description>urn:x-ogc:def:phenomenon:observationTime</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>depth</gml:name>
                             <gml:description>urn:x-ogc:def:phenomenon:OGC:depth</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>validity</gml:name>
                             <gml:description>urn:x-ogc:def:phenomenon:BRGM:validity</gml:description>
                         </sml:Output>
                     </sml:output>
