@@ -741,6 +741,67 @@ public class WFS2WorkerTest {
      *
      */
     @Test
+    public void getPropertyValueSMLTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName System with HITS
+         */
+        QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+        String valueReference = "inputs";
+        GetPropertyValueType request = new GetPropertyValueType("WFS", "2.0.0", null, Integer.MAX_VALUE, query, ResultTypeType.HITS, "text/xml; subtype=gml/3.2.1");
+        request.setValueReference(valueReference);
+
+        Object result = worker.getPropertyValue(request);
+
+        assertTrue(result instanceof ValueCollection);
+        assertEquals(3, ((ValueCollection)result).getNumberReturned());
+
+        /**
+         * Test 2 : query on typeName System with RESULTS
+         */
+        request.setResultType(ResultTypeType.RESULTS);
+        result = worker.getPropertyValue(request);
+
+        assertTrue(result instanceof ValueCollectionWrapper);
+        ValueCollectionWrapper wrapper = (ValueCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        valueWriter   = new JAXPStreamValueCollectionWriter(valueReference);
+
+        StringWriter writer = new StringWriter();
+        valueWriter.write((FeatureCollection)result,writer);
+
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.ValueCollectionSML1.xml"));
+        domCompare(expectedResult, writer.toString());
+
+        /**
+         * Test 3 : query on typeName System with RESULTS
+         */
+        valueReference = "keywords";
+        request.setValueReference(valueReference);
+        result = worker.getPropertyValue(request);
+
+        assertTrue(result instanceof ValueCollectionWrapper);
+        wrapper = (ValueCollectionWrapper) result;
+        result = wrapper.getFeatureCollection();
+        assertEquals("3.2.1", wrapper.getGmlVersion());
+
+        valueWriter   = new JAXPStreamValueCollectionWriter(valueReference);
+
+        writer = new StringWriter();
+        valueWriter.write((FeatureCollection)result,writer);
+
+        expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.ValueCollectionSML2.xml"));
+        expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
+        domCompare(expectedResult, writer.toString());
+    }
+
+    /**
+     * test the feature marshall
+     *
+     */
+    @Test
     public void getFeatureSMLTest() throws Exception {
 
         /**

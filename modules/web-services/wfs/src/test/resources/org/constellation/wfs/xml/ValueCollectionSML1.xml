@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wfs:ValueCollection xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:sml="http://www.opengis.net/sml/1.0">
+    <wfs:member>
+        <sml:Input>
+            <gml:name>level</gml:name>
+            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+        </sml:Input>
+    </wfs:member>
+    <wfs:member>
+        <sml:Input>
+            <gml:name>level</gml:name>
+            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+        </sml:Input>
+    </wfs:member>
+    <wfs:member>
+        <sml:Input>
+            <gml:name>level</gml:name>
+            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+        </sml:Input>
+    </wfs:member>
+</wfs:ValueCollection>

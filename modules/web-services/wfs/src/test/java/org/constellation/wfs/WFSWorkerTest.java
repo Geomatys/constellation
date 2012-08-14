@@ -648,7 +648,6 @@ public class WFSWorkerTest {
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
-        System.out.println(writer.toString());
         domCompare(expectedResult, writer.toString());
     }
 

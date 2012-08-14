@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wfs:ValueCollection xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:sml="http://www.opengis.net/sml/1.0">
+    <wfs:member>
+        <sml:keyword>piezometer</sml:keyword>
+        <sml:keyword>geosciences</sml:keyword>
+        <sml:keyword>point d'eau</sml:keyword>
+    </wfs:member>
+    <wfs:member>
+        <sml:keyword>well</sml:keyword>
+        <sml:keyword>geosciences</sml:keyword>
+        <sml:keyword>point d'eau</sml:keyword>
+    </wfs:member>
+    <wfs:member>
+        <sml:keyword>flotting plot</sml:keyword>
+        <sml:keyword>geosciences</sml:keyword>
+        <sml:keyword>sea</sml:keyword>
+    </wfs:member>
+</wfs:ValueCollection>
