@@ -2,8 +2,8 @@
 <wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:sml="http://www.opengis.net/sml/1.0">
     <gml:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
-            <gml:lowerCorner>65400.0 1731368.0</gml:lowerCorner>
-            <gml:upperCorner>65400.0 1731368.0</gml:upperCorner>
+            <gml:lowerCorner>65300.0 1731368.0</gml:lowerCorner>
+            <gml:upperCorner>67300.0 1851848.0</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
     <gml:featureMember>
@@ -37,7 +37,7 @@
                     </sml:input>
                 </sml:InputList>
             </sml:inputs>
-             <sml:outputs>
+            <sml:outputs>
                 <sml:OutputList>
                     <sml:output>
                         <sml:Output>
@@ -60,6 +60,118 @@
                 </sml:OutputList>
             </sml:outputs>
             <sml:producer name="BRGM">BLAISE Marion (BRGM)</sml:producer>
+        </sml:System>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sml:System gml:id="14">
+            <gml:description>a well in south africa</gml:description>
+            <gml:name>Well Test</gml:name>
+            <sml:keywords>
+                <sml:KeywordList>
+                    <sml:keyword>well</sml:keyword>
+                    <sml:keyword>geosciences</sml:keyword>
+                    <sml:keyword>point d'eau</sml:keyword>
+                </sml:KeywordList>
+            </sml:keywords>
+            <sml:location>
+                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <ns3:pos srsDimension="2" srsName="EPSG:27582">67300.0 1851848.0</ns3:pos>
+                </ns3:Point>
+            </sml:location>
+            <sml:phenomenons>time</sml:phenomenons>
+            <sml:phenomenons>depth</sml:phenomenons>
+            <sml:phenomenons>validity</sml:phenomenons>
+            <sml:smltype>System</sml:smltype>
+            <sml:smlref>http://ades.eaufrance.fr/FichePtEau.aspx?code=10972X0137/PONT</sml:smlref>
+            <sml:inputs>
+                <sml:InputList>
+                    <sml:input>
+                        <sml:Input>
+                            <gml:name>level</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+                        </sml:Input>
+                    </sml:input>
+                </sml:InputList>
+            </sml:inputs>
+            <sml:outputs>
+                <sml:OutputList>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>time</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:observationTime</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>depth</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:OGC:depth</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>validity</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:BRGM:validity</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                </sml:OutputList>
+            </sml:outputs>
+            <sml:producer name="BRGM">BLAISE Marion (BRGM)</sml:producer>
+        </sml:System>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sml:System gml:id="16">
+            <gml:description>Flotting plot</gml:description>
+            <gml:name>Plot Test</gml:name>
+            <sml:keywords>
+                <sml:KeywordList>
+                    <sml:keyword>flotting plot</sml:keyword>
+                    <sml:keyword>geosciences</sml:keyword>
+                    <sml:keyword>sea</sml:keyword>
+                </sml:KeywordList>
+            </sml:keywords>
+            <sml:location>
+                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <ns3:pos srsDimension="2" srsName="EPSG:27582">65300.0 1741257.0</ns3:pos>
+                </ns3:Point>
+            </sml:location>
+            <sml:phenomenons>time</sml:phenomenons>
+            <sml:phenomenons>depth</sml:phenomenons>
+            <sml:phenomenons>validity</sml:phenomenons>
+            <sml:smltype>System</sml:smltype>
+            <sml:smlref>http://ades.eaufrance.fr/FichePtEau.aspx?code=10972X0137/PONT</sml:smlref>
+            <sml:inputs>
+                <sml:InputList>
+                    <sml:input>
+                        <sml:Input>
+                            <gml:name>level</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:OGC:level</gml:description>
+                        </sml:Input>
+                    </sml:input>
+                </sml:InputList>
+            </sml:inputs>
+            <sml:outputs>
+                <sml:OutputList>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>time</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:observationTime</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>depth</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:OGC:depth</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                    <sml:output>
+                        <sml:Output>
+                            <gml:name>validity</gml:name>
+                            <gml:description>urn:x-ogc:def:phenomenon:BRGM:validity</gml:description>
+                        </sml:Output>
+                    </sml:output>
+                </sml:OutputList>
+            </sml:outputs>
+            <sml:producer name="COnservatoire de france">Alfred Musset</sml:producer>
         </sml:System>
     </gml:featureMember>
 </wfs:FeatureCollection>

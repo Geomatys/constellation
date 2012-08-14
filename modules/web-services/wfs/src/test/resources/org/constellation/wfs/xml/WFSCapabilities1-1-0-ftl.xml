@@ -195,8 +195,8 @@
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ows:LowerCorner>-4.1441104685037145 42.384870135541846</ows:LowerCorner>
-                <ows:UpperCorner>-4.1441104685037145 42.384870135541846</ows:UpperCorner>
+                <ows:LowerCorner>-4.267780806810321 42.384796180904864</ows:LowerCorner>
+                <ows:UpperCorner>-4.121179134071048 43.46478200379224</ows:UpperCorner>
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
     </wfs:FeatureTypeList>
