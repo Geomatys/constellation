@@ -49,15 +49,22 @@ public class AddStyleToStyleProvider extends AbstractCstlProcess {
     protected void execute() throws ProcessException {
 
         final String providerId = value(PROVIDER_ID, inputParameters);
-        final String styleName = value(STYLE_ID, inputParameters);
+        String styleName = value(STYLE_ID, inputParameters);
         final MutableStyle style = value(STYLE, inputParameters);
 
         if (providerId == null || "".equals(providerId.trim())) {
             throw new ProcessException("Provider identifier can't be null or empty.", this, null);
         }
 
-        if (styleName == null || "".equals(styleName.trim())) {
-            throw new ProcessException("Provider identifier can't be null or empty.", this, null);
+        //use MutableStyle name if style_name parame is null.
+        if ( styleName == null || "".equals(styleName.trim()) ) {
+            if ( style.getName() == null || "".equals(style.getName().trim()) ) {
+                throw new ProcessException("Style name can't be null or empty. Please set a name in style or use style_name input parameter.", this, null);
+            } else {
+                styleName = style.getName();
+            }
+        } else {
+            style.setName(styleName);
         }
 
         if (style != null) {

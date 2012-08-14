@@ -66,10 +66,45 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
         final File styleFile = new File(configDirectory.getAbsolutePath()+"/sldDir/", "myStyle.xml");
         assertTrue(styleFile.exists());
         assertTrue(provider.contains("myStyle"));
-
+        
         removeProvider("createStyleProvider1");
+        styleFile.delete();
     }
 
+    /**
+     * Empty style name
+     */
+    @Test
+    public void testCreateStyle2() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
+
+        addProvider(buildProvider("createStyleProvider3", true));
+
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, AddStyleToStyleProviderDescriptor.NAME);
+
+        final MutableStyleFactory msf = new DefaultStyleFactory();
+        final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
+        style.setName("styleName");
+
+        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
+        in.parameter(AddStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider3");
+        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
+
+        desc.createProcess(in).call();
+        
+        Provider provider = null;
+        for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
+            if ("createStyleProvider3".equals(p.getId())){
+                provider = p;
+            }
+        }
+        assertNotNull(provider);
+        final File styleFile = new File(configDirectory.getAbsolutePath()+"/sldDir/", "styleName.xml");
+        assertTrue(styleFile.exists());
+        assertTrue(provider.contains("styleName"));
+
+        removeProvider("createStyleProvider3");
+    }
+    
     /**
      * Provider doesn't exist.
      */
@@ -117,14 +152,12 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
             //do nothing
         }
     }
-
+    
     /**
-     * Empty style name
+     * Empty provider name
      */
     @Test
     public void testFailCreateStyle3() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
-
-        addProvider(buildProvider("createStyleProvider3", true));
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, AddStyleToStyleProviderDescriptor.NAME);
 
@@ -132,8 +165,7 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(AddStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider3");
-        in.parameter(AddStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue("");
+        in.parameter(AddStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue("createStyleProvider4");
         in.parameter(AddStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
 
         try {
@@ -142,7 +174,7 @@ public class CreateMapStyleTest extends AbstractMapStyleTest {
         } catch (ProcessException ex) {
             //do nothing
         }
-
-        removeProvider("createStyleProvider3");
     }
+
+    
 }

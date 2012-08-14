@@ -53,7 +53,7 @@ public class AddStyleToStyleProviderDescriptor extends AbstractProcessDescriptor
     public static final String STYLE_ID_NAME = "style_Name";
     private static final String STYLE_ID_REMARKS = "Name/Identifier of the new style.";
     public static final ParameterDescriptor<String> STYLE_ID =
-            new DefaultParameterDescriptor(STYLE_ID_NAME, STYLE_ID_REMARKS, String.class, null, true);
+            new DefaultParameterDescriptor(STYLE_ID_NAME, STYLE_ID_REMARKS, String.class, null, false);
 
     /*
      * Style
