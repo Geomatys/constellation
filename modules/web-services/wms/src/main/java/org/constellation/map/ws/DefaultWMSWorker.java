@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2012, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,37 +17,21 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
-import org.geotoolkit.display2d.GO2Utilities;
-import java.util.Collections;
-import java.beans.PropertyChangeEvent;
-import org.geotoolkit.display2d.service.OutputDef;
-import org.constellation.portrayal.internal.PortrayalResponse;
-import org.constellation.configuration.Reference;
-import org.geotoolkit.wms.xml.v130.DataURL;
-import org.constellation.configuration.FormatURL;
-import org.geotoolkit.wms.xml.v130.MetadataURL;
-import java.util.Arrays;
-import org.geotoolkit.wms.xml.v130.Keyword;
-import org.constellation.configuration.Layer;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.ws.LayerWorker;
-import java.io.File;
-import org.geotoolkit.wms.xml.v130.Capability;
-import java.net.URL;
-import org.geotoolkit.sld.MutableLayer;
-import org.opengis.util.FactoryException;
-import org.geotoolkit.sld.MutableStyledLayerDescriptor;
-import org.geotoolkit.sld.xml.XMLUtilities;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -65,23 +49,33 @@ import javax.xml.bind.JAXBException;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AttributionType;
+import org.constellation.configuration.Layer;
+import org.constellation.configuration.FormatURL;
+import org.constellation.configuration.Reference;
+import org.constellation.converter.DataReferenceConverter;
 import org.constellation.map.visitor.GetFeatureInfoVisitor;
 import org.constellation.map.visitor.WMSVisitorFactory;
 import org.constellation.portrayal.PortrayalUtil;
+import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.query.wms.WMSQuery;
-import org.geotoolkit.util.PeriodUtilities;
+import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
 import static org.constellation.api.CommonConstants.*;
-import org.constellation.converter.DataReferenceConverter;
+import static org.constellation.query.wms.WMSQuery.*;
 
 //Geotoolkit dependencies
+import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
@@ -89,20 +83,37 @@ import org.geotoolkit.factory.Hints;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
 import org.geotoolkit.inspire.xml.vs.LanguageType;
 import org.geotoolkit.inspire.xml.vs.LanguagesType;
+import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
+import org.geotoolkit.map.MapItem;
+import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
+import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
 import org.geotoolkit.sld.MutableNamedStyle;
+import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.sld.xml.GetLegendGraphic;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.StyleUtilities;
 import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.PeriodUtilities;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.util.converter.NonconvertibleObjectException;
+import org.geotoolkit.wms.xml.v111.Request;
+import org.geotoolkit.wms.xml.v130.Keyword;
+import org.geotoolkit.wms.xml.v130.DataURL;
+import org.geotoolkit.wms.xml.v130.Capability;
+import org.geotoolkit.wms.xml.v130.MetadataURL;
+import org.geotoolkit.wms.xml.v130.Identifier;
+import org.geotoolkit.wms.xml.v130.KeywordList;
+import org.geotoolkit.wms.xml.v130.LogoURL;
 import org.geotoolkit.wms.xml.AbstractDimension;
 import org.geotoolkit.wms.xml.AbstractLayer;
 import org.geotoolkit.wms.xml.AbstractRequest;
@@ -116,30 +127,18 @@ import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v130.Attribution;
 import org.geotoolkit.wms.xml.v130.AuthorityURL;
 import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
+import org.geotoolkit.xml.MarshallerPool;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 //Geoapi dependencies
-import org.geotoolkit.wms.xml.v130.Identifier;
-import org.geotoolkit.wms.xml.v130.KeywordList;
-import org.geotoolkit.wms.xml.v130.LogoURL;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.query.wms.WMSQuery.*;
-import org.constellation.util.DataReference;
-import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.map.MapItem;
-import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.style.StyleUtilities;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.wms.xml.v111.Request;
 import org.opengis.style.Style;
+import org.opengis.util.FactoryException;
 
 
 /**
@@ -152,8 +151,6 @@ import org.opengis.style.Style;
  * in one of the fields of the parent class which holds instances of the
  * injectable interface {@code Context} objects created by the JEE container.
  * </p>
- *
- * @version $Id$
  *
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)

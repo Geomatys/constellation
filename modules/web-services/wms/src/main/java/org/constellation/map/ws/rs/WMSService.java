@@ -472,7 +472,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         /*
          * we verify that the exception format is an allowed value
          */
-        if ("1.3.0".equals(version)) {
+        if (ServiceDef.WMS_1_3_0_SLD.version.toString().equals(version)) {
             if (strExceptions != null &&
                 (!"XML".equals(strExceptions) && !"INIMAGE".equals(strExceptions) && !"BLANK".equals(strExceptions))) {
                 throw new CstlServiceException("exception format:" + strExceptions + " is not allowed. Use XML, INIMAGE or BLANK", INVALID_PARAMETER_VALUE);

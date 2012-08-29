@@ -989,14 +989,14 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <repository>
+        <!--repository>
             <id>jboss.com</id>
             <name>Jboss</name>
             <url>http://repository.jboss.com/maven2/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
+        </repository-->
          <repository>
             <id>jboss nexus</id>
             <name>Jboss nexus</name>
