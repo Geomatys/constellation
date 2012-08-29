@@ -877,6 +877,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         try {
             final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
             sdef.setContext(context);
+            //apply layercontext filters
+            applyLayerFilters(context);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
@@ -1137,26 +1139,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 if(mapLayer instanceof MapLayer){
                     ((MapLayer)mapLayer).setSelectable(true);
                 }
-                if (mapLayer instanceof FeatureMapLayer) {
-                    final FeatureMapLayer fml = (FeatureMapLayer)mapLayer;
-                    if (fml != null) {
-                        final Layer layerContext = layersContext.get(layerRef.getName());
-                        if (layerContext.getFilter() != null) {
-                            final XMLUtilities xmlUtil = new XMLUtilities();
-                            Filter filterGt = Filter.INCLUDE;
-                            try {
-                                filterGt = xmlUtil.getTransformer110().visitFilter(layerContext.getFilter());
-                            } catch (FactoryException e) {
-                                LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-                            }
-
-                            fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filterGt));
-                        }
-                    }
-                }
                 mapLayer.setVisible(true);
                 context.items().add(mapLayer);
             }
+            //apply layercontext filters
+            applyLayerFilters(context);
 
             sdef.setContext(context);
         } catch (PortrayalException ex) {
@@ -1311,6 +1298,28 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         return styles;
     }
 
+    private void applyLayerFilters(final MapContext context){
+        final Map<Name,Layer> layersContext = getLayers();
+        
+        for(MapLayer layer : context.layers()){
+            if (layer instanceof FeatureMapLayer) {
+                final FeatureMapLayer fml = (FeatureMapLayer)layer;
+                final Layer layerContext = layersContext.get(fml.getCollection().getFeatureType().getName());
+                if (layerContext.getFilter() != null) {
+                    final XMLUtilities xmlUtil = new XMLUtilities();
+                    Filter filterGt = Filter.INCLUDE;
+                    try {
+                        filterGt = xmlUtil.getTransformer110().visitFilter(layerContext.getFilter());
+                    } catch (FactoryException e) {
+                        LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+                    }
+                    fml.setQuery(QueryBuilder.filtered(fml.getCollection().getFeatureType().getName(), filterGt));
+                }
+            }
+        }
+        
+    }
+    
     /**
      * Overriden from AbstractWorker because the behaviour is different when the request updateSequence
      * is equal to the current.
