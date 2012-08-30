@@ -26,7 +26,11 @@ import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.filter.text.cql2.CQL;
+import org.geotoolkit.filter.text.cql2.CQLException;
+import org.geotoolkit.map.DefaultCoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
@@ -36,6 +40,7 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.util.MeasurementRange;
 import org.opengis.feature.type.Name;
+import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
@@ -123,6 +128,34 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
                     ref,
                     style,
                     getName().getLocalPart());
+
+        // EXTRA FILTER extra parameter ////////////////////////////////////////
+        if (params != null && layer instanceof DefaultCoverageMapLayer) {
+            final Map<String,?> extras = (Map<String, ?>) params.get(KEY_EXTRA_PARAMETERS);
+            if(extras != null){
+                for(String key : extras.keySet()){
+                    if(key.equalsIgnoreCase("cql_filter")){
+                        final String cqlFilter = ((List)extras.get(key)).get(0).toString();
+                        if(cqlFilter == null){
+                            break;
+                        }
+                        try {
+                            final Filter filter = CQL.toFilter(cqlFilter);
+                            if(filter != null){
+                                final DefaultCoverageMapLayer cml = (DefaultCoverageMapLayer) layer;
+                                cml.setQuery(QueryBuilder.filtered(cml.getCoverageName(), filter));
+                            }
+
+                        } catch (CQLException ex) {
+                            LOGGER.log(Level.INFO,  ex.getMessage(),ex);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        ////////////////////////////////////////////////////////////////////////
+
         return layer;
     }
 
