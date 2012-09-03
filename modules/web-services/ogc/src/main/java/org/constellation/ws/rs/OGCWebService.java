@@ -198,24 +198,28 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 
     private void startAllInstance() {
         final File serviceDirectory = getServiceDirectory();
-        for (File instanceDirectory : serviceDirectory.listFiles()) {
-            if (instanceDirectory.isDirectory()) {
-                final String instance = instanceDirectory.getName();
-                try {
-                    ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
-                    ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                    inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                    inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(instance);
-                    inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(serviceDirectory);
+        if (serviceDirectory != null && serviceDirectory.isDirectory()) {
+            for (File instanceDirectory : serviceDirectory.listFiles()) {
+                if (instanceDirectory.isDirectory()) {
+                    final String instance = instanceDirectory.getName();
+                    try {
+                        ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
+                        ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                        inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+                        inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(instance);
+                        inputs.parameter(StartServiceDescriptor.SERVICE_DIRECTORY_NAME).setValue(serviceDirectory);
 
-                    org.geotoolkit.process.Process proc = desc.createProcess(inputs);
-                    proc.call();
-                } catch (NoSuchIdentifierException ex) {
-                    LOGGER.log(Level.SEVERE, "StartService process is unreachable.");
-                } catch (ProcessException ex) {
-                    LOGGER.log(Level.SEVERE, ex.getLocalizedMessage());
+                        org.geotoolkit.process.Process proc = desc.createProcess(inputs);
+                        proc.call();
+                    } catch (NoSuchIdentifierException ex) {
+                        LOGGER.log(Level.SEVERE, "StartService process is unreachable.");
+                    } catch (ProcessException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getLocalizedMessage());
+                    }
                 }
             }
+        } else {
+            LOGGER.log(Level.WARNING, "no service directory for :{0}", serviceName);
         }
     }
 

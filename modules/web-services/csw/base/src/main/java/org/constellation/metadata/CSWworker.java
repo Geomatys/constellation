@@ -226,7 +226,7 @@ public class CSWworker extends AbstractWorker {
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
      *
      */
-    public CSWworker(final String serviceID, File configDir) {
+    public CSWworker(final String serviceID, final File configDir) {
         this(serviceID, configDir, null);
     }
 

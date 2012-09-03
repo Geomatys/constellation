@@ -64,7 +64,7 @@ public final class RestartService extends AbstractCstlProcess {
             }
         }
 
-        if (serviceDir.exists() && serviceDir.isDirectory()) {
+        if (serviceDir.isDirectory()) {
 
             if (identifier == null || "".equals(identifier)) {
                 buildWorkers(serviceDir, serviceName, null, closeFirst, clazz);
@@ -90,22 +90,25 @@ public final class RestartService extends AbstractCstlProcess {
      */
     private void buildWorkers(final File serviceDir, final String serviceName, final String identifier, final boolean closeInstance, final Class clazz) throws ProcessException {
 
+        /*
+         * Single refresh
+         */
         if (identifier != null) {
             if (closeInstance) {
-                WSEngine.shutdownInstance(serviceDir.getName(), identifier);
+                WSEngine.shutdownInstance(serviceName, identifier);
             }
 
             final File instanceDirectory = new File(serviceDir, identifier);
 
-            if (instanceDirectory.exists() && serviceDir.isDirectory()) {
+            if (instanceDirectory.isDirectory()) {
                 if (!instanceDirectory.getName().startsWith(".")) {
                     try {
                         final Constructor constructor = clazz.getConstructor(String.class, File.class);
 
-                        Worker worker = (Worker) constructor.newInstance(instanceDirectory.getName(), instanceDirectory);
+                        final Worker worker = (Worker) constructor.newInstance(instanceDirectory.getName(), instanceDirectory);
 
                         if (worker != null) {
-                            WSEngine.addServiceInstance(serviceDir.getName(), identifier, worker);
+                            WSEngine.addServiceInstance(serviceName, identifier, worker);
                             if (!worker.isStarted()) {
                                 throw new ProcessException("Unable to start the instance " + identifier + ".", this, null);
                             }
@@ -129,59 +132,49 @@ public final class RestartService extends AbstractCstlProcess {
             } else {
                 throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
             }
-
+        /*
+         * Multiple refresh
+         */
         } else {
 
-            Map<String, Worker> oldWorkersMap = null;
-            if (WSEngine.getWorkersMap(serviceName) != null ) {
-                oldWorkersMap = new HashMap<String, Worker>(WSEngine.getWorkersMap(serviceName));
-            }
             final Map<String, Worker> workersMap = new HashMap<String, Worker>();
-
             if (closeInstance) {
-                WSEngine.destroyInstances(serviceDir.getName());
+                WSEngine.destroyInstances(serviceName);
             }
 
-            if (oldWorkersMap != null && !oldWorkersMap.isEmpty()) {
-                for (File instanceDir : serviceDir.listFiles()) {
-                    /*
-                    * For each sub-directory we build a new Worker only if his already have an instance.
-                    */
-                    if (instanceDir.isDirectory()) {
-                        if (!instanceDir.getName().startsWith(".")) {
-                            if (oldWorkersMap.containsKey(instanceDir.getName())) {
+            for (File instanceDir : serviceDir.listFiles()) {
+                if (instanceDir.isDirectory()) {
+                    final String instanceID = instanceDir.getName();
+                    if (!instanceID.startsWith(".")) {
+                        try {
+                            final Constructor constructor = clazz.getConstructor(String.class, File.class);
 
-                                try {
-                                    final Constructor constructor = clazz.getConstructor(String.class, File.class);
+                            final Worker worker = (Worker) constructor.newInstance(instanceID, instanceDir);
 
-                                    Worker worker = (Worker) constructor.newInstance(identifier, instanceDir);
-
-                                    if (worker != null) {
-                                        workersMap.put(instanceDir.getName(), worker);
-                                    } else {
-                                        throw new ProcessException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", this, null);
-                                    }
-                                } catch (NoSuchMethodException ex) {
-                                    throw new ProcessException(null, this, ex);
-                                } catch (SecurityException ex) {
-                                    throw new ProcessException(null, this, ex);
-                                } catch (InstantiationException ex) {
-                                    throw new ProcessException(null, this, ex);
-                                } catch (IllegalAccessException ex) {
-                                    throw new ProcessException(null, this, ex);
-                                } catch (IllegalArgumentException ex) {
-                                    throw new ProcessException(null, this, ex);
-                                } catch (InvocationTargetException ex) {
-                                    throw new ProcessException(null, this, ex);
-                                }
+                            if (worker != null) {
+                                workersMap.put(instanceID, worker);
+                            } else {
+                                throw new ProcessException("The instance " + instanceID + " can be started, maybe there is no configuration directory with this name.", this, null);
                             }
+                        } catch (NoSuchMethodException ex) {
+                            throw new ProcessException(null, this, ex);
+                        } catch (SecurityException ex) {
+                            throw new ProcessException(null, this, ex);
+                        } catch (InstantiationException ex) {
+                            throw new ProcessException(null, this, ex);
+                        } catch (IllegalAccessException ex) {
+                            throw new ProcessException(null, this, ex);
+                        } catch (IllegalArgumentException ex) {
+                            throw new ProcessException(null, this, ex);
+                        } catch (InvocationTargetException ex) {
+                            throw new ProcessException(null, this, ex);
                         }
-                    } else {
-                        throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
                     }
+                } else {
+                    throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
                 }
-                WSEngine.setServiceInstances(serviceDir.getName(), workersMap);
             }
+            WSEngine.setServiceInstances(serviceName, workersMap);
         }
     }
 }
