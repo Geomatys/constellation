@@ -148,13 +148,13 @@
             <gmd:spatialRepresentationType>
                 <gmd:MD_SpatialRepresentationTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode" codeListValue="grid">Grid</gmd:MD_SpatialRepresentationTypeCode>
             </gmd:spatialRepresentationType>
-            <gmd:spatialResolution>
+            <!--gmd:spatialResolution>
                 <gmd:MD_Resolution>
                     <gmd:distance>
                         <gco:Distance uom="http://schemas.opengis.net/iso/19139/20070417/resources/uom/gmxUom.xml#xpointer(//*[@gml:id='m'])">2.5</gco:Distance>
                     </gmd:distance>
                 </gmd:MD_Resolution>
-            </gmd:spatialResolution>
+            </gmd:spatialResolution-->
             <gmd:extent>
                 <gmd:EX_Extent>
                     <gmd:geographicElement>
