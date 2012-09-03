@@ -719,21 +719,21 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             // ${providerStyleType|providerStyleId|styleName}
             final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
             for (String styl : configLayer.getStyles()) {
-                final MutableStyle ms;
+                MutableStyle ms = null;
                 if (styl.startsWith("${")) {
                     final DataReference dr = new DataReference(styl);
                     Style style = null;
                     try {
                         style = DataReferenceConverter.convertDataReferenceToStyle(dr);
+                        ms = StyleUtilities.copy(style);
                     } catch (NonconvertibleObjectException e) {
                         // The given style reference was invalid, we can't get a style from that
                         LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
                     }
-                    ms = StyleUtilities.copy(style);
                 } else {
                     ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
                 }
-
+                
                 final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
                 styles.add(wmsStyle);
             }
