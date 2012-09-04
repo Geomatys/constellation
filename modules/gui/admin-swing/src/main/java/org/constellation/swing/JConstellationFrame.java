@@ -19,6 +19,7 @@ package org.constellation.swing;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.admin.service.ConstellationServerFactory;
 import org.geotoolkit.parameter.Parameters;
@@ -28,10 +29,14 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public final class ConstellationFrame {
+public final class JConstellationFrame extends JFrame{
     
-    private ConstellationFrame(){}
-    
+    public JConstellationFrame(ConstellationServer server){
+        final JTabbedPane pane = new JTabbedPane();
+        pane.add("Services", new JServicesPane(server,null));
+        pane.add("Providers", new JProvidersPane(server,null));
+        setContentPane(pane);
+    }
     
     public static void show(String login, String password, String url, boolean showLoginDialog) throws MalformedURLException{
         
@@ -47,23 +52,19 @@ public final class ConstellationFrame {
             password = dialog.getPassword();
             url = dialog.getURL();
         }
-        
-        
+                
         final ParameterValueGroup param = ConstellationServerFactory.PARAMETERS.createValue();
         Parameters.getOrCreate(ConstellationServerFactory.URL, param).setValue(new URL(url));
         Parameters.getOrCreate(ConstellationServerFactory.USER, param).setValue(login);
         Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, param).setValue(password);
-        
-        
+                
         final ConstellationServer server = new ConstellationServer(param);
         
-        final JFrame frame = new JFrame();
-        frame.setContentPane(new ServicesPanel(server,null));
+        final JConstellationFrame frame = new JConstellationFrame(server);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-    
     
 }

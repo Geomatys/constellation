@@ -45,7 +45,7 @@ import org.netbeans.swing.outline.RowModel;
  *
  * @author Quentin Boileau (Geomatys)
  */
-public class JServiceMapEditPane extends ServiceEditionPanel {
+public class JServiceMapEditPane extends JServiceEditionPane {
 
     //icones
     private static final ImageIcon ICON_EDIT = new ImageIcon(JServiceMapEditPane.class.getResource("/org/constellation/swing/edit.png"));

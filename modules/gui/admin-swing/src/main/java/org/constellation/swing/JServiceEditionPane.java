@@ -23,9 +23,9 @@ import javax.swing.JPanel;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public abstract class ServiceEditionPanel extends JPanel {
+public abstract class JServiceEditionPane extends JPanel {
 
-    public ServiceEditionPanel() {
+    public JServiceEditionPane() {
         setLayout(new BorderLayout());
     }
     

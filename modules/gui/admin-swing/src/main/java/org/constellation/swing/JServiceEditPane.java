@@ -31,7 +31,7 @@ public class JServiceEditPane extends javax.swing.JPanel {
     private final ConstellationServer server;
     private final String serviceType;
     private final Instance serviceInstance;
-    private final ServiceEditionPanel serviceEditionPanel;
+    private final JServiceEditionPane serviceEditionPanel;
     
     public JServiceEditPane(final ConstellationServer server, final String serviceType, final Instance serviceInstance) {
         this.server = server;
