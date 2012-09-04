@@ -96,8 +96,8 @@ public class ConfigurationXmlBindingTest {
     @Test
     public void instanceReportMarshalingTest() throws Exception {
         List<Instance> instances = new ArrayList<Instance>();
-        instances.add(new Instance("default", ServiceStatus.WORKING));
-        instances.add(new Instance("test1", ServiceStatus.NOT_STARTED));
+        instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
+        instances.add(new Instance("test1", "WMS", ServiceStatus.NOT_STARTED));
         InstanceReport report = new InstanceReport(instances);
 
         StringWriter sw = new StringWriter();
@@ -106,8 +106,8 @@ public class ConfigurationXmlBindingTest {
         String expresult =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:InstanceReport >" + '\n'
-                + "    <ns2:instance status=\"WORKING\" name=\"default\"/>" + '\n'
-                + "    <ns2:instance status=\"NOT_STARTED\" name=\"test1\"/>" + '\n'
+                + "    <ns2:instance status=\"WORKING\" type=\"WMS\" name=\"default\"/>" + '\n'
+                + "    <ns2:instance status=\"NOT_STARTED\" type=\"WMS\" name=\"test1\"/>" + '\n'
                 + "</ns2:InstanceReport>\n";
 
         String result =  removeXmlns(sw.toString());
@@ -117,16 +117,16 @@ public class ConfigurationXmlBindingTest {
     @Test
     public void instanceReportUnMarshalingTest() throws Exception {
         List<Instance> instances = new ArrayList<Instance>();
-        instances.add(new Instance("default", ServiceStatus.WORKING));
-        instances.add(new Instance("test1", ServiceStatus.NOT_STARTED));
+        instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
+        instances.add(new Instance("test1", "WMS", ServiceStatus.NOT_STARTED));
         InstanceReport expResult = new InstanceReport(instances);
 
 
         String xml =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:InstanceReport xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
-                + "    <ns2:instance status=\"WORKING\" name=\"default\"/>" + '\n'
-                + "    <ns2:instance status=\"NOT_STARTED\" name=\"test1\"/>" + '\n'
+                + "    <ns2:instance status=\"WORKING\" type=\"WMS\" name=\"default\"/>" + '\n'
+                + "    <ns2:instance status=\"NOT_STARTED\" type=\"WMS\" name=\"test1\"/>" + '\n'
                 + "</ns2:InstanceReport>\n";
 
         Object result =  unmarshaller.unmarshal(new StringReader(xml));

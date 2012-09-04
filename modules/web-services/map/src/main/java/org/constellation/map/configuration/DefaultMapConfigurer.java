@@ -767,7 +767,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                         keys.add(DefaultName.toJCRExtendedForm(n));
                     }
 
-                    providerReports.add(new ProviderReport(p.getId(),keys));
+                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys));
                 }
             }
             for (StyleProvider p : styleProviders) {
@@ -776,7 +776,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                     for(String n : p.getKeys()){
                         keys.add(n);
                     }
-                    providerReports.add(new ProviderReport(p.getId(),keys));
+                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys));
                 }
             }
             providerServ.add(new ProviderServiceReport(service.getName(),

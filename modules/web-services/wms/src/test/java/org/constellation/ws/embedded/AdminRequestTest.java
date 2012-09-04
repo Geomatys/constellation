@@ -95,9 +95,9 @@ public class AdminRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof InstanceReport);
 
         List<Instance> instances = new ArrayList<Instance>();
-        instances.add(new Instance("default", ServiceStatus.WORKING));
-        instances.add(new Instance("wms1", ServiceStatus.WORKING));
-        instances.add(new Instance("wms2", ServiceStatus.NOT_STARTED));
+        instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
+        instances.add(new Instance("wms1", "WMS", ServiceStatus.WORKING));
+        instances.add(new Instance("wms2", "WMS", ServiceStatus.NOT_STARTED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
 
@@ -149,9 +149,9 @@ public class AdminRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof InstanceReport);
 
         List<Instance> instances = new ArrayList<Instance>();
-        instances.add(new Instance("default", ServiceStatus.WORKING));
-        instances.add(new Instance("wms1", ServiceStatus.WORKING));
-        instances.add(new Instance("wms2", ServiceStatus.WORKING));
+        instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
+        instances.add(new Instance("wms1", "WMS", ServiceStatus.WORKING));
+        instances.add(new Instance("wms2", "WMS", ServiceStatus.WORKING));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
 
@@ -241,9 +241,9 @@ public class AdminRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof InstanceReport);
 
         List<Instance> instances = new ArrayList<Instance>();
-        instances.add(new Instance("default", ServiceStatus.WORKING));
-        instances.add(new Instance("wms1", ServiceStatus.WORKING));
-        instances.add(new Instance("wms2", ServiceStatus.NOT_STARTED));
+        instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
+        instances.add(new Instance("wms1", "WMS", ServiceStatus.WORKING));
+        instances.add(new Instance("wms2", "WMS", ServiceStatus.NOT_STARTED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
     }
@@ -280,8 +280,8 @@ public class AdminRequestTest extends AbstractTestRequest {
         assertTrue(obj instanceof InstanceReport);
 
         List<Instance> instances = new ArrayList<Instance>();
-        instances.add(new Instance("default", ServiceStatus.WORKING));
-        instances.add(new Instance("wms1", ServiceStatus.WORKING));
+        instances.add(new Instance("default", "WMS", ServiceStatus.WORKING));
+        instances.add(new Instance("wms1", "WMS", ServiceStatus.WORKING));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
     }

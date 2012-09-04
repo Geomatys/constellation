@@ -66,7 +66,7 @@ import org.mapfaces.utils.FacesUtils;
 
 /**
  * Abstract JSF Bean for service administration interface.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
@@ -97,7 +97,7 @@ public class AbstractServiceBean extends I18NBean {
             return "";
         }
     };
-    
+
     public static final OutlineCellStyler CELL_STYLER = new OutlineCellStyler() {
 
         @Override
@@ -114,13 +114,13 @@ public class AbstractServiceBean extends I18NBean {
             return "";
         }
     };
-    
-    
+
+
     /**
      * When user is log in, a ServiceAdministrator object is added in the session map.
      */
     public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
-    
+
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.bean");
 
     private final Specification specification;
@@ -131,11 +131,11 @@ public class AbstractServiceBean extends I18NBean {
     private LayerContextTreeModel treemodel = null;
     private String selectedPotentialSource = null;
     private UploadedFile uploadedCapabilities;
-    
+
     public static boolean ACTION_VISIBLE = true;
-    
+
     public static boolean POPUP_UPLOAD = false;
-    
+
     private boolean creatingFlag = false;
 
     public AbstractServiceBean(final Specification specification, final String mainPage, final String configPage) {
@@ -155,7 +155,7 @@ public class AbstractServiceBean extends I18NBean {
         return (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
     }
-    
+
     /**
      * @return List of all service instance of this specification.
      *      This list include both started and stopped instances.
@@ -181,11 +181,11 @@ public class AbstractServiceBean extends I18NBean {
     protected ServiceInstance toServiceInstance(Instance inst){
         return new ServiceInstance(inst);
     }
-       
+
     public OutlineCellStyler getCellStyler(){
         return CELL_STYLER;
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // CREATING NEW INSTANCE ///////////////////////////////////////////////////
 
@@ -213,17 +213,17 @@ public class AbstractServiceBean extends I18NBean {
                 }
             }
             server.services.newInstance(getSpecificationName(), newInstanceName);
-            
-            configuredInstance  = new ServiceInstance(new Instance(newInstanceName, ServiceStatus.NOT_STARTED));
+
+            configuredInstance  = new ServiceInstance(new Instance(newInstanceName, getSpecificationName(), ServiceStatus.NOT_STARTED));
             configurationObject = server.services.getInstanceconfiguration(getSpecificationName(), newInstanceName);
-           
+
 
             if (configurationObject instanceof LayerContext) {
                 treemodel = new LayerContextTreeModel((LayerContext)configurationObject, server);
             } else {
                 treemodel = null;
             }
-            
+
             if (configPage != null) {
                  creatingFlag = true;
                 final MenuBean bean = getMenuBean();
@@ -237,7 +237,7 @@ public class AbstractServiceBean extends I18NBean {
 
     ////////////////////////////////////////////////////////////////////////////
     // ACTION TO ADD NEW SOURCE IN LAYER CONTEXT ///////////////////////////////
-    
+
     public List<SelectItem> getPotentialSources(){
         final List<SelectItem> items = new ArrayList<SelectItem>();
         final ConstellationServer server = getServer();
@@ -254,32 +254,32 @@ public class AbstractServiceBean extends I18NBean {
         }
         return items;
     }
-    
+
     public String getSelectedPotentialSource(){
         return selectedPotentialSource;
     }
-    
+
     public void setSelectedPotentialSource(String selected){
         selectedPotentialSource = selected;
     }
-    
+
     public boolean getPartialTree() {
         return MenuBean.PARTIAL_TREE;
     }
-    
+
     public boolean getActionVisible() {
         return AbstractServiceBean.ACTION_VISIBLE;
     }
-    
+
     public boolean getPopupUpload() {
         return AbstractServiceBean.POPUP_UPLOAD;
     }
-    
+
     public void addSource(){
         if(!(configurationObject instanceof LayerContext) ){
             return;
         }
-        
+
         final LayerContext ctx = (LayerContext) configurationObject;
         final Source src = new Source();
         src.setId((selectedPotentialSource == null) ? "" : selectedPotentialSource );
@@ -290,27 +290,27 @@ public class AbstractServiceBean extends I18NBean {
         } else {
             treemodel = null;
         }
-        
+
     }
-    
+
     public void removeSource(){
         if(!(configurationObject instanceof LayerContext) ){
             return;
         }
-                
+
         final FacesContext context = FacesContext.getCurrentInstance();
         final ExternalContext ext = context.getExternalContext();
         final Integer index = Integer.valueOf(ext.getRequestParameterMap().get("NodeId"));
          final String outlineId = ext.getRequestParameterMap().get("outlineID");
 
         final UIOutline outline = (UIOutline) FacesUtils.findComponentByClientId(context, context.getViewRoot(), outlineId);
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) 
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                 OutlineDataModel.getNode(outline, (TreeNode)treemodel.getRoot(), index);
-        
+
         treemodel.removeProperty(new TreePath(OutlineDataModel.getTreePath(node)));
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////////////////
     // CONFIGURE CURRENT INSTANCE //////////////////////////////////////////////
 
@@ -322,7 +322,7 @@ public class AbstractServiceBean extends I18NBean {
     public String getMainPage(){
         return mainPage;
     }
-    
+
     public void goMainPage(){
         if (creatingFlag && configuredInstance != null) {
             creatingFlag = false;
@@ -339,7 +339,7 @@ public class AbstractServiceBean extends I18NBean {
             FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
         }
     }
-    
+
     public void goToSourceAdmin(){
         if (mainPage != null) {
             final MenuBean bean = getMenuBean();
@@ -374,12 +374,12 @@ public class AbstractServiceBean extends I18NBean {
         configuredInstance = null;
         configurationObject = null;
     }
-    
+
     public LayerContextTreeModel getLayerModel(){
         return treemodel;
     }
-    
-    
+
+
     /**
      * Save the currently edited instance.
      * Subclass should override this method to make the proper save.
@@ -393,7 +393,7 @@ public class AbstractServiceBean extends I18NBean {
         creatingFlag = false;
         goMainPage();
     }
-    
+
     public void updateCapabilitiesPortlet() {
         final FacesContext context = FacesContext.getCurrentInstance();
         final ActionRequest request = (ActionRequest) context.getExternalContext().getRequest();
@@ -403,7 +403,7 @@ public class AbstractServiceBean extends I18NBean {
             if ("application/xml".equals(contentType)
              || "text/xml".equals(contentType)
              || "application/x-httpd-php".equals(contentType)){
-               
+
                 final String instanceId = getConfiguredInstance().getName();
                 try {
                     final File tmp = File.createTempFile("cstl", null);
@@ -422,14 +422,14 @@ public class AbstractServiceBean extends I18NBean {
             LOGGER.log(Level.WARNING, "imported file is null");
         }
     }
-    
+
     public void updateCapabilities() {
          if (uploadedCapabilities != null) {
             final String contentType = uploadedCapabilities.getContentType();
             if ("application/xml".equals(contentType)
              || "text/xml".equals(contentType)
              || "application/x-httpd-php".equals(contentType)){
-               
+
                 final String instanceId = getConfiguredInstance().getName();
                 try {
                     final File tmp = File.createTempFile("cstl", null);
@@ -467,7 +467,7 @@ public class AbstractServiceBean extends I18NBean {
         final FacesContext context = FacesContext.getCurrentInstance();
         return (MenuBean) context.getApplication().evaluateExpressionGet(context, "#{menuBean}", MenuBean.class);
     }
-    
+
     public class ServiceInstance implements Comparable<ServiceInstance>{
 
         protected Instance instance;
@@ -513,7 +513,7 @@ public class AbstractServiceBean extends I18NBean {
                 default:        return "provider.smallgray.png.mfRes";
             }
         }
-        
+
         public boolean isWorking(){
             return ServiceStatus.WORKING.equals(instance.getStatus());
         }
@@ -526,20 +526,20 @@ public class AbstractServiceBean extends I18NBean {
             final ConstellationServer server = getServer();
             if (server != null) {
                 configurationObject = server.services.getInstanceconfiguration(getSpecificationName(), instance.getName());
-            
+
                 if (configurationObject instanceof LayerContext) {
                     treemodel = new LayerContextTreeModel((LayerContext)configurationObject, server);
                 }
             } else {
                 treemodel = null;
             }
-            
+
             if (configPage != null) {
                 final MenuBean bean = getMenuBean();
                 if (bean != null) {
                     bean.addToNavigationStack(configuredInstance.getName());
                 }
-            
+
                 //the session is not logged, redirect him to the authentication page
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(configPage);
             }

@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.geotoolkit.util.Utilities;
 
 /**
  *
@@ -34,10 +35,18 @@ public class ProviderReport {
 
     @XmlAttribute
     private String id;
+    @XmlAttribute
+    private String type;
     @XmlElement(name = "item")
     private List<String> items;
 
     public ProviderReport() {
+    }
+
+    public ProviderReport(final String id, final String type, final List<String> items) {
+        this.id = id;
+        this.type = type;
+        this.items = items;
     }
 
     /**
@@ -54,9 +63,18 @@ public class ProviderReport {
         this.id = id;
     }
 
-    public ProviderReport(final String id, final List<String> items) {
-        this.id = id;
-        this.items = items;
+    /**
+     * @return id of the provider
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param id : provider id
+     */
+    public void setType(String type) {
+        this.type = type;
     }
 
     /**
@@ -82,10 +100,10 @@ public class ProviderReport {
             return true;
         }
         if (other instanceof ProviderReport) {
-            ProviderReport compar = (ProviderReport) other;
-            if (compar.getId().equals(getId()) && compar.getItems().equals(getItems())) {
-                return true;
-            }
+            final ProviderReport that = (ProviderReport) other;
+            return Utilities.equals(this.id, that.id) &&
+                   Utilities.equals(this.type, that.type) &&
+                   Utilities.equals(this.items, that.items);
         }
         return false;
     }
@@ -94,6 +112,7 @@ public class ProviderReport {
     public int hashCode() {
         int hash = 7;
         hash = 89 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 89 * hash + (this.type != null ? this.type.hashCode() : 0);
         hash = 89 * hash + (this.items != null ? this.items.hashCode() : 0);
         return hash;
     }

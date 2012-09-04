@@ -90,7 +90,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         pool = EBRIMMarshallerPool.getInstance();
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
-        worker = new CSWworker("", configDir);
+        worker = new CSWworker(configDir.getName(), configDir);
         worker.setLogLevel(Level.FINER);
     }
 

@@ -66,12 +66,12 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Johann Sorel (Geomatys)
  */
 public abstract class AbstractProviderConfigBean extends I18NBean {
-    
+
     /**
      * When user is log in, a ServiceAdministrator object is added in the session map.
      */
     public static final String SERVICE_ADMIN_KEY = "serviceAdmin";
-    
+
     /**
      * Model adaptor, only display the layers parameters
      */
@@ -81,23 +81,23 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             return new ParameterTreeModel(s,ProviderParameters.LAYER_DESCRIPTOR);
         }
     };
-    
+
     protected static final Logger LOGGER = Logging.getLogger(AbstractProviderConfigBean.class);
 
     private final OutlineRowStyler ROW_STYLER = new HighLightRowStyler() {
-        
+
         @Override
         public String getRowClass(final UIOutline outline, final TreeNode node) {
             String candidate = super.getRowClass(outline, node);
-       
+
             if(node.equals(configuredInstance)){
                 candidate += " active";
             }
-            
+
             return candidate;
         }
     };
-    
+
     /**
      * Store a list of all used ids.
      * Must be refresh when a providerReport is available using method
@@ -113,10 +113,10 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     protected ParameterValueGroup configuredParams = null;
     private ParameterValueGroup layerParams = null;
     private String selectedPotentialStyle = null;
-    
+
     protected boolean creatingFlag = false;
 
-    public AbstractProviderConfigBean(final String serviceName, 
+    public AbstractProviderConfigBean(final String serviceName,
             final String mainPage, final String configPage, final String layerConfigPage){
         addBundle("provider.overview");
 
@@ -126,26 +126,26 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         this.itemConfigPage   = layerConfigPage;
 
     }
-    
+
     public String getUsedIds() {
         return StringUtilities.toCommaSeparatedValues(usedIds);
     }
 
     protected void refreshUsedIds(final ProvidersReport reports){
         usedIds.clear();
-        
+
         if(reports == null){
             return;
         }
-        
+
         for(ProviderServiceReport sr : reports.getProviderServices()){
             for(ProviderReport r : sr.getProviders()){
                 usedIds.add(r.getId());
             }
         }
-        
-    } 
-    
+
+    }
+
     private GeneralParameterDescriptor getSourceDescriptor(){
         final ConstellationServer server = getServer();
         if (server != null) {
@@ -153,12 +153,12 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
         return null;
     }
-        
+
     /**
      * Build a tree model representation of all available layers.
      */
     public synchronized TreeModel getInstanceModel(){
-        
+
         //TODO, changing constellation config path makes this cache obsolete
         //but we don't have any event system yet to handle this, so we make the query each time
         //for know.
@@ -176,24 +176,24 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         //}
         return layersModel;
     }
-    
+
     protected ConstellationServer getServer(){
         return (ConstellationServer) FacesContext.getCurrentInstance()
                 .getExternalContext().getSessionMap().get(SERVICE_ADMIN_KEY);
     }
-    
+
     public synchronized TreeModel getLayerModel(){
         if(configuredInstance == null){
             return new DefaultTreeModel(new DefaultMutableTreeNode());
         }
-        
+
         final DefaultMutableTreeNode root = buildProviderNode(configuredInstance.provider,true);
         return new DefaultTreeModel(root);
     }
 
     private TreeModel buildModel(final ProvidersReport proxy, final boolean onlyKeys){
         final DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
-        
+
         if(proxy != null){
             final ProviderServiceReport serviceReport = proxy.getProviderService(serviceName);
             if(serviceReport != null && serviceReport.getProviders() != null){
@@ -214,16 +214,16 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
 
         final ConstellationServer server = getServer();
-        
+
         final List<String> names = new ArrayList<String>();
         if(provider != null){
             for(String str : provider.getItems()){
                 names.add(DefaultName.valueOf(str).getLocalPart());
-            }            
+            }
         }
-        
+
         final List<String> sourceNames = new ArrayList<String>(names);
-        
+
         //add all names from the configuration files
         if (server != null) {
             final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
@@ -242,7 +242,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                 }
             }
         }
-        
+
         //sort them
         Collections.sort(names);
 
@@ -250,10 +250,10 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             final DefaultMutableTreeNode n = buildItemNode(provider, name, sourceNames);
             root.add(n);
         }
-        return root;        
+        return root;
     }
-    
-    protected DefaultMutableTreeNode buildItemNode(final ProviderReport provider, 
+
+    protected DefaultMutableTreeNode buildItemNode(final ProviderReport provider,
             final String name, final List<String> sourceNames){
         final TypeNode n = new TypeNode(provider,DefaultName.valueOf(name),
                     sourceNames.contains(name));
@@ -271,10 +271,10 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
      * Create a new instance of this service.
      */
     public void createSource(){
-        
+
         final ConstellationServer server = getServer();
         if (server != null) {
-            
+
             final ProvidersReport report              = server.providers.listProviders();
             final List<ProviderServiceReport> serviceReports = report.getProviderServices();
             final List<ProviderReport> providerReports = new ArrayList<ProviderReport>();
@@ -298,7 +298,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                     }
                 }
             }
-        
+
             final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup)
                     server.providers.getServiceDescriptor(serviceName);
 
@@ -310,13 +310,13 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             AcknowlegementType type = server.providers.createProvider(serviceName, params);
 
             if (type != null) {
-                FacesContext.getCurrentInstance().addMessage("Error", 
+                FacesContext.getCurrentInstance().addMessage("Error",
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, type.getMessage(), ""));
             }
-            
+
             layersModel = null;
-           
-            configuredInstance = new ProviderNode(new ProviderReport(newSourceName, null));
+
+            configuredInstance = new ProviderNode(new ProviderReport(newSourceName, serviceName, null));
             configuredParams   = params;
 
             if (sourceConfigPage != null) {
@@ -327,7 +327,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                 }
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(sourceConfigPage);
             }
-            
+
         }
     }
 
@@ -342,7 +342,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     public String getMainPage(){
         return mainPage;
     }
-    
+
     public void goMainPage(){
         if (creatingFlag && configuredInstance != null) {
             creatingFlag = false;
@@ -359,7 +359,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             FacesContext.getCurrentInstance().getViewRoot().setViewId(mainPage);
         }
     }
-    
+
     public void goMainPageFromLayer(){
         if (mainPage != null) {
             final MenuBean bean = getMenuBean();
@@ -380,7 +380,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             FacesContext.getCurrentInstance().getViewRoot().setViewId("/provider/sld.xhtml");
         }
     }
-    
+
     /**
      * @return the currently configured instance.
      */
@@ -394,21 +394,21 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
     public ParameterValueGroup getConfiguredParameters(){
         return configuredParams;
     }
-    
+
     /**
      * @return the source id parameter
      */
     public GeneralParameterValue getIdParameter(){
         return configuredParams.parameter(ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode());
     }
-    
+
     /**
      * @return the source id parameter
      */
     public GeneralParameterValue getLayerNameParameter(){
         return layerParams.parameter(ProviderParameters.LAYER_NAME_DESCRIPTOR.getName().getCode());
     }
-    
+
     /**
      * @return the source store parameters
      */
@@ -420,9 +420,9 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
         return null;
     }
-    
+
     /**
-     * 
+     *
      * @return the layer parameters
      */
     public ParameterTreeModel getLayerConfiguredParameters(){
@@ -435,7 +435,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         final ParameterTreeModel model = new ParameterTreeModel(layerParams, restrictions.toArray(new GeneralParameterDescriptor[restrictions.size()]));
         return model;
     }
-    
+
     public void saveConfiguration(){
         final ConstellationServer server = getServer();
         if (server!= null) {
@@ -444,7 +444,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         creatingFlag = false;
         goMainPage();
     }
-    
+
     public void saveConfigurationFromLayer(){
         final ConstellationServer server = getServer();
         if (server!= null) {
@@ -457,7 +457,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         final FacesContext context = FacesContext.getCurrentInstance();
         return (MenuBean) context.getApplication().evaluateExpressionGet(context, "#{menuBean}", MenuBean.class);
     }
-    
+
     public void deleteLayer() {
         final ParameterValueGroup config = configuredParams;
         final String name = Parameters.value(ProviderParameters.LAYER_NAME_DESCRIPTOR, layerParams);
@@ -491,7 +491,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
         }
         return items;
     }
-    
+
     /**
      * @return the selectedPotentialStyle
      */
@@ -511,11 +511,11 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             layerParams.parameter(ProviderParameters.LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue(selectedPotentialStyle);
         }
     }
-    
+
     public boolean getPartialTree() {
         return MenuBean.PARTIAL_TREE;
     }
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // SUBCLASSES //////////////////////////////////////////////////////////////
 
@@ -528,7 +528,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
             super(provider);
             this.provider = provider;
         }
-        
+
         public void delete(){
             final ConstellationServer server = getServer();
             if (server != null) {
@@ -563,7 +563,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                     .descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
             }
         }
-        
+
         /**
          * Set this instance as the currently configured one in for the property dialog.
          */
@@ -599,7 +599,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                 return "provider.smallred.png.mfRes";
             }
         }
-        
+
         /**
          * @return true if this configured layer is in the datastore
          */
@@ -617,12 +617,12 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                     final String layerName = Parameters.stringValue(ProviderParameters.LAYER_NAME_DESCRIPTOR, (ParameterValueGroup) groups);
                     if (DefaultName.match(name, layerName)) {
                        //we have found the layer
-                        layerParams = (ParameterValueGroup) groups;   
+                        layerParams = (ParameterValueGroup) groups;
                         break;
                     }
                 }
             }
-            
+
             if (layerParams == null) {
                 //config does not exist, create it
                 layerParams = configuredParams.addGroup(
@@ -630,8 +630,8 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                 layerParams.parameter(ProviderParameters.LAYER_NAME_DESCRIPTOR.getName().getCode())
                         .setValue(name.getLocalPart());
             }
-            
-            
+
+
             if (itemConfigPage != null) {
                 final MenuBean bean = getMenuBean();
                 if (bean != null) {
@@ -641,7 +641,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                 FacesContext.getCurrentInstance().getViewRoot().setViewId(itemConfigPage);
             }
         }
-        
+
         public void delete(){
             //add all names from the configuration files
             final ParameterValueGroup config = configuredParams;
@@ -655,7 +655,7 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
                 }
             }
         }
-            
+
             saveConfiguration();
         }
 
@@ -664,12 +664,12 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
 //            final ELContext elContext = FacesContext.getCurrentInstance().getELContext();
 //            ProviderBean providerBean = (ProviderBean) FacesContext.getCurrentInstance().getApplication()
 //                .getExpressionFactory().createValueExpression(elContext, "#{providerBean}", ProviderBean.class).getValue(elContext);
-//            
+//
 //            if(providerBean == null){
 //                LOGGER.log(Level.WARNING, "ProviderBean not found.");
 //                return;
 //            }
-//            
+//
 //            //find the exact name
 //            Name layerName = null;
 //            for(Name str : provider.getKeys()){
@@ -677,22 +677,22 @@ public abstract class AbstractProviderConfigBean extends I18NBean {
 //                    layerName = str;
 //                }
 //            }
-//            
+//
 //            if(layerName == null){
 //                LOGGER.log(Level.WARNING, "Layer not found : {0}", name);
 //                return;
 //            }
-//            
+//
 //            final LayerDetails details = provider.getByIdentifier(layerName);
-//            
+//
 //            try {
 //                providerBean.getMapContext().layers().add(details.getMapLayer(null, null));
 //            } catch (PortrayalException ex) {
 //                LOGGER.log(Level.SEVERE, null, ex);
-//            } 
-                        
+//            }
+
         }
-        
+
     }
 
 }

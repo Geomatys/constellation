@@ -565,7 +565,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     } else {
                         status = ServiceStatus.ERROR;
                     }
-                    instances.add(new Instance(entry.getKey(), status));
+                    instances.add(new Instance(entry.getKey(), serviceName, status));
                 }
                 // 2- Then we list the instance not yet started
                 final File serviceDirectory = getServiceDirectory();
@@ -573,7 +573,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     for (File instanceDirectory : serviceDirectory.listFiles()) {
                         final String name = instanceDirectory.getName();
                         if (instanceDirectory.isDirectory() && !name.startsWith(".") && !WSEngine.serviceInstanceExist(serviceName, name)) {
-                            instances.add(new Instance(name, ServiceStatus.NOT_STARTED));
+                            instances.add(new Instance(name, serviceName, ServiceStatus.NOT_STARTED));
                         }
                     }
                 }

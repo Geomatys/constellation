@@ -35,14 +35,18 @@ public class Instance {
     private String name;
 
     @XmlAttribute
+    private String type;
+
+    @XmlAttribute
     private ServiceStatus status;
 
     public Instance() {
 
     }
 
-    public Instance(final String name, final ServiceStatus status) {
+    public Instance(final String name, final String type, final ServiceStatus status) {
         this.name   = name;
+        this.type   = type;
         this.status = status;
     }
 
@@ -52,7 +56,7 @@ public class Instance {
     public String getName() {
         return name;
     }
-    
+
     public void setName(final String newName) {
         this.name = newName;
     }
@@ -64,6 +68,20 @@ public class Instance {
         return status;
     }
 
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -71,7 +89,8 @@ public class Instance {
         }
         if (obj instanceof Instance) {
             final Instance that = (Instance) obj;
-            return Utilities.equals(this.name, that.name) &&
+            return Utilities.equals(this.name,   that.name) &&
+                   Utilities.equals(this.type,   that.type) &&
                    Utilities.equals(this.status, that.status);
         }
         return false;
@@ -81,11 +100,12 @@ public class Instance {
     public int hashCode() {
         int hash = 5;
         hash = 73 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 73 * hash + (this.type != null ? this.type.hashCode() : 0);
         hash = 73 * hash + (this.status != null ? this.status.hashCode() : 0);
         return hash;
     }
 
-    
+
 
     @Override
     public String toString() {
