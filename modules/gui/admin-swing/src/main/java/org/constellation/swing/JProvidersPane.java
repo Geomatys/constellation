@@ -145,6 +145,8 @@ public final class JProvidersPane extends JPanel implements ActionListener {
         
         final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
         final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
+        final ImageIcon viewIcon = new ImageIcon(JServicesPane.createImage(LayerRowModel.BUNDLE.getString("view"), 
+                null, Color.BLACK, fontNormal, Color.LIGHT_GRAY));
         final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage(LayerRowModel.BUNDLE.getString("edit"), 
                 ICON_SERVICE_EDIT, Color.BLACK, fontNormal, Color.LIGHT_GRAY));
         final ImageIcon reloadIcon = new ImageIcon(JServicesPane.createImage(LayerRowModel.BUNDLE.getString("reload"), 
@@ -179,8 +181,31 @@ public final class JProvidersPane extends JPanel implements ActionListener {
             
         });
         
-        guiTable.getColumn(1).setCellRenderer(new ActionCell.Renderer(editIcon));
-        guiTable.getColumn(1).setCellEditor(new ActionCell.Editor(editIcon) {
+        guiTable.getColumn(1).setCellRenderer(new ActionCell.Renderer(viewIcon));
+        guiTable.getColumn(1).setCellEditor(new ActionCell.Editor(viewIcon) {
+            @Override
+            public void actionPerformed(final ActionEvent e, Object value) {
+                if (value instanceof DefaultMutableTreeNode) {
+                    value = ((DefaultMutableTreeNode)value).getUserObject();
+                }
+                if (value instanceof Entry) {
+                    final Entry entry = (Entry) value;                
+                    final String type = (String) entry.getKey();
+                    final ProviderReport inst = (ProviderReport) entry.getValue();
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            getDisplayer().display(cstl, type, inst);
+                        }
+                    });
+                                       
+                }
+            }
+        });
+        
+        guiTable.getColumn(2).setCellRenderer(new ActionCell.Renderer(editIcon));
+        guiTable.getColumn(2).setCellEditor(new ActionCell.Editor(editIcon) {
             @Override
             public void actionPerformed(final ActionEvent e, Object value) {
                 if (value instanceof DefaultMutableTreeNode) {
@@ -217,8 +242,8 @@ public final class JProvidersPane extends JPanel implements ActionListener {
             }
         });
         
-        guiTable.getColumn(2).setCellRenderer(new ActionCell.Renderer(reloadIcon));
-        guiTable.getColumn(2).setCellEditor(new ActionCell.Editor(reloadIcon) {
+        guiTable.getColumn(3).setCellRenderer(new ActionCell.Renderer(reloadIcon));
+        guiTable.getColumn(3).setCellEditor(new ActionCell.Editor(reloadIcon) {
             @Override
             public void actionPerformed(final ActionEvent e, Object value) {
                 if(value instanceof DefaultMutableTreeNode){
@@ -247,6 +272,9 @@ public final class JProvidersPane extends JPanel implements ActionListener {
         guiTable.getColumn(2).setMinWidth(width);     
         guiTable.getColumn(2).setPreferredWidth(width);
         guiTable.getColumn(2).setMaxWidth(width);
+        guiTable.getColumn(3).setMinWidth(width);     
+        guiTable.getColumn(3).setPreferredWidth(width);
+        guiTable.getColumn(3).setMaxWidth(width);
         guiTable.setTableHeader(null);
         guiTable.setRowHeight(37);
         guiTable.setFillsViewportHeight(true);
@@ -376,7 +404,7 @@ public final class JProvidersPane extends JPanel implements ActionListener {
 
         @Override
         public int getColumnCount() {
-            return 3;
+            return 4;
         }
 
         @Override

@@ -17,6 +17,9 @@
 package org.constellation.swing;
 
 import javax.swing.JComponent;
+import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.ProviderReport;
 
 /**
  *
@@ -24,6 +27,10 @@ import javax.swing.JComponent;
  */
 public interface FrameDisplayer {
     
-    public void display(JComponent edit);
+    void display(JComponent edit);
+        
+    void display(ConstellationServer server, String serviceType, Instance service);
+    
+    void display(ConstellationServer server, String providerType, ProviderReport provider);
     
 }
