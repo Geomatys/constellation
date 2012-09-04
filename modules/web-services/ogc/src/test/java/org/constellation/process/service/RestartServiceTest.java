@@ -16,6 +16,8 @@
  */
 package org.constellation.process.service;
 
+import java.io.File;
+import java.util.Set;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -36,6 +38,16 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         super(RestartServiceDescriptor.NAME, serviceName, workerClass);
     }
 
+
+    private void startAllInstance() {
+        // start all the existing  instance
+        final File serviceDir =  new File(configDirectory, serviceName);
+        for (File instanceDir : serviceDir.listFiles()) {
+            if (instanceDir.isDirectory()) {
+                startInstance(instanceDir.getName());
+            }
+        }
+    }
 
     @Test
     public void testRestartOneNoClose() throws NoSuchIdentifierException, ProcessException {
@@ -84,6 +96,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
     @Test
     public void testRestartAllNoClose() throws NoSuchIdentifierException, ProcessException {
 
+        startAllInstance();
         createInstance("restartInstance3");
         createInstance("restartInstance4");
         startInstance("restartInstance3");
@@ -99,7 +112,9 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
 
-        assertTrue(WSEngine.getInstanceSize(serviceName) == initSize);
+        final int newSize =  WSEngine.getInstanceSize(serviceName);
+        final Set<String> instances = WSEngine.getInstanceNames(serviceName);
+        assertTrue("expected " + initSize + " but was:" + newSize + "(" + instances + ")", newSize == initSize);
         assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance3"));
         assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance4"));
 
@@ -111,6 +126,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
     @Test
     public void testRestartAllClose() throws NoSuchIdentifierException, ProcessException {
 
+        startAllInstance();
         createInstance("restartInstance5");
         createInstance("restartInstance6");
         startInstance("restartInstance5");

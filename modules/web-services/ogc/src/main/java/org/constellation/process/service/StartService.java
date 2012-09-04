@@ -67,7 +67,7 @@ public final class StartService extends AbstractCstlProcess {
             //create service instance directory
             final File instanceDirectory = new File(serviceDir, identifier);
 
-            if (instanceDirectory.exists() && instanceDirectory.isDirectory()) {
+            if (instanceDirectory.isDirectory()) {
                 if (!instanceDirectory.getName().startsWith(".")) {
                     try {
                         final Class clazz = WSEngine.getServiceWorkerClass(serviceName);
