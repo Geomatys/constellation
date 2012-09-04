@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -181,7 +182,24 @@ public final class JProvidersPane extends JPanel implements ActionListener {
             
         });
         
-        guiTable.getColumn(1).setCellRenderer(new ActionCell.Renderer(viewIcon));
+        guiTable.getColumn(1).setCellRenderer(new ActionCell.Renderer(viewIcon){
+
+            @Override
+            public Icon getIcon(Object value) {
+                if(value instanceof DefaultMutableTreeNode){
+                    value =((DefaultMutableTreeNode)value).getUserObject();
+                }
+                if(value instanceof Entry){
+                    final Entry entry = (Entry) value;                
+                    final String type = (String) entry.getKey();
+                    if("sld".equalsIgnoreCase(type)){
+                        return null;
+                    }
+                }
+                return super.getIcon(value);
+            }
+            
+        });
         guiTable.getColumn(1).setCellEditor(new ActionCell.Editor(viewIcon) {
             @Override
             public void actionPerformed(final ActionEvent e, Object value) {
@@ -414,6 +432,20 @@ public final class JProvidersPane extends JPanel implements ActionListener {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
+            if(columnIndex == 1){
+                Object value = getValueAt(rowIndex, columnIndex);
+                if(value instanceof DefaultMutableTreeNode){
+                    value =((DefaultMutableTreeNode)value).getUserObject();
+                }
+                if(value instanceof Entry){
+                    final Entry entry = (Entry) value;                
+                    final String type = (String) entry.getKey();
+                    if("sld".equalsIgnoreCase(type)){
+                        return false;
+                    }
+                }
+            }
+            
             return columnIndex>0;
         }
         
