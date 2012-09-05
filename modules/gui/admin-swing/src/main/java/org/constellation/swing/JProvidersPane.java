@@ -47,12 +47,15 @@ import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
+import org.constellation.security.DefaultRoleController;
+import org.constellation.security.RoleController;
+import static org.constellation.security.ActionPermissions.*;
 import org.geotoolkit.gui.swing.misc.ActionCell;
 import org.jdesktop.swingx.JXTable;
 
 /**
  * Top component to manage constellation providers.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public final class JProvidersPane extends JPanel implements ActionListener {
@@ -64,25 +67,29 @@ public final class JProvidersPane extends JPanel implements ActionListener {
             return o1.getType().compareTo(o2.getType());
         }
     };
-    
+
     private static final ImageIcon ICON_SERVICE_EDIT =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceEdit.png"));
     private static final ImageIcon ICON_SERVICE_RELOAD =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceReload.png"));
-    
+
     private final JXTable guiTable = new JXTable();
     private final ConstellationServer cstl;
     private final FrameDisplayer displayer;
-        
-    public JProvidersPane(final ConstellationServer cstl, FrameDisplayer displayer) {
+    private final RoleController roleController;
+
+    public JProvidersPane(final ConstellationServer cstl, final FrameDisplayer displayer) {
+        this(cstl, displayer, new DefaultRoleController());
+    }
+
+    public JProvidersPane(final ConstellationServer cstl, final FrameDisplayer displayer, final RoleController roleController) {
         initComponents();
-        
+
         this.cstl = cstl;
         if(displayer == null){
-            displayer = new DefaultFrameDisplayer();
+            this.displayer = new DefaultFrameDisplayer();
+        } else {
+            this.displayer = displayer;
         }
-        
-        this.displayer = displayer;
-        
-        
+        this.roleController = roleController;
         //list all providers
         guiAll.addActionListener(this);
         final ProvidersReport providersReport = cstl.providers.listProviders();
@@ -96,7 +103,8 @@ public final class JProvidersPane extends JPanel implements ActionListener {
             guiTypeGroup.add(btn);
             guiToolBar.add(btn);
         }
-                        
+        guiNew.setVisible(roleController.hasPermission(NEW_PROVIDER));
+
         add(BorderLayout.CENTER,new JScrollPane(guiTable));
         updateInstanceList();
     }
@@ -106,17 +114,17 @@ public final class JProvidersPane extends JPanel implements ActionListener {
     }
 
     private void updateInstanceList(){
-        
+
         String action = "all";
         if(guiTypeGroup.getSelection() != null){
             action = guiTypeGroup.getSelection().getActionCommand();
         }
-        
+
         //list all providers
         final ProvidersReport providersReport = cstl.providers.listProviders();
         final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
         final List<Entry<String,ProviderReport>> instances = new ArrayList<Entry<String,ProviderReport>> ();
-        
+
         for (final ProviderServiceReport serviceReport : servicesReport) {
             final String type = serviceReport.getType();
             if("all".equals(action) || action.equalsIgnoreCase(type)){
@@ -127,7 +135,7 @@ public final class JProvidersPane extends JPanel implements ActionListener {
                 }
             }
         }
-                
+
         Collections.sort(instances,new Comparator<Entry<String,ProviderReport>>(){
             @Override
             public int compare(Entry<String,ProviderReport> o1, Entry<String,ProviderReport> o2) {
@@ -139,49 +147,49 @@ public final class JProvidersPane extends JPanel implements ActionListener {
                     return o1.getKey().compareTo(o2.getKey());
                 }
             }
-        });     
-        
+        });
+
         final TableModel model = new InstanceModel(instances);
-        guiTable.setModel(model);        
-        
+        guiTable.setModel(model);
+
         final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
         final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
-        final ImageIcon viewIcon = new ImageIcon(JServicesPane.createImage(LayerRowModel.BUNDLE.getString("view"), 
+        final ImageIcon viewIcon = new ImageIcon(JServicesPane.createImage(LayerRowModel.BUNDLE.getString("view"),
                 null, Color.BLACK, fontNormal, Color.LIGHT_GRAY));
-        final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage(LayerRowModel.BUNDLE.getString("edit"), 
+        final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage(LayerRowModel.BUNDLE.getString("edit"),
                 ICON_SERVICE_EDIT, Color.BLACK, fontNormal, Color.LIGHT_GRAY));
-        final ImageIcon reloadIcon = new ImageIcon(JServicesPane.createImage(LayerRowModel.BUNDLE.getString("reload"), 
+        final ImageIcon reloadIcon = new ImageIcon(JServicesPane.createImage(LayerRowModel.BUNDLE.getString("reload"),
                 ICON_SERVICE_RELOAD, Color.WHITE, fontNormal, new Color(65,150,190)));
-        
+
         guiTable.getColumn(0).setCellRenderer(new DefaultTableCellRenderer(){
 
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object o, 
+            public Component getTableCellRendererComponent(JTable table, Object o,
             boolean isSelected, boolean hasFocus, int row, int column) {
                 final JLabel lbl = (JLabel) super.getTableCellRendererComponent(
                         table, o, isSelected, hasFocus, row, column);
-                
+
                 lbl.setIcon(null);
-                
+
                 if(o instanceof DefaultMutableTreeNode){
                     o = ((DefaultMutableTreeNode)o).getUserObject();
                 }
                 if(o instanceof Entry){
-                    final Entry entry = (Entry) o;                
+                    final Entry entry = (Entry) o;
                     final String type = (String) entry.getKey();
                     final ProviderReport inst = (ProviderReport) entry.getValue();
                     final Color bgColor = new Color(130, 160, 50);
 
                     final BufferedImage img = JServicesPane.createImage(type, null, Color.WHITE,fontBig, bgColor);
-                    lbl.setIcon(new ImageIcon(img));       
-                    lbl.setText(inst.getId());          
+                    lbl.setIcon(new ImageIcon(img));
+                    lbl.setText(inst.getId());
                 }
-                
+
                 return lbl;
             }
-            
+
         });
-        
+
         guiTable.getColumn(1).setCellRenderer(new ActionCell.Renderer(viewIcon){
 
             @Override
@@ -190,7 +198,7 @@ public final class JProvidersPane extends JPanel implements ActionListener {
                     value =((DefaultMutableTreeNode)value).getUserObject();
                 }
                 if(value instanceof Entry){
-                    final Entry entry = (Entry) value;                
+                    final Entry entry = (Entry) value;
                     final String type = (String) entry.getKey();
                     if("sld".equalsIgnoreCase(type)){
                         return null;
@@ -198,7 +206,7 @@ public final class JProvidersPane extends JPanel implements ActionListener {
                 }
                 return super.getIcon(value);
             }
-            
+
         });
         guiTable.getColumn(1).setCellEditor(new ActionCell.Editor(viewIcon) {
             @Override
@@ -207,92 +215,94 @@ public final class JProvidersPane extends JPanel implements ActionListener {
                     value = ((DefaultMutableTreeNode)value).getUserObject();
                 }
                 if (value instanceof Entry) {
-                    final Entry entry = (Entry) value;                
+                    final Entry entry = (Entry) value;
                     final String type = (String) entry.getKey();
                     final ProviderReport inst = (ProviderReport) entry.getValue();
-                    
+
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             getDisplayer().display(cstl, type, inst);
                         }
                     });
-                                       
-                }
-            }
-        });
-        
-        guiTable.getColumn(2).setCellRenderer(new ActionCell.Renderer(editIcon));
-        guiTable.getColumn(2).setCellEditor(new ActionCell.Editor(editIcon) {
-            @Override
-            public void actionPerformed(final ActionEvent e, Object value) {
-                if (value instanceof DefaultMutableTreeNode) {
-                    value = ((DefaultMutableTreeNode)value).getUserObject();
-                }
-                if (value instanceof Entry) {
-                    final Entry entry = (Entry) value;                
-                    final String type = (String) entry.getKey();
-                    final ProviderReport inst = (ProviderReport) entry.getValue();
-                              
-                    
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            
-                            final JProviderEditPane edit = new JProviderEditPane(cstl, type, inst);
-                            final PropertyChangeListener cl = new PropertyChangeListener() {
-                                @Override
-                                public void propertyChange(PropertyChangeEvent evt) {
-                                    if ("update".equals(evt.getPropertyName())) {
-                                        updateInstanceList();
-                                        edit.removePropertyChangeListener(this);
-                                    }
-                                }
-                            };
 
-                            edit.addPropertyChangeListener(cl);
-                            
-                            getDisplayer().display(edit);
-                        }
-                    });
-                                       
                 }
             }
         });
-        
-        guiTable.getColumn(3).setCellRenderer(new ActionCell.Renderer(reloadIcon));
-        guiTable.getColumn(3).setCellEditor(new ActionCell.Editor(reloadIcon) {
-            @Override
-            public void actionPerformed(final ActionEvent e, Object value) {
-                if(value instanceof DefaultMutableTreeNode){
-                    value =((DefaultMutableTreeNode)value).getUserObject();
+
+        int columIndex = 2;
+        if (roleController.hasPermission(EDIT_PROVIDER)) {
+            guiTable.getColumn(columIndex).setCellRenderer(new ActionCell.Renderer(editIcon));
+            guiTable.getColumn(columIndex).setCellEditor(new ActionCell.Editor(editIcon) {
+                @Override
+                public void actionPerformed(final ActionEvent e, Object value) {
+                    if (value instanceof DefaultMutableTreeNode) {
+                        value = ((DefaultMutableTreeNode)value).getUserObject();
+                    }
+                    if (value instanceof Entry) {
+                        final Entry entry = (Entry) value;
+                        final String type = (String) entry.getKey();
+                        final ProviderReport inst = (ProviderReport) entry.getValue();
+
+
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                final JProviderEditPane edit = new JProviderEditPane(cstl, type, inst);
+                                final PropertyChangeListener cl = new PropertyChangeListener() {
+                                    @Override
+                                    public void propertyChange(PropertyChangeEvent evt) {
+                                        if ("update".equals(evt.getPropertyName())) {
+                                            updateInstanceList();
+                                            edit.removePropertyChangeListener(this);
+                                        }
+                                    }
+                                };
+
+                                edit.addPropertyChangeListener(cl);
+
+                                getDisplayer().display(edit);
+                            }
+                        });
+
+                    }
                 }
-                if(value instanceof Entry){
-                    final Entry entry = (Entry) value;                
-                    final String type = (String) entry.getKey();
-                    final ProviderReport inst = (ProviderReport) entry.getValue();
-                    
-                     cstl.providers.restartProvider(inst.getId());
-                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateInstanceList();
-                        }
-                    });
+            });
+            columIndex++;
+        }
+
+        if (roleController.hasPermission(RELOAD_PROVIDER)) {
+            guiTable.getColumn(columIndex).setCellRenderer(new ActionCell.Renderer(reloadIcon));
+            guiTable.getColumn(columIndex).setCellEditor(new ActionCell.Editor(reloadIcon) {
+                @Override
+                public void actionPerformed(final ActionEvent e, Object value) {
+                    if(value instanceof DefaultMutableTreeNode){
+                        value =((DefaultMutableTreeNode)value).getUserObject();
+                    }
+                    if(value instanceof Entry){
+                        final Entry entry = (Entry) value;
+                        final String type = (String) entry.getKey();
+                        final ProviderReport inst = (ProviderReport) entry.getValue();
+
+                         cstl.providers.restartProvider(inst.getId());
+                         SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateInstanceList();
+                            }
+                        });
+                    }
                 }
-            }
-        });
-                
+            });
+        }
+
         final int width = 140;
-        guiTable.getColumn(1).setMinWidth(width);        
-        guiTable.getColumn(1).setPreferredWidth(width);
-        guiTable.getColumn(1).setMaxWidth(width);
-        guiTable.getColumn(2).setMinWidth(width);     
-        guiTable.getColumn(2).setPreferredWidth(width);
-        guiTable.getColumn(2).setMaxWidth(width);
-        guiTable.getColumn(3).setMinWidth(width);     
-        guiTable.getColumn(3).setPreferredWidth(width);
-        guiTable.getColumn(3).setMaxWidth(width);
+        for (int i = 1; i < guiTable.getColumnCount(); i++) {
+            guiTable.getColumn(i).setMinWidth(width);
+            guiTable.getColumn(i).setPreferredWidth(width);
+            guiTable.getColumn(i).setMaxWidth(width);
+        }
         guiTable.setTableHeader(null);
         guiTable.setRowHeight(37);
         guiTable.setFillsViewportHeight(true);
@@ -302,10 +312,10 @@ public final class JProvidersPane extends JPanel implements ActionListener {
         guiTable.setShowVerticalLines(false);
         guiTable.revalidate();
         guiTable.repaint();
-                
+
     }
-    
-    
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -383,10 +393,10 @@ public final class JProvidersPane extends JPanel implements ActionListener {
     }//GEN-LAST:event_guiRefreshActionPerformed
 
     private void guiNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiNewActionPerformed
-        
-        JProviderCreationPane.showDialog(cstl);         
+
+        JProviderCreationPane.showDialog(cstl);
         updateInstanceList();
-        
+
     }//GEN-LAST:event_guiNewActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -406,15 +416,15 @@ public final class JProvidersPane extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         updateInstanceList();
     }
-    
+
     private class InstanceModel extends AbstractTableModel{
 
         private final List<Entry<String,ProviderReport>> entries;
 
-        public InstanceModel(List<Entry<String,ProviderReport>> entries) {
+        public InstanceModel(final List<Entry<String,ProviderReport>> entries) {
             this.entries = entries;
         }
-        
+
         @Override
         public int getRowCount() {
             return entries.size();
@@ -422,7 +432,14 @@ public final class JProvidersPane extends JPanel implements ActionListener {
 
         @Override
         public int getColumnCount() {
-            return 4;
+            int nbColumn = 2; // instance name + viewButton
+            if (roleController.hasPermission(EDIT_PROVIDER)) {
+                nbColumn++;
+            }
+            if (roleController.hasPermission(RELOAD_PROVIDER)) {
+                nbColumn++;
+            }
+            return nbColumn;
         }
 
         @Override
@@ -438,17 +455,17 @@ public final class JProvidersPane extends JPanel implements ActionListener {
                     value =((DefaultMutableTreeNode)value).getUserObject();
                 }
                 if(value instanceof Entry){
-                    final Entry entry = (Entry) value;                
+                    final Entry entry = (Entry) value;
                     final String type = (String) entry.getKey();
                     if("sld".equalsIgnoreCase(type)){
                         return false;
                     }
                 }
             }
-            
+
             return columnIndex>0;
         }
-        
+
     }
-        
+
 }

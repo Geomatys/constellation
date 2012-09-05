@@ -29,17 +29,32 @@ public class ActionPermissions {
     public static final String NEW_SERVICE = "newService";
 
     /**
-     * Permission to edit a service instance;
+     * Permission to edit a service instance.
      */
     public static final String EDIT_SERVICE = "editService";
 
     /**
-     * Permission to edit a service instance;
+     * Permission to edit a service instance.
      */
     public static final String RELOAD_SERVICE = "reloadService";
 
     /**
-     * Permission to start/stop a service instance;
+     * Permission to start/stop a service instance.
      */
     public static final String START_STOP_SERVICE = "startStopService";
+
+    /**
+     * Permission to create a new provider instance.
+     */
+    public static final String NEW_PROVIDER = "newProvider";
+
+    /**
+     * Permission to edit a service instance.
+     */
+    public static final String EDIT_PROVIDER = "editProvider";
+
+    /**
+     * Permission to edit a service instance.
+     */
+    public static final String RELOAD_PROVIDER = "reloadProvider";
 }

@@ -252,137 +252,139 @@ public final class JServicesPane extends JPanel implements ActionListener {
             }
         });
 
-        guiTable.getColumn(2).setCellRenderer(new ActionCell.Renderer(editIcon));
-        guiTable.getColumn(2).setCellEditor(new ActionCell.Editor(editIcon) {
-            @Override
-            public void actionPerformed(final ActionEvent e, Object value) {
-                if (value instanceof DefaultMutableTreeNode) {
-                    value = ((DefaultMutableTreeNode)value).getUserObject();
-                }
-                if (value instanceof Entry) {
-                    final Instance inst = (Instance) ((Entry)value).getKey();
-                    final String type = (String) ((Entry)value).getValue();
+        int columIndex = 2;
+        if (roleController.hasPermission(EDIT_SERVICE)) {
+            guiTable.getColumn(columIndex).setCellRenderer(new ActionCell.Renderer(editIcon));
+            guiTable.getColumn(columIndex).setCellEditor(new ActionCell.Editor(editIcon) {
+                @Override
+                public void actionPerformed(final ActionEvent e, Object value) {
+                    if (value instanceof DefaultMutableTreeNode) {
+                        value = ((DefaultMutableTreeNode)value).getUserObject();
+                    }
+                    if (value instanceof Entry) {
+                        final Instance inst = (Instance) ((Entry)value).getKey();
+                        final String type = (String) ((Entry)value).getValue();
 
 
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
 
-                            final JServiceEditPane edit = new JServiceEditPane(cstl, type, inst);
-                            final PropertyChangeListener cl = new PropertyChangeListener() {
-                                @Override
-                                public void propertyChange(PropertyChangeEvent evt) {
-                                    if ("update".equals(evt.getPropertyName())) {
-                                        updateInstanceList();
-                                        edit.removePropertyChangeListener(this);
+                                final JServiceEditPane edit = new JServiceEditPane(cstl, type, inst);
+                                final PropertyChangeListener cl = new PropertyChangeListener() {
+                                    @Override
+                                    public void propertyChange(PropertyChangeEvent evt) {
+                                        if ("update".equals(evt.getPropertyName())) {
+                                            updateInstanceList();
+                                            edit.removePropertyChangeListener(this);
+                                        }
                                     }
-                                }
-                            };
+                                };
 
-                            edit.addPropertyChangeListener(cl);
+                                edit.addPropertyChangeListener(cl);
 
-                            getDisplayer().display(edit);
-                        }
-                    });
+                                getDisplayer().display(edit);
+                            }
+                        });
 
-                }
-            }
-        });
-
-        guiTable.getColumn(3).setCellRenderer(new ActionCell.Renderer(reloadIcon));
-        guiTable.getColumn(3).setCellEditor(new ActionCell.Editor(reloadIcon) {
-            @Override
-            public void actionPerformed(final ActionEvent e, Object value) {
-                if(value instanceof DefaultMutableTreeNode){
-                    value =((DefaultMutableTreeNode)value).getUserObject();
-                }
-                if(value instanceof Entry){
-                    final Instance inst = (Instance) ((Entry)value).getKey();
-                    final String type = (String) ((Entry)value).getValue();
-                     cstl.services.restartInstance(type, inst.getName());
-                     SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateInstanceList();
-                        }
-                    });
-                }
-            }
-        });
-
-        guiTable.getColumn(4).setCellRenderer(new ActionCell.Renderer(null){
-
-            @Override
-            public Icon getIcon(Object value) {
-                if(value instanceof DefaultMutableTreeNode){
-                    value =((DefaultMutableTreeNode)value).getUserObject();
-                }
-                if(value instanceof Entry){
-                    final Instance inst = (Instance) ((Entry)value).getKey();
-                    if(ServiceStatus.WORKING.equals(inst.getStatus())){
-                        return stopIcon;
-                    }else{
-                        return startIcon;
                     }
                 }
-                return super.getIcon(value);
-            }
-        });
-        guiTable.getColumn(4).setCellEditor(new ActionCell.Editor(null) {
-            @Override
-            public void actionPerformed(final ActionEvent e, Object value) {
-                if(value instanceof DefaultMutableTreeNode){
-                    value =((DefaultMutableTreeNode)value).getUserObject();
-                }
-                if(value instanceof Entry){
-                    final Instance inst = (Instance) ((Entry)value).getKey();
-                    final String type = (String) ((Entry)value).getValue();
+            });
+            columIndex++;
+        }
 
-                    if(ServiceStatus.WORKING.equals(inst.getStatus())){
-                        cstl.services.stopInstance(type, inst.getName());
-                    }else{
-                        cstl.services.startInstance(type, inst.getName());
+        if (roleController.hasPermission(RELOAD_SERVICE)) {
+            guiTable.getColumn(columIndex).setCellRenderer(new ActionCell.Renderer(reloadIcon));
+            guiTable.getColumn(columIndex).setCellEditor(new ActionCell.Editor(reloadIcon) {
+                @Override
+                public void actionPerformed(final ActionEvent e, Object value) {
+                    if(value instanceof DefaultMutableTreeNode){
+                        value =((DefaultMutableTreeNode)value).getUserObject();
                     }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateInstanceList();
+                    if(value instanceof Entry){
+                        final Instance inst = (Instance) ((Entry)value).getKey();
+                        final String type = (String) ((Entry)value).getValue();
+                         cstl.services.restartInstance(type, inst.getName());
+                         SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateInstanceList();
+                            }
+                        });
+                    }
+                }
+            });
+            columIndex++;
+        }
+
+        if (roleController.hasPermission(START_STOP_SERVICE)) {
+            guiTable.getColumn(columIndex).setCellRenderer(new ActionCell.Renderer(null){
+
+                @Override
+                public Icon getIcon(Object value) {
+                    if(value instanceof DefaultMutableTreeNode){
+                        value =((DefaultMutableTreeNode)value).getUserObject();
+                    }
+                    if(value instanceof Entry){
+                        final Instance inst = (Instance) ((Entry)value).getKey();
+                        if(ServiceStatus.WORKING.equals(inst.getStatus())){
+                            return stopIcon;
+                        }else{
+                            return startIcon;
                         }
-                    });
+                    }
+                    return super.getIcon(value);
                 }
-            }
+            });
+            guiTable.getColumn(columIndex).setCellEditor(new ActionCell.Editor(null) {
+                @Override
+                public void actionPerformed(final ActionEvent e, Object value) {
+                    if(value instanceof DefaultMutableTreeNode){
+                        value =((DefaultMutableTreeNode)value).getUserObject();
+                    }
+                    if(value instanceof Entry){
+                        final Instance inst = (Instance) ((Entry)value).getKey();
+                        final String type = (String) ((Entry)value).getValue();
 
-            @Override
-            public Icon getIcon(Object value) {
-                if(value instanceof DefaultMutableTreeNode){
-                    value =((DefaultMutableTreeNode)value).getUserObject();
-                }
-                if(value instanceof Entry){
-                    final Instance inst = (Instance) ((Entry)value).getKey();
-                    if(ServiceStatus.WORKING.equals(inst.getStatus())){
-                        return stopIcon;
-                    }else{
-                        return startIcon;
+                        if(ServiceStatus.WORKING.equals(inst.getStatus())){
+                            cstl.services.stopInstance(type, inst.getName());
+                        }else{
+                            cstl.services.startInstance(type, inst.getName());
+                        }
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateInstanceList();
+                            }
+                        });
                     }
                 }
-                return super.getIcon(value);
-            }
 
-        });
+                @Override
+                public Icon getIcon(Object value) {
+                    if(value instanceof DefaultMutableTreeNode){
+                        value =((DefaultMutableTreeNode)value).getUserObject();
+                    }
+                    if(value instanceof Entry){
+                        final Instance inst = (Instance) ((Entry)value).getKey();
+                        if(ServiceStatus.WORKING.equals(inst.getStatus())){
+                            return stopIcon;
+                        }else{
+                            return startIcon;
+                        }
+                    }
+                    return super.getIcon(value);
+                }
+
+            });
+        }
 
         final int width = 140;
-        guiTable.getColumn(1).setMinWidth(width);
-        guiTable.getColumn(1).setPreferredWidth(width);
-        guiTable.getColumn(1).setMaxWidth(width);
-        guiTable.getColumn(2).setMinWidth(width);
-        guiTable.getColumn(2).setPreferredWidth(width);
-        guiTable.getColumn(2).setMaxWidth(width);
-        guiTable.getColumn(3).setMinWidth(width);
-        guiTable.getColumn(3).setPreferredWidth(width);
-        guiTable.getColumn(3).setMaxWidth(width);
-        guiTable.getColumn(4).setMinWidth(width);
-        guiTable.getColumn(4).setPreferredWidth(width);
-        guiTable.getColumn(4).setMaxWidth(width);
+        for (int i = 1; i < guiTable.getColumnCount(); i++) {
+            guiTable.getColumn(i).setMinWidth(width);
+            guiTable.getColumn(i).setPreferredWidth(width);
+            guiTable.getColumn(i).setMaxWidth(width);
+        }
         guiTable.setTableHeader(null);
         guiTable.setRowHeight(37);
         guiTable.setFillsViewportHeight(true);
@@ -516,7 +518,17 @@ public final class JServicesPane extends JPanel implements ActionListener {
 
         @Override
         public int getColumnCount() {
-            return 5;
+            int nbColumn = 2; // instance name + viewButton
+            if (roleController.hasPermission(EDIT_SERVICE)) {
+                nbColumn++;
+            }
+            if (roleController.hasPermission(RELOAD_SERVICE)) {
+                nbColumn++;
+            }
+            if (roleController.hasPermission(START_STOP_SERVICE)) {
+                nbColumn++;
+            }
+            return nbColumn;
         }
 
         @Override
