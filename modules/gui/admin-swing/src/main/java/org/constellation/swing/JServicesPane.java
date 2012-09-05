@@ -53,12 +53,15 @@ import org.constellation.admin.service.ConstellationServer.Services;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceStatus;
+import org.constellation.security.DefaultRoleController;
+import org.constellation.security.RoleController;
+import static org.constellation.security.ActionPermissions.*;
 import org.geotoolkit.gui.swing.misc.ActionCell;
 import org.jdesktop.swingx.JXTable;
 
 /**
  * Top component to manage constellation services.
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public final class JServicesPane extends JPanel implements ActionListener {
@@ -67,25 +70,31 @@ public final class JServicesPane extends JPanel implements ActionListener {
     private static final ImageIcon ICON_SERVICE_START = new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceStart.png"));
     private static final ImageIcon ICON_SERVICE_RELOAD =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceReload.png"));
     private static final ImageIcon ICON_SERVICE_STOP =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceStop.png"));
-    
+
     private final JXTable guiTable = new JXTable();
     private final ConstellationServer cstl;
     private final FrameDisplayer displayer;
-        
-    public JServicesPane(final ConstellationServer cstl, FrameDisplayer displayer) {
+    private final RoleController roleController;
+
+    public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer) {
+        this(cstl, displayer, new DefaultRoleController());
+    }
+
+    public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer, final RoleController roleController) {
         initComponents();
-        
+
         this.cstl = cstl;
-        if(displayer == null){
-            displayer = new DefaultFrameDisplayer();
+        if (displayer == null) {
+            this.displayer = new DefaultFrameDisplayer();
+        } else {
+            this.displayer = displayer;
         }
-        
-        this.displayer = displayer;
+        this.roleController = roleController;
         final Services services = cstl.services;
         final Map<String,List<String>> listServices = services.getAvailableService();
         final List<String> types = new ArrayList<String>(listServices.keySet());
         Collections.sort(types);
-        
+
         guiAll.addActionListener(this);
         for(String type : types) {
             final JToggleButton btn = new JToggleButton(type);
@@ -94,7 +103,9 @@ public final class JServicesPane extends JPanel implements ActionListener {
             guiTypeGroup.add(btn);
             guiToolBar.add(btn);
         }
-                
+
+        guiNew.setVisible(roleController.hasPermission(NEW_SERVICE));
+
         add(BorderLayout.CENTER,new JScrollPane(guiTable));
         updateInstanceList();
     }
@@ -104,16 +115,16 @@ public final class JServicesPane extends JPanel implements ActionListener {
     }
 
     private void updateInstanceList(){
-        
+
         String action = "all";
         if(guiTypeGroup.getSelection() != null){
             action = guiTypeGroup.getSelection().getActionCommand();
         }
-        
+
         //list all services
         final List<Entry<Instance,String>> instances = new ArrayList<Entry<Instance, String>> ();
-        
-        
+
+
         final Map<String,List<String>> services = cstl.services.getAvailableService();
         for(Map.Entry<String,List<String>> service : services.entrySet()){
 
@@ -123,9 +134,9 @@ public final class JServicesPane extends JPanel implements ActionListener {
                 for(Instance instance : report.getInstances()){
                     instances.add(new AbstractMap.SimpleImmutableEntry<Instance, String>(instance, service.getKey()));
                 }
-            }            
+            }
         }
-        
+
         Collections.sort(instances,new Comparator<Entry<Instance,String>>(){
             @Override
             public int compare(Entry<Instance, String> o1, Entry<Instance, String> o2) {
@@ -137,39 +148,39 @@ public final class JServicesPane extends JPanel implements ActionListener {
                     return o1.getValue().compareTo(o2.getValue());
                 }
             }
-        });     
-        
+        });
+
         final TableModel model = new InstanceModel(instances);
-        guiTable.setModel(model);        
-        
+        guiTable.setModel(model);
+
         final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
         final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
-        final ImageIcon viewIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("view"), 
+        final ImageIcon viewIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("view"),
                 null, Color.BLACK, fontNormal, Color.LIGHT_GRAY));
-        final ImageIcon editIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("edit"), 
+        final ImageIcon editIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("edit"),
                 ICON_SERVICE_EDIT, Color.BLACK, fontNormal, Color.LIGHT_GRAY));
-        final ImageIcon reloadIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("reload"), 
+        final ImageIcon reloadIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("reload"),
                 ICON_SERVICE_RELOAD, Color.WHITE, fontNormal, new Color(65,150,190)));
-        final ImageIcon startIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("start"), 
+        final ImageIcon startIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("start"),
                 ICON_SERVICE_START, Color.WHITE, fontNormal, new Color(130, 160, 50)));
-        final ImageIcon stopIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("stop"), 
+        final ImageIcon stopIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("stop"),
                 ICON_SERVICE_STOP, Color.WHITE, fontNormal, new Color(180,60,60)));
-        
+
         guiTable.getColumn(0).setCellRenderer(new DefaultTableCellRenderer(){
 
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object o, 
+            public Component getTableCellRendererComponent(JTable table, Object o,
             boolean isSelected, boolean hasFocus, int row, int column) {
                 final JLabel lbl = (JLabel) super.getTableCellRendererComponent(
                         table, o, isSelected, hasFocus, row, column);
-                
+
                 lbl.setIcon(null);
-                
+
                 if(o instanceof DefaultMutableTreeNode){
                     o = ((DefaultMutableTreeNode)o).getUserObject();
                 }
                 if(o instanceof Entry){
-                    final Entry entry = (Entry) o;                
+                    final Entry entry = (Entry) o;
                     final Instance inst = (Instance) entry.getKey();
                     final String type = (String) entry.getValue();
 
@@ -183,15 +194,15 @@ public final class JServicesPane extends JPanel implements ActionListener {
                     }
 
                     final BufferedImage img = JServicesPane.createImage(type, null, Color.WHITE,fontBig, bgColor);
-                    lbl.setIcon(new ImageIcon(img));       
-                    lbl.setText(inst.getName());          
+                    lbl.setIcon(new ImageIcon(img));
+                    lbl.setText(inst.getName());
                 }
-                
+
                 return lbl;
             }
-            
+
         });
-        
+
         guiTable.getColumn(1).setCellRenderer(new ActionCell.Renderer(viewIcon){
 
             @Override
@@ -203,16 +214,16 @@ public final class JServicesPane extends JPanel implements ActionListener {
                     final Instance inst = (Instance) ((Entry)value).getKey();
                     final String type = (String) ((Entry)value).getValue();
                     final String lowerType = type.toLowerCase();
-                    
+
                     if(!(lowerType.equals("wms") || lowerType.equals("wmts") || lowerType.equals("wfs"))){
                         //not a viewable type
                         return null;
-                    }          
+                    }
                 }
-                
+
                 return super.getIcon(value);
             }
-            
+
         });
         guiTable.getColumn(1).setCellEditor(new ActionCell.Editor(viewIcon) {
             @Override
@@ -224,23 +235,23 @@ public final class JServicesPane extends JPanel implements ActionListener {
                     final Instance inst = (Instance) ((Entry)value).getKey();
                     final String type = (String) ((Entry)value).getValue();
                     final String lowerType = type.toLowerCase();
-                    
+
                     if(!(lowerType.equals("wms") || lowerType.equals("wmts") || lowerType.equals("wfs"))){
                         //not a viewable type
                         return;
                     }
-                    
+
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             getDisplayer().display(cstl, type, inst);
                         }
                     });
-                                       
+
                 }
             }
         });
-        
+
         guiTable.getColumn(2).setCellRenderer(new ActionCell.Renderer(editIcon));
         guiTable.getColumn(2).setCellEditor(new ActionCell.Editor(editIcon) {
             @Override
@@ -251,12 +262,12 @@ public final class JServicesPane extends JPanel implements ActionListener {
                 if (value instanceof Entry) {
                     final Instance inst = (Instance) ((Entry)value).getKey();
                     final String type = (String) ((Entry)value).getValue();
-                              
-                    
+
+
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            
+
                             final JServiceEditPane edit = new JServiceEditPane(cstl, type, inst);
                             final PropertyChangeListener cl = new PropertyChangeListener() {
                                 @Override
@@ -269,15 +280,15 @@ public final class JServicesPane extends JPanel implements ActionListener {
                             };
 
                             edit.addPropertyChangeListener(cl);
-                            
+
                             getDisplayer().display(edit);
                         }
                     });
-                                       
+
                 }
             }
         });
-        
+
         guiTable.getColumn(3).setCellRenderer(new ActionCell.Renderer(reloadIcon));
         guiTable.getColumn(3).setCellEditor(new ActionCell.Editor(reloadIcon) {
             @Override
@@ -298,9 +309,9 @@ public final class JServicesPane extends JPanel implements ActionListener {
                 }
             }
         });
-        
+
         guiTable.getColumn(4).setCellRenderer(new ActionCell.Renderer(null){
-        
+
             @Override
             public Icon getIcon(Object value) {
                 if(value instanceof DefaultMutableTreeNode){
@@ -312,8 +323,8 @@ public final class JServicesPane extends JPanel implements ActionListener {
                         return stopIcon;
                     }else{
                         return startIcon;
-                    }                    
-                }                
+                    }
+                }
                 return super.getIcon(value);
             }
         });
@@ -326,7 +337,7 @@ public final class JServicesPane extends JPanel implements ActionListener {
                 if(value instanceof Entry){
                     final Instance inst = (Instance) ((Entry)value).getKey();
                     final String type = (String) ((Entry)value).getValue();
-                    
+
                     if(ServiceStatus.WORKING.equals(inst.getStatus())){
                         cstl.services.stopInstance(type, inst.getName());
                     }else{
@@ -352,24 +363,24 @@ public final class JServicesPane extends JPanel implements ActionListener {
                         return stopIcon;
                     }else{
                         return startIcon;
-                    }                    
-                }                
+                    }
+                }
                 return super.getIcon(value);
             }
-            
+
         });
-        
+
         final int width = 140;
-        guiTable.getColumn(1).setMinWidth(width);        
+        guiTable.getColumn(1).setMinWidth(width);
         guiTable.getColumn(1).setPreferredWidth(width);
         guiTable.getColumn(1).setMaxWidth(width);
-        guiTable.getColumn(2).setMinWidth(width);     
+        guiTable.getColumn(2).setMinWidth(width);
         guiTable.getColumn(2).setPreferredWidth(width);
         guiTable.getColumn(2).setMaxWidth(width);
-        guiTable.getColumn(3).setMinWidth(width);     
+        guiTable.getColumn(3).setMinWidth(width);
         guiTable.getColumn(3).setPreferredWidth(width);
         guiTable.getColumn(3).setMaxWidth(width);
-        guiTable.getColumn(4).setMinWidth(width);     
+        guiTable.getColumn(4).setMinWidth(width);
         guiTable.getColumn(4).setPreferredWidth(width);
         guiTable.getColumn(4).setMaxWidth(width);
         guiTable.setTableHeader(null);
@@ -381,10 +392,10 @@ public final class JServicesPane extends JPanel implements ActionListener {
         guiTable.setShowVerticalLines(false);
         guiTable.revalidate();
         guiTable.repaint();
-                
+
     }
-    
-    
+
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -462,13 +473,13 @@ public final class JServicesPane extends JPanel implements ActionListener {
     }//GEN-LAST:event_guiRefreshActionPerformed
 
     private void guiNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiNewActionPerformed
-        
+
         final String[] params = JServiceCreationPane.showDialog(cstl);
         if(params != null){
-            cstl.services.newInstance(params[0], params[1]);            
+            cstl.services.newInstance(params[0], params[1]);
             updateInstanceList();
         }
-        
+
     }//GEN-LAST:event_guiNewActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -488,15 +499,16 @@ public final class JServicesPane extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         updateInstanceList();
     }
-    
+
     private class InstanceModel extends AbstractTableModel{
 
         private final List<Entry<Instance,String>> entries;
 
-        public InstanceModel(List<Entry<Instance,String>> entries) {
+        public InstanceModel(final List<Entry<Instance,String>> entries) {
             this.entries = entries;
+
         }
-        
+
         @Override
         public int getRowCount() {
             return entries.size();
@@ -514,67 +526,67 @@ public final class JServicesPane extends JPanel implements ActionListener {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            
+
             if(columnIndex == 1){
                 Object value = getValueAt(rowIndex, columnIndex);
-            
+
                 if (value instanceof DefaultMutableTreeNode) {
                     value = ((DefaultMutableTreeNode)value).getUserObject();
                 }
                 if (value instanceof Entry) {
                     final String type = (String) ((Entry)value).getValue();
                     final String lowerType = type.toLowerCase();
-                    
+
                     if(!(lowerType.equals("wms") || lowerType.equals("wmts") || lowerType.equals("wfs"))){
                         //not a viewable type : disable edition
                         return false;
-                    }                                       
+                    }
                 }
             }
-            
+
             return columnIndex>0;
         }
-        
+
     }
-    
+
     static BufferedImage createImage(String text, ImageIcon icon, Color textColor, Font font,Color bgColor){
-        
+
         final int border = 5;
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
-        
+
         final FontMetrics fm = g.getFontMetrics(font);
-        final int textSize = fm.stringWidth(text);        
+        final int textSize = fm.stringWidth(text);
         int width = textSize+border*2;
         int height = fm.getHeight()+border*2;
         if(icon != null){
             width += icon.getIconWidth() + 2;
             height = Math.max(height, icon.getIconHeight());
         }
-        
+
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         g = img.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        
+
         final RoundRectangle2D rect = new RoundRectangle2D.Double(0, 0, width-1, img.getHeight()-1, border, border);
-        
+
         g.setColor(bgColor);
         g.fill(rect);
-        
+
         int x = border;
         //draw icon
         if(icon != null){
             g.drawImage(icon.getImage(), x, (height-icon.getIconHeight())/2, null);
             x += icon.getIconWidth()+2;
         }
-        
+
         //draw text
         g.setColor(textColor);
         g.setFont(font);
         g.drawString(text, x, fm.getMaxAscent()+border);
-                
+
         return img;
     }
-        
+
 }
