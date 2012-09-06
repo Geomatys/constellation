@@ -22,6 +22,15 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.admin.service.ConstellationServerFactory;
+import org.constellation.security.RoleController;
+import org.constellation.swing.action.Action;
+import org.constellation.swing.action.ProviderEditAction;
+import org.constellation.swing.action.ProviderReloadAction;
+import org.constellation.swing.action.ProviderViewAction;
+import org.constellation.swing.action.ServiceEditAction;
+import org.constellation.swing.action.ServiceReloadAction;
+import org.constellation.swing.action.ServiceStartStopAction;
+import org.constellation.swing.action.ServiceViewAction;
 import org.geotoolkit.parameter.Parameters;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -33,8 +42,21 @@ public final class JConstellationFrame extends JFrame{
     
     public JConstellationFrame(ConstellationServer server){
         final JTabbedPane pane = new JTabbedPane();
-        pane.add("Services", new JServicesPane(server,null));
-        pane.add("Providers", new JProvidersPane(server,null));
+        pane.add("Services", new JServicesPane(
+                server,
+                (FrameDisplayer)null,
+                (RoleController)null,
+                new ServiceViewAction(),
+                new ServiceEditAction(),
+                new ServiceReloadAction(),
+                new ServiceStartStopAction()));
+        pane.add("Providers", new JProvidersPane(
+                server,
+                (FrameDisplayer)null,
+                (RoleController)null,
+                new ProviderViewAction(),
+                new ProviderEditAction(),
+                new ProviderReloadAction()));
         setContentPane(pane);
     }
     

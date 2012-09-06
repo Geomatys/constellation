@@ -36,14 +36,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
-import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
@@ -56,7 +54,9 @@ import org.constellation.configuration.ServiceStatus;
 import org.constellation.security.DefaultRoleController;
 import org.constellation.security.RoleController;
 import static org.constellation.security.ActionPermissions.*;
-import org.geotoolkit.gui.swing.misc.ActionCell;
+import org.constellation.swing.action.Action;
+import org.constellation.swing.action.ActionEditor;
+import org.constellation.swing.action.ActionRenderer;
 import org.jdesktop.swingx.JXTable;
 
 /**
@@ -64,24 +64,32 @@ import org.jdesktop.swingx.JXTable;
  *
  * @author Johann Sorel (Geomatys)
  */
-public final class JServicesPane extends JPanel implements ActionListener {
+public final class JServicesPane extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private static final ImageIcon ICON_SERVICE_EDIT =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceEdit.png"));
-    private static final ImageIcon ICON_SERVICE_START = new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceStart.png"));
-    private static final ImageIcon ICON_SERVICE_RELOAD =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceReload.png"));
-    private static final ImageIcon ICON_SERVICE_STOP =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceStop.png"));
-
+    private final List<Action> actions = new ArrayList<Action>();
     private final JXTable guiTable = new JXTable();
     private final ConstellationServer cstl;
     private final FrameDisplayer displayer;
     private final RoleController roleController;
 
     public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer) {
-        this(cstl, displayer, new DefaultRoleController());
+        this(cstl, displayer, null);
     }
 
-    public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer, final RoleController roleController) {
+    public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer, 
+            RoleController roleController, Action ... actions) {
         initComponents();
+        
+        if(roleController == null){
+            roleController = new DefaultRoleController();
+        }
+        
+        for(Action act : actions){
+            if(roleController.hasPermission(act.getName())){
+                this.actions.add(act);
+                act.addPropertyChangeListener(this);
+            }
+        }
 
         this.cstl = cstl;
         if (displayer == null) {
@@ -106,6 +114,48 @@ public final class JServicesPane extends JPanel implements ActionListener {
 
         guiNew.setVisible(roleController.hasPermission(NEW_SERVICE));
 
+        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl));
+        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl));
+        
+        guiTable.setDefaultRenderer(Entry.class, new DefaultTableCellRenderer(){
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object o,
+            boolean isSelected, boolean hasFocus, int row, int column) {
+                final JLabel lbl = (JLabel) super.getTableCellRendererComponent(
+                        table, o, isSelected, hasFocus, row, column);
+
+                lbl.setIcon(null);
+
+                if(o instanceof DefaultMutableTreeNode){
+                    o = ((DefaultMutableTreeNode)o).getUserObject();
+                }
+                if(o instanceof Entry){
+                    final Entry entry = (Entry) o;
+                    final Instance inst = (Instance) entry.getKey();
+                    final String type = (String) entry.getValue();
+
+                    final Color bgColor;
+                    if(ServiceStatus.WORKING.equals(inst.getStatus())){
+                        bgColor = new Color(130, 160, 50);
+                    }else if(ServiceStatus.NOT_STARTED.equals(inst.getStatus())){
+                        bgColor = Color.GRAY;
+                    }else{
+                        bgColor = new Color(180,60,60);
+                    }
+
+                    final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
+                    final BufferedImage img = JServicesPane.createImage(type, null, Color.WHITE,fontBig, bgColor);
+                    lbl.setIcon(new ImageIcon(img));
+                    lbl.setText(inst.getName());
+                }
+
+                return lbl;
+            }
+
+        });
+        
+        
         add(BorderLayout.CENTER,new JScrollPane(guiTable));
         updateInstanceList();
     }
@@ -152,232 +202,6 @@ public final class JServicesPane extends JPanel implements ActionListener {
 
         final TableModel model = new InstanceModel(instances);
         guiTable.setModel(model);
-
-        final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
-        final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
-        final ImageIcon viewIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("view"),
-                null, Color.BLACK, fontNormal, Color.LIGHT_GRAY));
-        final ImageIcon editIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("edit"),
-                ICON_SERVICE_EDIT, Color.BLACK, fontNormal, Color.LIGHT_GRAY));
-        final ImageIcon reloadIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("reload"),
-                ICON_SERVICE_RELOAD, Color.WHITE, fontNormal, new Color(65,150,190)));
-        final ImageIcon startIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("start"),
-                ICON_SERVICE_START, Color.WHITE, fontNormal, new Color(130, 160, 50)));
-        final ImageIcon stopIcon = new ImageIcon(createImage(LayerRowModel.BUNDLE.getString("stop"),
-                ICON_SERVICE_STOP, Color.WHITE, fontNormal, new Color(180,60,60)));
-
-        guiTable.getColumn(0).setCellRenderer(new DefaultTableCellRenderer(){
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object o,
-            boolean isSelected, boolean hasFocus, int row, int column) {
-                final JLabel lbl = (JLabel) super.getTableCellRendererComponent(
-                        table, o, isSelected, hasFocus, row, column);
-
-                lbl.setIcon(null);
-
-                if(o instanceof DefaultMutableTreeNode){
-                    o = ((DefaultMutableTreeNode)o).getUserObject();
-                }
-                if(o instanceof Entry){
-                    final Entry entry = (Entry) o;
-                    final Instance inst = (Instance) entry.getKey();
-                    final String type = (String) entry.getValue();
-
-                    final Color bgColor;
-                    if(ServiceStatus.WORKING.equals(inst.getStatus())){
-                        bgColor = new Color(130, 160, 50);
-                    }else if(ServiceStatus.NOT_STARTED.equals(inst.getStatus())){
-                        bgColor = Color.GRAY;
-                    }else{
-                        bgColor = new Color(180,60,60);
-                    }
-
-                    final BufferedImage img = JServicesPane.createImage(type, null, Color.WHITE,fontBig, bgColor);
-                    lbl.setIcon(new ImageIcon(img));
-                    lbl.setText(inst.getName());
-                }
-
-                return lbl;
-            }
-
-        });
-
-        guiTable.getColumn(1).setCellRenderer(new ActionCell.Renderer(viewIcon){
-
-            @Override
-            public Icon getIcon(Object value){
-                if (value instanceof DefaultMutableTreeNode) {
-                    value = ((DefaultMutableTreeNode)value).getUserObject();
-                }
-                if (value instanceof Entry) {
-                    final Instance inst = (Instance) ((Entry)value).getKey();
-                    final String type = (String) ((Entry)value).getValue();
-                    final String lowerType = type.toLowerCase();
-
-                    if(!(lowerType.equals("wms") || lowerType.equals("wmts") || lowerType.equals("wfs"))){
-                        //not a viewable type
-                        return null;
-                    }
-                }
-
-                return super.getIcon(value);
-            }
-
-        });
-        guiTable.getColumn(1).setCellEditor(new ActionCell.Editor(viewIcon) {
-            @Override
-            public void actionPerformed(final ActionEvent e, Object value) {
-                if (value instanceof DefaultMutableTreeNode) {
-                    value = ((DefaultMutableTreeNode)value).getUserObject();
-                }
-                if (value instanceof Entry) {
-                    final Instance inst = (Instance) ((Entry)value).getKey();
-                    final String type = (String) ((Entry)value).getValue();
-                    final String lowerType = type.toLowerCase();
-
-                    if(!(lowerType.equals("wms") || lowerType.equals("wmts") || lowerType.equals("wfs"))){
-                        //not a viewable type
-                        return;
-                    }
-
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            getDisplayer().display(cstl, type, inst);
-                        }
-                    });
-
-                }
-            }
-        });
-
-        int columIndex = 2;
-        if (roleController.hasPermission(EDIT_SERVICE)) {
-            guiTable.getColumn(columIndex).setCellRenderer(new ActionCell.Renderer(editIcon));
-            guiTable.getColumn(columIndex).setCellEditor(new ActionCell.Editor(editIcon) {
-                @Override
-                public void actionPerformed(final ActionEvent e, Object value) {
-                    if (value instanceof DefaultMutableTreeNode) {
-                        value = ((DefaultMutableTreeNode)value).getUserObject();
-                    }
-                    if (value instanceof Entry) {
-                        final Instance inst = (Instance) ((Entry)value).getKey();
-                        final String type = (String) ((Entry)value).getValue();
-
-
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                final JServiceEditPane edit = new JServiceEditPane(cstl, type, inst);
-                                final PropertyChangeListener cl = new PropertyChangeListener() {
-                                    @Override
-                                    public void propertyChange(PropertyChangeEvent evt) {
-                                        if ("update".equals(evt.getPropertyName())) {
-                                            updateInstanceList();
-                                            edit.removePropertyChangeListener(this);
-                                        }
-                                    }
-                                };
-
-                                edit.addPropertyChangeListener(cl);
-
-                                getDisplayer().display(edit);
-                            }
-                        });
-
-                    }
-                }
-            });
-            columIndex++;
-        }
-
-        if (roleController.hasPermission(RELOAD_SERVICE)) {
-            guiTable.getColumn(columIndex).setCellRenderer(new ActionCell.Renderer(reloadIcon));
-            guiTable.getColumn(columIndex).setCellEditor(new ActionCell.Editor(reloadIcon) {
-                @Override
-                public void actionPerformed(final ActionEvent e, Object value) {
-                    if(value instanceof DefaultMutableTreeNode){
-                        value =((DefaultMutableTreeNode)value).getUserObject();
-                    }
-                    if(value instanceof Entry){
-                        final Instance inst = (Instance) ((Entry)value).getKey();
-                        final String type = (String) ((Entry)value).getValue();
-                         cstl.services.restartInstance(type, inst.getName());
-                         SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateInstanceList();
-                            }
-                        });
-                    }
-                }
-            });
-            columIndex++;
-        }
-
-        if (roleController.hasPermission(START_STOP_SERVICE)) {
-            guiTable.getColumn(columIndex).setCellRenderer(new ActionCell.Renderer(null){
-
-                @Override
-                public Icon getIcon(Object value) {
-                    if(value instanceof DefaultMutableTreeNode){
-                        value =((DefaultMutableTreeNode)value).getUserObject();
-                    }
-                    if(value instanceof Entry){
-                        final Instance inst = (Instance) ((Entry)value).getKey();
-                        if(ServiceStatus.WORKING.equals(inst.getStatus())){
-                            return stopIcon;
-                        }else{
-                            return startIcon;
-                        }
-                    }
-                    return super.getIcon(value);
-                }
-            });
-            guiTable.getColumn(columIndex).setCellEditor(new ActionCell.Editor(null) {
-                @Override
-                public void actionPerformed(final ActionEvent e, Object value) {
-                    if(value instanceof DefaultMutableTreeNode){
-                        value =((DefaultMutableTreeNode)value).getUserObject();
-                    }
-                    if(value instanceof Entry){
-                        final Instance inst = (Instance) ((Entry)value).getKey();
-                        final String type = (String) ((Entry)value).getValue();
-
-                        if(ServiceStatus.WORKING.equals(inst.getStatus())){
-                            cstl.services.stopInstance(type, inst.getName());
-                        }else{
-                            cstl.services.startInstance(type, inst.getName());
-                        }
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateInstanceList();
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public Icon getIcon(Object value) {
-                    if(value instanceof DefaultMutableTreeNode){
-                        value =((DefaultMutableTreeNode)value).getUserObject();
-                    }
-                    if(value instanceof Entry){
-                        final Instance inst = (Instance) ((Entry)value).getKey();
-                        if(ServiceStatus.WORKING.equals(inst.getStatus())){
-                            return stopIcon;
-                        }else{
-                            return startIcon;
-                        }
-                    }
-                    return super.getIcon(value);
-                }
-
-            });
-        }
 
         final int width = 140;
         for (int i = 1; i < guiTable.getColumnCount(); i++) {
@@ -502,15 +326,28 @@ public final class JServicesPane extends JPanel implements ActionListener {
         updateInstanceList();
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        updateInstanceList();
+    }
+
     private class InstanceModel extends AbstractTableModel{
 
         private final List<Entry<Instance,String>> entries;
 
         public InstanceModel(final List<Entry<Instance,String>> entries) {
             this.entries = entries;
-
         }
 
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            if(columnIndex == 0){
+                return Entry.class;
+            }else{
+                return Action.class;
+            }
+        }
+        
         @Override
         public int getRowCount() {
             return entries.size();
@@ -518,50 +355,29 @@ public final class JServicesPane extends JPanel implements ActionListener {
 
         @Override
         public int getColumnCount() {
-            int nbColumn = 2; // instance name + viewButton
-            if (roleController.hasPermission(EDIT_SERVICE)) {
-                nbColumn++;
-            }
-            if (roleController.hasPermission(RELOAD_SERVICE)) {
-                nbColumn++;
-            }
-            if (roleController.hasPermission(START_STOP_SERVICE)) {
-                nbColumn++;
-            }
-            return nbColumn;
+            return 1+actions.size();
         }
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
+            if(columnIndex>0){
+                final Action act = actions.get(columnIndex-1);
+                act.setTarget(entries.get(rowIndex));
+                act.setDisplayer(displayer);
+                return act;
+            }
+            
             return entries.get(rowIndex);
         }
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-
-            if(columnIndex == 1){
-                Object value = getValueAt(rowIndex, columnIndex);
-
-                if (value instanceof DefaultMutableTreeNode) {
-                    value = ((DefaultMutableTreeNode)value).getUserObject();
-                }
-                if (value instanceof Entry) {
-                    final String type = (String) ((Entry)value).getValue();
-                    final String lowerType = type.toLowerCase();
-
-                    if(!(lowerType.equals("wms") || lowerType.equals("wmts") || lowerType.equals("wfs"))){
-                        //not a viewable type : disable edition
-                        return false;
-                    }
-                }
-            }
-
             return columnIndex>0;
         }
 
     }
 
-    static BufferedImage createImage(String text, ImageIcon icon, Color textColor, Font font,Color bgColor){
+    public static BufferedImage createImage(String text, ImageIcon icon, Color textColor, Font font,Color bgColor){
 
         final int border = 5;
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
