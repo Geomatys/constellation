@@ -126,6 +126,16 @@ public class WPSProcessListener implements ProcessListener{
         responseDoc.setStatus(status);
         WPSUtils.storeResponse(responseDoc, folderPath, fileName);
     }
+
+    @Override
+    public void paused(final ProcessEvent event) {
+	// TODO
+    }
+
+    @Override
+    public void resumed(final ProcessEvent event) {
+	// TODO
+    }
     
     /**
      * Write the occured exception in the response file.
