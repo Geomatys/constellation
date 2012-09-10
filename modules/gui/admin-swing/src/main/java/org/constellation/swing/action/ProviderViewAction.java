@@ -21,7 +21,6 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.constellation.configuration.ProviderReport;
-import org.constellation.security.ActionPermissions;
 import org.constellation.swing.LayerRowModel;
 
 /**
@@ -29,12 +28,12 @@ import org.constellation.swing.LayerRowModel;
  * @author Johann Sorel (Geomatys)
  */
 public class ProviderViewAction extends Action {
-    
-    
+
+
     public ProviderViewAction() {
         super("view");
     }
-    
+
     @Override
     public boolean isEnable() {
         if(target instanceof Map.Entry){
@@ -83,5 +82,10 @@ public class ProviderViewAction extends Action {
 
         }
     }
-    
+
+    @Override
+    public Action clone() {
+        return new ProviderViewAction();
+    }
+
 }

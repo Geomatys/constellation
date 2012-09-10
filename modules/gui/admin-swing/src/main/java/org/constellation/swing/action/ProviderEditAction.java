@@ -36,12 +36,12 @@ public class ProviderEditAction extends Action {
 
     private static final ImageIcon ICON_SERVICE_EDIT =  new ImageIcon(
             JServicesPane.class.getResource("/org/constellation/swing/serviceEdit.png"));
-    
-    
+
+
     public ProviderEditAction() {
         super(ActionPermissions.EDIT_PROVIDER);
     }
-    
+
     @Override
     public boolean isEnable() {
         if (target instanceof Map.Entry) {
@@ -101,5 +101,10 @@ public class ProviderEditAction extends Action {
 
         }
     }
-    
+
+    @Override
+    public Action clone() {
+        return new ProviderEditAction();
+    }
+
 }

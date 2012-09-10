@@ -76,14 +76,14 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
         this(cstl, displayer, null);
     }
 
-    public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer, 
+    public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer,
             RoleController roleController, Action ... actions) {
         initComponents();
-        
+
         if(roleController == null){
             roleController = new DefaultRoleController();
         }
-        
+
         for(Action act : actions){
             if(roleController.hasPermission(act.getName())){
                 this.actions.add(act);
@@ -116,7 +116,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
 
         guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl));
         guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl));
-        
+
         guiTable.setDefaultRenderer(Entry.class, new DefaultTableCellRenderer(){
 
             @Override
@@ -154,8 +154,8 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
             }
 
         });
-        
-        
+
+
         add(BorderLayout.CENTER,new JScrollPane(guiTable));
         updateInstanceList();
     }
@@ -347,7 +347,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
                 return Action.class;
             }
         }
-        
+
         @Override
         public int getRowCount() {
             return entries.size();
@@ -361,12 +361,12 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             if(columnIndex>0){
-                final Action act = actions.get(columnIndex-1);
+                final Action act = actions.get(columnIndex-1).clone();
                 act.setTarget(entries.get(rowIndex));
                 act.setDisplayer(displayer);
                 return act;
             }
-            
+
             return entries.get(rowIndex);
         }
 

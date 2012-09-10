@@ -35,11 +35,11 @@ public class ServiceEditAction extends Action {
 
     private static final ImageIcon ICON_SERVICE_EDIT =  new ImageIcon(
             ServiceEditAction.class.getResource("/org/constellation/swing/serviceEdit.png"));
-    
+
     public ServiceEditAction() {
         super(ActionPermissions.EDIT_SERVICE);
     }
-    
+
     @Override
     public boolean isEnable() {
         if (target instanceof Map.Entry) {
@@ -99,5 +99,10 @@ public class ServiceEditAction extends Action {
             });
         }
     }
-    
+
+    @Override
+    public Action clone() {
+        return new ServiceEditAction();
+    }
+
 }

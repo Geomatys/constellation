@@ -35,11 +35,11 @@ public class ServiceStartStopAction extends Action {
             ServiceStartStopAction.class.getResource("/org/constellation/swing/serviceStart.png"));
     private static final ImageIcon ICON_SERVICE_STOP =  new ImageIcon(
             ServiceStartStopAction.class.getResource("/org/constellation/swing/serviceStop.png"));
-    
+
     public ServiceStartStopAction() {
         super(ActionPermissions.START_STOP_SERVICE);
     }
-    
+
     @Override
     public boolean isEnable() {
         if (target instanceof Map.Entry) {
@@ -114,5 +114,10 @@ public class ServiceStartStopAction extends Action {
             });
         }
     }
-    
+
+    @Override
+    public Action clone() {
+        return new ServiceStartStopAction();
+    }
+
 }

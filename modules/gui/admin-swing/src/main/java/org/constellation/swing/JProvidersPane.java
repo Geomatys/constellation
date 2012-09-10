@@ -68,7 +68,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
         }
     };
 
-    
+
     private final List<Action> actions = new ArrayList<Action>();
     private final JXTable guiTable = new JXTable();
     private final ConstellationServer cstl;
@@ -79,7 +79,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
         this(cstl, displayer, new DefaultRoleController());
     }
 
-    public JProvidersPane(final ConstellationServer cstl, final FrameDisplayer displayer, 
+    public JProvidersPane(final ConstellationServer cstl, final FrameDisplayer displayer,
             RoleController roleController, final Action ... actions) {
         initComponents();
 
@@ -89,18 +89,18 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
         } else {
             this.displayer = displayer;
         }
-        
+
         if(roleController == null){
             roleController = new DefaultRoleController();
         }
-        
+
         for(Action act : actions){
             if(roleController.hasPermission(act.getName())){
                 this.actions.add(act);
                 act.addPropertyChangeListener(this);
             }
         }
-        
+
         this.roleController = roleController;
         //list all providers
         guiAll.addActionListener(this);
@@ -117,8 +117,8 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
         }
         guiNew.setVisible(roleController.hasPermission(NEW_PROVIDER));
 
-        
-        
+
+
         final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
         guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl));
         guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl));
@@ -150,7 +150,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
             }
 
         });
-        
+
         add(BorderLayout.CENTER,new JScrollPane(guiTable));
         updateInstanceList();
     }
@@ -197,7 +197,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
         final TableModel model = new InstanceModel(instances);
         guiTable.setModel(model);
-        
+
 
         final int width = 140;
         for (int i = 1; i < guiTable.getColumnCount(); i++) {
@@ -340,7 +340,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
                 return Action.class;
             }
         }
-        
+
         @Override
         public int getRowCount() {
             return entries.size();
@@ -354,12 +354,12 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             if(columnIndex>0){
-                final Action act = actions.get(columnIndex-1);
+                final Action act = actions.get(columnIndex-1).clone();
                 act.setTarget(entries.get(rowIndex));
                 act.setDisplayer(displayer);
                 return act;
             }
-            
+
             return entries.get(rowIndex);
         }
 

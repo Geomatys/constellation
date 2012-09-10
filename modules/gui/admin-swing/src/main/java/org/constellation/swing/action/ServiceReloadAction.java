@@ -32,12 +32,12 @@ public class ServiceReloadAction extends Action {
 
     private static final ImageIcon ICON_SERVICE_RELOAD =  new ImageIcon(
             ServiceEditAction.class.getResource("/org/constellation/swing/serviceReload.png"));
-    
-    
+
+
     public ServiceReloadAction() {
         super(ActionPermissions.RELOAD_SERVICE);
     }
-    
+
     @Override
     public boolean isEnable() {
         if (target instanceof Map.Entry) {
@@ -83,5 +83,10 @@ public class ServiceReloadAction extends Action {
             });
         }
     }
-    
+
+    @Override
+    public Action clone() {
+        return new ServiceReloadAction();
+    }
+
 }

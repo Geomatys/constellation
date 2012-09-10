@@ -32,7 +32,7 @@ public class ServiceViewAction extends Action {
     public ServiceViewAction() {
         super("view");
     }
-    
+
     @Override
     public boolean isEnable() {
         if (target instanceof Map.Entry) {
@@ -44,7 +44,7 @@ public class ServiceViewAction extends Action {
                 //not a viewable type
                 return false;
             }
-            
+
             return true;
         }
         return false;
@@ -91,5 +91,10 @@ public class ServiceViewAction extends Action {
 
         }
     }
-    
+
+    @Override
+    public Action clone() {
+        return new ServiceViewAction();
+    }
+
 }

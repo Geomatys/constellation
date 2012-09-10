@@ -30,10 +30,10 @@ import org.constellation.swing.FrameDisplayer;
  */
 public abstract class Action {
 
-    private final EventListenerList listenres = new EventListenerList();
-    
+    private final EventListenerList listeners = new EventListenerList();
+
     private final String name;
-    
+
     protected ConstellationServer server;
     protected Object target;
     protected FrameDisplayer displayer;
@@ -45,7 +45,7 @@ public abstract class Action {
     public String getName() {
         return name;
     }
-    
+
     public ConstellationServer getServer() {
         return server;
     }
@@ -69,29 +69,29 @@ public abstract class Action {
     public void setDisplayer(FrameDisplayer displayer) {
         this.displayer = displayer;
     }
-    
+
     public void addPropertyChangeListener(PropertyChangeListener listener){
-        listenres.add(PropertyChangeListener.class, listener);
+        listeners.add(PropertyChangeListener.class, listener);
     }
-    
+
     protected void fireUpdate(){
-        for(PropertyChangeListener l : listenres.getListeners(PropertyChangeListener.class)){
+        for(PropertyChangeListener l : listeners.getListeners(PropertyChangeListener.class)){
             l.propertyChange(new PropertyChangeEvent(this, "update", 0, 1));
         }
     }
-    
+
     public abstract boolean isEnable();
-    
+
     public abstract String getDisplayName();
-    
+
     public abstract ImageIcon getIcon();
-    
+
     public abstract Color getTextColor();
-    
+
     public abstract Color getBackgroundColor();
-    
+
     public abstract void actionPerformed();
-        
-    
-    
+
+    public abstract Action clone();
+
 }
