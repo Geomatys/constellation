@@ -45,15 +45,16 @@ import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Edit a service.
- * 
+ *
  * @author Johann Sorel (geomatys)
  */
 public class JProviderEditPane extends javax.swing.JPanel {
 
     private static final ImageIcon ICON_EDIT =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceEditBlanc.png"));
     private static final ImageIcon ICON_DELETE = new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceCross.png"));
-    
-    
+
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/constellation/swing/Bundle");
+
     private final ConstellationServer server;
     private final String providerType;
     private ProviderReport providerReport;
@@ -65,51 +66,51 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private ParameterDescriptorGroup subdataDesc = null;
     private ParameterValueGroup subdataParam;
     private final JFeatureOutLine guiParameterEditor = new JFeatureOutLine();
-    
+
     public JProviderEditPane(final ConstellationServer server, final String serviceType, final ProviderReport providerReport) {
         this.server = server;
         this.providerType = serviceType;
         this.providerReport = providerReport;
-        
+
         configDesc = (ParameterDescriptorGroup) server.providers.getServiceDescriptor(providerType);
         sourceDesc = (ParameterDescriptorGroup) configDesc.descriptor("source");
         sourceParam = (ParameterValueGroup) server.providers.getProviderConfiguration(providerReport.getId(), sourceDesc);
         dataDesc = (ParameterDescriptorGroup) server.providers.getSourceDescriptor(providerType);
         dataParam = sourceParam.groups(dataDesc.getName().getCode()).get(0);
-        
+
         if("choice".equalsIgnoreCase(dataDesc.getName().getCode())){
             for(GeneralParameterValue sub : dataParam.values()){
                 subdataParam = (ParameterValueGroup) sub;
                 subdataDesc = subdataParam.getDescriptor();
             }
         }
-        
-        initComponents();        
+
+        initComponents();
         guiParameterEditor.setEdited((subdataParam==null) ? dataParam : subdataParam);
         guiParameters.setViewportView(guiParameterEditor);
-        
+
         guiIdentifier.setText(providerReport.getId());
         final boolean styleType = "sld".equals(serviceType);
         guiAdd.setVisible(styleType);
-        
+
         //data list
         updateDataModel();
-        
+
     }
-    
+
     private void updateDataModel(){
         providerReport = server.providers.listProviders().getProviderService(providerType).getProvider(providerReport.getId());
         final boolean styleType = "sld".equals(providerType);
-        
+
         final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
         final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
-        final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage("", 
+        final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage("",
                 ICON_EDIT, Color.BLACK, fontNormal, Color.DARK_GRAY));
-        final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("", 
+        final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
                 ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
-        
-        guiData.setModel(new DataModel(providerReport.getItems(),styleType));  
-        
+
+        guiData.setModel(new DataModel(providerReport.getItems(),styleType));
+
         if(styleType){
             guiData.getColumn(1).setCellRenderer(new ActionCell.Renderer(editIcon));
             guiData.getColumn(1).setCellEditor(new ActionCell.Editor(editIcon) {
@@ -118,7 +119,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
                     final String styleName = (String) value;
                     MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
                     editStyle(style, styleName,false);
-                    
+
                 }
             });
 
@@ -137,7 +138,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
                 }
             });
         }
-        
+
         guiData.setTableHeader(null);
         guiData.setRowHeight(37);
         guiData.setFillsViewportHeight(true);
@@ -162,34 +163,34 @@ public class JProviderEditPane extends javax.swing.JPanel {
         guiIdentifier.setText(guiIdentifier.getText().replace(' ', '_'));
         guiIdentifier.setCaretPosition(pos);
     }
-    
+
     private void editStyle(MutableStyle style, String styleName,final boolean isNew){
         final String oldName = styleName;
-        
+
         final JDialog dialog = new JDialog();
         final JPanel pane = new JPanel(new BorderLayout());
-        final JLabel lbl = new JLabel(ResourceBundle.getBundle("org/constellation/swing/Bundle").getString("name"));
+        final JLabel lbl = new JLabel(BUNDLE.getString("name"));
         final JTextField textField = new JTextField(styleName);
         final JAdvancedStylePanel editor = new JAdvancedStylePanel();
         editor.parse(style);
-        
+
         final JPanel north = new JPanel(new BorderLayout());
         north.add(BorderLayout.WEST,lbl);
         north.add(BorderLayout.CENTER,textField);
-        
+
         pane.add(BorderLayout.NORTH,north);
         pane.add(BorderLayout.CENTER,editor);
-        
-        
+
+
         dialog.setContentPane(pane);
         dialog.setModal(true);
         dialog.setSize(800, 600);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-        
+
         style = (MutableStyle) editor.create();
         style.setName(textField.getText());
-        
+
         if(isNew){
             //ensure name does not exist
             final String baseName = styleName;
@@ -203,12 +204,12 @@ public class JProviderEditPane extends javax.swing.JPanel {
                 server.providers.deleteStyle(providerReport.getId(), oldName);
             }
         }
-        
+
         server.providers.createStyle(providerReport.getId(), styleName, style);
         updateDataModel();
-        
+
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -357,27 +358,27 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
     private void guiSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiSaveActionPerformed
         correctName();
-        
+
         final String id = providerReport.getId();
         final ParameterValueGroup config = guiParameterEditor.getEditedAsParameter(
                 (subdataDesc==null) ? dataDesc : subdataDesc );
-        
+
         final ParameterValueGroup params = sourceParam;
         params.parameter("id").setValue(id);
-        
+
         if(subdataDesc == null){
             Parameters.copy(config, dataParam);
         }else{
             Parameters.copy(config, subdataParam);
         }
-        
+
         server.providers.updateProvider(providerType, id, sourceParam);
-        
+
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiSaveActionPerformed
 
     private void guiDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiDeleteActionPerformed
-        server.providers.deleteProvider(providerReport.getId());        
+        server.providers.deleteProvider(providerReport.getId());
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiDeleteActionPerformed
 
@@ -390,12 +391,12 @@ public class JProviderEditPane extends javax.swing.JPanel {
     }//GEN-LAST:event_guiIdentifierKeyPressed
 
     private void guiAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiAddActionPerformed
-        
+
         final MutableStyleFactory MSF = new DefaultStyleFactory();
         MutableStyle style = MSF.style();
         String name = "unnamed";
         editStyle(style,name,true);
-        
+
     }//GEN-LAST:event_guiAddActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -423,7 +424,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
             this.datas = datas;
             this.styleType = styleType;
         }
-        
+
         @Override
         public int getRowCount() {
             return datas.size();
@@ -457,7 +458,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         }
-        
+
     }
-    
+
 }

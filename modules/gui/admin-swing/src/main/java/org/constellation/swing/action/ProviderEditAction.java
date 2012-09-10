@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.constellation.configuration.ProviderReport;
@@ -37,6 +38,7 @@ public class ProviderEditAction extends Action {
     private static final ImageIcon ICON_SERVICE_EDIT =  new ImageIcon(
             JServicesPane.class.getResource("/org/constellation/swing/serviceEdit.png"));
 
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org.constellation.swing.Bundle");
 
     public ProviderEditAction() {
         super(ActionPermissions.EDIT_PROVIDER);
@@ -83,6 +85,7 @@ public class ProviderEditAction extends Action {
                 public void run() {
 
                     final JProviderEditPane edit = new JProviderEditPane(server, type, inst);
+                    edit.setName(BUNDLE.getString("data") +" - "+ BUNDLE.getString("edit") +" - "+ inst.getId());
                     final PropertyChangeListener cl = new PropertyChangeListener() {
                         @Override
                         public void propertyChange(PropertyChangeEvent evt) {

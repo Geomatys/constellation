@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ObjectFactory;
@@ -58,7 +57,6 @@ import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -68,7 +66,7 @@ import org.opengis.parameter.ParameterValueGroup;
 public class DefaultFrameDisplayer implements FrameDisplayer {
 
     private static final Logger LOGGER = Logging.getLogger(DefaultFrameDisplayer.class);
-    
+
     @Override
     public void display(final JComponent edit) {
         final JDialog dialog = new JDialog();
@@ -76,6 +74,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
         dialog.setContentPane(edit);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
+        dialog.setTitle(edit.getName());
 
         final PropertyChangeListener cl = new PropertyChangeListener() {
             @Override
@@ -91,7 +90,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     }
 
     @Override
-    public void display(ConstellationServer cstl, String serviceType, Instance service) {
+    public void display(final ConstellationServer cstl, final String serviceType, final Instance service) {
         try {
             final String url = cstl.services.getInstanceURL(serviceType, service.getName());
             final ServerFactory factory = ServerFinder.getFactoryById(serviceType);
@@ -112,8 +111,8 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
         if(!(desc instanceof ParameterDescriptorGroup)) {
             return;
         }
-        
-        // parameters needed to build the store. 
+
+        // parameters needed to build the store.
         final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) ((ParameterDescriptorGroup) desc).descriptor(ObjectFactory.SOURCE_QNAME.getLocalPart());
         final ParameterValueGroup gpv = (ParameterValueGroup) server.providers.getProviderConfiguration(pr.getId(), sourceDesc);
 
@@ -123,11 +122,10 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
         } catch (DataStoreException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(),ex);
         }
-        
+
     }
-    
-    protected MapContext getProviderLayers(ParameterValueGroup providerParameters) 
-            throws DataStoreException {
+
+    protected MapContext getProviderLayers(final ParameterValueGroup providerParameters) throws DataStoreException {
 
         MapContext result = MapBuilder.createContext();
         ParameterValueGroup choiceParam = providerParameters.groups("choice").get(0);
@@ -149,11 +147,11 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
                     final MapLayer layer = MapBuilder.createCoverageLayer(cStore.getCoverageReference(name), style, name.getLocalPart());
                     result.layers().add(layer);
                 }
-                //datastore                              
+                //datastore
             }
-            
+
             final DataStore dStore = DataStoreFinder.open(storeconfig);
-            
+
             if(dStore != null){
                 Session storeSession = dStore.createSession(true);
 
@@ -169,15 +167,15 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
         }
         return result;
     }
-    
+
     /**
-     * 
+     *
      * @param candidate , Server, DataStore or CoverageStore
      */
-    protected void display(Object candidate) throws DataStoreException{
-        
+    protected void display(final Object candidate) throws DataStoreException{
+
         final MapContext context = MapBuilder.createContext();
-        
+
         if (candidate instanceof CoverageStore) {
             final CoverageStore cs = (CoverageStore) candidate;
 
@@ -204,9 +202,9 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
         }
         display(context);
     }
-    
+
     protected void display(final MapContext context){
         JMap2DFrame.show(context);
     }
-    
+
 }

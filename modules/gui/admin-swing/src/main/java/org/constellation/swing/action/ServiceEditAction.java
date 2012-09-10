@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.constellation.configuration.Instance;
@@ -32,6 +33,7 @@ import org.constellation.swing.LayerRowModel;
  * @author Johann Sorel (Geomatys)
  */
 public class ServiceEditAction extends Action {
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org.constellation.swing.Bundle");
 
     private static final ImageIcon ICON_SERVICE_EDIT =  new ImageIcon(
             ServiceEditAction.class.getResource("/org/constellation/swing/serviceEdit.png"));
@@ -82,6 +84,7 @@ public class ServiceEditAction extends Action {
                 public void run() {
 
                     final JServiceEditPane edit = new JServiceEditPane(server, type, inst);
+                    edit.setName(BUNDLE.getString("data") +" - "+ BUNDLE.getString("edit") +" - "+ inst.getName());
                     final PropertyChangeListener cl = new PropertyChangeListener() {
                         @Override
                         public void propertyChange(PropertyChangeEvent evt) {

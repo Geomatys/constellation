@@ -71,7 +71,6 @@ public class ProviderReloadAction extends Action {
     public void actionPerformed() {
         if(target instanceof Map.Entry){
             final Map.Entry entry = (Map.Entry) target;
-            final String type = (String) entry.getKey();
             final ProviderReport inst = (ProviderReport) entry.getValue();
 
              server.providers.restartProvider(inst.getId());
