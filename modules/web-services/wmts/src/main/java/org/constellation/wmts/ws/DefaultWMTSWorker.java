@@ -23,6 +23,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.text.ParseException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
 
@@ -438,8 +439,18 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
     public TileReference getTile(GetTile request) throws CstlServiceException {
 
         //1 LAYER NOT USED FOR NOW
-        final Name layerName = Util.parseLayerName(request.getLayer());
+        Name layerName = Util.parseLayerName(request.getLayer());
 
+        //switch alias -> name
+        final Map<Name,Layer> declaredLayers = getLayers();
+        if(declaredLayers != null){
+            for(Entry<Name,Layer> entry : declaredLayers.entrySet()){
+                if(layerName.getLocalPart().equalsIgnoreCase(entry.getValue().getAlias())){
+                    layerName = entry.getKey();
+                }
+            }
+        }
+        
         // 2. PARAMETERS NOT USED FOR NOW
         Double elevation =  null;
         Date time        = null;
