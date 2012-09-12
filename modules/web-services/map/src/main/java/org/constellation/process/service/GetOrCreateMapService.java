@@ -19,15 +19,16 @@ package org.constellation.process.service;
 import java.io.File;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import static org.constellation.process.service.GetOrCreateMapServiceDescriptor.*;
+import static org.geotoolkit.parameter.Parameters.*;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
-import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.service.CreateMapServiceDescriptor.*;
 
 /**
  * Process that create a new instance configuration from the service name (WMS, WMTS, WCS or WFS) for a specified instance name.
@@ -36,9 +37,9 @@ import static org.constellation.process.service.CreateMapServiceDescriptor.*;
  * a configuration file already exist fo this instance name.
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateMapService extends AbstractProcess {
+public class GetOrCreateMapService extends AbstractProcess {
 
-    public CreateMapService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public GetOrCreateMapService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
@@ -96,10 +97,29 @@ public class CreateMapService extends AbstractProcess {
 
 
         File configurationFile = null;
+        boolean createConfig = true;
         if (instanceDirectory.exists()) {
             configurationFile = new File(instanceDirectory, "layerContext.xml");
+            
+            //get configuration if aleady exist.
             if (configurationFile.exists()) {
-                throw new ProcessException("Instance identifier already exist.", this, null);
+                createConfig = false;
+                Unmarshaller unmarshaller = null;
+                try {
+                    unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    Object obj = unmarshaller.unmarshal(configurationFile);
+                    if (obj instanceof LayerContext) {
+                        configuration = (LayerContext) obj;
+                    } else {
+                        throw new ProcessException("The layerContext.xml file does not contain a LayerContext object", this, null);
+                    }
+                } catch (JAXBException ex) {
+                    throw new ProcessException(null, this, ex);
+                } finally {
+                    if (unmarshaller != null) {
+                        GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                    }
+                }
             }
 
         } else if (instanceDirectory.mkdir()) {
@@ -108,20 +128,23 @@ public class CreateMapService extends AbstractProcess {
             throw new ProcessException("Service instance directory can' be created. Check permissions.", this, null);
         }
 
-        //create layerContext.xml file for the default configuration.
-        Marshaller marshaller = null;
-        try {
-            marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            marshaller.marshal(configuration, configurationFile);
+        if (createConfig) {
+            //create layerContext.xml file for the default configuration.
+            Marshaller marshaller = null;
+            try {
+                marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                marshaller.marshal(configuration, configurationFile);
 
-        } catch (JAXBException ex) {
-            throw new ProcessException(null, this, ex);
-        } finally {
-            if (marshaller != null) {
-                GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+            } catch (JAXBException ex) {
+                throw new ProcessException(null, this, ex);
+            } finally {
+                if (marshaller != null) {
+                    GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                }
             }
         }
-
+            
         getOrCreate(OUT_CONFIGURATION, outputParameters).setValue(configuration);
+        
     }
 }

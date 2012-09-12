@@ -16,7 +16,7 @@
  */
 package org.constellation.process.service;
 
-import org.constellation.process.service.CreateMapServiceDescriptor;
+import org.constellation.process.service.GetOrCreateMapServiceDescriptor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,21 +37,21 @@ import static org.junit.Assert.*;
  *
  * @author Quentin Boileau (Geometys).
  */
-public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
+public abstract class GetOrCreateMapServiceTest extends AbstractMapServiceTest {
 
-    public CreateMapServiceTest(final String serviceName, final Class workerClass) {
-        super(CreateMapServiceDescriptor.NAME, serviceName, workerClass);
+    public GetOrCreateMapServiceTest(final String serviceName, final Class workerClass) {
+        super(GetOrCreateMapServiceDescriptor.NAME, serviceName, workerClass);
     }
 
     @Test
     public void testCreateWMS() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetOrCreateMapServiceDescriptor.NAME);
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance1");
+        in.parameter(GetOrCreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+        in.parameter(GetOrCreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance1");
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -63,7 +63,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
     @Test
     public void testCreateWMSWithContext() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetOrCreateMapServiceDescriptor.NAME);
 
         final List<Source> sources = new ArrayList<Source>();
         sources.add(new Source("source1", Boolean.TRUE, null, null));
@@ -72,9 +72,9 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
 
         //WMS
         ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance11");
-        in.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue(conf);
+        in.parameter(GetOrCreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+        in.parameter(GetOrCreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance11");
+        in.parameter(GetOrCreateMapServiceDescriptor.CONFIG_NAME).setValue(conf);
 
         org.geotoolkit.process.Process proc = desc.createProcess(in);
         proc.call();
@@ -84,15 +84,41 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
 
         deleteInstance("createInstance11");
     }
+    
+    @Test
+    public void testGetWMSWithContext() throws ProcessException, NoSuchIdentifierException {
+
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetOrCreateMapServiceDescriptor.NAME);
+
+        final List<Source> sources = new ArrayList<Source>();
+        sources.add(new Source("source1", Boolean.TRUE, null, null));
+        final Layers layers = new Layers(sources);
+        final LayerContext conf = new LayerContext(layers);
+        createCustomInstance("createInstance15", conf);
+        //create 
+        ParameterValueGroup in = desc.getInputDescriptor().createValue();
+        in.parameter(GetOrCreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+        in.parameter(GetOrCreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance15");
+
+        org.geotoolkit.process.Process proc = desc.createProcess(in);
+        ParameterValueGroup out = proc.call();
+        
+        final LayerContext outContext = (LayerContext)out.parameter(GetOrCreateMapServiceDescriptor.OUT_CONFIG_NAME).getValue();
+                
+        assertTrue(checkInstanceExist("createInstance15"));
+        assertEquals(conf, outContext);
+
+        deleteInstance("createInstance15");
+    }
 
     @Test
     public void testCreateEmptyIdentifier() throws ProcessException, NoSuchIdentifierException {
 
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
+        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetOrCreateMapServiceDescriptor.NAME);
 
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("");
+        in.parameter(GetOrCreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+        in.parameter(GetOrCreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("");
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -101,27 +127,5 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         } catch (ProcessException ex) {
             //do nothing
         }
-    }
-
-    @Test
-    public void testCreateAleardyExist() throws ProcessException, NoSuchIdentifierException {
-
-        createCustomInstance("createInstance3", new LayerContext());
-
-        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
-
-        final ParameterValueGroup in = desc.getInputDescriptor().createValue();
-        in.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-        in.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance3");
-
-        try {
-            final org.geotoolkit.process.Process proc = desc.createProcess(in);
-            proc.call();
-            fail();
-        } catch (ProcessException ex) {
-            //do nothing
-        }
-
-        deleteInstance("createInstance3");
     }
 }

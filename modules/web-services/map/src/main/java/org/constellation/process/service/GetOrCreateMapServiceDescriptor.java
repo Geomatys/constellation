@@ -37,10 +37,10 @@ import org.opengis.util.InternationalString;
  * ProcessDescriptor for create a new Map service like WMS, WMTS, WCS or WFS.
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
+public class GetOrCreateMapServiceDescriptor extends AbstractProcessDescriptor {
 
 
-    public static final String NAME = "map_service.create";
+    public static final String NAME = "map_service.get_or_create";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new map service (WMS, WMTS, WFS, WCS) in constellation.");
 
 
@@ -94,13 +94,13 @@ public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
-    public CreateMapServiceDescriptor() {
+    public GetOrCreateMapServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override
     public Process createProcess(ParameterValueGroup input) {
-        return new CreateMapService(this, input);
+        return new GetOrCreateMapService(this, input);
     }
 
 }
