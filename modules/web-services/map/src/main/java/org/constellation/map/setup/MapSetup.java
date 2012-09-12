@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProviderProxy;
 
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.internal.SetupService;
@@ -65,6 +67,7 @@ public class MapSetup implements SetupService {
      */
     @Override
     public void shutdown() {
-        // do nothing
+        LayerProviderProxy.getInstance().dispose();
+        StyleProviderProxy.getInstance().dispose();
     }
 }
