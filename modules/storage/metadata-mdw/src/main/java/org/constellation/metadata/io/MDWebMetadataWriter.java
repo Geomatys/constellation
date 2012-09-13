@@ -443,9 +443,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
 
             final String identifier = Utils.findIdentifier(object);
-            if (mdWriter.isAlreadyUsedIdentifier(identifier)) {
+            /*if (mdWriter.isAlreadyUsedIdentifier(identifier)) {
                 throw new MD_IOException("The identifier " + identifier + " is already used");
-            }
+            }*/
             final FullRecord record = new FullRecord(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, FullRecord.TYPE.NORMALRECORD);
 
             final Classe rootClasse = getClasseFromObject(object);
