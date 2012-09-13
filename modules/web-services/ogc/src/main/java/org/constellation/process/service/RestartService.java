@@ -31,6 +31,8 @@ import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.value;
 import static org.constellation.process.service.RestartServiceDescriptor.*;
 import org.constellation.ws.Worker;
+import org.geotoolkit.process.ProcessFinder;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * Restart an instance for the specified WMS identifier. Or all WMS instances if identifier is not specified.
@@ -72,7 +74,19 @@ public final class RestartService extends AbstractCstlProcess {
                 if (WSEngine.serviceInstanceExist(serviceName, identifier)) {
                     buildWorkers(serviceDir, serviceName, identifier, closeFirst, clazz);
                 } else {
-                    throw new ProcessException("There is no instance of" + identifier, this, null);
+                    //try to start service
+                    try {
+                        final ProcessDescriptor startDesc = ProcessFinder.getProcessDescriptor("constellation", StartServiceDescriptor.NAME);
+                        final ParameterValueGroup input = StartServiceDescriptor.INPUT_DESC.createValue();
+                        input.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+                        input.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
+                        
+                        startDesc.createProcess(input).call(); // try to start
+                    } catch (NoSuchIdentifierException ex) {
+                        throw new ProcessException("There is no instance of " + identifier, this, null);
+                    } catch (ProcessException ex) {
+                        throw new ProcessException("There is no instance of " + identifier, this, null);
+                    }
                 }
             }
 
