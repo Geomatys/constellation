@@ -45,7 +45,6 @@ import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
-import org.constellation.security.DefaultRoleController;
 import org.constellation.security.RoleController;
 import static org.constellation.security.ActionPermissions.*;
 import org.constellation.swing.action.Action;
@@ -73,10 +72,9 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
     private final JXTable guiTable = new JXTable();
     private final ConstellationServer cstl;
     private final FrameDisplayer displayer;
-    private final RoleController roleController;
 
     public JProvidersPane(final ConstellationServer cstl, final FrameDisplayer displayer) {
-        this(cstl, displayer, new DefaultRoleController());
+        this(cstl, displayer, null);
     }
 
     public JProvidersPane(final ConstellationServer cstl, final FrameDisplayer displayer,
@@ -90,18 +88,13 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
             this.displayer = displayer;
         }
 
-        if(roleController == null){
-            roleController = new DefaultRoleController();
-        }
-
         for(Action act : actions){
-            if(roleController.hasPermission(act.getName())){
+            if(roleController == null || roleController.hasPermission(act.getName())){
                 this.actions.add(act);
                 act.addPropertyChangeListener(this);
             }
         }
 
-        this.roleController = roleController;
         //list all providers
         guiAll.addActionListener(this);
         final ProvidersReport providersReport = cstl.providers.listProviders();
@@ -115,7 +108,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
             guiTypeGroup.add(btn);
             guiToolBar.add(btn);
         }
-        guiNew.setVisible(roleController.hasPermission(NEW_PROVIDER));
+        guiNew.setVisible(roleController == null || roleController.hasPermission(NEW_PROVIDER));
 
 
 

@@ -70,7 +70,6 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
     private final JXTable guiTable = new JXTable();
     private final ConstellationServer cstl;
     private final FrameDisplayer displayer;
-    private final RoleController roleController;
 
     public JServicesPane(final ConstellationServer cstl, final FrameDisplayer displayer) {
         this(cstl, displayer, null);
@@ -80,12 +79,8 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
             RoleController roleController, Action ... actions) {
         initComponents();
 
-        if(roleController == null){
-            roleController = new DefaultRoleController();
-        }
-
         for(Action act : actions){
-            if(roleController.hasPermission(act.getName())){
+            if(roleController == null || roleController.hasPermission(act.getName())){
                 this.actions.add(act);
                 act.addPropertyChangeListener(this);
             }
@@ -97,7 +92,6 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
         } else {
             this.displayer = displayer;
         }
-        this.roleController = roleController;
         final Services services = cstl.services;
         final Map<String,List<String>> listServices = services.getAvailableService();
         final List<String> types = new ArrayList<String>(listServices.keySet());
@@ -112,7 +106,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
             guiToolBar.add(btn);
         }
 
-        guiNew.setVisible(roleController.hasPermission(NEW_SERVICE));
+        guiNew.setVisible(roleController == null || roleController.hasPermission(NEW_SERVICE));
 
         guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl));
         guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl));
