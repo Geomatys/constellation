@@ -221,6 +221,24 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         this.alreadyWrite = new HashMap<Object, Value>();
     }
 
+    public MDWebMetadataWriter(final Writer mdWriter) throws MetadataIoException {
+        super();
+        this.mdWriter    = mdWriter;
+        try {
+            this.mdRecordSet = RecordSet.DATA_RECORDSET;
+            this.defaultUser = User.INTERNAL_USER;
+            this.contacts    = new HashMap<Object, Value>();
+            initStandardMapping();
+            initContactMap();
+        } catch (MD_IOException ex) {
+            throw new MetadataIoException("MD_IOException while getting the catalog and user:" +'\n'+
+                                           "cause:" + ex.getMessage());
+        }
+        this.noIndexation = false;
+        this.classBinding = new HashMap<String, Classe>();
+        this.alreadyWrite = new HashMap<Object, Value>();
+    }
+
     protected MDWebMetadataWriter() throws MetadataIoException {
         this.defaultUser = null;
         this.noIndexation = false;

@@ -37,7 +37,7 @@ public abstract class AbstractCSWMetadataWriter extends AbstractMetadataWriter i
      *
      * @param MDReader an MDWeb database reader.
      */
-    public AbstractCSWMetadataWriter(AbstractIndexer indexer) throws MetadataIoException {
+    public AbstractCSWMetadataWriter(final AbstractIndexer indexer) throws MetadataIoException {
         super();
         this.indexer        = indexer;
     }
@@ -49,7 +49,7 @@ public abstract class AbstractCSWMetadataWriter extends AbstractMetadataWriter i
      * @param properties A List of property-value to replace in the specified metadata.
      */
     @Override
-    public abstract boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException;
+    public abstract boolean updateMetadata(final String metadataID, final List<RecordPropertyType> properties) throws MetadataIoException;
 
 
     /**
@@ -57,8 +57,9 @@ public abstract class AbstractCSWMetadataWriter extends AbstractMetadataWriter i
      */
     @Override
     public void destroy() {
-        if (indexer != null)
+        if (indexer != null) {
             indexer.destroy();
+        }
     }
 }
 
