@@ -70,6 +70,16 @@ public abstract class Action {
         this.displayer = displayer;
     }
 
+    public PropertyChangeListener[] getPropertyListeners(){
+        return listeners.getListeners(PropertyChangeListener.class);
+    }
+    
+    protected void addPropertyChangeListener(PropertyChangeListener[] lsts){
+        for(PropertyChangeListener pl : lsts){
+            listeners.add(PropertyChangeListener.class, pl);
+        }
+    }
+    
     public void addPropertyChangeListener(PropertyChangeListener listener){
         listeners.add(PropertyChangeListener.class, listener);
     }

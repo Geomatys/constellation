@@ -76,7 +76,8 @@ public class JProviderEditPane extends javax.swing.JPanel {
         sourceDesc = (ParameterDescriptorGroup) configDesc.descriptor("source");
         sourceParam = (ParameterValueGroup) server.providers.getProviderConfiguration(providerReport.getId(), sourceDesc);
         dataDesc = (ParameterDescriptorGroup) server.providers.getSourceDescriptor(providerType);
-        dataParam = sourceParam.groups(dataDesc.getName().getCode()).get(0);
+        final List<ParameterValueGroup> dataGroups = sourceParam.groups(dataDesc.getName().getCode());
+        dataParam = (dataGroups.isEmpty()) ? null : dataGroups.get(0);
 
         if("choice".equalsIgnoreCase(dataDesc.getName().getCode())){
             for(GeneralParameterValue sub : dataParam.values()){
@@ -86,8 +87,10 @@ public class JProviderEditPane extends javax.swing.JPanel {
         }
 
         initComponents();
-        guiParameterEditor.setEdited((subdataParam==null) ? dataParam : subdataParam);
-        guiParameters.setViewportView(guiParameterEditor);
+        if(dataParam != null || subdataParam != null){
+            guiParameterEditor.setEdited((subdataParam==null) ? dataParam : subdataParam);
+            guiParameters.setViewportView(guiParameterEditor);
+        }
 
         guiIdentifier.setText(providerReport.getId());
         final boolean styleType = "sld".equals(serviceType);

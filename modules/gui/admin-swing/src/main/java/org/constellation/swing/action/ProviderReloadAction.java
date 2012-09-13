@@ -42,7 +42,11 @@ public class ProviderReloadAction extends Action {
     @Override
     public boolean isEnable() {
         if (target instanceof Map.Entry) {
-            return true;
+            final Map.Entry entry = (Map.Entry) target;
+            final String type = (String) entry.getKey();
+            if(!"go2style".equalsIgnoreCase(type)){
+                return true;
+            }
         }
         return false;
     }
@@ -85,7 +89,9 @@ public class ProviderReloadAction extends Action {
 
     @Override
     public Action clone() {
-        return new ProviderReloadAction();
+        final Action action = new ProviderReloadAction();
+        action.addPropertyChangeListener(this.getPropertyListeners());
+        return action;
     }
 
 }

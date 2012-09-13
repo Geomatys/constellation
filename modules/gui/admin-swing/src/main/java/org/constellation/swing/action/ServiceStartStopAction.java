@@ -117,7 +117,9 @@ public class ServiceStartStopAction extends Action {
 
     @Override
     public Action clone() {
-        return new ServiceStartStopAction();
+        final Action action = new ServiceStartStopAction();
+        action.addPropertyChangeListener(this.getPropertyListeners());
+        return action;
     }
 
 }

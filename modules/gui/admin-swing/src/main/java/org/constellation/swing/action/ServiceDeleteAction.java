@@ -17,29 +17,25 @@
 package org.constellation.swing.action;
 
 import java.awt.Color;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Map;
-import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.constellation.configuration.Instance;
 import org.constellation.security.ActionPermissions;
-import org.constellation.swing.JServiceEditPane;
 import org.constellation.swing.LayerRowModel;
 
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
-public class ServiceEditAction extends Action {
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org.constellation.swing.Bundle");
+public class ServiceDeleteAction extends Action {
 
-    private static final ImageIcon ICON_SERVICE_EDIT =  new ImageIcon(
-            ServiceEditAction.class.getResource("/org/constellation/swing/serviceEdit.png"));
-
-    public ServiceEditAction() {
-        super(ActionPermissions.EDIT_SERVICE);
+    private static final ImageIcon ICON_DELETE =  new ImageIcon(
+            ServiceEditAction.class.getResource("/org/constellation/swing/serviceCross.png"));
+    
+    public ServiceDeleteAction() {
+        super(ActionPermissions.NEW_SERVICE);
     }
 
     @Override
@@ -55,57 +51,48 @@ public class ServiceEditAction extends Action {
 
     @Override
     public String getDisplayName() {
-        return LayerRowModel.BUNDLE.getString("edit");
+        return LayerRowModel.BUNDLE.getString("delete");
     }
 
     @Override
     public ImageIcon getIcon() {
-        return ICON_SERVICE_EDIT;
+        return ICON_DELETE;
     }
 
     @Override
     public Color getTextColor() {
-        return Color.BLACK;
+        return Color.WHITE;
     }
 
     @Override
     public Color getBackgroundColor() {
-        return Color.LIGHT_GRAY;
+        return new Color(180,60,60);
     }
 
     @Override
     public void actionPerformed() {
-        if (target instanceof Map.Entry) {
+        if(target instanceof Map.Entry){
             final Instance inst = (Instance) ((Map.Entry)target).getKey();
             final String type = (String) ((Map.Entry)target).getValue();
-
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-
-                    final JServiceEditPane edit = new JServiceEditPane(server, type, inst);
-                    edit.setName(BUNDLE.getString("data") +" - "+ BUNDLE.getString("edit") +" - "+ inst.getName());
-                    final PropertyChangeListener cl = new PropertyChangeListener() {
-                        @Override
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            if ("update".equals(evt.getPropertyName())) {
-                                edit.removePropertyChangeListener(this);
-                                fireUpdate();
-                            }
-                        }
-                    };
-
-                    edit.addPropertyChangeListener(cl);
-
-                    getDisplayer().display(edit);
-                }
-            });
+            
+            final int res = JOptionPane.showConfirmDialog(null, LayerRowModel.BUNDLE.getString("confirmdelete")
+                    ,getDisplayName(),JOptionPane.YES_NO_OPTION);
+            
+            if(res == JOptionPane.YES_OPTION){
+                server.services.deleteInstance(type, inst.getName());
+                SwingUtilities.invokeLater(new Runnable() {
+                   @Override
+                   public void run() {
+                       fireUpdate();
+                   }
+               });
+            }
         }
     }
 
     @Override
     public Action clone() {
-        final Action action = new ServiceEditAction();
+        final Action action = new ServiceDeleteAction();
         action.addPropertyChangeListener(this.getPropertyListeners());
         return action;
     }

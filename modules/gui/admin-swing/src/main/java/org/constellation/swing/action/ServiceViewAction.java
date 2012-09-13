@@ -94,7 +94,9 @@ public class ServiceViewAction extends Action {
 
     @Override
     public Action clone() {
-        return new ServiceViewAction();
+        final Action action = new ServiceViewAction();
+        action.addPropertyChangeListener(this.getPropertyListeners());
+        return action;
     }
 
 }

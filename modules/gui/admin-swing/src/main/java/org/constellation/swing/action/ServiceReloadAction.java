@@ -86,7 +86,9 @@ public class ServiceReloadAction extends Action {
 
     @Override
     public Action clone() {
-        return new ServiceReloadAction();
+        final Action action = new ServiceReloadAction();
+        action.addPropertyChangeListener(this.getPropertyListeners());
+        return action;
     }
 
 }

@@ -19,73 +19,81 @@ package org.constellation.swing.action;
 import java.awt.Color;
 import java.util.Map;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.constellation.configuration.ProviderReport;
+import org.constellation.security.ActionPermissions;
 import org.constellation.swing.LayerRowModel;
 
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
-public class ProviderViewAction extends Action {
+public class ProviderDeleteAction extends Action {
 
-
-    public ProviderViewAction() {
-        super("view");
+    private static final ImageIcon ICON_DELETE =  new ImageIcon(
+            ServiceEditAction.class.getResource("/org/constellation/swing/serviceCross.png"));
+    
+    public ProviderDeleteAction() {
+        super(ActionPermissions.NEW_PROVIDER);
     }
 
     @Override
     public boolean isEnable() {
-        if(target instanceof Map.Entry){
+        if (target instanceof Map.Entry) {
             final Map.Entry entry = (Map.Entry) target;
             final String type = (String) entry.getKey();
-            if("sld".equalsIgnoreCase(type) || "go2style".equalsIgnoreCase(type)){
-                return false;
+            if(!"go2style".equalsIgnoreCase(type)){
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     @Override
     public String getDisplayName() {
-        return LayerRowModel.BUNDLE.getString("view");
+        return LayerRowModel.BUNDLE.getString("delete");
     }
 
     @Override
     public ImageIcon getIcon() {
-        return null;
+        return ICON_DELETE;
     }
 
     @Override
     public Color getTextColor() {
-        return Color.BLACK;
+        return Color.WHITE;
     }
 
     @Override
     public Color getBackgroundColor() {
-        return Color.LIGHT_GRAY;
+        return new Color(180,60,60);
     }
 
     @Override
     public void actionPerformed() {
-        if (target instanceof Map.Entry) {
+        if(target instanceof Map.Entry){
             final Map.Entry entry = (Map.Entry) target;
-            final String type = (String) entry.getKey();
             final ProviderReport inst = (ProviderReport) entry.getValue();
 
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    getDisplayer().display(server, type, inst);
-                }
-            });
-
+            final int res = JOptionPane.showConfirmDialog(null, LayerRowModel.BUNDLE.getString("confirmdelete")
+                    ,getDisplayName(),JOptionPane.YES_NO_OPTION);
+            
+            if(res == JOptionPane.YES_OPTION){
+                server.providers.deleteProvider(inst.getId());
+                SwingUtilities.invokeLater(new Runnable() {
+                   @Override
+                   public void run() {
+                       fireUpdate();
+                   }
+               });
+            }
         }
     }
 
     @Override
     public Action clone() {
-        final Action action = new ProviderViewAction();
+        final Action action = new ProviderDeleteAction();
         action.addPropertyChangeListener(this.getPropertyListeners());
         return action;
     }

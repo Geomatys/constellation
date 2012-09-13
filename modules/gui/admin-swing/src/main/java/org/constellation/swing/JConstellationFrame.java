@@ -23,10 +23,11 @@ import javax.swing.JTabbedPane;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.admin.service.ConstellationServerFactory;
 import org.constellation.security.RoleController;
-import org.constellation.swing.action.Action;
+import org.constellation.swing.action.ProviderDeleteAction;
 import org.constellation.swing.action.ProviderEditAction;
 import org.constellation.swing.action.ProviderReloadAction;
 import org.constellation.swing.action.ProviderViewAction;
+import org.constellation.swing.action.ServiceDeleteAction;
 import org.constellation.swing.action.ServiceEditAction;
 import org.constellation.swing.action.ServiceReloadAction;
 import org.constellation.swing.action.ServiceStartStopAction;
@@ -49,14 +50,16 @@ public final class JConstellationFrame extends JFrame{
                 new ServiceViewAction(),
                 new ServiceEditAction(),
                 new ServiceReloadAction(),
-                new ServiceStartStopAction()));
+                new ServiceStartStopAction(),
+                new ServiceDeleteAction()));
         pane.add("Providers", new JProvidersPane(
                 server,
                 (FrameDisplayer)null,
                 (RoleController)null,
                 new ProviderViewAction(),
                 new ProviderEditAction(),
-                new ProviderReloadAction()));
+                new ProviderReloadAction(),
+                new ProviderDeleteAction()));
         setContentPane(pane);
     }
     
