@@ -1342,13 +1342,24 @@ public class CSWworker extends AbstractWorker {
      * @return
      */
     public TransactionResponseType transaction(final Transaction request) throws CstlServiceException {
+        return transaction(request, false);
+    }
+
+    /**
+     * A web service method allowing to Insert / update / delete record from the CSW.
+     *
+     * @param request
+     * @param javaCall use this flag to pass the shiro security whan using the worker in a non web context.
+     * @return
+     */
+    public TransactionResponseType transaction(final Transaction request, final boolean javaCall) throws CstlServiceException {
         LOGGER.log(logLevel, "Transaction request processing\n");
 
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
         }
-        if (transactionSecurized && !SecurityManager.isAuthenticated()) {
+        if (!javaCall && transactionSecurized && !SecurityManager.isAuthenticated()) {
             throw new UnauthorizedException("You must be authentified to perform a transaction request.");
         }
         final long startTime = System.currentTimeMillis();
