@@ -443,9 +443,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
 
             final String identifier = Utils.findIdentifier(object);
-            /*if (mdWriter.isAlreadyUsedIdentifier(identifier)) {
-                throw new MD_IOException("The identifier " + identifier + " is already used");
-            }*/
             final FullRecord record = new FullRecord(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, FullRecord.TYPE.NORMALRECORD);
 
             final Classe rootClasse = getClasseFromObject(object);
@@ -1049,8 +1046,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
 
             final long startTrans = System.currentTimeMillis();
-            record                  = getRecordFromObject(obj, title);
+            record                = getRecordFromObject(obj, title);
             transTime             = System.currentTimeMillis() - startTrans;
+
+            if (mdWriter.isAlreadyUsedIdentifier(record.getIdentifier())) {
+                throw new MD_IOException("The identifier " + record.getIdentifier() + " is already used");
+            }
 
         } catch (IllegalArgumentException e) {
              throw new MetadataIoException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
@@ -1104,8 +1105,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     public void destroy() {
         classBinding.clear();
         try {
-            if (mdWriter != null)
+            if (mdWriter != null) {
                 mdWriter.close();
+            }
             classBinding.clear();
             alreadyWrite.clear();
 
@@ -1171,7 +1173,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean isAlreadyUsedIdentifier(String metadataID) throws MetadataIoException {
+    public boolean isAlreadyUsedIdentifier(final String metadataID) throws MetadataIoException {
         try {
             return mdWriter.isAlreadyUsedIdentifier(metadataID);
         } catch (MD_IOException ex) {
