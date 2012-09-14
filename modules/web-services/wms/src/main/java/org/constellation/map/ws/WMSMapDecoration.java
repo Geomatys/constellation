@@ -261,14 +261,14 @@ public final class WMSMapDecoration {
     /**
      * Create an output definition for the given mime type
      * Compression rate, type and optimal writer spi.
-     * 
+     *
      * @param mime
-     * @return 
+     * @return
      */
     OutputDef getOutputDef(String mime) {
         final OutputDef odef = new OutputDef(mime, new Object());
         odef.setCompression(getCompression(mime));
-        
+
         if(nativeWriters != null){
             for(String str : nativeWriters){
                 if(mime.equalsIgnoreCase(str)){
@@ -276,14 +276,26 @@ public final class WMSMapDecoration {
                 }
             }
         }
-        
+        if (odef.getSpi() == null) {
+            final ServiceRegistry registry = IIORegistry.getDefaultInstance();
+            for (final Iterator<ImageWriterSpi> it = registry.getServiceProviders(ImageWriterSpi.class, false); it.hasNext();) {
+                ImageWriterSpi spi = it.next();
+                final String classname = spi.getClass().getName();
+                if (!classname.startsWith("com.sun.media.")) {
+                    if(XArrays.contains(spi.getMIMETypes(),mime)){
+                        odef.setSpi(spi);
+                        break;
+                    }
+                }
+            }
+        }
         return odef;
     }
-    
+
     private synchronized static ImageWriterSpi getNativeWriterSpi(final String mime){
         ImageWriterSpi spi = nativewriterspi.get(mime);
         if(spi != null) return spi;
-        
+
         final ServiceRegistry registry = IIORegistry.getDefaultInstance();
         for (final Iterator<ImageWriterSpi> it = registry.getServiceProviders(ImageWriterSpi.class, false); it.hasNext();) {
             spi = it.next();
@@ -297,8 +309,8 @@ public final class WMSMapDecoration {
         }
         return null;
     }
-    
-    
+
+
     private PortrayalExtension read(final File configFile) throws ParserConfigurationException, SAXException, IOException{
 
         if(!configFile.exists()){
