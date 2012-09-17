@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 
 /**
@@ -49,7 +49,7 @@ public class Query {
     private HashMap<String, String> parameters;
 
     private QueryList statique;
-    
+
     @XmlElement(required = true)
     private List<Select> select;
     private List<LeftJoin> leftJoin;
@@ -59,9 +59,9 @@ public class Query {
     private List<Orderby> orderBy;
     private List<Groupby> groupby;
     private String limit;
-    
-   
-    
+
+
+
     private Union union;
 
     /**
@@ -75,7 +75,7 @@ public class Query {
      * Clone a Query
      * @param name
      * @param select
-     * @param from 
+     * @param from
      */
     public Query(final Query query) {
         if (query != null) {
@@ -116,7 +116,7 @@ public class Query {
             }
         }
     }
-    
+
     /**
      * Build a SQL query with SELECT and FROM clause.
      *
@@ -200,7 +200,7 @@ public class Query {
         }
         return null;
     }
-    
+
     /**
      * Sets the value of the name property.
      */
@@ -252,14 +252,14 @@ public class Query {
     public void addSelect(final Select select) {
         this.getSelect().add(select);
     }
-    
+
     /**
      * Gets the value of the select property.
      */
     public void setSelect(final List<Select> select) {
         this.select = select;
     }
-    
+
     /**
      * Gets the value of the select property.
      */
@@ -269,7 +269,7 @@ public class Query {
         }
         this.select.add(select);
     }
-    
+
     /**
      * Gets the value of the from property.
      */
@@ -300,7 +300,7 @@ public class Query {
     public void addFrom(final From from) {
         this.getFrom().add(from);
     }
-    
+
     /**
      * Gets the value of the where property.
      */
@@ -344,7 +344,7 @@ public class Query {
     public void addWhere(final Where where) {
         this.getWhere().add(where);
     }
-    
+
     /**
     /**
      * Gets the value of the orderby property.
@@ -377,7 +377,7 @@ public class Query {
         this.getOrderby().add(orderby);
     }
 
-    
+
     /**
      * @return the union
      */
@@ -408,7 +408,7 @@ public class Query {
     public void setGroupby(List<Groupby> groupby) {
         this.groupby = groupby;
     }
-    
+
     /**
      * @return the parameters
      */
@@ -422,7 +422,7 @@ public class Query {
     public void setParameters(final HashMap<String, String> parameters) {
         this.parameters = parameters;
     }
-    
+
     /**
      * @return the leftJoin
      */
@@ -439,7 +439,7 @@ public class Query {
     public void setLeftJoin(final List<LeftJoin> leftJoin) {
         this.leftJoin = leftJoin;
     }
-    
+
     /**
      * Gets the value of the where property for the specified group name.
      */
@@ -473,7 +473,7 @@ public class Query {
     public void addLeftJoin(final LeftJoin leftJoin) {
         this.getLeftJoin().add(leftJoin);
     }
-    
+
     /**
      * @return the statique
      */
@@ -487,7 +487,7 @@ public class Query {
     public void setStatique(QueryList statique) {
         this.statique = statique;
     }
-    
+
     /**
      * Build the SQL query text by using the different clause contained in this object.
      *
@@ -498,7 +498,7 @@ public class Query {
     }
     /**
      * Return an textual SQL query for a preparedStatement (contains '?').
-     * 
+     *
      * @param staticParameters A map of varName/varValue to replace in the SQL text.
      * @return
      */
@@ -546,7 +546,7 @@ public class Query {
                mainQuery = mainQuery.delete(mainQuery.length() - 1, mainQuery.length());
             }
         }
-        
+
         final String varBegin = ":${";
         if (where != null) {
             mainQuery.append("\n WHERE ");
@@ -569,9 +569,9 @@ public class Query {
                 }
                 sql        = sql.replace("':$'", "?");
                 sql        = sql.replace(":$", "?");
-                
+
                 final String block = '(' + sql + ')';
-                
+
                 if (i + 1 < where.size()) {
                     if (where.get(i + 1).getGroup().equals(w.getGroup()) && (!"AND".equals(w.getOperator()))) {
                         if (oRblock) {
@@ -621,7 +621,7 @@ public class Query {
         }
         return mainQuery.toString();
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Query]");
@@ -677,7 +677,7 @@ public class Query {
         }
         return s.toString();
     }
-    
+
     /**
      * Verify if this entry is identical to the specified object.
      */
@@ -689,16 +689,16 @@ public class Query {
         if (object instanceof Query) {
             final Query that = (Query) object;
 
-            return Utilities.equals(this.from,    that.from) &&
-                   Utilities.equals(this.name,    that.name) &&
-                   Utilities.equals(this.orderBy, that.orderBy) &&
-                   Utilities.equals(this.groupby, that.groupby) && 
-                   Utilities.equals(this.leftJoin, that.leftJoin) && 
-                   Utilities.equals(this.parameters, that.parameters) && 
-                   Utilities.equals(this.statique, that.statique) && 
-                   Utilities.equals(this.select,  that.select) &&
-                   Utilities.equals(this.where,   that.where) &&
-                   Utilities.equals(this.option,  that.option);
+            return Objects.equals(this.from,    that.from) &&
+                   Objects.equals(this.name,    that.name) &&
+                   Objects.equals(this.orderBy, that.orderBy) &&
+                   Objects.equals(this.groupby, that.groupby) &&
+                   Objects.equals(this.leftJoin, that.leftJoin) &&
+                   Objects.equals(this.parameters, that.parameters) &&
+                   Objects.equals(this.statique, that.statique) &&
+                   Objects.equals(this.select,  that.select) &&
+                   Objects.equals(this.where,   that.where) &&
+                   Objects.equals(this.option,  that.option);
         }
         return false;
     }

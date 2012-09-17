@@ -31,29 +31,29 @@ import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.BooleanType;
 import org.geotoolkit.swe.xml.v101.QuantityType;
 import org.geotoolkit.swe.xml.v101.TimeType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  * Connexion vers la table des {@linkplain AnyScalarType dataRecord field}.
- * 
- * 
+ *
+ *
  * @author Guilhem Legal
  * @version $Id:
  */
 public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType> implements Cloneable {
-    
+
     /**
      * identifiant secondaire de la table
      * (identifiant du DataBlock contenant le dataRecord qui possede ce champ).
      */
     private String idDataBlock;
-    
+
     /**
      * identifiant secondaire de la table.
      * (identifiant du dataRecord qui possede ce champ).
      */
     private String idDataRecord;
-    
+
     /**
      * Construit une table des dataRecord field.
      *
@@ -62,14 +62,14 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType> implem
     public AnyScalarTable(final Database database) {
         this(new AnyScalarQuery(database));
     }
-    
+
     /**
      * Initialise l'identifiant de la table.
      */
     private AnyScalarTable(final AnyScalarQuery query) {
         super(query, query.byName);
     }
-    
+
      /**
      * Un constructeur qui prend en parametre un table partagée afin d'en creer
      * une qui ne l'ai pas.
@@ -91,38 +91,38 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType> implem
     public synchronized String getIdDataBlock() {
         return idDataBlock;
     }
-    
+
     /**
      * Modifie l'identifiant du dataBlock si il est different de l'actuel.
      *
      * @param idDataBlock le nouvel identifiant du dataBlock.
      */
     public synchronized void setIdDataBlock(final String idDataBlock) {
-        if (!Utilities.equals(this.idDataBlock, idDataBlock)) {
+        if (!Objects.equals(this.idDataBlock, idDataBlock)) {
             this.idDataBlock = idDataBlock;
             fireStateChanged("idDataBlock");
         }
     }
-    
+
     /**
      * Retourne identifiant du dataRecord qui possede ce champ.
      */
     public String getIdDataRecord() {
         return idDataRecord;
     }
-    
+
     /**
      * Modifie l'identifiant du dataRecord si il est different de l'actuel.
      *
      * @param idDataRecoed le nouvel identifiant du dataRecord.
      */
     public synchronized void setIdDataRecord(final String idDataRecord) {
-        if (!Utilities.equals(this.idDataRecord, idDataRecord)) {
+        if (!Objects.equals(this.idDataRecord, idDataRecord)) {
             this.idDataRecord = idDataRecord;
             fireStateChanged("idDataRecord");
         }
     }
-    
+
     /**
      * Construit un data block pour l'enregistrement courant.
      */
@@ -131,23 +131,23 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType> implem
         final AnyScalarQuery query = (AnyScalarQuery) super.query;
         AbstractDataComponentType component = null;
         if (results.getString(indexOf(query.type)).equals("Quantity")) {
-            component = new QuantityType(results.getString(indexOf(query.definition )), 
+            component = new QuantityType(results.getString(indexOf(query.definition )),
                                               results.getString(indexOf(query.uomCode)),
-                                              results.getString(indexOf(query.uomHref))); 
+                                              results.getString(indexOf(query.uomHref)));
         } else if (results.getString(indexOf(query.type)).equals("Time")) {
-            component = new TimeType(results.getString(indexOf(query.definition )), 
+            component = new TimeType(results.getString(indexOf(query.definition )),
                                      results.getString(indexOf(query.uomCode)),
-                                     results.getString(indexOf(query.uomHref))); 
+                                     results.getString(indexOf(query.uomHref)));
         } else if (results.getString(indexOf(query.type)).equals("Boolean")) {
-            component = new BooleanType(results.getString(indexOf(query.definition )), 
-                                        results.getBoolean(indexOf(query.value))); 
-        } 
+            component = new BooleanType(results.getString(indexOf(query.definition )),
+                                        results.getBoolean(indexOf(query.value)));
+        }
         return new AnyScalarPropertyType(
                 results.getString(indexOf(query.idDataRecord )),
                 results.getString(indexOf(query.name )),
                 component);
     }
-    
+
     /**
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
@@ -159,9 +159,9 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType> implem
             statement.setString(indexOf(query.byIdDataRecord), idDataRecord);
             statement.setString(indexOf(query.byIdDataBlock), idDataBlock);
         }
-        
+
     }
-    
+
      /**
      * Retourne un nouvel identifier (ou l'identifier du champ passée en parametre si non-null)
      * et enregistre le nouveau champ dans la base de donnée si il n'y est pas deja.

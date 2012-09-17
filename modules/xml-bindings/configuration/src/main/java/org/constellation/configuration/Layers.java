@@ -22,7 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -34,7 +34,7 @@ public class Layers {
 
     @XmlElement(name="MainLayer")
     private Layer mainLayer;
-    
+
     @XmlElement(name="Source")
     private List<Source> source;
 
@@ -81,13 +81,13 @@ public class Layers {
     public void setMainLayer(final Layer mainLayer) {
         this.mainLayer = mainLayer;
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Layers) {
             final Layers that = (Layers) obj;
-            return Utilities.equals(this.mainLayer, that.mainLayer) &&
-                   Utilities.equals(this.source, that.source);
+            return Objects.equals(this.mainLayer, that.mainLayer) &&
+                   Objects.equals(this.source, that.source);
         }
         return false;
     }

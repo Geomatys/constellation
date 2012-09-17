@@ -25,11 +25,11 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 
 /**
- * 
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -62,7 +62,7 @@ public class From {
         }
     }
 
-    
+
     /**
      * Build a FROM clause with the value.
      * @param value the string to add after the FROM in th SQL request.
@@ -112,7 +112,7 @@ public class From {
     public void setvalue(String value) {
         this.value = value;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[From]");
@@ -124,7 +124,7 @@ public class From {
             s.append("value : ").append(value).append('\n');
         return s.toString();
     }
-    
+
     /**
      * Verify if this entry is identical to the specified object.
      */
@@ -136,9 +136,9 @@ public class From {
         if (object instanceof From) {
             final From that = (From) object;
 
-            return Utilities.equals(this.alias, that.alias) &&
-                   Utilities.equals(this.group, that.group) &&
-                   Utilities.equals(this.value, that.value);
+            return Objects.equals(this.alias, that.alias) &&
+                   Objects.equals(this.group, that.group) &&
+                   Objects.equals(this.value, that.value);
         }
         return false;
     }

@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -311,20 +311,20 @@ public class Layer {
     public boolean equals(final Object obj) {
         if (obj instanceof Layer) {
             final Layer that = (Layer) obj;
-            return Utilities.equals(this.abstrac,      that.abstrac) &&
-                   Utilities.equals(this.attribution,  that.attribution) &&
-                   Utilities.equals(this.authorityURL, that.authorityURL) &&
-                   Utilities.equals(this.crs,          that.crs) &&
-                   Utilities.equals(this.dataURL,      that.dataURL) &&
-                   Utilities.equals(this.filter,       that.filter) &&
-                   Utilities.equals(this.alias,        that.alias) &&
-                   Utilities.equals(this.identifier,   that.identifier) &&
-                   Utilities.equals(this.keywords,     that.keywords) &&
-                   Utilities.equals(this.metadataURL,  that.metadataURL) &&
-                   Utilities.equals(this.name,         that.name) &&
-                   Utilities.equals(this.styles,       that.styles) &&
-                   Utilities.equals(this.opaque,       that.opaque) &&
-                   Utilities.equals(this.title,        that.title);
+            return Objects.equals(this.abstrac,      that.abstrac) &&
+                   Objects.equals(this.attribution,  that.attribution) &&
+                   Objects.equals(this.authorityURL, that.authorityURL) &&
+                   Objects.equals(this.crs,          that.crs) &&
+                   Objects.equals(this.dataURL,      that.dataURL) &&
+                   Objects.equals(this.filter,       that.filter) &&
+                   Objects.equals(this.alias,        that.alias) &&
+                   Objects.equals(this.identifier,   that.identifier) &&
+                   Objects.equals(this.keywords,     that.keywords) &&
+                   Objects.equals(this.metadataURL,  that.metadataURL) &&
+                   Objects.equals(this.name,         that.name) &&
+                   Objects.equals(this.styles,       that.styles) &&
+                   Objects.equals(this.opaque,       that.opaque) &&
+                   Objects.equals(this.title,        that.title);
         }
         return false;
     }

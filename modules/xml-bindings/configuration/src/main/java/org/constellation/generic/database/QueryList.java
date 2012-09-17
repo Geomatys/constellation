@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -43,7 +43,7 @@ public class QueryList {
     public QueryList() {
 
     }
-    
+
     public QueryList(final QueryList queryList) {
         if (queryList != null) {
             this.query = new ArrayList<Query>();
@@ -122,7 +122,7 @@ public class QueryList {
         if (object instanceof QueryList) {
             final QueryList that = (QueryList) object;
 
-            return Utilities.equals(this.query, that.query) ;
+            return Objects.equals(this.query, that.query) ;
         }
         return false;
     }

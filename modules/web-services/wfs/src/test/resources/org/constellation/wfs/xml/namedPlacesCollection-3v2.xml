@@ -14,7 +14,7 @@
                         <ns3:Polygon srsName="urn:ogc:def:crs:epsg:4326">
                             <ns3:exterior>
                                 <ns3:LinearRing srsName="urn:ogc:def:crs:epsg:4326">
-                                    <ns3:posList>0.0020 0.0024 0.0042 0.0024 0.0042 6.0E-4 0.0014 6.0E-4 0.0014 0.0010 0.0020 0.0024</ns3:posList>
+                                    <ns3:posList>0.002 0.0024 0.0042 0.0024 0.0042 6.0E-4 0.0014 6.0E-4 0.0014 0.001 0.002 0.0024</ns3:posList>
                                 </ns3:LinearRing>
                             </ns3:exterior>
                         </ns3:Polygon>

@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlValue;
 
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -34,9 +34,9 @@ import org.geotoolkit.util.Utilities;
 public class DataSourceType {
 
     private static final List<DataSourceType> VALUES = new ArrayList<DataSourceType>();
-    
+
     public static final DataSourceType FILESYSTEM = new DataSourceType("filesystem");
-    
+
     public static final DataSourceType NETCDF = new DataSourceType("netcdf");
 
     public static final DataSourceType MDWEB = new DataSourceType("mdweb");
@@ -44,25 +44,25 @@ public class DataSourceType {
     public static final DataSourceType POSTGRID = new DataSourceType("postgrid");
 
     public static final DataSourceType GENERIC = new DataSourceType("generic");
-    
+
     public static final DataSourceType LUCENE = new DataSourceType("lucene");
 
     public static final DataSourceType NONE = new DataSourceType("none");
 
     @XmlValue
     private final String name;
-    
+
     public DataSourceType() {
         this.name = null;
     }
-    
+
     public DataSourceType(final String name) {
         this.name = name;
         if (!VALUES.contains(this)) {
             VALUES.add(this);
         }
     }
-    
+
     public static DataSourceType fromName(final String name) {
         for (DataSourceType o : VALUES) {
             if (o.getName().equalsIgnoreCase(name)) {
@@ -85,7 +85,7 @@ public class DataSourceType {
         hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
         return hash;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -93,11 +93,11 @@ public class DataSourceType {
         }
         if (obj instanceof DataSourceType) {
             DataSourceType that = (DataSourceType)obj;
-            return Utilities.equals(this.name, that.name);
+            return Objects.equals(this.name, that.name);
         }
         return false;
     }
-    
+
     public String toString() {
         return name;
     }

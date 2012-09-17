@@ -28,7 +28,7 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.swe.xml.v101.ComponentType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -36,17 +36,17 @@ import org.geotoolkit.util.Utilities;
  * @author Guilhem Legal
  */
 public class ComponentTable extends SingletonTable<ComponentType> implements Cloneable {
-    
+
     /**
      * identifiant secondaire de la table.
      */
     private String idCompositePhenomenon;
-    
+
     /**
      * un lien vers la table des phénomènes.
      */
     private PhenomenonTable phenomenons;
-    
+
     /**
      * Construit une table des phenomene composé.
      *
@@ -55,7 +55,7 @@ public class ComponentTable extends SingletonTable<ComponentType> implements Clo
     public ComponentTable(final Database database) {
         this(new ComponentQuery(database));
     }
-    
+
     /**
      * Construit une nouvelle table non partagée
      */
@@ -71,27 +71,27 @@ public class ComponentTable extends SingletonTable<ComponentType> implements Clo
     protected ComponentTable clone() {
         return new ComponentTable(this);
     }
-    
+
     /**
      * Initialise l'identifiant de la table.
      */
     private ComponentTable(final ComponentQuery query) {
         super(query, query.byComponent);
     }
-    
-    
+
+
     @Override
     protected ComponentType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final ComponentQuery query = (ComponentQuery) super.query;
-        
+
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
         final PhenomenonType component = (PhenomenonType)phenomenons.getEntry(results.getString(indexOf(query.idComponent)));
-        
+
         return new ComponentType(results.getString(indexOf(query.idCompositePhenomenon)), component);
     }
-    
+
     /**
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
@@ -101,22 +101,22 @@ public class ComponentTable extends SingletonTable<ComponentType> implements Clo
         final ComponentQuery query = (ComponentQuery) super.query;
         if (! type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byComposite), idCompositePhenomenon);
-        
+
     }
-    
-    
+
+
     public synchronized String getIdCompositePhenomenon() {
         return idCompositePhenomenon;
     }
-    
+
     public synchronized void setIdCompositePhenomenon(String idCompositePhenomenon) {
-        if (!Utilities.equals(this.idCompositePhenomenon, idCompositePhenomenon)) {
+        if (!Objects.equals(this.idCompositePhenomenon, idCompositePhenomenon)) {
             this.idCompositePhenomenon = idCompositePhenomenon;
             fireStateChanged("idCompositePhenomenon");
         }
-        
+
     }
-    
+
     /**
      *Insere un nouveau composant d'une phenomene composé dans la base de donnée.
      *
@@ -157,5 +157,5 @@ public class ComponentTable extends SingletonTable<ComponentType> implements Clo
             }
         }
     }
-    
+
 }

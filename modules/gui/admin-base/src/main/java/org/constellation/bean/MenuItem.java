@@ -19,38 +19,38 @@ package org.constellation.bean;
 
 import java.util.List;
 import org.constellation.admin.service.ConstellationServer;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
- * 
+ *
  * @author Johann Sorel (Geomatys)
  */
 public interface MenuItem {
 
     /**
-     * 
+     *
      * @param server : Server to test
      * @return true if this menu item is available for the given server.
      */
     public boolean isAvailable(final ConstellationServer server);
-    
+
     /**
      * The identifier of the MenuItem
-     * 
+     *
      * @return an identifier never null
      */
     public String getId();
-    
+
     /**
      * The localized name of the MenuItem
-     * 
+     *
      * @return a name never null
      */
     public String getTitle();
-    
+
     /**
      * List of string path to xhtml pages that need to be copied in the web application.
-     * 
+     *
      * @return list never null
      */
     public List<String> getPages();
@@ -78,7 +78,7 @@ public interface MenuItem {
         public final String icon;
         public final int priority;
 
-        public Path(final Path parent, final String i18nKey, final String linkedPage, 
+        public Path(final Path parent, final String i18nKey, final String linkedPage,
                 final String icon, final int priority) {
             this.parent = parent;
             this.i18nKey = i18nKey;
@@ -86,13 +86,13 @@ public interface MenuItem {
             this.icon = icon;
             this.priority = priority;
         }
-        
+
         public boolean isChildOf(final Path path) {
             if (this.equals(path)) return true;
             if (this.parent != null) return this.parent.isChildOf(path);
             else return false;
         }
-        
+
         @Override
         public boolean equals(final Object obj) {
             if (obj == this) {
@@ -100,11 +100,11 @@ public interface MenuItem {
             }
             if (obj instanceof Path) {
                 final Path that = (Path) obj;
-                return Utilities.equals(this.i18nKey, that.i18nKey) &&
-                       Utilities.equals(this.icon, that.icon) &&
-                       Utilities.equals(this.linkedPage, that.linkedPage) &&
-                       Utilities.equals(this.priority, that.priority) &&
-                       Utilities.equals(this.parent, that.parent);
+                return Objects.equals(this.i18nKey, that.i18nKey) &&
+                       Objects.equals(this.icon, that.icon) &&
+                       Objects.equals(this.linkedPage, that.linkedPage) &&
+                       Objects.equals(this.priority, that.priority) &&
+                       Objects.equals(this.parent, that.parent);
             }
             return false;
         }
@@ -119,7 +119,7 @@ public interface MenuItem {
             hash = 53 * hash + this.priority;
             return hash;
         }
-        
+
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder("[Path]\n");

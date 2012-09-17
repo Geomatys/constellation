@@ -140,7 +140,9 @@ public class SOSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!\nCause:Premature end of file.");
+            boolean ok = ex.getMessage().equals("The service is not running!\nCause:Premature end of file.") ||
+                         ex.getMessage().equals("The service is not running!\nCause:Fin prématurée du fichier.");
+            assertTrue("was" + ex.getMessage(), ok);
             exceptionLaunched = true;
         }
 
@@ -155,7 +157,7 @@ public class SOSWorkerInitialisationTest {
         Marshaller marshaller = SOSMarshallerPool.getInstance().acquireMarshaller();
         marshaller.marshal(request, configFile);
         SOSMarshallerPool.getInstance().release(marshaller);
-        
+
         worker = new SOSworker("", configurationDirectory);
 
         exceptionLaunched = false;
@@ -168,7 +170,7 @@ public class SOSWorkerInitialisationTest {
             assertTrue(ex.getMessage().startsWith("The service is not running!"));
             exceptionLaunched = true;
         }
-        
+
 
         marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
 
@@ -292,7 +294,7 @@ public class SOSWorkerInitialisationTest {
         }
 
         assertTrue(exceptionLaunched);
-        
+
         GenericDatabaseMarshallerPool.getInstance().release(marshaller);
     }
 

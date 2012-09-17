@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 
 /**
@@ -37,7 +37,7 @@ public class Select {
     @XmlAttribute
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     private String group;
-    
+
     /**
      * A list of Column to add in the select and their alias.
      */
@@ -48,7 +48,7 @@ public class Select {
      */
     public Select() {
     }
-    
+
     public Select(final Select select) {
         if (select != null) {
             this.col = new ArrayList<Column>();
@@ -108,7 +108,7 @@ public class Select {
     public void setCol(List<Column> value) {
         this.col = value;
     }
-    
+
     /**
      * Gets the value of the alias property.
      */
@@ -120,7 +120,7 @@ public class Select {
             col.add(column);
         }
     }
-    
+
     /**
      * Gets the value of the alias property.
      */
@@ -131,7 +131,7 @@ public class Select {
         col.add(new Column(var, sql));
     }
 
-    
+
     /**
      * @return the group
      */
@@ -145,8 +145,8 @@ public class Select {
     public void setGroup(final String group) {
         this.group = group;
     }
-    
-    
+
+
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Select]");
@@ -159,7 +159,7 @@ public class Select {
         }
         return s.toString();
     }
-    
+
     /**
      * Verify if this entry is identical to the specified object.
      */
@@ -171,8 +171,8 @@ public class Select {
         if (object instanceof Select) {
             final Select that = (Select) object;
 
-            return Utilities.equals(this.col,   that.col) &&
-                   Utilities.equals(this.group, that.group);
+            return Objects.equals(this.col,   that.col) &&
+                   Objects.equals(this.group, that.group);
         }
         return false;
     }

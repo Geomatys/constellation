@@ -17,7 +17,7 @@
 
 package org.constellation.generic.database;
 
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -28,15 +28,15 @@ public class Union {
     private Query query;
 
     public Union() {
-        
+
     }
-    
+
     public Union(final Union union) {
         if (union != null) {
             this.query = new Query(union.query);
         }
     }
-    
+
     /**
      * @return the query
      */
@@ -66,7 +66,7 @@ public class Union {
         }
         if (object instanceof Union) {
             final Union that = (Union) object;
-            return Utilities.equals(this.query, that.query) ;
+            return Objects.equals(this.query, that.query) ;
         }
         return false;
     }

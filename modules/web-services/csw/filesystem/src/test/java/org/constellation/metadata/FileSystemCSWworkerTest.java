@@ -197,20 +197,8 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
      */
     @Test
     @Override
-    public void transactionDeleteTest() throws Exception {
-        super.transactionDeleteTest();
-    }
-
-    /**
-     * Tests the transaction method
-     *
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Override
-    public void transactionInsertTest() throws Exception {
-        super.transactionInsertTest();
-
+    public void transactionDeleteInsertTest() throws Exception {
+        super.transactionDeleteInsertTest();
     }
 
     /**

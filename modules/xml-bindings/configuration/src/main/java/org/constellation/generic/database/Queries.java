@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -37,9 +37,9 @@ public class Queries {
     private Query main;
 
     private QueryList statique;
-    
+
     private QueryList queryList;
-    
+
     /**
      * Empty constructor used by JAXB
      */
@@ -118,7 +118,7 @@ public class Queries {
     public Query getQueryByName(String queryName) {
         return queryList.getQueryByName(queryName);
     }
-    
+
     /**
      * @return the parameters
      */
@@ -135,7 +135,7 @@ public class Queries {
     public void setParameters(HashMap<String, String> parameters) {
         this.parameters = parameters;
     }
-    
+
     /**
      * @return the statique
      */
@@ -165,7 +165,7 @@ public class Queries {
         s.append("queryList:").append(queryList).append('\n');
         return s.toString();
     }
-    
+
     /**
      * Verify if this entry is identical to the specified object.
      */
@@ -177,10 +177,10 @@ public class Queries {
         if (object instanceof Queries) {
             final Queries that = (Queries) object;
 
-            return Utilities.equals(this.main,       that.main)     &&
-                   Utilities.equals(this.queryList,  that.queryList) &&
-                   Utilities.equals(this.statique,   that.statique) &&
-                   Utilities.equals(this.parameters, that.parameters);
+            return Objects.equals(this.main,       that.main)     &&
+                   Objects.equals(this.queryList,  that.queryList) &&
+                   Objects.equals(this.statique,   that.statique) &&
+                   Objects.equals(this.parameters, that.parameters);
         }
         return false;
     }

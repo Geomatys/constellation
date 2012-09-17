@@ -21,6 +21,7 @@ package org.constellation.metadata.index.mdweb;
 import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
 import org.mdweb.model.storage.TextValue;
+import org.mdweb.model.storage.FullRecord;
 import java.io.File;
 import java.sql.Connection;
 import java.util.*;
@@ -110,6 +111,8 @@ public class MdwebIndexTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.5.sql"));
+        sr.close(false);
+        con.close();
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
@@ -935,7 +938,10 @@ public class MdwebIndexTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void DeleteDocumentTest() throws Exception {
+    public void deleteDocumentTest() throws Exception {
+        final FullRecord record = indexer.getEntry("CTDF02");
+        assertNotNull(record);
+
         indexer.removeDocument("CTDF02");
 
         indexSearcher.refresh();
@@ -965,6 +971,20 @@ public class MdwebIndexTest {
         expectedResult = null;
 
         assertEquals(expectedResult, result);
+
+        // restore the doc and verify that is well indexed
+        indexer.indexDocument(record);
+        indexSearcher.refresh();
+        
+        result = indexSearcher.identifierQuery(identifier);
+
+        LOGGER.log(Level.FINER, "identifier query 3:\n{0}", result);
+
+        expectedResult = "CTDF02";
+
+        assertEquals(expectedResult, result);
+
+
     }
 
     @Test

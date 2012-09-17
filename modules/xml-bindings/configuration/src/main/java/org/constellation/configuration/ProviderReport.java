@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -101,9 +101,9 @@ public class ProviderReport {
         }
         if (other instanceof ProviderReport) {
             final ProviderReport that = (ProviderReport) other;
-            return Utilities.equals(this.id, that.id) &&
-                   Utilities.equals(this.type, that.type) &&
-                   Utilities.equals(this.items, that.items);
+            return Objects.equals(this.id, that.id) &&
+                   Objects.equals(this.type, that.type) &&
+                   Objects.equals(this.items, that.items);
         }
         return false;
     }

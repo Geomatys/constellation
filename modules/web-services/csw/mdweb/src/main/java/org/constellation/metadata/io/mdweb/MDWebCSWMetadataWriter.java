@@ -30,7 +30,7 @@ import org.constellation.metadata.io.MetadataIoException;
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb meta model dependencies
@@ -163,7 +163,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                         } else {
                             final Classe requestType = getClasseFromObject(value);
                             final Classe valueType   = v.getType();
-                            if (!Utilities.equals(requestType, valueType)) {
+                            if (!Objects.equals(requestType, valueType)) {
                                 throw new MetadataIoException("The type of the replacement value (" + requestType.getName() +
                                                                ") does not match with the value type :" + valueType.getName(),
                                         INVALID_PARAMETER_VALUE);

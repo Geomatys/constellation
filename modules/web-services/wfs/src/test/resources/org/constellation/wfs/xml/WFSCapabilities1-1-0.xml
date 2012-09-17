@@ -153,7 +153,7 @@
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ows:LowerCorner>6.0E-4 0.0010</ows:LowerCorner>
+                <ows:LowerCorner>6.0E-4 0.001</ows:LowerCorner>
                 <ows:UpperCorner>9.0E-4 0.0022</ows:UpperCorner>
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
@@ -165,7 +165,7 @@
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
                 <ows:LowerCorner>5.0E-4 8.0E-4</ows:LowerCorner>
-                <ows:UpperCorner>0.0010 0.0024</ows:UpperCorner>
+                <ows:UpperCorner>0.001 0.0024</ows:UpperCorner>
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
@@ -252,8 +252,8 @@
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ows:LowerCorner>0.0016 -0.0020</ows:LowerCorner>
-                <ows:UpperCorner>0.0020 -0.0014</ows:UpperCorner>
+                <ows:LowerCorner>0.0016 -0.002</ows:LowerCorner>
+                <ows:UpperCorner>0.002 -0.0014</ows:UpperCorner>
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>

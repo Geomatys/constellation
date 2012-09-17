@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -193,15 +193,15 @@ public class Source {
         sb.append(" LoadAll=").append(loadAll);
         return sb.toString();
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Source) {
             final Source that = (Source) obj;
-            return Utilities.equals(this.exclude, that.exclude) &&
-                   Utilities.equals(this.id,      that.id)      &&
-                   Utilities.equals(this.include, that.include) &&
-                   Utilities.equals(this.loadAll, that.loadAll);
+            return Objects.equals(this.exclude, that.exclude) &&
+                   Objects.equals(this.id,      that.id)      &&
+                   Objects.equals(this.include, that.include) &&
+                   Objects.equals(this.loadAll, that.loadAll);
         }
         return false;
     }

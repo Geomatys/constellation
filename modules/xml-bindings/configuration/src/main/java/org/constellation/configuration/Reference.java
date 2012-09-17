@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -41,7 +41,7 @@ public class Reference {
     private String value;
 
     public Reference() {
-        
+
     }
 
     public Reference(final String href) {
@@ -52,7 +52,7 @@ public class Reference {
         this.authority = authority;
         this.value     = value;
     }
-    
+
     public Reference(final String href, final String authority, final String value) {
         this.href      = href;
         this.authority = authority;
@@ -100,7 +100,7 @@ public class Reference {
     public void setValue(String value) {
         this.value = value;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Reference]");
@@ -115,14 +115,14 @@ public class Reference {
         }
         return sb.toString();
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Reference) {
             final Reference that = (Reference) obj;
-            return Utilities.equals(this.authority, that.authority) &&
-                   Utilities.equals(this.href,      that.href) &&
-                   Utilities.equals(this.value,     that.value);
+            return Objects.equals(this.authority, that.authority) &&
+                   Objects.equals(this.href,      that.href) &&
+                   Objects.equals(this.value,     that.value);
         }
         return false;
     }

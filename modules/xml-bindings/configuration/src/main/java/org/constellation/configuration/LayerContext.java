@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.geotoolkit.gui.swing.tree.Trees;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -149,10 +149,10 @@ public class LayerContext {
     public boolean equals(final Object obj) {
         if (obj instanceof LayerContext) {
             final LayerContext that = (LayerContext) obj;
-            return Utilities.equals(this.layers, that.layers) &&
-                   Utilities.equals(this.security, that.security) &&
-                   Utilities.equals(this.customParameters, that.customParameters) &&
-                   Utilities.equals(this.supportedLanguages, that.supportedLanguages);
+            return Objects.equals(this.layers, that.layers) &&
+                   Objects.equals(this.security, that.security) &&
+                   Objects.equals(this.customParameters, that.customParameters) &&
+                   Objects.equals(this.supportedLanguages, that.supportedLanguages);
         }
         return false;
     }

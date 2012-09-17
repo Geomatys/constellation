@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -89,9 +89,9 @@ public class Instance {
         }
         if (obj instanceof Instance) {
             final Instance that = (Instance) obj;
-            return Utilities.equals(this.name,   that.name) &&
-                   Utilities.equals(this.type,   that.type) &&
-                   Utilities.equals(this.status, that.status);
+            return Objects.equals(this.name,   that.name) &&
+                   Objects.equals(this.type,   that.type) &&
+                   Objects.equals(this.status, that.status);
         }
         return false;
     }

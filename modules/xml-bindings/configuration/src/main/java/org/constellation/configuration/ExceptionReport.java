@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -58,7 +58,7 @@ public class ExceptionReport {
     public String getCode() {
         return code;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -66,8 +66,8 @@ public class ExceptionReport {
         }
         if (obj instanceof ExceptionReport) {
             final ExceptionReport that = (ExceptionReport) obj;
-            return Utilities.equals(this.code, that.code) &&
-                   Utilities.equals(this.message, that.message);
+            return Objects.equals(this.code, that.code) &&
+                   Objects.equals(this.message, that.message);
         }
         return false;
     }

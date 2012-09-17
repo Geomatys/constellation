@@ -17,7 +17,7 @@
 package org.constellation.gml.v311;
 
 import org.geotoolkit.internal.sql.table.Entry;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -92,8 +92,8 @@ public class DirectPositionType implements Entry {
         }
         if (object instanceof DirectPositionType) {
             final DirectPositionType that = (DirectPositionType) object;
-            return  Utilities.equals(this.name, that.name)     &&
-                    Utilities.equals(this.position, that.position);
+            return  Objects.equals(this.name, that.name)     &&
+                    Objects.equals(this.position, that.position);
         }
         return false;
     }

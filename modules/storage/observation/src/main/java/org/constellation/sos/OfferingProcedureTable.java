@@ -28,7 +28,7 @@ import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
-import org.geotoolkit.util.Utilities;
+import java.util.Objects;
 
 /**
  *
@@ -36,17 +36,17 @@ import org.geotoolkit.util.Utilities;
  */
 public class OfferingProcedureTable extends SingletonTable<OfferingProcedureType> implements Cloneable {
 
-        
+
     /**
      * identifier secondary of the table.
      */
     private String idOffering;
-    
+
     /**
      * a link to the reference table.
      */
     private ReferenceTable process;
-    
+
     /**
      * Construit une table des phenomene composé.
      *
@@ -55,14 +55,14 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureType
     public OfferingProcedureTable(final Database database) {
         this(new OfferingProcedureQuery(database));
     }
-    
+
     /**
      * Build a new table not shared.
      */
     private OfferingProcedureTable(final OfferingProcedureTable table) {
         super(table);
     }
-    
+
     /**
      * Initialize the identifier of the table.
      */
@@ -79,19 +79,19 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureType
         return new OfferingProcedureTable(this);
     }
 
-    
+
     @Override
     protected OfferingProcedureType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingProcedureQuery query = (OfferingProcedureQuery) super.query;
-        
+
         if (process == null) {
             process = getDatabase().getTable(ReferenceTable.class);
         }
         final ReferenceType procedure = process.getEntry(results.getString(indexOf(query.procedure)));
-        
+
         return new OfferingProcedureType(results.getString(indexOf(query.idOffering)), procedure);
     }
-    
+
     /**
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
@@ -101,22 +101,22 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureType
         final OfferingProcedureQuery query = (OfferingProcedureQuery) super.query;
         if (! type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byOffering), idOffering);
-        
+
     }
-    
-    
+
+
     public synchronized String getIdOffering() {
         return idOffering;
     }
-    
+
     public synchronized void setIdOffering(String idOffering) {
-        if (!Utilities.equals(this.idOffering, idOffering)) {
+        if (!Objects.equals(this.idOffering, idOffering)) {
             this.idOffering = idOffering;
             fireStateChanged("idOffering");
         }
-        
+
     }
-    
+
      /**
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *
@@ -159,5 +159,5 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureType
             }
         }
     }
-    
+
 }
