@@ -190,6 +190,8 @@ public class JProviderEditPane extends javax.swing.JPanel {
         dialog.setSize(800, 600);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+        
+        styleName = textField.getText();
 
         style = (MutableStyle) editor.create();
         style.setName(textField.getText());
