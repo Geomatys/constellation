@@ -1,7 +1,7 @@
 /*
  * MDweb - Open Source tool for cataloging and locating environmental resources
  *         http://mdweb.codehaus.org
- * 
+ *
  *   Copyright (c) 2010, Institut de Recherche pour le Développement (IRD)
  *   Copyright (c) 2010, Geomatys
  *
@@ -15,7 +15,7 @@
  * MDweb is distributed in the hope that it will be useful,
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- *   Lesser General Public License for more details:  
+ *   Lesser General Public License for more details:
  *         http://www.gnu.org/licenses/lgpl-3.0.html
  *
  */
@@ -53,13 +53,13 @@ import org.mdweb.model.auth.UserAuthnInfo;
  * @since 0.8
  */
 public class DefaultCstlRealm extends AuthorizingRealm {
- 
+
     private static final String NO_DB_MSG = "Unable to contact authentication database. refusing the access to anyone";
-    
+
     private AuthenticationReader authReader;
-    
+
     private static final Logger LOGGER = Logging.getLogger(DefaultCstlRealm.class);
-    
+
     public DefaultCstlRealm() {
         final File authProperties = ConfigDirectory.getAuthConfigFile();
         final Properties prop = new Properties();
@@ -75,7 +75,7 @@ public class DefaultCstlRealm extends AuthorizingRealm {
             LOGGER.log(Level.WARNING, "IOException while loading cstl auth properties file", ex);
         }
     }
-    
+
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token) throws UnknownAccountException {
         if (authReader == null) {
@@ -87,8 +87,8 @@ public class DefaultCstlRealm extends AuthorizingRealm {
         checkNotNull(username, "Null usernames are not allowed by this realm.");
         final String password;
         try {
-            
-            if (!authReader.UserExist(username)) {
+
+            if (!authReader.userExist(username)) {
                 throw new UnknownAccountException("There is no account for login:" + username);
             } else {
                 password = authReader.getPassword(username);
@@ -97,10 +97,10 @@ public class DefaultCstlRealm extends AuthorizingRealm {
             LOGGER.warning(NO_DB_MSG);
             throw new UnknownAccountException(NO_DB_MSG);
         }
- 
+
         return new SimpleAuthenticationInfo(username, password, getName());
     }
- 
+
     private void checkNotNull(final Object reference, final String message) {
         if (reference == null) {
             throw new AuthenticationException(message);
@@ -114,7 +114,7 @@ public class DefaultCstlRealm extends AuthorizingRealm {
             LOGGER.warning(NO_DB_MSG);
             throw new UnknownAccountException(NO_DB_MSG);
         }
- 
+
         final String username              = (String) principals.getPrimaryPrincipal();
         final UserAuthnInfo user           = authReader.getUser(username);
         final Set<String> roles            = new HashSet<String>();
