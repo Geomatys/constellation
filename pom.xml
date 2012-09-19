@@ -395,12 +395,12 @@
             <dependency>
                <groupId>org.apache.shiro</groupId>
                <artifactId>shiro-core</artifactId>
-               <version>1.2.0</version>
+               <version>1.2.1</version>
             </dependency>
             <dependency>
                <groupId>org.apache.shiro</groupId>
                <artifactId>shiro-web</artifactId>
-               <version>1.2.0</version>
+               <version>1.2.1</version>
             </dependency>
             <!-- milton webdav -->
             <dependency>
@@ -610,11 +610,6 @@
             <dependency>
                 <groupId>org.geotoolkit.pending</groupId>
                 <artifactId>geotk-filter</artifactId>
-                <version>${geotoolkit-pending.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.geotoolkit.pending</groupId>
-                <artifactId>geotk-cql</artifactId>
                 <version>${geotoolkit-pending.version}</version>
             </dependency>
             <dependency>
@@ -1130,6 +1125,11 @@
                     <artifactId>maven-plugin-plugin</artifactId>
                     <version>3.1</version>
                 </plugin>
+                <plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.8.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -1219,7 +1219,6 @@
                         <plugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-javadoc-plugin</artifactId>
-                            <version>2.7</version>
                             <reportSets>
                                 <reportSet>
                                     <reports>
@@ -1328,7 +1327,7 @@
             <extension>
                 <groupId>org.apache.maven.wagon</groupId>
                 <artifactId>wagon-ssh-external</artifactId>
-                <version>1.0-alpha-5</version>
+                <version>2.2</version>
             </extension>
         </extensions>
     </build>
