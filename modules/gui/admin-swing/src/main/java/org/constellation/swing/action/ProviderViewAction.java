@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import org.constellation.configuration.ProviderReport;
+import org.constellation.security.ActionPermissions;
 import org.constellation.swing.LayerRowModel;
 
 /**
@@ -31,7 +32,7 @@ public class ProviderViewAction extends Action {
 
 
     public ProviderViewAction() {
-        super("view");
+        super(ActionPermissions.VIEW_PROVIDER);
     }
 
     @Override

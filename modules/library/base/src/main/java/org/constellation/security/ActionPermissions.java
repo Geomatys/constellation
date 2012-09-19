@@ -24,6 +24,11 @@ package org.constellation.security;
 public class ActionPermissions {
 
     /**
+     * Permission to display a service instance.
+     */
+    public static final String VIEW_SERVICE = "viewService";
+
+    /**
      * Permission to create a new service instance.
      */
     public static final String NEW_SERVICE = "newService";
@@ -42,6 +47,11 @@ public class ActionPermissions {
      * Permission to start/stop a service instance.
      */
     public static final String START_STOP_SERVICE = "startStopService";
+
+    /**
+     * Permission to display a provider instance.
+     */
+    public static final String VIEW_PROVIDER = "viewProvider";
 
     /**
      * Permission to create a new provider instance.
