@@ -24,8 +24,8 @@ import javax.xml.bind.JAXBException;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.ConfigureMapServiceDescriptor;
-import org.constellation.process.service.GetOrCreateMapServiceDescriptor;
+import org.constellation.process.service.SetConfigMapServiceDescriptor;
+import org.constellation.process.service.CreateMapServiceDescriptor;
 import org.constellation.process.service.GetConfigMapServiceDescriptor;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
@@ -76,12 +76,12 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
                 if (instanceDirectory.listFiles().length == 0) {
                     //Create
                     try {
-                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetOrCreateMapServiceDescriptor.NAME);
+                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
                         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(GetOrCreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                        inputs.parameter(GetOrCreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-                        inputs.parameter(GetOrCreateMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
-                        inputs.parameter(GetOrCreateMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+                        inputs.parameter(CreateMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+                        inputs.parameter(CreateMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+                        inputs.parameter(CreateMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
+                        inputs.parameter(CreateMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
 
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();
@@ -96,12 +96,12 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
 
                     //Update
                     try {
-                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, ConfigureMapServiceDescriptor.NAME);
+                        final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigMapServiceDescriptor.NAME);
                         final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                        inputs.parameter(ConfigureMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                        inputs.parameter(ConfigureMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
-                        inputs.parameter(ConfigureMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
-                        inputs.parameter(ConfigureMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
+                        inputs.parameter(SetConfigMapServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
+                        inputs.parameter(SetConfigMapServiceDescriptor.IDENTIFIER_NAME).setValue(instanceDirectory.getName());
+                        inputs.parameter(SetConfigMapServiceDescriptor.CONFIG_NAME).setValue((LayerContext) configuration);
+                        inputs.parameter(SetConfigMapServiceDescriptor.INSTANCE_DIRECTORY_NAME).setValue(instanceDirectory);
 
                         final org.geotoolkit.process.Process process = desc.createProcess(inputs);
                         process.call();

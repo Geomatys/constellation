@@ -16,17 +16,16 @@
  */
 package org.constellation.process;
 
-import org.constellation.process.service.ConfigureMapServiceTest;
-import org.constellation.wfs.ws.DefaultWFSWorker;
+import org.constellation.process.service.CreateMapServiceTest;
 
 /**
  *
  * @author Quentin Boileau (Geomatys)
  */
-public class ConfigureWFSServiceTest extends ConfigureMapServiceTest {
+public class CreateWFSServiceTest extends CreateMapServiceTest {
 
-    public ConfigureWFSServiceTest() {
-        super("WFS", DefaultWFSWorker.class);
+    public CreateWFSServiceTest() {
+        super("WFS", org.constellation.wfs.ws.DefaultWFSWorker.class);
     }
 
 }

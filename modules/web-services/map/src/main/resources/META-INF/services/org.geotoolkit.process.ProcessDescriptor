@@ -1,4 +1,4 @@
 #Service process
-org.constellation.process.service.GetOrCreateMapServiceDescriptor
-org.constellation.process.service.ConfigureMapServiceDescriptor
+org.constellation.process.service.CreateMapServiceDescriptor
+org.constellation.process.service.SetConfigMapServiceDescriptor
 org.constellation.process.service.GetConfigMapServiceDescriptor

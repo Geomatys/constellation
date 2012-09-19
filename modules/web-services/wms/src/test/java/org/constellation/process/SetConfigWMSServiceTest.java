@@ -17,15 +17,15 @@
 package org.constellation.process;
 
 import org.constellation.map.ws.DefaultWMSWorker;
-import org.constellation.process.service.GetOrCreateMapServiceTest;
+import org.constellation.process.service.SetConfigMapServiceTest;
 
 /**
  *
  * @author Quentin Boileau (Geomatys)
  */
-public class GetOrCreateWMSServiceTest extends GetOrCreateMapServiceTest {
+public class SetConfigWMSServiceTest extends SetConfigMapServiceTest {
 
-    public GetOrCreateWMSServiceTest() {
+    public SetConfigWMSServiceTest() {
         super("WMS", DefaultWMSWorker.class);
     }
 

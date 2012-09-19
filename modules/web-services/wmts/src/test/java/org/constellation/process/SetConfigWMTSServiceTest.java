@@ -18,7 +18,7 @@ package org.constellation.process;
 
 import java.io.File;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.process.service.ConfigureMapServiceTest;
+import org.constellation.process.service.SetConfigMapServiceTest;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.AfterClass;
@@ -28,7 +28,7 @@ import org.junit.BeforeClass;
  *
  * @author Quentin Boileau (Geomatys)
  */
-public class ConfigureWMTSServiceTest extends ConfigureMapServiceTest {
+public class SetConfigWMTSServiceTest extends SetConfigMapServiceTest {
 
     @BeforeClass
     public static void createConfig () {
@@ -45,7 +45,7 @@ public class ConfigureWMTSServiceTest extends ConfigureMapServiceTest {
         FileUtilities.deleteDirectory(configDirectory);
     }
 
-    public ConfigureWMTSServiceTest() {
+    public SetConfigWMTSServiceTest() {
         super("WMTS", DefaultWMTSWorker.class);
     }
 

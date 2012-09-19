@@ -33,11 +33,11 @@ import org.opengis.util.InternationalString;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class AddStyleToStyleProviderDescriptor extends AbstractProcessDescriptor {
+public class SetStyleToStyleProviderDescriptor extends AbstractProcessDescriptor {
 
-    public static final String NAME = "style_provider.add_style";
+    public static final String NAME = "style_provider.set_style";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Add a style to an exising StyleProvider."
-            + "If style name already exist, process will throw a ProcessException.");
+            + "If style name already exist, style will be update.");
 
     /*
      * StyleProvider identifier
@@ -76,12 +76,12 @@ public class AddStyleToStyleProviderDescriptor extends AbstractProcessDescriptor
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
-    public AddStyleToStyleProviderDescriptor() {
+    public SetStyleToStyleProviderDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override
     public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
-        return new AddStyleToStyleProvider(this, input);
+        return new SetStyleToStyleProvider(this, input);
     }
 }

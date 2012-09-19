@@ -20,13 +20,8 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.process.AbstractProcessTest;
-import org.constellation.ws.WSEngine;
-import org.geotoolkit.util.FileUtilities;
-import org.junit.AfterClass;
 
 /**
  *

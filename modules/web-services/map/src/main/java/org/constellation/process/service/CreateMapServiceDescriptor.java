@@ -24,6 +24,7 @@ import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.AbstractProcessDescriptor;
+import org.geotoolkit.process.Process;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -33,14 +34,14 @@ import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
 
 /**
- *
+ * ProcessDescriptor for create a new Map service like WMS, WMTS, WCS or WFS.
  * @author Quentin Boileau (Geomatys).
  */
-public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
+public class CreateMapServiceDescriptor extends AbstractProcessDescriptor {
 
 
-    public static final String NAME = "map_service.configure";
-    public static final InternationalString ABSTRACT = new SimpleInternationalString("Update configuration of an existing map service (WMS, WMTS, WFS, WCS) in constellation.");
+    public static final String NAME = "service.create";
+    public static final InternationalString ABSTRACT = new SimpleInternationalString("Get an existing or create a new map service (WMS, WMTS, WFS, WCS) in constellation.");
 
 
     public static final String SERVICE_TYPE_NAME = "service_type";
@@ -58,14 +59,15 @@ public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptor(SERVICE_TYPE_PROPERTIES, String.class, SERVICE_TYPE_VALID_VALUES, null, null, null, null, true);
 
 
+
     public static final String IDENTIFIER_NAME = "identifier";
-    private static final String IDENTIFIER_REMARKS = "Identifier of the service instance.";
+    private static final String IDENTIFIER_REMARKS = "Identifier of the new service instance.";
     public static final ParameterDescriptor<String> IDENTIFIER =
             new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, "default", true);
 
 
     public static final String CONFIG_NAME = "configuration";
-    private static final String CONFIG_REMARKS = "LayerContext object use to update instance configuration. If not specified the instance will be configured from default LayerContext.";
+    private static final String CONFIG_REMARKS = "LayerContext object use to configure the instance. If not specified the instance will be configured from default LayerContext.";
     public static final ParameterDescriptor<LayerContext> CONFIGURATION =
             new DefaultParameterDescriptor(CONFIG_NAME, CONFIG_REMARKS, LayerContext.class, null, false);
 
@@ -79,18 +81,26 @@ public class ConfigureMapServiceDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptorGroup("InputParameters",
             new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, INSTANCE_DIRECTORY});
 
+
+    public static final String OUT_CONFIG_NAME = "out_configuration";
+    private static final String OUT_CONFIG_REMARKS = "The LayerContext configuration for the new instance.";
+    public static final ParameterDescriptor<LayerContext> OUT_CONFIGURATION =
+            new DefaultParameterDescriptor(OUT_CONFIG_NAME, OUT_CONFIG_REMARKS, LayerContext.class, null, false);
     /**Output parameters */
-    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
+    public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
+            new GeneralParameterDescriptor[]{OUT_CONFIGURATION});
+
 
     /**
      * Public constructor use by the ServiceRegistry to find and instantiate all ProcessDescriptor.
      */
-    public ConfigureMapServiceDescriptor() {
+    public CreateMapServiceDescriptor() {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
     @Override
-    public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
-        return new ConfigureMapService(this, input);
+    public Process createProcess(ParameterValueGroup input) {
+        return new CreateMapService(this, input);
     }
+
 }

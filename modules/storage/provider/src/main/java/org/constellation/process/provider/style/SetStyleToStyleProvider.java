@@ -22,41 +22,49 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.provider.style.UpdateStyleToStyleProviderDescriptor.*;
+import static org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor.*;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.style.MutableStyle;
 
 /**
- * Update a style of an existing style provider.
+ * Add a style to an exising StyleProvider. If style name already exist, process will throw a ProcessException.
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class UpdateStyleToStyleProvider extends AbstractCstlProcess {
+public class SetStyleToStyleProvider extends AbstractCstlProcess {
 
-    public UpdateStyleToStyleProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
+    public SetStyleToStyleProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
     /**
-     * Update a style of an existing style provider.
+     * Add a style to an existing style provider.
      * @throws ProcessException if :
      * - provider identifier is null/empty or not found in LayerProvider list.
      * - style name is null/empty.
+     * - style is null.
      */
     @Override
     protected void execute() throws ProcessException {
 
         final String providerId = value(PROVIDER_ID, inputParameters);
-        final String styleName = value(STYLE_ID, inputParameters);
+        String styleName = value(STYLE_ID, inputParameters);
         final MutableStyle style = value(STYLE, inputParameters);
 
         if (providerId == null || "".equals(providerId.trim())) {
             throw new ProcessException("Provider identifier can't be null or empty.", this, null);
         }
 
-        if (styleName == null || "".equals(styleName.trim())) {
-            throw new ProcessException("Provider identifier can't be null or empty.", this, null);
+        //use MutableStyle name if style_name parame is null.
+        if ( styleName == null || "".equals(styleName.trim()) ) {
+            if ( style.getName() == null || "".equals(style.getName().trim()) ) {
+                throw new ProcessException("Style name can't be null or empty. Please set a name in style or use style_name input parameter.", this, null);
+            } else {
+                styleName = style.getName();
+            }
+        } else {
+            style.setName(styleName);
         }
 
         if (style != null) {

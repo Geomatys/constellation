@@ -17,15 +17,15 @@
 package org.constellation.process;
 
 import org.constellation.coverage.ws.DefaultWCSWorker;
-import org.constellation.process.service.GetOrCreateMapServiceTest;
+import org.constellation.process.service.SetConfigMapServiceTest;
 
 /**
  *
  * @author Quentin Boileau (Geomatys)
  */
-public class GetOrCreateWCSServiceTest extends GetOrCreateMapServiceTest {
+public class SetConfigWCSServiceTest extends SetConfigMapServiceTest {
 
-    public GetOrCreateWCSServiceTest() {
+    public SetConfigWCSServiceTest() {
         super("WCS", DefaultWCSWorker.class);
     }
 

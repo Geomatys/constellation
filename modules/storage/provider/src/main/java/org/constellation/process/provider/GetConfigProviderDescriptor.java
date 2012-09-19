@@ -34,7 +34,7 @@ import org.opengis.util.InternationalString;
  */
 public class GetConfigProviderDescriptor extends AbstractProcessDescriptor {
 
-    public static final String NAME = "provider.getConfig";
+    public static final String NAME = "provider.get_config";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Return provider configuration.");
 
 
