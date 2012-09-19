@@ -359,6 +359,24 @@ public class MDWebMetadataWriterTest {
 
     }
 
+    @Test
+    public void writeMetadataMultiContactTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta11.xml"));
+        assertEquals(3, absExpResult.getContacts().size());
+        writer.storeMetadata(absExpResult);
+        Object absResult = reader.getMetadata("multi-contacts", AbstractMetadataReader.ISO_19115);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        DefaultMetadata result = (DefaultMetadata) absResult;
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta11.xml"));
+
+        metadataEquals(expResult,result);
+
+        pool.release(unmarshaller);
+    }
+
     /**
      * Tests the storeMetadata method for ISO 19110 data
      *
