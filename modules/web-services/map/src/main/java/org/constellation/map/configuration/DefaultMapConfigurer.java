@@ -63,6 +63,8 @@ import org.geotoolkit.util.converter.Classes;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
 import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -72,9 +74,6 @@ import org.opengis.util.NoSuchIdentifierException;
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.provider.layer.CreateProviderLayerStyleDescriptor;
-import org.constellation.process.provider.layer.DeleteProviderLayerStyleDescriptor;
-import org.constellation.process.provider.layer.UpdateProviderLayerStyleDescriptor;
 import org.constellation.process.provider.CreateProviderDescriptor;
 import org.constellation.process.provider.GetConfigProviderDescriptor;
 import org.constellation.process.provider.DeleteProviderDescriptor;
@@ -444,35 +443,59 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         final String sourceId = getParameter("id", true, parameters);
         final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
+        
         try {
             // we read the soruce parameter to add
             reader.setInput(objectRequest);
             final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
-
-
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderLayerStyleDescriptor.NAME);
-            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(CreateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(CreateProviderLayerStyleDescriptor.LAYER_NAME).setValue(newLayer);
-
-            try {
-                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                process.call();
-
-            } catch (ProcessException ex) {
-                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-            }
-
             reader.dispose();
-            return new AcknowlegementType("Success", "The layer has been added");
 
-        } catch (NoSuchIdentifierException ex) {
-           throw new CstlServiceException(ex);
+            final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+            for (LayerProvider p : providers) {
+                if (p.getId().equals(sourceId)) {
+                    p.getSource().values().add(newLayer);
+                    p.updateSource(p.getSource());
+                    return new AcknowlegementType("Success", "The layer has been added");
+                }
+            }
+            return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
+
+
         } catch (XMLStreamException ex) {
             throw new CstlServiceException(ex);
         } catch (IOException ex) {
             throw new CstlServiceException(ex);
         }
+        
+//        try {
+//            // we read the soruce parameter to add
+//            reader.setInput(objectRequest);
+//            final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
+//
+//
+//            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderLayerStyleDescriptor.NAME);
+//            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+//            inputs.parameter(CreateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+//            inputs.parameter(CreateProviderLayerStyleDescriptor.LAYER_NAME).setValue(newLayer);
+//
+//            try {
+//                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+//                process.call();
+//
+//            } catch (ProcessException ex) {
+//                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
+//            }
+//
+//            reader.dispose();
+//            return new AcknowlegementType("Success", "The layer has been added");
+//
+//        } catch (NoSuchIdentifierException ex) {
+//           throw new CstlServiceException(ex);
+//        } catch (XMLStreamException ex) {
+//            throw new CstlServiceException(ex);
+//        } catch (IOException ex) {
+//            throw new CstlServiceException(ex);
+//        }
     }
 
     /**
@@ -487,26 +510,46 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final String sourceId = getParameter("id", true, parameters);
         final String layerName = getParameter("layerName", true, parameters);
 
-        try {
-
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerStyleDescriptor.NAME);
-            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(DeleteProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(DeleteProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue(layerName);
-
-            try {
-                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                process.call();
-
-            } catch (ProcessException ex) {
-                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
+        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        for (LayerProvider p : providers) {
+            if (p.getId().equals(sourceId)) {
+                for (GeneralParameterValue param : p.getSource().values()) {
+                    if (param instanceof ParameterValueGroup) {
+                        final ParameterValueGroup pvg = (ParameterValueGroup)param;
+                        if (param.getDescriptor().equals(ProviderParameters.LAYER_DESCRIPTOR)) {
+                            final ParameterValue value = pvg.parameter("name");
+                            if (value.stringValue().equals(layerName)) {
+                                p.getSource().values().remove(pvg);
+                                break;
+                            }
+                        }
+                    }
+                }
+                p.updateSource(p.getSource());
+                return new AcknowlegementType("Success", "The layer has been removed");
             }
-
-            return new AcknowlegementType("Success", "The source has been deleted");
-
-        } catch (NoSuchIdentifierException ex) {
-           throw new CstlServiceException(ex);
         }
+        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
+//        try {
+//
+//            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderLayerStyleDescriptor.NAME);
+//            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+//            inputs.parameter(DeleteProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+//            inputs.parameter(DeleteProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue(layerName);
+//
+//            try {
+//                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+//                process.call();
+//
+//            } catch (ProcessException ex) {
+//                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
+//            }
+//
+//            return new AcknowlegementType("Success", "The source has been deleted");
+//
+//        } catch (NoSuchIdentifierException ex) {
+//           throw new CstlServiceException(ex);
+//        }
     }
 
     /**
@@ -527,34 +570,67 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
 
         try {
-            // we read the soruce parameter to add
+            // we read the source parameter to add
             reader.setInput(objectRequest);
-            final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
-
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerStyleDescriptor.NAME);
-            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(UpdateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(UpdateProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue(layerName);
-            inputs.parameter(UpdateProviderLayerStyleDescriptor.UPDATE_LAYER_NAME).setValue(newLayer);
-
-            try {
-                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                process.call();
-
-            } catch (ProcessException ex) {
-                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-            }
-
+            ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
             reader.dispose();
-            return new AcknowlegementType("Success", "The layer has been modified");
 
-        } catch (NoSuchIdentifierException ex) {
-            throw new CstlServiceException(ex);
+            Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+            for (LayerProvider p : providers) {
+                if (p.getId().equals(sourceId)) {
+                    for (GeneralParameterValue param : p.getSource().values()) {
+                        if (param instanceof ParameterValueGroup) {
+                            ParameterValueGroup pvg = (ParameterValueGroup)param;
+                            if (param.getDescriptor().equals(ProviderParameters.LAYER_DESCRIPTOR)) {
+                                ParameterValue value = pvg.parameter("name");
+                                if (value.stringValue().equals(layerName)) {
+                                    p.getSource().values().remove(pvg);
+                                    p.getSource().values().add(newLayer);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    p.updateSource(p.getSource());
+                    return new AcknowlegementType("Success", "The layer has been modified");
+                }
+            }
         } catch (XMLStreamException ex) {
             throw new CstlServiceException(ex);
         } catch (IOException ex) {
             throw new CstlServiceException(ex);
         }
+        return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
+        
+//        try {
+//            // we read the soruce parameter to add
+//            reader.setInput(objectRequest);
+//            final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
+//
+//            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderLayerStyleDescriptor.NAME);
+//            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+//            inputs.parameter(UpdateProviderLayerStyleDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
+//            inputs.parameter(UpdateProviderLayerStyleDescriptor.LAYER_NAME_NAME).setValue(layerName);
+//            inputs.parameter(UpdateProviderLayerStyleDescriptor.UPDATE_LAYER_NAME).setValue(newLayer);
+//
+//            try {
+//                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+//                process.call();
+//
+//            } catch (ProcessException ex) {
+//                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
+//            }
+//
+//            reader.dispose();
+//            return new AcknowlegementType("Success", "The layer has been modified");
+//
+//        } catch (NoSuchIdentifierException ex) {
+//            throw new CstlServiceException(ex);
+//        } catch (XMLStreamException ex) {
+//            throw new CstlServiceException(ex);
+//        } catch (IOException ex) {
+//            throw new CstlServiceException(ex);
+//        }
     }
 
     /**

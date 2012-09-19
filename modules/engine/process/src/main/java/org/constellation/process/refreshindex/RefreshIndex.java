@@ -17,7 +17,6 @@
 package org.constellation.process.refreshindex;
 
 
-import org.constellation.process.restart.RestartDescriptor;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Date;
