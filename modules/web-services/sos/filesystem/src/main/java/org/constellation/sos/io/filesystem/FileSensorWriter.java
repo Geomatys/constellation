@@ -233,8 +233,9 @@ public class FileSensorWriter implements SensorWriter {
      */
     @Override
     public void destroy() {
-        if (uncommittedFiles != null)
+        if (uncommittedFiles != null) {
             uncommittedFiles.clear();
+        }
     }
 
     /**

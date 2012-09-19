@@ -53,7 +53,7 @@ import org.opengis.observation.Observation;
 
 /**
  * Default Observation reader for Postgrid O&M database.
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  */
 public class DefaultObservationWriter implements ObservationWriter {
@@ -96,7 +96,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * Build a new Observation writer for postgrid dataSource.
      *
      * @param configuration
-     * 
+     *
      * @throws org.constellation.ws.CstlServiceException
      */
     public DefaultObservationWriter(final Automatic configuration) throws CstlServiceException {
@@ -111,7 +111,7 @@ public class DefaultObservationWriter implements ObservationWriter {
         isPostgres = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         try {
             omDatabase = DatabasePool.getDatabase(db);
-            
+
             //we build the database table frequently used.
             obsTable  = omDatabase.getTable(ObservationTable.class);
             measTable = omDatabase.getTable(MeasurementTable.class);
@@ -119,7 +119,7 @@ public class DefaultObservationWriter implements ObservationWriter {
 
         } catch (NoSuchTableException ex) {
             throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        } 
+        }
     }
 
     /**
@@ -180,13 +180,15 @@ public class DefaultObservationWriter implements ObservationWriter {
     @Override
     public void updateOffering(final OfferingProcedureType offProc, final OfferingPhenomenonType offPheno, final OfferingSamplingFeatureType offSF) throws CstlServiceException {
         try {
-            if (offProc != null)
+            if (offProc != null) {
                 offTable.getProcedures().getIdentifier(offProc);
-            if (offPheno != null)
+            }
+            if (offPheno != null) {
                 offTable.getPhenomenons().getIdentifier(offPheno);
-            if (offSF != null)
+            }
+            if (offSF != null) {
                 offTable.getStations().getIdentifier(offSF);
-
+            }
         } catch (CatalogException ex) {
             throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (SQLException e) {
@@ -208,8 +210,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      */
     @Override
     public void recordProcedureLocation(final String physicalID, final DirectPositionType position) throws CstlServiceException {
-        if (position == null || position.getValue().size() < 2 || !isPostgres)
-            return;
+        if (position == null || position.getValue().size() < 2 || !isPostgres) {return;}
         try {
             final Connection c       = omDatabase.getDataSource(true).getConnection();
             final Statement stmt2    = c.createStatement();
@@ -217,8 +218,9 @@ public class DefaultObservationWriter implements ObservationWriter {
             String request = "SELECT * FROM ";
             boolean insert = true;
             String srsName = "4326";
-            if (position.getSrsName() != null)
+            if (position.getSrsName() != null) {
                 srsName = position.getSrsName();
+            }
 
             if (srsName.startsWith("urn:ogc:crs:EPSG:")) {
                 srsName = srsName.substring(17);

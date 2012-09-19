@@ -94,7 +94,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
     protected List<String> getAllIdentifiers() throws IndexingException {
         throw new UnsupportedOperationException("not used in this implementation");
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -102,7 +102,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
     protected ObservationType getEntry(final String identifier) throws IndexingException {
         throw new UnsupportedOperationException("not used in this implementation");
     }
-    
+
      /**
      * {@inheritDoc}
      */
@@ -166,7 +166,9 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
             LOGGER.log(Level.SEVERE, "JAXB Exception while indexing: {0}", msg);
             throw new IndexingException("JAXBException while indexing documents.", ex);
         } finally {
-            if (unmarshaller != null) SOSMarshallerPool.getInstance().release(unmarshaller);
+            if (unmarshaller != null) {
+                SOSMarshallerPool.getInstance().release(unmarshaller);
+            }
         }
 
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\nObservations indexed: "
@@ -204,7 +206,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationType> {
                 final TimeInstantType instant = (TimeInstantType) time;
                 doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(instant.getTimePosition()), Field.Store.YES, Field.Index.ANALYZED));
                 doc.add(new Field("sampling_time_end",    "NULL", Field.Store.YES, Field.Index.ANALYZED));
-                
+
             } else if (time != null) {
                 LOGGER.log(Level.WARNING, "unrecognized sampling time type:{0}", time);
             }

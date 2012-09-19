@@ -211,8 +211,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     @Override
     public void abortTransaction() throws CstlServiceException {
         try {
-            if (currentSavePoint != null)
+            if (currentSavePoint != null) {
                 smlConnection.rollback(currentSavePoint);
+            }
             smlConnection.commit();
             smlConnection.setAutoCommit(true);
         } catch (SQLException e) {
@@ -228,8 +229,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     @Override
     public void endTransaction() throws CstlServiceException {
         try {
-            if (currentSavePoint != null)
+            if (currentSavePoint != null) {
                 smlConnection.releaseSavepoint(currentSavePoint);
+            }
             smlConnection.commit();
             smlConnection.setAutoCommit(true);
         } catch (SQLException e) {
