@@ -54,6 +54,9 @@ import org.opengis.feature.catalog.FeatureCatalogue;
 
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.mdweb.model.storage.FullRecord;
+import org.mdweb.model.storage.LinkedValue;
+import org.mdweb.model.storage.Value;
 
 /**
  *
@@ -365,6 +368,15 @@ public class MDWebMetadataWriterTest {
 
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta11.xml"));
         assertEquals(3, absExpResult.getContacts().size());
+
+        FullRecord f = writer.getRecordFromObject(absExpResult);
+        int nbLinkedValue = 0;
+        for (Value v : f.getValues()) {
+            if (v instanceof LinkedValue) {
+                nbLinkedValue++;
+            }
+        }
+        assertEquals(2, nbLinkedValue);
         writer.storeMetadata(absExpResult);
         Object absResult = reader.getMetadata("multi-contacts", AbstractMetadataReader.ISO_19115);
         assertTrue(absResult != null);
