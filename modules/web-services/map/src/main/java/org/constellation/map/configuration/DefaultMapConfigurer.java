@@ -82,6 +82,7 @@ import org.constellation.process.provider.UpdateProviderDescriptor;
 import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
 import org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor;
 import org.geotoolkit.process.ProcessException;
+import org.opengis.parameter.InvalidParameterValueException;
 
 /**
  *
@@ -267,6 +268,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
             } catch (NoSuchIdentifierException ex) {
                 throw new CstlServiceException(ex);
+            } catch (InvalidParameterValueException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             } catch (XMLStreamException ex) {
                 throw new CstlServiceException(ex);
             } catch (IOException ex) {
@@ -321,6 +324,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
             } catch (NoSuchIdentifierException ex) {
                 throw new CstlServiceException(ex);
+            } catch (InvalidParameterValueException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             } catch (XMLStreamException ex) {
                 throw new CstlServiceException(ex);
             } catch (IOException ex) {
@@ -360,6 +365,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         } catch (NoSuchIdentifierException ex) {
            throw new CstlServiceException(ex);
+        } catch (InvalidParameterValueException ex) {
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
     }
 
@@ -392,6 +399,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         } catch (NoSuchIdentifierException ex) {
            throw new CstlServiceException(ex);
+        } catch (InvalidParameterValueException ex) {
+           throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
 
     }
@@ -425,6 +434,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         } catch (NoSuchIdentifierException ex) {
            throw new CstlServiceException(ex);
+        } catch (InvalidParameterValueException ex) {
+           throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
     }
 
@@ -443,7 +454,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         final String sourceId = getParameter("id", true, parameters);
         final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
-        
+
         try {
             // we read the soruce parameter to add
             reader.setInput(objectRequest);
@@ -466,7 +477,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         } catch (IOException ex) {
             throw new CstlServiceException(ex);
         }
-        
+
 //        try {
 //            // we read the soruce parameter to add
 //            reader.setInput(objectRequest);
@@ -601,7 +612,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             throw new CstlServiceException(ex);
         }
         return new AcknowlegementType("Failure", "Unable to find a source named:" + sourceId);
-        
+
 //        try {
 //            // we read the soruce parameter to add
 //            reader.setInput(objectRequest);
@@ -698,6 +709,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
             } catch (NoSuchIdentifierException ex) {
                 throw new CstlServiceException(ex);
+            } catch (InvalidParameterValueException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
         }
         return new AcknowlegementType("Failure", "Passed object is not a style:" + Classes.getShortClassName(objectRequest));
@@ -736,6 +749,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         } catch (NoSuchIdentifierException ex) {
             throw new CstlServiceException(ex);
+        } catch (InvalidParameterValueException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
     }
 
@@ -779,6 +794,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
             } catch (NoSuchIdentifierException ex) {
                 throw new CstlServiceException(ex);
+            } catch (InvalidParameterValueException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
         }
 
@@ -915,6 +932,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             desc = ProcessFinder.getProcessDescriptor(authority,code);
         } catch (NoSuchIdentifierException ex) {
             throw new CstlServiceException("No Process for id : {" + authority + "}"+code+" has been found", INVALID_PARAMETER_VALUE);
+        } catch (InvalidParameterValueException ex) {
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
         if(desc == null){
             throw new CstlServiceException("No Process for id : {" + authority + "}"+code+" has been found", INVALID_PARAMETER_VALUE);
@@ -987,6 +1006,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             originalDesc = ProcessFinder.getProcessDescriptor(authority,code).getInputDescriptor();
         } catch (NoSuchIdentifierException ex) {
             return new AcknowlegementType("Failure", "No process for given id.");
+        }  catch (InvalidParameterValueException ex) {
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
         final ParameterValueGroup orig = originalDesc.createValue();
         orig.values().addAll(params.values());
@@ -1040,6 +1061,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             originalDesc = ProcessFinder.getProcessDescriptor(authority,code).getInputDescriptor();
         } catch (NoSuchIdentifierException ex) {
             return new AcknowlegementType("Failure", "No process for given id.");
+        } catch (InvalidParameterValueException ex) {
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
         final ParameterValueGroup orig = originalDesc.createValue();
         orig.values().addAll(params.values());

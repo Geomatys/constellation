@@ -65,7 +65,10 @@ public class JProviderCreationPane extends javax.swing.JPanel {
     }
 
     public String getType(){
-        return ((ProviderServiceReport)guiType.getSelectedItem()).getType();
+        if (guiType.getSelectedItem() instanceof ProviderServiceReport) {
+            return ((ProviderServiceReport)guiType.getSelectedItem()).getType();
+        }
+        return guiType.getSelectedItem().toString();
     }
 
     public ParameterValueGroup getParameters(){

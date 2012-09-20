@@ -163,35 +163,37 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
         //list all providers
         final ProvidersReport providersReport = cstl.providers.listProviders();
-        final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
-        final List<Entry<String,ProviderReport>> instances = new ArrayList<Entry<String,ProviderReport>> ();
+        if (providersReport != null) {
+            final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
+            final List<Entry<String,ProviderReport>> instances = new ArrayList<Entry<String,ProviderReport>> ();
 
-        for (final ProviderServiceReport serviceReport : servicesReport) {
-            final String type = serviceReport.getType();
-            if("all".equals(action) || action.equalsIgnoreCase(type)){
-                final List<ProviderReport> providers = serviceReport.getProviders();
+            for (final ProviderServiceReport serviceReport : servicesReport) {
+                final String type = serviceReport.getType();
+                if("all".equals(action) || action.equalsIgnoreCase(type)){
+                    final List<ProviderReport> providers = serviceReport.getProviders();
 
-                for(ProviderReport report : providers){
-                    instances.add(new AbstractMap.SimpleEntry<String,ProviderReport>(type,report));
+                    for(ProviderReport report : providers){
+                        instances.add(new AbstractMap.SimpleEntry<String,ProviderReport>(type,report));
+                    }
                 }
             }
+
+            Collections.sort(instances,new Comparator<Entry<String,ProviderReport>>(){
+                @Override
+                public int compare(Entry<String,ProviderReport> o1, Entry<String,ProviderReport> o2) {
+                    if(o1.getKey().equals(o2.getKey())){
+                        //compare instance names
+                        return o1.getValue().getId().compareTo(o2.getValue().getId());
+                    }else{
+                        //compare types
+                        return o1.getKey().compareTo(o2.getKey());
+                    }
+                }
+            });
+
+            final TableModel model = new InstanceModel(instances);
+            guiTable.setModel(model);
         }
-
-        Collections.sort(instances,new Comparator<Entry<String,ProviderReport>>(){
-            @Override
-            public int compare(Entry<String,ProviderReport> o1, Entry<String,ProviderReport> o2) {
-                if(o1.getKey().equals(o2.getKey())){
-                    //compare instance names
-                    return o1.getValue().getId().compareTo(o2.getValue().getId());
-                }else{
-                    //compare types
-                    return o1.getKey().compareTo(o2.getKey());
-                }
-            }
-        });
-
-        final TableModel model = new InstanceModel(instances);
-        guiTable.setModel(model);
 
 
         final int width = 140;

@@ -22,6 +22,9 @@ package org.constellation.process.provider;
  */
 public enum ProviderType {
 
+    SHAPEFILE("shapefile"),
+    POSTGIS("postgis"),
+    COVERAGE_SQL("coverage-sql"),
     DATA_STORE("data-store"),
     SERVER_STORE("server-store"),
     COVERAGE_STORE("coverage-store"),
