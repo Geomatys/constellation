@@ -30,6 +30,7 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.event.EventListenerList;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -77,22 +78,23 @@ import static org.constellation.api.QueryConstants.*;
 
 /**
  * convenient class to perform actions on constellation web services.
- * 
+ *
  * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
 public class ConstellationServer<S extends Services, P extends Providers, C extends Csws, T extends Tasks> extends AbstractServer{
-    
+
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
+    private final EventListenerList listeners = new EventListenerList();
 
     public final S services;
     public final P providers;
     public final C csws;
     public final T tasks;
-    
+
     public final String currentUser;
-    
+
     public ConstellationServer(final URL server, final String user, final String password) {
         super(create(ConstellationServerFactory.PARAMETERS, server, null));
         this.services    = createServiceManager();
@@ -104,7 +106,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters).setValue(new BasicAuthenticationSecurity(user, password));
         this.currentUser = Parameters.value(ConstellationServerFactory.USER, parameters);
     }
-    
+
     public ConstellationServer(ParameterValueGroup params){
         super(params);
         this.services    = createServiceManager();
@@ -114,7 +116,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         this.currentUser = Parameters.value(ConstellationServerFactory.USER, parameters);
         Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters)
                 .setValue(new BasicAuthenticationSecurity(
-                        Parameters.value(ConstellationServerFactory.USER, params), 
+                        Parameters.value(ConstellationServerFactory.USER, params),
                         Parameters.value(ConstellationServerFactory.PASSWORD, params)));
     }
 
@@ -122,30 +124,30 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     public ServerFactory getFactory() {
         return new ConstellationServerFactory();
     }
-    
+
     protected S createServiceManager(){
         return (S) new Services();
     }
-    
+
     protected T createTaskManager(){
         return (T) new Tasks();
     }
-    
+
     protected C createCswManager(){
         return (C) new Csws();
     }
-    
+
     protected P createProviderManager(){
         return (P) new Providers();
     }
-    
+
     public static ConstellationServer login(final ParameterValueGroup value) {
         return login(Parameters.value(ConstellationServerFactory.URL, value),
              Parameters.stringValue(ConstellationServerFactory.USER, value),
              Parameters.stringValue(ConstellationServerFactory.PASSWORD, value));
     }
-    
-    public static ConstellationServer login(final String serviceURL, 
+
+    public static ConstellationServer login(final String serviceURL,
             final String login, final String password) {
         final URL url;
         try {
@@ -156,24 +158,24 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
         return login(url, login, password);
     }
-    
-    public static ConstellationServer login(final URL serviceURL, 
+
+    public static ConstellationServer login(final URL serviceURL,
             final String login, final String password) {
         ArgumentChecks.ensureNonNull("server url", serviceURL);
         ArgumentChecks.ensureNonNull("user", login);
         ArgumentChecks.ensureNonNull("password", password);
-        
+
         ConstellationServer serviceAdmin = new ConstellationServer(serviceURL, login, password);
-        
+
         //check if the service and logins are valid
         if(!serviceAdmin.authenticate()){
             //unvalid configuration
             serviceAdmin = null;
         }
-        
+
         return serviceAdmin;
     }
-    
+
     /**
      * Set the basic authentication for HTTP request.
      * @return true if login/password are valid
@@ -186,7 +188,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             final URL url = new URL(str);
             cnx = (HttpURLConnection) url.openConnection();
             getClientSecurity().secure(cnx);
-            stream = AbstractRequest.openRichException(cnx, getClientSecurity());            
+            stream = AbstractRequest.openRichException(cnx, getClientSecurity());
         } catch (Exception ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             return false;
@@ -231,15 +233,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
         return null;
     }
-    
+
     /**
-     * 
+     *
      * @param path
      * @return true if succeed
      */
     public boolean setConfigurationPath(final String path){
         try {
-            
+
             final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_SET_CONFIG_PATH + "&path=" + URLEncoder.encode(path);
             final Object response = sendRequest(url, null);
             if (response instanceof AcknowlegementType) {
@@ -256,7 +258,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
         return false;
     }
-    
+
     public boolean deleteUser(final String userName){
         try {
             final String url = getURLWithEndSlash() + "configuration?request=deleteUser&username=" + userName;
@@ -278,7 +280,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
         return false;
     }
-    
+
     public boolean updateUser(final String userName, final String password, final String oldLogin){
         if (oldLogin == null) {
             LOGGER.warning("you must specify the old login to change it");
@@ -304,7 +306,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
         return false;
     }
-    
+
     public String getUserName(){
         try {
             final String url = getURLWithEndSlash() + "configuration?request=getUserName";
@@ -326,12 +328,65 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
         return null;
     }
-    
+
+    /**
+     * Adds a {@linkplain ConstellationListener listener}.
+     *
+     * @param listener Listener to add
+     */
+    public void addListener(final ConstellationListener listener) {
+        listeners.add(ConstellationListener.class, listener);
+    }
+
+    /**
+     * Remove a {@linkplain ConstellationListener listener}.
+     *
+     * @param listener Listener to remove
+     */
+    public void removeListener(final ConstellationListener listener) {
+        listeners.remove(ConstellationListener.class, listener);
+    }
+
+    /**
+     * Fire event that a provider has been created.
+     *
+     * @param serviceName Service name for this provider.
+     * @param config Configuration of the provider.
+     */
+    private void fireProviderCreated(final String serviceName, final ParameterValueGroup config) {
+        for (ConstellationListener listener : listeners.getListeners(ConstellationListener.class)) {
+            listener.providerCreated(serviceName, config);
+        }
+    }
+
+    /**
+     * Fire event that a provider has been deleted.
+     *
+     * @param id Identifier of the provider to delete.
+     */
+    private void fireProviderDeleted(final String id) {
+        for (ConstellationListener listener : listeners.getListeners(ConstellationListener.class)) {
+            listener.providerDeleted(id);
+        }
+    }
+
+    /**
+     * Fire event that a provider has been updated.
+     * @param serviceName Service name for this provider.
+     * @param id Identifier of the provider to delete.
+     * @param config Configuration of the provider.
+     */
+    private void fireProviderUpdated(final String serviceName, final String id, final ParameterValueGroup config) {
+        for (ConstellationListener listener : listeners.getListeners(ConstellationListener.class)) {
+            listener.providerUpdated(serviceName, id, config);
+        }
+    }
+
     /**
      * Configuration methods for services
      */
     public final class Services{
-        
+
         public Map<String, List<String>> getAvailableService() {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_SERVICE;
@@ -350,7 +405,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return new HashMap<String, List<String>>();
         }
-        
+
         /**
          * Restart all the web-service (wms, wfs, csw,...)
          *
@@ -377,9 +432,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Restart all the instance of a specific web-service (wms, wfs, csw,...)
-         * 
+         *
          * @param service The service name to restart (wms, wfs, csw,...).
-         * 
+         *
          * @return true if the operation succeed
          */
         public boolean restartAllInstance(final String service) {
@@ -400,12 +455,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         /**
          * Restart all the instance of a specific web-service (wms, wfs, csw,...)
-         * 
+         *
          * @param service The service name to restart (wms, wfs, csw,...).
-         * 
+         *
          * @return true if the operation succeed
          */
         public boolean renameInstance(final String service, final String instanceId, final String newName) {
@@ -429,10 +484,10 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Restart a unique instance for the specified service  (wms, wfs, csw,...) and instance identifier.
-         * 
+         *
          * @param service The service name to restart (wms, wfs, csw,...).
          * @param instanceId The instance identifier to restart.
-         * 
+         *
          * @return true if the operation succeed
          */
         public boolean restartInstance(final String service, final String instanceId) {
@@ -459,7 +514,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          *
          * @param service The service name to restart (wms, wfs, csw,...).
          * @param instanceId The instance identifier to create.
-         * 
+         *
          * @return true if the operation succeed
          */
         public boolean newInstance(String service, String instanceId) {
@@ -483,7 +538,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Start a new instance for the specified service  (wms, wfs, csw,...) with the specified identifier.
-         * 
+         *
          * @param service The service name to restart (wms, wfs, csw,...).
          * @param instanceId The instance identifier to create.
          *
@@ -590,7 +645,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Send a configuration object to the specified service and instance.
-         * 
+         *
          * @param service The service name to restart (wms, wfs, csw,...).
          * @param instanceId The instance identifier to configure.
          * @param configuration A configuration object depending on the service type (for example WxS service take LayerContext object).
@@ -662,7 +717,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         /**
          * Return a complete URL for the specified service  (wms, wfs, csw,...) and instance identifier.
          *
@@ -674,14 +729,14 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public String getInstanceURL(final String service, final String instanceId) {
             return getURLWithEndSlash() + service.toLowerCase() + '/' + instanceId;
         }
-        
+
     }
-    
+
     /**
      * Configuration methods for providers
      */
     public final class Providers{
-                
+
         /**
          * Restart all layer providers.
          */
@@ -704,7 +759,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         /**
          * Restart all layer providers.
          */
@@ -727,13 +782,13 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         /**
          * Add a new source provider to the service.
-         * 
+         *
          * @param serviceName The provider service name (shapefile, coverage-sql, ...)
          * @param config The configuration Object to add to the specific provider file.
-         * @return 
+         * @return
          */
         public AcknowlegementType createProvider(final String serviceName, final ParameterValueGroup config) {
             ArgumentChecks.ensureNonNull("service name", serviceName);
@@ -744,6 +799,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
                     if ("Success".equals(ack.getStatus())) {
+                        fireProviderCreated(serviceName, config);
                         return null;
                     } else {
                         return ack;
@@ -760,9 +816,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Get the source provider configuration.
-         * 
+         *
          * @param id The identifier of the source
-         * @return 
+         * @return
          */
         public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
             try {
@@ -781,9 +837,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Remove a source provider in the service.
-         * 
+         *
          * @param id The identifier of the source
-         * @return 
+         * @return
          */
         public boolean deleteProvider(final String id) {
             try {
@@ -792,6 +848,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
                     if ("Success".equals(ack.getStatus())) {
+                        fireProviderDeleted(id);
                         return true;
                     } else {
                         LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
@@ -807,11 +864,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Modify a source provider in the service.
-         * 
+         *
          * @param serviceName The provider type (shapefile, coverage-sql, ...)
          * @param id The identifier of the source to update.
          * @param config The configuration Object to modify on the specific provider file.
-         * @return 
+         * @return
          */
         public boolean updateProvider(final String serviceName, final String id, final ParameterValueGroup config) {
             try {
@@ -820,6 +877,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
                     if ("Success".equals(ack.getStatus())) {
+                        fireProviderUpdated(serviceName, id, config);
                         return true;
                     } else {
                         LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
@@ -835,9 +893,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Reload a source provider in the service.
-         * 
+         *
          * @param id The identifier of the source
-         * @return 
+         * @return
          */
         public boolean restartProvider(final String id){
             try {
@@ -858,15 +916,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
-        
+
+
         // LAYER PROVIDERS ACTIONS /////////////////////////////////////////////
-        
+
         /**
          *Add a new layer to a source provider in the service.
-         * 
+         *
          * @param id The identifier of the provider
-         * @return 
+         * @return
          */
         public boolean createLayer(final String id, final ParameterValueGroup config) {
             ArgumentChecks.ensureNonNull("id", id);
@@ -892,9 +950,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Remove a source provider in the service.
-         * 
+         *
          * @param id The identifier of the provider
-         * @return 
+         * @return
          */
         public boolean deleteLayer(final String id, final String layerName) {
             try {
@@ -918,9 +976,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          *Add a new layer to a source provider in the service.
-         * 
+         *
          * @param id The identifier of the provider
-         * @return 
+         * @return
          */
         public boolean updateLayer(final String id, final String layerName, final ParameterValueGroup layer) {
             try {
@@ -943,15 +1001,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
 
         // STYLE PROVIDERS ACTIONS /////////////////////////////////////////////
-        
+
         public MutableStyle downloadStyle(final String id, final String styleName){
             ArgumentChecks.ensureNonNull("id", id);
             ArgumentChecks.ensureNonNull("styleName", styleName);
-            
+
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_DOWNLOAD_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, null, null, XMLUtilities.getJaxbContext110(), false);
-                
+
                 if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 } else {
@@ -967,9 +1025,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return null;
         }
-        
+
         /**
-         * 
+         *
          * @param id
          * @param style : SLD or other
          * @return null if successful, AcknowlegementType if failed
@@ -996,9 +1054,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         /**
-         * 
+         *
          * @param id : provider id
          * @param styleName : style id
          * @return true if successful
@@ -1006,7 +1064,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean deleteStyle(final String id, final String styleName){
             ArgumentChecks.ensureNonNull("id", id);
             ArgumentChecks.ensureNonNull("styleName", styleName);
-            
+
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_DELETE_STYLE+"&id=" + id + "&styleName=" + styleName;
                 Object response = sendRequest(url, null);
@@ -1025,14 +1083,14 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         /**
          * Update a style
-         * 
+         *
          * @param id The identifier of the provider
          * @param styleName The identifier of the style
          * @param style The new style definition
-         * @return 
+         * @return
          */
         public boolean updateStyle(final String id, final String styleName, final Object style) {
             ArgumentChecks.ensureNonNull("id", id);
@@ -1056,12 +1114,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         /**
          * Get the provider service configuration description.
-         * 
+         *
          * @param id The identifier of the service
-         * @return 
+         * @return
          */
         public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) {
             try {
@@ -1079,12 +1137,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return null;
         }
-        
+
         /**
          * Get the provider service source configuration description.
-         * 
+         *
          * @param id The identifier of the service
-         * @return 
+         * @return
          */
         public GeneralParameterDescriptor getSourceDescriptor(final String serviceName) {
             try {
@@ -1123,12 +1181,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
 
     }
-    
+
     /**
      * Configuration methods for task scheduler.
      */
     public final class Tasks{
-        
+
         /**
          * Ask for a list of all available process.
          */
@@ -1150,7 +1208,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return null;
         }
-        
+
         /**
          * Ask for a list of all tasks.
          */
@@ -1172,7 +1230,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return null;
         }
-        
+
         /**
          * Get the parameters description for the given process.
          */
@@ -1192,11 +1250,11 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return null;
         }
-        
+
         /**
          * Get the parameters for the given task
          * @param id
-         * @return 
+         * @return
          */
         public GeneralParameterValue getTaskParameters(final String id, ParameterDescriptorGroup desc){
             try {
@@ -1214,18 +1272,18 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return null;
         }
-        
+
         /**
          * Create a new task.
-         * 
+         *
          * @param authority
          * @param code
          * @param title
          * @param step
          * @param parameters
-         * @return 
+         * @return
          */
-        public boolean createTask(final String authority, final String code, final String id, 
+        public boolean createTask(final String authority, final String code, final String id,
                 final String title, final int step, final GeneralParameterValue parameters){
             ArgumentChecks.ensureNonNull("authority", authority);
             ArgumentChecks.ensureNonNull("code", code);
@@ -1235,7 +1293,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("parameters", parameters);
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_CREATE_TASK
-                        +"&authority=" + authority 
+                        +"&authority=" + authority
                         +"&code=" + code
                         +"&id=" + id
                         +"&title=" + URLEncoder.encode(title, "UTF-8")
@@ -1256,19 +1314,19 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
-        
+
+
         /**
          * Update a task.
-         * 
+         *
          * @param authority
          * @param code
          * @param title
          * @param step
          * @param parameters
-         * @return 
+         * @return
          */
-        public boolean updateTask(final String authority, final String code, final String id, 
+        public boolean updateTask(final String authority, final String code, final String id,
                 final String title, final int step, final GeneralParameterValue parameters){
             ArgumentChecks.ensureNonNull("authority", authority);
             ArgumentChecks.ensureNonNull("code", code);
@@ -1278,10 +1336,10 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("parameters", parameters);
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_UPDATE_TASK
-                        +"&authority=" + authority 
+                        +"&authority=" + authority
                         +"&code=" + code
                         +"&id=" + id
-                        +"&title=" + title 
+                        +"&title=" + title
                         +"&step=" + step;
                 final Object response = sendRequest(url, parameters);
                 if (response instanceof AcknowlegementType) {
@@ -1299,9 +1357,9 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
-        
-        
+
+
+
         /**
          * Delete an existing task.
          */
@@ -1325,14 +1383,14 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
     }
-    
+
     /**
      * Configuration methods for csw
      */
     public class Csws {
-        
+
         public boolean refreshIndex(final String id, final boolean asynchrone) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
@@ -1352,7 +1410,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-    
+
         public boolean importFile(final String id, final File importFile, final String fileName) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id + "&filename=" + fileName;
@@ -1372,7 +1430,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         public boolean metadataExist(final String id, final String metadataName) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_METADATA_EXIST + "&id=" + id + "&metadata=" + metadataName;
@@ -1394,7 +1452,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         public boolean deleteMetadata(final String id, final String metadataName) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_RECORDS + "&id=" + id + "&metadata=" + metadataName;
@@ -1414,7 +1472,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             }
             return false;
         }
-        
+
         public Collection<String> getAvailableDataSourceType() {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_AVAILABLE_SOURCE_TYPE;
@@ -1431,14 +1489,14 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return new ArrayList<String>();
         }
     }
-    
-    
+
+
     // convinient methods //////////////////////////////////////////////////////
-    
+
     protected Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
          return sendRequest(sourceURL, request, null, null, false);
     }
-    
+
     /**
      * Send a request to another service.
      *
@@ -1451,7 +1509,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      * @throws java.io.IOException
      * @throws org.constellation.coverage.web.CstlServiceException
      */
-    protected Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor, 
+    protected Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor,
             MarshallerPool unmarshallerPool, boolean put) throws MalformedURLException, IOException {
 
         final URL source = new URL(sourceURL);
@@ -1488,7 +1546,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 } else if (request instanceof org.opengis.sld.StyledLayerDescriptor) {
                     final XMLUtilities util = new XMLUtilities();
                     try {
-                        util.writeSLD(conec.getOutputStream(), 
+                        util.writeSLD(conec.getOutputStream(),
                                 (org.opengis.sld.StyledLayerDescriptor)request, StyledLayerDescriptor.V_1_1_0);
                     } catch (JAXBException ex) {
                         LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
@@ -1521,21 +1579,21 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                     }
                 }
             }
-            
+
             if(unmarshallerPool == null){
                 //use default pool
                 unmarshallerPool = POOL;
             }
-            
+
             readSessionId(conec);
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = unmarshallerPool.acquireUnmarshaller();
-                final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());  
+                final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());
                 response = unmarshaller.unmarshal(responseStream);
                 if (response instanceof JAXBElement) {
                     JAXBElement element = (JAXBElement) response;
-                    if (element.getName().equals(ObjectFactory.SOURCE_QNAME) 
+                    if (element.getName().equals(ObjectFactory.SOURCE_QNAME)
                      || element.getName().equals(ObjectFactory.LAYER_QNAME)
                      || element.getName().equals(ObjectFactory.INPUT_QNAME)) {
                         final ParameterValueReader reader = new ParameterValueReader(descriptor);
@@ -1562,7 +1620,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
         return response;
     }
-    
+
     /**
      * Send a request to another service.
      *
@@ -1584,7 +1642,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         applySessionId(conec);
 
         try {
-            
+
             // for a POST request
             if (request != null) {
 
@@ -1601,16 +1659,16 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                         POOL.release(marshaller);
                     }
                 }
-                
+
             }
             try {
                 readSessionId(conec);
                 final ParameterDescriptorReader reader = new ParameterDescriptorReader();
-                final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());  
+                final InputStream responseStream = AbstractRequest.openRichException(conec, getClientSecurity());
                 reader.setInput(responseStream);
                 reader.read();
                 response = reader.getDescriptorsRoot();
-                
+
             } catch (ClassNotFoundException ex) {
                 LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to read response document.\ncause: {0}", ex.getMessage());
             } catch (XMLStreamException ex) {
