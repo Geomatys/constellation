@@ -837,7 +837,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     /**
      * Return the value of a point in a map.
      *
-     * @param gfi The {@linkplain GetFeatureInfo get feature info} request.
+     * @param getFI The {@linkplain GetFeatureInfo get feature info} request.
      * @return text, HTML , XML or GML code.
      *
      * @throws CstlServiceException

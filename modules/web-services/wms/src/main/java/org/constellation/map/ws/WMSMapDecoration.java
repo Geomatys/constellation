@@ -243,6 +243,11 @@ public final class WMSMapDecoration {
     public Hints getHints() {
         getExtension();
         //return a copy to avoid modifications
+
+        if(!hints.containsKey(RenderingHints.KEY_ANTIALIASING)){
+            hints.put(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        }
+
         return new Hints(hints);
     }
 
@@ -312,6 +317,9 @@ public final class WMSMapDecoration {
 
 
     private PortrayalExtension read(final File configFile) throws ParserConfigurationException, SAXException, IOException{
+
+        //set antialiasing to true by default
+        hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         if(!configFile.exists()){
             return null;
