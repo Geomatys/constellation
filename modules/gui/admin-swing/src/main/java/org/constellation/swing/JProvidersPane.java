@@ -98,15 +98,17 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
         //list all providers
         guiAll.addActionListener(this);
         final ProvidersReport providersReport = cstl.providers.listProviders();
-        final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
-        Collections.sort(servicesReport,SERVICE_COMPARATOR);
-        for (final ProviderServiceReport serviceReport : servicesReport) {
-            //add a button for each type
-            final JToggleButton btn = new JToggleButton(serviceReport.getType());
-            btn.setActionCommand(serviceReport.getType());
-            btn.addActionListener(this);
-            guiTypeGroup.add(btn);
-            guiToolBar.add(btn);
+        if (providersReport != null) {
+            final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
+            Collections.sort(servicesReport,SERVICE_COMPARATOR);
+            for (final ProviderServiceReport serviceReport : servicesReport) {
+                //add a button for each type
+                final JToggleButton btn = new JToggleButton(serviceReport.getType());
+                btn.setActionCommand(serviceReport.getType());
+                btn.addActionListener(this);
+                guiTypeGroup.add(btn);
+                guiToolBar.add(btn);
+            }
         }
         guiNew.setVisible(roleController == null || roleController.hasPermission(NEW_PROVIDER));
 
