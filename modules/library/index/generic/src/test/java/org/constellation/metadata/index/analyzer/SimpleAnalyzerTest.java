@@ -132,11 +132,11 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
 
-
         // ERROR: here the simple analyzer remove all the number and '_'
-        // the result is all the records instead of only 4 result
         expectedResult.add("40510_145_19930221211500");
+        // -----------------------------------------------------------//
         expectedResult.add("CTDF02");
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
 
         assertEquals(expectedResult, result);
 
@@ -233,6 +233,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("CTDF02");
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
 
         assertEquals(expectedResult, result);
     }
@@ -417,6 +418,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("CTDF02");
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
 
         assertEquals(expectedResult, result);
 
@@ -437,6 +439,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("CTDF02");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
@@ -463,6 +466,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("CTDF02");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
@@ -495,6 +499,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
 
         assertEquals(expectedResult, result);
     }
@@ -561,6 +566,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
 
         assertEquals(expectedResult, result);
     }
