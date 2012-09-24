@@ -14,30 +14,20 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.process.provider;
+package org.constellation.process;
+
+import org.constellation.process.service.AddLayerToMapServiceTest;
+import org.constellation.wfs.ws.DefaultWFSWorker;
 
 /**
- * Simple enum that contain all provider types.
- * @author Quentin Boileau (Geomatys).
+ *
+ * @author Quentin Boileau (Geomatys)
  */
-public enum ProviderType {
+public class AddLayerToWFSServiceTest extends AddLayerToMapServiceTest {
 
-    SHAPEFILE("shapefile"),
-    POSTGIS("postgis"),
-    COVERAGE_SQL("coverage-sql"),
-    DATA_STORE("data-store"),
-    SERVER_STORE("server-store"),
-    COVERAGE_STORE("coverage-store"),
-    COVERAGE_GROUP("coverages-group"),
-    SLD("sld");
-
-    private String providerType;
-    private ProviderType(final String providerType) {
-        this.providerType = providerType;
+    public AddLayerToWFSServiceTest() {
+        super("WFS", DefaultWFSWorker.class);
     }
-
-    public String getCode() {
-        return this.providerType;
-    }
-
+    
+    
 }

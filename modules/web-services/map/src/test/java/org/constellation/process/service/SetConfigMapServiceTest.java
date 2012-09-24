@@ -42,9 +42,9 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
     }
 
     @Test
-    public void testUpdateWMS() throws ProcessException, NoSuchIdentifierException {
+    public void testUpdate() throws ProcessException, NoSuchIdentifierException {
 
-        createInstance("updateInstance4");
+        createInstance("updateInstance4", null);
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigMapServiceDescriptor.NAME);
 
@@ -68,7 +68,7 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
     }
 
     @Test
-    public void testUpdateNoInstanceWMS() throws ProcessException, NoSuchIdentifierException {
+    public void testUpdateNoInstance() throws ProcessException, NoSuchIdentifierException {
 
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigMapServiceDescriptor.NAME);

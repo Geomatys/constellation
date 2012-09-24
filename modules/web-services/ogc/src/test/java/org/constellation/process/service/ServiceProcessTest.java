@@ -19,6 +19,7 @@ package org.constellation.process.service;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.LayerContext;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;

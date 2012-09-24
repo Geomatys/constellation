@@ -34,16 +34,19 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
         super(str, serviceName, workerClass);
     }
 
-
     /** {@inheritDoc} */
     @Override
-    protected void createInstance(final String identifier) {
+    protected void createInstance(String identifier) {
+        createCustomInstance(identifier, null);
+    }
+
+    protected void createInstance(final String identifier, LayerContext context) {
         final File wms = new File(configDirectory, serviceName);
         final File instance = new File(wms, identifier);
         instance.mkdir();
 
         final File configFile = new File(instance, "layerContext.xml");
-        final LayerContext configuration = new LayerContext();
+        final LayerContext configuration = context != null ? context : new LayerContext();
         Marshaller marshaller = null;
         try {
             marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
