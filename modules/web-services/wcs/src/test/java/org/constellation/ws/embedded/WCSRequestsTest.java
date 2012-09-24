@@ -158,6 +158,11 @@ public class WCSRequestsTest extends AbstractTestRequest {
         }
     }
 
+    @AfterClass
+    public static void shutDown() throws JAXBException {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+    }
+    
     /**
      * Ensure that a wrong value given in the request parameter for the WCS server
      * returned an error report for the user.

@@ -119,6 +119,7 @@ public class WFSCustomSQLTest extends AbstractTestRequest {
 
     @AfterClass
     public static void finish() {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

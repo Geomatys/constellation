@@ -190,6 +190,15 @@ public class WFSRequestTest extends AbstractTestRequest {
         LayerProviderProxy.getInstance().setConfigurator(config);
     }
 
+    @AfterClass
+    public static void finish() {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
+    }
+
     /**
      * Initializes the data directory in unzipping the jar containing the resources
      * into a temporary directory.
@@ -222,14 +231,6 @@ public class WFSRequestTest extends AbstractTestRequest {
         IOUtilities.unzip(in, outputDir);
         in.close();
         return outputDir;
-    }
-
-    @AfterClass
-    public static void finish() {
-        File f = new File("derby.log");
-        if (f.exists()) {
-            f.delete();
-        }
     }
 
     @Test

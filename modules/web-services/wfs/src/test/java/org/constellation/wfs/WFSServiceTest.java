@@ -121,6 +121,7 @@ public class WFSServiceTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         if (ds != null) {
             ds.shutdown();
         }

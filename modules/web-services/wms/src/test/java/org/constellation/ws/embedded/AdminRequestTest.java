@@ -32,10 +32,17 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceStatus;
 
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.configuration.Configurator;
+import org.constellation.provider.shapefile.ShapeFileProviderService;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import static org.constellation.provider.configuration.ProviderParameters.*;
 
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -50,10 +57,64 @@ public class AdminRequestTest extends AbstractTestRequest {
     public static void initPool() throws JAXBException {
         // Get the list of layers
         pool = GenericDatabaseMarshallerPool.getInstance();
+
+        final Configurator config = new Configurator() {
+            @Override
+            public ParameterValueGroup getConfiguration(String serviceName, ParameterDescriptorGroup desc) {
+
+                final ParameterValueGroup config = desc.createValue();
+
+                if("coverage-sql".equals(serviceName)){
+                    // Defines a PostGrid data provider
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+
+                }else if("shapefile".equals(serviceName)){
+                    try{
+                        final File outputDir = initDataDirectory();
+
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(ShapeFileProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("shapeSrc");
+                        srcconfig.parameter(ShapeFileProviderService.FOLDER_DESCRIPTOR.getName().getCode())
+                                .setValue(outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
+                        srcconfig.parameter(ShapeFileProviderService.NAMESPACE_DESCRIPTOR.getName().getCode())
+                                .setValue("http://www.opengis.net/gml");
+
+                        ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
+                        layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
+                        layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
+
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                    }
+                }
+                //empty configuration for others
+                return config;
+            }
+
+            @Override
+            public void saveConfiguration(String serviceName, ParameterValueGroup params) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
+
+        LayerProviderProxy.getInstance().setConfigurator(config);
     }
 
     @AfterClass
     public static void finish() {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

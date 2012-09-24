@@ -200,38 +200,9 @@ public class WMSRequestsTest extends AbstractTestRequest {
         }
     }
 
-    /**
-     * Initializes the data directory in unzipping the jar containing the resources
-     * into a temporary directory.
-     *
-     * @return The root output directory where the data are unzipped.
-     * @throws IOException
-     */
-    private static File initDataDirectory() throws IOException {
-        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
-        if (styleResource.indexOf('!') != -1) {
-            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
-        }
-        if (styleResource.startsWith("file:")) {
-            styleResource = styleResource.substring(5);
-        }
-        final File styleJar = new File(styleResource);
-        if (styleJar == null || !styleJar.exists()) {
-            throw new IOException("Unable to find the style folder: "+ styleJar);
-        }
-        if (styleJar.isDirectory()) {
-            return styleJar;
-        }
-        final InputStream in = new FileInputStream(styleJar);
-        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        final File outputDir = new File(tmpDir, "Constellation");
-        if (!outputDir.exists()) {
-            outputDir.mkdir();
-        }
-        IOUtilities.unzip(in, outputDir);
-        in.close();
-        return outputDir;
+    @AfterClass
+    public static void shutDown() throws JAXBException {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
     }
 
     /**

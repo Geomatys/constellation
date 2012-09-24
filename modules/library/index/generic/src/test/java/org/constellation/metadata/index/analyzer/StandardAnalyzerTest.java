@@ -341,6 +341,35 @@ public class StandardAnalyzerTest extends AbstractAnalyzerTest {
 
     }
 
+    /**
+     * Test simple lucene search.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void wildCharUnderscoreSearchTest() throws Exception {
+        Filter nullFilter   = null;
+        String resultReport = "";
+
+        /**
+         * Test 1 simple search: title = title1
+         */
+        SpatialQuery spatialQuery = new SpatialQuery("identifier:*MDWeb_FR_SY*", nullFilter, SerialChainFilter.AND);
+        Set<String> result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        logger.log(Level.FINER, " wildCharUnderscoreSearch 1:\n{0}", resultReport);
+
+        Set<String> expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
+
+        assertEquals(expectedResult, result);
+    }
+
+
      /**
      * Test simple lucene date search.
      *
