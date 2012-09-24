@@ -1112,7 +1112,6 @@ public class CSWworker extends AbstractWorker {
 
         for (String id : request.getId()) {
 
-            //we get the form ID and catalog code
             final String saved = id;
             id = executeIdentifierQuery(id);
             if (id == null) {
@@ -1126,7 +1125,7 @@ public class CSWworker extends AbstractWorker {
                 final Object o = mdReader.getMetadata(id, mode, set, null);
                 if (o != null) {
                     if (expectedType != null && !expectedType.isInstance(o)) {
-                        LOGGER.severe("The form " + id + " is not a " + expectedType.getSimpleName() + "object.");
+                        LOGGER.severe("The record " + id + " is not a " + expectedType.getSimpleName() + "object.");
                         continue;
                     }
                     if (mode == DUBLINCORE) {
@@ -1135,7 +1134,7 @@ public class CSWworker extends AbstractWorker {
                         otherRecords.add(o);
                     }
                 } else {
-                    LOGGER.log(Level.WARNING, "The form {0} has not be read is null.", id);
+                    LOGGER.log(Level.WARNING, "The record {0} has not be read is null.", id);
                 }
             } catch (MetadataIoException ex) {
                 CodeList exceptionCode = ex.getExceptionCode();
