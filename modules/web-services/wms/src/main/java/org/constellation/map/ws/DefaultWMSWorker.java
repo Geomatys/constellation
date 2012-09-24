@@ -443,11 +443,15 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 /*
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
+                 *
+                 *
+                 * do we have to use the same order as WMS 1.3.0 (SOUTH WEST NORTH EAST) ???
                  */
                 final org.geotoolkit.wms.xml.v111.BoundingBox outputBBox =
                     new org.geotoolkit.wms.xml.v111.BoundingBox("EPSG:4326",
                             inputGeoBox.getWestBoundLongitude(),
-                            inputGeoBox.getSouthBoundLatitude(), inputGeoBox.getEastBoundLongitude(),
+                            inputGeoBox.getSouthBoundLatitude(),
+                            inputGeoBox.getEastBoundLongitude(),
                             inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion);
 
                 // we build The Style part
@@ -487,10 +491,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                  */
                 final org.geotoolkit.wms.xml.v130.BoundingBox outputBBox =
                     new org.geotoolkit.wms.xml.v130.BoundingBox("EPSG:4326",
-                            inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getSouthBoundLatitude(),
-                            inputGeoBox.getEastBoundLongitude(),
-                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0,
+                            inputGeoBox.getWestBoundLongitude(),
+                            inputGeoBox.getNorthBoundLatitude(),
+                            inputGeoBox.getEastBoundLongitude(), 0.0, 0.0,
                             queryVersion);
 
                 // we build a Style Object
@@ -733,7 +737,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 } else {
                     ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
                 }
-                
+
                 final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
                 styles.add(wmsStyle);
             }
@@ -1300,7 +1304,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     private void applyLayerFilters(final MapContext context){
         final Map<Name,Layer> layersContext = getLayers();
-        
+
         for(MapLayer layer : context.layers()){
             if (layer instanceof FeatureMapLayer) {
                 final FeatureMapLayer fml = (FeatureMapLayer)layer;
@@ -1317,9 +1321,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             }
         }
-        
+
     }
-    
+
     /**
      * Overriden from AbstractWorker because the behaviour is different when the request updateSequence
      * is equal to the current.
