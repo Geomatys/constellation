@@ -62,7 +62,7 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         indexer.destroy();
         indexSearcher          = new LuceneIndexSearcher(configDirectory, "", new ClassicAnalyzer(Version.LUCENE_36), true);
         indexSearcher.setLogLevel(Level.FINER);
-        
+
     }
 
     @AfterClass
@@ -95,8 +95,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         SpatialQuery spatialQuery = new SpatialQuery("Title:\"90008411.ctd\"", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
@@ -110,13 +111,13 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
          /**
          * Test 2 simple search: indentifier != 40510_145_19930221211500
          */
-        resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc NOT identifier:\"40510_145_19930221211500\"", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
@@ -136,8 +137,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
@@ -145,7 +147,7 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_5p_19900609195600");
 
         assertEquals(expectedResult, result);
-        
+
         /**
          * Test 4 simple search: ID = World Geodetic System 84
          */
@@ -153,8 +155,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 4:\n{0}", resultReport);
 
@@ -172,8 +175,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 5:\n{0}", resultReport);
 
@@ -190,8 +194,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 6:\n{0}", resultReport);
 
@@ -211,8 +216,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 7:\n{0}", resultReport);
 
@@ -239,8 +245,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         SpatialQuery spatialQuery = new SpatialQuery("Title:90008411*", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
@@ -257,8 +264,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
@@ -274,8 +282,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         spatialQuery = new SpatialQuery("Title:*.ctd", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "wildCharSearch 3:\n{0}", resultReport);
 
@@ -294,8 +303,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
 
@@ -312,8 +322,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
 
@@ -344,8 +355,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
         SpatialQuery spatialQuery = new SpatialQuery("date:{20090125 30000101}", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
@@ -378,8 +390,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
@@ -403,8 +416,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
@@ -428,8 +442,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
@@ -453,8 +468,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
@@ -493,8 +509,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
@@ -519,8 +536,9 @@ public class ClassicAnalyzerTest extends AbstractAnalyzerTest {
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 

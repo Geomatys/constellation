@@ -254,6 +254,24 @@ public class MdwebIndexTest {
 
 
         assertEquals(expectedResult, result);
+
+        /**
+         * Test 6 simple search: identifier = 40510_145_19930221211500
+         */
+        spatialQuery = new SpatialQuery("identifier:\"40510_145_19930221211500\"", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
     }
 
     /**
@@ -501,6 +519,42 @@ public class MdwebIndexTest {
         expectedResult.add("42292_5p_19900609195600");
 
         //issues here it found
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 6 wildCharSearch: identifier LIKE 40510_145_*
+         */
+        spatialQuery = new SpatialQuery("identifier:40510_145_*", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "wildCharSearch 6:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("40510_145_19930221211500");
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 7 wildCharSearch: identifier LIKE *40510_145_*
+         */
+        spatialQuery = new SpatialQuery("identifier:*40510_145_*", nullFilter, SerialChainFilter.AND);
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        resultReport = "";
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "wildCharSearch 7:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("40510_145_19930221211500");
+
         assertEquals(expectedResult, result);
 
     }

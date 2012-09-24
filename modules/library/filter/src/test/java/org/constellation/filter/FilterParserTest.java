@@ -433,6 +433,33 @@ public class FilterParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "CreationDate:(200*0602)");
 
+        /**
+         * Test 3: a simple Filter PropertyIsLike on a identifier field
+         */
+        XMLrequest =
+                    "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
+	            "    <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">" +
+                    "        <ogc:PropertyName>identifier</ogc:PropertyName>"                   +
+		    "        <ogc:Literal>*chain_acq_1*</ogc:Literal>"                                    +
+		    "    </ogc:PropertyIsLike>"                                                  +
+                    "</ogc:Filter>";
+
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "identifier:(*chain_acq_1*)");
+
         pool.release(filterUnmarshaller);
     }
 

@@ -51,7 +51,7 @@ import static org.junit.Assert.*;
 public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
 
     private static File configDirectory = new File("SimpleAnalyzerTest");
-    
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         FileUtilities.deleteDirectory(configDirectory);
@@ -68,11 +68,11 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         indexSearcher.destroy();
     }
 
-    
+
 
     @Before
     public void setUp() throws Exception {
-        
+
     }
 
     @After
@@ -95,8 +95,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         SpatialQuery spatialQuery = new SpatialQuery("Title:\"90008411.ctd\"", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SimpleSearch 1:\n{0}", resultReport);
 
@@ -115,13 +116,13 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
          /**
          * Test 2 simple search: indentifier != 40510_145_19930221211500
          */
-        resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc NOT identifier:\"40510_145_19930221211500\"", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SimpleSearch 2:\n{0}", resultReport);
 
@@ -136,7 +137,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         // the result is all the records instead of only 4 result
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("CTDF02");
-        
+
         assertEquals(expectedResult, result);
 
         /**
@@ -146,8 +147,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 3:\n{0}", resultReport);
 
@@ -163,8 +165,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 4:\n{0}", resultReport);
 
@@ -182,8 +185,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 5:\n{0}", resultReport);
 
@@ -199,8 +203,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 6:\n{0}", resultReport);
 
@@ -220,8 +225,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "simpleSearch 7:\n{0}", resultReport);
 
@@ -247,8 +253,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         SpatialQuery spatialQuery = new SpatialQuery("Title:*0008411.ctd", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "wildCharSearch 1:\n{0}", resultReport);
 
@@ -267,8 +274,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "wildCharSearch 2:\n{0}", resultReport);
 
@@ -284,8 +292,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         spatialQuery = new SpatialQuery("Title:*.ctd", nullFilter, SerialChainFilter.AND);
         result       = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "WilCharSearch 3:\n{0}", resultReport);
 
@@ -297,7 +306,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
 
         // ERROR: it didn't find any result (why???)
         expectedResult = new LinkedHashSet<String>();
-        
+
         assertEquals(expectedResult, result);
 
 
@@ -308,8 +317,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "wildCharSearch 4:\n{0}", resultReport);
 
@@ -325,8 +335,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         result = indexSearcher.doSearch(spatialQuery);
 
         resultReport = "";
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "wildCharSearch 5:\n{0}", resultReport);
 
@@ -356,8 +367,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         SpatialQuery spatialQuery = new SpatialQuery("date:{20090125 30000101}", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "DateSearch 1:\n{0}", resultReport);
 
@@ -392,8 +404,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
 
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SortedSearch 1:\n{0}", resultReport);
 
@@ -417,8 +430,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
@@ -442,8 +456,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SortedSearch 3:\n{0}", resultReport);
 
@@ -467,8 +482,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
@@ -507,8 +523,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
 
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "spatialSearch 1:\n{0}", resultReport);
 
@@ -516,7 +533,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
-        
+
         assertEquals(expectedResult, result);
 
         /**
@@ -526,7 +543,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         List<Filter> lf = new ArrayList<Filter>();
         //sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
         sf           = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
-        
+
         lf.add(sf);
         int[] op = {SerialChainFilter.NOT};
         SerialChainFilter f = new SerialChainFilter(lf, op);
@@ -534,8 +551,9 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
 
         result = indexSearcher.doSearch(spatialQuery);
 
-        for (String s: result)
+        for (String s: result) {
             resultReport = resultReport + s + '\n';
+        }
 
         logger.log(Level.FINER, "spatialSearch 2:\n{0}", resultReport);
 
@@ -573,11 +591,11 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         logger.log(Level.FINER, "identifier query 2:\n{0}", result);
 
         expectedResult = "CTDF02";
-        
+
         assertEquals(expectedResult, result);
     }
-    
 
-    
+
+
 
 }
