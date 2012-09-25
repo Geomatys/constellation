@@ -703,20 +703,27 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     }
 
     /**
+     * find recursively the files names used as record identifier.
      *
+     * @param directory
+     * @param parentIdentifierPrefix
+     * @return
+     * @throws MetadataIoException
      */
-    public List<String> getAllIdentifiers(final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
+    private List<String> getAllIdentifiers(final File directory, final String parentIdentifierPrefix) throws MetadataIoException {
         final String identifierPrefix = conputeIdentifierPrefix(directory, parentIdentifierPrefix);
         final List<String> results = new ArrayList<String>();
-        for (File f : directory.listFiles()) {
-            final String fileName = f.getName();
-            if (fileName.endsWith(CURRENT_EXT)) {
-                results.add(computeIdentifier(fileName, identifierPrefix));
-            } else if (f.isDirectory()){
-                results.addAll(getAllIdentifiers(f, identifierPrefix));
-            } else {
-                //do not throw exception just skipping
-                //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
+        if (directory != null && directory.exists()) {
+            for (File f : directory.listFiles()) {
+                final String fileName = f.getName();
+                if (fileName.endsWith(CURRENT_EXT)) {
+                    results.add(computeIdentifier(fileName, identifierPrefix));
+                } else if (f.isDirectory()){
+                    results.addAll(getAllIdentifiers(f, identifierPrefix));
+                } else {
+                    //do not throw exception just skipping
+                    //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with " + CURRENT_EXT + " or is not a directory", INVALID_PARAMETER_VALUE);
+                }
             }
         }
         return results;
