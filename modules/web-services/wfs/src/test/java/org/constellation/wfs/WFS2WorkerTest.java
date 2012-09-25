@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -45,6 +46,7 @@ import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.test.CstlDOMComparator;
+import org.constellation.util.QNameComparator;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 
@@ -162,6 +164,7 @@ public class WFS2WorkerTest {
         alltypes.add(new QName("http://www.opengis.net/sml/1.0","ProcessModel"));
         alltypes.add(new QName("http://www.opengis.net/sml/1.0","ProcessChain"));
         alltypes.add(new QName("http://www.opengis.net/gml/3.2","Ponds"));
+        Collections.sort(alltypes, new QNameComparator());
     }
 
     @BeforeClass

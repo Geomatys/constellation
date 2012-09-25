@@ -38,6 +38,7 @@ import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.util.NameComparator;
+import org.constellation.util.QNameComparator;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.wfs.ws.WFSConstants.*;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
@@ -226,6 +227,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
        }
        if (!found) {
            final List<QName> typeNames = Utils.getQNameListFromNameSet(getLayers().keySet());
+           Collections.sort(typeNames, new QNameComparator());
            final QueryType query = new QueryType(IDENTIFIER_FILTER, typeNames, "2.0.0");
            final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, typeNames);
            final ObjectFactory factory = new ObjectFactory();

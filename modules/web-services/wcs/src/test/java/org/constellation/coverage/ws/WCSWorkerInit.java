@@ -126,6 +126,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         FileUtilities.deleteDirectory(new File("WCSWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {

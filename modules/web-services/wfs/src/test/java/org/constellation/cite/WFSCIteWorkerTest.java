@@ -103,7 +103,8 @@ public class WFSCIteWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-          FileUtilities.deleteDirectory(new File("WFSCiteWorkerTest"));
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        FileUtilities.deleteDirectory(new File("WFSCiteWorkerTest"));
     }
 
     @Before
@@ -131,7 +132,7 @@ public class WFSCIteWorkerTest {
         points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(70.83, 29.86))));
         points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(68.87, 31.08))));
         points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(71.96, 32.19))));
-        
+
         EqualsType equals = new EqualsType("http://cite.opengeospatial.org/gmlsf:multiPointProperty", new MultiPointType("urn:x-ogc:def:crs:EPSG:4326", points));
         FilterType f = new FilterType(equals);
         queries.add(new QueryType(f, Arrays.asList(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature")), "1.1.0"));
@@ -151,7 +152,7 @@ public class WFSCIteWorkerTest {
 
         /**
          * Test 1 : query on typeName aggragateGeofeature
-         
+
 
         queries = new ArrayList<QueryType>();
         BBOXType bbox = new BBOXType("http://cite.opengeospatial.org/gmlsf:pointProperty", 30, -12, 60, -6, "urn:x-ogc:def:crs:EPSG:4326");
@@ -175,8 +176,8 @@ public class WFSCIteWorkerTest {
         assertEquals(1, collection.size());
         */
 
-        
-         
+
+
 
     }
 
@@ -223,7 +224,7 @@ public class WFSCIteWorkerTest {
 
     }
 
-    
+
 
     public String removeXmlns(String xml) {
 
