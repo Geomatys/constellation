@@ -41,8 +41,6 @@ import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
@@ -174,24 +172,10 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      * {@inheritDoc}
      */
     @Override
-    public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
-        try{
-            Envelope env = store.getEnvelope(QueryBuilder.all(name));
-            if(!CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), DefaultGeographicCRS.WGS84)){
-                env = CRS.transform(env, DefaultGeographicCRS.WGS84);
-            }
-
-            if(env != null){
-                return new DefaultGeographicBoundingBox(env);
-            }
-
-        }catch(Exception e){
-            LOGGER.log(Level.WARNING , "Could not evaluate the bounding box for the layer \"" +getName() +"\". " +
-                    "The selected one by defaut will be: " + DUMMY_BBOX, e);
-        }
-
-        return DUMMY_BBOX;
+    public Envelope getEnvelope() throws DataStoreException {
+        return store.getEnvelope(QueryBuilder.all(name));
     }
+    
 
     /**
      * {@inheritDoc}

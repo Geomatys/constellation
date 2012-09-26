@@ -163,28 +163,7 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
-        final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
-        if (generalGridGeom == null) {
-            LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
-            return null;
-        }
-        try {
-            final Envelope env = generalGridGeom.getEnvelope();
-            return new DefaultGeographicBoundingBox(env);
-        } catch (CancellationException ex) {
-            throw new DataStoreException(ex);
-        } catch (TransformException ex) {
-            throw new DataStoreException(ex);
-        }
-
-    }
-
-    /**
-     * Returns the netive envelope of this layer.
+     * Returns the native envelope of this layer.
      */
     @Override
     public Envelope getEnvelope() throws DataStoreException {

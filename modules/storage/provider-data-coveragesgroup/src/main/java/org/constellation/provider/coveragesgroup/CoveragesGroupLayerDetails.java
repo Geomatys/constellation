@@ -101,13 +101,11 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
     }
 
     @Override
-    public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
+    public Envelope getEnvelope() throws DataStoreException {
         try {
-            return new DefaultGeographicBoundingBox(ctxt.getBounds());
-        } catch (TransformException e) {
-            throw new DataStoreException(e);
-        } catch (IOException e) {
-            throw new DataStoreException(e);
+            return ctxt.getBounds();
+        } catch (IOException ex) {
+            throw new DataStoreException(ex);
         }
     }
 

@@ -35,10 +35,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
@@ -129,12 +131,18 @@ import org.geotoolkit.wms.xml.v130.AuthorityURL;
 import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
+import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 //Geoapi dependencies
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.style.Style;
@@ -175,6 +183,14 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         VISITOR_FACTORIES = factories.toArray(new WMSVisitorFactory[factories.size()]);
     }
 
+    /**
+     * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
+     */
+    private static final List<String> COMMONS_DIM = UnmodifiableArrayList.wrap(
+            "NORTH", "EAST", "SOUTH", "WEST", 
+            "UP", "DOWN",
+            "FUTURE", "PAST");
+    
 
     /**
      * Output responses of a GetCapabilities request.
@@ -413,6 +429,73 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 dimensions.add(dim);
             }
 
+            /*
+             * Create dimentions using CRS of the layer native envelope
+             */
+            Envelope nativeEnv;
+            try {
+                nativeEnv = layer.getEnvelope();
+            } catch (DataStoreException exception) {
+                throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
+            }
+            
+            if (nativeEnv != null) {
+                final CoordinateReferenceSystem crs = nativeEnv.getCoordinateReferenceSystem();
+                final CoordinateSystem cs = crs.getCoordinateSystem();
+
+                final int nbDim = cs.getDimension();
+
+                for (int i = 0; i < nbDim; i++) {
+                    final CoordinateSystemAxis axis = cs.getAxis(i);
+                    final AxisDirection direction = axis.getDirection();
+                    
+                    final String directionName = direction.name();
+                    if (!COMMONS_DIM.contains(directionName)) {
+                        final org.opengis.metadata.Identifier axisName = axis.getName();
+                        
+                        final Unit<?> u = axis.getUnit();
+                        final String unit = (u != null) ? u.toString() : null;
+                        String unitSymbol;
+                        try {
+                            unitSymbol = UnitFormat.getInstance().format(u);
+                        } catch (IllegalArgumentException e) {
+                            // Workaround for one more bug in javax.measure...
+                            unitSymbol = unit;
+                        }
+                        
+                        final LinkedList<String> valuesList = new LinkedList<String>();
+                        if (axis instanceof DiscreteCoordinateSystemAxis) {
+                            final DiscreteCoordinateSystemAxis direcretAxis = (DiscreteCoordinateSystemAxis) axis;
+                            final int nbOrdiante = direcretAxis.length();
+                            for (int j = 0; j < nbOrdiante; j++) {
+                                valuesList.add(direcretAxis.getOrdinateAt(j).toString());
+                            }
+                        }
+                        
+                        final StringBuilder values = new StringBuilder();
+                        int index = 0;
+                        for (final String val : valuesList) {
+                            values.append(val);
+                            if (index++ < valuesList.size()-1) {
+                                values.append(",");
+                            }
+                        }
+                        
+                        final String defaut = !valuesList.isEmpty() ? valuesList.getFirst() : null;
+                        final boolean multipleValues = (valuesList.size() > 1);
+                        
+                        dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+                            new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName.getCode(), unit, 
+                                unitSymbol, defaut, multipleValues, null, null) :
+                            new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName.getCode(), unit, 
+                                unitSymbol, defaut, multipleValues, null, null);
+                        
+                        dimensions.add(dim);
+                    }
+                }
+            }
+            
+            
             /*
              * LegendUrl generation
              * TODO: Use a StringBuilder or two

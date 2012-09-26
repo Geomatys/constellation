@@ -121,6 +121,11 @@ public interface LayerDetails {
      * @see Layer#getGeographicBoundingBox
      */
     GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException;
+    
+    /**
+     * Returns the native envelope of this layer.
+     */
+    Envelope getEnvelope() throws DataStoreException;
 
     /**
      * Returns the legend graphic representation for the layer.

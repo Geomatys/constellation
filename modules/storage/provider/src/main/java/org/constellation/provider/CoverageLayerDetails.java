@@ -47,5 +47,4 @@ public interface CoverageLayerDetails extends LayerDetails {
 
     SpatialMetadata getSpatialMetadata() throws DataStoreException;
 
-    Envelope getEnvelope() throws DataStoreException;
 }
