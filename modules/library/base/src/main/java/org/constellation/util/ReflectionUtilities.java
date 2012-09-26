@@ -125,11 +125,11 @@ public final class ReflectionUtilities {
         } catch (IllegalAccessException ex) {
             LOGGER.log(Level.WARNING, "Unable to access the constructor in class: {0}", classe.getName());
         } catch (IllegalArgumentException ex) {//TODO: this cannot possibly happen.
-            LOGGER.log(Level.WARNING, "Illegal Argument in empty constructor for class: {0}", classe.getName());
+            LOGGER.log(Level.WARNING, "Illegal Argument in constructor for class: {0}", classe.getName());
         } catch (InvocationTargetException ex) {
             LOGGER.log(Level.WARNING, "Invocation Target Exception in empty constructor for class: {0}", classe.getName());
         } catch (NoSuchMethodException ex) {
-            LOGGER.log(Level.WARNING, "There is no empty constructor for class: {0}", classe.getName());
+            LOGGER.log(Level.WARNING, "There is no such constructor for class: {0}", classe.getName());
         } catch (SecurityException ex) {
             LOGGER.log(Level.WARNING, "Security exception while instantiating class: {0}", classe.getName());
         }
@@ -191,8 +191,7 @@ public final class ReflectionUtilities {
      */
     public static Object newInstance(final Class<?> classe, final String parameter1, final String parameter2) {
         try {
-            if (classe == null)
-                return null;
+            if (classe == null) {return null;}
             final Constructor<?> constructor = classe.getConstructor(String.class, String.class);
 
             //we execute the constructor
@@ -227,8 +226,7 @@ public final class ReflectionUtilities {
      */
     public static Object newInstance(final Class<?> classe, final CharSequence parameter) {
         try {
-            if (classe == null)
-                return null;
+            if (classe == null) {return null;}
             final Constructor<?> constructor = classe.getConstructor(CharSequence.class);
 
             //we execute the constructor
@@ -320,8 +318,9 @@ public final class ReflectionUtilities {
 
         } catch (IllegalArgumentException ex) {
             String param = "null";
-            if (parameter != null)
+            if (parameter != null) {
                 param = parameter.getClass().getSimpleName();
+            }
             LOGGER.warning(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")" + '\n' +
                            "cause:" + ex.getMessage());
 
@@ -446,7 +445,7 @@ public final class ReflectionUtilities {
 
         Method getter = getGetterFromAnnotation(propertyName, rootClass);
 
-        if (getter != null) return getter;
+        if (getter != null) {return getter;}
 
         final String rootClassName = rootClass.getName();
         //special case and corrections TODO remove
@@ -720,10 +719,10 @@ public final class ReflectionUtilities {
                         final Object obj = getAttributeValue(subMeta, attributeName);
                         if (obj instanceof Collection) {
                             for (Object o : (Collection)obj) {
-                                if (o != null) tmp.add(o);
+                                if (o != null) {tmp.add(o);}
                             }
                         } else {
-                            if (obj != null) tmp.add(obj);
+                            if (obj != null) {tmp.add(obj);}
                         }
                     }
                     metadata = tmp;
@@ -745,7 +744,7 @@ public final class ReflectionUtilities {
      * @return True if the specified path starts with the type of the metadata
      */
     public static boolean pathMatchObjectType(Object metadata, String pathID) {
-        if (metadata == null) return false;
+        if (metadata == null) {return false;}
 
         return (pathID.startsWith("ISO 19115:MD_Metadata")         && "DefaultMetadata".equals(metadata.getClass().getSimpleName())) ||
                (pathID.startsWith("ISO 19115-2:MI_Metadata")       && "MI_Metadata".equals(metadata.getClass().getSimpleName())) ||
@@ -807,7 +806,7 @@ public final class ReflectionUtilities {
             int i = 0;
             while (t.hasNext()) {
                 result = t.next();
-                if (i == ordinal) return result;
+                if (i == ordinal) {return result;}
                 i++;
             }
 
@@ -859,16 +858,19 @@ public final class ReflectionUtilities {
                             final Object obj = ReflectionUtilities.getAttributeValue(subMeta, attributeName);
                             if (obj instanceof Collection) {
                                 for (Object o : (Collection)obj) {
-                                    if (o != null) tmp.add(o);
+                                    if (o != null) {tmp.add(o);}
                                 }
                             } else {
-                                if (obj != null) tmp.add(obj);
+                                if (obj != null) {tmp.add(obj);}
                             }
                         }
                     }
 
-                    if (tmp.size() == 1) metadata = tmp.get(0);
-                    else metadata = tmp;
+                    if (tmp.size() == 1) {
+                        metadata = tmp.get(0);
+                    } else {
+                        metadata = tmp;
+                    }
 
                 } else {
                     if (pathID.isEmpty()) {
