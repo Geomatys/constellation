@@ -64,14 +64,61 @@ public final class ReflectionUtilities {
      */
     public static Object newInstance(final Class<?> classe) {
         try {
-            if (classe == null)
+            if (classe == null) {
                 return null;
+            }
 
             final Constructor<?> constructor = classe.getDeclaredConstructor();
             constructor.setAccessible(true);
 
             //we execute the constructor
             return constructor.newInstance();
+
+        } catch (InstantiationException ex) {
+            LOGGER.log(Level.WARNING, "Unable to instantiate the class: {0}()", classe.getName());
+        } catch (IllegalAccessException ex) {
+            LOGGER.log(Level.WARNING, "Unable to access the constructor in class: {0}", classe.getName());
+        } catch (IllegalArgumentException ex) {//TODO: this cannot possibly happen.
+            LOGGER.log(Level.WARNING, "Illegal Argument in empty constructor for class: {0}", classe.getName());
+        } catch (InvocationTargetException ex) {
+            LOGGER.log(Level.WARNING, "Invocation Target Exception in empty constructor for class: {0}", classe.getName());
+        } catch (NoSuchMethodException ex) {
+            LOGGER.log(Level.WARNING, "There is no empty constructor for class: {0}", classe.getName());
+        } catch (SecurityException ex) {
+            LOGGER.log(Level.WARNING, "Security exception while instantiating class: {0}", classe.getName());
+        }
+        return null;
+    }
+
+    /**
+     * Call the empty constructor on the specified class and return the result,
+     * handling most errors which could be expected by logging the cause and
+     * returning {@code null}.
+     *
+     * @param classe An arbitrary class, expected to be instantiable with a
+     *                 {@code null} argument constructor.
+     * @return The instantiated instance of the given class, or {@code null}.
+     */
+    public static Object newInstance(final Class<?> classe, final Object... parameters) {
+        try {
+            if (classe == null) {
+                return null;
+            }
+
+            final Constructor<?> constructor;
+            if (parameters != null && parameters.length > 1) {
+                final Class[] parametersTypes = new Class[parameters.length];
+                for (int i = 0; i < parameters.length; i++) {
+                    parametersTypes[i] = parameters[i].getClass();
+                }
+                constructor = classe.getConstructor(parametersTypes);
+            } else {
+                constructor = classe.getConstructor();
+            }
+            constructor.setAccessible(true);
+
+            //we execute the constructor
+            return constructor.newInstance(parameters);
 
         } catch (InstantiationException ex) {
             LOGGER.log(Level.WARNING, "Unable to instantiate the class: {0}()", classe.getName());
@@ -102,8 +149,9 @@ public final class ReflectionUtilities {
      */
     public static Object newInstance(final Class<?> classe, final String parameter) {
         try {
-            if (classe == null)
+            if (classe == null) {
                 return null;
+            }
             final Constructor<?> constructor = classe.getConstructor(String.class);
 
             //we execute the constructor
@@ -151,7 +199,7 @@ public final class ReflectionUtilities {
             return constructor.newInstance(parameter1, parameter2);
 
         } catch (InstantiationException ex) {
-            LOGGER.log(Level.WARNING, "The service can''t instantiate the class: {0}(string, string)", classe.getName());
+            LOGGER.log(Level.WARNING, "The service can't instantiate the class: {0}(string, string)", classe.getName());
         } catch (IllegalAccessException ex) {
             LOGGER.log(Level.WARNING, "The service can not access the constructor in class: {0}", classe.getName());
         } catch (IllegalArgumentException ex) {
@@ -399,7 +447,7 @@ public final class ReflectionUtilities {
         Method getter = getGetterFromAnnotation(propertyName, rootClass);
 
         if (getter != null) return getter;
-        
+
         final String rootClassName = rootClass.getName();
         //special case and corrections TODO remove
         if ("beginPosition".equals(propertyName) && !"org.geotoolkit.gml.xml.v311.TimePeriodType".equals(rootClassName)) {
@@ -655,7 +703,7 @@ public final class ReflectionUtilities {
 
             //for each part of the path we execute a (many) getter
             while (!pathID.isEmpty()) {
-                
+
                 //we extract the current attributeName
                 String attributeName;
                 if (pathID.indexOf(':') != -1) {
@@ -870,13 +918,13 @@ public final class ReflectionUtilities {
 
         return result;
     }
-    
+
     /**
      * Return true if the specified class or on of its superClass is equals to the specified name.
-     * 
+     *
      * @param fullClassName
      * @param c
-     * @return 
+     * @return
      */
     public static boolean instanceOf(final String fullClassName, Class c) {
         if (c != null) {

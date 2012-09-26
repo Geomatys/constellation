@@ -46,6 +46,7 @@ import org.constellation.process.service.DeleteServiceDescriptor;
 import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.process.service.StartServiceDescriptor;
 import org.constellation.process.service.StopServiceDescriptor;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.security.SecurityManager;
@@ -214,7 +215,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     } catch (NoSuchIdentifierException ex) {
                         LOGGER.log(Level.SEVERE, "StartService process is unreachable.");
                     } catch (ProcessException ex) {
-                        LOGGER.log(Level.SEVERE, ex.getLocalizedMessage());
+                        LOGGER.log(Level.SEVERE, "Error while starting all instances", ex);
                     }
                 }
             }
@@ -247,27 +248,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
      * @return
      */
     private Worker createWorker(final File instanceDirectory) {
-        try {
-            final Class clazz = getWorkerClass();
-            final Constructor constructor = clazz.getConstructor(String.class, File.class);
-
-            Worker worker = (Worker) constructor.newInstance(instanceDirectory.getName(), instanceDirectory);
-            return worker;
-
-        } catch (InstantiationException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (NoSuchMethodException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }
-        return  null;
+        final Class clazz = getWorkerClass();
+        return (Worker) ReflectionUtilities.newInstance(clazz, instanceDirectory.getName(), instanceDirectory);
     }
 
     /**
@@ -655,8 +637,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
             }
 
         } catch (IOException ex) {
-            LOGGER.severe("IO exception while uploading file");
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            LOGGER.log(Level.SEVERE, "IO exception while uploading file", ex);
             launchException("error while uploading the file", NO_APPLICABLE_CODE.name(), null);
             // should never happen
             return null;
