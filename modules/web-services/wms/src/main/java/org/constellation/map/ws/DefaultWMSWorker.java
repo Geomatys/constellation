@@ -780,7 +780,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 dimension.width, dimension.height);
 
         String styleName = ms.getName();
-        if (!styleName.isEmpty() && styleName.startsWith("${")) {
+        if (styleName != null && !styleName.isEmpty() && styleName.startsWith("${")) {
             final DataReference dataRef = new DataReference(styleName);
             styleName = dataRef.getLayerId().getLocalPart();
         }
@@ -913,7 +913,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 dimension.width, dimension.height);
 
         String styleName = ms.getName();
-        if (!styleName.isEmpty() && styleName.startsWith("${")) {
+        if (styleName != null && !styleName.isEmpty() && styleName.startsWith("${")) {
             final DataReference dataRef = new DataReference(styleName);
             styleName = dataRef.getLayerId().getLocalPart();
         }
