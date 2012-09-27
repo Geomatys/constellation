@@ -47,14 +47,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
      */
     protected static GrizzlyThread grizzly = null;
 
-    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
-
-    /**
-     * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
-     * and defines a PostGrid data provider.
-     */
-    @BeforeClass
-    public static void initServer() {
+    public static void initServer(final String[] resourcePackages) {
         // Protective test in order not to launch a new instance of the grizzly server for
         // each sub classes.
         if (grizzly != null) {
@@ -65,7 +58,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
          * The implementation waits for the data provider to be defined for
          * starting the server.
          */
-        grizzly = new GrizzlyThread();
+        grizzly = new GrizzlyThread(resourcePackages);
 
         // Starting the grizzly server
         grizzly.start();
@@ -91,13 +84,13 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
      * Requests will be done on this working server.
      */
     protected static class GrizzlyThread extends Thread {
-        private final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{}, new String[] {
-            "org.constellation.map.ws.rs",
-            "org.constellation.configuration.ws.rs",
-            "org.constellation.ws.rs.provider"
-        });
+        private final CstlEmbeddedService cstlServer;
 
-        public int getCurrentPort() {
+        public GrizzlyThread(final String[] resourcePackages) {
+            cstlServer = new CstlEmbeddedService(new String[]{}, resourcePackages);
+        }
+
+        public Integer getCurrentPort() {
             return cstlServer.currentPort;
         }
 

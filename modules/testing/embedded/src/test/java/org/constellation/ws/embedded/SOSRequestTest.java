@@ -58,6 +58,7 @@ public class SOSRequestTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
+        initServer(null);
         // Get the list of layers
         pool = SOSMarshallerPool.getInstance();
     }

@@ -132,6 +132,12 @@ public class WMSRequestsTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
+        initServer(new String[] {
+            "org.constellation.map.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"
+        });
+
         pool = WMSMarshallerPool.getInstance();
 
         final Configurator config = new Configurator() {

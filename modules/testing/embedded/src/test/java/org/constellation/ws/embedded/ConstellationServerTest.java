@@ -33,6 +33,7 @@ public class ConstellationServerTest extends AbstractTestRequest {
 
     @BeforeClass
     public static void initPool() throws JAXBException {
+        initServer(null);
         // Get the list of layers
         pool = new MarshallerPool("org.constellation.configuration:"
                                 + "org.constellation.generic.database:"

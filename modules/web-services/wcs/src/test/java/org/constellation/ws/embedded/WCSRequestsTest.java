@@ -109,6 +109,12 @@ public class WCSRequestsTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initLayerList() throws JAXBException {
+        initServer(new String[] {
+            "org.constellation.coverage.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"
+        });
+
         pool = WCSMarshallerPool.getInstance();
 
         final Configurator config = new Configurator() {
@@ -162,7 +168,7 @@ public class WCSRequestsTest extends AbstractTestRequest {
     public static void shutDown() throws JAXBException {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
     }
-    
+
     /**
      * Ensure that a wrong value given in the request parameter for the WCS server
      * returned an error report for the user.

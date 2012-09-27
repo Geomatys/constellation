@@ -119,6 +119,11 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initLayerList() {
+        initServer(new String[] {
+            "org.constellation.map.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"
+        });
 
         final Configurator config = new Configurator() {
             @Override
@@ -177,6 +182,18 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
     }
 
     /**
+     * Free some resources.
+     */
+    @AfterClass
+    public static void finish() {
+        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        layers = null;
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
+    }
+    /**
      * Returns {@code true} if the {@code SST_tests} layer is found in the list of
      * available layers. It means the postgrid database, pointed by the postgrid.xml
      * file in the configuration directory, contains this layer and can then be requested
@@ -189,18 +206,6 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
             }
         }
         return false;
-    }
-
-    /**
-     * Free some resources.
-     */
-    @AfterClass
-    public static void finish() {
-        layers = null;
-        File f = new File("derby.log");
-        if (f.exists()) {
-            f.delete();
-        }
     }
 
     /**

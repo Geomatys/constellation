@@ -54,7 +54,14 @@ public class AdminRequestTest extends AbstractTestRequest {
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
-    public static void initPool() throws JAXBException {
+    public static void start() throws JAXBException {
+
+        initServer(new String[] {
+            "org.constellation.map.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"
+        });
+
         // Get the list of layers
         pool = GenericDatabaseMarshallerPool.getInstance();
 

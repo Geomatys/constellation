@@ -39,6 +39,10 @@ public class WPSRequestTest  extends AbstractTestRequest {
 
     @BeforeClass
     public static void initLayerList() throws JAXBException {
+        initServer(new String[] {
+            "org.constellation.wps.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"});
         pool = WPSMarshallerPool.getInstance();
     }
 

@@ -95,6 +95,10 @@ public class WFSRequestTest extends AbstractTestRequest {
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
+        initServer(new String[] {"org.constellation.wfs.ws.rs",
+            "org.constellation.configuration.ws.rs",
+            "org.constellation.ws.rs.provider"});
+        
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
         pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
