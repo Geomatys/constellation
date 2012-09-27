@@ -663,7 +663,7 @@ public class MdwebRecordIndexTest {
 
         //The records
         Date d = new Date(120);
-        User inputUser = new User("admin", "adminadmin", null, d, d);
+        User inputUser = new User("admin", null, d, d);
         writer.writeUser(inputUser);
 
         FullRecord f1 = new FullRecord(1, "2345-aa453-ade456", cat, "title1", inputUser, null, null, d, d, null, true, true, FullRecord.TYPE.NORMALRECORD);
