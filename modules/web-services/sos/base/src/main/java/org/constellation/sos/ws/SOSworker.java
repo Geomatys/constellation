@@ -1070,9 +1070,10 @@ public class SOSworker extends AbstractWorker {
                 //verify that the station is registred in the DB.
                 final Collection<String> fois = omReader.getFeatureOfInterestNames();
                 for (final String samplingFeatureName : foiRequest.getObjectID()) {
-                    if (!fois.contains(samplingFeatureName))
+                    if (!fois.contains(samplingFeatureName)) {
                         throw new CstlServiceException("the feature of interest "+ samplingFeatureName + " is not registered",
                                                          INVALID_PARAMETER_VALUE, "featureOfInterest");
+                    }
                 }
                 localOmFilter.setFeatureOfInterest(foiRequest.getObjectID());
 
@@ -1090,9 +1091,10 @@ public class SOSworker extends AbstractWorker {
                         } else {
                             for (ReferenceType refStation : off.getFeatureOfInterest()) {
                                 final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
-                                if (station == null)
+                                if (station == null) {
                                     throw new CstlServiceException("the feature of interest is not registered",
                                             INVALID_PARAMETER_VALUE);
+                                }
                                 if (station instanceof SamplingPointType) {
                                     final SamplingPointType sp = (SamplingPointType) station;
                                     if (samplingPointMatchEnvelope(sp, e)) {
@@ -1770,8 +1772,9 @@ public class SOSworker extends AbstractWorker {
                 process = (AbstractSensorML) d.getAny();
             } else {
                 String type = "null";
-                if (d != null && d.getAny() != null)
+                if (d != null && d.getAny() != null) {
                     type = d.getAny().getClass().getName();
+                }
                 throw new CstlServiceException("unexpected type for process: " + type , INVALID_PARAMETER_VALUE, "sensorDescription");
             }
 
@@ -1850,7 +1853,7 @@ public class SOSworker extends AbstractWorker {
         } finally {
             if (!success) {
                smlWriter.abortTransaction();
-               LOGGER.severe("Transaction failed");
+               LOGGER.warning("Transaction failed");
             } else {
                 smlWriter.endTransaction();
             }
@@ -2128,7 +2131,9 @@ public class SOSworker extends AbstractWorker {
         while (notFound) {
             if (templates.containsKey(templateName + '-' + i)) {
                 i++;
-            } else notFound = false;
+            } else {
+                notFound = false;
+            }
         }
         return i;
     }
@@ -2343,14 +2348,10 @@ public class SOSworker extends AbstractWorker {
      */
     @Override
     public void destroy() {
-        if (smlReader != null)
-            smlReader.destroy();
-        if (smlWriter != null)
-            smlWriter.destroy();
-        if (omReader != null)
-            omReader.destroy();
-        if (omWriter != null)
-            omWriter.destroy();
+        if (smlReader != null) {smlReader.destroy();}
+        if (smlWriter != null) {smlWriter.destroy();}
+        if (omReader != null)  {omReader.destroy();}
+        if (omWriter != null)  {omWriter.destroy();}
         for (Timer t : schreduledTask) {
             t.cancel();
         }

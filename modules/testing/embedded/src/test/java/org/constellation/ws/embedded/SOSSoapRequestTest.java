@@ -36,7 +36,7 @@ import static org.junit.Assume.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class SOSSoapRequestTest extends AbstractTestSoapRequest {
+public class SOSSoapRequestTest extends AbstractGrizzlyServer {
 
     private static final String SOS_DEFAULT = "http://localhost:9191/sos/default?";
 
@@ -67,7 +67,7 @@ public class SOSSoapRequestTest extends AbstractTestSoapRequest {
         }
 
         URLConnection conec = getCapsUrl.openConnection();
-        postRequestFile(conec, "org/constellation/xml/sos/GetCapabilitiesSOAP.xml");
+        postRequestFile(conec, "org/constellation/xml/sos/GetCapabilitiesSOAP.xml", "application/soap+xml");
 
         String result    = getStringResponse(conec);
         String expResult = getStringFromFile("org/constellation/xml/sos/GetCapabilitiesResponseSOAP.xml");
@@ -85,7 +85,7 @@ public class SOSSoapRequestTest extends AbstractTestSoapRequest {
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
-        postRequestFile(conec, "org/constellation/xml/sos/GetFeatureOfInterestSOAP.xml");
+        postRequestFile(conec, "org/constellation/xml/sos/GetFeatureOfInterestSOAP.xml", "application/soap+xml");
 
         String result    = getStringResponse(conec);
         String expResult = getStringFromFile("org/constellation/xml/sos/GetFeatureOfInterestResponseSOAP.xml");
@@ -99,7 +99,7 @@ public class SOSSoapRequestTest extends AbstractTestSoapRequest {
 
         conec = getCapsUrl.openConnection();
 
-        postRequestFile(conec, "org/constellation/xml/sos/GetFeatureOfInterestSOAP2.xml");
+        postRequestFile(conec, "org/constellation/xml/sos/GetFeatureOfInterestSOAP2.xml", "application/soap+xml");
 
         result    = getStringResponse(conec);
         expResult = getStringFromFile("org/constellation/xml/sos/GetFeatureOfInterestResponseSOAP2.xml");

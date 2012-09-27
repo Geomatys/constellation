@@ -48,7 +48,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class AdminRequestTest extends AbstractTestRequest {
+public class AdminRequestTest extends AbstractGrizzlyServer {
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.

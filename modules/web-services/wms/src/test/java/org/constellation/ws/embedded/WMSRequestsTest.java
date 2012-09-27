@@ -73,7 +73,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WMSRequestsTest extends AbstractTestRequest {
+public class WMSRequestsTest extends AbstractGrizzlyServer {
 
     /**
      * The layer to test.

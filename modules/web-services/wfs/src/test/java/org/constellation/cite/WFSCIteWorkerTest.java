@@ -223,21 +223,4 @@ public class WFSCIteWorkerTest {
         LayerProviderProxy.getInstance().setConfigurator(config);
 
     }
-
-
-
-    public String removeXmlns(String xml) {
-
-        String s = xml;
-        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
-
-        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
-
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
-
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
-
-
-        return s;
-    }
 }

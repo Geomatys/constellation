@@ -49,7 +49,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class WFSCustomSQLTest extends AbstractTestRequest {
+public class WFSCustomSQLTest extends AbstractGrizzlyServer {
 
      private static final String WFS_DESCRIBE_FEATURE_TYPE_URL =
                "request=DescribeFeatureType"

@@ -24,6 +24,7 @@ import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.wps.ws.soap.WPSService;
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -34,7 +35,7 @@ import static org.junit.Assume.*;
  * @author Guilhem Legal (Geomatys)
  * @since 0.9
  */
-public class WPSRequestTest  extends AbstractTestRequest {
+public class WPSRequestTest  extends AbstractGrizzlyServer {
 
     private static final String WPS_GETCAPABILITIES ="request=GetCapabilities&service=WPS&version=1.0.0";
 

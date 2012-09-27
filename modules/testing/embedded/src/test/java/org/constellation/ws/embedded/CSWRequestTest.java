@@ -47,7 +47,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class CSWRequestTest extends AbstractTestRequest {
+public class CSWRequestTest extends AbstractGrizzlyServer {
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.

@@ -30,6 +30,7 @@ import javax.xml.bind.Unmarshaller;
 
 //Junit dependencies
 import org.constellation.configuration.SOSConfiguration;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -70,7 +71,7 @@ public class GenericConfigurationXMLBindingTest {
     public void genericMarshalingTest() throws Exception {
 
         BDD bdd = new BDD("org.driver.test", "http://somehost/blablabla", "bobby", "juanito");
-        
+
         HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put("staticVar01", "something");
         parameters.put("staticVar02", "blavl, bloub");
@@ -80,7 +81,7 @@ public class GenericConfigurationXMLBindingTest {
         Query mquery = new Query("multiQuery1", new Select(Arrays.asList(new Column("var02", "pp.name"), new Column("var03", "tr.id"))),
                                                 new From("physical_parameter pp, transduction tr"),
                                                 new Where("tr.parameter=pp.id"));
-        
+
         Query mainQuery = new Query("mainQuery", new Select("varx", "p.main"), new From("physical_test pt"));
 
         Orderby order = new Orderby();
@@ -96,7 +97,7 @@ public class GenericConfigurationXMLBindingTest {
         StringWriter sw = new StringWriter();
         marshaller.marshal(config, sw);
 
-        String result =  removeXmlns(sw.toString());
+        String result =  StringUtilities.removeXmlns(sw.toString());
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                + '\n' +
         "<automatic format=\"MDWEB\" >"                                                + '\n' +
@@ -178,11 +179,11 @@ public class GenericConfigurationXMLBindingTest {
         Automatic config2 = new Automatic("MDWEB", bdd, null);
         config2.setName("coriolis");
         sosConfig.getExtensions().add(config2);
-        
+
         StringWriter sw = new StringWriter();
         marshaller.marshal(sosConfig, sw);
 
-        String result =  removeXmlns(sw.toString());
+        String result =  StringUtilities.removeXmlns(sw.toString());
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
         "<ns2:SOSConfiguration >"                                                  + '\n' +
@@ -192,7 +193,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
-        "            <sharedConnection>false</sharedConnection>"                   + '\n' +                
+        "            <sharedConnection>false</sharedConnection>"                   + '\n' +
         "        </bdd>"                                                           + '\n' +
         "        <customparameters/>"                                              + '\n' +
         "    </ns2:SMLConfiguration>"                                              + '\n' +
@@ -202,7 +203,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
-        "            <sharedConnection>false</sharedConnection>"                   + '\n' +                         
+        "            <sharedConnection>false</sharedConnection>"                   + '\n' +
         "        </bdd>"                                                           + '\n' +
         "        <customparameters/>"                                              + '\n' +
         "    </ns2:OMConfiguration>"                                               + '\n' +
@@ -212,7 +213,7 @@ public class GenericConfigurationXMLBindingTest {
         "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
-        "            <sharedConnection>false</sharedConnection>"                   + '\n' +                        
+        "            <sharedConnection>false</sharedConnection>"                   + '\n' +
         "        </bdd>"                                                           + '\n' +
         "        <customparameters/>"                                              + '\n' +
         "    </ns2:extensions>"                                                    + '\n' +
@@ -224,7 +225,7 @@ public class GenericConfigurationXMLBindingTest {
         "</ns2:SOSConfiguration>" + '\n';
 
         assertEquals(expResult, result);
-    
+
     }
 
     /**
@@ -243,7 +244,7 @@ public class GenericConfigurationXMLBindingTest {
         "        <connectURL>http://somehost/blablabla</connectURL>"                   + '\n' +
         "        <user>bobby</user>"                                                   + '\n' +
         "        <password>juanito</password>"                                         + '\n' +
-        "         <sharedConnection>false</sharedConnection>"                          + '\n' +                
+        "         <sharedConnection>false</sharedConnection>"                          + '\n' +
         "    </bdd>"                                                                   + '\n' +
         "    <queries>"                                                                + '\n' +
         "        <parameters>"                                                         + '\n' +
@@ -313,14 +314,14 @@ public class GenericConfigurationXMLBindingTest {
         Query mquery = new Query("multiQuery1", new Select(Arrays.asList(new Column("var02", "pp.name"), new Column("var03", "tr.id"))),
                                                 new From("physical_parameter pp, transduction tr"),
                                                 new Where("tr.parameter=pp.id"));
-        
+
         Query mainQuery = new Query("mainQuery", new Select("varx", "p.main"), new From("physical_test pt"));
 
         Orderby order = new Orderby();
         order.setSens("ASC");
         order.setvalue("blav");
         mquery.getOrderby().add(order);
-        
+
         QueryList multi = new QueryList(Arrays.asList(query, mquery));
 
         Queries queries     = new Queries(mainQuery, multi, parameters);
@@ -398,11 +399,11 @@ public class GenericConfigurationXMLBindingTest {
         expResult.addOrderby(order);
 
         HashMap<String, String> parameters = new HashMap<String, String>();
-       
+
         parameters.put("st1", "plouf");
 
         expResult.setParameters(parameters);
-        
+
         Query query = new Query("platformList", new Select("platformList", "platf"), new From("(select '13471' from dual)"));
         Orderby order2 = new Orderby();
         order2.setvalue("name");
@@ -501,13 +502,13 @@ public class GenericConfigurationXMLBindingTest {
 
         marshaller.marshal(query, sw);
 
-        String result =  removeXmlns(sw.toString());
-        
+        String result =  StringUtilities.removeXmlns(sw.toString());
+
         assertEquals(expResult, result);
     }
 
     /*
-     * 
+     *
      */
     @Test
     public void providerSourceUnMarshalingTest() throws Exception {
@@ -528,22 +529,13 @@ public class GenericConfigurationXMLBindingTest {
                 + "     <style>LineRed2</style>" + '\n'
                 + "   </Layer>" + '\n'
                 + " </source>";
-        
+
         Object obj = unmarshaller.unmarshal(new StringReader(xml));
-        
+
         assertTrue(obj instanceof JAXBElement);
         obj = ((JAXBElement)obj).getValue();
         System.out.println(obj);
-        
+
         assertTrue(obj instanceof Node);
-    }
-    
-    public static String removeXmlns(String xml) {
-        String s = xml;
-        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
-        return s;
     }
 }

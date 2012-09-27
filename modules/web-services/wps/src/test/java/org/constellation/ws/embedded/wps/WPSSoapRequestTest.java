@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
 import org.constellation.wps.ws.soap.WPSService;
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
 import org.geotoolkit.util.StringUtilities;
 
 import org.junit.*;
@@ -34,7 +35,7 @@ import static org.junit.Assume.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WPSSoapRequestTest extends AbstractTestSoapRequest {
+public class WPSSoapRequestTest extends AbstractGrizzlyServer {
 
     private static final String WPS_DEFAULT = "http://localhost:9191/wps/default?";
 
@@ -71,7 +72,7 @@ public class WPSSoapRequestTest extends AbstractTestSoapRequest {
         }
 
         URLConnection conec = getCapsUrl.openConnection();
-        postRequestFile(conec, "org/constellation/xml/wps/GetCapabilitiesSOAP.xml");
+        postRequestFile(conec, "org/constellation/xml/wps/GetCapabilitiesSOAP.xml", "application/soap+xml");
 
         final String result    = cleanXMlString(getStringResponse(conec));
         final String expResult = cleanXMlString(getStringFromFile("org/constellation/xml/wps/GetCapabilitiesResponseSOAP.xml"));
@@ -94,7 +95,7 @@ public class WPSSoapRequestTest extends AbstractTestSoapRequest {
         }
 
         URLConnection conec = getCapsUrl.openConnection();
-        postRequestFile(conec, "org/constellation/xml/wps/DescribeProcessSOAP.xml");
+        postRequestFile(conec, "org/constellation/xml/wps/DescribeProcessSOAP.xml", "application/soap+xml");
 
         final String result    = cleanXMlString(getStringResponse(conec));
         final String expResult = cleanXMlString(getStringFromFile("org/constellation/xml/wps/DescribeProcessResponseSOAP.xml"));
@@ -118,7 +119,7 @@ public class WPSSoapRequestTest extends AbstractTestSoapRequest {
         }
 
         URLConnection conec = getCapsUrl.openConnection();
-        postRequestFile(conec, "org/constellation/xml/wps/ExecuteSOAP.xml");
+        postRequestFile(conec, "org/constellation/xml/wps/ExecuteSOAP.xml", "application/soap+xml");
 
         final String result    = cleanXMlString(getStringResponse(conec));
         final String expResult = cleanXMlString(getStringFromFile("org/constellation/xml/wps/ExecuteResponseSOAP.xml"));

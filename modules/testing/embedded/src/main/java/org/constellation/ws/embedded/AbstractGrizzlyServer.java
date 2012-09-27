@@ -19,14 +19,31 @@ package org.constellation.ws.embedded;
 // JAI dependencies
 
 // J2SE dependencies
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Map;
-import java.util.logging.Logger;
+import javax.imageio.ImageReader;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
 import org.constellation.data.CoverageSQLTestCase;
-
-// geotoolkit dependencies
-import org.geotoolkit.util.logging.Logging;
-
+import org.constellation.util.Util;
+import org.geotoolkit.image.io.XImageIO;
+import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.xml.MarshallerPool;
 
 /**
  * Launches a Grizzly server in a thread at the beginning of the testing process
@@ -43,7 +60,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
      */
     protected static GrizzlyThread grizzly = null;
 
-    private static final Logger LOGGER = Logging.getLogger("org.constellation.ws.embedded");
+    protected static MarshallerPool pool;
 
     /**
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
@@ -81,6 +98,31 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         grizzly = null;
     }
 
+    public void waitForStart() throws Exception {
+        boolean ex = true;
+        int cpt = 0;
+        while (ex) {
+            Thread.sleep(1 * 1000);
+            final URL u;
+            if (grizzly != null && grizzly.getCurrentPort() != null) {
+                u = new URL("http://localhost:" + grizzly.getCurrentPort()  + "/configuration?request=access");
+            } else {
+                u = new URL("http://localhost:9090/configuration?request=access");
+            }
+            ex = false;
+            URLConnection conec = u.openConnection();
+            try {
+                conec.getInputStream();
+            } catch (IOException e) {
+                ex = true;
+            }
+            if (cpt == 30) {
+                throw new Exception("The grizzly server never start");
+            }
+            cpt++;
+        }
+    }
+
     /**
      * Thread that launches a Grizzly server in a separate thread.
      * Requests will be done on this working server.
@@ -115,4 +157,196 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             cstlServer.runAll();
         }
     }
+
+    protected static String getStringResponse(URLConnection conec) throws UnsupportedEncodingException, IOException {
+        final StringWriter sw     = new StringWriter();
+        final BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
+        char [] buffer = new char[1024];
+        int size;
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+        String xmlResult = sw.toString();
+        xmlResult = StringUtilities.removeXmlns(xmlResult);
+        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
+        return xmlResult;
+    }
+
+    /**
+     * Already in FileUtilities ???
+     */
+    protected static String getStringFromFile(String filePath) throws UnsupportedEncodingException, IOException {
+        final StringWriter sw     = new StringWriter();
+        final BufferedReader in   = new BufferedReader(new InputStreamReader(Util.getResourceAsStream(filePath), "UTF-8"));
+        char [] buffer = new char[1024];
+        int size;
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+        String xmlExpResult = sw.toString();
+
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+        xmlExpResult = StringUtilities.removeXmlns(xmlExpResult);
+
+        return xmlExpResult;
+    }
+
+    protected static void postRequestFile(URLConnection conec, String filePath, String contentType) throws IOException {
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", contentType);
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        final InputStream is = Util.getResourceAsStream(filePath);
+        final StringWriter sw = new StringWriter();
+        final BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        char[] buffer = new char[1024];
+        int size;
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+        wr.write(sw.toString());
+        wr.flush();
+        in.close();
+    }
+
+    protected static void postRequestFile(URLConnection conec, String filePath) throws IOException {
+        postRequestFile(conec, filePath, "text/xml");
+    }
+
+    protected static void postRequestPlain(URLConnection conec, String request) throws IOException {
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "text/plain");
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        wr.write(request);
+        wr.flush();
+    }
+
+    /**
+     * Returned the {@link BufferedImage} from an URL requesting an image.
+     *
+     * @param url  The url of a request of an image.
+     * @param mime The mime type of the image to return.
+     *
+     * @return The {@link BufferedImage} or {@code null} if an error occurs.
+     * @throws IOException
+     */
+    protected static BufferedImage getImageFromURL(final URL url, final String mime) throws IOException {
+        // Try to get the image from the url.
+        final InputStream in = url.openStream();
+        final ImageReader reader = XImageIO.getReaderByMIMEType(mime, in, true, true);
+        final BufferedImage image = reader.read(0);
+        XImageIO.close(reader);
+        reader.dispose();
+        // For debugging, uncomment the JFrame creation and the Thread.sleep further,
+        // in order to see the image in a popup.
+//        javax.swing.JFrame frame = new javax.swing.JFrame();
+//        frame.setContentPane(new javax.swing.JLabel(new javax.swing.ImageIcon(image)));
+//        frame.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+//        frame.pack();
+//        frame.setVisible(true);
+//        try {
+//            Thread.sleep(5 * 1000);
+//            frame.dispose();
+//        } catch (InterruptedException ex) {
+//            assumeNoException(ex);
+//        }
+        return image;
+    }
+
+    /**
+     * Initializes the data directory in unzipping the jar containing the resources
+     * into a temporary directory.
+     *
+     * @return The root output directory where the data are unzipped.
+     * @throws IOException
+     */
+    protected static File initDataDirectory() throws IOException {
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
+        if (styleResource.indexOf('!') != -1) {
+            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        }
+        if (styleResource.startsWith("file:")) {
+            styleResource = styleResource.substring(5);
+        }
+        final File styleJar = new File(styleResource);
+        if (styleJar == null || !styleJar.exists()) {
+            throw new IOException("Unable to find the style folder: "+ styleJar);
+        }
+        if (styleJar.isDirectory()) {
+            return styleJar;
+        }
+        final InputStream in = new FileInputStream(styleJar);
+        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        final File outputDir = new File(tmpDir, "Constellation");
+        if (!outputDir.exists()) {
+            outputDir.mkdir();
+        }
+        IOUtilities.unzip(in, outputDir);
+        in.close();
+        return outputDir;
+    }
+
+    protected static void postRequestObject(URLConnection conec, Object request) throws IOException, JAXBException {
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "text/xml");
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        final StringWriter sw = new StringWriter();
+        Marshaller marshaller = pool.acquireMarshaller();
+        marshaller.marshal(request, sw);
+
+        wr.write(sw.toString());
+        wr.flush();
+    }
+
+    protected static Object unmarshallResponse(URLConnection conec) throws JAXBException, IOException {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(conec.getInputStream());
+
+        pool.release(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        return obj;
+    }
+
+    protected static Object unmarshallResponse(URL conec) throws JAXBException, IOException {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(conec.openStream());
+
+        pool.release(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        return obj;
+    }
+
+    protected static String removeUpdateSequence(final String xml) {
+        String s = xml;
+        s = s.replaceAll("updateSequence=\"[^\"]*\" ", "");
+        return s;
+    }
+
+    /**
+      FOR SOAP TODO see if well need it
+      public void waitForStart() throws Exception {
+        final URL u = new URL("http://localhost:9191/wps/wsdl?");
+        boolean ex = true;
+
+        while (ex) {
+            Thread.sleep(1 * 1000);
+            ex = false;
+            URLConnection conec = u.openConnection();
+            try {
+                conec.getInputStream();
+            } catch (ConnectException e) {
+                ex = true;
+            }
+        }
+    }
+     */
 }

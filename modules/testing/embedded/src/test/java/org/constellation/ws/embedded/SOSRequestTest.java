@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class SOSRequestTest extends AbstractTestRequest {
+public class SOSRequestTest extends AbstractGrizzlyServer {
 
     private static String getDefaultURL() {
         return "http://localhost:" +  grizzly.getCurrentPort() + "/sos/default?";

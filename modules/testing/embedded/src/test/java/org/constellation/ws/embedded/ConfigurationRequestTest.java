@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class ConfigurationRequestTest extends AbstractTestRequest {
+public class ConfigurationRequestTest extends AbstractGrizzlyServer {
 
     @BeforeClass
     public static void initPool() throws Exception {

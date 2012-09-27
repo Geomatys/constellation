@@ -17,6 +17,7 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -83,7 +84,7 @@ public class ConfigurationXmlBindingTest {
                 "    </ns2:availableServices>" + '\n' +
                 "</ns2:ServiceReport>\n";
 
-        String result =  removeXmlns(sw.toString());
+        String result =  StringUtilities.removeXmlns(sw.toString());
 
         assertEquals(expresult, result);
     }
@@ -110,7 +111,7 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:instance status=\"NOT_STARTED\" type=\"WMS\" name=\"test1\"/>" + '\n'
                 + "</ns2:InstanceReport>\n";
 
-        String result =  removeXmlns(sw.toString());
+        String result =  StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
 
@@ -166,7 +167,7 @@ public class ConfigurationXmlBindingTest {
                 + "    </ns2:customParameters>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        String result = removeXmlns(sw.toString());
+        String result = StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
         sources = new ArrayList<Source>();
@@ -197,7 +198,7 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result =  removeXmlns(sw.toString());
+        result =  StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
         sources = new ArrayList<Source>();
@@ -228,7 +229,7 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result =  removeXmlns(sw.toString());
+        result =  StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
         sources = new ArrayList<Source>();
@@ -305,7 +306,7 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result =  removeXmlns(sw.toString());
+        result =  StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
         sources = new ArrayList<Source>();
@@ -332,7 +333,7 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result =  removeXmlns(sw.toString());
+        result =  StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
         sources = new ArrayList<Source>();
@@ -373,7 +374,7 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 
-        result = removeXmlns(sw.toString());
+        result = StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
 
@@ -405,7 +406,7 @@ public class ConfigurationXmlBindingTest {
                 + "    </ns2:processes>" + '\n'
                 + "</ns2:ProcessContext>\n";
 
-        String result = removeXmlns(sw.toString());
+        String result = StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
         factories = new ArrayList<ProcessFactory>();
@@ -442,7 +443,7 @@ public class ConfigurationXmlBindingTest {
                 + "    </ns2:processes>" + '\n'
                 + "</ns2:ProcessContext>\n";
 
-        result =  removeXmlns(sw.toString());
+        result =  StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
         factories = new ArrayList<ProcessFactory>();
@@ -478,7 +479,7 @@ public class ConfigurationXmlBindingTest {
                 + "    </ns2:processes>" + '\n'
                 + "</ns2:ProcessContext>\n";
 
-        result =  removeXmlns(sw.toString());
+        result =  StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
 
@@ -501,7 +502,7 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:contextPath>webdav</ns2:contextPath>" + '\n'
                 + "</ns2:WebdavContext>\n";
 
-        String result = removeXmlns(sw.toString());
+        String result = StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
 
@@ -782,15 +783,6 @@ public class ConfigurationXmlBindingTest {
 
     }
 
-    public static String removeXmlns(String xml) {
-        String s = xml;
-        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
-        return s;
-    }
-
     @Test
     public void stringListMarshalingTest() throws Exception {
         final List<String> list = new ArrayList<String>();
@@ -806,7 +798,7 @@ public class ConfigurationXmlBindingTest {
                 + "    <ns2:Entry>value2</ns2:Entry>" + '\n'
                 + "</ns2:StringList>\n";
 
-        String result = removeXmlns(sw.toString());
+        String result = StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
 
         final Set<String> set = new HashSet<String>();
@@ -816,7 +808,7 @@ public class ConfigurationXmlBindingTest {
         sw = new StringWriter();
         marshaller.marshal(slSet, sw);
 
-        result = removeXmlns(sw.toString());
+        result = StringUtilities.removeXmlns(sw.toString());
         assertEquals(expresult, result);
     }
 

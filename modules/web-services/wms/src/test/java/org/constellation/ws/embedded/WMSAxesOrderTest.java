@@ -65,7 +65,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WMSAxesOrderTest extends AbstractTestRequest {
+public class WMSAxesOrderTest extends AbstractGrizzlyServer {
 
     /**
      * The layer to test.
