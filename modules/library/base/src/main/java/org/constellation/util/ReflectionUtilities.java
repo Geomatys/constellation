@@ -937,4 +937,28 @@ public final class ReflectionUtilities {
         }
         return false;
     }
+
+    /**
+     *
+     * @param enumeration
+     * @return
+     */
+    public static String getElementNameFromEnum(final Object enumeration) {
+        String value = "";
+        try {
+            final Method getValue = enumeration.getClass().getDeclaredMethod("value");
+            value = (String) getValue.invoke(enumeration);
+        } catch (IllegalAccessException ex) {
+            LOGGER.warning("The class is not accessible");
+        } catch (IllegalArgumentException ex) {
+            LOGGER.warning("IllegalArgument exeption in value()");
+        } catch (InvocationTargetException ex) {
+            LOGGER.log(Level.WARNING, "Exception throw in the invokated getter value() \nCause: {0}", ex.getMessage());
+        } catch (NoSuchMethodException ex) {
+           LOGGER.log(Level.WARNING, "no such method value() in {0}", enumeration.getClass().getSimpleName());
+        } catch (SecurityException ex) {
+           LOGGER.warning("security Exception while getting the codelistElement in value() method");
+        }
+        return value;
+    }
 }

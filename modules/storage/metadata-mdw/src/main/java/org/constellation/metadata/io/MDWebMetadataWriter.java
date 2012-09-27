@@ -602,7 +602,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
                     } else if (object.getClass().isEnum()) {
 
-                        codelistElement = Util.getElementNameFromEnum(object);
+                        codelistElement = ReflectionUtilities.getElementNameFromEnum(object);
 
                     } else {
                         LOGGER.log (Level.SEVERE, "{0} is not a codelist!", object.getClass().getName());

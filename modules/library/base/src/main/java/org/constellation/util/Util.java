@@ -18,9 +18,11 @@
 
 package org.constellation.util;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -45,17 +47,17 @@ import org.opengis.feature.type.Name;
  *       -- Reflection
  *       -- ...
  * </p>
- * 
+ *
  * @author Mehdi Sidhoum (Geomatys)
  * @author Legal Guilhem (Geomatys)
  * @author Adrian Custer (Geomatys)
- * 
+ *
  * @since 0.2
  */
 public final class Util {
-	
+
     private static final Logger LOGGER = Logging.getLogger("org.constellation.util");
-    
+
     private Util() {}
 
     /**
@@ -67,7 +69,7 @@ public final class Util {
     static {
         baseClassLoader = Thread.currentThread().getContextClassLoader();
     }
-    
+
     /**
      * Return an marshallable Object from an url
      */
@@ -75,9 +77,9 @@ public final class Util {
         final URL source         = new URL(url);
         final URLConnection conec = source.openConnection();
         Object response = null;
-        
+
         try {
-        
+
             // we get the response document
             final InputStream in   = conec.getInputStream();
             final StringWriter out = new StringWriter();
@@ -94,7 +96,7 @@ public final class Util {
             //we need to replace % character by "percent because they are reserved char for url encoding
             brutString = brutString.replaceAll("%", "percent");
             final String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
-            
+
             try {
                 response = unmarshaller.unmarshal(new StringReader(decodedString));
                 if (response instanceof JAXBElement) {
@@ -109,31 +111,7 @@ public final class Util {
         }
         return response;
     }
-    
-    /**
-     * 
-     * @param enumeration
-     * @return
-     */
-    public static String getElementNameFromEnum(final Object enumeration) {
-        String value = "";
-        try {
-            final Method getValue = enumeration.getClass().getDeclaredMethod("value");
-            value = (String) getValue.invoke(enumeration);
-        } catch (IllegalAccessException ex) {
-            LOGGER.severe("The class is not accessible");
-        } catch (IllegalArgumentException ex) {
-            LOGGER.severe("IllegalArguement exeption in value()");
-        } catch (InvocationTargetException ex) {
-            LOGGER.log(Level.SEVERE, "Exception throw in the invokated getter value() \nCause: {0}", ex.getMessage());
-        } catch (NoSuchMethodException ex) {
-           LOGGER.log(Level.SEVERE, "no such method value() in {0}", enumeration.getClass().getSimpleName());
-        } catch (SecurityException ex) {
-           LOGGER.severe("security Exception while getting the codelistElement in value() method");
-        }
-        return value;
-    }
-    
+
     /**
      * Obtain the Thread Context ClassLoader.
      */
@@ -145,9 +123,9 @@ public final class Util {
             }
         });
     }
-    
+
     /**
-     * Return an input stream of the specified resource. 
+     * Return an input stream of the specified resource.
      */
     public static InputStream getResourceAsStream(final String url) {
         final ClassLoader cl = getContextClassLoader();
@@ -170,7 +148,7 @@ public final class Util {
         }
         return name;
     }
-    
+
     /**
      * Parse a String to instantiate a named Layer ({namespace}name).
      * @param layerName
@@ -187,7 +165,7 @@ public final class Util {
         }
         return name;
     }
-    
+
     public static File getWebappDiretory() {
         final URL url = baseClassLoader.getResource("org/constellation/util/Util.class");
         String path = url.toString();

@@ -281,7 +281,7 @@ public class WFSService extends GridWebService<WFSWorker> {
      * @throws JAXBException
      */
     @Override
-    protected Object unmarshallRequest(Unmarshaller unmarshaller, InputStream is) throws JAXBException {
+    protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException {
         try {
             final JAXBEventHandler handler          = new JAXBEventHandler();
             unmarshaller.setEventHandler(handler);
@@ -291,7 +291,7 @@ public class WFSService extends GridWebService<WFSWorker> {
                     new Class[]{XMLEventReader.class}, new InvocationHandler() {
 
                 @Override
-                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
                     Object returnVal = null;
                     try {
                         returnVal = method.invoke(rootEventReader, args);
@@ -299,12 +299,12 @@ public class WFSService extends GridWebService<WFSWorker> {
                         throw ex.getTargetException();
                     }
                     if (method.getName().equals("nextEvent")) {
-                        XMLEvent evt = (XMLEvent) returnVal;
+                        final XMLEvent evt = (XMLEvent) returnVal;
                         if (evt.isStartElement()) {
-                            StartElement startElem = evt.asStartElement();
-                            Iterator<Namespace> t = startElem.getNamespaces();
+                            final StartElement startElem = evt.asStartElement();
+                            final Iterator<Namespace> t = startElem.getNamespaces();
                             while (t.hasNext()) {
-                                Namespace n = t.next();
+                                final Namespace n = t.next();
                                 prefixMapping.put(n.getPrefix(), n.getNamespaceURI());
                             }
                         }
