@@ -29,9 +29,11 @@ import java.net.URLConnection;
 import java.net.URL;
 import java.io.File;
 import java.util.ArrayList;
-import javax.xml.bind.JAXBException;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.namespace.QName;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.sos.ws.soap.SOService;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.*;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
@@ -51,18 +53,21 @@ public class CSWRequestTest extends AbstractTestRequest {
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
-    public static void initPool() throws JAXBException {
-        initServer(null);
+    public static void initPool() throws Exception {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("sos", new SOService());
+        initServer(null, map);
         // Get the list of layers
         pool = EBRIMMarshallerPool.getInstance();
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
+        //finish();
     }
 
     private static String getDefaultURL() {

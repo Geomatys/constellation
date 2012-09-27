@@ -28,8 +28,10 @@ import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import java.net.URLConnection;
 import java.net.URL;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import javax.xml.bind.JAXBException;
+import org.constellation.sos.ws.soap.SOService;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
@@ -57,18 +59,21 @@ public class SOSRequestTest extends AbstractTestRequest {
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
-    public static void initPool() throws JAXBException {
-        initServer(null);
+    public static void initPool() throws Exception {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("sos", new SOService());
+        initServer(null, map);
         // Get the list of layers
         pool = SOSMarshallerPool.getInstance();
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
+        //finish();
     }
 
     @Test

@@ -20,15 +20,12 @@ package org.constellation.ws.embedded;
 
 // J2SE dependencies
 import java.io.File;
+import java.util.Map;
 import java.util.logging.Logger;
-
-// Constellation dependencies
+import org.constellation.data.CoverageSQLTestCase;
 
 // geotoolkit dependencies
 import org.geotoolkit.util.logging.Logging;
-
-// JUnit dependencies
-import org.junit.*;
 
 
 /**
@@ -40,7 +37,7 @@ import org.junit.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public abstract class AbstractGrizzlyServer { //extends CoverageSQLTestCase {
+public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     /**
      * The grizzly server that will received some HTTP requests.
      */
@@ -52,7 +49,7 @@ public abstract class AbstractGrizzlyServer { //extends CoverageSQLTestCase {
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
      */
-    public static void initServer(final String[] resourcePackages) {
+    public static void initServer(final String[] resourcePackages, final Map<String, Object> soapServices) {
         // Protective test in order not to launch a new instance of the grizzly server for
         // each sub classes.
         if (grizzly != null) {
@@ -63,7 +60,7 @@ public abstract class AbstractGrizzlyServer { //extends CoverageSQLTestCase {
          * The implementation waits for the data provider to be defined for
          * starting the server.
          */
-        grizzly = new GrizzlyThread(resourcePackages);
+        grizzly = new GrizzlyThread(resourcePackages, soapServices);
 
         // Starting the grizzly server
         grizzly.start();
@@ -73,7 +70,6 @@ public abstract class AbstractGrizzlyServer { //extends CoverageSQLTestCase {
     /**
      * Stop the grizzly server, if it is still alive.
      */
-    @AfterClass
     public static void finish() {
         if (grizzly.isAlive()) {
             grizzly.interrupt();
@@ -82,6 +78,7 @@ public abstract class AbstractGrizzlyServer { //extends CoverageSQLTestCase {
         if (f.exists()) {
             f.delete();
         }
+        grizzly = null;
     }
 
     /**
@@ -90,9 +87,15 @@ public abstract class AbstractGrizzlyServer { //extends CoverageSQLTestCase {
      */
     protected static class GrizzlyThread extends Thread {
         private final CstlEmbeddedService cstlServer;
+        private final Map<String, Object> soapServices;
 
-        public GrizzlyThread(final String[] resourcePackages) {
-            cstlServer = new CstlEmbeddedService(new String[]{}, resourcePackages);
+        public GrizzlyThread(final String[] resourcePackages, final Map<String, Object> soapServices) {
+            this.soapServices = soapServices;
+            if (resourcePackages != null) {
+                cstlServer = new CstlEmbeddedService(new String[]{}, resourcePackages);
+            } else {
+                cstlServer = new CstlEmbeddedService(new String[]{});
+            }
         }
 
         public Integer getCurrentPort() {
@@ -106,6 +109,9 @@ public abstract class AbstractGrizzlyServer { //extends CoverageSQLTestCase {
         public void run() {
             cstlServer.duration = 5*60*1000;
             cstlServer.findAvailablePort = true;
+            if (soapServices != null) {
+                cstlServer.serviceInstanceSOAP.putAll(soapServices);
+            }
             cstlServer.runAll();
         }
     }

@@ -18,8 +18,10 @@ package org.constellation.ws.embedded;
 
 import org.constellation.admin.service.ConstellationServer;
 import org.geotoolkit.xml.MarshallerPool;
-import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import org.constellation.sos.ws.soap.SOService;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -32,8 +34,10 @@ import static org.junit.Assert.*;
 public class ConstellationServerTest extends AbstractTestRequest {
 
     @BeforeClass
-    public static void initPool() throws JAXBException {
-        initServer(null);
+    public static void initPool() throws Exception {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("sos", new SOService());
+        initServer(null, map);
         // Get the list of layers
         pool = new MarshallerPool("org.constellation.configuration:"
                                 + "org.constellation.generic.database:"
@@ -44,11 +48,12 @@ public class ConstellationServerTest extends AbstractTestRequest {
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
+        //finish();
     }
 
     @Test

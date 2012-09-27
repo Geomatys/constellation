@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.JAXBException;
+import org.constellation.sos.ws.soap.SOService;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.util.StringUtilities;
@@ -38,12 +41,15 @@ public class SOSSoapRequestTest extends AbstractTestSoapRequest {
     private static final String SOS_DEFAULT = "http://localhost:9191/sos/default?";
 
     @BeforeClass
-    public static void initLayerList() throws JAXBException {
-        initServer(null);
+    public static void initLayerList() throws Exception {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("sos", new SOService());
+        initServer(null, map);
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
+        //finish();
     }
 
     /**

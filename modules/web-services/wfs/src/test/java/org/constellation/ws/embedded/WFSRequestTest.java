@@ -97,8 +97,8 @@ public class WFSRequestTest extends AbstractTestRequest {
     public static void initPool() throws JAXBException {
         initServer(new String[] {"org.constellation.wfs.ws.rs",
             "org.constellation.configuration.ws.rs",
-            "org.constellation.ws.rs.provider"});
-        
+            "org.constellation.ws.rs.provider"}, null);
+
         EPSG_VERSION = CRS.getVersion("EPSG").toString();
         pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
@@ -195,12 +195,13 @@ public class WFSRequestTest extends AbstractTestRequest {
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
+        //finish();
     }
 
     /**

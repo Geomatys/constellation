@@ -123,7 +123,7 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
             "org.constellation.map.ws.rs",
             "org.constellation.configuration.ws.rs",
             "org.constellation.ws.rs.provider"
-        });
+        }, null);
 
         final Configurator config = new Configurator() {
             @Override
@@ -185,13 +185,14 @@ public class WMSAxesOrderTest extends AbstractTestRequest {
      * Free some resources.
      */
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         layers = null;
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
+        //finish();
     }
     /**
      * Returns {@code true} if the {@code SST_tests} layer is found in the list of

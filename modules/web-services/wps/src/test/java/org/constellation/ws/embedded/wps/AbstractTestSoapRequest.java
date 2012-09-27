@@ -26,15 +26,15 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.geotoolkit.xml.MarshallerPool;
-
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
 /**
  *
  * @author guilhem
  */
 public class AbstractTestSoapRequest extends AbstractGrizzlyServer {
-    
+
     protected static MarshallerPool pool;
-    
+
     public void postRequestFile(URLConnection conec, String filePath) throws IOException {
 
         conec.setDoOutput(true);
@@ -53,7 +53,7 @@ public class AbstractTestSoapRequest extends AbstractGrizzlyServer {
         in.close();
 
     }
-    
+
     public String getStringResponse(URLConnection conec) throws UnsupportedEncodingException, IOException {
         final StringWriter sw     = new StringWriter();
         final BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
@@ -66,7 +66,7 @@ public class AbstractTestSoapRequest extends AbstractGrizzlyServer {
         xmlResult = removeUpdateSequence(xmlResult);
         return xmlResult;
     }
-    
+
     public Object unmarshallResponse(URLConnection conec) throws JAXBException, IOException {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(conec.getInputStream());
@@ -78,7 +78,7 @@ public class AbstractTestSoapRequest extends AbstractGrizzlyServer {
         }
         return obj;
     }
-    
+
     public String getStringFromFile(String filePath) throws UnsupportedEncodingException, IOException {
         final StringWriter sw     = new StringWriter();
         final BufferedReader in   = new BufferedReader(new InputStreamReader(Util.getResourceAsStream(filePath), "UTF-8"));
@@ -95,17 +95,17 @@ public class AbstractTestSoapRequest extends AbstractGrizzlyServer {
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
         return xmlExpResult;
     }
-    
+
     public String removeUpdateSequence(final String xml) {
         String s = xml;
         s = s.replaceAll("updateSequence=\"[^\"]*\" ", "");
         return s;
     }
-    
+
     public void waitForStart() throws Exception {
         final URL u = new URL("http://localhost:9191/wps/wsdl?");
         boolean ex = true;
-        
+
         while (ex) {
             Thread.sleep(1 * 1000);
             ex = false;

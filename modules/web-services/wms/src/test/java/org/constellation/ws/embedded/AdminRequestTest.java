@@ -60,7 +60,7 @@ public class AdminRequestTest extends AbstractTestRequest {
             "org.constellation.map.ws.rs",
             "org.constellation.configuration.ws.rs",
             "org.constellation.ws.rs.provider"
-        });
+        }, null);
 
         // Get the list of layers
         pool = GenericDatabaseMarshallerPool.getInstance();
@@ -120,12 +120,13 @@ public class AdminRequestTest extends AbstractTestRequest {
     }
 
     @AfterClass
-    public static void finish() {
+    public static void shutDown() {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
+        //finish();
     }
 
     @Test

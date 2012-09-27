@@ -136,7 +136,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
             "org.constellation.map.ws.rs",
             "org.constellation.configuration.ws.rs",
             "org.constellation.ws.rs.provider"
-        });
+        }, null);
 
         pool = WMSMarshallerPool.getInstance();
 
@@ -210,6 +210,7 @@ public class WMSRequestsTest extends AbstractTestRequest {
     @AfterClass
     public static void shutDown() throws JAXBException {
         LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        //finish();
     }
 
     /**

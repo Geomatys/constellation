@@ -20,7 +20,10 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.bind.JAXBException;
+import org.constellation.wps.ws.soap.WPSService;
 import org.geotoolkit.util.StringUtilities;
 
 import org.junit.*;
@@ -39,11 +42,13 @@ public class WPSSoapRequestTest extends AbstractTestSoapRequest {
 
 
     @BeforeClass
-    public static void initLayerList() throws JAXBException {
+    public static void initLayerList() throws Exception {
+        final Map<String, Object> map = new HashMap<String, Object>();
+        map.put("wps", new WPSService());
         initServer(new String[] {
             "org.constellation.wps.ws.rs",
             "org.constellation.configuration.ws.rs",
-            "org.constellation.ws.rs.provider"});
+            "org.constellation.ws.rs.provider"}, map);
     }
 
     @AfterClass
