@@ -157,7 +157,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
 
                 for (Name name : dStore.getNames()) {
                     final FeatureCollection collection = storeSession.getFeatureCollection(QueryBuilder.all(name));
-                    final MutableStyle style = RandomStyleFactory.createRandomVectorStyle(collection);
+                    final MutableStyle style = RandomStyleFactory.createDefaultVectorStyle(collection);
                     final MapLayer layer = MapBuilder.createFeatureLayer(collection, style);
                     layer.setName(name.toString());
                     layer.setDescription(new DefaultDescription(new SimpleInternationalString(name.toString()), null));
@@ -192,7 +192,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             final Session storeSession = ds.createSession(true);
             for (Name n : ds.getNames()) {
                 final FeatureCollection collection = storeSession.getFeatureCollection(QueryBuilder.all(n));
-                final MutableStyle style = RandomStyleFactory.createRandomVectorStyle(collection);
+                final MutableStyle style = RandomStyleFactory.createDefaultVectorStyle(collection);
                 final FeatureMapLayer layer = MapBuilder.createFeatureLayer(collection, style);
                 layer.setName(n.toString());
                 layer.setDescription(new DefaultDescription(new SimpleInternationalString(n.toString()), null));

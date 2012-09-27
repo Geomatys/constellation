@@ -92,4 +92,8 @@ public final class JConstellationFrame extends JFrame{
         frame.setVisible(true);
     }
     
+    public static void main(String[] args) throws MalformedURLException {
+        JConstellationFrame.show("admin", "admin", "http://localhost:8084/constellation/WS/", true);
+    }
+    
 }

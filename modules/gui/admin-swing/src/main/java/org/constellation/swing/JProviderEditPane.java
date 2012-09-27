@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -33,8 +34,16 @@ import javax.swing.table.AbstractTableModel;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.geotoolkit.gui.swing.misc.ActionCell;
+import org.geotoolkit.gui.swing.misc.JOptionDialog;
 import org.geotoolkit.gui.swing.propertyedit.JFeatureOutLine;
+import org.geotoolkit.gui.swing.propertyedit.LayerStylePropertyPanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JAdvancedStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JClassificationIntervalStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JClassificationSingleStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JRasterColorMapStylePanel;
+import org.geotoolkit.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
@@ -170,30 +179,35 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private void editStyle(MutableStyle style, String styleName,final boolean isNew){
         final String oldName = styleName;
 
-        final JDialog dialog = new JDialog();
         final JPanel pane = new JPanel(new BorderLayout());
         final JLabel lbl = new JLabel(BUNDLE.getString("name"));
         final JTextField textField = new JTextField(styleName);
-        final JAdvancedStylePanel editor = new JAdvancedStylePanel();
-        editor.parse(style);
+        
+        final MapLayer layer = MapBuilder.createEmptyMapLayer();
+        layer.setStyle(style);
 
+        LayerStylePropertyPanel editors = new LayerStylePropertyPanel();
+        editors.addPropertyPanel(new JSimpleStylePanel());
+        editors.addPropertyPanel(new JClassificationSingleStylePanel());
+        editors.addPropertyPanel(new JClassificationIntervalStylePanel());
+        editors.addPropertyPanel(new JRasterColorMapStylePanel());
+        editors.addPropertyPanel(new JAdvancedStylePanel());
+        editors.setTarget(layer);
+        
         final JPanel north = new JPanel(new BorderLayout());
         north.add(BorderLayout.WEST,lbl);
         north.add(BorderLayout.CENTER,textField);
 
         pane.add(BorderLayout.NORTH,north);
-        pane.add(BorderLayout.CENTER,editor);
+        pane.add(BorderLayout.CENTER,editors);
 
-
-        dialog.setContentPane(pane);
-        dialog.setModal(true);
-        dialog.setSize(800, 600);
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        int res = JOptionDialog.show(null, pane, JOptionPane.OK_CANCEL_OPTION);
+        if(JOptionPane.OK_OPTION != res) return;
         
         styleName = textField.getText();
 
-        style = (MutableStyle) editor.create();
+        editors.apply();
+        style = layer.getStyle();
         style.setName(textField.getText());
 
         if(isNew){
