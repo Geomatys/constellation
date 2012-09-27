@@ -20,6 +20,7 @@ package org.constellation.map.ws;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -40,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
@@ -187,10 +187,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
      */
     private static final List<String> COMMONS_DIM = UnmodifiableArrayList.wrap(
-            "NORTH", "EAST", "SOUTH", "WEST", 
+            "NORTH", "EAST", "SOUTH", "WEST",
             "UP", "DOWN",
             "FUTURE", "PAST");
-    
+
 
     /**
      * Output responses of a GetCapabilities request.
@@ -438,7 +438,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             } catch (DataStoreException exception) {
                 throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
             }
-            
+
             if (nativeEnv != null) {
                 final CoordinateReferenceSystem crs = nativeEnv.getCoordinateReferenceSystem();
                 final CoordinateSystem cs = crs.getCoordinateSystem();
@@ -448,11 +448,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 for (int i = 0; i < nbDim; i++) {
                     final CoordinateSystemAxis axis = cs.getAxis(i);
                     final AxisDirection direction = axis.getDirection();
-                    
+
                     final String directionName = direction.name();
                     if (!COMMONS_DIM.contains(directionName)) {
                         final org.opengis.metadata.Identifier axisName = axis.getName();
-                        
+
                         final Unit<?> u = axis.getUnit();
                         final String unit = (u != null) ? u.toString() : null;
                         String unitSymbol;
@@ -462,7 +462,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                             // Workaround for one more bug in javax.measure...
                             unitSymbol = unit;
                         }
-                        
+
                         final LinkedList<String> valuesList = new LinkedList<String>();
                         if (axis instanceof DiscreteCoordinateSystemAxis) {
                             final DiscreteCoordinateSystemAxis direcretAxis = (DiscreteCoordinateSystemAxis) axis;
@@ -471,7 +471,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                                 valuesList.add(direcretAxis.getOrdinateAt(j).toString());
                             }
                         }
-                        
+
                         final StringBuilder values = new StringBuilder();
                         int index = 0;
                         for (final String val : valuesList) {
@@ -480,22 +480,22 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                                 values.append(",");
                             }
                         }
-                        
+
                         final String defaut = !valuesList.isEmpty() ? valuesList.getFirst() : null;
                         final boolean multipleValues = (valuesList.size() > 1);
-                        
+
                         dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-                            new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName.getCode(), unit, 
+                            new org.geotoolkit.wms.xml.v111.Dimension(values.toString(), axisName.getCode(), unit,
                                 unitSymbol, defaut, multipleValues, null, null) :
-                            new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName.getCode(), unit, 
+                            new org.geotoolkit.wms.xml.v130.Dimension(values.toString(), axisName.getCode(), unit,
                                 unitSymbol, defaut, multipleValues, null, null);
-                        
+
                         dimensions.add(dim);
                     }
                 }
             }
-            
-            
+
+
             /*
              * LegendUrl generation
              * TODO: Use a StringBuilder or two
@@ -1205,12 +1205,17 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         sdef.extensions().add(mapDecoration.getExtension());
         final Hints hints = mapDecoration.getHints();
         if (hints != null) {
+            /*
+             * HACK we set anti-aliasing to false for gif
+             */
+            if ("image/gif".equals(getMap.getFormat())) {
+                hints.put(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+            }
             sdef.getHints().putAll(hints);
         }
 
         try {
             final MapContext context = MapBuilder.createContext();
-            final Map<Name,Layer> layersContext = getLayers();
 
             for (int i = 0; i < layerRefs.size(); i++) {
                 final LayerDetails layerRef = layerRefs.get(i);

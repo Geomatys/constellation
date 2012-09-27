@@ -54,7 +54,6 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
-import org.geotoolkit.internal.io.IOUtilities;
 
 // JUnit dependencies
 
@@ -126,6 +125,8 @@ public class WMSRequestsTest extends AbstractTestRequest {
     private static final String WMS_GETMAP_GIF =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/gif&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
+    private static final String WMS_GETMAP_GIF_TRANSPARENT =
+    "TrAnSpArEnT=TRUE&CrS=CRS:84&FoRmAt=image%2Fgif&VeRsIoN=1.3.0&HeIgHt=100&WiDtH=200&StYlEs=&LaYeRs=cite%3ALakes&ReQuEsT=GetMap&BbOx=0,-0.0020,0.0040,0";
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -275,6 +276,28 @@ public class WMSRequestsTest extends AbstractTestRequest {
         assertEquals(100, image.getWidth());
         assertEquals(100,  image.getHeight());
         assertTrue  (ImageTesting.getNumColors(image) > 2);
+    }
+
+    /**
+     * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
+     */
+    @Test
+    public void testWMSGetMapLakeGifransparent() throws IOException {
+                // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_GIF_TRANSPARENT);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/gif");
+
+        // Test on the returned image.
+        assertEquals(200, image.getWidth());
+        assertEquals(100,  image.getHeight());
     }
 
     /**
