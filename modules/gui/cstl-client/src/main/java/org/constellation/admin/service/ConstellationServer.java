@@ -262,19 +262,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     public boolean deleteUser(final String userName){
         try {
             final String url = getURLWithEndSlash() + "configuration?request=deleteUser&username=" + userName;
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                final AcknowlegementType ak = (AcknowlegementType) response;
-                if ("Success".equalsIgnoreCase(ak.getStatus())) {
-                    return true;
-                }
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
+            return sendRequestAck(url, null);
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, null, ex);
         }
@@ -288,19 +276,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
         try {
             final String url = getURLWithEndSlash() + "configuration?request=updateUser&username=" + userName + "&password=" + password + "&oldLogin=" + oldLogin;
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                final AcknowlegementType ak = (AcknowlegementType) response;
-                if ("Success".equalsIgnoreCase(ak.getStatus())) {
-                    return true;
-                }
-            } else if (response instanceof ExceptionReport){
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
+            return sendRequestAck(url, null);
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, null, ex);
         }
@@ -414,16 +390,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean restartAll() {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_FULL_RESTART;
-                final Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    return "Success".equals(((AcknowlegementType)response).getStatus());
-                } else if (response instanceof ExceptionReport){
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return false;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return false;
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -440,16 +407,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean restartAllInstance(final String service) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=restart";
-                final Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    return "Success".equals(((AcknowlegementType)response).getStatus());
-                } else if (response instanceof ExceptionReport){
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return false;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return false;
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -466,16 +424,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean renameInstance(final String service, final String instanceId, final String newName) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=renameInstance&id=" + instanceId + "&newName=" + newName;
-                final Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    return "Success".equals(((AcknowlegementType)response).getStatus());
-                } else if (response instanceof ExceptionReport){
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return false;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return false;
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -493,16 +442,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean restartInstance(final String service, final String instanceId) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=restart&id=" + instanceId;
-                final Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    return "Success".equals(((AcknowlegementType)response).getStatus());
-                } else if (response instanceof ExceptionReport){
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return false;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return false;
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -520,16 +460,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean newInstance(String service, String instanceId) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=newInstance&id=" + instanceId;
-                final Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    return "Success".equals(((AcknowlegementType)response).getStatus());
-                } else if (response instanceof ExceptionReport){
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return false;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return false;
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -547,16 +478,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean startInstance(final String service, final String instanceId) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=start&id=" + instanceId;
-                final Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    return "Success".equals(((AcknowlegementType)response).getStatus());
-                } else if (response instanceof ExceptionReport){
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return false;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return false;
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -574,16 +496,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean stopInstance(final String service, final String instanceId) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=stop&id=" + instanceId;
-                final Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    return "Success".equals(((AcknowlegementType)response).getStatus());
-                } else if (response instanceof ExceptionReport){
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return false;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return false;
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -601,16 +514,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean deleteInstance(final String service, final String instanceId) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=delete&id=" + instanceId;
-                final Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    return "Success".equals(((AcknowlegementType)response).getStatus());
-                } else if (response instanceof ExceptionReport){
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return false;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return false;
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -655,16 +559,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean configureInstance(final String service, final String instanceId, final Object configuration) {
             try {
                 final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=configure&id=" + instanceId;
-                final Object response = sendRequest(url, configuration);
-                if (response instanceof AcknowlegementType) {
-                    return "Success".equals(((AcknowlegementType)response).getStatus());
-                } else if (response instanceof ExceptionReport){
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return false;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return false;
-                }
+                return sendRequestAck(url, configuration);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -743,17 +638,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean restartAllLayerProviders() {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_RESTART_ALL_LAYER_PROVIDERS;
-                Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -766,17 +651,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean restartAllStyleProviders() {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_RESTART_ALL_STYLE_PROVIDERS;
-                Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -900,17 +775,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean restartProvider(final String id){
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_RESTART_PROVIDER+"&id=" + id;
-                Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -931,17 +796,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("config", config);
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_CREATE_LAYER+"&id=" + id;
-                Object response = sendRequest(url, config);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, config);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -957,17 +812,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean deleteLayer(final String id, final String layerName) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_DELETE_LAYER+"&id=" + id + "&layerName=" + layerName;
-                Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -983,17 +828,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean updateLayer(final String id, final String layerName, final ParameterValueGroup layer) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_UPDATE_LAYER+"&id=" + id + "&layerName=" + layerName;
-                Object response = sendRequest(url, layer);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, layer);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1038,17 +873,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("style", style);
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_CREATE_STYLE+"&id=" + id + "&styleName=" + styleName;
-                Object response = sendRequest(url, style);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, style);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1067,18 +892,8 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_DELETE_STYLE+"&id=" + id + "&styleName=" + styleName;
-                Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
+                return sendRequestAck(url, null);
+             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
             return false;
@@ -1098,17 +913,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("style", style);
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_UPDATE_STYLE+"&id=" + id + "&styleName=" + styleName;
-                Object response = sendRequest(url, style);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, style);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1298,17 +1103,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                         +"&id=" + id
                         +"&title=" + URLEncoder.encode(title, "UTF-8")
                         +"&step=" + step;
-                Object response = sendRequest(url, parameters);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, parameters);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1341,17 +1136,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                         +"&id=" + id
                         +"&title=" + title
                         +"&step=" + step;
-                final Object response = sendRequest(url, parameters);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, parameters);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1367,17 +1152,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             ArgumentChecks.ensureNonNull("id", id);
             try {
                 final String url = getURLWithEndSlash().toString() + "configuration?request="+REQUEST_DELETE_TASK+"&id="+id;
-                Object response = sendRequest(url,null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url,null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1394,17 +1169,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean refreshIndex(final String id, final boolean asynchrone) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
-                Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1414,17 +1179,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean importFile(final String id, final File importFile, final String fileName) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id + "&filename=" + fileName;
-                Object response = sendRequest(url, importFile, null, null, true);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, importFile, null, null, true);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1456,13 +1211,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         public boolean deleteMetadata(final String id, final String metadataName) {
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_RECORDS + "&id=" + id + "&metadata=" + metadataName;
-                Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    return "Success".equalsIgnoreCase(ack.getStatus());
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
+                return sendRequestAck(url, null);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
@@ -1488,6 +1237,28 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
 
     // convinient methods //////////////////////////////////////////////////////
+
+    protected boolean sendRequestAck(String sourceURL, Object request, ParameterDescriptorGroup descriptor,
+            MarshallerPool unmarshallerPool, boolean put) throws MalformedURLException, IOException {
+        final Object response =  sendRequest(sourceURL, request, descriptor, unmarshallerPool, put);
+         if (response instanceof AcknowlegementType) {
+            final AcknowlegementType ak = (AcknowlegementType) response;
+            if ("Success".equalsIgnoreCase(ak.getStatus())) {
+                return true;
+            } else {
+                LOGGER.log(Level.WARNING, "Failure:{0}", ak.getMessage());
+            }
+        } else if (response instanceof ExceptionReport) {
+            LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
+        } else {
+            LOGGER.warning("The service respond uncorrectly");
+        }
+        return false;
+    }
+
+    protected boolean sendRequestAck(String sourceURL, Object request) throws MalformedURLException, IOException {
+         return sendRequestAck(sourceURL, request, null, null, false);
+    }
 
     protected Object sendRequest(String sourceURL, Object request) throws MalformedURLException, IOException {
          return sendRequest(sourceURL, request, null, null, false);
