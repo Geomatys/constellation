@@ -88,7 +88,7 @@ public class Source {
      * @param loadAll the loadAll to set
      */
     public void setLoadAll(final Boolean loadAll) {
-        if (loadAll == false) {
+        if (loadAll != null && !loadAll) {
             this.include = new LayerList();
         }
         this.loadAll = loadAll;
@@ -193,7 +193,7 @@ public class Source {
         sb.append(" LoadAll=").append(loadAll);
         return sb.toString();
     }
-    
+
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Source) {

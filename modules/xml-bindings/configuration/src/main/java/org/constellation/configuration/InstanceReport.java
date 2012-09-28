@@ -55,8 +55,31 @@ public class InstanceReport {
         return instances;
     }
 
+    public Instance getInstance(final String name) {
+        if (instances != null) {
+            for (Instance instance : instances) {
+                if (instance.getName().equals(name)) {
+                    return instance;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Instance> getInstances(final String type) {
+        final List<Instance> results = new ArrayList<Instance>();
+        if (instances != null) {
+            for (Instance instance : instances) {
+                if (instance.getType().equals(type)) {
+                    results.add(instance);
+                }
+            }
+        }
+        return results;
+    }
+
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == this) {
             return true;
         }
@@ -73,7 +96,7 @@ public class InstanceReport {
         hash = 89 * hash + (this.instances != null ? this.instances.hashCode() : 0);
         return hash;
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[InstanceReport]\n");

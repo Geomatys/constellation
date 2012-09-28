@@ -1459,11 +1459,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 Object response = sendRequest(url, null);
                 if (response instanceof AcknowlegementType) {
                     final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equalsIgnoreCase(ack.getStatus())) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return "Success".equalsIgnoreCase(ack.getStatus());
                 } else if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 }
