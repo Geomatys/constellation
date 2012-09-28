@@ -17,6 +17,8 @@
 
 package org.constellation.wfs.ws;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -55,6 +57,7 @@ import org.geotoolkit.feature.SchemaException;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.factory.HintsPending;
 import org.geotoolkit.feature.FeatureTypeUtilities;
@@ -73,6 +76,7 @@ import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
 import org.geotoolkit.filter.visitor.IsValidSpatialFilterVisitor;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGML;
+import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.ogc.xml.XMLFilter;
@@ -1073,8 +1077,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                 } catch (IllegalArgumentException ex) {
                                     throw new CstlServiceException(ex);
                                 }
+                            }else if(value instanceof DirectPosition){
+                                final DirectPosition dp = (DirectPosition) value;
+                                value = new GeometryFactory().createPoint(new Coordinate(dp.getOrdinate(0), dp.getOrdinate(1)));
                             }
-                            LOGGER.finer(">> updating : "+ updatePropertyValue +"   => " + value);
+                            LOGGER.log(Level.FINER, ">> updating : {0} => {1}", new Object[]{updatePropertyValue, value});
                             if (value != null) {
                                 LOGGER.log(Level.FINER, "type : {0}", value.getClass());
                             }
