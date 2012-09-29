@@ -94,7 +94,7 @@ public class DefaultCstlRealm extends AuthorizingRealm {
                 password = authReader.getPassword(username);
             }
         } catch ( org.mdweb.model.auth.AuthenticationException ex) {
-            LOGGER.warning(NO_DB_MSG, ex);
+            LOGGER.log(Level.WARNING, NO_DB_MSG, ex);
             throw new UnknownAccountException(NO_DB_MSG);
         }
 
