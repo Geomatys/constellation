@@ -2083,7 +2083,8 @@ public class SOSworker extends AbstractWorker {
                     throw new CstlServiceException("This operation is not take in charge by the Web Service, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
                                                   OPERATION_NOT_SUPPORTED);
                 } else {
-                    throw new CstlServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During",
+                    throw new CstlServiceException("Unknow time filter operation, supported one are: TM_Equals, TM_After, TM_Before, TM_During.\n"
+                                                 + "Another possibility is that the content of your time filter is empty or unrecognized.",
                                                   OPERATION_NOT_SUPPORTED);
                 }
             }
