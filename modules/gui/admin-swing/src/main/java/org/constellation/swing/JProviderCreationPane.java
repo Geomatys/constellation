@@ -77,7 +77,7 @@ public class JProviderCreationPane extends javax.swing.JPanel {
         final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup) cstl.providers.getServiceDescriptor(type);
         final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
         ParameterValueGroup sources = sourceDesc.createValue();
-        sources.parameter("id").setValue(guiId.getText());
+        sources.parameter("id").setValue(guiId.getText().trim());
 
         final ParameterValueGroup params;
         if(guiSubType.isEnabled()){
@@ -269,11 +269,18 @@ public class JProviderCreationPane extends javax.swing.JPanel {
         if(JOptionPane.OK_OPTION == res){
             final String type = pane.getType();
             final ParameterValueGroup parameters = pane.getParameters();
-            if(type != null && parameters != null){
-                //request server for creation. If it worked, a null value is returned.
-                final AcknowlegementType response = server.providers.createProvider(type, parameters);
-                if (response != null) {
-                    JOptionPane.showMessageDialog(null, response.getMessage(), response.getStatus(), JOptionPane.WARNING_MESSAGE);
+            
+            //identifier null or empty
+            if (parameters.parameter("id") == null || parameters.parameter("id").stringValue().isEmpty()) {
+                JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("invalidProviderNameMessage"), 
+                        LayerRowModel.BUNDLE.getString("invalidProviderNameFrameTitle"), JOptionPane.WARNING_MESSAGE);
+            } else {
+                if(type != null && parameters != null) {
+                    //request server for creation. If it worked, a null value is returned.
+                    final AcknowlegementType response = server.providers.createProvider(type, parameters);
+                    if (response != null) {
+                        JOptionPane.showMessageDialog(null, response.getMessage(), response.getStatus(), JOptionPane.WARNING_MESSAGE);
+                    }
                 }
             }
         }
