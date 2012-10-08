@@ -83,13 +83,13 @@ public final class MetadataUtilities {
         final boolean eq = Utilities.deepEquals(expected, result, mode);
         final String msg;
         if (!eq) {
-            msg = "expected:<" + expected + "> but was <" + result + ">"; 
+            msg = "expected:<" + expected + "> but was <" + result + ">";
         } else {
             msg = "object are equals";
         }
         assertTrue(msg, eq);
     }
-    
+
     public static void metadataEquals(final DefaultMetadata expResult, final DefaultMetadata result, ComparisonMode mode) {
 
         assertEqualsMode(expResult.getFileIdentifier(), result.getFileIdentifier(), mode);
@@ -111,15 +111,15 @@ public final class MetadataUtilities {
                 assertEqualsMode(expId.getResourceMaintenances(), resId.getResourceMaintenances(), mode);
                 assertEqualsMode(expId.getResourceSpecificUsages(), resId.getResourceSpecificUsages(), mode);
                 assertEqualsMode(expId.getStatus(), resId.getStatus(), mode);
-                
-                
+
+
                 if (expId instanceof DefaultDataIdentification) {
                     DefaultDataIdentification expDid = (DefaultDataIdentification) expId;
                     DefaultDataIdentification resDid = (DefaultDataIdentification) resId;
                     assertEqualsMode(expDid.getCharacterSets(), resDid.getCharacterSets(), mode);
                     assertEqualsMode(expDid.getEnvironmentDescription(), resDid.getEnvironmentDescription(), mode);
                     assertEquals(expDid.getExtents().size(), resDid.getExtents().size());
-                    
+
                     Iterator<Extent> expExtents = expDid.getExtents().iterator();
                     Iterator<Extent> resExtents = resDid.getExtents().iterator();
                     while (expExtents.hasNext()) {
@@ -127,7 +127,7 @@ public final class MetadataUtilities {
                         Extent resExtent = resExtents.next();
                         assertEqualsMode(expExtent.getGeographicElements(), resExtent.getGeographicElements(), mode);
                         assertEqualsMode(expExtent.getTemporalElements(), resExtent.getTemporalElements(), mode);
-                        
+
                         Iterator<? extends VerticalExtent> expVExtents = expExtent.getVerticalElements().iterator();
                         Iterator<? extends VerticalExtent> resVExtents = resExtent.getVerticalElements().iterator();
                         while (expVExtents.hasNext()) {
@@ -140,22 +140,22 @@ public final class MetadataUtilities {
                                 assertEqualsMode(expVExtent.getVerticalCRS().getDatum(), resVExtent.getVerticalCRS().getDatum(), mode);
                             }
                             assertEqualsMode(expVExtent.getVerticalCRS(), resVExtent.getVerticalCRS(), mode);
-                            
+
                             assertEqualsMode(expVExtent, resVExtent, mode);
                         }
-                        
+
                         assertEqualsMode(expExtent.getVerticalElements(), resExtent.getVerticalElements(), mode);
                         assertEqualsMode(expExtent, resExtent, mode);
                     }
-                            
-                    
+
+
                     assertEqualsMode(expDid.getExtents(), resDid.getExtents(), mode);
                     assertEqualsMode(expDid.getLanguages(), resDid.getLanguages(), mode);
                     assertEqualsMode(expDid.getSpatialRepresentationTypes(), resDid.getSpatialRepresentationTypes(), mode);
                     assertEqualsMode(expDid.getSpatialResolutions(), resDid.getSpatialResolutions(), mode);
                     assertEqualsMode(expDid.getSupplementalInformation(), resDid.getSupplementalInformation(), mode);
                     assertEqualsMode(expDid.getTopicCategories(), resDid.getTopicCategories(), mode);
-                    
+
                 } else if (expId instanceof ServiceIdentificationImpl) {
                     ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;
                     ServiceIdentificationImpl resService = (ServiceIdentificationImpl) result.getIdentificationInfo().iterator().next();
@@ -169,7 +169,7 @@ public final class MetadataUtilities {
         assertEqualsMode(expResult.getDistributionInfo(), result.getDistributionInfo(), mode);
         assertEqualsMode(expResult, result, mode);
     }
-    
+
     public static void metadataEquals(final DefaultMetadata expResult, final DefaultMetadata result) {
 
         assertEquals(expResult.getAcquisitionInformation().size(), result.getAcquisitionInformation().size());
@@ -561,7 +561,7 @@ public final class MetadataUtilities {
 
         assertEquals(expectedExtents, resultExtents);
     }
-    
+
     public static void citationEquals(final Citation expectedCitation, final Citation resultCitation) {
         if (expectedCitation != null && resultCitation != null) {
             assertEquals(expectedCitation.getAlternateTitles(), resultCitation.getAlternateTitles());
@@ -660,9 +660,9 @@ public final class MetadataUtilities {
 
         assertEquals(expResult.getMember().size(), result.getMember().size());
     }
-    
+
     public static void systemSMLEquals(final SensorML expResult, final SensorML result) {
-        
+
         sensorMLEquals(expResult, result);
         assertEquals(expResult.getMember().size(), 1);
         SystemType expSysProcess = (SystemType) expResult.getMember().iterator().next().getProcess().getValue();
@@ -713,7 +713,7 @@ public final class MetadataUtilities {
         for (int i = 0; i < expSysProcess.getClassification().get(0).getClassifierList().getClassifier().size(); i++) {
             assertEquals(expSysProcess.getClassification().get(0).getClassifierList().getClassifier().get(i), resSysProcess.getClassification().get(0).getClassifierList().getClassifier().get(i));
         }
-        
+
         assertEquals(expSysProcess.getClassification().get(0).getClassifierList().getClassifier(), resSysProcess.getClassification().get(0).getClassifierList().getClassifier());
         assertEquals(expSysProcess.getClassification().get(0).getClassifierList(), resSysProcess.getClassification().get(0).getClassifierList());
         assertEquals(expSysProcess.getClassification().get(0), resSysProcess.getClassification().get(0));
@@ -774,7 +774,7 @@ public final class MetadataUtilities {
         assertEquals(expSysProcess.getPositions().getPositionList().getPosition(), resSysProcess.getPositions().getPositionList().getPosition());
         assertEquals(expSysProcess.getPositions().getPositionList(), resSysProcess.getPositions().getPositionList());
         assertEquals(expSysProcess.getPositions(), resSysProcess.getPositions());
-        
+
         assertEquals(expSysProcess.getSMLLocation().getPoint().getPos(), resSysProcess.getSMLLocation().getPoint().getPos());
         assertEquals(expSysProcess.getSMLLocation().getPoint().getAxisLabels(), resSysProcess.getSMLLocation().getPoint().getAxisLabels());
         assertEquals(expSysProcess.getSMLLocation().getPoint().getUomLabels(), resSysProcess.getSMLLocation().getPoint().getUomLabels());
@@ -800,9 +800,9 @@ public final class MetadataUtilities {
     }
 
     public static void componentEquals(final SensorML expResult, final SensorML result) {
-        
+
         sensorMLEquals(expResult, result);
-        
+
         assertEquals(expResult.getMember().size(), 1);
         ComponentType expProcess = (ComponentType) expResult.getMember().iterator().next().getProcess().getValue();
         assertTrue(result.getMember().iterator().next().getProcess().getValue() instanceof ComponentType);
@@ -876,6 +876,16 @@ public final class MetadataUtilities {
         assertEquals(expProcess.getSrsName(), resProcess.getSrsName());
         assertEquals(expProcess.getTemporalReferenceFrame(), resProcess.getTemporalReferenceFrame());
         assertEquals(expProcess.getTimePosition(), resProcess.getTimePosition());
+        if (expProcess.getValidTime() != null && resProcess.getValidTime() != null) {
+            if (expProcess.getValidTime().getTimePeriod() != null && resProcess.getValidTime().getTimePeriod() != null) {
+                if (expProcess.getValidTime().getTimePeriod().getBeginPosition()!= null && resProcess.getValidTime().getTimePeriod().getBeginPosition() != null) {
+                    assertEquals(expProcess.getValidTime().getTimePeriod().getBeginPosition().getValue(), resProcess.getValidTime().getTimePeriod().getBeginPosition().getValue());
+                }
+                assertEquals(expProcess.getValidTime().getTimePeriod().getBeginPosition(), resProcess.getValidTime().getTimePeriod().getBeginPosition());
+                assertEquals(expProcess.getValidTime().getTimePeriod().getEndPosition(), resProcess.getValidTime().getTimePeriod().getEndPosition());
+            }
+            assertEquals(expProcess.getValidTime().getTimePeriod(), resProcess.getValidTime().getTimePeriod());
+        }
         assertEquals(expProcess.getValidTime(), resProcess.getValidTime());
 
         assertEquals(expResult.getMember().iterator().next().getArcrole(), result.getMember().iterator().next().getArcrole());
