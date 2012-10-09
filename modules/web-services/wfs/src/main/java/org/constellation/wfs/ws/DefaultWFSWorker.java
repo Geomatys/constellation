@@ -126,6 +126,7 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.feature.type.PropertyType;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -884,7 +885,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final List<Object> transactions            = request.getTransactionAction();
         final Map<String, String> inserted         = new LinkedHashMap<String, String>();
         final Map<String, String> namespaceMapping = request.getPrefixMapping();
-        final XmlFeatureReader featureReader       = new JAXPStreamFeatureReader(getFeatureTypes());
+        final JAXPStreamFeatureReader featureReader= new JAXPStreamFeatureReader(getFeatureTypes());
 
         for (Object transaction: transactions) {
 
@@ -1055,16 +1056,18 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                     // we verify that the update property are contained in the feature type
                     for (final Property updateProperty : updateRequest.getProperty()) {
-                        final String updatePropertyValue = updateProperty.getLocalName();
-                        final PropertyAccessor pa        = Accessors.getAccessor(Feature.class, updatePropertyValue, null);
-                        if (pa == null || pa.get(ft, updatePropertyValue, null) == null) {
-                            throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyValue, INVALID_PARAMETER_VALUE);
+                        final String updatePropertyName = updateProperty.getLocalName();
+                        final PropertyAccessor pa = Accessors.getAccessor(Feature.class, updatePropertyName, null);
+                        if (pa == null || pa.get(ft, updatePropertyName, null) == null) {
+                            throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyName, INVALID_PARAMETER_VALUE);
                         }
+                        final PropertyType propertyType = ft.getDescriptor(updatePropertyName).getType();
+                        
                         Object value;
                         if (updateProperty.getValue() instanceof Element) {
                             final String strValue = getXMLFromElementNSImpl((Element)updateProperty.getValue());
                             value = null;
-                            LOGGER.finer(">> updating : "+ updatePropertyValue +"   => " + strValue);
+                            LOGGER.log(Level.FINER, ">> updating : {0}   => {1}", new Object[]{updatePropertyName, strValue});
                         } else {
                             value = updateProperty.getValue();
                             if (value instanceof AbstractGeometryType) {
@@ -1080,13 +1083,15 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                             }else if(value instanceof DirectPosition){
                                 final DirectPosition dp = (DirectPosition) value;
                                 value = new GeometryFactory().createPoint(new Coordinate(dp.getOrdinate(0), dp.getOrdinate(1)));
+                            }else if(value instanceof String){
+                                value = featureReader.readValue((String)value, propertyType);
                             }
-                            LOGGER.log(Level.FINER, ">> updating : {0} => {1}", new Object[]{updatePropertyValue, value});
+                            LOGGER.log(Level.FINER, ">> updating : {0} => {1}", new Object[]{updatePropertyName, value});
                             if (value != null) {
                                 LOGGER.log(Level.FINER, "type : {0}", value.getClass());
                             }
                         }
-                        values.put(ft.getDescriptor(updatePropertyValue), value);
+                        values.put(ft.getDescriptor(updatePropertyName), value);
 
                     }
 
