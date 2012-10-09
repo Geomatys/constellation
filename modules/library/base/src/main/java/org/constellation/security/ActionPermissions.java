@@ -17,6 +17,9 @@
 
 package org.constellation.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -67,4 +70,17 @@ public class ActionPermissions {
      * Permission to edit a service instance.
      */
     public static final String RELOAD_PROVIDER = "reloadProvider";
+
+    public static final List<String> VALUES = new ArrayList<String>();
+    static {
+        VALUES.add(VIEW_SERVICE);
+        VALUES.add(NEW_SERVICE);
+        VALUES.add(EDIT_SERVICE);
+        VALUES.add(RELOAD_SERVICE);
+        VALUES.add(START_STOP_SERVICE);
+        VALUES.add(VIEW_PROVIDER);
+        VALUES.add(NEW_PROVIDER);
+        VALUES.add(EDIT_PROVIDER);
+        VALUES.add(RELOAD_PROVIDER);
+    }
 }
