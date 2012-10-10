@@ -18,6 +18,7 @@
 package org.constellation.wfs.ws;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -56,6 +58,7 @@ import org.geotoolkit.data.DataUtilities;
 import org.geotoolkit.feature.SchemaException;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.data.memory.GenericReprojectFeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.factory.Hints;
@@ -72,8 +75,10 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.accessor.Accessors;
 import org.geotoolkit.filter.accessor.PropertyAccessor;
+import org.geotoolkit.filter.visitor.FillCrsVisitor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
 import org.geotoolkit.filter.visitor.IsValidSpatialFilterVisitor;
+import org.geotoolkit.geometry.jts.JTS;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGML;
 import org.geotoolkit.gml.xml.DirectPosition;
@@ -124,6 +129,7 @@ import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
 // GeoAPI dependencies
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.feature.type.PropertyType;
@@ -321,25 +327,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     final org.geotoolkit.wfs.xml.FeatureType ftt;
                     try {
 
-                        final String defaultCRS;
-                        if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
-                            final CoordinateReferenceSystem crs = type.getGeometryDescriptor().getCoordinateReferenceSystem();
-                            //todo wait for martin fix
-                            String id  = IdentifiedObjects.lookupIdentifier(crs, true);
-                            if (id == null) {
-                                id = IdentifiedObjects.getIdentifier(crs);
-                            }
-
-                            if (id != null) {
-                                defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
-            //                    final String defaultCRS = IdentifiedObjects.lookupIdentifier(Citations.URN_OGC,
-            //                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
-                            } else {
-                                defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
-                            }
-                        } else {
-                            defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
-                        }
+                        final String defaultCRS = getCRSCode(type);
                         final String title;
                         if (configLayer.getTitle() != null) {
                             title = configLayer.getTitle();
@@ -412,6 +400,31 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         LOGGER.log(logLevel, "GetCapabilities treated in {0}ms", (System.currentTimeMillis() - start));
         return result;
     }
+    
+    private String getCRSCode(FeatureType type) throws FactoryException{
+        
+        final String defaultCRS;
+        if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
+            final CoordinateReferenceSystem crs = type.getGeometryDescriptor().getCoordinateReferenceSystem();
+            //todo wait for martin fix
+            String id  = IdentifiedObjects.lookupIdentifier(crs, true);
+            if (id == null) {
+                id = IdentifiedObjects.getIdentifier(crs);
+            }
+
+            if (id != null) {
+                defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
+//                final String defaultCRS = IdentifiedObjects.lookupIdentifier(Citations.URN_OGC,
+//                        type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+            } else {
+                defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
+            }
+        } else {
+            defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
+        }
+        return defaultCRS;
+    }
+    
 
     /**
      * {@inheritDoc }
@@ -633,20 +646,19 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
             //decode filter-----------------------------------------------------
             final Filter filter = extractJAXBFilter(featureId, query.getFilter(), Filter.INCLUDE, namespaceMapping, currentVersion);
-
+            
             //decode crs--------------------------------------------------------
-            final CoordinateReferenceSystem crs = extractCRS(query.getSrsName());
+            final CoordinateReferenceSystem queryCRS = extractCRS(query.getSrsName());
 
             //decode property names---------------------------------------------
             final List<String> requestPropNames = extractPropertyNames(query.getPropertyNames());
 
             //decode sort by----------------------------------------------------
-             final List<SortBy> sortBys = visitJaxbSortBy(query.getSortBy(), namespaceMapping, currentVersion);
+            final List<SortBy> sortBys = visitJaxbSortBy(query.getSortBy(), namespaceMapping, currentVersion);
 
 
             final QueryBuilder queryBuilder = new QueryBuilder();
-            queryBuilder.setFilter(filter);
-            queryBuilder.setCRS(crs);
+            queryBuilder.setCRS(queryCRS);
 
             if (!sortBys.isEmpty()) {
                 queryBuilder.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
@@ -678,15 +690,30 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
                 // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
                 queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
-
                 queryBuilder.setTypeName(ft.getName());
                 queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
-
+                queryBuilder.setFilter(fillFilterCrs(ft, filter));
+                
                 // we verify that all the properties contained in the filter are known by the feature type.
                 verifyFilterProperty(ft, filter);
+                               
 
-                final FeatureCollection collection = layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery());
+                FeatureCollection collection = layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery());
                 if (!collection.isEmpty()) {
+                    if(queryCRS == null){
+                        try {
+                            //ensure axes are in the declared order, since we use urn epsg, we must comply
+                            //to proper epsg axis order                        
+                            final String defaultCRS = getCRSCode(ft);
+                            final CoordinateReferenceSystem rcrs = CRS.decode(defaultCRS);
+                            if(!CRS.equalsIgnoreMetadata(rcrs, ft.getCoordinateReferenceSystem())){
+                                collection = GenericReprojectFeatureIterator.wrap(collection, CRS.decode(defaultCRS));
+                            }
+                        } catch (FactoryException ex) {
+                            Logger.getLogger(DefaultWFSWorker.class.getName()).log(Level.WARNING, ex.getMessage(), ex);
+                        }
+                    }
+                        
                     collections.add(collection);
                     // we write The SchemaLocation
                     putSchemaLocation(typeName, schemaLocations);
@@ -767,7 +794,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
 
             final QueryBuilder queryBuilder = new QueryBuilder();
-            queryBuilder.setFilter(filter);
             queryBuilder.setCRS(crs);
 
             if (!sortBys.isEmpty()) {
@@ -797,6 +823,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
                 // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
                 queryBuilder.setProperties(verifyPropertyNames(typeName, ft, requestPropNames));
+                queryBuilder.setFilter(fillFilterCrs(ft, filter));
 
                 queryBuilder.setTypeName(ft.getName());
                 queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
@@ -941,12 +968,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                         throw new CstlServiceException(ex);
                     }
                     final Name typeName;
-                    final Collection<? extends Feature> featureCollection;
+                    FeatureCollection featureCollection;
 
                     if (featureObject instanceof Feature) {
                         final Feature feature = (Feature) featureObject;
                         typeName = feature.getType().getName();
-                        featureCollection = Collections.singleton(feature);
+                        featureCollection = DataUtilities.collection(feature);
                     } else if (featureObject instanceof FeatureCollection) {
                         featureCollection = (FeatureCollection) featureObject;
                         typeName = ((FeatureCollection)featureCollection).getFeatureType().getName();
@@ -969,6 +996,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     }
                     final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName);
                     try {
+                        final CoordinateReferenceSystem trueCrs = layer.getStore().getFeatureType(typeName).getCoordinateReferenceSystem();
+                        if(trueCrs != null && !CRS.equalsIgnoreMetadata(trueCrs, featureCollection.getFeatureType().getCoordinateReferenceSystem())){
+                            featureCollection = GenericReprojectFeatureIterator.wrap(featureCollection, trueCrs);
+                        }
+                        
                         final List<FeatureId> features = layer.getStore().addFeatures(typeName, featureCollection);
 
                         for (FeatureId fid : features) {
@@ -1010,7 +1042,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                     // we extract the number of feature deleted
                     final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
-                    queryBuilder.setFilter(filter);
+                    queryBuilder.setFilter(fillFilterCrs(ft, filter));
                     totalDeleted = totalDeleted + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
                     layer.getStore().removeFeatures(layer.getName(), filter);
@@ -1072,8 +1104,18 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                             value = updateProperty.getValue();
                             if (value instanceof AbstractGeometryType) {
                                 try {
+                                    final String defaultCRS = getCRSCode(ft);
+                                    final CoordinateReferenceSystem exposedCrs = CRS.decode(defaultCRS);
+                                    final CoordinateReferenceSystem trueCrs = ((GeometryType)propertyType).getCoordinateReferenceSystem();
+                                    
                                     value = GeometrytoJTS.toJTS((AbstractGeometryType) value);
+                                    if(!CRS.equalsIgnoreMetadata(exposedCrs, trueCrs)){
+                                        value = JTS.transform((Geometry)value, CRS.findMathTransform(exposedCrs, trueCrs));
+                                    }
+                                    
                                 } catch (NoSuchAuthorityCodeException ex) {
+                                    Logging.unexpectedException(LOGGER, ex);
+                                } catch (TransformException ex) {
                                     Logging.unexpectedException(LOGGER, ex);
                                 } catch (FactoryException ex) {
                                     Logging.unexpectedException(LOGGER, ex);
@@ -1100,7 +1142,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                     // we extract the number of feature update
                     final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
-                    queryBuilder.setFilter(filter);
+                    queryBuilder.setFilter(fillFilterCrs(ft, filter));
                     totalUpdated = totalUpdated + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
                     layer.getStore().updateFeatures(layer.getName(), filter, values);
@@ -1282,6 +1324,30 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     /**
+     * Ensure crs is set on all geometric elements and with correct crs.
+     */
+    private Filter fillFilterCrs(FeatureType ft, Filter filter){
+        try {         
+            final String defaultCRS = getCRSCode(ft);
+            final CoordinateReferenceSystem exposedCrs = CRS.decode(defaultCRS);
+            final CoordinateReferenceSystem trueCrs = ft.getCoordinateReferenceSystem();
+            
+            if(CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)){
+                return filter;
+            }else{
+                filter = (Filter) filter.accept(FillCrsVisitor.VISITOR, exposedCrs);
+                filter = (Filter) filter.accept(new CrsAdjustFilterVisitor(exposedCrs, trueCrs), null);
+                
+                return filter;
+            }
+            
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+        }
+        return filter;
+    }
+    
+    /**
      * Extract the WGS84 BBOx from a featureSource.
      * what ? may not be wgs84 exactly ? why is there a CRS attribute on a wgs84 bbox ?
      */
@@ -1418,11 +1484,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          }
     }
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public List<FeatureType> getFeatureTypes() {
+    private List<FeatureType> getFeatureTypes() {
         final List<FeatureType> types       = new ArrayList<FeatureType>();
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
         final Map<Name,Layer> layers        = getLayers();
@@ -1432,9 +1494,16 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             final LayerDetails layer = namedProxy.get(name);
             if (!(layer instanceof FeatureLayerDetails)) {continue;}
 
+            
+            
             try {
-                types.add(getFeatureTypeFromLayer((FeatureLayerDetails)layer));
-            } catch (DataStoreException ex) {
+                //fix feature type to define the exposed crs : true EPSG axis order
+                final FeatureType baseType = getFeatureTypeFromLayer((FeatureLayerDetails)layer);
+                final String crsCode = getCRSCode(baseType);
+                final CoordinateReferenceSystem exposedCrs = CRS.decode(crsCode);
+                final FeatureType exposedType = FeatureTypeUtilities.transform(baseType, exposedCrs);
+                types.add(exposedType);
+            } catch (Exception ex) {
                 LOGGER.severe("DataStore exception while getting featureType");
             }
         }
