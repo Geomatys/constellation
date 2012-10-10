@@ -159,40 +159,34 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails {
     public SortedSet<Date> getAvailableTimes() throws DataStoreException {
         SortedSet<Date> dates = new TreeSet<Date>();
         final Envelope env = getEnvelope();
-        
-        try {
-            final Envelope tempEnv = CRS.transform(env, DefaultTemporalCRS.JAVA);
             
-            final CoordinateReferenceSystem crs = tempEnv.getCoordinateReferenceSystem();
-            final CoordinateSystem cs = crs.getCoordinateSystem();
+        final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
+        final CoordinateSystem cs = crs.getCoordinateSystem();
 
-            final int nbDim = cs.getDimension();
+        final int nbDim = cs.getDimension();
 
-            for (int i = 0; i < nbDim; i++) {
-                final CoordinateSystemAxis axis = cs.getAxis(i);
-                final AxisDirection direction = axis.getDirection();
+        for (int i = 0; i < nbDim; i++) {
+            final CoordinateSystemAxis axis = cs.getAxis(i);
+            final AxisDirection direction = axis.getDirection();
 
-                //TEMPORAL AXIS
-                if (direction.equals(AxisDirection.PAST) || direction.equals(AxisDirection.FUTURE)) {
-                    if (axis instanceof DiscreteCoordinateSystemAxis) {
-                        final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
-                        final int nbOrdinate = discretAxis.length();
-                        for (int j = 0; j < nbOrdinate; j++) {
-                            dates.add((Date) discretAxis.getOrdinateAt(j));
-                        }
-                    } else {
-                        final Double min = Double.valueOf(axis.getMinimumValue());
-                        final Double max = Double.valueOf(axis.getMaximumValue());
-                        final long intMin = min.longValue();
-                        final long intMax = max.longValue();
-                        
-                        dates.add(new Date(intMin));
-                        dates.add(new Date(intMax));
-                    } 
+            //TEMPORAL AXIS
+            if (direction.equals(AxisDirection.PAST) || direction.equals(AxisDirection.FUTURE)) {
+                if (axis instanceof DiscreteCoordinateSystemAxis) {
+                    final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
+                    final int nbOrdinate = discretAxis.length();
+                    for (int j = 0; j < nbOrdinate; j++) {
+                        dates.add((Date) discretAxis.getOrdinateAt(j));
+                    }
+                } else {
+                    final Double min = Double.valueOf(axis.getMinimumValue());
+                    final Double max = Double.valueOf(axis.getMaximumValue());
+                    final long intMin = min.longValue();
+                    final long intMax = max.longValue();
+
+                    dates.add(new Date(intMin));
+                    dates.add(new Date(intMax));
                 } 
-            }
-        } catch (TransformException ex) {
-            throw new DataStoreException(ex);
+            } 
         }
         return dates;
     }
