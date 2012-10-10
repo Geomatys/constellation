@@ -48,7 +48,7 @@ public class DataStoreProvider extends AbstractLayerProvider{
         super.reload();
         dispose();
 
-        //pameter is a choice of different types
+        //parameter is a choice of different types
         //extract the first one
         ParameterValueGroup param = getSource();
         param = param.groups("choice").get(0);
@@ -79,6 +79,11 @@ public class DataStoreProvider extends AbstractLayerProvider{
 
     }
 
+    public synchronized DataStore getStore() {
+        if(store == null) reload();
+        return store;
+    }
+    
     @Override
     public synchronized void dispose() {
         super.dispose();
