@@ -23,7 +23,7 @@ import org.constellation.configuration.Instance;
 
 /**
  * Edit a service.
- * 
+ *
  * @author Johann Sorel (geomatys)
  */
 public class JServiceEditPane extends javax.swing.JPanel {
@@ -32,13 +32,13 @@ public class JServiceEditPane extends javax.swing.JPanel {
     private final String serviceType;
     private final Instance serviceInstance;
     private final JServiceEditionPane serviceEditionPanel;
-    
+
     public JServiceEditPane(final ConstellationServer server, final String serviceType, final Instance serviceInstance) {
         this.server = server;
         this.serviceType = serviceType;
         this.serviceInstance = serviceInstance;
         Object configuration = server.services.getInstanceconfiguration(serviceType, serviceInstance.getName());
-        initComponents();        
+        initComponents();
         guiName.setText(serviceInstance.getName());
         if ("WMS".equals(serviceType) || "WMTS".equals(serviceType) || "WCS".equals(serviceType) || "WFS".equals(serviceType)) {
             serviceEditionPanel =  new JServiceMapEditPane(server, serviceType, serviceInstance, configuration);
@@ -46,7 +46,7 @@ public class JServiceEditPane extends javax.swing.JPanel {
         } else {
             serviceEditionPanel = null;
         }
-        
+
     }
 
     public String getServiceType() {
@@ -62,7 +62,7 @@ public class JServiceEditPane extends javax.swing.JPanel {
         guiName.setText(guiName.getText().replace(' ', '_'));
         guiName.setCaretPosition(pos);
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -148,13 +148,15 @@ public class JServiceEditPane extends javax.swing.JPanel {
         correctName();
         server.services.renameInstance(serviceType, serviceInstance.getName(), guiName.getText());
         serviceInstance.setName(guiName.getText());
-        server.services.configureInstance(serviceType, serviceInstance.getName(), serviceEditionPanel.getConfiguration());
+        if (serviceEditionPanel != null) {
+            server.services.configureInstance(serviceType, serviceInstance.getName(), serviceEditionPanel.getConfiguration());
+        }
         server.services.startInstance(serviceType, serviceInstance.getName());
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiSaveActionPerformed
 
     private void guiDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiDeleteActionPerformed
-        server.services.deleteInstance(serviceType, serviceInstance.getName());        
+        server.services.deleteInstance(serviceType, serviceInstance.getName());
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiDeleteActionPerformed
 
