@@ -689,7 +689,10 @@ public class SOSworker extends AbstractWorker {
 
         // we load the skeleton capabilities
         final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "SOS");
-
+        if (skeletonCapabilities == null) {
+            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+        }
+        
         final Capabilities localCapabilities;
         if (keepCapabilities) {
             localCapabilities = cachedCapabilities;

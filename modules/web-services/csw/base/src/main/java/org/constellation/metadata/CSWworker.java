@@ -368,10 +368,12 @@ public class CSWworker extends AbstractWorker {
     private void initializeSupportedTypeNames() {
         supportedTypeNames = new ArrayList<QName>();
         final List<Integer> supportedDataTypes = mdReader.getSupportedDataTypes();
-        if (supportedDataTypes.contains(ISO_19115))
+        if (supportedDataTypes.contains(ISO_19115)) {
             supportedTypeNames.addAll(ISO_TYPE_NAMES);
-        if (supportedDataTypes.contains(DUBLINCORE))
+        }
+        if (supportedDataTypes.contains(DUBLINCORE)) {
             supportedTypeNames.addAll(DC_TYPE_NAMES);
+        }
         if (supportedDataTypes.contains(EBRIM)) {
             supportedTypeNames.addAll(EBRIM30_TYPE_NAMES);
             supportedTypeNames.addAll(EBRIM25_TYPE_NAMES);
@@ -551,6 +553,9 @@ public class CSWworker extends AbstractWorker {
 
         // we load the skeleton capabilities
         final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
+        if (skeletonCapabilities == null) {
+            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+        }
 
         //we prepare the response document
         ServiceIdentification si = null;
@@ -564,8 +569,9 @@ public class CSWworker extends AbstractWorker {
         }
 
         //according to CITE test a GetCapabilities must always return Filter_Capabilities
-        if (!sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL))
+        if (!sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL)) {
             sections.add(FILTER_CAPABILITIES);
+        }
 
         //we enter the information for service identification.
         if (sections.containsSection("ServiceIdentification") || sections.containsSection(ALL)) {
@@ -603,10 +609,11 @@ public class CSWworker extends AbstractWorker {
                         om.getConstraint().add(fedCata);
                     }
                 } else {
-                    if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty())
+                    if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
                         cascadedCSW.setValue(cascadedCSWservers);
-                    else
+                    } else {
                         om.removeConstraint(cascadedCSW);
+                    }
                 }
 
                 // we update the operation parameters
@@ -779,8 +786,9 @@ public class CSWworker extends AbstractWorker {
                     //we verify that the typeName is supported
                     if (!supportedTypeNames.contains(type)) {
                         String typeName = "null";
-                        if (type != null)
+                        if (type != null) {
                             typeName = type.getLocalPart();
+                        }
                         throw new CstlServiceException("The typeName " + typeName + " is not supported by the service:" +'\n' +
                                                       "supported one are:" + '\n' + supportedTypeNames(),
                                                       INVALID_PARAMETER_VALUE, TYPENAMES);
@@ -916,8 +924,9 @@ public class CSWworker extends AbstractWorker {
         int nextRecord         = startPos + maxRecord;
         final int totalMatched = nbResults + distributedResults.nbMatched;
 
-        if (nextRecord > totalMatched)
+        if (nextRecord > totalMatched) {
             nextRecord = 0;
+        }
 
         final int maxDistributed = distributedResults.additionalResults.size();
         int max = (startPos - 1) + maxRecord;
@@ -1079,9 +1088,9 @@ public class CSWworker extends AbstractWorker {
             }
         }
 
-        if (request.getId().isEmpty())
-            throw new CstlServiceException("You must specify at least one identifier",
-                                          MISSING_PARAMETER_VALUE, "id");
+        if (request.getId().isEmpty()){
+            throw new CstlServiceException("You must specify at least one identifier", MISSING_PARAMETER_VALUE, "id");
+        }
 
         //we begin to build the result
         GetRecordByIdResponseType response;
@@ -1281,7 +1290,10 @@ public class CSWworker extends AbstractWorker {
 
                     // we load the skeleton capabilities
                     final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
-
+                    if (skeletonCapabilities == null) {
+                        throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+                    }
+                    
                     final String operationName = token.substring(0, pointLocation);
                     final String parameter     = token.substring(pointLocation + 1);
                     final Operation o          = skeletonCapabilities.getOperationsMetadata().getOperation(operationName);

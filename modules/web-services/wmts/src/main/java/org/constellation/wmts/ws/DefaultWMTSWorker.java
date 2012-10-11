@@ -178,9 +178,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
         // we load the skeleton capabilities
         final Capabilities skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "WMTS");
-
         if (skeletonCapabilities == null) {
-            throw new CstlServiceException("the service was unable to find the metadata for capabilities operation", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("Unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
         }
 
         //we enter the information for service identification.
@@ -450,7 +449,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 }
             }
         }
-        
+
         // 2. PARAMETERS NOT USED FOR NOW
         Double elevation =  null;
         Date time        = null;
