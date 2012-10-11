@@ -1375,7 +1375,7 @@ public class CSWworkerTest {
 
         boolean exLaunched = false;
         try {
-            result = worker.getDomain(request);
+            worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getLocator(), "parameterName, propertyName");
@@ -1390,7 +1390,7 @@ public class CSWworkerTest {
 
         exLaunched = false;
         try {
-            result = worker.getDomain(request);
+            worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getLocator(), PARAMETERNAME);
@@ -1405,7 +1405,7 @@ public class CSWworkerTest {
 
         exLaunched = false;
         try {
-            result = worker.getDomain(request);
+            worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getLocator(), PARAMETERNAME);
@@ -1420,7 +1420,7 @@ public class CSWworkerTest {
 
         exLaunched = false;
         try {
-            result = worker.getDomain(request);
+            worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getLocator(), PARAMETERNAME);
@@ -1518,7 +1518,7 @@ public class CSWworkerTest {
         // we try to request the deleted metadata
         CstlServiceException exe = null;
         try {
-            GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+            worker.getRecordById(requestGRBI);
         } catch (CstlServiceException ex) {
             exe = ex;
         }
@@ -1934,7 +1934,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
         }
@@ -1975,7 +1975,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
         }
@@ -2021,7 +2021,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
         }
@@ -2235,7 +2235,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
             assertTrue(ex.getMessage(), ex.getMessage().contains("The property: abstract"));
@@ -2259,7 +2259,7 @@ public class CSWworkerTest {
 
         exe = null;
         try {
-            result     = worker.transaction(request);
+            worker.transaction(request);
         } catch (CstlServiceException ex) {
             exe = ex;
         }

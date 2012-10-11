@@ -65,12 +65,12 @@ import org.opengis.util.LocalName;
  * @author Guilhem Legal
  */
 public class GenericIndexer extends AbstractCSWIndexer<Object> {
-    
+
     /**
      * The Reader of this lucene index (generic DB mode).
      */
     private final MetadataReader reader;
-    
+
     private static final DateFormat LUCENE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
     /**
@@ -80,7 +80,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
-     * 
+     *
      * @param reader A generic reader to request the metadata dataSource.
      * @param configurationDirectory The directory where the index can write indexation file.
      * @param serviceID The identifier, if there is one, of the index/service.
@@ -114,7 +114,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      *
      * @param configDirectory A directory where the index can write indexation file.
      */
-    public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory, 
+    public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
             final String serviceID) throws IndexingException {
         super(serviceID, configDirectory, additionalQueryable);
         this.reader = null;
@@ -122,7 +122,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             createIndex(toIndex);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -134,7 +134,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             throw new IndexingException("Metadata_IOException while reading all identifiers", ex);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -146,7 +146,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             throw new IndexingException("Metadata_IOException while reading entry for:" + identifier, ex);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -239,7 +239,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
              final List<Object> newValues = new ArrayList<Object>();
              for (Object value : values.value) {
                  if (value instanceof String) {
-                     String stringValue = (String) value; 
+                     String stringValue = (String) value;
                      if (stringValue.endsWith("z") || stringValue.endsWith("Z")) {
                          stringValue = stringValue.substring(0, stringValue.length() - 1);
                      }
@@ -273,11 +273,11 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         }
         if (!sb.toString().isEmpty()) {
             // we remove the last ','
-            sb.delete(sb.length() - 1, sb.length()); 
+            sb.delete(sb.length() - 1, sb.length());
         }
         return sb.toString();
     }
-    
+
     protected List<Object> getValuesList(final Object metadata, final List<String> paths) {
         return extractValues(metadata, paths);
     }
@@ -286,14 +286,14 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * Extract the String values denoted by the specified paths
      * and return the values as a String values1,values2,....
      * if there is no values corresponding to the paths the method return "null" (the string)
-     * 
+     *
      * @param metadata
      * @param paths
      * @return
      */
     public static List<Object> extractValues(final Object metadata, final List<String> paths) {
         final List<Object> response  = new ArrayList<Object>();
-        
+
         if (paths != null) {
             for (String fullPathID: paths) {
                if (!ReflectionUtilities.pathMatchObjectType(metadata, fullPathID)) {
@@ -302,7 +302,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 String pathID;
                 String conditionalAttribute = null;
                 String conditionalValue     = null;
-                
+
                 // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
                 final int separator = fullPathID.indexOf('#');
                 if (separator != -1) {
@@ -318,16 +318,17 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                     }
                     LOGGER.finer("pathID              : " + pathID               + '\n' +
                                  "conditionalAttribute: " + conditionalAttribute + '\n' +
-                                 "conditionalValue    : " + conditionalValue); 
+                                 "conditionalValue    : " + conditionalValue);
                 } else {
                     pathID = fullPathID;
                 }
-                
+
                 if (conditionalAttribute == null) {
                     final Object brutValue   = ReflectionUtilities.getValuesFromPath(pathID, metadata);
                     final List<Object> value = getStringValue(brutValue);
-                    if (value != null && !value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE)))
+                    if (value != null && !value.isEmpty() && !value.equals(Arrays.asList(NULL_VALUE))) {
                         response.addAll(value);
+                    }
                 } else {
                     final Object brutValue   = ReflectionUtilities.getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata);
                     final List<Object> value = getStringValue(brutValue);
@@ -339,7 +340,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             response.add(NULL_VALUE);
         } else {
             // we remove the last ','
-            //response.delete(response.length() - 1, response.length()); 
+            //response.delete(response.length() - 1, response.length());
         }
         return response;
     }
@@ -348,7 +349,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     /**
      * Return a String value from the specified Object.
      * Let the number object as Number
-     * 
+     *
      * @param obj
      * @return
      */
@@ -383,7 +384,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             }
         } else if (obj instanceof org.opengis.util.CodeList) {
             result.add(((org.opengis.util.CodeList)obj).name());
-        
+
         } else if (obj instanceof Position) {
             final Position pos = (Position) obj;
             final Date d = pos.getDate();
@@ -408,13 +409,13 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             synchronized (LUCENE_DATE_FORMAT){
                 result.add(LUCENE_DATE_FORMAT.format((Date)obj));
             }
-            
+
         } else {
             throw new IllegalArgumentException("this type is unexpected: " + obj.getClass().getSimpleName());
         }
         return result;
     }
-    
+
     @Override
     public void destroy() {
         LOGGER.info("shutting down generic indexer");

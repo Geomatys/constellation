@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.namespace.QName;
-import org.constellation.configuration.AcknowlegementType;
 import org.constellation.sos.ws.soap.SOService;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.*;
@@ -359,4 +358,86 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
 
         assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
      }
+
+
+    @Test
+    public void testDescribeRecords() throws Exception {
+
+
+        /**
+         * Dublin core
+         */
+        URL getCapsUrl = new URL(getDefaultURL() + "service=CSW&request=DescribeRecord&version=2.0.2&typename=csw:Record");
+
+        // Try to marshall something from the response returned by the server.
+        Object obj = unmarshallResponse(getCapsUrl);
+        assertTrue("was:" + obj.getClass(), obj instanceof DescribeRecordResponseType);
+        DescribeRecordResponseType result = (DescribeRecordResponseType) obj;
+        assertEquals(result.getSchemaComponent().size(), 1);
+        assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), "http://www.opengis.net/cat/csw/2.0.2");
+
+
+        getCapsUrl = new URL(getDefaultURL() + "service=CSW&request=DescribeRecord&version=2.0.2&typename=csw:Record&namespace=xmlns(csw=http://www.opengis.net/cat/csw/2.0.2)");
+
+        // Try to marshall something from the response returned by the server.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue("was:" + obj.getClass(), obj instanceof DescribeRecordResponseType);
+        result = (DescribeRecordResponseType) obj;
+        assertEquals(result.getSchemaComponent().size(), 1);
+        assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), "http://www.opengis.net/cat/csw/2.0.2");
+
+        getCapsUrl = new URL(getDefaultURL() + "service=CSW&request=DescribeRecord&version=2.0.2&typename=csw:Record&namespace=xmlns(csw=http://www.opengis.net/cat/csw/3.8)");
+
+        // Try to marshall something from the response returned by the server.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue("was:" + obj.getClass(), obj instanceof DescribeRecordResponseType);
+        result = (DescribeRecordResponseType) obj;
+        assertEquals(result.getSchemaComponent().size(), 0);
+
+
+        /**
+         * GMD
+         */
+        getCapsUrl = new URL(getDefaultURL() + "service=CSW&request=DescribeRecord&version=2.0.2&typename=gmd:MD_Metadata");
+
+        // Try to marshall something from the response returned by the server.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue("was:" + obj.getClass(), obj instanceof DescribeRecordResponseType);
+        result = (DescribeRecordResponseType) obj;
+        assertEquals(result.getSchemaComponent().size(), 1);
+        assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), "http://www.isotc211.org/2005/gmd");
+
+        getCapsUrl = new URL(getDefaultURL() + "service=CSW&request=DescribeRecord&version=2.0.2&typename=gmd:MD_Metadata&namespace=xmlns(gmd=http://www.isotc211.org/2005/gmd)");
+
+        // Try to marshall something from the response returned by the server.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue("was:" + obj.getClass(), obj instanceof DescribeRecordResponseType);
+        result = (DescribeRecordResponseType) obj;
+        assertEquals(result.getSchemaComponent().size(), 1);
+        assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), "http://www.isotc211.org/2005/gmd");
+
+        getCapsUrl = new URL(getDefaultURL() + "service=CSW&request=DescribeRecord&version=2.0.2&typename=gmd:MD_Metadata&namespace=xmlns(csw=http://www.isotc211.org/2005/wrong)");
+
+        // Try to marshall something from the response returned by the server.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue("was:" + obj.getClass(), obj instanceof DescribeRecordResponseType);
+        result = (DescribeRecordResponseType) obj;
+        assertEquals(result.getSchemaComponent().size(), 0);
+
+
+        /**
+         * ALL
+         */
+        getCapsUrl = new URL(getDefaultURL() + "service=CSW&request=DescribeRecord&version=2.0.2");
+
+        // Try to marshall something from the response returned by the server.
+        obj = unmarshallResponse(getCapsUrl);
+        result = (DescribeRecordResponseType) obj;
+        assertEquals(result.getSchemaComponent().size(), 4);
+        assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), "http://www.opengis.net/cat/csw/2.0.2");
+        assertEquals(result.getSchemaComponent().get(1).getTargetNamespace(), "http://www.isotc211.org/2005/gmd");
+        assertEquals(result.getSchemaComponent().get(2).getTargetNamespace(), "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
+        assertEquals(result.getSchemaComponent().get(3).getTargetNamespace(), "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
+
+    }
 }
