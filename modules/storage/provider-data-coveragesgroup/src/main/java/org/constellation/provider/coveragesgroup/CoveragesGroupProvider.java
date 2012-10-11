@@ -109,12 +109,14 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
                             new org.geotoolkit.providers.xml.StyleReference(ms.getName());
                     final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
                             new org.geotoolkit.providers.xml.DataReference(id), styleRef);
+                    ml.setOpacity(fml.getOpacity());
                     finalMapItem.getMapItems().add(ml);
                 } else if (mapItem instanceof CoverageMapLayer) {
                     final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
                     final String id = cml.getCoverageReference().getName().getLocalPart();
                     final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
                             new org.geotoolkit.providers.xml.DataReference(id), (org.geotoolkit.providers.xml.StyleReference)null);
+                    ml.setOpacity(cml.getOpacity());
                     finalMapItem.getMapItems().add(ml);
                 } else {
                     visitMapItem(mapItem, finalMapItem);
