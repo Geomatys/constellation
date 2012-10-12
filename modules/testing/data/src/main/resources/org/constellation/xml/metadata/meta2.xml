@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco" 
-                 xmlns:gmd="http://www.isotc211.org/2005/gmd" 
-                 xmlns:fra="http://www.cnig.gouv.fr/2005/fra" 
+<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco"
+                 xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                 xmlns:fra="http://www.cnig.gouv.fr/2005/fra"
                  xmlns:gmx="http://www.isotc211.org/2005/gmx"
-                 xmlns:xlink="http://www.w3.org/1999/xlink" 
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
                  xmlns:gml="http://www.opengis.net/gml">
     <gmd:fileIdentifier>
         <gco:CharacterString>42292_9s_19900610041000</gco:CharacterString>
@@ -257,7 +257,7 @@
                     <gmd:date>
                         <gmd:CI_Date>
                             <gmd:date>
-                                <gco:Date>1970-02-04</gco:Date>
+                                <gco:Date>1970-02-04T03:04:26+02:00</gco:Date>
                             </gmd:date>
                             <gmd:dateType>
                                 <gmd:CI_DateTypeCode codeList="http://schemas.opengis.net/iso/19139/20070417/resources/Codelist/gmxCodelists.xml#CI_DateTypeCode" codeListValue="creation" codeSpace="eng">Creation</gmd:CI_DateTypeCode>
