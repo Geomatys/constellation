@@ -57,6 +57,7 @@ import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -96,6 +97,12 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             final ServerFactory factory = ServerFinder.getFactoryById(serviceType);
             final ParameterValueGroup params = factory.getParametersDescriptor().createValue();
             params.parameter("url").setValue(new URL(url));
+            params.parameter("security").setValue(cstl.getClientSecurity());
+            try {
+                params.parameter("post").setValue(true);
+            } catch(ParameterNotFoundException ex) {
+                // do nothing if the parameters does not exist
+            }
             final Server server = factory.create(params);
             display(server);
         } catch (MalformedURLException ex) {
