@@ -22,6 +22,8 @@ import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.document.NumericField;
 import java.util.Map.Entry;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,8 +52,10 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
     protected static final String NULL_VALUE = "null";
 
+    protected static final DateFormat LUCENE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss");
+
     private final Map<String, List<String>> additionalQueryable;
-    
+
     /**
      * Build a new CSW metadata indexer.
      *
@@ -70,7 +74,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
     /**
      * Build a new CSW metadata indexer, with the specified lucene analyzer.
-     * 
+     *
      * @param serviceID The identifier, if there is one, of the index/service.
      * @param configDirectory The directory where the files of the index will be stored.
      * @param analyzer A lucene analyzer used in text values indexation (default is ClassicAnalyzer).
@@ -96,7 +100,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         // make a new, empty document
         final Document doc = new Document();
         doc.add(new Field("docid", docId + "", Field.Store.YES, Field.Index.NOT_ANALYZED));
-         
+
         indexSpecialField(metadata, doc);
 
         final StringBuilder anyText     = new StringBuilder();
@@ -142,7 +146,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
     /**
      * Remove the mapping of the specified Queryable set if it is overridden by one in the additional Queryable set.
-     * 
+     *
      * @param queryableSet
      */
     private Map<String, List<String>> removeOverridenField(Map<String, List<String>> queryableSet) {
@@ -154,14 +158,14 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         }
         return result;
     }
-    
+
     /**
      * Index the values for the specified Field
-     * 
+     *
      * @param values
      * @param fieldName
      * @param anyText
-     * @param doc 
+     * @param doc
      */
     protected void indexFields(final List<Object> values, final String fieldName, final StringBuilder anyText, final Document doc) {
         for (Object value : values) {
@@ -174,15 +178,15 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             }
         }
     }
-    
+
     /**
      * Index a single String field.
      * Add this value to the anyText builder if its not equals to "null".
-     * 
+     *
      * @param fieldName
      * @param stringValue
      * @param anyText
-     * @param doc 
+     * @param doc
      */
     protected void indexField(final String fieldName, final String stringValue, final StringBuilder anyText, final Document doc) {
         final Field field        = new Field(fieldName, stringValue, Field.Store.YES, Field.Index.ANALYZED);
@@ -193,16 +197,16 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         doc.add(field);
         doc.add(fieldSort);
     }
-    
+
     /**
      * Inex a numeric field.
-     * 
+     *
      * @param fieldName
      * @param numValue
-     * @param doc 
+     * @param doc
      */
     protected void indexNumericField(final String fieldName, final Number numValue, final Document doc) {
-         
+
         final NumericField numField     = new NumericField(fieldName, NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
         final NumericField numSortField = new NumericField(fieldName + "_sort", NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
         final Character fieldType;
@@ -231,7 +235,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         doc.add(numField);
         doc.add(numSortField);
     }
-    
+
     /**
      * Add the specifics implementation field to the document.
      *
@@ -292,7 +296,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
      /**
       * Extract the double coordinate from a metadata object using a list of paths to find the data.
-      * 
+      *
       * @param metadata The metadata to spatially index.
       * @param paths A list of paths where to find the information within the metadata.
       * @return A list of Double coordinates.
@@ -318,12 +322,12 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
     /**
      * Extract some values from a metadata object using  the list of paths.
-     * 
+     *
      * @param meta The object to index.
      * @param paths A list of paths where to find the information within the metadata.
      *
      * @Deprecated
-     * 
+     *
      * @return A String containing one or more informations (comma separated) find in the metadata.
      * @throws IndexingException
      */

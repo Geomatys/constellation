@@ -217,7 +217,7 @@ public class FilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602\" 30000101]");
+        assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602000000\" 30000101000000]");
 
         /**
          * Test 6: a simple Filter PropertyIsGreaterThan
@@ -243,7 +243,7 @@ public class FilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:{\"20070602\" 30000101}");
+        assertEquals(spaQuery.getQuery(), "CreationDate:{\"20070602000000\" 30000101000000}");
 
         /**
          * Test 7: a simple Filter PropertyIsLessThan
@@ -269,7 +269,7 @@ public class FilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:{00000101 \"20070602\"}");
+        assertEquals(spaQuery.getQuery(), "CreationDate:{00000101000000 \"20070602000000\"}");
 
 
          /**
@@ -296,7 +296,7 @@ public class FilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:[00000101 \"20070602\"]");
+        assertEquals(spaQuery.getQuery(), "CreationDate:[00000101000000 \"20070602000000\"]");
 
 
         /**
@@ -328,7 +328,7 @@ public class FilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602\" 30000101]CreationDate:[00000101 \"20070604\"]");
+        assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602000000\" 30000101000000]CreationDate:[00000101000000 \"20070604000000\"]");
 
          /**
          * Test 10: a simple empty Filter
@@ -404,7 +404,7 @@ public class FilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:\"20070602\"");
+        assertEquals(spaQuery.getQuery(), "CreationDate:\"20070602000000\"");
 
         /**
          * Test 2: a simple Filter PropertyIsLike on a Date field
@@ -683,7 +683,7 @@ public class FilterParserTest {
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602\" 30000101]");
+        assertEquals(spaQuery.getQuery(), "CreationDate:[\"20070602000000\" 30000101000000]");
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.NOT);
 
         pool.release(filterUnmarshaller);

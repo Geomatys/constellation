@@ -19,8 +19,6 @@ package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -70,8 +68,6 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * The Reader of this lucene index (generic DB mode).
      */
     private final MetadataReader reader;
-
-    private static final DateFormat LUCENE_DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
     /**
      * Shared Thread Pool for parallel execution

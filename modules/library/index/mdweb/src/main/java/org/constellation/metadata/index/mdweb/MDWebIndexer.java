@@ -19,7 +19,13 @@ package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
@@ -38,6 +44,7 @@ import static org.constellation.metadata.CSWQueryable.*;
 
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 
 // MDweb dependencies
 import org.mdweb.model.schemas.Classe;
@@ -275,7 +282,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
                     final List<Value> values = getValuesFromPathID(fullPathID, record);
                     for (final Value v: values) {
                         //only handle textvalue
-                        if (!(v instanceof TextValue)) continue;
+                        if (!(v instanceof TextValue)) {continue;}
 
                         final TextValue tv = (TextValue) v;
                         try  {
@@ -306,7 +313,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
                     final List<Value> values = getValuesFromPathID(fullPathID, record);
                     for (final Value v: values) {
                         //only handle textvalue
-                        if (!(v instanceof TextValue)) continue;
+                        if (!(v instanceof TextValue)) {continue;}
 
                         final TextValue tv = (TextValue) v;
                         try {
@@ -431,11 +438,9 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
      */
     private String toLuceneDateSyntax(String value) {
         if (value != null) {
-            value = value.replaceAll("-", "");
-
-            // TODO use time
-            if (value.indexOf('T') != -1) {
-                value = value.substring(0, value.indexOf('T'));
+            final Date d = TemporalUtilities.parseDateSafe(value, true);
+            synchronized (LUCENE_DATE_FORMAT) {
+                value = LUCENE_DATE_FORMAT.format(d);
             }
         }
         return value;

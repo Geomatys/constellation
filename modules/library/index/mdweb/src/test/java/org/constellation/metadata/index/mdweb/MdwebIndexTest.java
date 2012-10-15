@@ -572,7 +572,7 @@ public class MdwebIndexTest {
         /**
          * Test 1 date search: date after 25/01/2009
          */
-        SpatialQuery spatialQuery = new SpatialQuery("date:{\"20090125\" 30000101}", nullFilter, SerialChainFilter.AND);
+        SpatialQuery spatialQuery = new SpatialQuery("date:{\"20090125000000\" 30000101000000}", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result) {
@@ -592,7 +592,7 @@ public class MdwebIndexTest {
         /**
          * Test 2 date search: TempExtent_begin before 01/01/1985
          */
-        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101 \"19850101\"}", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("TempExtent_begin:{00000101000000 \"19850101000000\"}", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result) {
@@ -611,7 +611,7 @@ public class MdwebIndexTest {
         /**
          * Test 3 date search: TempExtent_end after 01/01/1991
          */
-        spatialQuery = new SpatialQuery("TempExtent_end:{\"19910101\" 30000101}", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("TempExtent_end:{\"19910101000000\" 30000101000000}", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result) {
@@ -630,7 +630,7 @@ public class MdwebIndexTest {
         /**
          * Test 4 date search: date = 26/01/2009
          */
-        spatialQuery = new SpatialQuery("date:\"20090126\"", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("date:\"20090126122224\"", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result) {
@@ -641,15 +641,15 @@ public class MdwebIndexTest {
 
         expectedResult = new LinkedHashSet<String>();
         expectedResult.add("11325_158_19640418141800");
-        expectedResult.add("39727_22_19750113062500");
-        expectedResult.add("42292_9s_19900610041000");
+        //expectedResult.add("39727_22_19750113062500"); exclude since date time is handled
+        //expectedResult.add("42292_9s_19900610041000"); exclude since date time is handled
 
         assertEquals(expectedResult, result);
 
         /**
          * Test 5 date search: date LIKE 26/01/200*
          */
-        spatialQuery = new SpatialQuery("date:(200*0126)", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("date:(200*0126*)", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result) {
@@ -669,7 +669,7 @@ public class MdwebIndexTest {
         /**
          * Test 6 date search: CreationDate between 01/01/1800 and 01/01/2000
          */
-        spatialQuery = new SpatialQuery("CreationDate:[18000101  30000101]CreationDate:[00000101 20000101]", nullFilter, SerialChainFilter.AND);
+        spatialQuery = new SpatialQuery("CreationDate:[18000101000000  30000101000000]CreationDate:[00000101000000 20000101000000]", nullFilter, SerialChainFilter.AND);
         result = indexSearcher.doSearch(spatialQuery);
 
         for (String s: result) {
@@ -684,6 +684,22 @@ public class MdwebIndexTest {
 
         assertEquals(expectedResult, result);
 
+        /**
+         * Test 7 date time search: CreationDate after 1970-02-04T06:00:00
+         */
+        spatialQuery = new SpatialQuery("CreationDate:[19700204060000  30000101000000]", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        LOGGER.log(Level.FINER, "DateSearch 7:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<String>();
+        expectedResult.add("42292_5p_19900609195600");
+
+        assertEquals(expectedResult, result);
 
     }
 

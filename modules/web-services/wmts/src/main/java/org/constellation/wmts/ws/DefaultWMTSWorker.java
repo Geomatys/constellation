@@ -214,12 +214,14 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 final Layer configlayer = declaredLayers.get(n);
                 final Object origin = details.getOrigin();
                 if(!(origin instanceof CoverageReference)){
-                    //WMTS only handle CoverageRefenrece object
+                    //WMTS only handle CoverageReference object
+                    LOGGER.log(Level.INFO, "Layer {0} has not a coverageReference origin. It will not be included in capabilities", n.getLocalPart());
                     continue;
                 }
                 final CoverageReference ref = (CoverageReference) origin;
                 if(!(ref instanceof PyramidalModel)){
                     //WMTS only handle PyramidalModel
+                    LOGGER.log(Level.INFO, "Layer {0} has not a PyramidalModel origin. It will not be included in capabilities", n.getLocalPart());
                     continue;
                 }
 
