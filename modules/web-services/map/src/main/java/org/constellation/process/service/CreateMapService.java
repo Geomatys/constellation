@@ -22,6 +22,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.WMSPortrayal;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.process.service.CreateMapServiceDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.*;
@@ -100,6 +101,7 @@ public class CreateMapService extends AbstractProcess {
         boolean createConfig = true;
         if (instanceDirectory.exists()) {
             configurationFile = new File(instanceDirectory, "layerContext.xml");
+            final File portrayalFile = new File(instanceDirectory, "WMSPortrayal.xml");
             
             //get configuration if aleady exist.
             if (configurationFile.exists()) {
@@ -118,6 +120,24 @@ public class CreateMapService extends AbstractProcess {
                 } finally {
                     if (unmarshaller != null) {
                         GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
+                    }
+                }
+            }
+            
+            if (serviceName.equalsIgnoreCase("WMS")) {
+                //create default portrayal file if not exist ONLY for WMS services
+                if (!portrayalFile.exists()) {
+                    Marshaller marshaller = null;
+                    try {
+                        marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                        marshaller.marshal(new WMSPortrayal(), portrayalFile);
+
+                    } catch (JAXBException ex) {
+                        throw new ProcessException(null, this, ex);
+                    } finally {
+                        if (marshaller != null) {
+                            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
+                        }
                     }
                 }
             }

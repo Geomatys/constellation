@@ -16,7 +16,6 @@
  */
 package org.constellation.process.service;
 
-import org.constellation.process.service.CreateMapServiceDescriptor;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.AbstractMapServiceTest;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -61,7 +59,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
     }
 
     @Test
-    public void testCreateWMSWithContext() throws ProcessException, NoSuchIdentifierException {
+    public void testCreateMapServiceWithContext() throws ProcessException, NoSuchIdentifierException {
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 
@@ -86,7 +84,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
     }
     
     @Test
-    public void testGetWMSWithContext() throws ProcessException, NoSuchIdentifierException {
+    public void testGetMapServiceWithContext() throws ProcessException, NoSuchIdentifierException {
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateMapServiceDescriptor.NAME);
 

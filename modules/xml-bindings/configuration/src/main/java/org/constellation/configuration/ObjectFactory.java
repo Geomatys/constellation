@@ -143,6 +143,17 @@ public class ObjectFactory {
         return new WebdavContext();
     }
     
+    public TextDecoration createTextDecoration() {
+        return new TextDecoration();
+    }
+    
+    public GridDecoration createGridDecoration() {
+        return new GridDecoration();
+    }
+    
+    public WMSPortrayal createWMSMapPortrayal() {
+        return new WMSPortrayal();
+    }
     
     @XmlElementDecl(namespace = "http://www.geotoolkit.org/parameter", name = "source")
     public JAXBElement<Object> createSource(Object value) {

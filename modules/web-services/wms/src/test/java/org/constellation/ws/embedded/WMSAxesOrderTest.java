@@ -30,7 +30,7 @@ import javax.imageio.spi.ImageWriterSpi;
 // Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.map.ws.WMSMapDecoration;
+import org.constellation.configuration.WMSPortrayal;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
@@ -160,7 +160,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
 
 
         WorldFileImageReader.Spi.registerDefaults(null);
-        WMSMapDecoration.setEmptyExtension(true);
+        WMSPortrayal.setEmptyExtension(true);
 
         //reset values, only allow pure java readers
         for(String jn : ImageIO.getReaderFormatNames()){

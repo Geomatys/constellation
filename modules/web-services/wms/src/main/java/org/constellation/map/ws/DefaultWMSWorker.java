@@ -46,6 +46,7 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
 import org.constellation.Cstl;
@@ -69,6 +70,8 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
 import static org.constellation.api.CommonConstants.*;
+import org.constellation.configuration.WMSPortrayal;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import static org.constellation.query.wms.WMSQuery.*;
 
 //Geotoolkit dependencies
@@ -198,11 +201,29 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     private final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE =
             Collections.synchronizedMap(new HashMap<String,AbstractWMSCapabilities>());
 
-    private final WMSMapDecoration mapDecoration;
+    private WMSPortrayal mapPortrayal;
 
     public DefaultWMSWorker(String id, File configurationDirectory) {
         super(id, configurationDirectory, ServiceDef.Specification.WMS);
-        mapDecoration = new WMSMapDecoration(configurationDirectory);
+        
+        mapPortrayal = new WMSPortrayal();
+        
+        final File portrayalFile = new File(configurationDirectory, "WMSPortrayal.xml");
+        if (portrayalFile.exists()) {
+            final MarshallerPool marshallerPool = GenericDatabaseMarshallerPool.getInstance();
+            Unmarshaller unmarchaller = null;
+            try {
+                unmarchaller = marshallerPool.acquireUnmarshaller();
+                mapPortrayal = (WMSPortrayal) unmarchaller.unmarshal(portrayalFile);
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            } finally {
+                if (unmarchaller != null) {
+                    marshallerPool.release(unmarchaller);
+                }
+            }
+        }
+        
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);
         }
@@ -761,7 +782,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return null;
         }
         org.geotoolkit.wms.xml.v111.OnlineResource or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
-        final LegendTemplate lt = mapDecoration.getDefaultLegendTemplate();
+        final LegendTemplate lt = mapPortrayal.getDefaultLegendTemplate();
         final Dimension dimension;
         try {
             dimension = layerDetails.getPreferredLegendSize(lt, ms);
@@ -894,7 +915,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return null;
         }
         org.geotoolkit.wms.xml.v130.OnlineResource or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
-        final LegendTemplate lt = mapDecoration.getDefaultLegendTemplate();
+        final LegendTemplate lt = mapPortrayal.getDefaultLegendTemplate();
         final Dimension dimension;
         try {
             dimension = layerDetails.getPreferredLegendSize(lt, ms);
@@ -1143,7 +1164,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     ms = null;
                 }
             }
-            image = layer.getLegendGraphic(dims, mapDecoration.getDefaultLegendTemplate(), ms, rule, scale);
+            image = layer.getLegendGraphic(dims, mapPortrayal.getDefaultLegendTemplate(), ms, rule, scale);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex);
         }
@@ -1202,8 +1223,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final Map<String, Object> params = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
         final SceneDef sdef = new SceneDef();
-        sdef.extensions().add(mapDecoration.getExtension());
-        final Hints hints = mapDecoration.getHints();
+        sdef.extensions().add(mapPortrayal.getExtension());
+        final Hints hints = mapPortrayal.getHints();
         if (hints != null) {
             /*
              * HACK we set anti-aliasing to false for gif
@@ -1277,7 +1298,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         // 4. IMAGE
         final String mime = getMap.getFormat();
-        final OutputDef odef = mapDecoration.getOutputDef(mime);
+        final OutputDef odef = mapPortrayal.getOutputDef(mime);
 
         try {
             //force longitude first
@@ -1290,7 +1311,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         final PortrayalResponse response = new PortrayalResponse(cdef, sdef, vdef, odef);
 
-        if(!mapDecoration.writeInStream()){
+        if(!mapPortrayal.isCoverageWriter()){
             try {
                 response.prepareNow();
             } catch (PortrayalException ex) {
