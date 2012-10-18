@@ -1283,7 +1283,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final CoordinateReferenceSystem crs;
         if (srsName != null) {
             try {
-                crs = CRS.decode(srsName, true);
+                crs = CRS.decode(srsName, false);
                 //todo use other properties to filter properly
             } catch (NoSuchAuthorityCodeException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);

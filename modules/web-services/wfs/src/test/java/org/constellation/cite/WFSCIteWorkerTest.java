@@ -129,9 +129,9 @@ public class WFSCIteWorkerTest {
 
         List<QueryType> queries = new ArrayList<QueryType>();
         List<PointPropertyType> points = new ArrayList<PointPropertyType>();
-        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(70.83, 29.86))));
-        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(68.87, 31.08))));
-        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(71.96, 32.19))));
+        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(29.86, 70.83))));
+        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(31.08, 68.87))));
+        points.add(new PointPropertyType(new PointType(null, new GeneralDirectPosition(32.19, 71.96))));
 
         EqualsType equals = new EqualsType("http://cite.opengeospatial.org/gmlsf:multiPointProperty", new MultiPointType("urn:x-ogc:def:crs:EPSG:4326", points));
         FilterType f = new FilterType(equals);

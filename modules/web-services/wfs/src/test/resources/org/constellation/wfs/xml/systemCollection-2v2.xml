@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:sml="http://www.opengis.net/sml/1.0">
     <gml:boundedBy>
-        <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
-            <gml:lowerCorner>65300.0 1731368.0</gml:lowerCorner>
-            <gml:upperCorner>67300.0 1851848.0</gml:upperCorner>
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326">
+            <gml:lowerCorner>42.387988622819975 -4.244083878356522</gml:lowerCorner>
+            <gml:upperCorner>43.46788242438395 -4.14498462789604</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
     <gml:featureMember>
@@ -17,8 +17,8 @@
                 </sml:KeywordList>
             </sml:keywords>
             <sml:location>
-                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <ns3:pos srsDimension="2" srsName="EPSG:27582">65400.0 1731368.0</ns3:pos>
+                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <ns3:pos srsDimension="2" srsName="EPSG:4326">42.387988622819975 -4.14498462789604</ns3:pos>
                 </ns3:Point>
             </sml:location>
             <sml:phenomenons>time</sml:phenomenons>
@@ -37,8 +37,8 @@
                 </sml:KeywordList>
             </sml:keywords>
             <sml:location>
-                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <ns3:pos srsDimension="2" srsName="EPSG:27582">67300.0 1851848.0</ns3:pos>
+                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <ns3:pos srsDimension="2" srsName="EPSG:4326">43.46788242438395 -4.244083878356522</ns3:pos>
                 </ns3:Point>
             </sml:location>
             <sml:phenomenons>time</sml:phenomenons>
@@ -57,8 +57,8 @@
                 </sml:KeywordList>
             </sml:keywords>
             <sml:location>
-                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <ns3:pos srsDimension="2" srsName="EPSG:27582">65300.0 1741257.0</ns3:pos>
+                <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <ns3:pos srsDimension="2" srsName="EPSG:4326">42.47639603324944 -4.156073981277588</ns3:pos>
                 </ns3:Point>
             </sml:location>
             <sml:phenomenons>time</sml:phenomenons>

@@ -31,25 +31,22 @@ import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-
-import org.constellation.wfs.ws.WFSWorker;
-import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.shapefile.ShapeFileProviderService;
-import org.constellation.util.Util;
-import org.constellation.ws.CstlServiceException;
-
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.test.CstlDOMComparator;
 import org.constellation.util.QNameComparator;
+import org.constellation.util.Util;
+import org.constellation.wfs.ws.DefaultWFSWorker;
+import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
-
+import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.om.OMDataStoreFactory;
@@ -70,54 +67,22 @@ import org.geotoolkit.ogc.xml.v200.SortByType;
 import org.geotoolkit.ogc.xml.v200.SortOrderType;
 import org.geotoolkit.ogc.xml.v200.SortPropertyType;
 import org.geotoolkit.ogc.xml.v200.SpatialOpsType;
-import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.wfs.xml.WFSMarshallerPool;
-import org.geotoolkit.wfs.xml.AllSomeType;
-import org.geotoolkit.wfs.xml.StoredQueryDescription;
-import org.geotoolkit.wfs.xml.StoredQueries;
-import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
-import org.geotoolkit.wfs.xml.v200.StoredQueryListItemType;
-import org.geotoolkit.wfs.xml.v200.ListStoredQueriesResponseType;
-import org.geotoolkit.wfs.xml.v200.ListStoredQueriesType;
-import org.geotoolkit.wfs.xml.v200.UpdateActionType;
-import org.geotoolkit.wfs.xml.v200.ValueReference;
-import org.geotoolkit.wfs.xml.v200.PropertyName;
-import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
-import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
-import org.geotoolkit.wfs.xml.v200.ParameterExpressionType;
-import org.geotoolkit.wfs.xml.v200.DeleteType;
-import org.geotoolkit.wfs.xml.v200.DescribeFeatureTypeType;
-import org.geotoolkit.wfs.xml.v200.FeatureCollectionType;
-import org.geotoolkit.wfs.xml.v200.GetFeatureType;
-import org.geotoolkit.wfs.xml.v200.InsertType;
-import org.geotoolkit.wfs.xml.v200.PropertyType;
-import org.geotoolkit.wfs.xml.v200.QueryType;
-import org.geotoolkit.wfs.xml.ResultTypeType;
-import org.geotoolkit.wfs.xml.v200.TransactionResponseType;
-import org.geotoolkit.wfs.xml.TransactionResponse;
-import org.geotoolkit.wfs.xml.v200.TransactionSummaryType;
-import org.geotoolkit.wfs.xml.v200.TransactionType;
-import org.geotoolkit.wfs.xml.v200.UpdateType;
-import org.geotoolkit.wfs.xml.WFSCapabilities;
-import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.v200.*;
 import org.geotoolkit.wfs.xml.v200.Title;
+import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
-
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
-
-// JUnit dependencies
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
@@ -825,7 +790,7 @@ public class WFS2WorkerTest {
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
 
-        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1v2.xml"));
+        String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
         domCompare(expectedResult, writer.toString());
@@ -849,7 +814,7 @@ public class WFS2WorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-
+        
         expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
 
@@ -1697,7 +1662,7 @@ public class WFS2WorkerTest {
 
             @Override
             public void saveConfiguration(String serviceName, ParameterValueGroup params) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                //throw new UnsupportedOperationException("Not supported yet.");
             }
         };
 
