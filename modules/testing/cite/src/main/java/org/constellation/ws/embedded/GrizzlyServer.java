@@ -29,7 +29,7 @@ import javax.imageio.ImageIO;
 
 // Constellation dependencies
 import org.constellation.data.CoverageSQLTestCase;
-import org.constellation.map.ws.WMSMapDecoration;
+import org.constellation.configuration.WMSPortrayal;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.Configurator;
@@ -96,7 +96,7 @@ public final class GrizzlyServer {
         CoverageSQLTestCase.init();
 
         WorldFileImageReader.Spi.registerDefaults(null);
-        WMSMapDecoration.setEmptyExtension(true);
+        WMSPortrayal.setEmptyExtension(true);
 
         // Extracts the zip data into a temporary folder
         final File outputDir = initDataDirectory();
