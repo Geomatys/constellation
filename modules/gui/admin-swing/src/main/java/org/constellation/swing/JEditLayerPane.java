@@ -19,6 +19,7 @@ package org.constellation.swing;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -298,6 +299,11 @@ public class JEditLayerPane extends javax.swing.JPanel {
                 layerModel.getLayer().setStyles(new ArrayList<String>());
             }
             if (!layerModel.getLayer().getStyles().contains(style)) {
+                //TODO handle multi style with the default one.
+                //remove old style and add the new one
+                
+                //currently new style replace the old one
+                layerModel.getLayer().getStyles().clear();
                 layerModel.getLayer().getStyles().add(style);
             }
         }
