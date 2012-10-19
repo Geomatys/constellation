@@ -103,7 +103,7 @@ public class SetConfigMapService extends AbstractProcess {
                 marshaller.marshal(configuration, configurationFile);
 
             } catch (JAXBException ex) {
-                throw new ProcessException(null, this, ex);
+                throw new ProcessException(ex.getMessage(), this, ex);
             } finally {
                 if (marshaller != null) {
                     GenericDatabaseMarshallerPool.getInstance().release(marshaller);

@@ -127,7 +127,7 @@ public final class RestartService extends AbstractCstlProcess {
                             throw new ProcessException("The instance " + identifier + " can be started, maybe there is no configuration directory with this name.", this, null);
                         }
                     } catch (IllegalArgumentException ex) {
-                        throw new ProcessException(null, this, ex);
+                        throw new ProcessException(ex.getMessage(), this, ex);
                     }
                 }
             } else {
@@ -156,7 +156,7 @@ public final class RestartService extends AbstractCstlProcess {
                                 throw new ProcessException("The instance " + instanceID + " can be started, maybe there is no configuration directory with this name.", this, null);
                             }
                         } catch (IllegalArgumentException ex) {
-                            throw new ProcessException(null, this, ex);
+                            throw new ProcessException(ex.getMessage(), this, ex);
                         }
                     }
                 } else {

@@ -314,7 +314,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         //set the current updateSequence parameter
         final boolean returnUS = returnUpdateSequenceDocument(getCapab.getUpdateSequence());
         if (returnUS) {
-            throw new CstlServiceException("th update sequence paramter is equal to the current", CURRENT_UPDATE_SEQUENCE, "updateSequence");
+            throw new CstlServiceException("the update sequence paramter is equal to the current", CURRENT_UPDATE_SEQUENCE, "updateSequence");
         }
 
         //Build the list of layers

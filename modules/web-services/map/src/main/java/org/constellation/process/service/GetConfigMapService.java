@@ -103,7 +103,7 @@ public class GetConfigMapService extends AbstractProcess {
                         throw new ProcessException("The layerContext.xml file does not contain a LayerContext object", this, null);
                     }
                 } catch (JAXBException ex) {
-                    throw new ProcessException(null, this, ex);
+                    throw new ProcessException(ex.getMessage(), this, ex);
                 } finally {
                     if (unmarshaller != null) {
                         GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
