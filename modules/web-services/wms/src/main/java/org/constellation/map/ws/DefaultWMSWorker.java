@@ -460,7 +460,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
             }
 
-            if (nativeEnv != null) {
+            if (nativeEnv != null && nativeEnv.getCoordinateReferenceSystem() != null) {
                 final CoordinateReferenceSystem crs = nativeEnv.getCoordinateReferenceSystem();
                 final CoordinateSystem cs = crs.getCoordinateSystem();
 
@@ -841,9 +841,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 } else {
                     ms = StyleProviderProxy.getInstance().getByIdentifier(styl);
                 }
-
-                final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
-                styles.add(wmsStyle);
+                if (ms != null) {
+                    final org.geotoolkit.wms.xml.v130.Style wmsStyle = convertMutableStyleToWmsStyle130(ms, layerDetails, legendUrlPng, legendUrlGif);
+                    styles.add(wmsStyle);
+                }
             }
             if (!styles.isEmpty()) {
                 outputLayer130.setStyle(styles);
