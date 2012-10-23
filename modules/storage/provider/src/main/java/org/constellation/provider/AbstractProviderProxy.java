@@ -30,6 +30,8 @@ import java.util.logging.Level;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.util.NullArgumentException;
+import org.geotoolkit.util.Utilities;
+import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -150,10 +152,34 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
      */
     @Override
     public V get(K key) {
+        final List<V> candidates = new ArrayList<V>();
+        
         for(final Provider<K,V> provider : getProviders()){
             final V layer = provider.get(key);
-            if(layer != null) return layer;
+            if(layer != null) candidates.add(layer);
         }
+        
+        if(candidates.size() == 1){
+            return candidates.get(0);
+        }else if(candidates.size()>1){
+            if(LayerDetails.class.isAssignableFrom(getValueClass())){
+                //make a more accurate search testing both namespace and local part are the same.
+                final Name nk = (Name) key;
+                for(int i=0;i<candidates.size();i++){
+                    final LayerDetails ld = (LayerDetails) candidates.get(i);
+                    if(   Utilities.equals(ld.getName().getNamespaceURI(),nk.getNamespaceURI())
+                       && Utilities.equals(ld.getName().getLocalPart(),nk.getLocalPart())){
+                        return (V)ld;
+                    }
+                }
+                
+                //we could not find one more accurate then another
+                return candidates.get(0);
+            }else{
+                return candidates.get(0);
+            }
+        }
+        
         return null;
     }
 
