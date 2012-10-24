@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.logging.Level;
 
 // Apache Lucene dependencies
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.queryParser.QueryParser.Operator;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser.Operator;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Query;
@@ -84,7 +84,7 @@ public class LuceneObservationSearcher extends LuceneIndexSearcher {
             final long start = System.currentTimeMillis();
             final List<ObservationResult> results = new ArrayList<ObservationResult>();
 
-            int maxRecords = searcher.maxDoc();
+            int maxRecords = (int) searcher.collectionStatistics("id").maxDoc();
             if (maxRecords == 0) {
                 LOGGER.severe("The index seems to be empty.");
                 maxRecords = 1;

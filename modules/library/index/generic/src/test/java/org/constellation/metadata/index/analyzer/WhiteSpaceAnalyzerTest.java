@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 // Lucene dependencies
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
@@ -431,7 +431,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
          * Test 1 sorted search: all orderBy identifier ASC
          */
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        SortField sf = new SortField("identifier_sort", SortField.STRING, false);
+        SortField sf = new SortField("identifier_sort", SortField.Type.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
         Set<String> result = indexSearcher.doSearch(spatialQuery);
@@ -458,7 +458,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("identifier_sort", SortField.STRING, true);
+        sf = new SortField("identifier_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
@@ -485,7 +485,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("Abstract_sort", SortField.STRING, false);
+        sf = new SortField("Abstract_sort", SortField.Type.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
@@ -512,7 +512,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("Abstract_sort", SortField.STRING, true);
+        sf = new SortField("Abstract_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);

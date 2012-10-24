@@ -20,7 +20,6 @@ package org.constellation.metadata.index.mdweb;
 // J2SE dependencies
 import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
-import org.mdweb.model.storage.TextValue;
 import java.io.File;
 import java.sql.Connection;
 import java.util.*;
@@ -32,6 +31,7 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.io.Reader;
 import org.mdweb.model.storage.FullRecord;
 import org.mdweb.io.MD_IOFactory;
+import org.mdweb.model.storage.TextValue;
 
 // Constellation dependencies
 import org.constellation.util.Util;
@@ -718,7 +718,7 @@ public class MdwebIndexTest {
          * Test 1 sorted search: all orderBy identifier ASC
          */
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        SortField sf = new SortField("identifier_sort", SortField.STRING, false);
+        SortField sf = new SortField("identifier_sort", SortField.Type.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
         Set<String> result = indexSearcher.doSearch(spatialQuery);
@@ -752,7 +752,7 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("identifier_sort", SortField.STRING, true);
+        sf = new SortField("identifier_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
@@ -787,7 +787,7 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("Abstract_sort", SortField.STRING, false);
+        sf = new SortField("Abstract_sort", SortField.Type.STRING, false);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
@@ -822,7 +822,7 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("Abstract_sort", SortField.STRING, true);
+        sf = new SortField("Abstract_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
@@ -857,7 +857,7 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("CloudCover:[0 TO 2147483648]", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("CloudCover_sort", SortField.STRING, true);
+        sf = new SortField("CloudCover_sort", SortField.Type.STRING, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
@@ -883,7 +883,7 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("CloudCover:[0 TO 2147483648]", nullFilter, SerialChainFilter.AND);
-        sf = new SortField("CloudCover_sort", SortField.DOUBLE, true);
+        sf = new SortField("CloudCover_sort", SortField.Type.DOUBLE, true);
         spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);

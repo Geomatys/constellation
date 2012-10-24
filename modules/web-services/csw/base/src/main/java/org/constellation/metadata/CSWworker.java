@@ -882,14 +882,14 @@ public class CSWworker extends AbstractWorker {
                 final Character fieldType =  indexSearcher.getNumericFields().get(propertyName);
                 if (fieldType != null) {
                     switch (fieldType) {
-                        case 'd': sf = new SortField(propertyName, SortField.DOUBLE, desc);break;
-                        case 'i': sf = new SortField(propertyName, SortField.INT, desc);break;
-                        case 'f': sf = new SortField(propertyName, SortField.FLOAT, desc);break;
-                        case 'l': sf = new SortField(propertyName, SortField.LONG, desc);break;
-                        default : sf = new SortField(propertyName, SortField.STRING, desc);break;
+                        case 'd': sf = new SortField(propertyName, SortField.Type.DOUBLE, desc);break;
+                        case 'i': sf = new SortField(propertyName, SortField.Type.INT, desc);break;
+                        case 'f': sf = new SortField(propertyName, SortField.Type.FLOAT, desc);break;
+                        case 'l': sf = new SortField(propertyName, SortField.Type.LONG, desc);break;
+                        default : sf = new SortField(propertyName, SortField.Type.STRING, desc);break;
                     }
                 } else {
-                    sf = new SortField(propertyName, SortField.STRING, desc);
+                    sf = new SortField(propertyName, SortField.Type.STRING, desc);
                 }
 
                 final Sort sortFilter     = new Sort(sf);

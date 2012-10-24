@@ -18,8 +18,6 @@
 package org.constellation.metadata.index;
 
 // J2SE dependencies
-import org.apache.lucene.util.NumericUtils;
-import org.apache.lucene.document.NumericField;
 import java.util.Map.Entry;
 import java.io.File;
 import java.text.DateFormat;
@@ -34,7 +32,12 @@ import java.util.logging.Level;
 // Apache Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.DoubleField;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FloatField;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.StringField;
 
 // geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
@@ -207,26 +210,28 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      */
     protected void indexNumericField(final String fieldName, final Number numValue, final Document doc) {
 
-        final NumericField numField     = new NumericField(fieldName, NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
-        final NumericField numSortField = new NumericField(fieldName + "_sort", NumericUtils.PRECISION_STEP_DEFAULT, Field.Store.YES, true);
+        final Field numField;
+        final Field numSortField;
         final Character fieldType;
         if (numValue instanceof Integer) {
-            numField.setIntValue((Integer) numValue);
-            numSortField.setIntValue((Integer) numValue);
+            numField     = new IntField(fieldName,           (Integer) numValue, Field.Store.YES);
+            numSortField = new IntField(fieldName + "_sort", (Integer) numValue, Field.Store.YES);
             fieldType = 'i';
         } else if (numValue instanceof Double) {
-            numField.setDoubleValue((Double) numValue);
-            numSortField.setDoubleValue((Double) numValue);
+            numField     = new DoubleField(fieldName,           (Double) numValue, Field.Store.YES);
+            numSortField = new DoubleField(fieldName + "_sort", (Double) numValue, Field.Store.YES);
             fieldType = 'd';
         } else if (numValue instanceof Float) {
-            numField.setFloatValue((Float) numValue);
-            numSortField.setFloatValue((Float) numValue);
+            numField     = new FloatField(fieldName,           (Float) numValue, Field.Store.YES);
+            numSortField = new FloatField(fieldName + "_sort", (Float) numValue, Field.Store.YES);
             fieldType = 'f';
         } else if (numValue instanceof Long) {
-            numField.setLongValue((Long) numValue);
-            numSortField.setLongValue((Long) numValue);
+            numField     = new LongField(fieldName,           (Long) numValue, Field.Store.YES);
+            numSortField = new LongField(fieldName + "_sort", (Long) numValue, Field.Store.YES);
             fieldType = 'l';
         } else {
+            numField     = new StringField(fieldName,           numValue + "", Field.Store.YES);
+            numSortField = new StringField(fieldName + "_sort", numValue + "", Field.Store.YES);
             fieldType = 'u';
             LOGGER.log(Level.WARNING, "Unexpected Number type:{0}", numValue.getClass().getName());
         }
