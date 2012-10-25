@@ -498,6 +498,11 @@ public abstract class FilterParser {
                     crsName  = gmlEnvelope.getSrsName();
                     geometry = GeometrytoJTS.toJTS(gmlEnvelope);
                 }
+                
+                if (geometry != null) {
+                    final int srid = SRIDGenerator.toSRID(crsName, Version.V1);
+                    geometry.setSRID(srid);
+                }
 
                 if ("DWithin".equals(operator)) {
                     spatialfilter = wrap(FF.dwithin(GEOMETRY_PROPERTY,FF.literal(geometry),distance, units));
