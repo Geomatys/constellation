@@ -99,7 +99,7 @@ import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
 import org.geotoolkit.sld.MutableNamedStyle;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
@@ -1111,7 +1111,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             MutableStyle ms = null;
             // If a sld file is given, extracts the style from it.
             if (sld != null && !sld.isEmpty()) {
-                final XMLUtilities utils = new XMLUtilities();
+                final StyleXmlIO utils = new StyleXmlIO();
                 final MutableStyledLayerDescriptor mutableSLD;
 
                 try {
@@ -1420,7 +1420,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 final FeatureMapLayer fml = (FeatureMapLayer)layer;
                 final Layer layerContext = layersContext.get(fml.getCollection().getFeatureType().getName());
                 if (layerContext.getFilter() != null) {
-                    final XMLUtilities xmlUtil = new XMLUtilities();
+                    final StyleXmlIO xmlUtil = new StyleXmlIO();
                     Filter filterGt = Filter.INCLUDE;
                     try {
                         filterGt = xmlUtil.getTransformer110().visitFilter(layerContext.getFilter());

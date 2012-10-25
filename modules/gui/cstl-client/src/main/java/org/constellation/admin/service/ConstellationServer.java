@@ -64,7 +64,7 @@ import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -843,12 +843,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
             try {
                 final String url = getURLWithEndSlash() + "configuration?request="+REQUEST_DOWNLOAD_STYLE+"&id=" + id + "&styleName=" + styleName;
-                Object response = sendRequest(url, null, null, XMLUtilities.getJaxbContext110(), false);
+                Object response = sendRequest(url, null, null, StyleXmlIO.getJaxbContext110(), false);
 
                 if (response instanceof ExceptionReport) {
                     LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
                 } else {
-                    final XMLUtilities utils = new XMLUtilities();
+                    final StyleXmlIO utils = new StyleXmlIO();
                     return utils.readStyle(response, SymbologyEncoding.V_1_1_0);
                 }
             } catch (IOException ex) {
@@ -1304,14 +1304,14 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                         LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
                     }
                 } else if (request instanceof Style) {
-                    final XMLUtilities util = new XMLUtilities();
+                    final StyleXmlIO util = new StyleXmlIO();
                     try {
                         util.writeStyle(conec.getOutputStream(), (Style)request, StyledLayerDescriptor.V_1_1_0);
                     } catch (JAXBException ex) {
                         LOGGER.log(Level.WARNING, "unable to marshall the request", ex);
                     }
                 } else if (request instanceof org.opengis.sld.StyledLayerDescriptor) {
-                    final XMLUtilities util = new XMLUtilities();
+                    final StyleXmlIO util = new StyleXmlIO();
                     try {
                         util.writeSLD(conec.getOutputStream(),
                                 (org.opengis.sld.StyledLayerDescriptor)request, StyledLayerDescriptor.V_1_1_0);

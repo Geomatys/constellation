@@ -39,7 +39,7 @@ import org.constellation.util.DataReference;
 import org.geotoolkit.filter.text.cql2.CQL;
 import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.util.logging.Logging;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.opengis.filter.Filter;
@@ -139,7 +139,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
             if (layer.getFilter() != null) {
                 try {
                     final FilterType filterType = layer.getFilter();
-                    final XMLUtilities xmlUtils = new XMLUtilities();
+                    final StyleXmlIO xmlUtils = new StyleXmlIO();
                     final Filter filter = xmlUtils.getTransformer110().visitFilter(filterType);
                     guiFilterArea.setText(CQL.toCQL(filter));
                 } catch (FactoryException ex) {
@@ -313,7 +313,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
         if (cql != null && !cql.trim().isEmpty()) {
             FilterType filterType = null;
             final Filter filter = CQL.toFilter(cql);
-            final XMLUtilities xmlUtils = new XMLUtilities();
+            final StyleXmlIO xmlUtils = new StyleXmlIO();
             filterType = xmlUtils.getTransformerXMLv110().visit(filter);
             layerModel.getLayer().setFilter(filterType);
         } else {

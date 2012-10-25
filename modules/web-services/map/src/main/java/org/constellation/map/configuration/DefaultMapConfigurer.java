@@ -57,7 +57,7 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.converter.Classes;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
@@ -122,7 +122,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         if ( REQUEST_CREATE_STYLE.equalsIgnoreCase(request)
           || REQUEST_UPDATE_STYLE.equalsIgnoreCase(request)) {
 
-            final XMLUtilities util = new XMLUtilities();
+            final StyleXmlIO util = new StyleXmlIO();
             try {
                 return util.readStyle(stream, SymbologyEncoding.V_1_1_0);
             } catch (FactoryException ex) {

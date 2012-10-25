@@ -29,7 +29,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.sld.StyledLayerDescriptor;
@@ -59,7 +59,7 @@ public final class StyleResponseWriter implements MessageBodyWriter {
             MultivaluedMap mm, OutputStream out) throws IOException, WebApplicationException {
         
         
-        final XMLUtilities utils = new XMLUtilities();
+        final StyleXmlIO utils = new StyleXmlIO();
         
         try{
             if(r instanceof Style){

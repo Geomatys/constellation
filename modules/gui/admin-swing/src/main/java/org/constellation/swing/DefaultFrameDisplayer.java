@@ -50,8 +50,8 @@ import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.DefaultDescription;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.RandomStyleBuilder;
 import org.geotoolkit.style.StyleConstants;
-import org.geotoolkit.util.RandomStyleFactory;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
@@ -164,7 +164,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
 
                 for (Name name : dStore.getNames()) {
                     final FeatureCollection collection = storeSession.getFeatureCollection(QueryBuilder.all(name));
-                    final MutableStyle style = RandomStyleFactory.createDefaultVectorStyle(collection);
+                    final MutableStyle style = RandomStyleBuilder.createDefaultVectorStyle(collection.getFeatureType());
                     final MapLayer layer = MapBuilder.createFeatureLayer(collection, style);
                     layer.setName(name.toString());
                     layer.setDescription(new DefaultDescription(new SimpleInternationalString(name.toString()), null));
@@ -199,7 +199,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             final Session storeSession = ds.createSession(true);
             for (Name n : ds.getNames()) {
                 final FeatureCollection collection = storeSession.getFeatureCollection(QueryBuilder.all(n));
-                final MutableStyle style = RandomStyleFactory.createDefaultVectorStyle(collection);
+                final MutableStyle style = RandomStyleBuilder.createDefaultVectorStyle(collection.getFeatureType());
                 final FeatureMapLayer layer = MapBuilder.createFeatureLayer(collection, style);
                 layer.setName(n.toString());
                 layer.setDescription(new DefaultDescription(new SimpleInternationalString(n.toString()), null));

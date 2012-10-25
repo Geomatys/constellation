@@ -70,7 +70,7 @@ import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.IdentifiedObjects;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.accessor.Accessors;
@@ -867,7 +867,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     private List<SortBy> visitJaxbSortBy(final org.geotoolkit.ogc.xml.SortBy jaxbSortby,final Map<String, String> namespaceMapping, final String version) {
         if (jaxbSortby != null) {
-            final XMLUtilities util = new XMLUtilities();
+            final StyleXmlIO util = new StyleXmlIO();
             if ("2.0.0".equals(version)) {
                 return util.getTransformer200(namespaceMapping).visitSortBy((org.geotoolkit.ogc.xml.v200.SortByType)jaxbSortby);
             } else {
@@ -1254,7 +1254,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * @throws CstlServiceException
      */
     private Filter extractJAXBFilter(final Filter jaxbFilter, final Filter defaultFilter, final Map<String, String> namespaceMapping, final String currentVersion) throws CstlServiceException {
-        final XMLUtilities util = new XMLUtilities();
+        final StyleXmlIO util = new StyleXmlIO();
         final Filter filter;
         try {
             if (jaxbFilter != null) {

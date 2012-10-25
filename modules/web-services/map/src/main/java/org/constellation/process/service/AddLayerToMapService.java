@@ -39,7 +39,7 @@ import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.util.NoSuchIdentifierException;
@@ -105,7 +105,7 @@ public class AddLayerToMapService extends AbstractProcess {
         //add filter if exist
         if (layerFilter != null) {
             //convert filter int an FilterType
-            final XMLUtilities xmlUtilities = new XMLUtilities();
+            final StyleXmlIO xmlUtilities = new StyleXmlIO();
             final FilterType filterType = xmlUtilities.getTransformerXMLv110().visit(layerFilter);
             newLayer.setFilter(filterType);
         }
