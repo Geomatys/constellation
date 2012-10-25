@@ -20,7 +20,7 @@ package org.constellation.provider;
 import java.util.List;
 import java.util.Map;
 
-import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.map.FeatureMapLayer;
@@ -38,11 +38,11 @@ import org.opengis.feature.type.Name;
  */
 public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
 
-    public DefaultDataStoreLayerDetails(Name name, DataStore store, List<String> favorites){
+    public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites){
         this(name,store,favorites,null,null,null,null);
     }
 
-    public DefaultDataStoreLayerDetails(Name name, DataStore store, List<String> favorites,
+    public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         super(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
     }

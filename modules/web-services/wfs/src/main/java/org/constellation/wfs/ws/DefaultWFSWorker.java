@@ -52,9 +52,9 @@ import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.UnauthorizedException;
 import org.geotoolkit.util.logging.Logging;
-import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.storage.DataStoreException;
-import org.geotoolkit.data.DataUtilities;
+import org.geotoolkit.data.FeatureStoreUtilities;
 import org.geotoolkit.feature.SchemaException;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.data.FeatureCollection;
@@ -746,11 +746,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          */
         final FeatureCollection featureCollection;
 	if (collections.size() > 1) {
-            featureCollection = DataUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
+            featureCollection = FeatureStoreUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
         } else if (collections.size() == 1) {
             featureCollection = collections.get(0);
         } else {
-            featureCollection = DataUtilities.collection("collection-1", null);
+            featureCollection = FeatureStoreUtilities.collection("collection-1", null);
         }
         if (request.getResultType() == ResultTypeType.HITS) {
             return xmlFactory.buildFeatureCollection(currentVersion, "collection-1", featureCollection.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
@@ -851,11 +851,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
          */
         final FeatureCollection featureCollection;
 	if (collections.size() > 1) {
-            featureCollection = DataUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
+            featureCollection = FeatureStoreUtilities.sequence("collection-1", collections.toArray(new FeatureCollection[collections.size()]));
         } else if (collections.size() == 1) {
             featureCollection = collections.get(0);
         } else {
-            featureCollection = DataUtilities.collection("collection-1", null);
+            featureCollection = FeatureStoreUtilities.collection("collection-1", null);
         }
 
         LOGGER.log(logLevel, "GetPropertyValue request processed in {0} ms", (System.currentTimeMillis() - startTime));
@@ -959,7 +959,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                 ft = feat.getType();
                                 features.add(feat);
                             }
-                            final FeatureCollection collection = DataUtilities.collection(id, ft);
+                            final FeatureCollection collection = FeatureStoreUtilities.collection(id, ft);
                             collection.addAll(features);
                             featureObject = collection;
                         }
@@ -976,7 +976,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     if (featureObject instanceof Feature) {
                         final Feature feature = (Feature) featureObject;
                         typeName = feature.getType().getName();
-                        featureCollection = DataUtilities.collection(feature);
+                        featureCollection = FeatureStoreUtilities.collection(feature);
                     } else if (featureObject instanceof FeatureCollection) {
                         featureCollection = (FeatureCollection) featureObject;
                         typeName = ((FeatureCollection)featureCollection).getFeatureType().getName();
@@ -1354,7 +1354,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
      * Extract the WGS84 BBOx from a featureSource.
      * what ? may not be wgs84 exactly ? why is there a CRS attribute on a wgs84 bbox ?
      */
-    private static Object toBBox(final DataStore source, final Name groupName, final String version) throws CstlServiceException{
+    private static Object toBBox(final FeatureStore source, final Name groupName, final String version) throws CstlServiceException{
         try {
             Envelope env = source.getEnvelope(QueryBuilder.all(groupName));
             final CoordinateReferenceSystem epsg4326 = CRS.decode("urn:ogc:def:crs:OGC:2:84");

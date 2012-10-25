@@ -34,8 +34,8 @@ import org.geotoolkit.client.ServerFinder;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
-import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreFinder;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
@@ -157,7 +157,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
                 //datastore
             }
 
-            final DataStore dStore = DataStoreFinder.open(storeconfig);
+            final FeatureStore dStore = FeatureStoreFinder.open(storeconfig);
 
             if(dStore != null){
                 Session storeSession = dStore.createSession(true);
@@ -194,8 +194,8 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
                 context.layers().add(layer);
             }
 
-        } else if (candidate instanceof DataStore) {
-            final DataStore ds = (DataStore) candidate;
+        } else if (candidate instanceof FeatureStore) {
+            final FeatureStore ds = (FeatureStore) candidate;
             final Session storeSession = ds.createSession(true);
             for (Name n : ds.getNames()) {
                 final FeatureCollection collection = storeSession.getFeatureCollection(QueryBuilder.all(n));

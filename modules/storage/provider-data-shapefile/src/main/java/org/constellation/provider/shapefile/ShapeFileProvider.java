@@ -28,8 +28,8 @@ import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.DefaultDataStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
 
-import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreFinder;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.shapefile.ShapefileDataStoreFactory;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.util.collection.Cache;
@@ -70,7 +70,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
      * Keeps a link between the file name and the file.
      */
     private final Map<Name,File> index = new HashMap<Name,File>();
-    private final Map<Name,DataStore> cache = new Cache<Name, DataStore>(10, 10, true);
+    private final Map<Name,FeatureStore> cache = new Cache<Name, FeatureStore>(10, 10, true);
 
 
     protected ShapeFileProvider(final ShapeFileProviderService service,
@@ -94,7 +94,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
      */
     @Override
     public LayerDetails get(Name key) {
-        DataStore store = cache.get(key);
+        FeatureStore store = cache.get(key);
 
         if (store == null) {
             //datastore is not in the cache, try to load it
@@ -227,7 +227,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         }
     }
 
-    private static DataStore loadDataStore(final File f,String namespace) {
+    private static FeatureStore loadDataStore(final File f,String namespace) {
         if (f == null || !f.exists()) {
             return null;
         }
@@ -236,7 +236,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         try {
             params.parameter(URLP.getName().getCode()).setValue(f.toURI().toURL());
             params.parameter(NAMESPACE.getName().getCode()).setValue(namespace);
-            return DataStoreFinder.open(params);
+            return FeatureStoreFinder.open(params);
        } catch (DataStoreException ex) {
             getLogger().log(Level.WARNING, null, ex);
             return null;

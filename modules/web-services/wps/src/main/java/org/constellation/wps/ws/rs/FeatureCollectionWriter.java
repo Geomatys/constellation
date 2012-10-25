@@ -29,7 +29,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
-import org.geotoolkit.data.DataStoreRuntimeException;
+import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.data.FeatureCollection;
@@ -66,7 +66,7 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
             LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);
         } catch (DataStoreException ex) {
             LOGGER.log(Level.SEVERE, "DataStore exception while writing the feature collection", ex);
-        } catch (DataStoreRuntimeException ex) {
+        } catch (FeatureStoreRuntimeException ex) {
             LOGGER.log(Level.SEVERE, "DataStoreRuntimeException exception while writing the feature collection", ex);
         }
     }

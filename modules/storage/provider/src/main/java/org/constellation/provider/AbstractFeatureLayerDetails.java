@@ -29,7 +29,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.data.FeatureCollection;
@@ -73,18 +73,18 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      */
     protected static final int MARGIN = 4;
 
-    protected final DataStore store;
+    protected final FeatureStore store;
     protected final PropertyName dateStartField;
     protected final PropertyName dateEndField;
     protected final PropertyName elevationStartField;
     protected final PropertyName elevationEndField;
 
-    protected AbstractFeatureLayerDetails(Name name, DataStore store, List<String> favorites){
+    protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites){
         this(name,store,favorites,null,null,null,null);
 
     }
 
-    protected AbstractFeatureLayerDetails(Name name, DataStore store, List<String> favorites,
+    protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         super(name,favorites);
 
@@ -121,7 +121,7 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      * {@inheritDoc}
      */
     @Override
-    public DataStore getStore(){
+    public FeatureStore getStore(){
         return store;
     }
 

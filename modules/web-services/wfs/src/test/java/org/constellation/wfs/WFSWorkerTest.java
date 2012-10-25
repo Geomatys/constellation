@@ -43,7 +43,7 @@ import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.data.DataStoreRuntimeException;
+import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.om.OMDataStoreFactory;
 import org.geotoolkit.data.sml.SMLDataStoreFactory;
@@ -770,7 +770,7 @@ public class WFSWorkerTest {
             featureWriter.write((FeatureCollection)result,writer);
             String xmlResult = writer.toString();
             fail("Should have raised an error.");
-        } catch (DataStoreRuntimeException ex) {
+        } catch (FeatureStoreRuntimeException ex) {
             //ok
         }
 
@@ -793,7 +793,7 @@ public class WFSWorkerTest {
             featureWriter.write((FeatureCollection)result,writer);
             String xmlResult = writer.toString();
             fail("Should have raised an error.");
-        } catch (DataStoreRuntimeException ex) {
+        } catch (FeatureStoreRuntimeException ex) {
             //ok
         }
 
