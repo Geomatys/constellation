@@ -183,7 +183,7 @@ public final class GrizzlyServer {
                     // Defines a PostGis data provider
                     final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
                     final ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    srcconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs-2");
                     srcconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
                     srcconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
                     srcconfig.parameter(USER.getName().getCode()).setValue("test");
