@@ -53,13 +53,14 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
- * Edit a service.
+ * Edit a provider.
  *
  * @author Johann Sorel (geomatys)
  */
 public class JProviderEditPane extends javax.swing.JPanel {
 
     private static final ImageIcon ICON_EDIT =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceEditBlanc.png"));
+    private static final ImageIcon ICON_COPY =  new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/edit_copy.png"));
     private static final ImageIcon ICON_DELETE = new ImageIcon(JServicesPane.class.getResource("/org/constellation/swing/serviceCross.png"));
 
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/constellation/swing/Bundle");
@@ -118,6 +119,8 @@ public class JProviderEditPane extends javax.swing.JPanel {
         final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
         final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage("",
                 ICON_EDIT, Color.BLACK, fontNormal, Color.DARK_GRAY));
+        final ImageIcon copyIcon = new ImageIcon(JServicesPane.createImage("",
+                ICON_COPY, Color.BLACK, fontNormal, Color.DARK_GRAY));
         final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
                 ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
 
@@ -134,9 +137,33 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
                 }
             });
+            guiData.getColumn(1).setMaxWidth(40);
+            guiData.getColumn(1).setWidth(40);
+            guiData.getColumn(1).setPreferredWidth(40);
+            
+            guiData.getColumn(2).setCellRenderer(new ActionCell.Renderer(copyIcon));
+            guiData.getColumn(2).setCellEditor(new ActionCell.Editor(copyIcon) {
+                @Override
+                public void actionPerformed(final ActionEvent e, Object value) {
+                    final String styleName = (String) value;
+                    final MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
+                    final String newName = styleName+"(copy)";
+                    style.setName(newName);
+                    server.providers.createStyle(providerReport.getId(), newName, style);
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateDataModel();
+                        }
+                    });
+                }
+            });
+            guiData.getColumn(2).setMaxWidth(40);
+            guiData.getColumn(2).setWidth(40);
+            guiData.getColumn(2).setPreferredWidth(40);
 
-            guiData.getColumn(2).setCellRenderer(new ActionCell.Renderer(deleteIcon));
-            guiData.getColumn(2).setCellEditor(new ActionCell.Editor(deleteIcon) {
+            guiData.getColumn(3).setCellRenderer(new ActionCell.Renderer(deleteIcon));
+            guiData.getColumn(3).setCellEditor(new ActionCell.Editor(deleteIcon) {
                 @Override
                 public void actionPerformed(final ActionEvent e, Object value) {
                     final String styleName = (String) value;
@@ -149,6 +176,9 @@ public class JProviderEditPane extends javax.swing.JPanel {
                     });
                 }
             });
+            guiData.getColumn(3).setMaxWidth(40);
+            guiData.getColumn(3).setWidth(40);
+            guiData.getColumn(3).setPreferredWidth(40);
         }
 
         guiData.setTableHeader(null);
@@ -451,7 +481,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
         @Override
         public int getColumnCount() {
-            return (styleType)? 3 : 1;
+            return (styleType)? 4 : 1;
         }
 
         @Override
