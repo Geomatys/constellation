@@ -75,6 +75,8 @@ import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 
 import static org.constellation.api.QueryConstants.*;
+import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.util.StringUtilities;
 
 /**
  * convenient class to perform actions on constellation web services.
@@ -1279,6 +1281,31 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     protected Object sendRequest(String sourceURL, Object request, ParameterDescriptorGroup descriptor,
             MarshallerPool unmarshallerPool, boolean put) throws MalformedURLException, IOException {
 
+        //fix possible not correctly encoded url parameters.
+        final int index = sourceURL.indexOf('?');
+        if(index > 0){
+            String params = sourceURL.substring(index+1);
+            final StringBuilder sb = new StringBuilder();
+            final String[] parts = params.split("&");
+            for(int i=0;i<parts.length;i++){
+                String part = parts[i];
+                final int sepi = part.indexOf('=');
+                if(sepi>0){
+                    sb.append(URLEncoder.encode(part.substring(0,sepi),"UTF-8"));
+                    sb.append('=');
+                    sb.append(URLEncoder.encode(part.substring(sepi+1),"UTF-8"));
+                    
+                }else{
+                    part = URLEncoder.encode(part,"UTF-8");
+                    sb.append(part);
+                }
+                
+                if(i<parts.length-1) { sb.append('&'); }
+            }
+            params = sb.toString();            
+            sourceURL = sourceURL.substring(0, index+1) + params;
+        }
+        
         final URL source = new URL(sourceURL);
         final HttpURLConnection conec = (HttpURLConnection) source.openConnection();
         getClientSecurity().secure(conec);
