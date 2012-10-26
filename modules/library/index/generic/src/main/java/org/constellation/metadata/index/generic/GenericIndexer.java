@@ -239,7 +239,14 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                      if (stringValue.endsWith("z") || stringValue.endsWith("Z")) {
                          stringValue = stringValue.substring(0, stringValue.length() - 1);
                      }
-                     value = stringValue.replace("-", "");
+                     if (stringValue != null) {
+                        stringValue = stringValue.replace("-", "");
+                        //add time if there is no
+                        if (stringValue.length() == 8) {
+                            stringValue = stringValue + "000000";
+                        }
+                        value = stringValue;
+                     }
                  }
                 newValues.add(value);
              }
