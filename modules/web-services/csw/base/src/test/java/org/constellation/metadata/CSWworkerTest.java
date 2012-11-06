@@ -478,7 +478,7 @@ public class CSWworkerTest {
 
         RegistryPackageType expRpResult =  ((JAXBElement<RegistryPackageType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim3.xml"))).getValue();
 
-        assertEquals(expRpResult, rpResult);
+        ebrimEquals(expRpResult, rpResult);
 
         pool.release(unmarshaller);
     }

@@ -134,6 +134,20 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         } else if (!dataDirectory.exists()) {
             dataDirectory.mkdir();
         }
+        if (configuration.getEnableThread() != null && !configuration.getEnableThread().isEmpty()) {
+            final boolean t = Boolean.parseBoolean(configuration.getEnableThread());
+            if (t) {
+                LOGGER.info("parrallele treatment enabled");
+            }
+            setIsThreadEnabled(t);
+        }
+        if (configuration.getEnableCache() != null && !configuration.getEnableCache().isEmpty()) {
+            final boolean c = Boolean.parseBoolean(configuration.getEnableCache());
+            if (!c) {
+                LOGGER.info("cache system have been disabled");
+            }
+            setIsCacheEnabled(c);
+        }
     }
 
     /**
@@ -149,7 +163,14 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        Object obj = getObjectFromFile(identifier);
+        //we look for cached object
+        Object obj = null;
+        if (isCacheEnabled()) {
+            obj = getFromCache(identifier);
+        }
+        if (obj == null) {
+            obj = getObjectFromFile(identifier);
+        }
         if (obj instanceof DefaultMetadata && mode == DUBLINCORE) {
             obj = translateISOtoDC((DefaultMetadata)obj, type, elementName);
         } else if (obj instanceof RecordType && mode == DUBLINCORE) {
@@ -357,8 +378,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 customRecord.setSimpleBoundingBox(bboxes);
             }
 
-            if (type != null && type.equals(ElementSetType.BRIEF))
+            if (type != null && type.equals(ElementSetType.BRIEF)) {
                 return new BriefRecordType(identifier, title, dataType, bboxes);
+            }
 
             /*
              *  SUMMARY part
@@ -425,8 +447,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             }
 
 
-            if (type != null && type.equals(ElementSetType.SUMMARY))
+            if (type != null && type.equals(ElementSetType.SUMMARY)) {
                 return new SummaryRecordType(identifier, title, dataType, bboxes, subjects, formats, modified, abstractt);
+            }
 
             final SimpleLiteral date    = modified;
             if (elementName != null && elementName.contains(_Date_QNAME)) {
@@ -442,7 +465,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                     }
                 }
             }
-            if (creator.isEmpty()) creator = null;
+            if (creator.isEmpty()) {creator = null;}
             
             if (elementName != null && elementName.contains(_Creator_QNAME)) {
                 customRecord.setCreator(creator);

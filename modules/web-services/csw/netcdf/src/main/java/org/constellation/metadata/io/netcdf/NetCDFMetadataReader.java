@@ -136,6 +136,20 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         } else {
             usePathAsIdentifier = false;
         }
+        if (configuration.getEnableThread() != null && !configuration.getEnableThread().isEmpty()) {
+            final boolean t = Boolean.parseBoolean(configuration.getEnableThread());
+            if (t) {
+                LOGGER.info("parrallele treatment enabled");
+            }
+            setIsThreadEnabled(t);
+        }
+        if (configuration.getEnableCache() != null && !configuration.getEnableCache().isEmpty()) {
+            final boolean c = Boolean.parseBoolean(configuration.getEnableCache());
+            if (!c) {
+                LOGGER.info("cache system have been disabled");
+            }
+            setIsCacheEnabled(c);
+        }
     }
 
     /**
@@ -151,7 +165,13 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
      */
     @Override
     public Object getMetadata(final String identifier, final int mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        Object obj = getObjectFromFile(identifier);
+        Object obj = null;
+        if (isCacheEnabled()) {
+            obj = getFromCache(identifier);
+        }
+        if (obj == null) {
+            obj = getObjectFromFile(identifier);
+        }
         if (obj instanceof DefaultMetadata && mode == DUBLINCORE) {
             obj = translateISOtoDC((DefaultMetadata)obj, type, elementName);
         } else if (obj instanceof RecordType && mode == DUBLINCORE) {
