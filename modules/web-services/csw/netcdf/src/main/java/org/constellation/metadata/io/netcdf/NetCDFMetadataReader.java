@@ -122,7 +122,10 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
         if (dataDirectory == null) {
             throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
         } else if (!dataDirectory.exists()) {
-            dataDirectory.mkdir();
+            boolean created = dataDirectory.mkdir();
+            if (!created) {
+                throw new MetadataIoException("cause: unable to create the unexisting data directory:" + dataDirectory.getPath(), NO_APPLICABLE_CODE);
+            }
         }
         final String extension = configuration.getParameter("netcdfExtension");
         if (extension != null) {
