@@ -81,7 +81,7 @@ public final class ReflectionUtilities {
         } catch (IllegalArgumentException ex) {//TODO: this cannot possibly happen.
             LOGGER.log(Level.WARNING, "Illegal Argument in empty constructor for class: {0}", classe.getName());
         } catch (InvocationTargetException ex) {
-            LOGGER.log(Level.WARNING, "Invocation Target Exception in empty constructor for class: {0}", classe.getName());
+            LOGGER.log(Level.WARNING, "Invocation Target Exception in empty constructor for class: {0}" + classe.getName(), ex);
         } catch (NoSuchMethodException ex) {
             LOGGER.log(Level.WARNING, "There is no empty constructor for class: {0}", classe.getName());
         } catch (SecurityException ex) {
@@ -127,7 +127,7 @@ public final class ReflectionUtilities {
         } catch (IllegalArgumentException ex) {//TODO: this cannot possibly happen.
             LOGGER.log(Level.WARNING, "Illegal Argument in constructor for class: {0}", classe.getName());
         } catch (InvocationTargetException ex) {
-            LOGGER.log(Level.WARNING, "Invocation Target Exception in empty constructor for class: {0}", classe.getName());
+            LOGGER.log(Level.WARNING, "Invocation Target Exception in empty constructor for class: "+ classe.getName(), ex);
         } catch (NoSuchMethodException ex) {
             LOGGER.log(Level.WARNING, "There is no such constructor for class: {0}", classe.getName());
         } catch (SecurityException ex) {

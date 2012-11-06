@@ -128,7 +128,7 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
         }
 
         final String title = getName().getLocalPart();
-        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, title);
+        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, 0, style, title);
         mapLayer.setDescription(STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style

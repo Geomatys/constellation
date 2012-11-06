@@ -147,7 +147,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
                             //a dim range is define, it replace any given style.
                             final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
                             style = STYLE_FACTORY.style(symbol);
-                            return MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
+                            return MapBuilder.createCoverageLayer(reader, 0, style, getName().getLocalPart());
                         }
                         break;
                     }
@@ -169,7 +169,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
         }
 
         final String title = getName().getLocalPart();
-        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, title);
+        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, 0, style, title);
         mapLayer.setDescription(STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style
