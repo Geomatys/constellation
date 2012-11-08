@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -377,10 +378,14 @@ public abstract class GenericReader  {
         
         //we extract the single values
         for (String sql : subStmts) {
+            String phase = "connecting";
             try {
                 final Connection connection  = datasource.getConnection();
+                phase = "preparing";
                 final PreparedStatement stmt = connection.prepareStatement(sql);
+                phase = "filling params";
                 fillStatement(stmt, parameters);
+                phase = "executing";
                 fillValues(stmt, sql, statements.get(sql), values);
                 stmt.close();
                 connection.close();
@@ -395,9 +400,9 @@ public abstract class GenericReader  {
                     LOGGER.log(Level.WARNING, "detected a connection lost:{0}", ex.getMessage());
                     reloadConnection();
                 }
-                logError(statements.get(sql), ex, sql);
+                logError(phase, statements.get(sql), ex, sql);
             } catch (IllegalArgumentException ex) {
-                logError(statements.get(sql), ex, sql);
+                logError(phase, statements.get(sql), ex, sql);
             }
         }
         return values;
@@ -449,6 +454,13 @@ public abstract class GenericReader  {
                     stmt.setInt(i, id);
                 } catch(NumberFormatException ex) {
                     LOGGER.log(Level.SEVERE, "unable to parse the int parameter:{0}", parameter);
+                }
+            } else if (type == java.sql.Types.TIMESTAMP) {
+                try {
+                    final Timestamp ts = Timestamp.valueOf(parameter);
+                    stmt.setTimestamp(i, ts);
+                } catch(IllegalArgumentException ex) {
+                    LOGGER.log(Level.SEVERE, "unable to parse the timestamp parameter:{0}", parameter);
                 }
             } else  {
                 stmt.setString(i, parameter);
@@ -508,7 +520,7 @@ public abstract class GenericReader  {
      * @param varList a list of variable.
      * @param ex
      */
-    private void logError(final List<String> varList, final Exception ex, final String sql) {
+    private void logError(final String phase, final List<String> varList, final Exception ex, final String sql) {
         final StringBuilder varlist = new StringBuilder();
         final String value;
         final int code;
@@ -536,6 +548,7 @@ public abstract class GenericReader  {
         }
         final StringBuilder sb = new StringBuilder(ex.getClass().getSimpleName());
         sb.append(" occurs while executing query: \nQuery: ").append(sql);
+        sb.append("\nPhase: ").append(phase);
         sb.append("\nCause: ").append(ex.getMessage());
         sb.append("\nCode: ").append(code);
         sb.append("\nSQLState : ").append(state);
