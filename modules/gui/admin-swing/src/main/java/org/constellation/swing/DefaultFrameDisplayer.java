@@ -103,7 +103,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
             } catch(ParameterNotFoundException ex) {
                 // do nothing if the parameters does not exist
             }
-            final Server server = factory.create(params);
+            final Server server = factory.open(params);
             display(server);
         } catch (MalformedURLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(),ex);

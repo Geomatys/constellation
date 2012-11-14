@@ -276,8 +276,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                             matrix.setMatrixHeight(mosaic.getGridSize().height);
                             matrix.setTileWidth(mosaic.getTileSize().width);
                             matrix.setTileHeight(mosaic.getTileSize().height);
-                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getX());
-                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getY());
+                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getOrdinate(0));
+                            matrix.getTopLeftCorner().add(mosaic.getUpperLeftCorner().getOrdinate(1));
                             tm.add(matrix);
                         }
                         tms.setTileMatrix(tm);
